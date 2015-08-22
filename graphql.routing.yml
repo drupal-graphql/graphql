@@ -1,0 +1,6 @@
+graphql.request:
+  path: '/graphql'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\RequestController::handleRequest'
+  requirements:
+    _permission: 'execute graphql requests'

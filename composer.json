@@ -1,0 +1,17 @@
+{
+  "name": "drupal/graphql",
+  "type": "drupal-module",
+  "description": "Drupal module for generating GraphQL schemas for content entity types.",
+  "homepage": "http://drupal.org/project/graphql",
+  "license": "GPL-2.0+",
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@bitbucket.org:fubhy/graphql-php.git"
+    }
+  ],
+  "require": {
+    "fubhy/graphql-php": "dev-master"
+  },
+  "minimum-stability": "dev"
+}

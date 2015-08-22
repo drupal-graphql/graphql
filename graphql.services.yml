@@ -1,0 +1,12 @@
+services:
+  graphql.graphql:
+    class: Fubhy\GraphQL\GraphQL
+  graphql.schema:
+    class: Drupal\graphql\SchemaProvider
+    tags:
+      - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
+  graphql.schema.entity:
+    class: Drupal\graphql\EntitySchemaProvider
+    arguments: ['@entity.manager', '@typed_data_manager']
+    tags:
+      - { name: graphql_schema_provider }
