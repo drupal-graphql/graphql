@@ -1,13 +1,13 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\graphql\SchemaProviderInterface.
+ */
+
 namespace Drupal\graphql;
 
 interface SchemaProviderInterface {
-    /**
-     * @return \Fubhy\GraphQL\Schema
-     */
-    public function getSchema();
-
     /**
      * @return array
      */

@@ -7,6 +7,20 @@ services:
       - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
   graphql.schema.entity:
     class: Drupal\graphql\EntitySchemaProvider
-    arguments: ['@entity.manager', '@typed_data_manager']
+    arguments: ['@entity.manager', '@graphql.field_schema']
     tags:
       - { name: graphql_schema_provider }
+  graphql.field_schema:
+    class: Drupal\graphql\Field\FieldSchemaProvider
+    tags:
+      - { name: service_collector, tag: graphql_field_schema_provider, call: addFieldSchemaProvider }
+  graphql.field_schema.default:
+    class: Drupal\graphql\Field\DefaultFieldSchemaProvider
+    arguments: ['@entity.manager']
+    tags:
+      - { name: graphql_field_schema_provider, priority: -100 }
+  graphql.field_schema.entity_reference:
+    class: Drupal\graphql\Field\EntityReferenceFieldSchemaProvider
+    arguments: ['@entity.manager']
+    tags:
+      - { name: graphql_field_schema_provider, priority: 0 }

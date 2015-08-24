@@ -10,6 +10,8 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\SchemaProviderInterface;
 use Fubhy\GraphQL\GraphQL;
+use Fubhy\GraphQL\Schema;
+use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,7 +76,12 @@ class RequestController implements ContainerInjectionInterface {
       throw new NotFoundHttpException();
     }
 
-    $result = $this->graphql->execute($this->schemaProvider->getSchema(), $query, null, $variables, $operation);
+    $schema =  new Schema(
+      new ObjectType('Query', $this->schemaProvider->getQuerySchema()),
+      new ObjectType('Mutation', $this->schemaProvider->getMutationSchema())
+    );
+
+    $result = $this->graphql->execute($schema, $query, null, $variables, $operation);
 
     return new Response(json_encode($result), 200, array('Content-Type' => $request->getMimeType('json')));
   }

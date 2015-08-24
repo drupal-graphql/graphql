@@ -1,24 +1,16 @@
 <?php
 
-namespace Drupal\graphql;
+/**
+ * @file
+ * Contains \Drupal\graphql\SchemaProviderBase.
+ */
 
-use Fubhy\GraphQL\Schema;
-use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
+namespace Drupal\graphql;
 
 /**
  * Abstract base class for schema providers.
  */
 abstract class SchemaProviderBase implements SchemaProviderInterface {
-  /**
-   * {@inheritdoc}
-   */
-  public function getSchema() {
-    return new Schema(
-        new ObjectType('Query', $this->getQuerySchema()),
-        new ObjectType('Mutation', $this->getMutationSchema())
-    );
-  }
-
   /**
    * {@inheritdoc}
    */
