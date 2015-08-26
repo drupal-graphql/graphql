@@ -123,7 +123,7 @@ class EntitySchemaProvider extends SchemaProviderBase implements EntitySchemaPro
 
     return [
       'type' => $this->getEntityTypeInterface($entity_type_id),
-      'name' => $entity_type->getLabel(),
+      'description' => $entity_type->getLabel(),
       'args' => [
         'id' => [
           'type' => Type::idType(),
@@ -140,11 +140,12 @@ class EntitySchemaProvider extends SchemaProviderBase implements EntitySchemaPro
    * @return array
    */
   protected function getEntityBundleSchema($entity_type_id, $bundle_name) {
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
     $bundle_info = $this->entityManager->getBundleInfo($entity_type_id);
 
     return [
       'type' => $this->getEntityBundleType($entity_type_id, $bundle_name),
-      'name' => $bundle_info[$bundle_name]['label'],
+      'description' => $entity_type->getLabel() . ': ' . $bundle_info[$bundle_name]['label'],
       'args' => [
         'id' => [
           'type' => Type::idType(),

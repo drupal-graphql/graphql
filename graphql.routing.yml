@@ -4,3 +4,9 @@ graphql.request:
     _controller: '\Drupal\graphql\Controller\RequestController::handleRequest'
   requirements:
     _permission: 'execute graphql requests'
+graphql.explorer:
+  path: '/graphql/explorer'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\ExplorerController::viewExplorer'
+  requirements:
+    _permission: 'use graphql explorer'

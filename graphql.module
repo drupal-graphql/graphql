@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function graphql_theme() {
+  return [
+    'page__graphql_explorer' => [
+      'render element' => 'elements',
+      'base hook' => 'block',
+    ],
+  ];
+}

@@ -10,6 +10,11 @@ services:
     arguments: ['@entity.manager', '@graphql.field_schema']
     tags:
       - { name: graphql_schema_provider }
+  graphql.schema.views:
+    class: Drupal\graphql\ViewsSchemaProvider
+    arguments: ['@entity.manager', '@graphql.schema.entity']
+    tags:
+      - { name: graphql_schema_provider }
   graphql.field_schema:
     class: Drupal\graphql\Field\FieldSchemaProvider
     tags:
@@ -24,3 +29,7 @@ services:
     arguments: ['@entity.manager']
     tags:
       - { name: graphql_field_schema_provider, priority: 0 }
+  graphql.page_display_variant_subscriber:
+    class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }

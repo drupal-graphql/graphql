@@ -68,17 +68,24 @@ class RequestController implements ContainerInjectionInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
   public function handleRequest(Request $request) {
-    $query = $request->query->has('query') ? $request->query->get('query') : $request->request->get('query');
-    $variables = $request->query->has('variables') ? $request->query->get('variables') : $request->request->get('variables', []);
-    $operation = $request->query->has('operation') ? $request->query->get('operation') : $request->request->get('operation');
+    $body = (array) json_decode($request->getContent()) + [
+      'query' => NULL,
+      'variables' => NULL,
+      'operation' => NULL,
+    ];
+
+    $query = $request->query->has('query') ? $request->query->get('query') : $body['query'];
+    $variables = $request->query->has('variables') ? $request->query->get('variables') : $body['variables'];
+    $operation = $request->query->has('operation') ? $request->query->get('operation') : $body['operation'];
 
     if (empty($query)) {
       throw new NotFoundHttpException();
     }
 
+    $mutation = $this->schemaProvider->getMutationSchema();
     $schema =  new Schema(
-      new ObjectType('Query', $this->schemaProvider->getQuerySchema()),
-      new ObjectType('Mutation', $this->schemaProvider->getMutationSchema())
+      new ObjectType('Root', $this->schemaProvider->getQuerySchema()),
+      $mutation ? new ObjectType('Mutation', $mutation) : NULL
     );
 
     $result = $this->graphql->execute($schema, $query, null, $variables, $operation);

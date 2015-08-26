@@ -1,3 +1,6 @@
 'execute graphql requests':
   title: 'Execute GraphQL requests'
   description: 'Allows users to execute GraphQL requests.'
+'use graphql explorer':
+  title: 'Use the GraphQL explorer'
+  description: 'Allows users to use the GraphiQL interface.'
