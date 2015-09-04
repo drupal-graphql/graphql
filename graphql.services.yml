@@ -1,34 +1,29 @@
 services:
   graphql.graphql:
     class: Fubhy\GraphQL\GraphQL
-  graphql.schema:
+  graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider
     tags:
       - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
-  graphql.schema.entity:
+  graphql.schema_provider.entity:
     class: Drupal\graphql\EntitySchemaProvider
-    arguments: ['@entity.manager', '@graphql.field_schema']
+    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver']
     tags:
       - { name: graphql_schema_provider }
-  graphql.schema.views:
+  graphql.schema_provider.views:
     class: Drupal\graphql\ViewsSchemaProvider
-    arguments: ['@entity.manager', '@graphql.schema.entity']
+    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver']
     tags:
       - { name: graphql_schema_provider }
-  graphql.field_schema:
-    class: Drupal\graphql\Field\FieldSchemaProvider
+  graphql.type_resolver:
+    class: Drupal\graphql\TypeResolver
     tags:
-      - { name: service_collector, tag: graphql_field_schema_provider, call: addFieldSchemaProvider }
-  graphql.field_schema.default:
-    class: Drupal\graphql\Field\DefaultFieldSchemaProvider
-    arguments: ['@entity.manager']
+      - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
+  graphql.type_resolver.typed_data:
+    class: Drupal\graphql\TypedDataTypeResolver
+    arguments: ['@entity.manager', '@typed_data_manager']
     tags:
-      - { name: graphql_field_schema_provider, priority: -100 }
-  graphql.field_schema.entity_reference:
-    class: Drupal\graphql\Field\EntityReferenceFieldSchemaProvider
-    arguments: ['@entity.manager']
-    tags:
-      - { name: graphql_field_schema_provider, priority: 0 }
+      - { name: graphql_type_resolver, priority: -100 }
   graphql.page_display_variant_subscriber:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:

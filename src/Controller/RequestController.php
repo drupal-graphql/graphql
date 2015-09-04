@@ -52,7 +52,7 @@ class RequestController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('graphql.graphql'),
-      $container->get('graphql.schema')
+      $container->get('graphql.schema_provider')
     );
   }
 

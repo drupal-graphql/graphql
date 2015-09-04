@@ -7,34 +7,55 @@
 
 namespace Drupal\graphql;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\views\ViewEntityInterface;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
 use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
+use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
 use Fubhy\GraphQL\Type\Definition\Types\Type;
 
 /**
- * Generates a GraphQL Schema for content entity types.
+ * Generates a GraphQL Schema for views.
  */
 class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderInterface {
-  protected $entityManager;
   /**
-   * @var EntitySchemaProviderInterface
+   * The entity manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
    */
-  protected $entitySchemaProvider;
+  protected $entityManager;
 
   /**
-   * Constructs a EntitySchemaProvider object.
+   * The type resolver service.
    *
-   * @param EntityManagerInterface $entityManager
-   *   The entity manager service.
-   * @param EntitySchemaProviderInterface $entitySchemaProvider
+   * @var \Drupal\graphql\TypeResolverInterface
    */
-  public function __construct(EntityManagerInterface $entityManager, EntitySchemaProviderInterface $entitySchemaProvider) {
+  protected $typeResolver;
+
+  /**
+   * The typed data manager service.
+   *
+   * @var \Drupal\Core\TypedData\TypedDataManager
+   */
+  private $typedDataManager;
+
+  /**
+   * Constructs a ViewsSchemaProvider object.
+   *
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   *   The entity manager service.
+   * @param TypedDataManager $typedDataManager
+   *   The typed data manager service.
+   * @param \Drupal\graphql\TypeResolverInterface $typeResolver
+   *   The type resolver service.
+   */
+  public function __construct(EntityManagerInterface $entityManager, TypedDataManager $typedDataManager, TypeResolverInterface $typeResolver) {
     $this->entityManager = $entityManager;
-    $this->entitySchemaProvider = $entitySchemaProvider;
+    $this->typeResolver = $typeResolver;
+    $this->typedDataManager = $typedDataManager;
   }
 
   /**
@@ -55,18 +76,17 @@ class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderIn
    * {@inheritdoc}
    */
   public function getQuerySchema() {
-    $schema = [];
+    $fields = [];
 
     $map = $this->getDataTableMap();
+    /** @var \Drupal\views\ViewEntityInterface $view */
     foreach ($this->entityManager->getStorage('view')->loadMultiple() as $view) {
       $base_table = $view->get('base_table');
       if (!isset($map[$base_table])) {
         continue;
       }
 
-      $view_id = $view->id();
-
-      /** @var \Drupal\views\ViewEntityInterface $view */
+      $displays = [];
       foreach ($view->get('display') as $display_id => $display) {
         if ($display['display_plugin'] !== 'graphql') {
           continue;
@@ -89,51 +109,49 @@ class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderIn
           return $carry;
         }, []);
 
-        $schema_key = $this->underscoreToCamelCase("view_{$view_id}_{$display_id}");
-        $schema[$schema_key] = [
-          'type' => new ListModifier($this->entitySchemaProvider->getEntityTypeInterface($map[$base_table])),
-          'resolve' => $this->getViewResolver($view_id, $display_id),
+        $definition = $this->typedDataManager->createDataDefinition("entity:{$map[$base_table]}");
+        $displays[$display_id] = [
+          'type' => new ListModifier($this->typeResolver->resolveRecursive($definition, FALSE)),
+          'resolve' => [__CLASS__, 'resolveDisplay'],
           'args' => array_merge($filters),
+        ];
+      }
+
+      if (!empty($displays)) {
+        $fields[$view->id()] = [
+          'type' => new ObjectType('View', $displays),
+          'resolve' => [__CLASS__, 'resolveView'],
         ];
       }
     }
 
-    return $schema;
+    return ['views' => [
+      'type' => new ObjectType('__ViewsRoot', $fields),
+      'resolve' => function () {
+        return $this->entityManager->getStorage('view');
+      }
+    ]];
   }
 
-  /**
-   * @param string $view_id
-   *
-   * @return callable
-   */
-  protected function getViewResolver($view_id, $display_id) {
-    return function ($source, array $args = []) use ($view_id, $display_id) {
-      if ($view = $this->entityManager->getStorage('view')->load($view_id)) {
-        /** @var \Drupal\views\ViewEntityInterface $view */
-        $executable = $view->getExecutable();
-        $executable->setDisplay($display_id);
-        $executable->setExposedInput(array_filter($args));
-        $executable->execute();
+  public static function resolveView($source, array $args = NULL, $root, Node $field) {
+    if ($source instanceof EntityStorageInterface) {
+      return $source->load($field->get('name')->get('value'));
+    }
+  }
 
-        $result = [];
-        foreach ($executable->result as $row) {
-          $result[$row->_entity->id()] = $row->_entity;
-        }
+  public static function resolveDisplay($source, array $args = NULL, $root, Node $field) {
+    if ($source instanceof ViewEntityInterface) {
+      $executable = $source->getExecutable();
+      $executable->setDisplay($field->get('name')->get('value'));
+      $executable->setExposedInput(array_filter($args));
+      $executable->execute();
 
-        return $result;
+      $result = [];
+      foreach ($executable->result as $row) {
+        $result[$row->_entity->id()] = $row->_entity->getTypedData();
       }
 
-      return [];
-    };
-  }
-
-  /**
-   * @param string $string
-   *
-   * @return string
-   */
-  protected function underscoreToCamelCase($string) {
-    $words = explode('_', strtolower($string));
-    return lcfirst(implode('', array_map('ucfirst', array_map('trim', $words))));
+      return $result;
+    }
   }
 }
