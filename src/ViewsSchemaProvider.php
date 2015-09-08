@@ -103,7 +103,7 @@ class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderIn
           $type = $filter['expose']['required'] ? new NonNullModifier($type) : $type;
 
           $carry[$filter['expose']['identifier']] = [
-            'type' => $type,
+              'type' => $type,
           ];
 
           return $carry;
@@ -111,25 +111,25 @@ class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderIn
 
         $definition = $this->typedDataManager->createDataDefinition("entity:{$map[$base_table]}");
         $displays[$display_id] = [
-          'type' => new ListModifier($this->typeResolver->resolveRecursive($definition, FALSE)),
-          'resolve' => [__CLASS__, 'resolveDisplay'],
-          'args' => array_merge($filters),
+            'type' => new ListModifier($this->typeResolver->resolveRecursive($definition, FALSE)),
+            'resolve' => [__CLASS__, 'resolveDisplay'],
+            'args' => array_merge($filters),
         ];
       }
 
       if (!empty($displays)) {
         $fields[$view->id()] = [
-          'type' => new ObjectType('View', $displays),
-          'resolve' => [__CLASS__, 'resolveView'],
+            'type' => new ObjectType($this->stringToName($view->id()), $displays),
+            'resolve' => [__CLASS__, 'resolveView'],
         ];
       }
     }
 
     return ['views' => [
-      'type' => new ObjectType('__ViewsRoot', $fields),
-      'resolve' => function () {
-        return $this->entityManager->getStorage('view');
-      }
+        'type' => new ObjectType('__ViewsRoot', $fields),
+        'resolve' => function () {
+          return $this->entityManager->getStorage('view');
+        }
     ]];
   }
 
@@ -153,5 +153,15 @@ class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderIn
 
       return $result;
     }
+  }
+
+  /**
+   * @param $string
+   *
+   * @return string
+   */
+  protected function stringToName($string) {
+    $words = preg_split('/[:\.\-_]/', strtolower($string));
+    return implode('', array_map('ucfirst', array_map('trim', $words)));
   }
 }
