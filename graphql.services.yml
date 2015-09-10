@@ -21,7 +21,7 @@ services:
       - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
   graphql.type_resolver.typed_data:
     class: Drupal\graphql\TypedDataTypeResolver
-    arguments: ['@entity.manager', '@typed_data_manager']
+    arguments: ['@entity.manager', '@typed_data_manager', '@renderer']
     tags:
       - { name: graphql_type_resolver, priority: -100 }
   graphql.page_display_variant_subscriber:

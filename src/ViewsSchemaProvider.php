@@ -125,12 +125,12 @@ class ViewsSchemaProvider extends SchemaProviderBase implements SchemaProviderIn
       }
     }
 
-    return ['views' => [
-        'type' => new ObjectType('__ViewsRoot', $fields),
-        'resolve' => function () {
-          return $this->entityManager->getStorage('view');
-        }
-    ]];
+    return !empty($fields) ? ['views' => [
+      'type' => new ObjectType('__ViewsRoot', $fields),
+      'resolve' => function () {
+        return $this->entityManager->getStorage('view');
+      }
+    ]] : [];
   }
 
   public static function resolveView($source, array $args = NULL, $root, Node $field) {

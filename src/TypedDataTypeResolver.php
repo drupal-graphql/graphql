@@ -9,9 +9,10 @@ namespace Drupal\graphql;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
@@ -24,6 +25,7 @@ use Drupal\Core\TypedData\Plugin\DataType\Language;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Fubhy\GraphQL\Language\Node;
+use Fubhy\GraphQL\Type\Definition\Types\EnumType;
 use Fubhy\GraphQL\Type\Definition\Types\InterfaceType;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
 use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
@@ -104,15 +106,21 @@ class TypedDataTypeResolver implements TypeResolverInterface {
    *
    * @todo Move property resolvers to dedicated tagged services for flexibility.
    */
-  public static function resolvePropertyValue($source, array $args = null, $root, Node $field) {
+  public static function resolvePropertyValue($source, array $args = NULL, $root, Node $field) {
     if (!($source instanceof TypedDataInterface)) {
       return NULL;
     }
 
     $key = $field->get('name')->get('value');
     $value = $source->get($key);
-    if ($value instanceof ListInterface || $value instanceof ComplexDataInterface) {
+    if ($value instanceof ComplexDataInterface) {
       return $value;
+    }
+
+    if ($value instanceof ListInterface) {
+      $offset = isset($args['offset']) ? $args['offset'] : 0;
+      $length = isset($args['length']) ? $args['length'] : NULL;
+      return array_slice(iterator_to_array($value), $offset, $length);
     }
 
     if ($value instanceof DataReferenceInterface) {
@@ -165,9 +173,10 @@ class TypedDataTypeResolver implements TypeResolverInterface {
    * @param TypedDataManager $typedDataManager
    *   The typed data manager service.
    */
-  public function __construct(EntityManagerInterface $entityManager, TypedDataManager $typedDataManager) {
+  public function __construct(EntityManagerInterface $entityManager, TypedDataManager $typedDataManager, RendererInterface $renderer) {
     $this->typedDataManager = $typedDataManager;
     $this->entityManager = $entityManager;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -261,8 +270,20 @@ class TypedDataTypeResolver implements TypeResolverInterface {
         return FALSE;
       }
 
+      $args = [];
+      if ($property instanceof ListDataDefinitionInterface) {
+        $args['offset'] = [
+          'type' => Type::intType(),
+        ];
+
+        $args['length'] = [
+          'type' => Type::intType(),
+        ];
+      }
+
       return [
         'type' => $type,
+        'args' => $args,
         'resolve' => [__CLASS__, 'resolvePropertyValue'],
       ];
     }, $definition->getPropertyDefinitions()));
@@ -287,7 +308,12 @@ class TypedDataTypeResolver implements TypeResolverInterface {
     $definition->setBundles([$bundle_name]);
 
     // No point in building a schema for an object without properties.
-    if ($fields = $this->getFieldsFromProperties($definition)) {
+    $fields = $this->getFieldsFromProperties($definition);
+    if ($rendered = $this->getRenderedEntityField($entity_type_id)) {
+      $fields['__rendered'] = $rendered;
+    }
+
+    if (!empty($fields)) {
       $interface = $this->getEntityTypeInterface($entity_type_id);
       $cache = new ObjectType($this->stringToName("entity:$entity_type_id:$bundle_name"), $fields, [$interface]);
     }
@@ -312,7 +338,12 @@ class TypedDataTypeResolver implements TypeResolverInterface {
     $definition = $this->typedDataManager->createDataDefinition("entity:$entity_type_id");
 
     // No point in building a schema for an object without properties.
-    if ($fields = $this->getFieldsFromProperties($definition)) {
+    $fields = $this->getFieldsFromProperties($definition);
+    if ($rendered = $this->getRenderedEntityField($entity_type_id)) {
+      $fields['__rendered'] = $rendered;
+    }
+
+    if (!empty($fields)) {
       $cache = new InterfaceType($this->stringToName("entity:$entity_type_id"), $fields, function ($source) {
         if ($source instanceof TypedDataInterface) {
           if (($entity = $source->getValue()) instanceof ContentEntityInterface) {
@@ -363,11 +394,75 @@ class TypedDataTypeResolver implements TypeResolverInterface {
     // Initialize the static cache entry.
     $cache = &$this->fieldItemTypes["field:item:$entity_type_id:$name"];
 
-    if ($fields = $this->getFieldsFromProperties($definition)) {
+    $fields = $this->getFieldsFromProperties($definition);
+    if ($rendered = $this->getRenderedFieldItemField($entity_type_id)) {
+      $fields['__rendered'] = $rendered;
+    }
+
+    if (!empty($fields)) {
       return $cache = new ObjectType($this->stringToName("field:item:$entity_type_id:$name"), $fields);
     }
 
     return $cache;
+  }
+
+  /**
+   * @param string $entity_type_id
+   *
+   * @return array|null
+   */
+  protected function getRenderedEntityField($entity_type_id) {
+    $name = $this->stringToName("display:modes:entity:$entity_type_id");
+    $modes = array_map(function ($value) {
+      return ['description' => $value['label']];
+    }, $this->entityManager->getViewModes($entity_type_id));
+
+    return $modes ? [
+      'type' => new NonNullModifier(Type::stringType()),
+      'args' => [
+        'displayMode' => [
+          'type' => new EnumType($name, $modes),
+        ],
+      ],
+      'resolve' => function ($source, array $args = NULL) {
+        if ($source instanceof TypedDataInterface && ($entity = $source->getValue()) && $entity instanceof ContentEntityInterface) {
+          $entity_view_builder = $this->entityManager->getViewBuilder($entity->getEntityTypeId());
+          $display_mode = $args['displayMode'] ? $args['displayMode'] : 'full';
+          $output = $entity_view_builder->view($entity, $display_mode);
+          return $this->renderer->render($output);
+        }
+      }
+    ] : NULL;
+  }
+
+  /**
+   * @param string $entity_type_id
+   *
+   * @return array|null
+   */
+  protected function getRenderedFieldItemField($entity_type_id) {
+    $name = $this->stringToName("display:modes:entity:$entity_type_id");
+    $modes = array_map(function ($value) {
+      return ['description' => $value['label']];
+    }, $this->entityManager->getViewModes($entity_type_id));
+
+    return $modes ? [
+      'type' => new NonNullModifier(Type::stringType()),
+      'args' => [
+        'displayMode' => [
+          'type' => new EnumType($name, $modes),
+        ],
+      ],
+      'resolve' => function ($source, array $args = NULL) {
+        if ($source instanceof FieldItemInterface) {
+          $entity_type_id = $source->getEntity()->getEntityTypeId();
+          $entity_view_builder = $this->entityManager->getViewBuilder($entity_type_id);
+          $display_mode = $args['displayMode'] ? $args['displayMode'] : 'full';
+          $output = $entity_view_builder->viewFieldItem($source, $display_mode);
+          return $this->renderer->render($output);
+        }
+      }
+    ] : NULL;
   }
 
   /**

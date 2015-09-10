@@ -74,12 +74,12 @@ class EntitySchemaProvider extends SchemaProviderBase {
       ];
     }
 
-    return ['entity' => [
+    return !empty($fields) ? ['entity' => [
       'type' => new ObjectType('__EntityRoot', $fields),
       'resolve' => function () {
         return $this->entityManager;
       }
-    ]];
+    ]] : [];
   }
 
   public static function resolveEntity($source, array $args = NULL, $root, Node $field) {
