@@ -2,10 +2,7 @@
 explorer:
   version: VERSION
   js:
-    "https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.min.js": { type: external, group: -100 }
-    "https://cdnjs.cloudflare.com/ajax/libs/fetch/0.9.0/fetch.min.js": { type: external, group: -100 }
-    js/graphiql.min.js: { group: -100 }
-    js/explorer.js: {}
+    js/dist/bundle.min.js: {}
   css:
     component:
       css/explorer.css: {}
