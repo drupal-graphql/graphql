@@ -459,7 +459,7 @@ class TypedDataTypeResolver implements TypeResolverInterface {
           $entity_view_builder = $this->entityManager->getViewBuilder($entity_type_id);
           $display_mode = $args['displayMode'] ? $args['displayMode'] : 'full';
           $output = $entity_view_builder->viewFieldItem($source, $display_mode);
-          return $this->renderer->render($output);
+          return $this->renderer->renderRoot($output);
         }
       }
     ] : NULL;
