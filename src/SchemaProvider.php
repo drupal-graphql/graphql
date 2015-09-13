@@ -10,7 +10,7 @@ namespace Drupal\graphql;
 /**
  * Generates a GraphQL Schema.
  */
-class SchemaProvider extends SchemaProviderBase {
+class SchemaProvider implements SchemaProviderInterface {
   /**
    * Unsorted list of schema providers nested and keyed by priority.
    *

@@ -2,10 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\graphql\SchemaProviderBase.
+ * Contains \Drupal\graphql\SchemaProvider\SchemaProviderBase.
  */
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\SchemaProvider;
+
+use Drupal\graphql\SchemaProviderInterface;
 
 /**
  * Abstract base class for schema providers.

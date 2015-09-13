@@ -8,7 +8,7 @@
 namespace Drupal\graphql;
 
 /**
- * Generates a GraphQL Schema for content entity types.
+ * Attempts to GraphQL type definitions from arbitrary data types.
  */
 class TypeResolver implements TypeResolverInterface {
   /**
@@ -28,7 +28,7 @@ class TypeResolver implements TypeResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies($definition) {
+  public function applies($type) {
     return TRUE;
   }
 
@@ -48,13 +48,13 @@ class TypeResolver implements TypeResolverInterface {
   /**
    * Returns the first applicable provider for the given type definition.
    *
-   * @param mixed $definition
+   * @param mixed $type
    *
    * @return \Drupal\graphql\TypeResolverInterface|null
    */
-  protected function getFirstApplicableTypeResolver($definition) {
+  protected function getFirstApplicableTypeResolver($type) {
     foreach ($this->getSortedResolvers() as $resolver) {
-      if ($resolver->applies($definition)) {
+      if ($resolver->applies($type)) {
         return $resolver;
       }
     }
@@ -82,14 +82,13 @@ class TypeResolver implements TypeResolverInterface {
   }
 
   /**
-   * @param mixed $definition
-   * @param bool $defer
+   * @param mixed $type
    *
    * @return \Fubhy\GraphQL\Type\Definition\Types\TypeInterface|null
    */
-  public function resolveRecursive($definition, $defer = TRUE) {
-    if ($resolver = $this->getFirstApplicableTypeResolver($definition)) {
-      return $resolver->resolveRecursive($definition, $defer);
+  public function resolveRecursive($type) {
+    if ($resolver = $this->getFirstApplicableTypeResolver($type)) {
+      return $resolver->resolveRecursive($type);
     }
 
     return NULL;

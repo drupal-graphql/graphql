@@ -12,12 +12,11 @@ namespace Drupal\graphql;
  */
 interface TypeResolverInterface {
     /**
-     * @param mixed $definition
-     * @param bool $defer
+     * @param mixed $type
      *
      * @return \Fubhy\GraphQL\Type\Definition\Types\TypeInterface|null
      */
-    public function resolveRecursive($definition, $defer = TRUE);
+    public function resolveRecursive($type);
 
     /**
      * @param mixed $type

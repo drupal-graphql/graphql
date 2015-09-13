@@ -7,22 +7,21 @@
 
 namespace Drupal\graphql\Controller;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Render\BareHtmlPageRendererInterface;
-use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Acts as intermedgraiate request forwarder for resource plugins.
+ * Controller for the GraphiQL query builder IDE.
  */
 class ExplorerController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
+   * The URL generator service.
+   *
    * @var \Drupal\Core\Routing\UrlGeneratorInterface
    */
   protected $urlGenerator;
@@ -46,6 +45,12 @@ class ExplorerController implements ContainerInjectionInterface {
     );
   }
 
+  /**
+   * Controller for the GraphiQL query builder IDE.
+   *
+   * @return array
+   *   The render array.
+   */
   public function viewExplorer() {
     $url = $this->urlGenerator->generate('graphql.request');
 

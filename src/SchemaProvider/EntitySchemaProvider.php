@@ -2,14 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\graphql\EntitySchemaProvider.
+ * Contains \Drupal\graphql\SchemaProvider\EntitySchemaProvider.
  */
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\SchemaProvider;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\graphql\TypeResolverInterface;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
 use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
@@ -34,7 +35,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
   /**
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  private $typedDataManager;
+  protected $typedDataManager;
 
   /**
    * Constructs a EntitySchemaProvider object.
@@ -66,7 +67,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
       $definition = $this->typedDataManager->createDataDefinition("entity:$entity_type_id");
 
       $fields[$entity_type_id] = [
-        'type' => $this->typeResolver->resolveRecursive($definition, FALSE),
+        'type' => $this->typeResolver->resolveRecursive($definition),
         'args' => [
           'id' => ['type' => new NonNullModifier(Type::idType())],
         ],
