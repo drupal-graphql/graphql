@@ -1,7 +1,6 @@
 {
-  "name": "nainuwa",
+  "name": "drupal-graphql",
   "version": "0.1.0",
-  "description": "Nainuwa Digital Library by Treventus.",
   "scripts": {
     "build": "rm -rf dist && NODE_ENV=production ./node_modules/.bin/webpack src/index.js dist/bundle.js && NODE_ENV=production COMPRESS=1 ./node_modules/.bin/webpack src/index.js dist/bundle.min.js && echo \"gzipped, the global build is `gzip -c dist/bundle.min.js | wc -c` bytes\"",
     "lint": "./node_modules/.bin/eslint src"
@@ -15,10 +14,12 @@
     "babel-runtime": "^5.8.20",
     "eslint": "^1.3.1",
     "eslint-plugin-react": "^2.3.0",
+    "webpack": "^1.9.6"
+  },
+  "dependencies": {
     "graphiql": "^0.1.3",
     "graphql": "^0.4.3",
     "react": "^0.13.0",
-    "webpack": "^1.9.6",
     "whatwg-fetch": "^0.9.0"
   }
 }
