@@ -14,9 +14,9 @@ use Drupal\Core\TypedData\DataReferenceInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\graphql\NullType;
 use Drupal\graphql\TypeResolverInterface;
 use Fubhy\GraphQL\Language\Node;
-use Fubhy\GraphQL\Type\Definition\Types\Scalars\NullType;
 use Fubhy\GraphQL\Type\Definition\Types\Type;
 
 /**
