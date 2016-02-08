@@ -88,7 +88,8 @@ class RequestController implements ContainerInjectionInterface {
       $mutation ? new ObjectType('Mutation', $mutation) : NULL
     );
 
-    $result = $this->graphql->execute($schema, $query, NULL, $variables ?: NULL, $operation);
+    $variables = $variables ? (array) json_decode($variables) : NULL;
+    $result = $this->graphql->execute($schema, $query, NULL, $variables, $operation);
 
     return new Response(json_encode($result), 200, array('Content-Type' => $request->getMimeType('json')));
   }
