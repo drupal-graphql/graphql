@@ -1,6 +1,5 @@
-import 'whatwg-fetch';
-import GraphiQL from 'graphiql';
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Drupal from 'drupal';
 import $ from 'jquery';
 
@@ -69,7 +68,7 @@ Drupal.behaviors.graphqlRenderExplorer = {
     }
 
     // Render <GraphiQL /> into the container.
-    React.render(
+    ReactDOM.render(
       React.createElement(GraphiQL, {
         fetcher: graphQLFetcher,
         query: parameters.query,
