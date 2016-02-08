@@ -51,7 +51,7 @@ class GraphQL extends DisplayPluginBase {
     /**
      * {@inheritdoc}
      */
-    protected function getType() {
+    public function getType() {
         return 'graphql';
     }
 
