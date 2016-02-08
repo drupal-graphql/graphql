@@ -85,7 +85,9 @@ class EntitySchemaProvider extends SchemaProviderBase {
 
   public static function resolveEntity($source, array $args = NULL, $root, Node $field) {
     if ($source instanceof EntityManagerInterface && isset($args['id'])) {
-      return $source->getStorage($field->get('name')->get('value'))->load($args['id'])->getTypedData();
+      $storage = $source->getStorage($field->get('name')->get('value'));
+      $entity = $storage->load($args['id']);
+      return $entity ? $entity->getTypedData() : NULL;
     }
   }
 }
