@@ -1,0 +1,78 @@
+language: php
+sudo: false
+
+php:
+  - 5.5
+  # We need to specify the latest version here because otherwise there are
+  # segmentation faults in PHP 5.6.5.
+  - 5.6.18
+  - 7
+  # HHVM is disabled for now because we have not figured out yet how to start a
+  # web server for the browser tests.
+  #- hhvm
+
+env:
+  - DRUPAL_CORE=8.0.x
+  - DRUPAL_CORE=8.1.x
+
+matrix:
+  allow_failures:
+    # We cannot use hhvm-nightly since that does not work in Travis CI's old
+    # Ubuntu 12.04.
+    #- php: hhvm
+  # Don't wait for the allowed failures to build.
+  fast_finish: true
+
+mysql:
+  database: graphql
+  username: root
+  encoding: utf8
+
+# Cache composer downloads because cloning Coder form drupal.org is very slow :-(
+cache:
+  directories:
+    - $HOME/.composer
+
+before_script:
+  # Remove Xdebug as we don't need it and it causes
+  # PHP Fatal error:  Maximum function nesting level of '256' reached.
+  # We also don't care if that file exists or not on PHP 7.
+  - phpenv config-rm xdebug.ini || true
+
+  # Remember the current graphql test directory for later use in the Drupal
+  # installation.
+  - TESTDIR=$(pwd)
+  # Navigate out of module directory to prevent blown stack by recursive module
+  # lookup.
+  - cd ..
+
+  # Create database.
+  - mysql -e 'create database graphql'
+  # Export database variable for kernel tests.
+  - export SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
+  # Download Drupal 8 core from the Github mirror because it is faster.
+  - travis_retry git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git
+  - cd drupal
+
+  # Reference graphql in build site.
+  - ln -s $TESTDIR modules/graphql
+
+  # Run composer install for Drupal 8.1. We need an up-to-date composer when
+  # installing Drupal 8.1.
+  - if [ "$DRUPAL_CORE" = "8.1.x" ]; then composer self-update && composer install; fi
+
+  # Start a web server on port 8888, run in the background.
+  - php -S localhost:8888 &
+
+  # Export web server URL for browser tests.
+  - export SIMPLETEST_BASE_URL=http://localhost:8888
+
+  # Install PHPCS to check for Drupal coding standards.
+  - travis_retry composer global require drupal/coder
+  - ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/drupal/coder/coder_sniffer
+
+script:
+  # Run the PHPUnit tests which also include the kernel tests.
+  - ./vendor/bin/phpunit -c ./core/phpunit.xml.dist ./modules/graphql
+  # Check for coding standards violations
+  - cd modules/graphql && ~/.composer/vendor/bin/phpcs
