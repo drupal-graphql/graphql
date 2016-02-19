@@ -63,20 +63,20 @@ class EntityTypeResolver extends ComplexDataTypeResolverBase {
   /**
    * Constructs a EntityTypeResolver object.
    *
-   * @param TypeResolverInterface $typeResolver
+   * @param TypeResolverInterface $type_resolver
    *   The base type resolver service.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
-   * @param TypedDataManager $typedDataManager
+   * @param TypedDataManager $typed_data_manager
    *   The typed data manager service.
    * @param RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(TypeResolverInterface $typeResolver, EntityManagerInterface $entityManager, TypedDataManager $typedDataManager, RendererInterface $renderer) {
-    parent::__construct($typeResolver);
+  public function __construct(TypeResolverInterface $type_resolver, EntityManagerInterface $entity_manager, TypedDataManager $typed_data_manager, RendererInterface $renderer) {
+    parent::__construct($type_resolver);
 
-    $this->typedDataManager = $typedDataManager;
-    $this->entityManager = $entityManager;
+    $this->typedDataManager = $typed_data_manager;
+    $this->entityManager = $entity_manager;
     $this->renderer = $renderer;
   }
 

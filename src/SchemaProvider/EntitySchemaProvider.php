@@ -40,17 +40,17 @@ class EntitySchemaProvider extends SchemaProviderBase {
   /**
    * Constructs a EntitySchemaProvider object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
-   * @param \Drupal\Core\TypedData\TypedDataManager $typedDataManager
+   * @param \Drupal\Core\TypedData\TypedDataManager $typed_data_manager
    *   The typed data manager service.
-   * @param \Drupal\graphql\TypeResolverInterface $typeResolver
+   * @param \Drupal\graphql\TypeResolverInterface $type_resolver
    *   The type resolver service.
    */
-  public function __construct(EntityManagerInterface $entityManager, TypedDataManager $typedDataManager, TypeResolverInterface $typeResolver) {
-    $this->entityManager = $entityManager;
-    $this->typeResolver = $typeResolver;
-    $this->typedDataManager = $typedDataManager;
+  public function __construct(EntityManagerInterface $entity_manager, TypedDataManager $typed_data_manager, TypeResolverInterface $type_resolver) {
+    $this->entityManager = $entity_manager;
+    $this->typeResolver = $type_resolver;
+    $this->typedDataManager = $typed_data_manager;
   }
 
   /**

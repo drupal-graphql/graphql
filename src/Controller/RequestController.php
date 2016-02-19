@@ -39,11 +39,11 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @param \Fubhy\GraphQL\GraphQL $graphql
    *   The GraphQL service.
-   * @param \Drupal\graphql\SchemaProviderInterface $schemaProvider
+   * @param \Drupal\graphql\SchemaProviderInterface $schema_provider
    */
-  public function __construct(GraphQL $graphql, SchemaProviderInterface $schemaProvider) {
+  public function __construct(GraphQL $graphql, SchemaProviderInterface $schema_provider) {
     $this->graphql = $graphql;
-    $this->schemaProvider = $schemaProvider;
+    $this->schemaProvider = $schema_provider;
   }
 
   /**
@@ -91,6 +91,6 @@ class RequestController implements ContainerInjectionInterface {
     $variables = $variables ? (array) json_decode($variables) : NULL;
     $result = $this->graphql->execute($schema, $query, NULL, $variables, $operation);
 
-    return new JsonResponse($result, 200, array('Content-Type' => $request->getMimeType('json')));
+    return new JsonResponse($result, 200, ['Content-Type' => $request->getMimeType('json')]);
   }
 }

@@ -33,11 +33,11 @@ abstract class ComplexDataTypeResolverBase implements TypeResolverInterface {
   /**
    * Constructs a ComplexDataTypeResolverBase object.
    *
-   * @param TypeResolverInterface $typeResolver
+   * @param TypeResolverInterface $type_resolver
    *   The base type resolver service.
    */
-  public function __construct(TypeResolverInterface $typeResolver) {
-    $this->typeResolver = $typeResolver;
+  public function __construct(TypeResolverInterface $type_resolver) {
+    $this->typeResolver = $type_resolver;
   }
 
   /**
