@@ -13,8 +13,8 @@ use Fubhy\GraphQL\GraphQL;
 use Fubhy\GraphQL\Schema;
 use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -91,6 +91,6 @@ class RequestController implements ContainerInjectionInterface {
     $variables = $variables ? (array) json_decode($variables) : NULL;
     $result = $this->graphql->execute($schema, $query, NULL, $variables, $operation);
 
-    return new Response(json_encode($result), 200, array('Content-Type' => $request->getMimeType('json')));
+    return new JsonResponse($result, 200, array('Content-Type' => $request->getMimeType('json')));
   }
 }
