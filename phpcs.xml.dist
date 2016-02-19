@@ -3,7 +3,7 @@
   <description>Default PHP CodeSniffer configuration for Rules.</description>
   <file>.</file>
 
-  <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml"/>
+  <arg name="extensions" value="inc,install,module,php,profile,test,theme"/>
 
   <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName">
     <!-- Annotations must use the same property names as in the configuration. -->
