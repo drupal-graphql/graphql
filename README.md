@@ -35,10 +35,5 @@ and a checkout of the GraphQL module in the modules folder.
     ../vendor/bin/phpunit ../modules/graphql/tests/src/Unit
     ../vendor/bin/phpunit ../modules/graphql/tests/src/Integration
 
-Example for executing one single test file during development:
-
-    cd /path/to/drupal-8/core
-    ../vendor/bin/phpunit ../modules/graphql/tests/src/Integration/Action/DataSetTest.php
-
 You can also execute the test cases from the web interface at
 ``/admin/config/development/testing``.
