@@ -3,3 +3,5 @@ type: module
 description: 'Generates GraphQL schemas for content entity types.'
 package: Web services
 core: 8.x
+dependencies:
+  - rest
