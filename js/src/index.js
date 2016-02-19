@@ -1,71 +1,69 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Drupal from 'drupal';
-import $ from 'jquery';
+import jQuery from 'jquery';
+import GraphiQL from 'graphiql';
 
-Drupal.behaviors.graphqlRenderExplorer = {
-  attach: function(context, settings) {
-    var container = $('#graphql-explorer', context).once('graphql-explorer')[0] || undefined;
+/**
+ * Behavior for rendering the GraphiQL interface.
+ */
+Drupal.behaviors.graphQLRenderExplorer = {
+  attach: (context, settings) => {
+    const container = jQuery('#graphql-explorer', context).once('graphql-explorer')[0] || undefined;
 
     if (typeof container === 'undefined') {
       return;
     }
 
     // Parse the search string to get url parameters.
-    var search = window.location.search;
-    var parameters = {};
-
-    search.substr(1).split('&').forEach(function (entry) {
-      var eq = entry.indexOf('=');
-
-      if (eq >= 0) {
-        parameters[decodeURIComponent(entry.slice(0, eq))] = decodeURIComponent(entry.slice(eq + 1));
-      }
-    });
+    const search = window.location.search;
+    const parameters = search.substr(1).split('&')
+      .map((entry) => ([entry, entry.indexOf('=')]))
+      .filter(([, equal]) => !!equal)
+      .reduce((previous, [entry, equal]) => ({
+        ...previous,
+        [decodeURIComponent(entry.slice(0, equal))]: decodeURIComponent(entry.slice(equal + 1)),
+      }), {});
 
     // If variables was provided, try to format it.
     if (parameters.variables) {
       try {
-        parameters.variables = JSON.stringify(JSON.parse(query.variables), null, 2);
+        parameters.variables = JSON.stringify(JSON.parse(parameters.variables), null, 2);
       } catch (e) {
-        // Do nothing, we want to display the invalid JSON as a string, rather than
-        // present an error.
+        // Do nothing, we want to display the invalid JSON as a string, rather
+        // than present an error.
       }
     }
 
-    // When the query and variables string is edited, update the URL bar so that it
-    // can be easily shared.
-    function onEditQuery(newQuery) {
-      parameters.query = newQuery;
-      updateURL();
-    }
-
-    function onEditVariables(newVariables) {
-      parameters.variables = newVariables;
-      updateURL();
-    }
-
-    function updateURL() {
-      var newSearch = '?' + Object.keys(parameters).map(function (key) {
-        return encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]);
-      }).join('&');
+    // When the query and variables string is edited, update the URL bar so that
+    // it can be easily shared.
+    const updateURL = () => {
+      const newSearch = `?${Object.keys(parameters).map(
+        (key) => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`
+      ).join('&')}`;
 
       history.replaceState(null, null, newSearch);
-    }
+    };
+
+    const onEditQuery = (newQuery) => {
+      parameters.query = newQuery;
+      updateURL();
+    };
+
+    const onEditVariables = (newVariables) => {
+      parameters.variables = newVariables;
+      updateURL();
+    };
 
     // Defines a GraphQL fetcher using the fetch API.
-    function graphQLFetcher(graphQLParams) {
-      return fetch(settings.graphqlRequestUrl, {
-        method: 'post',
-        credentials: 'same-origin',
-        body: JSON.stringify(graphQLParams),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(function (response) {
-        return response.json()
-      });
-    }
+    const graphQLFetcher = (graphQLParams) => fetch(settings.graphQLRequestUrl, {
+      method: 'post',
+      credentials: 'same-origin',
+      body: JSON.stringify(graphQLParams),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((response) => response.json());
 
     // Render <GraphiQL /> into the container.
     ReactDOM.render(
@@ -73,9 +71,9 @@ Drupal.behaviors.graphqlRenderExplorer = {
         fetcher: graphQLFetcher,
         query: parameters.query,
         variables: parameters.variables,
-        onEditQuery: onEditQuery,
-        onEditVariables: onEditVariables
+        onEditQuery,
+        onEditVariables,
       }), container
     );
-  }
+  },
 };

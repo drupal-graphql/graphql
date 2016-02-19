@@ -46,7 +46,9 @@
 
 	'use strict';
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 	var _react = __webpack_require__(1);
 
@@ -64,9 +66,20 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	_drupal2['default'].behaviors.graphqlRenderExplorer = {
+	var _graphiql = __webpack_require__(5);
+
+	var _graphiql2 = _interopRequireDefault(_graphiql);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	/**
+	 * Behavior for rendering the GraphiQL interface.
+	 */
+	_drupal2.default.behaviors.graphQLRenderExplorer = {
 	  attach: function attach(context, settings) {
-	    var container = (0, _jquery2['default'])('#graphql-explorer', context).once('graphql-explorer')[0] || undefined;
+	    var container = (0, _jquery2.default)('#graphql-explorer', context).once('graphql-explorer')[0] || undefined;
 
 	    if (typeof container === 'undefined') {
 	      return;
@@ -74,49 +87,54 @@
 
 	    // Parse the search string to get url parameters.
 	    var search = window.location.search;
-	    var parameters = {};
+	    var parameters = search.substr(1).split('&').map(function (entry) {
+	      return [entry, entry.indexOf('=')];
+	    }).filter(function (_ref) {
+	      var _ref2 = _slicedToArray(_ref, 2);
 
-	    search.substr(1).split('&').forEach(function (entry) {
-	      var eq = entry.indexOf('=');
+	      var equal = _ref2[1];
+	      return !!equal;
+	    }).reduce(function (previous, _ref3) {
+	      var _ref4 = _slicedToArray(_ref3, 2);
 
-	      if (eq >= 0) {
-	        parameters[decodeURIComponent(entry.slice(0, eq))] = decodeURIComponent(entry.slice(eq + 1));
-	      }
-	    });
+	      var entry = _ref4[0];
+	      var equal = _ref4[1];
+	      return _extends({}, previous, _defineProperty({}, decodeURIComponent(entry.slice(0, equal)), decodeURIComponent(entry.slice(equal + 1))));
+	    }, {});
 
 	    // If variables was provided, try to format it.
 	    if (parameters.variables) {
 	      try {
-	        parameters.variables = JSON.stringify(JSON.parse(query.variables), null, 2);
+	        parameters.variables = JSON.stringify(JSON.parse(parameters.variables), null, 2);
 	      } catch (e) {
-	        // Do nothing, we want to display the invalid JSON as a string, rather than
-	        // present an error.
+	        // Do nothing, we want to display the invalid JSON as a string, rather
+	        // than present an error.
 	      }
 	    }
 
-	    // When the query and variables string is edited, update the URL bar so that it
-	    // can be easily shared.
-	    function onEditQuery(newQuery) {
-	      parameters.query = newQuery;
-	      updateURL();
-	    }
-
-	    function onEditVariables(newVariables) {
-	      parameters.variables = newVariables;
-	      updateURL();
-	    }
-
-	    function updateURL() {
+	    // When the query and variables string is edited, update the URL bar so that
+	    // it can be easily shared.
+	    var updateURL = function updateURL() {
 	      var newSearch = '?' + Object.keys(parameters).map(function (key) {
 	        return encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]);
 	      }).join('&');
 
 	      history.replaceState(null, null, newSearch);
-	    }
+	    };
+
+	    var onEditQuery = function onEditQuery(newQuery) {
+	      parameters.query = newQuery;
+	      updateURL();
+	    };
+
+	    var onEditVariables = function onEditVariables(newVariables) {
+	      parameters.variables = newVariables;
+	      updateURL();
+	    };
 
 	    // Defines a GraphQL fetcher using the fetch API.
-	    function graphQLFetcher(graphQLParams) {
-	      return fetch(settings.graphqlRequestUrl, {
+	    var graphQLFetcher = function graphQLFetcher(graphQLParams) {
+	      return fetch(settings.graphQLRequestUrl, {
 	        method: 'post',
 	        credentials: 'same-origin',
 	        body: JSON.stringify(graphQLParams),
@@ -126,10 +144,10 @@
 	      }).then(function (response) {
 	        return response.json();
 	      });
-	    }
+	    };
 
 	    // Render <GraphiQL /> into the container.
-	    _reactDom2['default'].render(_react2['default'].createElement(GraphiQL, {
+	    _reactDom2.default.render(_react2.default.createElement(_graphiql2.default, {
 	      fetcher: graphQLFetcher,
 	      query: parameters.query,
 	      variables: parameters.variables,
@@ -162,6 +180,12 @@
 /***/ function(module, exports) {
 
 	module.exports = jQuery;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	module.exports = GraphiQL;
 
 /***/ }
 /******/ ]);
