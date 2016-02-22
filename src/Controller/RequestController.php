@@ -62,7 +62,7 @@ class RequestController implements ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\Request
    *   The request object.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The JSON formatted response.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -91,6 +91,6 @@ class RequestController implements ContainerInjectionInterface {
     $variables = $variables ? (array) json_decode($variables) : NULL;
     $result = $this->graphql->execute($schema, $query, NULL, $variables, $operation);
 
-    return new JsonResponse($result, 200, ['Content-Type' => $request->getMimeType('json')]);
+    return new JsonResponse($result);
   }
 }
