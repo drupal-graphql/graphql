@@ -9,6 +9,7 @@ namespace Drupal\graphql\SchemaProvider;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\field\Tests\FieldDefinitionIntegrityTest;
@@ -72,40 +73,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
     foreach ($entity_types as $entity_type_id => $entity_type) {
       /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinition $definition */
       $definition = $this->typedDataManager->createDataDefinition("entity:$entity_type_id");
-
-      $args = [];
-      foreach ($definition->getPropertyDefinitions() as $field_name => $field_definition) {
-        if (!($field_definition instanceof FieldDefinitionInterface)) {
-          continue;
-        }
-
-        $storage = $field_definition->getFieldStorageDefinition();
-        if (!$storage->isQueryable()) {
-          continue;
-        };
-
-        // Fetch the main property's definition and resolve it's type.
-        $main_property_name = $storage->getMainPropertyName();
-        $main_property = $field_definition->getPropertyDefinition($main_property_name);
-        $property_type = $this->typeResolver->resolveRecursive($main_property);
-        $wrapped_type = $property_type;
-
-        // Extract the wrapped type of the main property.
-        while ($wrapped_type instanceof ModifierInterface) {
-          $wrapped_type = $wrapped_type->getWrappedType();
-        }
-
-        // We only support scalars and enums as arguments.
-        if (!($wrapped_type instanceof ScalarType || $wrapped_type instanceof EnumType)) {
-          continue;
-        }
-
-        $args[$field_name] = [
-          'type' => new ListModifier($wrapped_type),
-          'name' => $field_definition->getName(),
-          'description' => $field_definition->getDescription(),
-        ];
-      }
+      $args = $this->getQueryArguments($definition);
 
       $fields[$entity_type_id] = [
         'type' => new ListModifier($this->typeResolver->resolveRecursive($definition)),
@@ -120,6 +88,49 @@ class EntitySchemaProvider extends SchemaProviderBase {
         return $this->entityManager;
       }
     ]] : [];
+  }
+
+  /**
+   * @param \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition
+   *
+   * @return array
+   */
+  protected function getQueryArguments(EntityDataDefinitionInterface $definition) {
+    $args = [];
+    foreach ($definition->getPropertyDefinitions() as $field_name => $field_definition) {
+      if (!($field_definition instanceof FieldDefinitionInterface)) {
+        continue;
+      }
+
+      $storage = $field_definition->getFieldStorageDefinition();
+      if (!$storage->isQueryable()) {
+        continue;
+      };
+
+      // Fetch the main property's definition and resolve it's type.
+      $main_property_name = $storage->getMainPropertyName();
+      $main_property = $field_definition->getPropertyDefinition($main_property_name);
+      $property_type = $this->typeResolver->resolveRecursive($main_property);
+      $wrapped_type = $property_type;
+
+      // Extract the wrapped type of the main property.
+      while ($wrapped_type instanceof ModifierInterface) {
+        $wrapped_type = $wrapped_type->getWrappedType();
+      }
+
+      // We only support scalars and enums as arguments.
+      if (!($wrapped_type instanceof ScalarType || $wrapped_type instanceof EnumType)) {
+        continue;
+      }
+
+      $args[$field_name] = [
+        'type' => new ListModifier($wrapped_type),
+        'name' => $field_definition->getName(),
+        'description' => $field_definition->getDescription(),
+      ];
+    }
+
+    return $args;
   }
 
   /**
