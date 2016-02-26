@@ -82,9 +82,7 @@ class TypeResolver implements TypeResolverInterface {
   }
 
   /**
-   * @param mixed $type
-   *
-   * @return \Fubhy\GraphQL\Type\Definition\Types\TypeInterface|null
+   * {@inheritdoc}
    */
   public function resolveRecursive($type) {
     if ($resolver = $this->getFirstApplicableTypeResolver($type)) {
