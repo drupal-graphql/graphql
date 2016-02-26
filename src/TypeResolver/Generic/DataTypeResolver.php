@@ -2,20 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\graphql\TypeResolver\PrimitiveTypeResolver.
+ * Contains \Drupal\graphql\TypeResolver\Generic\DataTypeResolver.
  */
 
-namespace Drupal\graphql\TypeResolver;
+namespace Drupal\graphql\TypeResolver\Generic;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\graphql\TypeResolverInterface;
-use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
 use Fubhy\GraphQL\Type\Definition\Types\Type;
 
 /**
  * Resolves typed data types.
  */
-class PrimitiveTypeResolver implements TypeResolverInterface {
+class DataTypeResolver implements TypeResolverInterface {
   /**
    * {@inheritdoc}
    */
@@ -32,8 +31,8 @@ class PrimitiveTypeResolver implements TypeResolverInterface {
    */
   public function resolveRecursive($type) {
     if ($type instanceof DataDefinitionInterface) {
-      if ($resolved = $this->getType($type->getDataType()) ?: NULL) {
-        return $type->isRequired() ? new NonNullModifier($resolved) : $resolved;
+      if ($resolved = $this->getType($type->getDataType())) {
+        return $resolved;
       }
     }
 
