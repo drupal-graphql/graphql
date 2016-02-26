@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\TypeResolverInterface;
 use Fubhy\GraphQL\Language\Node;
+use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
 use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
 use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
 use Fubhy\GraphQL\Type\Definition\Types\Type;
@@ -67,9 +68,9 @@ class EntitySchemaProvider extends SchemaProviderBase {
       $definition = $this->typedDataManager->createDataDefinition("entity:$entity_type_id");
 
       $fields[$entity_type_id] = [
-        'type' => $this->typeResolver->resolveRecursive($definition),
+        'type' => new ListModifier($this->typeResolver->resolveRecursive($definition)),
         'args' => [
-          'id' => ['type' => new NonNullModifier(Type::idType())],
+          'id' => ['type' => new ListModifier(new NonNullModifier(Type::idType()))],
         ],
         'resolve' => [__CLASS__, 'resolveEntity'],
       ];
@@ -83,11 +84,21 @@ class EntitySchemaProvider extends SchemaProviderBase {
     ]] : [];
   }
 
+  /**
+   * @param $source
+   * @param array|NULL $args
+   * @param $root
+   * @param \Fubhy\GraphQL\Language\Node $field
+   *
+   * @return array
+   */
   public static function resolveEntity($source, array $args = NULL, $root, Node $field) {
     if ($source instanceof EntityManagerInterface && isset($args['id'])) {
       $storage = $source->getStorage($field->get('name')->get('value'));
-      $entity = $storage->load($args['id']);
-      return $entity ? $entity->getTypedData() : NULL;
+
+      return array_map(function ($entity) {
+        return $entity->getTypedData();
+      }, $storage->loadMultiple($args['id']));
     }
   }
 }
