@@ -19,32 +19,37 @@ services:
     class: Drupal\graphql\TypeResolver
     tags:
       - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
-  graphql.type_resolver.typed_data.list:
-    class: Drupal\graphql\TypeResolver\ListTypeResolver
-    arguments: ['@graphql.type_resolver']
-    tags:
-      - { name: graphql_type_resolver }
   graphql.type_resolver.typed_data.data_reference:
-    class: Drupal\graphql\TypeResolver\DataReferenceTypeResolver
+    class: Drupal\graphql\TypeResolver\Generic\DataReferenceTypeResolver
     arguments: ['@graphql.type_resolver']
     tags:
       - { name: graphql_type_resolver }
+  graphql.type_resolver.typed_data.complex_data:
+    class: Drupal\graphql\TypeResolver\Generic\ComplexDataTypeResolver
+    arguments: ['@graphql.type_resolver']
+    tags:
+      - { name: graphql_type_resolver, priority: -100 }
+  graphql.type_resolver.typed_data.data:
+    class: Drupal\graphql\TypeResolver\Generic\DataTypeResolver
+    tags:
+      - { name: graphql_type_resolver, priority: -1000 }
   graphql.type_resolver.typed_data.entity:
-    class: Drupal\graphql\TypeResolver\EntityTypeResolver
-    arguments: ['@graphql.type_resolver', '@entity.manager', '@typed_data_manager', '@renderer']
+    class: Drupal\graphql\TypeResolver\Specialized\EntityTypeResolver
+    arguments: ['@graphql.type_resolver', '@entity.manager', '@typed_data_manager']
     tags:
       - { name: graphql_type_resolver }
   graphql.type_resolver.typed_data.field_item:
-    class: Drupal\graphql\TypeResolver\FieldItemTypeResolver
-    arguments: ['@graphql.type_resolver', '@entity.manager', '@renderer']
+    class: Drupal\graphql\TypeResolver\Specialized\FieldItemTypeResolver
+    arguments: ['@graphql.type_resolver', '@entity.manager']
     tags:
       - { name: graphql_type_resolver }
+  graphql.type_resolver.typed_data.field_item.entity_reference:
+    class: Drupal\graphql\TypeResolver\Specialized\EntityReferenceFieldItemTypeResolver
+    arguments: ['@graphql.type_resolver', '@entity.manager']
+    tags:
+      - { name: graphql_type_resolver, priority: 10 }
   graphql.type_resolver.typed_data.language:
-    class: Drupal\graphql\TypeResolver\LanguageTypeResolver
-    tags:
-      - { name: graphql_type_resolver }
-  graphql.type_resolver.typed_data.primitive:
-    class: Drupal\graphql\TypeResolver\PrimitiveTypeResolver
+    class: Drupal\graphql\TypeResolver\Specialized\LanguageTypeResolver
     tags:
       - { name: graphql_type_resolver }
   graphql.page_display_variant_subscriber:
