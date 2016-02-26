@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\graphql\TypeResolver\DataReferenceTypeResolver.
+ * Contains \Drupal\graphql\TypeResolver\Generic\DataReferenceTypeResolver.
  */
 
-namespace Drupal\graphql\TypeResolver;
+namespace Drupal\graphql\TypeResolver\Generic;
 
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\graphql\TypeResolverInterface;
@@ -21,16 +21,16 @@ class DataReferenceTypeResolver implements TypeResolverInterface {
    *
    * @var TypeResolverInterface
    */
-  protected $resolver;
+  protected $typeResolver;
 
   /**
    * Constructs a DataReferenceTypeResolver object.
    *
-   * @param TypeResolverInterface $resolver
+   * @param TypeResolverInterface $type_resolver
    *   The base type resolver service.
    */
-  public function __construct(TypeResolverInterface $resolver) {
-    $this->resolver = $resolver;
+  public function __construct(TypeResolverInterface $type_resolver) {
+    $this->typeResolver = $type_resolver;
   }
 
   /**
@@ -43,15 +43,13 @@ class DataReferenceTypeResolver implements TypeResolverInterface {
   }
 
   /**
-   * @param mixed $type
-   *
-   * @return \Fubhy\GraphQL\Type\Definition\Types\TypeInterface|callable|null
+   * {@inheritdoc}
    */
   public function resolveRecursive($type) {
     if ($type instanceof DataReferenceDefinitionInterface) {
       $target = $type->getTargetDefinition();
-      if ($resolved = $this->resolver->resolveRecursive($target)) {
-        return $type->isRequired() ? new NonNullModifier($resolved) : $resolved;
+      if ($resolved = $this->typeResolver->resolveRecursive($target)) {
+        return $resolved;
       }
     }
 
