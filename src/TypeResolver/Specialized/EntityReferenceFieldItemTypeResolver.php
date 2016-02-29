@@ -33,6 +33,8 @@ class EntityReferenceFieldItemTypeResolver extends FieldItemTypeResolver {
    * @return array
    */
   protected function getFieldsFromProperties(ComplexDataDefinitionInterface $definition) {
+    $this->typeResolver->resolveRecursive($definition->getPropertyDefinition('entity'));
+
     return [
       'value' => [
         'type' => $this->typeResolver->resolveRecursive($definition->getPropertyDefinition('target_id')),

@@ -10,7 +10,6 @@ namespace Drupal\graphql\TypeResolver\Generic;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\graphql\TypeResolverInterface;
 use Fubhy\GraphQL\Language\Node;
-use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
 
 /**
  * Resolves typed data types.
