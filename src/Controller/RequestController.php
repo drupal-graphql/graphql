@@ -102,6 +102,7 @@ class RequestController implements ContainerInjectionInterface {
     $variables = $variables ? (array) json_decode($variables) : NULL;
     $result = $this->graphql->execute($schema, $query, NULL, $variables, $operation);
 
-    return new JsonResponse($result);
+    $response = new JsonResponse($result);
+    return $response->setPrivate();
   }
 }
