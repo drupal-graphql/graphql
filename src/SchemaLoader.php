@@ -11,7 +11,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Fubhy\GraphQL\Schema;
 use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
-use Fubhy\GraphQL\Type\Definition\Types\Type;
 
 /**
  * Loads and caches a generated GraphQL schema.
