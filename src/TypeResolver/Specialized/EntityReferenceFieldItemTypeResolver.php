@@ -7,6 +7,7 @@
 
 namespace Drupal\graphql\TypeResolver\Specialized;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -33,18 +34,32 @@ class EntityReferenceFieldItemTypeResolver extends FieldItemTypeResolver {
    * @return array
    */
   protected function getFieldsFromProperties(ComplexDataDefinitionInterface $definition) {
-    $this->typeResolver->resolveRecursive($definition->getPropertyDefinition('entity'));
+    $fields = [];
 
-    return [
-      'value' => [
-        'type' => $this->typeResolver->resolveRecursive($definition->getPropertyDefinition('target_id')),
+    $property = $definition->getPropertyDefinition('target_id');
+    if ($raw = $this->typeResolver->resolveRecursive($property)) {
+      $fields['raw'] = [
+        'type' => $raw,
         'resolve' => [__CLASS__, 'resolveRaw'],
-      ],
-      'entity' => [
-        'type' => $this->typeResolver->resolveRecursive($definition->getPropertyDefinition('entity')),
+      ];
+    }
+
+    $property = $definition->getPropertyDefinition('entity');
+    $target_definition = $property->getTargetDefinition();
+    $target_type_id = $target_definition->getEntityTypeId();
+    $target_type = $this->entityManager->getDefinition($target_type_id);
+
+    if (
+      $target_type instanceof ContentEntityTypeInterface &&
+      $target = $this->typeResolver->resolveRecursive($property)
+    ) {
+      $fields['target'] = [
+        'type' => $target,
         'resolve' => [__CLASS__, 'resolveTarget'],
-      ],
-    ];
+      ];
+    }
+
+    return $fields;
   }
 
   /**
