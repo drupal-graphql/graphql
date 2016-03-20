@@ -8,6 +8,8 @@
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\graphql\SchemaLoader;
 use Drupal\graphql\SchemaProviderInterface;
 use Fubhy\GraphQL\GraphQL;
 use Fubhy\GraphQL\Schema;
@@ -30,20 +32,33 @@ class RequestController implements ContainerInjectionInterface {
   protected $graphql;
 
   /**
-   * @var \Drupal\graphql\SchemaProviderInterface
+   * The schema loader service.
+   *
+   * @var \Drupal\graphql\SchemaLoader
    */
-  protected $schemaProvider;
+  protected $schemaLoader;
+
+  /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
 
   /**
    * Constructs a RequestController object.
    *
    * @param \Fubhy\GraphQL\GraphQL $graphql
    *   The GraphQL service.
-   * @param \Drupal\graphql\SchemaProviderInterface $schema_provider
+   * @param \Drupal\graphql\SchemaLoader $schema_loader
+   *   The schema loader service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager service.
    */
-  public function __construct(GraphQL $graphql, SchemaProviderInterface $schema_provider) {
+  public function __construct(GraphQL $graphql, SchemaLoader $schema_loader, LanguageManagerInterface $language_manager) {
     $this->graphql = $graphql;
-    $this->schemaProvider = $schema_provider;
+    $this->schemaLoader = $schema_loader;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -52,7 +67,8 @@ class RequestController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('graphql.graphql'),
-      $container->get('graphql.schema_provider')
+      $container->get('graphql.schema_loader'),
+      $container->get('language_manager')
     );
   }
 
@@ -82,12 +98,7 @@ class RequestController implements ContainerInjectionInterface {
       throw new NotFoundHttpException();
     }
 
-    $mutation = $this->schemaProvider->getMutationSchema();
-    $schema =  new Schema(
-      new ObjectType('Root', $this->schemaProvider->getQuerySchema()),
-      $mutation ? new ObjectType('Mutation', $mutation) : NULL
-    );
-
+    $schema = $this->schemaLoader->loadSchema($this->languageManager->getCurrentLanguage());
     $variables = $variables ? (array) json_decode($variables) : NULL;
     $result = $this->graphql->execute($schema, $query, NULL, $variables, $operation);
 
