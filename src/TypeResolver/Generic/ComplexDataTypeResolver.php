@@ -15,8 +15,8 @@ use Drupal\Core\TypedData\DataReferenceInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\graphql\NullType;
 use Drupal\graphql\TypeResolverInterface;
+use Drupal\graphql\Utility\String;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
 use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
@@ -53,30 +53,17 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * @param mixed $type
+   *
+   * @return \Fubhy\GraphQL\Type\Definition\Types\ObjectType|null
    */
   public function resolveRecursive($type) {
-    // Prevent infinite loops by resolving complex data definitions lazily.
-    if ($type instanceof ComplexDataDefinitionInterface) {
-      return function () use ($type) {
-        // Optimally, we would also only return NULL here but since that breaks
-        // the whole thing we need to invent a null schema type.
-        // @todo Revisit this later to try and find a better solution.
-        return $this->doResolveRecursive($type) ?: new NullType();
-      };
+    if (!($type instanceof ComplexDataDefinitionInterface)) {
+      return NULL;
     }
 
-    return NULL;
-  }
-
-  /**
-   * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface $definition
-   *
-   * @return mixed
-   */
-  protected function doResolveRecursive(ComplexDataDefinitionInterface $definition) {
-    if ($fields = $this->getFieldsFromProperties($definition)) {
-      return new ObjectType($this->getTypeName($definition), $fields);
+    if ($fields = $this->getFieldsFromProperties($type)) {
+      return new ObjectType($this->getTypeName($type), $fields);
     }
 
     return NULL;
@@ -88,9 +75,18 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
    * @return array
    */
   protected function getFieldsFromProperties(ComplexDataDefinitionInterface $definition) {
-    return array_filter(array_map(function (DataDefinitionInterface $property) use ($definition) {
-      return $this->getFieldFromProperty($definition, $property);
-    }, $definition->getPropertyDefinitions()));
+    $properties = $definition->getPropertyDefinitions();
+
+    $keys = array_keys($properties);
+    $fields = array_reduce($keys, function ($carry, $key) use ($definition, $properties) {
+      $property = $properties[$key];
+      $carry[$key] = $this->getFieldFromProperty($definition, $property, $key);
+      return $carry;
+    }, []);
+
+    $names = String::formatPropertyNameList($keys);
+    $fields = array_combine($names, $fields);
+    return array_filter($fields);
   }
 
   /**
@@ -99,7 +95,7 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
    *
    * @return array
    */
-  protected function getFieldFromProperty(ComplexDataDefinitionInterface $definition, DataDefinitionInterface $property) {
+  protected function getFieldFromProperty(ComplexDataDefinitionInterface $definition, DataDefinitionInterface $property, $key) {
     if (!$type = $this->typeResolver->resolveRecursive($property)) {
       return FALSE;
     }
@@ -123,6 +119,7 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
     return [
       'type' => $type,
       'resolve' => $resolve,
+      'resolveData' => ['key' => $key],
     ];
   }
 
@@ -154,13 +151,12 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|null
    */
-  public static function resolveValue($source, array $args = NULL, $root, Node $field) {
+  public static function resolveValue($source, array $args = NULL, $root, Node $field, $a, $b, $c, $data) {
     if (!($source instanceof TypedDataInterface)) {
       return NULL;
     }
 
-    $key = $field->get('name')->get('value');
-    $value = $source->get($key);
+    $value = $source->get($data['key']);
     return $value->getValue();
   }
 
@@ -172,13 +168,12 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|null
    */
-  public static function resolveReferencedValue($source, array $args = NULL, $root, Node $field) {
+  public static function resolveReferencedValue($source, array $args = NULL, $root, Node $field, $a, $b, $c, $data) {
     if (!($source instanceof TypedDataInterface)) {
       return NULL;
     }
 
-    $key = $field->get('name')->get('value');
-    $value = $source->get($key);
+    $value = $source->get($data['key']);
     if (!($value instanceof DataReferenceInterface)) {
       return NULL;
     }
@@ -194,13 +189,12 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|null
    */
-  public static function resolveComplexValue($source, array $args = NULL, $root, Node $field) {
+  public static function resolveComplexValue($source, array $args = NULL, $root, Node $field, $a, $b, $c, $data) {
     if (!($source instanceof TypedDataInterface)) {
       return NULL;
     }
 
-    $key = $field->get('name')->get('value');
-    $value = $source->get($key);
+    $value = $source->get($data['key']);
     if (!($value instanceof ComplexDataInterface)) {
       return NULL;
     }
@@ -216,13 +210,12 @@ class ComplexDataTypeResolver implements TypeResolverInterface {
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|null
    */
-  public static function resolveListValue($source, array $args = NULL, $root, Node $field) {
+  public static function resolveListValue($source, array $args = NULL, $root, Node $field, $a, $b, $c, $data) {
     if (!($source instanceof TypedDataInterface)) {
       return NULL;
     }
 
-    $key = $field->get('name')->get('value');
-    $value = $source->get($key);
+    $value = $source->get($data['key']);
     if (!($value instanceof ListInterface)) {
       return NULL;
     }
