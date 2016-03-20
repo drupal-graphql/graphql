@@ -65,3 +65,14 @@ services:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
       - { name: event_subscriber }
+  graphql.entity_schema_subscriber:
+    class: Drupal\graphql\EventSubscriber\EntitySchemaSubscriber
+    arguments: ['@cache.graphql_schema']
+    tags:
+      - { name: 'event_subscriber' }
+  cache.graphql_schema:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_schema]
