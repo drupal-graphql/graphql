@@ -21,7 +21,7 @@ services:
       - { name: graphql_schema_provider }
   graphql.schema_provider.views:
     class: Drupal\graphql\SchemaProvider\ViewsSchemaProvider
-    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver']
+    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver', '@module_handler']
     tags:
       - { name: graphql_schema_provider }
   graphql.type_resolver:
