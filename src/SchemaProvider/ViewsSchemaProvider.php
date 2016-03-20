@@ -9,8 +9,10 @@ namespace Drupal\graphql\SchemaProvider;
 
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\TypeResolverInterface;
+use Drupal\graphql\Utility\String;
 use Drupal\views\ViewEntityInterface;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
@@ -44,6 +46,13 @@ class ViewsSchemaProvider extends SchemaProviderBase {
   protected $typedDataManager;
 
   /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs a ViewsSchemaProvider object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -52,11 +61,14 @@ class ViewsSchemaProvider extends SchemaProviderBase {
    *   The typed data manager service.
    * @param \Drupal\graphql\TypeResolverInterface $type_resolver
    *   The base type resolver service.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, TypedDataManager $typed_data_manager, TypeResolverInterface $type_resolver) {
+  public function __construct(EntityManagerInterface $entity_manager, TypedDataManager $typed_data_manager, TypeResolverInterface $type_resolver, ModuleHandlerInterface $module_handler) {
     $this->entityManager = $entity_manager;
     $this->typeResolver = $type_resolver;
     $this->typedDataManager = $typed_data_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -77,6 +89,11 @@ class ViewsSchemaProvider extends SchemaProviderBase {
    * {@inheritdoc}
    */
   public function getQuerySchema() {
+    // Do not attempt to generate the schema if the views module is not enabled.
+    if (!$this->moduleHandler->moduleExists('views')) {
+      return [];
+    }
+
     $fields = [];
 
     $map = $this->getDataTableMap();
@@ -111,27 +128,40 @@ class ViewsSchemaProvider extends SchemaProviderBase {
         }, []);
 
         $definition = $this->typedDataManager->createDataDefinition("entity:{$map[$base_table]}");
+        if (!$resolved = $this->typeResolver->resolveRecursive($definition)) {
+          continue;
+        }
+
         $displays[$display_id] = [
-          'type' => new ListModifier($this->typeResolver->resolveRecursive($definition)),
+          'type' => new ListModifier($resolved),
           'resolve' => [__CLASS__, 'resolveDisplay'],
-          'args' => array_merge($filters),
+          'args' => $filters,
         ];
       }
 
       if (!empty($displays)) {
-        $fields[$view->id()] = [
-          'type' => new ObjectType($this->stringToName($view->id()), $displays),
+        // Format the display names as camel-cased strings.
+        $names = String::formatPropertyNameList(array_keys($displays));
+        $displays = array_combine($names, $displays);
+
+        $id = $view->id();
+        $name = String::formatPropertyName($id);
+        $fields[$name] = [
+          'type' => new ObjectType($name, $displays),
           'resolve' => [__CLASS__, 'resolveView'],
+          'resolveData' => ['id' => $id],
         ];
       }
     }
 
     return !empty($fields) ? ['views' => [
       'type' => new ObjectType('__ViewsRoot', $fields),
-      'resolve' => function () {
-        return $this->entityManager->getStorage('view');
-      }
+      'resolve' => [__CLASS__, 'resolveRoot']
     ]] : [];
+  }
+
+  public static function resolveRoot() {
+    return TRUE;
   }
 
   /**
@@ -143,9 +173,13 @@ class ViewsSchemaProvider extends SchemaProviderBase {
    * @return \Drupal\Core\Entity\EntityInterface|null
    */
   public static function resolveView($source, array $args = NULL, $root, Node $field) {
-    if ($source instanceof EntityStorageInterface) {
-      return $source->load($field->get('name')->get('value'));
+    // @todo Fix injection of container dependencies in resolver functions.
+    $storage = \Drupal::entityManager()->getStorage('view');
+    if ($view = $storage->load($field->get('name')->get('value'))) {
+      return $view;
     }
+
+    return NULL;
   }
 
   /**
@@ -170,15 +204,5 @@ class ViewsSchemaProvider extends SchemaProviderBase {
 
       return $result;
     }
-  }
-
-  /**
-   * @param $string
-   *
-   * @return string
-   */
-  protected function stringToName($string) {
-    $words = preg_split('/[:\.\-_]/', strtolower($string));
-    return implode('', array_map('ucfirst', array_map('trim', $words)));
   }
 }
