@@ -1,6 +1,15 @@
 services:
+  cache.graphql_schema:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_schema]
   graphql.graphql:
     class: Fubhy\GraphQL\GraphQL
+  graphql.schema_loader:
+    class: Drupal\graphql\SchemaLoader
+    arguments: ['@graphql.schema_provider', '@cache.graphql_schema']
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider
     tags:
