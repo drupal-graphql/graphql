@@ -16,7 +16,6 @@ class EntityQueryTest extends QueryTestBase {
   /**
    * Helper function to issue a HTTP request with simpletest's cURL.
    *
-   *
    * @return string
    *   The content returned from the request.
    */
@@ -30,5 +29,12 @@ class EntityQueryTest extends QueryTestBase {
     }';
 
     $response = $this->query($query);
+    $this->assertEqual($response, [
+      'entityQuery' => [
+        'node' => [
+          'title' => 'someTitle',
+        ],
+      ],
+    ]);
   }
 }

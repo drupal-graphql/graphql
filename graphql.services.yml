@@ -19,11 +19,11 @@ services:
     arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver']
     tags:
       - { name: graphql_schema_provider }
-  graphql.schema_provider.views:
-    class: Drupal\graphql\SchemaProvider\ViewsSchemaProvider
-    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver', '@module_handler']
-    tags:
-      - { name: graphql_schema_provider }
+#  graphql.schema_provider.views:
+#    class: Drupal\graphql\SchemaProvider\ViewsSchemaProvider
+#    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver', '@module_handler']
+#    tags:
+#      - { name: graphql_schema_provider }
   graphql.type_resolver:
     class: Drupal\graphql\TypeResolver
     tags:
@@ -32,26 +32,31 @@ services:
     class: Drupal\graphql\TypeResolver\TypedDataTypeResolver
     arguments: ['@graphql.type_resolver']
     tags:
-      - { name: graphql_type_resolver, priority; -10 }
+      - { name: graphql_type_resolver, priority: -10 }
   graphql.type_resolver.typed_data.content_entity:
     class: Drupal\graphql\TypeResolver\ContentEntityTypeResolver
     arguments: ['@graphql.type_resolver', '@entity.manager', '@typed_data_manager']
     tags:
-      - { name: graphql_type_resolver }
+      - { name: graphql_type_resolver, priority: 10 }
+  graphql.type_resolver.typed_data.config_entity:
+    class: Drupal\graphql\TypeResolver\ConfigEntityTypeResolver
+    arguments: ['@entity.manager']
+    tags:
+      - { name: graphql_type_resolver, priority: 20 }
   graphql.type_resolver.typed_data.field_item:
     class: Drupal\graphql\TypeResolver\FieldItemTypeResolver
     arguments: ['@graphql.type_resolver', '@entity.manager']
     tags:
       - { name: graphql_type_resolver }
-#  graphql.type_resolver.typed_data.field_item.entity_reference:
-#    class: Drupal\graphql\TypeResolver\Specialized\EntityReferenceFieldItemTypeResolver
-#    arguments: ['@graphql.type_resolver', '@entity.manager']
-#    tags:
-#      - { name: graphql_type_resolver, priority: 10 }
-#  graphql.type_resolver.typed_data.language:
-#    class: Drupal\graphql\TypeResolver\Specialized\LanguageTypeResolver
-#    tags:
-#      - { name: graphql_type_resolver }
+  graphql.type_resolver.typed_data.field_item.entity_reference:
+    class: Drupal\graphql\TypeResolver\Specialized\EntityReferenceFieldItemTypeResolver
+    arguments: ['@graphql.type_resolver', '@entity.manager']
+    tags:
+      - { name: graphql_type_resolver, priority: 10 }
+  graphql.type_resolver.typed_data.language:
+    class: Drupal\graphql\TypeResolver\Specialized\LanguageTypeResolver
+    tags:
+      - { name: graphql_type_resolver }
   graphql.page_display_variant_subscriber:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
