@@ -4,11 +4,11 @@ explorer:
     //cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js: { type: external, minified: true }
     //cdn.jsdelivr.net/react/0.14.7/react.min.js: { type: external, minified: true }
     //cdn.jsdelivr.net/react/0.14.7/react-dom.min.js: { type: external, minified: true }
-    //cdn.jsdelivr.net/graphiql/0.4.9/graphiql.min.js: { type: external, minified: true }
+    //cdn.jsdelivr.net/graphiql/0.7.0/graphiql.js: { type: external, minified: true }
     js/dist/bundle.min.js: {}
   css:
     component:
-      http://cdn.jsdelivr.net/graphiql/0.4.9/graphiql.css: { type: external }
+      http://cdn.jsdelivr.net/graphiql/0.7.0/graphiql.css: { type: external }
       css/explorer.css: {}
   dependencies:
     - core/drupal

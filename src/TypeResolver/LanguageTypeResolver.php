@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\graphql\TypeResolver\Specialized\LanguageTypeResolver.
+ * Contains \Drupal\graphql\TypeResolver\LanguageTypeResolver.
  */
 
-namespace Drupal\graphql\TypeResolver\Specialized;
+namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Language;
@@ -15,10 +15,12 @@ use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
 use Fubhy\GraphQL\Type\Definition\Types\Type;
 
 /**
- * Resolves typed data types.
+ * Resolves the schema for the 'language' data type.
  */
 class LanguageTypeResolver implements TypeResolverInterface {
   /**
+   * Static cache of the language schema definition.
+   *
    * @var \Fubhy\GraphQL\Type\Definition\Types\ObjectType
    */
   protected $languageType;
@@ -39,48 +41,41 @@ class LanguageTypeResolver implements TypeResolverInterface {
    */
   public function resolveRecursive($type) {
     if ($type instanceof DataDefinitionInterface && $type->getDataType() === 'language') {
-      return $this->getLanguageType();
+      if (!isset($this->languageType)) {
+        $this->languageType = new ObjectType(
+          'Language', [
+            'id' => [
+              'type' => new NonNullModifier(Type::idType()),
+              'resolve' => [__CLASS__, 'getId'],
+            ],
+            'name' => [
+              'type' => new NonNullModifier(Type::stringType()),
+              'resolve' => [__CLASS__, 'getName'],
+            ],
+            'direction' => [
+              'type' => new NonNullModifier(Type::stringType()),
+              'resolve' => [__CLASS__, 'getDirection'],
+            ],
+            'weight' => [
+              'type' => new NonNullModifier(Type::intType()),
+              'resolve' => [__CLASS__, 'getWeight'],
+            ],
+            'locked' => [
+              'type' => new NonNullModifier(Type::booleanType()),
+              'resolve' => [__CLASS__, 'isLocked'],
+            ],
+            'default' => [
+              'type' => new NonNullModifier(Type::booleanType()),
+              'resolve' => [__CLASS__, 'isDefault'],
+            ],
+          ]
+        );
+      }
+
+      return $this->languageType;
     }
 
     return NULL;
-  }
-
-  /**
-   * @return \Fubhy\GraphQL\Type\Definition\Types\ObjectType
-   */
-  protected function getLanguageType() {
-    if (!isset($this->languageType)) {
-      $this->languageType = new ObjectType(
-        'Language', [
-          'id' => [
-            'type' => new NonNullModifier(Type::idType()),
-            'resolve' => [__CLASS__, 'resolveId'],
-          ],
-          'name' => [
-            'type' => new NonNullModifier(Type::stringType()),
-            'resolve' => [__CLASS__, 'resolveName'],
-          ],
-          'direction' => [
-            'type' => new NonNullModifier(Type::stringType()),
-            'resolve' => [__CLASS__, 'resolveDirection'],
-          ],
-          'weight' => [
-            'type' => new NonNullModifier(Type::intType()),
-            'resolve' => [__CLASS__, 'resolveWeight'],
-          ],
-          'locked' => [
-            'type' => new NonNullModifier(Type::booleanType()),
-            'resolve' => [__CLASS__, 'resolveIsLocked'],
-          ],
-          'default' => [
-            'type' => new NonNullModifier(Type::booleanType()),
-            'resolve' => [__CLASS__, 'resolveIsDefault'],
-          ],
-        ]
-      );
-    }
-
-    return $this->languageType;
   }
 
   /**
@@ -93,7 +88,7 @@ class LanguageTypeResolver implements TypeResolverInterface {
    * The human-readable name of the language (in the language that was
    * used to construct this object).
    */
-  public static function resolveName(Language $language) {
+  public static function getName(Language $language) {
     return $language->getValue()->getName();
   }
 
@@ -106,7 +101,7 @@ class LanguageTypeResolver implements TypeResolverInterface {
    * @return string
    *   The language code.
    */
-  public static function resolveId(Language $language) {
+  public static function getId(Language $language) {
     return $language->getValue()->getId();
   }
 
@@ -119,7 +114,7 @@ class LanguageTypeResolver implements TypeResolverInterface {
    * @return string
    *   Either self::DIRECTION_LTR or self::DIRECTION_RTL.
    */
-  public static function resolveDirection(Language $language) {
+  public static function getDirection(Language $language) {
     return $language->getValue()->getDirection();
   }
 
@@ -133,7 +128,7 @@ class LanguageTypeResolver implements TypeResolverInterface {
    *   The weight, used to order languages with larger positive weights sinking
    *   items toward the bottom of lists.
    */
-  public static function resolveWeight(Language $language) {
+  public static function getWeight(Language $language) {
     return $language->getValue()->getWeight();
   }
 
@@ -146,7 +141,7 @@ class LanguageTypeResolver implements TypeResolverInterface {
    * @return bool
    *   Whether the language is the default language.
    */
-  public static function resolveIsDefault(Language $language) {
+  public static function isDefault(Language $language) {
     return $language->getValue()->isDefault();
   }
 
@@ -159,7 +154,7 @@ class LanguageTypeResolver implements TypeResolverInterface {
    * @return bool
    *   Whether the language is locked or not.
    */
-  public static function resolveIsLocked(Language $language) {
+  public static function isLocked(Language $language) {
     return $language->getValue()->isLocked();
   }
 }

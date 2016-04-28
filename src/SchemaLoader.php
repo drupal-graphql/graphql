@@ -7,6 +7,7 @@
 
 namespace Drupal\graphql;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Fubhy\GraphQL\Schema;
@@ -54,7 +55,7 @@ class SchemaLoader {
    */
   public function loadSchema(LanguageInterface $language) {
     if ($schema = $this->schemaCache->get($language->getId())) {
-      return $schema->data;
+      //return $schema->data;
     }
 
     $query = new ObjectType('Root', $this->schemaProvider->getQuerySchema());
@@ -66,7 +67,10 @@ class SchemaLoader {
     $schema->getTypeMap();
 
     // Cache the generated schema in the configured cache backend.
-    $this->schemaCache->set($language->getId(), $schema);
+    $expire = Cache::PERMANENT;
+    $tags  = ['views', 'entity_field_info', 'entity_bundles'];
+    $cid = $language->getId();
+    $this->schemaCache->set($cid, $schema, $expire, $tags);
 
     return $schema;
   }

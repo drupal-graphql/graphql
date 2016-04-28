@@ -38,7 +38,7 @@ abstract class QueryTestBase extends WebTestBase {
     $this->drupalLogin($this->drupalCreateUser(['execute graphql requests']));
 
     // Create a test content type for node testing.
-    $this->drupalCreateContentType(['name' => 'graphqltest', 'type' => 'graphqltest']);
+    $this->drupalCreateContentType(['name' => 'article', 'type' => 'article']);
   }
 
   /**
@@ -52,9 +52,6 @@ abstract class QueryTestBase extends WebTestBase {
    * The content returned from the request.
    */
   protected function query($query, array $variables = NULL, $operation = NULL) {
-    // @todo Generate CSRF token.
-    $token = '';
-
     $body = [
       'query' => $query,
       'variables' => $variables,
@@ -86,8 +83,8 @@ abstract class QueryTestBase extends WebTestBase {
    * value.
    *
    * @param array $expected
-   *   The expected value.
-   * @param array $actual
+   *   The expected value as an array.
+   * @param $actual
    *   The actual value.
    * @param string $message
    *   (optional) A message to display with the assertion. Do not translate
@@ -103,10 +100,10 @@ abstract class QueryTestBase extends WebTestBase {
    * @return bool
    *   TRUE if the assertion succeeded, FALSE otherwise.
    */
-  protected function assertResponseBody(array $expected, array $actual, $message = '', $group = 'GraphQL Response') {
-    $expected = json_decode($expected);
+  protected function assertResponseBody(array $expected, $actual, $message = '', $group = 'GraphQL Response') {
+    $expected = json_decode(json_encode($expected));
     $actual = json_decode($actual);
 
-    return $this->assertIdentical($expected, $actual, $message ? $message : strtr('Response body @expected (expected) is equal to @response (actual).', array('@expected' => var_export($expected, TRUE), '@response' => var_export($actual, TRUE))), $group);
+    return $this->assertEqual($expected, $actual, $message ? $message : strtr('Response body @expected (expected) is equal to @response (actual).', array('@expected' => var_export($expected, TRUE), '@response' => var_export($actual, TRUE))), $group);
   }
 }

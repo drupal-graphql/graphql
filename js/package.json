@@ -1,6 +1,6 @@
 {
   "name": "drupal-graphql",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && NODE_ENV=production webpack src/index.js dist/bundle.js && NODE_ENV=production COMPRESS=1 webpack src/index.js dist/bundle.min.js && echo \"gzipped, the global build is `gzip -c dist/bundle.min.js | wc -c` bytes\"",
@@ -8,13 +8,6 @@
   },
   "author": "Sebastian Siemssen <fubhy@fubhy.com> (http://github.com/fubhy)",
   "homepage": "http://drupal.org/project/graphql",
-  "dependencies": {
-    "fetch": "^1.0.0",
-    "graphiql": "^0.5.0",
-    "graphql": "^0.4.16",
-    "react": "^0.14.7",
-    "react-dom": "^0.14.7"
-  },
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-core": "^6.5.2",

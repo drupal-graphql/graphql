@@ -55,20 +55,20 @@ class ViewsSchemaProvider extends SchemaProviderBase {
   /**
    * Constructs a ViewsSchemaProvider object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager service.
-   * @param TypedDataManager $typed_data_manager
+   * @param TypedDataManager $typedDataManager
    *   The typed data manager service.
-   * @param \Drupal\graphql\TypeResolverInterface $type_resolver
+   * @param \Drupal\graphql\TypeResolverInterface $typeResolver
    *   The base type resolver service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, TypedDataManager $typed_data_manager, TypeResolverInterface $type_resolver, ModuleHandlerInterface $module_handler) {
-    $this->entityManager = $entity_manager;
-    $this->typeResolver = $type_resolver;
-    $this->typedDataManager = $typed_data_manager;
-    $this->moduleHandler = $module_handler;
+  public function __construct(EntityManagerInterface $entityManager, TypedDataManager $typedDataManager, TypeResolverInterface $typeResolver, ModuleHandlerInterface $moduleHandler) {
+    $this->entityManager = $entityManager;
+    $this->typeResolver = $typeResolver;
+    $this->typedDataManager = $typedDataManager;
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -76,9 +76,9 @@ class ViewsSchemaProvider extends SchemaProviderBase {
    */
   protected function getDataTableMap() {
     $map = [];
-    foreach ($this->entityManager->getDefinitions() as $entity_type_id => $entity_type) {
-      if ($data_table = $entity_type->getDataTable()) {
-        $map[$data_table] = $entity_type->id();
+    foreach ($this->entityManager->getDefinitions() as $entityTypeId => $entityType) {
+      if ($dataTable = $entityType->getDataTable()) {
+        $map[$dataTable] = $entityType->id();
       }
     }
 
@@ -95,25 +95,25 @@ class ViewsSchemaProvider extends SchemaProviderBase {
     }
 
     $fields = [];
-
     $map = $this->getDataTableMap();
     /** @var \Drupal\views\ViewEntityInterface $view */
     foreach ($this->entityManager->getStorage('view')->loadMultiple() as $view) {
-      $base_table = $view->get('base_table');
-      if (!isset($map[$base_table])) {
+      $baseTable = $view->get('base_table');
+      if (!isset($map[$baseTable])) {
         continue;
       }
 
-      $displays = [];
-      foreach ($view->get('display') as $display_id => $display) {
+      $viewId = $view->id();
+      foreach ($view->get('display') as $displayId => $display) {
         if ($display['display_plugin'] !== 'graphql') {
           continue;
         }
 
         $executable = $view->getExecutable();
-        $executable->setDisplay($display_id);
+        $executable->setDisplay($displayId);
 
-        $filters = array_reduce(array_filter($executable->getDisplay()->getOption('filters'), function (array $filter) {
+        $filters = $executable->getDisplay()->getOption('filters');
+        $filters = array_reduce(array_filter($filters, function (array $filter) {
           return !empty($filter['exposed']);
         }), function (array $carry, array $filter) {
           $type = $filter['expose']['required'] ? new NonNullModifier(Type::stringType()) : Type::stringType();
@@ -127,82 +127,46 @@ class ViewsSchemaProvider extends SchemaProviderBase {
           return $carry;
         }, []);
 
-        $definition = $this->typedDataManager->createDataDefinition("entity:{$map[$base_table]}");
+        $definition = $this->typedDataManager->createDataDefinition("entity:{$map[$baseTable]}");
         if (!$resolved = $this->typeResolver->resolveRecursive($definition)) {
           continue;
         }
 
-        $displays[$display_id] = [
+        $fields["$viewId:$displayId"] = [
           'type' => new ListModifier($resolved),
-          'resolve' => [__CLASS__, 'resolveDisplay'],
+          'resolve' => [__CLASS__, 'getViewResults'],
           'args' => $filters,
-        ];
-      }
-
-      if (!empty($displays)) {
-        // Format the display names as camel-cased strings.
-        $names = String::formatPropertyNameList(array_keys($displays));
-        $displays = array_combine($names, $displays);
-
-        $id = $view->id();
-        $name = String::formatPropertyName($id);
-        $fields[$name] = [
-          'type' => new ObjectType($name, $displays),
-          'resolve' => [__CLASS__, 'resolveView'],
-          'resolveData' => ['id' => $id],
+          'resolveData' => ['view' => $viewId, 'display' => $displayId],
         ];
       }
     }
 
-    return !empty($fields) ? ['views' => [
-      'type' => new ObjectType('__ViewsRoot', $fields),
-      'resolve' => [__CLASS__, 'resolveRoot']
-    ]] : [];
-  }
-
-  public static function resolveRoot() {
-    return TRUE;
+    $names = String::formatPropertyNameList(array_keys($fields));
+    return array_combine($names, $fields);
   }
 
   /**
-   * @param $source
-   * @param array|null $args
-   * @param $root
-   * @param Node $field
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * Views result resolver callback.
    */
-  public static function resolveView($source, array $args = NULL, $root, Node $field) {
+  public static function getViewResults($source, array $args = NULL, $root, Node $field, $a, $b, $c, $data) {
     // @todo Fix injection of container dependencies in resolver functions.
     $storage = \Drupal::entityManager()->getStorage('view');
-    if ($view = $storage->load($field->get('name')->get('value'))) {
-      return $view;
+    /** @var \Drupal\views\ViewEntityInterface $view */
+    if (!$view = $storage->load($data['view'])) {
+      return NULL;
     }
 
-    return NULL;
-  }
+    $executable = $view->getExecutable();
+    $executable->setDisplay($data['display']);
+    $executable->setExposedInput(array_filter($args));
+    $executable->execute();
 
-  /**
-   * @param $source
-   * @param array|null $args
-   * @param $root
-   * @param Node $field
-   *
-   * @return array
-   */
-  public static function resolveDisplay($source, array $args = NULL, $root, Node $field) {
-    if ($source instanceof ViewEntityInterface) {
-      $executable = $source->getExecutable();
-      $executable->setDisplay($field->get('name')->get('value'));
-      $executable->setExposedInput(array_filter($args));
-      $executable->execute();
-
-      $result = [];
-      foreach ($executable->result as $row) {
-        $result[$row->_entity->id()] = $row->_entity->getTypedData();
-      }
-
-      return $result;
+    $result = [];
+    foreach ($executable->result as $row) {
+      $entity = $row->_entity;
+      $result[$entity->id()] = $entity->getTypedData();
     }
+
+    return $result;
   }
 }
