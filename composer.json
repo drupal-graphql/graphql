@@ -5,7 +5,7 @@
   "homepage": "http://drupal.org/project/graphql",
   "license": "GPL-2.0+",
   "require": {
-    "fubhy/graphql-php": "dev-master"
+    "fubhy/graphql-php": "~1.0"
   },
   "minimum-stability": "dev"
 }
