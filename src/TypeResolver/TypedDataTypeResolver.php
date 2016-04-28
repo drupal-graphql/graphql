@@ -114,21 +114,21 @@ class TypedDataTypeResolver implements TypeResolverInterface {
    *   The object type or NULL if the type does not have any resolvable fields.
    */
   protected function resolveRecursiveComplex(ComplexDataDefinitionInterface $type) {
-    if (($identifier = $this->getTypeIdentifier($type)) && array_key_exists($identifier, $this->complexTypes)) {
-      return $this->complexTypes[$identifier];
+    if (($dataType = $this->getTypeIdentifier($type)) && array_key_exists($dataType, $this->complexTypes)) {
+      return $this->complexTypes[$dataType];
     }
 
     // Resolve complex data definitions lazily due to recursive definitions.
-    return function () use ($type, $identifier) {
-      if (array_key_exists($identifier, $this->complexTypes)) {
-        return $this->complexTypes[$identifier];
+    return function () use ($type) {
+      if (($dataType = $this->getTypeIdentifier($type)) && array_key_exists($dataType, $this->complexTypes)) {
+        return $this->complexTypes[$dataType];
       }
 
       $propertyDefinitions = $type->getPropertyDefinitions();
       $propertyKeys = array_keys($propertyDefinitions);
       $propertyNames = String::formatPropertyNameList($propertyKeys);
 
-      $typeName = String::formatTypeName($identifier);
+      $typeName = String::formatTypeName($dataType);
       $typeDescription = $type->getDescription();
       $typeDescription = $typeDescription ? "{$type->getLabel()}: $typeDescription" : $type->getLabel();
       $typeFields = array_reduce($propertyKeys, function ($previous, $key) use ($propertyNames, $propertyDefinitions) {
@@ -170,12 +170,12 @@ class TypedDataTypeResolver implements TypeResolverInterface {
 
       // Do not register object types without any fields.
       if (empty($typeFields)) {
-        return $this->complexTypes[$identifier] = Type::stringType();
+        return $this->complexTypes[$dataType] = Type::stringType();
       }
 
       // Statically cache the resolved type based on its data type.
-      $this->complexTypes[$identifier] = new ObjectType($typeName, $typeFields, [], NULL, $typeDescription);
-      return $this->complexTypes[$identifier];
+      $this->complexTypes[$dataType] = new ObjectType($typeName, $typeFields, [], NULL, $typeDescription);
+      return $this->complexTypes[$dataType];
     };
   }
 
