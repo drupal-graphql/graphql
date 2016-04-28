@@ -7,25 +7,31 @@
 
 namespace Drupal\graphql\TypeResolver;
 
-use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
+use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\TypeResolverInterface;
 use Drupal\graphql\Utility\String;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\InterfaceType;
-use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
-use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
 use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
 
 /**
  * Resolves typed data types.
  */
-class ContentEntityTypeResolver extends TypedDataTypeResolver {
+class ContentEntityTypeResolver implements TypeResolverInterface {
+  /**
+   * The type resolver service.
+   *
+   * @var \Drupal\graphql\TypeResolverInterface
+   */
+  protected $typeResolver;
+  
   /**
    * The typed data manager service.
    *
@@ -58,7 +64,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
    *   The typed data manager service.
    */
   public function __construct(TypeResolverInterface $typeResolver, EntityManagerInterface $entityManager, TypedDataManagerInterface $typedDataManager) {
-    parent::__construct($typeResolver);
+    $this->typeResolver = $typeResolver;
     $this->entityManager = $entityManager;
     $this->typedDataManager = $typedDataManager;
   }
@@ -67,14 +73,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
    * {@inheritdoc}
    */
   public function applies($type) {
-    if ($type instanceof EntityDataDefinitionInterface) {
-      $entityTypeId = $type->getEntityTypeId();
-      $entityType = $this->entityManager->getDefinition($entityTypeId);
-
-      return $entityType->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface');
-    }
-
-    return FALSE;
+    return $type instanceof EntityDataDefinitionInterface;
   }
 
   /**
@@ -98,170 +97,150 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
     $constraintBundle = count($constraintBundles) === 1 ? reset($constraintBundles) : NULL;
 
     // Check if we've already built the type definitions for this entity type.
-    $cacheKey = isset($constraintBundle) ? $constraintBundle : $entityTypeId;
+    $cacheIdentifier = isset($constraintBundle) ? "$entityTypeId:$constraintBundle" : $entityTypeId;
     if (array_key_exists($entityTypeId, $this->cachedTypes)) {
-      return $this->cachedTypes[$entityTypeId][$cacheKey];
+      return $this->cachedTypes[$cacheIdentifier];
     }
 
     // Resolve complex data definitions lazily due to recursive definitions.
-    return function () use ($entityTypeId, $cacheKey) {
+    return function () use ($entityTypeId, $availableBundles, $constraintBundle, $cacheIdentifier) {
       if (array_key_exists($entityTypeId, $this->cachedTypes)) {
-        return $this->cachedTypes[$entityTypeId][$cacheKey];
+        return $this->cachedTypes[$cacheIdentifier];
       }
 
-      // Initialize the static cache for this entity type.
-      $staticCache = &$this->cachedTypes[$entityTypeId];
-      $staticCache = [];
-
-      // Retrieve the field map for the entity type (contains base and bundle
-      // specific fields).
-      $fieldMap = $this->getEntityTypeFieldMap($entityTypeId);
-      $baseFields = $fieldMap['base'];
-
+      // Name of the interface- or the object type (if there are no bundles).
       $entityTypeName = String::formatTypeName("entity:$entityTypeId");
-      if (!empty($fieldMap['bundles'])) {
-        // If there are bundles, create an interface type definition and the
-        // object type definition for all available bundles.
-        $objectTypeResolver = [__CLASS__, 'getObjectTypeFromData'];
-        $staticCache[$entityTypeId] = new InterfaceType($entityTypeName, $baseFields, $objectTypeResolver);
-        $typeInterfaces = [$staticCache[$entityTypeId]];
 
-        foreach ($fieldMap['bundles'] as $bundleKey => $bundleFields) {
-          $bundleName = String::formatTypeName("entity:$entityTypeId:$bundleKey");
-          $staticCache[$bundleKey] = new ObjectType($bundleName, $bundleFields + $baseFields, $typeInterfaces);
-        }
-      }
-      else {
-        // If there are no bundles, simply handle the entity type as a
-        // stand-alone object type.
-        $staticCache[$entityTypeId] = !empty($baseFields) ? new ObjectType($entityTypeName, $baseFields) : NULL;
+      // Get all shared properties for all bundles and the interface.
+      $baseFields = $this->resolveBaseFields($entityTypeId);
+      
+      // If there are no bundles, simply handle the entity type as a
+      // stand-alone object type.
+      if (empty($availableBundles)) {
+        $this->cachedTypes[$entityTypeId] = new ObjectType($entityTypeName, $baseFields);
+        return $this->cachedTypes[$entityTypeId];
       }
 
-      return $staticCache[$cacheKey];
+      // Else, create an interface type definition and the object type definiton
+      // for all available bundles.
+      $objectTypeResolver = [__CLASS__, 'resolveObjectType'];
+      $this->cachedTypes[$entityTypeId] = new InterfaceType($entityTypeName, $baseFields, $objectTypeResolver);
+
+      foreach ($availableBundles as $bundleKey) {
+        $bundleName = String::formatTypeName("entity:$entityTypeId:$bundleKey");
+        $bundleFields = $this->resolveBundleFields($entityTypeId, $bundleKey);
+        $typeInterfaces = [$this->cachedTypes[$entityTypeId]];
+        $this->cachedTypes["$entityTypeId:$bundleKey"] = new ObjectType($bundleName, $bundleFields + $baseFields, $typeInterfaces);
+      }
+
+      return $this->cachedTypes[$cacheIdentifier];
+//
+//      $propertyDefinitions = $type->getPropertyDefinitions();
+//      $propertyKeys = array_keys($propertyDefinitions);
+//      $propertyNames = String::formatPropertyNameList($propertyKeys);
+//
+//      $typeName = String::formatTypeName($identifier);
+//      $typeDescription = $type->getDescription();
+//      $typeDescription = $typeDescription ? "{$type->getLabel()}: $typeDescription" : $type->getLabel();
+//      $typeFields = array_reduce($propertyKeys, function ($previous, $key) use ($propertyNames, $propertyDefinitions) {
+//        $propertyDefinition = $propertyDefinitions[$key];
+//        if (!$propertyType = $this->typeResolver->resolveRecursive($propertyDefinition)) {
+//          return $previous;
+//        }
+//
+//        $isList = $propertyDefinition->isList();
+//        $isRequired = $propertyDefinition->isRequired();
+//
+//        $propertyType = $isList ? new ListModifier($propertyType) : $propertyType;
+//        $propertyType = $isRequired ? new NonNullModifier($propertyType) : $propertyType;
+//
+//        if ($propertyDefinition instanceof ComplexDataDefinitionInterface) {
+//          $resolverFunction = [__CLASS__, 'getPropertyComplexValue'];
+//        }
+//        else if ($propertyDefinition instanceof ListDataDefinitionInterface) {
+//          $resolverFunction = [__CLASS__, 'getPropertyListValue'];
+//        }
+//        else if ($propertyDefinition instanceof DataReferenceDefinitionInterface) {
+//          $resolverFunction = [__CLASS__, 'getPropertyReferenceValue'];
+//        }
+//        else if ($propertyDefinition instanceof DataDefinitionInterface) {
+//          $resolverFunction = [__CLASS__, 'getPropertyPrimitiveValue'];
+//        }
+//        else {
+//          return $previous;
+//        }
+//
+//        return $previous + [
+//          $propertyNames[$key] => [
+//            'type' => $propertyType,
+//            'resolve' => $resolverFunction,
+//            'resolveData' => ['property' => $key],
+//          ],
+//        ];
+//      }, []);
+//
+//      // Do not register object types without any fields.
+//      if (empty($typeFields)) {
+//        return $this->complexTypes[$identifier] = Type::stringType();
+//      }
+//
+//      // Statically cache the resolved type based on its data type.
+//      $this->complexTypes[$identifier] = new ObjectType($typeName, $typeFields, [], NULL, $typeDescription);
+//      return $this->complexTypes[$identifier];
     };
   }
 
-  /**
-   * Helper function to retrieve the field schema definitions for an entity.
-   *
-   * Retrieves the field schema definitions for the base properties and the
-   * bundle specific properties for each available bundle.
-   *
-   * @param string $entityTypeId
-   *   The entity type for which to build the field schema definitions.
-   *
-   * @return array
-   *   A structured array containing the field schema definitions for the base-
-   *   and bundle specific properties.
-   */
-  protected function getEntityTypeFieldMap($entityTypeId) {
-    /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $baseDefinition */
-    $baseDefinition = $this->typedDataManager->createDataDefinition("entity:$entityTypeId");
-    $baseProperties = $baseDefinition->getPropertyDefinitions();
-    $basePropertyKeys = array_keys($baseProperties);
-    $basePropertyNames = String::formatPropertyNameList($basePropertyKeys);
+  protected function resolveBaseFields($entityTypeId) {
+    $definition = $this->typedDataManager->createDataDefinition("entity:$entityTypeId");
+    $propertyDefinitions = $definition->getPropertyDefinitions();
+    $propertyKeys = array_keys($propertyDefinitions);
+    $propertyNames = String::formatPropertyNameList($propertyKeys);
 
-    // Resolve fields from base properties.
-    $baseFields = array_map(function ($propertyKey) use ($baseProperties) {
-      $propertyDefinition = $baseProperties[$propertyKey];
-      $resolvedProperty = $this->resolveFieldFromProperty($propertyKey, $propertyDefinition);
-      return $resolvedProperty;
-    }, $basePropertyKeys);
+    $typeFields = array_map(function ($propertyKey) use ($propertyDefinitions) {
+      $propertyDefinition = $propertyDefinitions[$propertyKey];
+      return $this->resolveFieldFromProperty($propertyKey, $propertyDefinition);
+    }, $propertyKeys);
 
-    $fieldMap['base'] = array_filter(array_combine($basePropertyNames, $baseFields));
+    $typeFields = array_filter(array_combine($propertyNames, $typeFields));
 
-    // The bundles available for this entity type.
-    $bundleInfo = $this->entityManager->getBundleInfo($entityTypeId);
-    $bundleKeys = array_keys($bundleInfo);
-    $availableBundles = array_diff($bundleKeys, [$entityTypeId]);
-
-    foreach ($availableBundles as $bundleKey) {
-      /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $bundleDefinition */
-      $bundleDefinition = $this->typedDataManager->createDataDefinition("entity:$entityTypeId:$bundleKey");
-      $bundleProperties = $bundleDefinition->getPropertyDefinitions();
-      $bundleProperties = array_diff_key($bundleProperties, $baseProperties);
-      $bundlePropertyKeys = array_keys($bundleProperties);
-      $bundlePropertyNames = String::formatPropertyNameList($bundlePropertyKeys, $basePropertyNames);
-
-      if (!empty($bundleProperties)) {
-        // Resolve fields from bundle properties.
-        $bundleFields = array_map(function ($propertyKey) use ($bundleProperties) {
-          $propertyDefinition = $bundleProperties[$propertyKey];
-          $resolvedProperty = $this->resolveFieldFromProperty($propertyKey, $propertyDefinition);
-          return $resolvedProperty;
-        }, $bundlePropertyKeys);
-
-        $fieldMap['bundles'][$bundleKey] = array_filter(array_combine($bundlePropertyNames, $bundleFields));
-      }
-      else {
-        $fieldMap['bundles'][$bundleKey] = [];
-      }
-    }
-
-    return $fieldMap;
+    return $typeFields;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function resolveFieldFromProperty($propertyKey, DataDefinitionInterface $propertyDefinition) {
-    if (!($propertyDefinition instanceof FieldDefinitionInterface)) {
-      // Treat non-field properties via the default typed data resolver.
-      return parent::resolveFieldFromProperty($propertyKey, $propertyDefinition);
+  protected function resolveBundleFields($entityTypeId, $bundleKey) {
+    /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition */
+    $definition = $this->typedDataManager->createDataDefinition("entity:$entityTypeId:$bundleKey");
+    $propertyDefinitions = $definition->getPropertyDefinitions();
+    $propertyKeys = array_keys($propertyDefinitions);
+    $propertyNames = String::formatPropertyNameList($propertyKeys);
+
+    $typeFields = array_map(function ($propertyKey) use ($propertyDefinitions) {
+      $propertyDefinition = $propertyDefinitions[$propertyKey];
+      return $this->resolveFieldFromProperty($propertyKey, $propertyDefinition);
+    }, $propertyKeys);
+
+    $typeFields = array_filter(array_combine($propertyNames, $typeFields));
+
+    return $typeFields;
+  }
+
+  protected function resolveFieldFromProperty($propertyKey, $propertyDefinition) {
+    if (!$propertyType = $this->typeResolver->resolveRecursive($propertyDefinition)) {
+      return NULL;
     }
-
-    $storageDefinition = $propertyDefinition->getFieldStorageDefinition();
-    $isRequired = $propertyDefinition->isRequired();
-
-    // Skip the list if the cardinality is 1.
-    $skipList = $storageDefinition->getCardinality() === 1;
-
-    // Skip the sub-selection if there is just one field item property and it is
-    // defined as the main property.
-    /** @var \Drupal\Core\TypedData\ComplexDataDefinitionInterface $itemDefinition */
-    $itemDefinition = $propertyDefinition->getItemDefinition();
-    $subProperties = $itemDefinition->getPropertyDefinitions();
-    $mainPropertyName = $itemDefinition->getMainPropertyName();
-    $mainProperty = $itemDefinition->getPropertyDefinition($mainPropertyName);
-    $skipSubSelection = count($subProperties) === 1 && $mainPropertyName && $mainPropertyName === key($subProperties);
-
-    // Use the default typed data resolver if we can't simplify this field.
-    if (!$skipList && !$skipSubSelection) {
-      return parent::resolveFieldFromProperty($propertyKey, $propertyDefinition);
-    }
-
-    $propertyDefinition = $skipList ? $itemDefinition : $propertyDefinition;
-    $propertyDefinition = $skipSubSelection ? $mainProperty : $propertyDefinition;
-    $finalResolver = $this->getPropertyResolverFunction($propertyDefinition);
-
-    $propertyType = $this->typeResolver->resolveRecursive($propertyDefinition);
-    $propertyType = $skipList ? $propertyType : new ListModifier($propertyType);
-    $propertyType = $isRequired ? new NonNullModifier($propertyType) : $propertyType;
 
     return [
       'type' => $propertyType,
-      'resolve' => [__CLASS__, 'getFieldValueSimplified'],
-      'resolveData' => [
-        'skipList' => $skipList,
-        'skipSubSelection' => $skipSubSelection,
-        'property' => $propertyKey,
-        'subProperty' => $mainPropertyName,
-        'finalResolver' => $finalResolver,
-      ],
+      'resolve' => [__CLASS__, 'getPropertyValue'],
+      'resolveData' => ['propertyKey' => $propertyKey],
     ];
   }
 
-  /**
-   * Object type resolver callback for entity type schema interfaces.
-   *
-   * @param \Drupal\Core\Entity\Plugin\DataType\EntityAdapter $data
-   *   The object type of the given data.
-   *
-   * @return \Fubhy\GraphQL\Type\Definition\Types\ObjectType|null
-   *   The object type of the given data or NULL if it could not be resolved.
-   */
-  public static function getObjectTypeFromData(EntityAdapter $data) {
-    if (!$entity = $data->getValue()) {
+  public static function getPropertyValue() {
+    return 'asd';
+  }
+
+  public static function resolveObjectType($source) {
+    if (!($source instanceof EntityAdapter) || !$entity = $source->getValue()) {
       return NULL;
     }
 
@@ -273,38 +252,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
     $bundleKey = $entity->bundle();
     $typeIdentifier = 'entity:' . (($bundleKey !== $entityTypeId) ? "$entityTypeId:$bundleKey" : $entityTypeId);
     $typeName = String::formatTypeName($typeIdentifier);
-
+    
     return isset($typeMap[$typeName]) ? $typeMap[$typeName] : NULL;
-  }
-
-  /**
-   * Property value resolver callback for primitive properties.
-   *
-   * @param \Drupal\Core\Entity\Plugin\DataType\EntityAdapter $data
-   *   The parent complex data structure to extract the property from.
-   *
-   * @return mixed
-   *   The resolved value.
-   */
-  public static function getFieldValueSimplified(EntityAdapter $data, $a, $b, $c, $d, $e, $f, $config) {
-    $skipList = $config['skipList'];
-    $skipSubSelection = $config['skipSubSelection'];
-    $property = $config['property'];
-    $subProperty = $config['subProperty'];
-    $finalResolver = $config['finalResolver'];
-
-    $data = $data->get($property);
-    if ($data instanceof AccessibleInterface && !$data->access('view')) {
-      return NULL;
-    }
-
-    $data = $skipList ? [$data->get(0)] : iterator_to_array($data);
-    $args = [$a, $b, $c, $d, $e, $f, ['property' => $subProperty]];
-
-    $data = $skipSubSelection ? array_map(function ($item) use ($finalResolver, $args) {
-      return call_user_func_array($finalResolver, array_merge([$item], $args));
-    }, $data) : $data;
-
-    return $skipList ? reset($data) : $data;
   }
 }

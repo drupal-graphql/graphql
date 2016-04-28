@@ -7,7 +7,6 @@
 
 namespace Drupal\graphql\TypeResolver\Specialized;
 
-use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
@@ -316,20 +315,12 @@ class EntityTypeResolver extends ComplexDataTypeResolver {
 
       $storage = $value->getFieldDefinition()->getFieldStorageDefinition();
       $multiple = $storage->isMultiple();
-      if ($value instanceof AccessibleInterface && !$value->access('view')) {
-        return NULL;
-      }
-
       $value = $multiple ? iterator_to_array($value) : [$value->first()];
 
       if (count($storage->getPropertyNames()) === 1 && $main = $storage->getMainPropertyName()) {
-        $value = array_filter(array_map(function ($item) use ($main) {
-          if ($item instanceof AccessibleInterface && !$item->access('view')) {
-            return NULL;
-          }
-
+        $value = array_map(function ($item) use ($main) {
           return $item->get($main)->getValue();
-        }, $value));
+        }, $value);
       }
 
       return $multiple ? $value : reset($value);
@@ -359,13 +350,12 @@ class EntityTypeResolver extends ComplexDataTypeResolver {
         return [];
       }
 
-      return array_filter(array_map(function ($entity) {
-        if ($entity instanceof AccessibleInterface && !$entity->access('view')) {
-          return NULL;
-        }
+      $entities = $storage->loadMultiple($results);
+      foreach ($entities as &$entity) {
+        $entity = $entity->getTypedData();
+      }
 
-        return $entity->getTypedData();
-      }, $storage->loadMultiple($results)));
+      return $entities;
     }
 
     return NULL;

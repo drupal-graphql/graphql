@@ -36,16 +36,14 @@ class String {
    *
    * @param array $strings
    *   Array of strings to format.
-   * @param array $others
-   *   An array of strings that should be taken into consideration.
    *
-   * @return array The list of formatted strings.
-   * The list of formatted strings.
+   * @return array
+   *   The list of formatted strings.
    */
-  public static function formatPropertyNameList(array $strings, array $others = []) {
-    return array_reduce($strings, function (array $names, $input) use ($others) {
+  public static function formatPropertyNameList(array $strings) {
+    return array_reduce($strings, function (array $names, $input) {
       $formatted = static::formatPropertyName($input);
-      $formatted = static::ensureUnambiguousness($formatted, $names + $others);
+      $formatted = static::ensureUnambiguousness($formatted, $names);
       return $names + [$input => $formatted];
     }, []);
   }

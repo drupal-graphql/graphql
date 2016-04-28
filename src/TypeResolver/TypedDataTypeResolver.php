@@ -7,12 +7,15 @@
 
 namespace Drupal\graphql\TypeResolver;
 
-use Drupal\Core\Access\AccessibleInterface;
+use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
+use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\graphql\TypeResolverInterface;
 use Drupal\graphql\Utility\String;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
@@ -128,13 +131,44 @@ class TypedDataTypeResolver implements TypeResolverInterface {
       $typeName = String::formatTypeName($identifier);
       $typeDescription = $type->getDescription();
       $typeDescription = $typeDescription ? "{$type->getLabel()}: $typeDescription" : $type->getLabel();
-      $typeFields = array_map(function ($propertyKey) use ($propertyDefinitions) {
-        $propertyDefinition = $propertyDefinitions[$propertyKey];
-        return $this->resolveFieldFromProperty($propertyKey, $propertyDefinition);
-      }, $propertyKeys);
+      $typeFields = array_reduce($propertyKeys, function ($previous, $key) use ($propertyNames, $propertyDefinitions) {
+        $propertyDefinition = $propertyDefinitions[$key];
+        if (!$propertyType = $this->typeResolver->resolveRecursive($propertyDefinition)) {
+          return $previous;
+        }
+
+        $isList = $propertyDefinition->isList();
+        $isRequired = $propertyDefinition->isRequired();
+
+        $propertyType = $isList ? new ListModifier($propertyType) : $propertyType;
+        $propertyType = $isRequired ? new NonNullModifier($propertyType) : $propertyType;
+
+        if ($propertyDefinition instanceof ComplexDataDefinitionInterface) {
+          $resolverFunction = [__CLASS__, 'getPropertyComplexValue'];
+        }
+        else if ($propertyDefinition instanceof ListDataDefinitionInterface) {
+          $resolverFunction = [__CLASS__, 'getPropertyListValue'];
+        }
+        else if ($propertyDefinition instanceof DataReferenceDefinitionInterface) {
+          $resolverFunction = [__CLASS__, 'getPropertyReferenceValue'];
+        }
+        else if ($propertyDefinition instanceof DataDefinitionInterface) {
+          $resolverFunction = [__CLASS__, 'getPropertyPrimitiveValue'];
+        }
+        else {
+          return $previous;
+        }
+
+        return $previous + [
+          $propertyNames[$key] => [
+            'type' => $propertyType,
+            'resolve' => $resolverFunction,
+            'resolveData' => ['property' => $key],
+          ],
+        ];
+      }, []);
 
       // Do not register object types without any fields.
-      $typeFields = array_filter(array_combine($propertyNames, $typeFields));
       if (empty($typeFields)) {
         return $this->complexTypes[$identifier] = Type::stringType();
       }
@@ -143,65 +177,6 @@ class TypedDataTypeResolver implements TypeResolverInterface {
       $this->complexTypes[$identifier] = new ObjectType($typeName, $typeFields, [], NULL, $typeDescription);
       return $this->complexTypes[$identifier];
     };
-  }
-
-  /**
-   * Helper function to resolve a field definition from a typed data property.
-   *
-   * @param string $propertyKey
-   *   The key of the typed data property.
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $propertyDefinition
-   *   The data definition of the property.
-   *
-   * @return array|null
-   *   The resolved field definition.
-   */
-  protected function resolveFieldFromProperty($propertyKey, DataDefinitionInterface $propertyDefinition) {
-    if (!$propertyType = $this->typeResolver->resolveRecursive($propertyDefinition)) {
-      return NULL;
-    }
-
-    $isList = $propertyDefinition->isList();
-    $isRequired = $propertyDefinition->isRequired();
-
-    $propertyType = $isList ? new ListModifier($propertyType) : $propertyType;
-    $propertyType = $isRequired ? new NonNullModifier($propertyType) : $propertyType;
-    $resolverFunction = $this->getPropertyResolverFunction($propertyDefinition);
-
-    return [
-      'type' => $propertyType,
-      'resolve' => $resolverFunction,
-      'resolveData' => ['property' => $propertyKey],
-    ];
-  }
-
-  /**
-   * Helper function to find the proper resolver function for a given property.
-   *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $propertyDefinition
-   *   The property definition for which to return the resolver function.
-   *
-   * @return callable|null
-   *   The resolver function or NULL if none applies.
-   */
-  protected function getPropertyResolverFunction(DataDefinitionInterface $propertyDefinition) {
-    if ($propertyDefinition instanceof ComplexDataDefinitionInterface) {
-      return [__CLASS__, 'getPropertyComplexValue'];
-    }
-
-    if ($propertyDefinition instanceof ListDataDefinitionInterface) {
-      return [__CLASS__, 'getPropertyListValue'];
-    }
-
-    if ($propertyDefinition instanceof DataReferenceDefinitionInterface) {
-      return [__CLASS__, 'getPropertyReferenceValue'];
-    }
-
-    if ($propertyDefinition instanceof DataDefinitionInterface) {
-      return [__CLASS__, 'getPropertyPrimitiveValue'];
-    }
-
-    return NULL;
   }
 
   /**
@@ -298,10 +273,6 @@ class TypedDataTypeResolver implements TypeResolverInterface {
    */
   public static function getPropertyComplexValue(ComplexDataInterface $data, $a, $b, $c, $d, $e, $f, $config) {
     $value = $data->get($config['property']);
-    if ($value instanceof AccessibleInterface && !$value->access('view')) {
-      return NULL;
-    }
-
     return $value;
   }
 
@@ -317,10 +288,6 @@ class TypedDataTypeResolver implements TypeResolverInterface {
   public static function getPropertyListValue(ComplexDataInterface $data, $a, $b, $c, $d, $e, $f, $config) {
     /** @var \Drupal\Core\TypedData\ListInterface $value */
     $value = $data->get($config['property']);
-    if ($value instanceof AccessibleInterface && !$value->access('view')) {
-      return NULL;
-    }
-
     return iterator_to_array($value);
   }
 
@@ -336,10 +303,6 @@ class TypedDataTypeResolver implements TypeResolverInterface {
   public static function getPropertyReferenceValue(ComplexDataInterface $data, $a, $b, $c, $d, $e, $f, $config) {
     /** @var \Drupal\Core\TypedData\DataReferenceInterface $value */
     $value = $data->get($config['property']);
-    if ($value instanceof AccessibleInterface && !$value->access('view')) {
-      return NULL;
-    }
-
     return $value->getTarget();
   }
 
@@ -354,10 +317,6 @@ class TypedDataTypeResolver implements TypeResolverInterface {
    */
   public static function getPropertyPrimitiveValue(ComplexDataInterface $data, $a, $b, $c, $d, $e, $f, $config) {
     $value = $data->get($config['property']);
-    if ($value instanceof AccessibleInterface && !$value->access('view')) {
-      return NULL;
-    }
-
     return $value->getValue();
   }
 }
