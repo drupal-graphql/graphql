@@ -54,7 +54,7 @@ class SchemaLoader {
    */
   public function loadSchema(LanguageInterface $language) {
     if ($schema = $this->schemaCache->get($language->getId())) {
-      //return $schema->data;
+      return $schema->data;
     }
 
     $query = new ObjectType('Root', $this->schemaProvider->getQuerySchema());
