@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\TypeResolverInterface;
-use Drupal\graphql\Utility\String;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\ViewEntityInterface;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
@@ -141,7 +141,7 @@ class ViewsSchemaProvider extends SchemaProviderBase {
       }
     }
 
-    $names = String::formatPropertyNameList(array_keys($fields));
+    $names = StringHelper::formatPropertyNameList(array_keys($fields));
     return array_combine($names, $fields);
   }
 

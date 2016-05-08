@@ -1,16 +1,10 @@
 <?php
-
-/**
- * @file
- * Contains \Drupal\graphql\Utility\String.
- */
-
 namespace Drupal\graphql\Utility;
 
 /**
- * Generates a GraphQL Schema.
+ * String utilities to help in generting a GraphQL schema.
  */
-class String {
+class StringHelper {
   /**
    * Formats and filters a string as a camel-cased type name.
    *

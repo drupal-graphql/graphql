@@ -14,7 +14,7 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\TypeResolverInterface;
-use Drupal\graphql\Utility\String;
+use Drupal\graphql\Utility\StringHelper;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\EnumType;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
@@ -77,7 +77,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
     });
 
     // Format the entity type names as camel-cased strings.
-    $names = String::formatPropertyNameList(array_keys($types));
+    $names = StringHelper::formatPropertyNameList(array_keys($types));
 
     foreach ($types as $key => $type) {
       /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinition $definition */
@@ -98,7 +98,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
       ];
 
       $arguments = $this->getQueryArguments($definition);
-      $argumentNames = String::formatPropertyNameList(array_keys($arguments));
+      $argumentNames = StringHelper::formatPropertyNameList(array_keys($arguments));
 
       $fields["$names[$key]Query"] = [
         'type' => new ListModifier($resolved),

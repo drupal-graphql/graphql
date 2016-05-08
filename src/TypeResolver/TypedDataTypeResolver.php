@@ -15,7 +15,7 @@ use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\graphql\NullType;
 use Drupal\graphql\TypeResolverInterface;
-use Drupal\graphql\Utility\String;
+use Drupal\graphql\Utility\StringHelper;
 use Fubhy\GraphQL\Type\Definition\Types\ListModifier;
 use Fubhy\GraphQL\Type\Definition\Types\NonNullModifier;
 use Fubhy\GraphQL\Type\Definition\Types\ObjectType;
@@ -128,14 +128,14 @@ class TypedDataTypeResolver implements TypeResolverInterface {
       $typeFields = $this->resolveFields($type);
 
       // Clean up the field names and remove any empty fields from the list.
-      $fieldNames = String::formatPropertyNameList(array_keys($typeFields));
+      $fieldNames = StringHelper::formatPropertyNameList(array_keys($typeFields));
       $typeFields = array_filter(array_combine($fieldNames, $typeFields));
 
       if (empty($typeFields)) {
         return $this->complexTypes[$identifier] = new NullType();
       }
 
-      $typeName = String::formatTypeName($identifier);
+      $typeName = StringHelper::formatTypeName($identifier);
       $typeDescription = $type->getDescription();
       $typeDescription = $typeDescription ? "{$type->getLabel()}: $typeDescription" : $type->getLabel();
 

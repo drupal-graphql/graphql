@@ -17,7 +17,7 @@ use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\NullType;
 use Drupal\graphql\TypeResolverInterface;
-use Drupal\graphql\Utility\String;
+use Drupal\graphql\Utility\StringHelper;
 use Fubhy\GraphQL\Language\Node;
 use Fubhy\GraphQL\Type\Definition\Types\EnumType;
 use Fubhy\GraphQL\Type\Definition\Types\InterfaceType;
@@ -123,7 +123,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
       $fieldMap = $this->getEntityTypeFieldMap($entityTypeId);
       $baseFields = $fieldMap['base'];
 
-      $entityTypeName = String::formatTypeName("entity:$entityTypeId");
+      $entityTypeName = StringHelper::formatTypeName("entity:$entityTypeId");
       if (!empty($fieldMap['bundles'])) {
         // If there are bundles, create an interface type definition and the
         // object type definition for all available bundles.
@@ -132,7 +132,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
         $typeInterfaces = [$staticCache[$entityTypeId]];
 
         foreach ($fieldMap['bundles'] as $bundleKey => $bundleFields) {
-          $bundleName = String::formatTypeName("entity:$entityTypeId:$bundleKey");
+          $bundleName = StringHelper::formatTypeName("entity:$entityTypeId:$bundleKey");
           $staticCache[$bundleKey] = new ObjectType($bundleName, $bundleFields + $baseFields, $typeInterfaces);
         }
       }
@@ -165,7 +165,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
 
     // Resolve fields from base properties.
     $baseFields = $this->resolveFields($baseDefinition);
-    $baseFieldNames = String::formatPropertyNameList(array_keys($baseFields));
+    $baseFieldNames = StringHelper::formatPropertyNameList(array_keys($baseFields));
 
     // Store the resolved base fields in the field map.
     $fieldMap['base'] = array_filter(array_combine($baseFieldNames, $baseFields));
@@ -180,7 +180,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
       $bundleDefinition = $this->typedDataManager->createDataDefinition("entity:$entityTypeId:$bundleKey");
       $bundleFields = $this->resolveFields($bundleDefinition);
       $bundleFields = array_diff_key($bundleFields, $baseFields);
-      $bundleFieldNames = String::formatPropertyNameList(array_keys($bundleFields), $baseFieldNames);
+      $bundleFieldNames = StringHelper::formatPropertyNameList(array_keys($bundleFields), $baseFieldNames);
 
       // Store the resolved bundle fields in the field map.
       $fieldMap['bundles'][$bundleKey] = array_filter(array_combine($bundleFieldNames, $bundleFields));
@@ -199,7 +199,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
 
     $defaultFields = [];
     if (empty($type->getBundles())) {
-      $enumName = String::formatTypeName("entity:view:modes:$entityTypeId");
+      $enumName = StringHelper::formatTypeName("entity:view:modes:$entityTypeId");
       $enumValues = $this->entityManager->getViewModes($entityTypeId);
 
       $defaultFields['rendered:output'] = [
@@ -307,7 +307,7 @@ class ContentEntityTypeResolver extends TypedDataTypeResolver {
     $entityTypeId = $entity->getEntityType()->id();
     $bundleKey = $entity->bundle();
     $typeIdentifier = 'entity:' . (($bundleKey !== $entityTypeId) ? "$entityTypeId:$bundleKey" : $entityTypeId);
-    $typeName = String::formatTypeName($typeIdentifier);
+    $typeName = StringHelper::formatTypeName($typeIdentifier);
 
     return isset($typeMap[$typeName]) ? $typeMap[$typeName] : NULL;
   }
