@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\Controller\RequestController.
- */
-
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;

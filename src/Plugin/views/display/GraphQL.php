@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\Plugin\views\display
- */
-
 namespace Drupal\graphql\Plugin\views\display;
 
 use Drupal\views\Plugin\views\display\DisplayPluginBase;

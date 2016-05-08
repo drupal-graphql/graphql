@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\TypeResolver\ConfigEntityTypeResolver.
- */
-
 namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\Entity\EntityManagerInterface;

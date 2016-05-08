@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\Tests\QueryTestBase.
- */
-
 namespace Drupal\graphql\Tests;
 
 use Drupal\simpletest\WebTestBase;

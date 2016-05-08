@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\SchemaLoader.
- */
-
 namespace Drupal\graphql;
 
 use Drupal\Core\Cache\Cache;

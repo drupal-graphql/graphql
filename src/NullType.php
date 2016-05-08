@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\NullType.
- */
-
 namespace Drupal\graphql;
 
 use Fubhy\GraphQL\Language\Node;

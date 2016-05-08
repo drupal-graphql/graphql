@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\TypeResolver.
- */
-
 namespace Drupal\graphql;
 
 /**

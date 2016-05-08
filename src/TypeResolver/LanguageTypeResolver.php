@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\TypeResolver\LanguageTypeResolver.
- */
-
 namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;

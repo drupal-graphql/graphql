@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\Tests\EntityQueryTest.
- */
-
 namespace Drupal\graphql\Tests;
 
 /**

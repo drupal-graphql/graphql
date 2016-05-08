@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber.
- */
-
 namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Render\PageDisplayVariantSelectionEvent;

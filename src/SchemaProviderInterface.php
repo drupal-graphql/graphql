@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\SchemaProviderInterface.
- */
-
 namespace Drupal\graphql;
 
 interface SchemaProviderInterface {

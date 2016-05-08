@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\SchemaProvider\ViewsSchemaProvider.
- */
-
 namespace Drupal\graphql\SchemaProvider;
 
 use Drupal\Core\Entity\EntityManagerInterface;

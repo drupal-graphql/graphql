@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\TypeResolver\FieldItemTypeResolver.
- */
-
 namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\Entity\EntityManagerInterface;

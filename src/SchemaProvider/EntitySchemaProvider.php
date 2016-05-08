@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\SchemaProvider\EntitySchemaProvider.
- */
-
 namespace Drupal\graphql\SchemaProvider;
 
 use Drupal\Core\Entity\ContentEntityInterface;

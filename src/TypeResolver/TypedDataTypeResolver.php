@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\graphql\TypeResolver\TypedDataTypeResolver.
- */
-
 namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\Access\AccessibleInterface;
