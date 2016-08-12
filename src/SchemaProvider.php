@@ -7,11 +7,25 @@ namespace Drupal\graphql;
  */
 class SchemaProvider implements SchemaProviderInterface {
   /**
+   * Unsorted list of schema providers nested and keyed by priority.
+   *
+   * @var array
+   */
+  protected $providers;
+
+  /**
+   * Sorted list of schema providers.
+   *
+   * @var array
+   */
+  protected $sortedProviders;
+
+  /**
    * {@inheritdoc}
    */
   public function getQuerySchema() {
     return array_reduce($this->getSortedProviders(), function ($carry, SchemaProviderInterface $provider) {
-      return array_merge($carry, $provider->getQuerySchema());
+      return array_merge($carry, $provider->getQuerySchema() ?: []);
     }, []);
   }
 
@@ -19,7 +33,9 @@ class SchemaProvider implements SchemaProviderInterface {
    * {@inheritdoc}
    */
   public function getMutationSchema() {
-    return [];
+    return array_reduce($this->getSortedProviders(), function ($carry, SchemaProviderInterface $provider) {
+      return array_merge($carry, $provider->getMutationSchema() ?: []);
+    }, []);
   }
 
   /**
