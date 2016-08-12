@@ -63,8 +63,8 @@ class RequestController implements ContainerInjectionInterface {
       throw new NotFoundHttpException();
     }
 
-    $variables = $variables ? (array) json_decode($variables) : NULL;
-    $result = $this->processor->processPayload($query, $variables);
+    $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
+    $result = $this->processor->processPayload($query, (array) ($variables ?: []));
 
     $response = new JsonResponse($result->getResponseData());
     return $response->setPrivate();
