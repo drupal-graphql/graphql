@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql;
 
-use Drupal\graphql\Rule\TypeValidationRule;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -10,7 +9,9 @@ use Youshido\GraphQL\Execution\Processor as BaseProcessor;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
+use Youshido\GraphQL\Parser\Ast\Field as FieldAst;
 use Youshido\GraphQL\Parser\Ast\Query;
+use Youshido\GraphQL\Type\TypeMap;
 use Youshido\GraphQL\Type\TypeService;
 use Youshido\GraphQL\Validator\Exception\ResolveException;
 
@@ -25,6 +26,32 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
   }
 
   /**
+   * Helper function to resolve a value using a service.
+   *
+   * @param \Youshido\GraphQL\Field\AbstractField $field
+   * @param array $resolveFunction
+   * @return mixed
+   *
+   * @throws \Youshido\GraphQL\Validator\Exception\ResolveException
+   */
+  protected function getResolveServiceCallable(AbstractField $field, array $resolveFunction) {
+    $service = substr($resolveFunction[0], 1);
+    $method = $resolveFunction[1];
+
+    if (!$this->container->has($service)) {
+      throw new ResolveException(sprintf('Resolve service "%s" not found for field "%s".', $service, $field->getName()));
+    }
+
+    $serviceInstance = $this->container->get($service);
+
+    if (!method_exists($serviceInstance, $method)) {
+      throw new ResolveException(sprintf('Resolve method "%s" not found in "%s" service for field "%s".', $method, $service, $field->getName()));
+    }
+
+    return [$serviceInstance, $method];
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function resolveFieldValue(AbstractField $field, $contextValue, Query $query) {
@@ -32,29 +59,14 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
     $args = $this->parseArgumentsValues($field, $query);
 
     if ($field instanceof Field) {
-      if ($resolveFunc = $field->getConfig()->getResolveFunction()) {
-        if (is_array($resolveFunc) && count($resolveFunc) == 2 && strpos($resolveFunc[0], '@') === 0) {
-          $service = substr($resolveFunc[0], 1);
-          $method = $resolveFunc[1];
-
-          if (!$this->container->has($service)) {
-            throw new ResolveException(sprintf('Resolve service "%s" not found for field "%s".', $service, $field->getName()));
-          }
-
-          $serviceInstance = $this->container->get($service);
-
-          if (!method_exists($serviceInstance, $method)) {
-            throw new ResolveException(sprintf('Resolve method "%s" not found in "%s" service for field "%s".', $method, $service, $field->getName()));
-          }
-
-          return $serviceInstance->$method($contextValue, $args, $resolveInfo);
+      if ($resolveFunction = $field->getConfig()->getResolveFunction()) {
+        if (is_array($resolveFunction) && count($resolveFunction) == 2 && strpos($resolveFunction[0], '@') === 0) {
+          $resolveFunction = $this->getResolveServiceCallable($field, $resolveFunction);
         }
 
-        if (!is_callable($resolveFunc)) {
-          throw new ResolveException('Resolve function is not callable.');
+        if (is_callable($resolveFunction)) {
+          return $resolveFunction($contextValue, $this->parseArgumentsValues($field, $query), $resolveInfo);
         }
-
-        return $resolveFunc($contextValue, $args, $resolveInfo);
       }
       else if ($propertyValue = TypeService::getPropertyValue($contextValue, $field->getName())) {
         return $propertyValue;
@@ -69,5 +81,48 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
     }
 
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPreResolvedValue($contextValue, FieldAst $fieldAst, AbstractField $field) {
+    $resolved = false;
+    $resolverValue = null;
+
+    if (is_array($contextValue) && array_key_exists($fieldAst->getName(), $contextValue)) {
+      $resolverValue = $contextValue[$fieldAst->getName()];
+      $resolved = true;
+    }
+    else if (is_object($contextValue)) {
+      $resolverValue = TypeService::getPropertyValue($contextValue, $fieldAst->getName());
+      $resolved = true;
+    }
+
+    if (!$resolved && $field->getType()->getNamedType()->getKind() == TypeMap::KIND_SCALAR) {
+      $resolved = true;
+    }
+
+    if ($resolveFunction = $field->getConfig()->getResolveFunction()) {
+      $resolveInfo = new ResolveInfo($field, [$fieldAst], $field->getType(), $this->executionContext);
+
+      if (!$this->resolveValidator->validateArguments($field, $fieldAst, $this->executionContext->getRequest())) {
+        throw new \Exception(sprintf('Not valid arguments for the field "%s"', $fieldAst->getName()));
+      }
+
+      if (is_array($resolveFunction) && count($resolveFunction) == 2 && strpos($resolveFunction[0], '@') === 0) {
+        $resolveFunction = $this->getResolveServiceCallable($field, $resolveFunction);
+      }
+
+      if (is_callable($resolveFunction)) {
+        $resolverValue = $resolveFunction($resolved ? $resolverValue : $contextValue, $fieldAst->getKeyValueArguments(), $resolveInfo);
+      }
+    }
+
+    if (!$resolverValue && !$resolved) {
+      throw new \Exception(sprintf('Property "%s" not found in resolve result', $fieldAst->getName()));
+    }
+
+    return $resolverValue;
   }
 }

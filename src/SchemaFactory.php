@@ -3,7 +3,9 @@
 namespace Drupal\graphql;
 
 use Drupal\graphql\Rule\TypeValidationRule;
+use MyProject\Proxies\__CG__\stdClass;
 use Youshido\GraphQL\Schema\Schema;
+use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\Object\ObjectType;
 use Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator;
 
@@ -40,9 +42,16 @@ class SchemaFactory {
    *   The generated GraphQL schema.
    */
   public function getSchema() {
+    $fields = $this->schemaProvider->getQuerySchema();
+
     $config['query'] = new ObjectType([
       'name' => 'QueryRoot',
-      'fields' => $this->schemaProvider->getQuerySchema(),
+      'fields' => $fields,
+    ]);
+
+    $config['query']->addField('root', [
+      'type' => new NonNullType($config['query']),
+      'resolve' => ['@graphql.schema_factory', 'resolveRoot'],
     ]);
 
     if ($mutation = $this->schemaProvider->getMutationSchema()) {
@@ -53,5 +62,17 @@ class SchemaFactory {
     }
 
     return new Schema($config);
+  }
+
+  /**
+   * Dummy resolve function.
+   *
+   * Used to enable adding a recursive reference to the query root for use in
+   * a React & Relay setting.
+   *
+   * https://github.com/facebook/relay/issues/112#issuecomment-170648934
+   */
+  public function resolveRoot() {
+    return [];
   }
 }
