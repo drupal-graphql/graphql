@@ -11,23 +11,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
 use Youshido\GraphQL\Parser\Ast\Query;
-use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\TypeService;
-use Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator;
 use Youshido\GraphQL\Validator\Exception\ResolveException;
 
 class Processor extends BaseProcessor implements ContainerAwareInterface {
   use ContainerAwareTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(AbstractSchema $schema) {
-    $validator = ConfigValidator::getInstance();
-    $validator->addRule('type', new TypeValidationRule($validator));
-
-    parent::__construct($schema);
-  }
 
   /**
    * {@inheritdoc}

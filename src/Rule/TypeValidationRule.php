@@ -15,6 +15,7 @@ class TypeValidationRule extends BaseTypeValidationRule {
       return false;
     }
 
+    // Allow service references as resolver functions.
     if (($ruleInfo == TypeService::TYPE_CALLABLE) && (is_callable($data) || (is_array($data) && count($data) == 2 && substr($data[0], 0, 1) == '@'))) {
       return true;
     }
