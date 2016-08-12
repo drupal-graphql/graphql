@@ -18,5 +18,11 @@
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^5.0.1",
     "webpack": "^1.12.13"
+  },
+  "dependencies": {
+    "graphiql": "^0.7.4",
+    "graphql": "^0.6.2",
+    "react": "^15.3.0",
+    "react-dom": "^15.3.0"
   }
 }
