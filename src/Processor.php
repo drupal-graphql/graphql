@@ -87,22 +87,6 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
    * {@inheritdoc}
    */
   protected function getPreResolvedValue($contextValue, FieldAst $fieldAst, AbstractField $field) {
-    $resolved = false;
-    $resolverValue = null;
-
-    if (is_array($contextValue) && array_key_exists($fieldAst->getName(), $contextValue)) {
-      $resolverValue = $contextValue[$fieldAst->getName()];
-      $resolved = true;
-    }
-    else if (is_object($contextValue)) {
-      $resolverValue = TypeService::getPropertyValue($contextValue, $fieldAst->getName());
-      $resolved = true;
-    }
-
-    if (!$resolved && $field->getType()->getNamedType()->getKind() == TypeMap::KIND_SCALAR) {
-      $resolved = true;
-    }
-
     if ($resolveFunction = $field->getConfig()->getResolveFunction()) {
       $resolveInfo = new ResolveInfo($field, [$fieldAst], $field->getType(), $this->executionContext);
 
@@ -115,14 +99,10 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
       }
 
       if (is_callable($resolveFunction)) {
-        $resolverValue = $resolveFunction($resolved ? $resolverValue : $contextValue, $fieldAst->getKeyValueArguments(), $resolveInfo);
+        return $resolveFunction($contextValue, $fieldAst->getKeyValueArguments(), $resolveInfo);
       }
     }
 
-    if (!$resolverValue && !$resolved) {
-      throw new \Exception(sprintf('Property "%s" not found in resolve result', $fieldAst->getName()));
-    }
-
-    return $resolverValue;
+    return parent::getPreResolvedValue($contextValue, $fieldAst, $field);
   }
 }
