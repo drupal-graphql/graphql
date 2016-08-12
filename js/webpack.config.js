@@ -33,10 +33,6 @@ module.exports = {
   },
   externals: {
     jquery: 'jQuery',
-    drupal: 'Drupal',
-    fetch: 'fetch',
-    graphiql: 'GraphiQL',
-    react: 'React',
-    'react-dom': 'ReactDOM'
+    drupal: 'Drupal'
   }
 };

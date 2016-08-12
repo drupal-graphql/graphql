@@ -11,24 +11,3 @@ function graphql_theme() {
     ],
   ];
 }
-
-/**
- * Implements hook_ENTITY_TYPE_insert().
- */
-function view_insert() {
-  \Drupal::service('cache.graphql')->deleteAll();
-}
-
-/**
- * Implements hook_ENTITY_TYPE_update().
- */
-function view_update() {
-  \Drupal::service('cache.graphql')->deleteAll();
-}
-
-/**
- * Implements hook_ENTITY_TYPE_delete().
- */
-function view_delete() {
-  \Drupal::service('cache.graphql')->deleteAll();
-}

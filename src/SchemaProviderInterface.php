@@ -3,13 +3,13 @@
 namespace Drupal\graphql;
 
 interface SchemaProviderInterface {
-    /**
-     * @return array
-     */
+  /**
+   * @return array
+   */
     public function getQuerySchema();
 
-    /**
-     * @return array
-     */
+  /**
+   * @return array
+   */
     public function getMutationSchema();
 }

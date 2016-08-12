@@ -1,64 +1,21 @@
 services:
-  cache.graphql_schema:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory: cache_factory:get
-    arguments: [graphql_schema]
-  graphql.graphql:
-    class: Fubhy\GraphQL\GraphQL
-  graphql.schema_loader:
-    class: Drupal\graphql\SchemaLoader
-    arguments: ['@graphql.schema_provider', '@cache.graphql_schema']
+  graphql.processor:
+      class: Drupal\graphql\Processor
+      arguments: ['@graphql.schema']
+      calls:
+          - [ setContainer, ['@service_container']]
+  graphql.schema:
+    class: Drupal\graphql\Schema
+    factory: ['@graphql.schema_factory', getSchema]
+  graphql.schema_factory:
+    class: Drupal\graphql\SchemaFactory
+    arguments: ['@graphql.schema_provider']
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider
     tags:
         - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
-  graphql.schema_provider.entity:
-    class: Drupal\graphql\SchemaProvider\EntitySchemaProvider
-    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver']
-    tags:
-      - { name: graphql_schema_provider }
-  graphql.schema_provider.views:
-    class: Drupal\graphql\SchemaProvider\ViewsSchemaProvider
-    arguments: ['@entity.manager', '@typed_data_manager', '@graphql.type_resolver', '@module_handler']
-    tags:
-      - { name: graphql_schema_provider }
-  graphql.type_resolver:
-    class: Drupal\graphql\TypeResolver
-    tags:
-      - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
-  graphql.type_resolver.typed_data:
-    class: Drupal\graphql\TypeResolver\TypedDataTypeResolver
-    arguments: ['@graphql.type_resolver']
-    tags:
-      - { name: graphql_type_resolver, priority: -10 }
-  graphql.type_resolver.typed_data.content_entity:
-    class: Drupal\graphql\TypeResolver\ContentEntityTypeResolver
-    arguments: ['@graphql.type_resolver', '@entity.manager', '@typed_data_manager']
-    tags:
-      - { name: graphql_type_resolver }
-  graphql.type_resolver.typed_data.config_entity:
-    class: Drupal\graphql\TypeResolver\ConfigEntityTypeResolver
-    arguments: ['@entity.manager']
-    tags:
-      - { name: graphql_type_resolver }
-  graphql.type_resolver.typed_data.field_item:
-    class: Drupal\graphql\TypeResolver\FieldItemTypeResolver
-    arguments: ['@graphql.type_resolver', '@entity.manager']
-    tags:
-      - { name: graphql_type_resolver }
-  graphql.type_resolver.typed_data.language:
-    class: Drupal\graphql\TypeResolver\LanguageTypeResolver
-    tags:
-      - { name: graphql_type_resolver }
   graphql.page_display_variant_subscriber:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
       - { name: event_subscriber }
-  cache.graphql_schema:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory: cache_factory:get
-    arguments: [graphql_schema]
+
