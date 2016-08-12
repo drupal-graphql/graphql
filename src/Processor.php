@@ -11,7 +11,6 @@ use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
 use Youshido\GraphQL\Parser\Ast\Field as FieldAst;
 use Youshido\GraphQL\Parser\Ast\Query;
-use Youshido\GraphQL\Type\TypeMap;
 use Youshido\GraphQL\Type\TypeService;
 use Youshido\GraphQL\Validator\Exception\ResolveException;
 

@@ -4,6 +4,8 @@ namespace Drupal\graphql;
 
 use Drupal\graphql\Rule\TypeValidationRule;
 use MyProject\Proxies\__CG__\stdClass;
+use Youshido\GraphQL\Relay\Fetcher\CallableFetcher;
+use Youshido\GraphQL\Relay\Field\NodeField;
 use Youshido\GraphQL\Schema\Schema;
 use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\Object\ObjectType;
@@ -54,6 +56,10 @@ class SchemaFactory {
       'resolve' => ['@graphql.schema_factory', 'resolveRoot'],
     ]);
 
+    // @todo This needs to be made cacheable.
+    $fetcher = new CallableFetcher([$this, 'resolveNode'], [$this, 'resolveType']);
+    $config['query']->addField(new NodeField($fetcher));
+
     if ($mutation = $this->schemaProvider->getMutationSchema()) {
       $config['mutation'] = new ObjectType([
         'name' => 'MutationRoot',
@@ -74,5 +80,19 @@ class SchemaFactory {
    */
   public function resolveRoot() {
     return [];
+  }
+
+  /**
+   * Resolves a node given a type and an id.
+   */
+  public function resolveNode() {
+    // @todo Add this.
+  }
+
+  /**
+   * Resolves a type given an object.
+   */
+  public function resolveType() {
+    // @todo Add this.
   }
 }
