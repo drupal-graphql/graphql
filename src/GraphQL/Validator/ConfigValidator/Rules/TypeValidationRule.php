@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Rule;
+namespace Drupal\graphql\GraphQL\Validator\ConfigValidator\Rules;
 
 use Youshido\GraphQL\Type\TypeService;
 use Youshido\GraphQL\Validator\ConfigValidator\Rules\TypeValidationRule as BaseTypeValidationRule;

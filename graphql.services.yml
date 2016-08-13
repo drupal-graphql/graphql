@@ -1,15 +1,30 @@
+parameters:
+  graphql.config:
+    # GraphQL schema cache:
+    #
+    # By default, the GraphQL schema gets cached. This can be disabled during development.
+    #
+    # @default true
+    cache: true
+
 services:
+  cache.graphql_schema:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_schema]
   graphql.processor:
-      class: Drupal\graphql\Processor
-      arguments: ['@graphql.schema']
-      calls:
-          - [ setContainer, ['@service_container']]
+    class: Drupal\graphql\GraphQL\Execution\Processor
+    arguments: ['@graphql.schema']
+    calls:
+      - [ setContainer, ['@service_container']]
   graphql.schema:
-    class: Drupal\graphql\Schema
+    class: Drupal\graphql\GraphQL\Relay\Schema
     factory: ['@graphql.schema_factory', getSchema]
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory
-    arguments: ['@graphql.schema_provider']
+    arguments: ['@language_manager', '@graphql.schema_provider', '@cache.graphql_schema']
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider
     tags:
@@ -18,4 +33,3 @@ services:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
       - { name: event_subscriber }
-

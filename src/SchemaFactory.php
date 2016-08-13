@@ -2,19 +2,24 @@
 
 namespace Drupal\graphql;
 
-use Drupal\graphql\Rule\TypeValidationRule;
-use MyProject\Proxies\__CG__\stdClass;
-use Youshido\GraphQL\Relay\Fetcher\CallableFetcher;
-use Youshido\GraphQL\Relay\Field\NodeField;
-use Youshido\GraphQL\Schema\Schema;
-use Youshido\GraphQL\Type\NonNullType;
-use Youshido\GraphQL\Type\Object\ObjectType;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\graphql\GraphQL\Relay\Schema;
+use Drupal\graphql\GraphQL\Validator\ConfigValidator\Rules\TypeValidationRule;
 use Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator;
 
 /**
  * Loads and caches a generated GraphQL schema.
  */
 class SchemaFactory {
+  /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
   /**
    * The schema provider service.
    *
@@ -23,78 +28,53 @@ class SchemaFactory {
   protected $schemaProvider;
 
   /**
-   * Constructs a SchemaLoader object.
+   * The schema cache backend.
    *
-   * @param \Drupal\graphql\SchemaProviderInterface $schemaProvider
-   *   The schema provider service.
+   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  public function __construct(SchemaProviderInterface $schemaProvider) {
+  protected $schemaCache;
+
+  /**
+   * Constructs a SchemaFactory object.
+   *
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
+   * @param \Drupal\graphql\SchemaProviderInterface $schema_provider
+   *   The schema provider service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $schema_cache
+   *   The schema cache backend.
+   */
+  public function __construct(LanguageManagerInterface $languageManager, SchemaProviderInterface $schema_provider, CacheBackendInterface $schema_cache) {
     // Override the default type validator to enable services as field resolver
     // callbacks.
     $validator = ConfigValidator::getInstance();
     $validator->addRule('type', new TypeValidationRule($validator));
 
-    $this->schemaProvider = $schemaProvider;
+    $this->schemaProvider = $schema_provider;
+    $this->languageManager = $languageManager;
+    $this->schemaCache = $schema_cache;
   }
 
   /**
    * Loads and caches the generated schema.
    *
-   * @return \Youshido\GraphQL\Schema\Schema The generated GraphQL schema.
+   * @return \Drupal\graphql\GraphQL\Relay\Schema The generated GraphQL schema.
    *   The generated GraphQL schema.
    */
   public function getSchema() {
-    $fields = $this->schemaProvider->getQuerySchema();
-
-    $config['query'] = new ObjectType([
-      'name' => 'QueryRoot',
-      'fields' => $fields,
-    ]);
-
-    $config['query']->addField('root', [
-      'type' => new NonNullType($config['query']),
-      'resolve' => ['@graphql.schema_factory', 'resolveRoot'],
-    ]);
-
-    // @todo This needs to be made cacheable.
-    $fetcher = new CallableFetcher([$this, 'resolveNode'], [$this, 'resolveType']);
-    $config['query']->addField(new NodeField($fetcher));
-
-    if ($mutation = $this->schemaProvider->getMutationSchema()) {
-      $config['mutation'] = new ObjectType([
-        'name' => 'MutationRoot',
-        'fields' => $mutation,
-      ]);
+    $language = $this->languageManager->getCurrentLanguage();
+    if ($schema = $this->schemaCache->get($language->getId())) {
+      return $schema->data;
     }
 
-    return new Schema($config);
-  }
+    $query = $this->schemaProvider->getQuerySchema();
+    $mutation = $this->schemaProvider->getMutationSchema();
+    $schema = new Schema($query, $mutation);
 
-  /**
-   * Dummy resolve function.
-   *
-   * Used to enable adding a recursive reference to the query root for use in
-   * a React & Relay setting.
-   *
-   * https://github.com/facebook/relay/issues/112#issuecomment-170648934
-   */
-  public function resolveRoot() {
-    return [];
-  }
+    // Cache the generated schema in the configured cache backend.
+    $tags  = ['views', 'entity_field_info', 'entity_bundles'];
+    $this->schemaCache->set($language->getId(), $schema, Cache::PERMANENT, $tags);
 
-  /**
-   * Resolves a node given a type and an id.
-   */
-  public function resolveNode() {
-    // @todo Add this.
-    throw new \Exception('The generic Relay node interface is not yet supported.');
-  }
-
-  /**
-   * Resolves a type given an object.
-   */
-  public function resolveType() {
-    // @todo Add this.
-    throw new \Exception('The generic Relay node interface is not yet supported.');
+    return $schema;
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Type;
+namespace Drupal\graphql\GraphQL\Relay\Field;
 
 use Drupal\Core\Entity\EntityInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
