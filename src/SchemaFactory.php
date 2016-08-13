@@ -87,6 +87,7 @@ class SchemaFactory {
    */
   public function resolveNode() {
     // @todo Add this.
+    throw new \Exception('The generic Relay node interface is not yet supported.');
   }
 
   /**
@@ -94,5 +95,6 @@ class SchemaFactory {
    */
   public function resolveType() {
     // @todo Add this.
+    throw new \Exception('The generic Relay node interface is not yet supported.');
   }
 }
