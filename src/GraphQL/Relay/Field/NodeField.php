@@ -2,12 +2,17 @@
 
 namespace Drupal\graphql\GraphQL\Relay\Field;
 
+use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Relay\Fetcher\FetcherInterface;
 use Youshido\GraphQL\Relay\Field\NodeField as NodeFieldBase;
 use Youshido\GraphQL\Relay\Node;
+use Youshido\GraphQL\Relay\NodeInterfaceType;
+use Youshido\GraphQL\Type\NonNullType;
+use Youshido\GraphQL\Type\Object\ObjectType;
+use Youshido\GraphQL\Type\Scalar\StringType;
 
 class NodeField extends NodeFieldBase implements ContainerAwareInterface, FetcherInterface {
 
@@ -33,7 +38,11 @@ class NodeField extends NodeFieldBase implements ContainerAwareInterface, Fetche
    * {@inheritdoc}
    */
   public function resolveNode($type, $id) {
-    // @todo Implement this.
+    switch ($type) {
+      case 'article':
+        return \Drupal::entityTypeManager()->getStorage('node')->load($id);
+    }
+
     throw new \Exception('The generic Relay node resolver is not yet implemented.');
   }
 
@@ -41,6 +50,25 @@ class NodeField extends NodeFieldBase implements ContainerAwareInterface, Fetche
    * {@inheritdoc}
    */
   public function resolveType($object) {
+    if ($object instanceof NodeInterface) {
+      switch ($object->bundle()) {
+        case 'sane_article':
+          return new ObjectType([
+            'name' => 'Article',
+            'fields' => [
+              'id' => new GlobalIdField('article'),
+              'title' => [
+                'type' => new NonNullType(new StringType()),
+                'resolve' => function (NodeInterface $node) {
+                  return $node->getTitle();
+                },
+              ],
+            ],
+            'interfaces' => [new NodeInterfaceType()],
+          ]);
+      }
+    }
+
     // @todo Implement this.
     throw new \Exception('The generic Relay type resolver is not yet implemented.');
   }
