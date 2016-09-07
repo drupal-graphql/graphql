@@ -59,7 +59,7 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
    * {@inheritdoc}
    */
   protected function resolveFieldValue(AbstractField $field, $contextValue, Query $query) {
-    $resolveInfo = new ResolveInfo($field, $query->getFields(), $field->getType(), $this->executionContext);
+    $resolveInfo = new ResolveInfo($field, $query->getFields(), $this->executionContext);
     $args = $this->parseArgumentsValues($field, $query);
 
     if ($field instanceof Field) {
@@ -86,7 +86,7 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
    */
   protected function getPreResolvedValue($contextValue, FieldAst $fieldAst, AbstractField $field) {
     if ($resolveFunction = $this->getResolveFunction($field)) {
-      $resolveInfo = new ResolveInfo($field, [$fieldAst], $field->getType(), $this->executionContext);
+      $resolveInfo = new ResolveInfo($field, [$fieldAst], $this->executionContext);
 
       if (!$this->resolveValidator->validateArguments($field, $fieldAst, $this->executionContext->getRequest())) {
         throw new \Exception(sprintf('Not valid arguments for the field "%s"', $fieldAst->getName()));
