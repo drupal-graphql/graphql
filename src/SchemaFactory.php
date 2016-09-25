@@ -69,7 +69,7 @@ class SchemaFactory {
   /**
    * Loads and caches the generated schema.
    *
-   * @return \Drupal\graphql\GraphQL\Relay\Schema The generated GraphQL schema.
+   * @return \Drupal\graphql\GraphQL\Relay\Schema
    *   The generated GraphQL schema.
    */
   public function getSchema() {

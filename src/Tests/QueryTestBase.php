@@ -38,7 +38,7 @@ abstract class QueryTestBase extends WebTestBase {
 
   /**
    * Helper function to issue a HTTP request with simpletest's cURL.
-   &
+   *
    * @param $query
    * @param array $variables
    * @param string|null $operation
