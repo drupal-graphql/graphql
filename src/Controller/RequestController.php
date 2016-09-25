@@ -2,12 +2,17 @@
 
 namespace Drupal\graphql\Controller;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableJsonResponse;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Youshido\GraphQL\Execution\Processor;
+use Youshido\GraphQL\Field\AbstractField;
+use Youshido\GraphQL\Parser\Ast\Query;
 
 /**
  * Handles GraphQL requests.
@@ -66,7 +71,32 @@ class RequestController implements ContainerInjectionInterface {
     $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
     $result = $this->processor->processPayload($query, (array) ($variables ?: []));
 
-    $response = new JsonResponse($result->getResponseData());
+    $metadata = $this->getCacheableMetadata();
+
+    $response = new CacheableJsonResponse($result->getResponseData());
+    $response->addCacheableDependency($metadata);
+
     return $response->setPrivate();
+  }
+
+  /**
+   * Determines the cacheable metadata.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   *   The cacheable metadata.
+   */
+  protected function getCacheableMetadata() {
+    $metadata = new CacheableMetadata();
+    // @todo why we do this here.
+    $queryType = $this->processor->getExecutionContext()
+      ->getSchema()
+      ->getQueryType();
+    foreach ($queryType->getFields() as $field) {
+      if ($field instanceof CacheableDependencyInterface) {
+        $metadata->addCacheableDependency($field);
+      }
+    }
+
+    return $metadata;
   }
 }
