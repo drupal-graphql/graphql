@@ -88,15 +88,15 @@ abstract class QueryTestBase extends KernelTestBase  {
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
    *   translate this string. Defaults to 'Other'; most tests do not override
    *   this default.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertResponseBody(array $expected, $actual, $message = '', $group = 'GraphQL Response') {
     $expected = json_decode(json_encode($expected));
     $actual = json_decode($actual);
 
-    return $this->assertEquals($expected, $actual, $message ? $message : strtr('Response body @expected (expected) is equal to @response (actual).', array('@expected' => var_export($expected, TRUE), '@response' => var_export($actual, TRUE))));
+    $this->assertEquals($expected, $actual, $message ? $message : strtr('Response body @expected (expected) is equal to @response (actual).', [
+      '@expected' => var_export($expected, TRUE),
+      '@response' => var_export($actual, TRUE),
+    ]));
   }
 
 }
