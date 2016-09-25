@@ -1,20 +1,21 @@
 <?php
 
-namespace Drupal\Tests\graphql\Functional;
+namespace Drupal\Tests\graphql\Kernel;
 
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
-use Drupal\simpletest\BrowserTestBase;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\user\Entity\Role;
+use Symfony\Component\HttpFoundation\Request;
 
-abstract class QueryTestBase extends BrowserTestBase {
+abstract class QueryTestBase extends KernelTestBase  {
 
   use NodeCreationTrait;
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql', 'node'];
+  public static $modules = ['graphql', 'node', 'user', 'system'];
 
   /**
    * The GraphQL resource.
@@ -29,12 +30,17 @@ abstract class QueryTestBase extends BrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Create a user with the proper permissions and log in.
-    $this->drupalLogin($this->drupalCreateUser(['execute graphql requests']));
+    $this->installSchema('system', 'router');
+    $this->installConfig('user');
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
+
+    \Drupal::service('router.builder')->rebuild();
 
     Role::load('anonymous')
       ->grantPermission('execute graphql requests')
       ->save();
+
 
     // Create a test content type for node testing.
     NodeType::create([
@@ -50,8 +56,7 @@ abstract class QueryTestBase extends BrowserTestBase {
    * @param array $variables
    * @param string|null $operation
    *
-   * @return string The content returned from the request.
-   * The content returned from the request.
+   * @return \Symfony\Component\HttpFoundation\Response
    */
   protected function query($query, array $variables = NULL, $operation = NULL) {
     $body = [
@@ -60,11 +65,9 @@ abstract class QueryTestBase extends BrowserTestBase {
       'operation' => $operation,
     ];
 
-    $response = \Drupal::httpClient()->post($this->getAbsoluteUrl($this->queryUrl), [
-      'body' => json_encode($body),
-    ]);
-
-    return (string) $response->getBody();
+    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */
+    $http_kernel = \Drupal::service('http_kernel');
+    return $http_kernel->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($body)));
   }
 
   /**

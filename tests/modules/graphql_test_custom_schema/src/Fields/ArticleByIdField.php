@@ -2,6 +2,8 @@
 
 namespace Drupal\graphql_test_custom_schema\Fields;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\graphql_test_custom_schema\Types\ArticleType;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -12,9 +14,10 @@ use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\Scalar\IntType;
 
-class ArticleByIdField extends AbstractField implements ContainerAwareInterface {
+class ArticleByIdField extends AbstractField implements ContainerAwareInterface, RefinableCacheableDependencyInterface {
 
   use ContainerAwareTrait;
+  use RefinableCacheableDependencyTrait;
 
   /**
    * {@inheritdoc}
@@ -47,9 +50,12 @@ class ArticleByIdField extends AbstractField implements ContainerAwareInterface 
   public function resolve($value, array $args, ResolveInfo $info) {
     /** @var EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->container->get('entity_type.manager');
-    
-    return $entityTypeManager
+
+    $entity = $entityTypeManager
       ->getStorage('node')
       ->load($args['id']);
+
+    $this->addCacheableDependency($entity);
+    return $entity;
   }
 }
