@@ -55,9 +55,10 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
     return $resolveFunction;
   }
 
-  protected function resolveFieldValue(AbstractField $field, $contextValue, array $fields, array $args)
-  {
-
+  /**
+   * {@inheritdoc}
+   */
+  protected function resolveFieldValue(AbstractField $field, $contextValue, array $fields, array $args) {
     $resolveInfo = $this->createResolveInfo($field, $fields);
 
     if ($field instanceof Field) {
