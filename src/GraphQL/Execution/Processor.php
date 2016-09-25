@@ -70,7 +70,7 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
       }
     }
     else {
-      if (in_array('Symfony\Component\DependencyInjection\ContainerAwareInterface', class_implements($field))) {
+      if ($field instanceof ContainerAwareInterface) {
         $field->setContainer($this->container);
       }
 
