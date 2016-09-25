@@ -55,16 +55,14 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
     return $resolveFunction;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function resolveFieldValue(AbstractField $field, $contextValue, Query $query) {
-    $resolveInfo = new ResolveInfo($field, $query->getFields(), $this->executionContext);
-    $args = $this->parseArgumentsValues($field, $query);
+  protected function resolveFieldValue(AbstractField $field, $contextValue, array $fields, array $args)
+  {
+
+    $resolveInfo = $this->createResolveInfo($field, $fields);
 
     if ($field instanceof Field) {
       if (($resolveFunction = $this->getResolveFunction($field)) && is_callable($resolveFunction)) {
-        return $resolveFunction($contextValue, $this->parseArgumentsValues($field, $query), $resolveInfo);
+        return $resolveFunction($contextValue, $args, $resolveInfo);
       }
       else if ($propertyValue = TypeService::getPropertyValue($contextValue, $field->getName())) {
         return $propertyValue;
