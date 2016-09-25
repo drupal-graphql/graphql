@@ -61,6 +61,9 @@ before_script:
   - composer self-update
   - composer install
 
+  # Bring in the module dependencies without requiring a merge plugin
+  - composer require youshido/graphql
+
   # Start a web server on port 8888, run in the background.
   - php -S localhost:8888 &
 
