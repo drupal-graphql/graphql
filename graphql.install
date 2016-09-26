@@ -28,3 +28,40 @@ function graphql_requirements($phase) {
 
   return $ret;
 }
+
+/**
+ * Implements hook_schema().
+ */
+function graphql_schema() {
+  $schema['graphql_uuid'] = array(
+    'description' => 'A UUID-to-entity map',
+    'fields' => array(
+      'uuid' => array(
+        'default' => '',
+        'description' => 'The entity UUID.',
+        'length' => 128,
+        'not null' => TRUE,
+        'type' => 'varchar',
+      ),
+      'type' => array(
+        'default' => '',
+        'description' => 'The type of the entity.',
+        'length' => 32,
+        'not null' => TRUE,
+        'type' => 'varchar',
+      ),
+      'id' => array(
+        'default' => '',
+        'description' => 'The id of the entity. Needs to be a string for config entities',
+        'length' => 128,
+        'not null' => TRUE,
+        'type' => 'varchar',
+      ),
+    ),
+    'unique keys' => array(
+      'reverse' => ['type', 'id'],
+    ),
+    'primary key' => ['uuid'],
+  );
+  return $schema;
+}

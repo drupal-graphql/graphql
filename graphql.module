@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\graphql\Utility\UuidHelper;
+
 /**
  * @file
  * The GraphQL module.
@@ -121,4 +123,28 @@ function graphql_theme() {
       'base hook' => 'block',
     ],
   ];
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function graphql_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
+  Drupal::database()
+    ->insert(UuidHelper::TABLE)
+    ->fields([
+      'uuid' => $entity->uuid(),
+      'type' => $entity->getEntityTypeId(),
+      'id' => $entity->id(),
+    ])
+    ->execute();
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function graphql_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
+  Drupal::database()
+    ->delete(UuidHelper::TABLE)
+    ->condition('uuid', $entity->uuid())
+    ->execute();
 }

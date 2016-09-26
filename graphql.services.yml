@@ -93,6 +93,9 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: graphql_response_policy }
+  graphql.uuid_helper:
+    class: 'Drupal\graphql\Utility\UuidHelper'
+    arguments: ['@database', '@entity_type.manager']
   page_cache_request_policy:
     class: Drupal\graphql\Cache\DefaultRequestPolicyOverride
     arguments: ['@session_configuration']
