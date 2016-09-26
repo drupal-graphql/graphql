@@ -30,7 +30,7 @@ class UuidTest extends KernelTestBase {
     $this->installSchema('user', 'users_data');
     $this->installSchema(static::MODULE, 'graphql_uuid');
 
-    $this->installConfig(array('field', 'node', 'user'));
+    $this->installConfig(['field', 'node', 'user']);
   }
 
   public function testLoader() {
