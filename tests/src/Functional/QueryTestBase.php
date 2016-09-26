@@ -1,13 +1,20 @@
 <?php
 
-namespace Drupal\graphql\Tests;
+namespace Drupal\Tests\graphql\Functional;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\node\Entity\NodeType;
+use Drupal\simpletest\BrowserTestBase;
+use Drupal\simpletest\NodeCreationTrait;
+use Drupal\user\Entity\Role;
 
-/**
- * Test helper class for GraphQL query tests.
- */
-abstract class QueryTestBase extends WebTestBase {
+abstract class QueryTestBase extends BrowserTestBase {
+
+  use NodeCreationTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['graphql', 'node'];
 
   /**
    * The GraphQL resource.
@@ -15,13 +22,6 @@ abstract class QueryTestBase extends WebTestBase {
    * @var string
    */
   protected $queryUrl = 'graphql';
-
-  /**
-   * Modules to install.
-   *
-   * @var array
-   */
-  public static $modules = array('graphql', 'node');
 
   /**
    * {@inheritdoc}
@@ -32,13 +32,20 @@ abstract class QueryTestBase extends WebTestBase {
     // Create a user with the proper permissions and log in.
     $this->drupalLogin($this->drupalCreateUser(['execute graphql requests']));
 
+    Role::load('anonymous')
+      ->grantPermission('execute graphql requests')
+      ->save();
+
     // Create a test content type for node testing.
-    $this->drupalCreateContentType(['name' => 'article', 'type' => 'article']);
+    NodeType::create([
+      'name' => 'article',
+      'type' => 'article',
+    ])->save();
   }
 
   /**
    * Helper function to issue a HTTP request with simpletest's cURL.
-   *
+  &
    * @param $query
    * @param array $variables
    * @param string|null $operation
@@ -53,24 +60,11 @@ abstract class QueryTestBase extends WebTestBase {
       'operation' => $operation,
     ];
 
-    $options = [
-      CURLOPT_HTTPGET => FALSE,
-      CURLOPT_POST => TRUE,
-      CURLOPT_POSTFIELDS => json_encode($body),
-      CURLOPT_URL => $this->buildUrl($this->queryUrl),
-      CURLOPT_NOBODY => FALSE,
-    ];
+    $response = \Drupal::httpClient()->post($this->getAbsoluteUrl($this->queryUrl), [
+      'body' => json_encode($body),
+    ]);
 
-    $body = $this->curlExec($options);
-    $headers = $this->drupalGetHeaders();
-
-    $this->verbose(
-      '<hr />Code: ' . curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE) .
-      '<hr />Response headers: ' . nl2br(print_r($headers, TRUE)) .
-      '<hr />Response body: ' .  $body
-    );
-
-    return $body;
+    return (string) $response->getBody();
   }
 
   /**
@@ -91,14 +85,15 @@ abstract class QueryTestBase extends WebTestBase {
    *   in test output. Use 'Debug' to indicate this is debugging output. Do not
    *   translate this string. Defaults to 'Other'; most tests do not override
    *   this default.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded, FALSE otherwise.
    */
   protected function assertResponseBody(array $expected, $actual, $message = '', $group = 'GraphQL Response') {
     $expected = json_decode(json_encode($expected));
     $actual = json_decode($actual);
 
-    return $this->assertEqual($expected, $actual, $message ? $message : strtr('Response body @expected (expected) is equal to @response (actual).', array('@expected' => var_export($expected, TRUE), '@response' => var_export($actual, TRUE))), $group);
+    $this->assertEquals($expected, $actual, $message ? $message : strtr('Response body @expected (expected) is equal to @response (actual).', [
+      '@expected' => var_export($expected, TRUE),
+      '@response' => var_export($actual, TRUE),
+    ]));
   }
+
 }

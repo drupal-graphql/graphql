@@ -1,0 +1,7 @@
+name: GraphQL Schema
+type: module
+description: Provides a custom GraphQL Schema for testing purposes.
+core: 8.x
+package: Custom
+dependencies:
+  - graphql

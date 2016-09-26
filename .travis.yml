@@ -2,18 +2,17 @@ language: php
 sudo: false
 
 php:
-  - 5.5
+  # - 5.5
   # We need to specify the latest version here because otherwise there are
   # segmentation faults in PHP 5.6.5.
-  - 5.6.18
+  # - 5.6.18
   - 7
   # HHVM is disabled for now because we have not figured out yet how to start a
   # web server for the browser tests.
   #- hhvm
 
 env:
-  - DRUPAL_CORE=8.0.x
-  - DRUPAL_CORE=8.1.x
+  - DRUPAL_CORE=8.2.x
 
 matrix:
   allow_failures:
@@ -57,9 +56,13 @@ before_script:
   # Reference graphql in build site.
   - ln -s $TESTDIR modules/graphql
 
-  # Run composer install for Drupal 8.1. We need an up-to-date composer when
-  # installing Drupal 8.1.
-  - if [ "$DRUPAL_CORE" = "8.1.x" ]; then composer self-update && composer install; fi
+  # Run composer install for Drupal 8.2. We need an up-to-date composer when
+  # installing Drupal 8.2.
+  - composer self-update
+  - composer install
+
+  # Bring in the module dependencies without requiring a merge plugin
+  - composer require youshido/graphql
 
   # Start a web server on port 8888, run in the background.
   - php -S localhost:8888 &
