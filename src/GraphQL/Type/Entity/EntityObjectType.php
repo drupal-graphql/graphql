@@ -23,7 +23,7 @@ class EntityObjectType extends AbstractObjectType {
 
     // @todo Build up the fields based on the entity properties and fields.
     $config = [
-      'name' => "Entity${$typeName}",
+      'name' => "Entity{$typeName}",
       'interfaces' => [
         new NodeInterfaceType(),
         new EntityInterfaceType(),
