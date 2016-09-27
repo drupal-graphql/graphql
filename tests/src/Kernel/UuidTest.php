@@ -35,44 +35,46 @@ class UuidTest extends KernelTestBase {
 
   public function testLoader() {
     $count = 3;
-    $accounts = [];
     $uuids = [];
     for ($i = 0 ; $i < $count ; $i++) {
       $account = User::create(['uid' => $i, 'name' => "user$i"]);
       $account->save();
-      $accounts[$account->id()] = $account;
       $uuids[$account->uuid()] = $account;
     }
 
     /** @var \Drupal\graphql\Utility\UuidHelper $uuid */
-    $uuid = $this->container->get('graphql.uuid_helper');
-    $entities = $uuid->loadEntitiesByUuid(array_keys($uuids));
-    $this->assertEquals(1, count($entities), "Load only returns one entity type");
-    $this->assertArrayHasKey('user', $entities, "Only users are found");
-    $loadedAccounts = $entities['user'];
-    $this->assertEquals($count, count($loadedAccounts), 'The correct number of users is found');
-    foreach ($loadedAccounts as $uid => $loadedAccount) {
-      $this->assertEquals($loadedAccount->uuid(), $accounts[$uid]->uuid());
+    $helper = $this->container->get('graphql.uuid_helper');
+    $entities = $helper->loadEntitiesByUuid(array_keys($uuids));
+    $this->assertEquals($count, count($entities), "Load returns as many entities as were created.");
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    foreach ($entities as $uuid => $entity) {
+      $this->assertEquals('user', $entity->getEntityTypeId(), 'Entity is of the expected type');
+      $this->assertEquals($entity->uuid(), $uuids[$uuid]->uuid());
     }
 
     /** @var \Drupal\user\Entity\User $user1 */
-    $user1 = $accounts[1];
-    $user1->delete();
+    reset($uuids);
+    $user1 = next($uuids);
+    $user1bis = $helper->loadEntityByUuid($user1->uuid());
+    $this->assertInstanceOf('Drupal\user\Entity\User', $user1bis);
+    $this->assertEquals($user1->id(), $user1bis->id());
+    $this->assertEquals($user1->uuid(), $user1bis->uuid());
 
-    $entities = $uuid->loadEntitiesByUuid(array_keys($uuids));
-    $this->assertEquals(1, count($entities), "Load only returns one entity type");
-    $this->assertArrayHasKey('user', $entities, "Only users are found");
-    $loadedAccounts = $entities['user'];
-    $this->assertEquals($count - 1, count($loadedAccounts), 'The correct number of users is found');
-    foreach ($loadedAccounts as $uid => $loadedAccount) {
-      $this->assertEquals($loadedAccount->uuid(), $accounts[$uid]->uuid());
+    $user1->delete();
+    $user1bis = $helper->loadEntityByUuid($user1->uuid());
+    $this->assertEmpty($user1bis, 'No user is loaded for the uuid of a deleted user.');
+
+    $entities = $helper->loadEntitiesByUuid(array_keys($uuids));
+    $this->assertEquals($count - 1, count($entities), 'The correct number of users is found');
+    foreach ($entities as $uuid => $entity) {
+      $this->assertEquals($entity->uuid(), $uuids[$uuid]->uuid());
     }
 
-    foreach ($accounts as $account) {
+    foreach ($uuids as $account) {
       $account->delete();
     }
 
-    $entities = $uuid->loadEntitiesByUuid(array_keys($uuids));
+    $entities = $helper->loadEntitiesByUuid(array_keys($uuids));
     $this->assertEquals(0, count($entities), "Load no longer returns anything");
   }
 

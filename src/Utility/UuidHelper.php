@@ -52,10 +52,6 @@ class UuidHelper {
     $query->condition('uuid', $uuids, 'IN');
     $cursor = $query->execute();
 
-    if (empty($cursor)) {
-      return NULL;
-    }
-
     $ids = [];
     foreach ($cursor as $row) {
       $type = $row->type;
@@ -63,10 +59,14 @@ class UuidHelper {
     }
 
     $entities = [];
+
     foreach ($ids as $type => $type_ids) {
-      $entities[$type] = $this->entityTypeManager
+      $typeEntities = $this->entityTypeManager
         ->getStorage($type)
         ->loadMultiple($type_ids);
+      foreach ($typeEntities as $entity) {
+        $entities[$entity->uuid()] = $entity;
+      }
     }
 
     return $entities;
@@ -80,13 +80,8 @@ class UuidHelper {
    * @return \Drupal\Core\Entity\EntityInterface|null
    */
   public function loadEntityByUuid($uuid) {
-    $allEntities = $this->loadEntitiesByUuid([$uuid]);
-    if (empty($allEntities)) {
-      return NULL;
-    }
-
-    $typeEntities = reset($allEntities);
-    $entity = reset($typeEntities);
+    $entities = $this->loadEntitiesByUuid([$uuid]);
+    $entity = isset($entities[$uuid]) ? $entities[$uuid] : NULL;
     return $entity;
   }
 
