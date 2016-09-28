@@ -164,7 +164,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
   public static function getEntitySingle($source, array $args = NULL, $root, Node $field, $a, $b, $c, $data) {
     // @todo Fix injection of container dependencies in resolver functions.
     $storage = \Drupal::entityManager()->getStorage($data['type']);
-    if ($entity = $storage->load($args['id'])) {
+    if ($entity = $storage->load($args['id']) && $entity->access('view')) {
       return $entity->getTypedData();
     }
 
