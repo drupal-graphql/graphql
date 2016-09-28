@@ -2,26 +2,37 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use Drupal\graphql\GraphQL\Validator\ResolveValidator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\Processor as BaseProcessor;
-use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
-use Youshido\GraphQL\Parser\Ast\Field as FieldAst;
-use Youshido\GraphQL\Parser\Ast\Query;
+use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\TypeService;
 use Youshido\GraphQL\Validator\Exception\ResolveException;
 
-class Processor extends BaseProcessor implements ContainerAwareInterface {
-  use ContainerAwareTrait;
+class Processor extends BaseProcessor {
+  /**
+   * The dependency injection container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected $container;
 
   /**
-   * {@inheritdoc}
+   * Constructs a Processor object.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The dependency injection container.
+   * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
+   *   The GraphQL schema.
    */
-  public function setContainer(ContainerInterface $container = NULL) {
+  public function __construct(ContainerInterface $container, AbstractSchema $schema) {
+    parent::__construct($schema);
+
     $this->container = $container;
+    $this->resolveValidator = new ResolveValidator($container, $this->executionContext);
   }
 
   /**
@@ -78,22 +89,5 @@ class Processor extends BaseProcessor implements ContainerAwareInterface {
     }
 
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPreResolvedValue($contextValue, FieldAst $fieldAst, AbstractField $field) {
-    if ($resolveFunction = $this->getResolveFunction($field)) {
-      $resolveInfo = new ResolveInfo($field, [$fieldAst], $this->executionContext);
-
-      if (!$this->resolveValidator->validateArguments($field, $fieldAst, $this->executionContext->getRequest())) {
-        throw new \Exception(sprintf('Not valid arguments for the field "%s"', $fieldAst->getName()));
-      }
-
-      return $resolveFunction($contextValue, $fieldAst->getKeyValueArguments(), $resolveInfo);
-    }
-
-    return parent::getPreResolvedValue($contextValue, $fieldAst, $field);
   }
 }

@@ -3,7 +3,7 @@
 namespace Drupal\graphql_test_custom_schema;
 
 use Drupal\graphql\SchemaProviderInterface;
-use Drupal\graphql_test_custom_schema\Fields\ArticleByIdField;
+use Drupal\graphql_test_custom_schema\Types\EntityNodeInterfaceType;
 
 class SchemaProvider implements SchemaProviderInterface {
   /**
@@ -11,7 +11,7 @@ class SchemaProvider implements SchemaProviderInterface {
    */
   public function getQuerySchema() {
     return [
-      new ArticleByIdField()
+
     ];
   }
 
@@ -19,6 +19,13 @@ class SchemaProvider implements SchemaProviderInterface {
    * {@inheritdoc}
    */
   public function getMutationSchema() {
+    return [];
+  }
+
+  /**
+   * @return array
+   */
+  public function getCacheTags() {
     return [];
   }
 }

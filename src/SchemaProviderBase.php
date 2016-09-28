@@ -9,6 +9,13 @@ abstract class SchemaProviderBase implements SchemaProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCacheTags() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getQuerySchema() {
     return [];
   }
@@ -18,5 +25,9 @@ abstract class SchemaProviderBase implements SchemaProviderInterface {
    */
   public function getMutationSchema() {
     return [];
+  }
+
+  public function getTypes() {
+
   }
 }

@@ -86,7 +86,7 @@ class SchemaFactory {
 
     if ($useCache) {
       // Cache the generated schema in the configured cache backend.
-      $tags = ['views', 'entity_field_info', 'entity_bundles'];
+      $tags = array_unique($this->schemaProvider->getCacheTags() ?: []);
       $this->schemaCache->set($language->getId(), $schema, Cache::PERMANENT, $tags);
     }
 

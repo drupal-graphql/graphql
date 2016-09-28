@@ -9,16 +9,25 @@ class SchemaProvider implements SchemaProviderInterface {
   /**
    * Unsorted list of schema providers nested and keyed by priority.
    *
-   * @var array
+   * @var \Drupal\graphql\SchemaProviderInterface[]
    */
   protected $providers;
 
   /**
    * Sorted list of schema providers.
    *
-   * @var array
+   * @var \Drupal\graphql\SchemaProviderInterface[]
    */
   protected $sortedProviders;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return array_unique(call_user_func_array('array_merge', array_map(function (SchemaProviderInterface $provider) {
+      return $provider->getCacheTags();
+    }, $this->getSortedProviders())));
+  }
 
   /**
    * {@inheritdoc}

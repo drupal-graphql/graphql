@@ -6,10 +6,15 @@ interface SchemaProviderInterface {
   /**
    * @return array
    */
-    public function getQuerySchema();
+  public function getCacheTags();
 
   /**
    * @return array
    */
-    public function getMutationSchema();
+  public function getQuerySchema();
+
+  /**
+   * @return array
+   */
+  public function getMutationSchema();
 }

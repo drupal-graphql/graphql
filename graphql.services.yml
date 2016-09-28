@@ -23,9 +23,7 @@ services:
     arguments: [graphql_schema]
   graphql.processor:
     class: Drupal\graphql\GraphQL\Execution\Processor
-    arguments: ['@graphql.schema']
-    calls:
-      - [ setContainer, ['@service_container']]
+    arguments: ['@service_container', '@graphql.schema']
   graphql.schema:
     class: Drupal\graphql\GraphQL\Relay\Schema
     factory: ['@graphql.schema_factory', getSchema]
@@ -36,6 +34,20 @@ services:
     class: Drupal\graphql\SchemaProvider
     tags:
         - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
+  graphql.schema_provider.entity:
+    class: Drupal\graphql\SchemaProvider\EntitySchemaProvider
+    arguments: ['@entity_type.manager', '@typed_data_manager', '@graphql.type_resolver']
+    tags:
+      - { name: graphql_schema_provider }
+  graphql.type_resolver:
+    class: Drupal\graphql\TypeResolver
+    tags:
+      - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
+  graphql.type_resolver.entity:
+    class: Drupal\graphql\TypeResolver\EntityTypeResolver
+    arguments: ['@entity_type.manager', '@typed_data_manager', '@graphql.type_resolver']
+    tags:
+      - { name: graphql_type_resolver }
   graphql.page_display_variant_subscriber:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
