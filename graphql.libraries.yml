@@ -12,3 +12,5 @@ explorer:
       css/explorer.css: {}
   dependencies:
     - core/drupal
+    - core/jquery
+    - core/jquery.once
