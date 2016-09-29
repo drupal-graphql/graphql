@@ -6,6 +6,7 @@ use Drupal\graphql\GraphQL\Field\FieldBase;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\Scalar\StringType;
 use Youshido\GraphQL\Type\TypeInterface;
@@ -54,11 +55,13 @@ class EntityByUuidField extends FieldBase implements ContainerAwareInterface {
    *   The parent value. Irrelevant in this case.
    * @param array $args
    *   The array of arguments. Contains the id of the entity to load.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The context information for which to resolve.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The loaded entity object or NULL if there is no entity with the given id.
    */
-  public function resolve($value, array $args = []) {
+  public function resolve($value, array $args = [], ResolveInfo $info) {
     /** @var \Drupal\Core\Entity\EntityRepository $entityRepository */
     $entityRepository = $this->container->get('entity.repository');
     return $entityRepository->loadEntityByUuid($this->entityType, $args['uuid']);

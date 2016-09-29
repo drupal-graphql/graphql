@@ -25,15 +25,18 @@ class CustomSchemaTest extends QueryTestBase  {
   }
 
   public function testSchemaWithCaching() {
-    Node::create([
+    $node = Node::create([
       'type' => 'article',
       'title' => 'giraffe',
-    ])->save();
+    ]);
+    $node->save();
+    $nid = $node->id();
+    $uuid = $node->uuid();
 
     $query = <<<GQL
 {
-  articleById(id: 1) {
-    title
+  nodeByUuid(uuid: "$uuid") {
+    entityId
   }
 }
     
@@ -43,8 +46,8 @@ GQL;
     $data = json_decode($response->getContent(), TRUE);
     $this->assertEquals([
       'data' => [
-        'articleById' => [
-          'title' => 'giraffe',
+        'nodeByUuid' => [
+          'entityId' => $nid,
         ],
       ],
     ], $data);

@@ -17,15 +17,18 @@ class CustomSchemaTest extends QueryTestBase  {
   public static $modules = ['graphql_test_custom_schema'];
 
   public function testSchema() {
-    Node::create([
+    $node = Node::create([
       'type' => 'article',
       'title' => 'giraffe',
-    ])->save();
+    ]);
+    $node->save();
 
+    $nid = $node->id();
+    $uuid = $node->uuid();
     $query = <<<GQL
 {
-  articleById(id: 1) {
-    title
+  nodeByUuid(uuid: "$uuid") {
+    entityId
   }
 }
     
@@ -33,10 +36,11 @@ GQL;
 
     $body = $this->query($query);
     $data = json_decode($body, TRUE);
+//    var_dump($data);
     $this->assertEquals([
       'data' => [
-        'articleById' => [
-          'title' => 'giraffe',
+        'nodeByUuid' => [
+          'entityId' => $nid,
         ],
       ],
     ], $data);
