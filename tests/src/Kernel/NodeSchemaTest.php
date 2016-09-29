@@ -8,12 +8,7 @@ use Drupal\node\Entity\Node;
 /**
  * Tests some custom schema.
  */
-class CustomSchemaTest extends QueryTestBase  {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql_test_custom_schema'];
+class NodeSchemaTest extends QueryTestBase  {
 
   /**
    * {@inheritdoc}
@@ -52,7 +47,7 @@ GQL;
       ],
     ], $data);
 
-    $this->assertEquals('config:user.role.anonymous node:1', $response->headers->get('X-Drupal-Cache-Tags', NULL));
+    $this->assertEquals("config:user.role.anonymous node:$nid", $response->headers->get('X-Drupal-Cache-Tags', NULL));
   }
 
 }
