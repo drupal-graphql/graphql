@@ -5,6 +5,7 @@ namespace Drupal\graphql\GraphQL\Field\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\GraphQL\Field\FieldBase;
 use Drupal\graphql\GraphQL\Type\EntityType\EntityTypeObjectType;
+use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\NonNullType;
 
 class EntityTypeField extends FieldBase {
@@ -23,15 +24,20 @@ class EntityTypeField extends FieldBase {
   /**
    * Resolve function for this field.
    *
-   * Loads the entity type object for the given entity.
+   * Loads the entity id for the given entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $value
-   *   The parent value (entity object).
+   *   The parent value (entity object). May not use language-level type hinting
+   *   to keep compatibility with the parent implementation.
+   * @param array $args
+   *   The field arguments.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The context information for which to resolve.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface|null
-   *   The associated entity type object.
+   * @return string The associated entity id as a string.
+   *   The associated entity id as a string.
    */
-  public function resolve(EntityInterface $value) {
+  public function resolve($value, array $args, ResolveInfo $info) {
     return $value->getEntityType();
   }
 }

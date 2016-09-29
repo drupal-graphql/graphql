@@ -8,12 +8,7 @@ use Drupal\node\Entity\Node;
 /**
  * Tests some custom schema.
  */
-class CustomSchemaTest extends QueryTestBase  {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql_test_custom_schema'];
+class NodeSchemaTest extends QueryTestBase  {
 
   /**
    * {@inheritdoc}
@@ -25,15 +20,18 @@ class CustomSchemaTest extends QueryTestBase  {
   }
 
   public function testSchemaWithCaching() {
-    Node::create([
+    $node = Node::create([
       'type' => 'article',
       'title' => 'giraffe',
-    ])->save();
+    ]);
+    $node->save();
+    $nid = $node->id();
+    $uuid = $node->uuid();
 
     $query = <<<GQL
 {
-  articleById(id: 1) {
-    title
+  nodeByUuid(uuid: "$uuid") {
+    entityId
   }
 }
     
@@ -43,13 +41,13 @@ GQL;
     $data = json_decode($response->getContent(), TRUE);
     $this->assertEquals([
       'data' => [
-        'articleById' => [
-          'title' => 'giraffe',
+        'nodeByUuid' => [
+          'entityId' => $nid,
         ],
       ],
     ], $data);
 
-    $this->assertEquals('config:user.role.anonymous node:1', $response->headers->get('X-Drupal-Cache-Tags', NULL));
+    $this->assertEquals("config:user.role.anonymous node:$nid", $response->headers->get('X-Drupal-Cache-Tags', NULL));
   }
 
 }
