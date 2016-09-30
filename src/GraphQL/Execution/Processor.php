@@ -77,7 +77,7 @@ class Processor extends BaseProcessor {
       if (($resolveFunction = $this->getResolveFunction($field)) && is_callable($resolveFunction)) {
         return $resolveFunction($contextValue, $args, $resolveInfo);
       }
-      else if ($propertyValue = TypeService::getPropertyValue($contextValue, $field->getName())) {
+      elseif ($propertyValue = TypeService::getPropertyValue($contextValue, $field->getName())) {
         return $propertyValue;
       }
     }
@@ -91,4 +91,5 @@ class Processor extends BaseProcessor {
 
     return NULL;
   }
+
 }
