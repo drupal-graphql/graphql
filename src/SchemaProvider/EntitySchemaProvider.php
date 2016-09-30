@@ -8,8 +8,7 @@ use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\GraphQL\Field\Root\Entity\EntityByIdField;
 use Drupal\graphql\GraphQL\Field\Root\Entity\EntityByPathField;
 use Drupal\graphql\GraphQL\Field\Root\Entity\EntityByUuidField;
-use Drupal\graphql\SchemaProviderBase;
-use Drupal\graphql\TypeResolverInterface;
+use Drupal\graphql\TypeResolver\TypeResolverInterface;
 
 /**
  * Generates a GraphQL Schema for content entity types.
@@ -25,7 +24,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
   /**
    * The type resolver service.
    *
-   * @var \Drupal\graphql\TypeResolverInterface
+   * @var \Drupal\graphql\TypeResolver\TypeResolverInterface
    */
   protected $typeResolver;
 
@@ -43,7 +42,7 @@ class EntitySchemaProvider extends SchemaProviderBase {
    *   The entity manager service.
    * @param \Drupal\Core\TypedData\TypedDataManager $typedDataManager
    *   The typed data manager service.
-   * @param \Drupal\graphql\TypeResolverInterface $typeResolver
+   * @param \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver
    *   The type resolver service.
    */
   public function __construct(EntityTypeManager $entityTypeManager, TypedDataManager $typedDataManager, TypeResolverInterface $typeResolver) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\SchemaProvider;
 
 /**
  * Generates a GraphQL Schema.
@@ -9,14 +9,14 @@ class SchemaProvider implements SchemaProviderInterface {
   /**
    * Unsorted list of schema providers nested and keyed by priority.
    *
-   * @var \Drupal\graphql\SchemaProviderInterface[]
+   * @var \Drupal\graphql\SchemaProvider\SchemaProviderInterface[]
    */
   protected $providers;
 
   /**
    * Sorted list of schema providers.
    *
-   * @var \Drupal\graphql\SchemaProviderInterface[]
+   * @var \Drupal\graphql\SchemaProvider\SchemaProviderInterface[]
    */
   protected $sortedProviders;
 
@@ -50,7 +50,7 @@ class SchemaProvider implements SchemaProviderInterface {
   /**
    * Adds a active theme negotiation service.
    *
-   * @param \Drupal\graphql\SchemaProviderInterface $provider
+   * @param \Drupal\graphql\SchemaProvider\SchemaProviderInterface $provider
    *   The schema provider to add.
    * @param int $priority
    *   Priority of the schema provider.
@@ -63,7 +63,7 @@ class SchemaProvider implements SchemaProviderInterface {
   /**
    * Returns the sorted array of schema providers.
    *
-   * @return \Drupal\graphql\SchemaProviderInterface[]
+   * @return \Drupal\graphql\SchemaProvider\SchemaProviderInterface[]
    *   An array of schema provider objects.
    */
   protected function getSortedProviders() {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\TypeResolver;
 
 interface TypeResolverWithRelaySupportInterface extends TypeResolverInterface {
   /**

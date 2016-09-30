@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
 
@@ -18,6 +18,18 @@ interface TypeResolverInterface {
    *   The resolved type.
    */
   public function resolveRecursive(DataDefinitionInterface $definition);
+
+  /**
+   * Allows registering of additional types that are not directly referenced.
+   *
+   * If an object- or union type is not explicitly referenced in the schema,
+   * e.g. in case of only registering its interface type, this method allows the
+   * type to be manually registered in the types list.
+   *
+   * @return \Youshido\GraphQL\Type\TypeInterface[]
+   *   An array of types to be manually registered with the schema.
+   */
+  public function collectTypes();
 
   /**
    * Determines if this implementation applies for the given data definition.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
 
@@ -11,14 +11,14 @@ class TypeResolver implements TypeResolverWithRelaySupportInterface {
   /**
    * Unsorted list of type resolvers nested and keyed by priority.
    *
-   * @var \Drupal\graphql\TypeResolverInterface[]
+   * @var \Drupal\graphql\TypeResolver\TypeResolverInterface[]
    */
   protected $resolvers;
 
   /**
    * Sorted list of type resolvers.
    *
-   * @var \Drupal\graphql\TypeResolverInterface[]
+   * @var \Drupal\graphql\TypeResolver\TypeResolverInterface[]
    */
   protected $sortedResolvers;
 
@@ -32,7 +32,7 @@ class TypeResolver implements TypeResolverWithRelaySupportInterface {
   /**
    * Adds a active theme negotiation service.
    *
-   * @param \Drupal\graphql\TypeResolverInterface $resolver
+   * @param \Drupal\graphql\TypeResolver\TypeResolverInterface $resolver
    *   The type resolver to add.
    * @param int $priority
    *   Priority of the type resolver.
@@ -45,7 +45,7 @@ class TypeResolver implements TypeResolverWithRelaySupportInterface {
   /**
    * Returns the sorted array of type resolvers.
    *
-   * @return \Drupal\graphql\TypeResolverInterface[]
+   * @return \Drupal\graphql\TypeResolver\TypeResolverInterface[]
    *   An array of type resolver objects.
    */
   protected function getSortedResolvers() {
@@ -72,6 +72,15 @@ class TypeResolver implements TypeResolverWithRelaySupportInterface {
     }
 
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function collectTypes() {
+    return call_user_func_array('array_merge', array_map(function (TypeResolverInterface $resolver) {
+      return $resolver->collectTypes();
+    }, $this->getSortedResolvers()));
   }
 
   /**

@@ -8,8 +8,6 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\GraphQL\Type\Entity\EntityObjectType;
-use Drupal\graphql\TypeResolverWithRelaySupportInterface;
-use Drupal\graphql\TypeResolverInterface;
 use Youshido\GraphQL\Relay\Node;
 
 class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
@@ -30,7 +28,7 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
   /**
    * The type resolver service.
    *
-   * @var \Drupal\graphql\TypeResolverInterface
+   * @var \Drupal\graphql\TypeResolver\TypeResolverInterface
    */
   protected $typeResolver;
 
@@ -65,6 +63,13 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
     $entityTypeId = $type->getEntityTypeId();
     $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
     return new EntityObjectType($entityType);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function collectTypes() {
+    return [];
   }
 
   /**
