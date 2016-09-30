@@ -2,14 +2,15 @@
 
 namespace Drupal\graphql\GraphQL\Type\Entity;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Youshido\GraphQL\Config\Object\InterfaceTypeConfig;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
+use Youshido\GraphQL\Type\Scalar\StringType;
 
 class EntitySpecificInterfaceType extends AbstractInterfaceType {
   /**
-   * Creates an EntityObjectType instance.
+   * Creates an EntitySpecificInterfaceType instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
    *   The entity type definition for this object type.
@@ -17,9 +18,13 @@ class EntitySpecificInterfaceType extends AbstractInterfaceType {
   public function __construct(EntityTypeInterface $entityType) {
     $typeName = StringHelper::formatTypeName($entityType->id());
 
-    // @todo Build up the fields based on the entity properties and fields.
     $config = [
       'name' => "Entity{$typeName}",
+      'fields' => [
+        'placeholder' => [
+          'type' => new StringType(),
+        ],
+      ],
     ];
 
     parent::__construct($config);
@@ -36,6 +41,10 @@ class EntitySpecificInterfaceType extends AbstractInterfaceType {
    * {@inheritdoc}
    */
   public function resolveType($object) {
-    // @todo Implement this.
+    if ($object instanceof EntityInterface) {
+      return new EntityObjectType($object->getEntityType());
+    }
+
+    return NULL;
   }
 }

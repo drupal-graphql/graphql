@@ -3,7 +3,7 @@
 namespace Drupal\graphql\GraphQL\Relay\Field;
 
 use Drupal\graphql\GraphQL\Relay\Type\NodeInterfaceType;
-use Drupal\graphql\TypeResolverWithRelaySupportInterface;
+use Drupal\graphql\TypeResolver\TypeResolverWithRelaySupportInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Config\Field\FieldConfig;
@@ -73,7 +73,7 @@ class NodeField extends AbstractField implements ContainerAwareInterface {
   public function resolve($value, array $args, ResolveInfo $info) {
     list($type, $id) = Node::fromGlobalId($args['id']);
 
-    /** @var \Drupal\graphql\TypeResolverInterface $typeResolver */
+    /** @var \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver */
     $typeResolver = $this->container->get('graphql.type_resolver');
     if ($typeResolver instanceof TypeResolverWithRelaySupportInterface) {
       if ($typeResolver->canResolveRelayNode($type, $id)) {

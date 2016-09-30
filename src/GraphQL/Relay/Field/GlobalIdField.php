@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Relay\Field;
 
-use Drupal\graphql\TypeResolverWithRelaySupportInterface;
+use Drupal\graphql\TypeResolver\TypeResolverWithRelaySupportInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -15,7 +15,7 @@ class GlobalIdField extends GlobalIdFieldBase implements ContainerAwareInterface
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    /** @var \Drupal\graphql\TypeResolverInterface $typeResolver */
+    /** @var \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver */
     $typeResolver = $this->container->get('graphql.type_resolver');
     if ($typeResolver instanceof TypeResolverWithRelaySupportInterface) {
       if ($typeResolver->canResolveRelayGlobalId($this->typeName, $value)) {

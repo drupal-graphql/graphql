@@ -13,7 +13,7 @@ class EntityInterfaceType extends AbstractInterfaceType {
    */
   public function __construct() {
     $config = [
-      'name' => 'EntityInterfaceType',
+      'name' => 'Entity',
       'fields' => [
         'entityId' => new EntityIdField(),
         'entityType' => new EntityTypeField(),

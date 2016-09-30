@@ -9,6 +9,7 @@ use Drupal\graphql\GraphQL\Relay\Field\GlobalIdField;
 use Drupal\graphql\GraphQL\Relay\Type\NodeInterfaceType;
 use Drupal\graphql\Utility\StringHelper;
 use Youshido\GraphQL\Type\Object\AbstractObjectType;
+use Youshido\GraphQL\Type\Scalar\StringType;
 
 class EntityObjectType extends AbstractObjectType {
   /**
@@ -21,18 +22,20 @@ class EntityObjectType extends AbstractObjectType {
     $entityTypeId = $entityType->id();
     $typeName = StringHelper::formatTypeName($entityTypeId);
 
-    // @todo Build up the fields based on the entity properties and fields.
     $config = [
       'name' => "Entity{$typeName}",
       'interfaces' => [
         new NodeInterfaceType(),
         new EntityInterfaceType(),
-        //new EntitySpecificInterfaceType($entityType),
+        new EntitySpecificInterfaceType($entityType),
       ],
       'fields' => [
         'id' => new GlobalIdField($entityTypeId),
         'entityId' => new EntityIdField(),
         'entityType' => new EntityTypeField(),
+        'placeholder' => [
+          'type' => new StringType(),
+        ],
       ],
     ];
 

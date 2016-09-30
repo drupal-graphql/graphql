@@ -9,11 +9,11 @@ use Youshido\GraphQL\Type\Scalar\StringType;
 
 class EntityTypeObjectType extends AbstractObjectType {
   /**
-   * EntityTypeObjectType constructor.
+   * Creates an EntityTypeObjectType object.
    */
   public function __construct() {
     $config = [
-      'name' => 'EntityType',
+      'name' => 'DrupalEntityType',
       'fields' => [
         'label' => [
           'type' => new NonNullType(new StringType()),
