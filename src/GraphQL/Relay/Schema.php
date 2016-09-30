@@ -16,8 +16,10 @@ class Schema extends AbstractSchema {
    *   An array of query fields.
    * @param array $mutation
    *   An array of mutation fields.
+   * @param array $types
+   *   An array of additional types to register.
    */
-  public function __construct(array $query, array $mutation = NULL) {
+  public function __construct(array $query, array $mutation = NULL, array $types = []) {
     $config['query'] = new ObjectType([
       'name' => 'QueryRoot',
       'fields' => [
@@ -30,6 +32,10 @@ class Schema extends AbstractSchema {
         'name' => 'MutationRoot',
         'fields' => $mutation,
       ]);
+    }
+
+    if (!empty($types)) {
+      $config['types'] = $types;
     }
 
     return parent::__construct($config);

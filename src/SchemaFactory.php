@@ -82,7 +82,9 @@ class SchemaFactory {
     $schemaClass = $this->config['schema_class'];
     $query = $this->schemaProvider->getQuerySchema();
     $mutation = $this->schemaProvider->getMutationSchema();
-    $schema = new $schemaClass($query, $mutation);
+
+    $types = [];
+    $schema = new $schemaClass($query, $mutation, $types);
 
     if ($useCache) {
       // Cache the generated schema in the configured cache backend.
