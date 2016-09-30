@@ -4,6 +4,7 @@ namespace Drupal\graphql\GraphQL\Field\Root\Entity;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\graphql\GraphQL\Field\FieldBase;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -23,21 +24,21 @@ class EntityByUuidField extends FieldBase implements ContainerAwareInterface, Re
    *
    * @var string
    */
-  protected $entityType;
+  protected $entityTypeId;
 
   /**
    * Constructs an EntityByUuidField object.
    *
-   * @param array $entityType
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
    *   The entity type handled by this field instance.
    * @param \Youshido\GraphQL\Type\TypeInterface $outputType
    *   The output type of the field.
    */
-  public function __construct($entityType, TypeInterface $outputType) {
-    $this->entityType = $entityType;
+  public function __construct(EntityTypeInterface $entityType, TypeInterface $outputType) {
+    $this->entityTypeId = $entityType->id();
 
     // Generate a human readable name from the entity type.
-    $typeName = StringHelper::formatPropertyName($entityType);
+    $typeName = StringHelper::formatPropertyName($this->entityTypeId);
 
     $config = [
       'name' => "{$typeName}ByUuid",
@@ -68,7 +69,7 @@ class EntityByUuidField extends FieldBase implements ContainerAwareInterface, Re
   public function resolve($value, array $args = [], ResolveInfo $info) {
     /** @var \Drupal\Core\Entity\EntityRepository $entityRepository */
     $entityRepository = $this->container->get('entity.repository');
-    $entity = $entityRepository->loadEntityByUuid($this->entityType, $args['uuid']);
+    $entity = $entityRepository->loadEntityByUuid($this->entityTypeId, $args['uuid']);
     $this->addCacheableDependency($entity);
     return $entity;
   }

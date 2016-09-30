@@ -63,18 +63,18 @@ class EntitySchemaProvider extends SchemaProviderBase {
    * {@inheritdoc}
    */
   public function getQuerySchema() {
-    $entityTypes = array_map(function (EntityTypeInterface $entityType) {
+    $entityTypes = $this->entityTypeManager->getDefinitions();
+    $entityTypeTypes = array_map(function (EntityTypeInterface $entityType) {
       $entityTypeId = $entityType->id();
       $dataDefinition = $this->typedDataManager->createDataDefinition("entity:$entityTypeId");
       return $this->typeResolver->resolveRecursive($dataDefinition);
-    }, $this->entityTypeManager->getDefinitions());
+    }, $entityTypes);
 
     $entityTypeKeys = array_keys($entityTypes);
-
-    $fields = array_reduce($entityTypeKeys, function ($carry, $key) use ($entityTypes) {
+    $fields = array_reduce($entityTypeKeys, function ($carry, $key) use ($entityTypes, $entityTypeTypes) {
       return array_merge($carry, [
-        new EntityByIdField($key, $entityTypes[$key]),
-        new EntityByUuidField($key, $entityTypes[$key]),
+        new EntityByIdField($entityTypes[$key], $entityTypeTypes[$key]),
+        new EntityByUuidField($entityTypes[$key], $entityTypeTypes[$key]),
       ]);
     }, []);
 
