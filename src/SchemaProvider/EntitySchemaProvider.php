@@ -72,12 +72,18 @@ class EntitySchemaProvider extends SchemaProviderBase {
 
     $entityTypeKeys = array_keys($entityTypes);
     $fields = array_reduce($entityTypeKeys, function ($carry, $key) use ($entityTypes, $entityTypeTypes) {
-      return array_merge($carry, [
-        new EntityByIdField($entityTypes[$key], $entityTypeTypes[$key]),
-        new EntityByUuidField($entityTypes[$key], $entityTypeTypes[$key]),
-        new EntityQueryField($entityTypes[$key], $entityTypeTypes[$key],
-          $this->typedDataManager, $this->typeResolver),
-      ]);
+      /** @var \Drupal\Core\Entity\EntityTypeInterface $entityType */
+      $entityType = $entityTypes[$key];
+      $entityTypeType = $entityTypeTypes[$key];
+
+      if ($entityType->hasKey('uuid')) {
+        array_push($carry, new EntityByUuidField($entityTypes[$key], $entityTypeTypes[$key]));
+      }
+
+      array_push($carry, new EntityByIdField($entityType, $entityTypeType));
+      array_push($carry, new EntityQueryField($entityType, $entityTypeType, $this->typedDataManager, $this->typeResolver));
+
+      return $carry;
     }, []);
 
     return array_merge($fields, [
