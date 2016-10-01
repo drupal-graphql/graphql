@@ -75,7 +75,8 @@ class EntitySchemaProvider extends SchemaProviderBase {
       return array_merge($carry, [
         new EntityByIdField($entityTypes[$key], $entityTypeTypes[$key]),
         new EntityByUuidField($entityTypes[$key], $entityTypeTypes[$key]),
-        new EntityQueryField($entityTypes[$key], $entityTypeTypes[$key]),
+        new EntityQueryField($entityTypes[$key], $entityTypeTypes[$key],
+          $this->entityTypeManager, $this->typedDataManager, $this->typeResolver),
       ]);
     }, []);
 
