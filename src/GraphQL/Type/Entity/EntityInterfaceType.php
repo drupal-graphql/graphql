@@ -5,6 +5,7 @@ namespace Drupal\graphql\GraphQL\Type\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\GraphQL\Field\Entity\EntityIdField;
 use Drupal\graphql\GraphQL\Field\Entity\EntityTypeField;
+use Drupal\graphql\GraphQL\Relay\Field\GlobalIdField;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
 class EntityInterfaceType extends AbstractInterfaceType {
@@ -15,6 +16,7 @@ class EntityInterfaceType extends AbstractInterfaceType {
     $config = [
       'name' => 'Entity',
       'fields' => [
+        'id' => new GlobalIdField('entity'),
         'entityId' => new EntityIdField(),
         'entityType' => new EntityTypeField(),
       ],

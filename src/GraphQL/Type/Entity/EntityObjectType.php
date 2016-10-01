@@ -30,12 +30,9 @@ class EntityObjectType extends AbstractObjectType {
         new EntitySpecificInterfaceType($entityType),
       ],
       'fields' => [
-        'id' => new GlobalIdField($entityTypeId),
+        'id' => new GlobalIdField("entity/$entityTypeId"),
         'entityId' => new EntityIdField(),
         'entityType' => new EntityTypeField(),
-        'placeholder' => [
-          'type' => new StringType(),
-        ],
       ],
     ];
 

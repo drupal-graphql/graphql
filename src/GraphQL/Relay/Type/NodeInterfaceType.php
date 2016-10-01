@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Relay\Type;
 
+use Drupal\graphql\TypeResolver\TypeResolverWithRelaySupportInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Relay\Field\GlobalIdField;
@@ -28,6 +29,14 @@ class NodeInterfaceType extends AbstractInterfaceType implements ContainerAwareI
    * {@inheritdoc}
    */
   public function resolveType($object) {
-    // @todo Implement this.
+    /** @var \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver */
+    $typeResolver = $this->container->get('graphql.type_resolver');
+    if ($typeResolver instanceof TypeResolverWithRelaySupportInterface) {
+      if ($typeResolver->canResolveRelayType($object)) {
+        return $typeResolver->resolveRelayType($object);
+      }
+    }
+
+    return NULL;
   }
 }

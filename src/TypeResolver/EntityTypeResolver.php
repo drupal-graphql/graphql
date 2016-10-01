@@ -9,6 +9,7 @@ use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\GraphQL\Type\Entity\EntityInterfaceType;
 use Drupal\graphql\GraphQL\Type\Entity\EntityObjectType;
+use Drupal\graphql\GraphQL\Type\Entity\EntitySpecificInterfaceType;
 use Drupal\graphql\GraphQL\Type\EntityType\EntityTypeObjectType;
 use Youshido\GraphQL\Relay\Node;
 
@@ -61,6 +62,15 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
    * {@inheritdoc}
    */
   public function resolveRecursive(DataDefinitionInterface $type) {
+    if (!($type instanceof EntityDataDefinitionInterface)) {
+      return NULL;
+    }
+
+    if ($entityTypeId = $type->getEntityTypeId()) {
+      $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+      return new EntitySpecificInterfaceType($entityType);
+    }
+
     return new EntityInterfaceType();
   }
 
@@ -75,28 +85,39 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
    * {@inheritdoc}
    */
   public function canResolveRelayNode($type, $id) {
-    // TODO: Implement canResolveRelayNode() method.
+    list($prefix, $entityTypeId) = explode('/', $type);
+    if ($prefix === 'entity' && $this->entityTypeManager->hasDefinition($entityTypeId)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolveRelayNode($type, $id) {
-    // TODO: Implement resolveRelayNode() method.
+    list(, $entityTypeId) = explode('/', $type);
+    $entityStorage = $this->entityTypeManager->getStorage($entityTypeId);
+    return $entityStorage->load($id);
   }
 
   /**
    * {@inheritdoc}
    */
   public function canResolveRelayType($object) {
-    // TODO: Implement canResolveRelayType() method.
+    return $object instanceof EntityInterface;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolveRelayType($object) {
-    // TODO: Implement resolveRelayType() method.
+    if ($object instanceof EntityInterface) {
+      return new EntityObjectType($object->getEntityType());
+    }
+
+    return NULL;
   }
 
   /**
