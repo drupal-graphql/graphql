@@ -8,6 +8,7 @@ use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\GraphQL\Field\Root\Entity\EntityByIdField;
 use Drupal\graphql\GraphQL\Field\Root\Entity\EntityByPathField;
 use Drupal\graphql\GraphQL\Field\Root\Entity\EntityByUuidField;
+use Drupal\graphql\GraphQL\Field\Root\Entity\EntityQueryField;
 use Drupal\graphql\TypeResolver\TypeResolverInterface;
 
 /**
@@ -74,6 +75,8 @@ class EntitySchemaProvider extends SchemaProviderBase {
       return array_merge($carry, [
         new EntityByIdField($entityTypes[$key], $entityTypeTypes[$key]),
         new EntityByUuidField($entityTypes[$key], $entityTypeTypes[$key]),
+        new EntityQueryField($entityTypes[$key], $entityTypeTypes[$key],
+          $this->typedDataManager, $this->typeResolver),
       ]);
     }, []);
 
