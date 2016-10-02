@@ -4,23 +4,32 @@ namespace Drupal\graphql\GraphQL\Field\Root\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\GraphQL\Field\FieldBase;
+use Drupal\graphql\GraphQL\Type\Entity\EntityObjectType;
 use Drupal\graphql\TypeResolver\TypeResolverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Fubhy\GraphQL\Type\Definition\Types\ModifierInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Execution\ResolveInfo;
+use Youshido\GraphQL\Relay\Connection\ArrayConnection;
+use Youshido\GraphQL\Relay\Connection\Connection;
 use Youshido\GraphQL\Type\Enum\EnumType;
 use Youshido\GraphQL\Type\ListType\ListType;
 use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
-use Youshido\GraphQL\Type\Scalar\IntType;
 use Youshido\GraphQL\Type\TypeInterface;
 
+/**
+ * Class EntityQueryField
+ *
+ * This class does *not* use StringTranslationTrait because it prevents
+ * serialization by setting the TranslationManager on the instance, and that
+ * object contains a reference to Settings, which cannot be serialized.
+ */
 class EntityQueryField extends FieldBase implements ContainerAwareInterface {
   use ContainerAwareTrait;
 
@@ -45,7 +54,8 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
     EntityTypeInterface $entityType,
     TypeInterface $outputType,
     TypedDataManagerInterface $typedDataManager,
-    TypeResolverInterface $typeResolver) {
+    TypeResolverInterface $typeResolver
+  ) {
     $this->entityTypeId = $entityType->id();
 
     /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinition $definition */
@@ -58,13 +68,17 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
 
     $this->args = array_flip($argumentNames);
 
+    $connectionDefinition = Connection::connectionDefinition(new EntityObjectType($entityType));
+    $connectionConfig = $connectionDefinition->getConfig();
+    $connectionConfig->set('description', t('A connection to a list of @name entities.', [
+      '@name' => $typeName,
+    ]));
     $config = [
       'name' => "{$typeName}Query",
-      'type' => new ListType($outputType),
-      'args' => [
-          'offset' => ['type' => new IntType()],
-          'limit' => ['type' => new IntType()],
-        ] + array_combine($argumentNames, $arguments),
+      'type' => $connectionDefinition,
+      'description' => 'The entities returned by the query',
+      'args' => Connection::connectionArgs() + array_combine($argumentNames,
+          $arguments),
     ];
 
     parent::__construct($config);
@@ -81,7 +95,8 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
    */
   protected function getQueryArguments(
     EntityDataDefinitionInterface $definition,
-    TypeResolverInterface $typeResolver) {
+    TypeResolverInterface $typeResolver
+  ) {
     $args = [];
 
     foreach ($definition->getPropertyDefinitions() as $fieldName => $fieldDefinition) {
@@ -124,12 +139,25 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
 
   /**
    * Entity list resolver callback.
+   *
+   * @param mixed $parent
+   *   The parent node
+   * @param array $args
+   *   The arguments passed to the query.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolution context.
+   *
+   * @return array|mixed|null
+   *   The Relay connection for the query results.
+   *
    */
   public function resolve($parent, array $args = NULL, ResolveInfo $info) {
-    $storage = $this->container->get('entity_type.manager')->getStorage($this->entityTypeId);
+    $storage = $this->container
+      ->get('entity_type.manager')
+      ->getStorage($this->entityTypeId);
     $query = $storage->getQuery()->accessCheck(TRUE);
 
-    $rangeArgs = array('offset', 'limit');
+    $rangeArgs = ['offset', 'limit'];
     $filterArgs = array_diff_key($args, array_flip($rangeArgs));
     foreach ($filterArgs as $key => $arg) {
       if (isset($arg) && isset($data['args'][$key])) {
@@ -144,16 +172,20 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
     }
 
     $result = $query->execute();
-    if (!empty($result)) {
+    if (empty($result)) {
+      $filteredEntities = [];
+    }
+    else {
       $entities = $storage->loadMultiple($result);
 
-      // Filter entities that the current user doesn't have view access for.
-      return array_filter($entities, function (EntityInterface $entity) {
-        return $entity->access('view');
-      });
+      $filteredEntities = array_filter($entities,
+        function (EntityInterface $entity) {
+          return $entity->access('view');
+        }
+      );
     }
 
-    return [];
+    return ArrayConnection::connectionFromArray($filteredEntities, $args);
   }
 
 }
