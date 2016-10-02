@@ -26,8 +26,4 @@ abstract class SchemaProviderBase implements SchemaProviderInterface {
   public function getMutationSchema() {
     return [];
   }
-
-  public function getTypes() {
-
-  }
 }

@@ -7,8 +7,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\graphql\GraphQL\Field\Entity\EntityIdField;
 use Drupal\graphql\GraphQL\Field\Entity\EntityTypeField;
 use Drupal\graphql\GraphQL\Relay\Field\GlobalIdField;
+use Drupal\graphql\GraphQL\Type\AbstractInterfaceType;
 use Drupal\graphql\Utility\StringHelper;
-use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
 class EntitySpecificInterfaceType extends AbstractInterfaceType {
   /**
@@ -31,13 +31,6 @@ class EntitySpecificInterfaceType extends AbstractInterfaceType {
     ];
 
     parent::__construct($config);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function build($config) {
-    // @todo This method should not be required.
   }
 
   /**

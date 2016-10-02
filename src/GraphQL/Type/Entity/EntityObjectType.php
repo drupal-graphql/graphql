@@ -7,9 +7,8 @@ use Drupal\graphql\GraphQL\Field\Entity\EntityIdField;
 use Drupal\graphql\GraphQL\Field\Entity\EntityTypeField;
 use Drupal\graphql\GraphQL\Relay\Field\GlobalIdField;
 use Drupal\graphql\GraphQL\Relay\Type\NodeInterfaceType;
+use Drupal\graphql\GraphQL\Type\AbstractObjectType;
 use Drupal\graphql\Utility\StringHelper;
-use Youshido\GraphQL\Type\Object\AbstractObjectType;
-use Youshido\GraphQL\Type\Scalar\StringType;
 
 class EntityObjectType extends AbstractObjectType {
   /**

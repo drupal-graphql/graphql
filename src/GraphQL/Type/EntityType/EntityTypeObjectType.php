@@ -3,8 +3,8 @@
 namespace Drupal\graphql\GraphQL\Type\EntityType;
 
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\graphql\GraphQL\Type\AbstractObjectType;
 use Youshido\GraphQL\Type\NonNullType;
-use Youshido\GraphQL\Type\Object\AbstractObjectType;
 use Youshido\GraphQL\Type\Scalar\StringType;
 
 class EntityTypeObjectType extends AbstractObjectType {
@@ -57,12 +57,5 @@ class EntityTypeObjectType extends AbstractObjectType {
    */
   public static function resolvePluralLabelFieldValue(EntityTypeInterface $value) {
     return $value->getPluralLabel();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function build($config) {
-    // @todo This method should not be required.
   }
 }

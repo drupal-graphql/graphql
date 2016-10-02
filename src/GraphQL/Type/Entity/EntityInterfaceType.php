@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\GraphQL\Field\Entity\EntityIdField;
 use Drupal\graphql\GraphQL\Field\Entity\EntityTypeField;
 use Drupal\graphql\GraphQL\Relay\Field\GlobalIdField;
-use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
+use Drupal\graphql\GraphQL\Type\AbstractInterfaceType;
 
 class EntityInterfaceType extends AbstractInterfaceType {
   /**
@@ -34,12 +34,5 @@ class EntityInterfaceType extends AbstractInterfaceType {
     }
 
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function build($config) {
-    // @todo This method should not be required.
   }
 }
