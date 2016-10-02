@@ -6,8 +6,16 @@
   "license": "GPL-2.0+",
   "repositories": [
     {
-      "type": "git",
-      "url": "https://github.com/fubhy/GraphQL"
+      "type": "package",
+      "package": {
+        "name": "youshido/graphql",
+        "version": "dev-drupal",
+        "source": {
+          "url": "https://github.com/fubhy/GraphQL.git",
+          "type": "git",
+          "reference": "drupal"
+        }
+      }
     }
   ],
   "require": {
