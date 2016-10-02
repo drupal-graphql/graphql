@@ -60,7 +60,7 @@ before_script:
   # installing Drupal 8.2.
   - composer self-update
   # Bring in the module dependencies without requiring a merge plugin
-  - composer require youshido/graphql
+  - composer require fubhy/graphql-php
   # The require already triggered the install.s
 
   # Start a web server on port 8888, run in the background.
