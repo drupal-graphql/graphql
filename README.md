@@ -6,6 +6,30 @@ This module generates and exposes a GraphQL schema for all content entity types.
 
 Project homepage: https://www.drupal.org/project/graphql
 
+## Installation
+
+In order to install this module, since we are currently using a fork of the library that this module depends on, you
+have to specify a custom repository in your composer.json.
+
+```
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "youshido/graphql",
+        "version": "dev-drupal",
+        "source": {
+          "url": "https://github.com/fubhy/GraphQL.git",
+          "type": "git",
+          "reference": "drupal"
+        }
+      }
+    }
+  ]
+```
+
+After adding this to your composer.json, you can run "composer require drupal/graphql:8.x-3.x".
+
 ## Contributing
 
 For some time, development will happen on GitHub using the pull request model:
@@ -35,5 +59,4 @@ and a checkout of the GraphQL module in the modules folder.
     ../vendor/bin/phpunit ../modules/graphql/tests/src/Unit
     ../vendor/bin/phpunit ../modules/graphql/tests/src/Integration
 
-You can also execute the test cases from the web interface at
-``/admin/config/development/testing``.
+You can also execute the test cases from the web interface at ``/admin/config/development/testing``.
