@@ -10,6 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\GraphQL\Field\FieldBase;
 use Drupal\graphql\GraphQL\Type\Entity\EntityObjectType;
+use Drupal\graphql\GraphQL\Type\Entity\EntitySpecificInterfaceType;
 use Drupal\graphql\TypeResolver\TypeResolverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Fubhy\GraphQL\Type\Definition\Types\ModifierInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Relay\Connection\ArrayConnection;
 use Youshido\GraphQL\Relay\Connection\Connection;
+use Youshido\GraphQL\Type\CompositeTypeInterface;
 use Youshido\GraphQL\Type\Enum\EnumType;
 use Youshido\GraphQL\Type\ListType\ListType;
 use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
@@ -48,7 +50,9 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
    * @param \Youshido\GraphQL\Type\TypeInterface $outputType
    *   The output type of the field.
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
-   *   The typed_data_manager service.
+   *   The typed data manager service.
+   * @param \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver
+   *   The type resolver service.
    */
   public function __construct(
     EntityTypeInterface $entityType,
@@ -66,19 +70,17 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
     // Generate a human readable name from the entity type.
     $typeName = StringHelper::formatPropertyName($this->entityTypeId);
 
-    $this->args = array_flip($argumentNames);
-
-    $connectionDefinition = Connection::connectionDefinition(new EntityObjectType($entityType));
+    $connectionDefinition = Connection::connectionDefinition(new EntitySpecificInterfaceType($entityType));
     $connectionConfig = $connectionDefinition->getConfig();
     $connectionConfig->set('description', t('A connection to a list of @name entities.', [
       '@name' => $typeName,
     ]));
+
     $config = [
       'name' => "{$typeName}Query",
       'type' => $connectionDefinition,
       'description' => 'The entities returned by the query',
-      'args' => Connection::connectionArgs() + array_combine($argumentNames,
-          $arguments),
+      'args' => Connection::connectionArgs() + array_combine($argumentNames, $arguments),
     ];
 
     parent::__construct($config);
@@ -89,14 +91,13 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
    *
    * @param \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition
    *   The entity type definition.
+   * @param \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver
+   *   The type resolver service.
    *
-   * @return array
-   *   The list of arguments for potential use in the entity query.
+   * @return array The list of arguments for potential use in the entity query.
+   * The list of arguments for potential use in the entity query.
    */
-  protected function getQueryArguments(
-    EntityDataDefinitionInterface $definition,
-    TypeResolverInterface $typeResolver
-  ) {
+  protected function getQueryArguments(EntityDataDefinitionInterface $definition, TypeResolverInterface $typeResolver) {
     $args = [];
 
     foreach ($definition->getPropertyDefinitions() as $fieldName => $fieldDefinition) {
@@ -119,8 +120,8 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
       $wrappedType = $propertyType;
 
       // Extract the wrapped type of the main property.
-      while ($wrappedType instanceof ModifierInterface) {
-        $wrappedType = $wrappedType->getWrappedType();
+      while ($wrappedType instanceof CompositeTypeInterface) {
+        $wrappedType = $wrappedType->getTypeOf();
       }
 
       // We only support scalars and enums as arguments.
@@ -149,12 +150,10 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
    *
    * @return array|mixed|null
    *   The Relay connection for the query results.
-   *
    */
   public function resolve($parent, array $args = NULL, ResolveInfo $info) {
-    $storage = $this->container
-      ->get('entity_type.manager')
-      ->getStorage($this->entityTypeId);
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')->getStorage($this->entityTypeId);
     $query = $storage->getQuery()->accessCheck(TRUE);
 
     $rangeArgs = ['offset', 'limit'];
@@ -172,18 +171,10 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
     }
 
     $result = $query->execute();
-    if (empty($result)) {
-      $filteredEntities = [];
-    }
-    else {
-      $entities = $storage->loadMultiple($result);
-
-      $filteredEntities = array_filter($entities,
-        function (EntityInterface $entity) {
-          return $entity->access('view');
-        }
-      );
-    }
+    $entities = $result ? $storage->loadMultiple($result) : [];
+    $filteredEntities = array_filter($entities, function (EntityInterface $entity) {
+      return $entity->access('view');
+    });
 
     return ArrayConnection::connectionFromArray($filteredEntities, $args);
   }

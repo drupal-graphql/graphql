@@ -3,6 +3,7 @@
 namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfo;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
@@ -38,16 +39,16 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
   /**
    * Constructs a ContentEntityTypeResolver object.
    *
-   * @param TypeResolverInterface $typeResolver
-   *   The base type resolver service.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityManager
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
    *   The typed data manager service.
+   * @param TypeResolverInterface $typeResolver
+   *   The base type resolver service.
    */
-  public function __construct(EntityTypeManager $entityManager, TypedDataManagerInterface $typedDataManager, TypeResolverInterface $typeResolver) {
+  public function __construct(EntityTypeManager $entityTypeManager, TypedDataManagerInterface $typedDataManager, TypeResolverInterface $typeResolver) {
     $this->typeResolver = $typeResolver;
-    $this->entityTypeManager = $entityManager;
+    $this->entityTypeManager = $entityTypeManager;
     $this->typedDataManager = $typedDataManager;
   }
 
@@ -66,12 +67,23 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
       return NULL;
     }
 
-    if ($entityTypeId = $type->getEntityTypeId()) {
-      $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
-      return new EntitySpecificInterfaceType($entityType);
+    if (!$entityTypeId = $type->getEntityTypeId()) {
+      return new EntityInterfaceType();
     }
 
-    return new EntityInterfaceType();
+    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+    if (($constraintBundles = $type->getBundles()) === NULL) {
+      // Return the interface type (all bundles are possible).
+      return new EntitySpecificInterfaceType($entityType);
+    }
+    else if (count($constraintBundles) === 1) {
+      // Return the object type (only a single bundle is possible)
+      return new EntityObjectType($entityType, reset($constraintBundles));
+    }
+
+    // Multiple bundles are possible.
+    // @todo Maybe we should return a union type here.
+    return new EntitySpecificInterfaceType($entityType);
   }
 
   /**
@@ -114,7 +126,7 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
    */
   public function resolveRelayType($object) {
     if ($object instanceof EntityInterface) {
-      return new EntityObjectType($object->getEntityType());
+      return $this->typeResolver->resolveRecursive($object->getTypedData()->getDataDefinition());
     }
 
     return NULL;

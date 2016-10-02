@@ -16,10 +16,12 @@ class EntityObjectType extends AbstractObjectType {
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
    *   The entity type definition for this object type.
+   * @param string $bundle
+   *   The entity bundle.
    */
-  public function __construct(EntityTypeInterface $entityType) {
+  public function __construct(EntityTypeInterface $entityType, $bundle) {
     $entityTypeId = $entityType->id();
-    $typeName = StringHelper::formatTypeName($entityTypeId);
+    $typeName = StringHelper::formatTypeName("$entityTypeId:$bundle");
 
     $config = [
       'name' => "Entity{$typeName}",
@@ -28,6 +30,7 @@ class EntityObjectType extends AbstractObjectType {
         new EntityInterfaceType(),
         new EntitySpecificInterfaceType($entityType),
       ],
+      // @todo Figure out how and where to use the typed data property definitions to build the fields array.
       'fields' => [
         'id' => new GlobalIdField("entity/$entityTypeId"),
         'entityId' => new EntityIdField(),
@@ -36,12 +39,5 @@ class EntityObjectType extends AbstractObjectType {
     ];
 
     parent::__construct($config);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function build($config) {
-    // @todo This method should not be required.
   }
 }

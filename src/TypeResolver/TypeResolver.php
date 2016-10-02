@@ -3,6 +3,7 @@
 namespace Drupal\graphql\TypeResolver;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * Attempts to GraphQL type definitions from arbitrary data types.
