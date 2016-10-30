@@ -4,22 +4,8 @@
   "description": "Exposes your Drupal data model through a GraphQL schema.",
   "homepage": "http://drupal.org/project/graphql",
   "license": "GPL-2.0+",
-  "repositories": [
-    {
-      "type": "package",
-      "package": {
-        "name": "youshido/graphql",
-        "version": "dev-drupal",
-        "source": {
-          "url": "https://github.com/fubhy/GraphQL.git",
-          "type": "git",
-          "reference": "drupal"
-        }
-      }
-    }
-  ],
   "require": {
-    "youshido/graphql": "dev-drupal"
+    "youshido/graphql": "dev-master"
   },
   "minimum-stability": "dev"
 }
