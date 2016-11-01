@@ -113,7 +113,7 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
       // Fetch the main property's definition and resolve it's type.
       $mainPropertyName = $storage->getMainPropertyName();
       $mainProperty = $storage->getPropertyDefinition($mainPropertyName);
-      if (!$propertyType = $typeResolver->resolveRecursive($mainProperty)) {
+      if (!$mainProperty || !$propertyType = $typeResolver->resolveRecursive($mainProperty)) {
         continue;
       }
 
