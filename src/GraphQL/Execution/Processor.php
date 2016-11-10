@@ -2,13 +2,14 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
-use Drupal\graphql\GraphQL\Validator\ResolveValidator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\Processor as BaseProcessor;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
 use Youshido\GraphQL\Field\FieldInterface;
+use Youshido\GraphQL\Parser\Ast\Interfaces\FieldInterface as AstFieldInterface;
+use Youshido\GraphQL\Parser\Ast\Query as AstQuery;
 use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\TypeService;
 use Youshido\GraphQL\Validator\Exception\ResolveException;
@@ -30,10 +31,33 @@ class Processor extends BaseProcessor {
    *   The GraphQL schema.
    */
   public function __construct(ContainerInterface $container, AbstractSchema $schema) {
-    parent::__construct($schema);
-
     $this->container = $container;
-    $this->resolveValidator = new ResolveValidator($container, $this->executionContext);
+
+    parent::__construct($schema);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doResolve(FieldInterface $field, AstFieldInterface $ast, $parentValue = NULL) {
+    $arguments = $this->parseArgumentsValues($field, $ast);
+    $astFields = $ast instanceof AstQuery ? $ast->getFields() : [];
+    $resolveInfo = $this->createResolveInfo($field, $astFields);
+
+    if ($field instanceof Field) {
+      if (($resolveFunction = $this->getResolveFunction($field)) && is_callable($resolveFunction)) {
+        return $resolveFunction($parentValue, $arguments, $resolveInfo);
+      }
+      else if ($propertyValue = TypeService::getPropertyValue($parentValue, $field->getName())) {
+        return $propertyValue;
+      }
+    }
+
+    if ($field instanceof ContainerAwareInterface) {
+      $field->setContainer($this->container);
+    }
+
+    return $field->resolve($parentValue, $arguments, $resolveInfo);
   }
 
   /**
@@ -65,30 +89,5 @@ class Processor extends BaseProcessor {
     }
 
     return $resolveFunction;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function resolveFieldValue(FieldInterface $field, $contextValue, array $fields, array $args) {
-    $resolveInfo = $this->createResolveInfo($field, $fields);
-
-    if ($field instanceof Field) {
-      if (($resolveFunction = $this->getResolveFunction($field)) && is_callable($resolveFunction)) {
-        return $resolveFunction($contextValue, $args, $resolveInfo);
-      }
-      else if ($propertyValue = TypeService::getPropertyValue($contextValue, $field->getName())) {
-        return $propertyValue;
-      }
-    }
-    else {
-      if ($field instanceof ContainerAwareInterface) {
-        $field->setContainer($this->container);
-      }
-
-      return $field->resolve($contextValue, $args, $resolveInfo);
-    }
-
-    return NULL;
   }
 }

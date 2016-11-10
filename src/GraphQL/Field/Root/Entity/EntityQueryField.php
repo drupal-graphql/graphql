@@ -74,7 +74,7 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
     $connectionConfig = $connectionDefinition->getConfig();
     $connectionConfig->set('description', t('A connection to a list of @name entities.', [
       '@name' => $typeName,
-    ]));
+    ])->render());
 
     $config = [
       'name' => "{$typeName}Query",
@@ -131,7 +131,6 @@ class EntityQueryField extends FieldBase implements ContainerAwareInterface {
 
       $args[$fieldName] = [
         'type' => new ListType($wrappedType),
-        'description' => $fieldDefinition->getDescription(),
       ];
     }
 
