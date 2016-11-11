@@ -45,7 +45,7 @@ services:
       - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
   graphql.type_resolver.entity:
     class: Drupal\graphql\TypeResolver\EntityTypeResolver
-    arguments: ['@entity_type.manager', '@typed_data_manager', '@graphql.type_resolver']
+    arguments: ['@entity_type.manager', '@entity_field.manager', '@typed_data_manager', '@graphql.type_resolver']
     tags:
       - { name: graphql_type_resolver }
   graphql.page_display_variant_subscriber:

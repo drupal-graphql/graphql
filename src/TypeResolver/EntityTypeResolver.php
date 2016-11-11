@@ -5,6 +5,7 @@ namespace Drupal\graphql\TypeResolver;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfo;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
@@ -41,14 +42,17 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entityFieldManager
+   *   The typed data manager service.
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
    *   The typed data manager service.
    * @param TypeResolverInterface $typeResolver
    *   The base type resolver service.
    */
-  public function __construct(EntityTypeManager $entityTypeManager, TypedDataManagerInterface $typedDataManager, TypeResolverInterface $typeResolver) {
+  public function __construct(EntityTypeManager $entityTypeManager, EntityFieldManager $entityFieldManager, TypedDataManagerInterface $typedDataManager,TypeResolverInterface $typeResolver) {
     $this->typeResolver = $typeResolver;
     $this->entityTypeManager = $entityTypeManager;
+    $this->entityFieldManager = $entityFieldManager;
     $this->typedDataManager = $typedDataManager;
   }
 
@@ -72,13 +76,15 @@ class EntityTypeResolver implements TypeResolverWithRelaySupportInterface {
     }
 
     $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+
     if (($constraintBundles = $type->getBundles()) === NULL) {
       // Return the interface type (all bundles are possible).
       return new EntitySpecificInterfaceType($entityType);
     }
     else if (count($constraintBundles) === 1) {
       // Return the object type (only a single bundle is possible)
-      return new EntityObjectType($entityType, reset($constraintBundles));
+      $fieldDefinitions = $this->entityFieldManager->getFieldDefinitions($entityTypeId, $constraintBundles);
+      return new EntityObjectType($entityType, reset($constraintBundles), $fieldDefinitions);
     }
 
     // Multiple bundles are possible.

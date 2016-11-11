@@ -39,7 +39,7 @@ class EntitySpecificInterfaceType extends AbstractInterfaceType {
   public function resolveType($object) {
     // @todo Use the type resolver service here instead.
     if ($object instanceof EntityInterface) {
-      return new EntityObjectType($object->getEntityType(), $object->bundle());
+      return new EntityObjectType($object->getEntityType(), $object->bundle(), $object->getFieldDefinitions());
     }
 
     return NULL;
