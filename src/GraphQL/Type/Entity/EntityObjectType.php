@@ -12,6 +12,9 @@ use Drupal\graphql\Utility\StringHelper;
 
 class EntityObjectType extends AbstractObjectType {
 
+  /**
+   * Field definitions
+   */
   protected $fieldDefinitions;
 
   /**
@@ -46,10 +49,12 @@ class EntityObjectType extends AbstractObjectType {
     parent::__construct($config);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function build($config){
-    $fieldDefinitions = $this->fieldDefinitions;
-    foreach ($fieldDefinitions as $fieldDefinition) {
-      // Resolve Field
+    foreach ($this->fieldDefinitions as $fieldDefinition) {
+      // Have a better resolver here, this is just for proof of concept. Doesn't even work for types with _ at the moment.
       $className = "Drupal\graphql\GraphQL\Field\Entity\Entity" . ucfirst($fieldDefinition->getType()) . "Field";
       if (class_exists($className)) {
         $config->addfield(new $className($fieldDefinition));
