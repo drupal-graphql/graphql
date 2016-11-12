@@ -1,7 +1,5 @@
 # GraphQL for Drupal
 
-[![Build Status](https://travis-ci.org/fubhy/graphql-drupal.svg?branch=8.x-3.x)](https://travis-ci.org/fubhy/graphql-drupal)
-
 This module generates and exposes a [GraphQL] schema for [Drupal 8] entities, and 
 allows you to expose your own custom schema in a consistent way and with minimal
 effort.
