@@ -5,7 +5,7 @@
   "homepage": "http://drupal.org/project/graphql",
   "license": "GPL-2.0+",
   "require": {
-    "youshido/graphql": "^1.4.2"
+    "youshido/graphql": "1.4.2.2"
   },
   "minimum-stability": "dev"
 }
