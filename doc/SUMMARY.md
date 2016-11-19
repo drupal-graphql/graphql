@@ -1,7 +1,7 @@
 # Summary
 
 * [Getting started](README)
-  * [Installing](start/install.md)
+  * [Installing](install/README.md)
   * [Exploring](start/graphiql.md)
   * [Running tests](tests/README.md)
 * [Concepts](concepts/README.md)
