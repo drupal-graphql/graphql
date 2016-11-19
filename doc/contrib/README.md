@@ -17,3 +17,17 @@ There are a few conventions that should be followed when contributing:
   your commits: you can look at the [Symfony documentation](http://symfony.com/doc/current/cmf/contributing/commits.html)
   or at the [Git book](http://git-scm.com/book/en/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages)
   for more information on how to do that.
+
+## Documentation
+
+Documentation is maintained in the `doc` directory in [GitBook] format, and can be edited just like code issues with the pull request process. 
+
+[GitBook]: https://www.gitbook.com/
+
+To check a local copy of documentation while working on it, install Gitbook locally, and type:
+
+    $ cd (your_drupal_site)
+    $ cd modules/contrib/graphql
+    $ gitbook serve
+    
+You then have documentation available on `http://localhost:4000/` with live-reload when you edit it.
