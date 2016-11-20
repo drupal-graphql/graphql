@@ -3,3 +3,6 @@ npm-debug.log
 
 # PHPunit coverage
 build
+
+# GitBook
+_book
