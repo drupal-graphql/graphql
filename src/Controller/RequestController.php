@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Controller;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Config;
@@ -77,11 +78,18 @@ class RequestController implements ContainerInjectionInterface {
     }
 
     $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
-    $result = $this->processor->processPayload($query, (array) ($variables ?: []));
+    $variables = (array) ($variables ?: []);
+    $result = $this->processor->processPayload($query, $variables);
     $response = new CacheableJsonResponse($result->getResponseData());
 
+    // @todo This needs proper, context and tag based caching logic.
+    //
+    // We need to add cache contexts and tags from the resolver functions in the
+    // schema and figure out a way to make this work with the dynamic page cache
+    // and fractional caching. For now, we only cache for anonymous users via
+    // the custom CacheSubscriber provided by this module. Not cool.
     $metadata = new CacheableMetadata();
-    $metadata->setCacheContexts(['graphql_query']);
+    $metadata->setCacheMaxAge(Cache::PERMANENT);
     $response->addCacheableDependency($metadata);
 
     // Set the execution context on the request attributes for use in the
