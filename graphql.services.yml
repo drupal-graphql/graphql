@@ -32,9 +32,6 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: cache.context }
-  graphql.processor:
-    class: Drupal\graphql\GraphQL\Execution\Processor
-    arguments: ['@service_container', '@graphql.schema']
   graphql.schema:
     class: Drupal\graphql\GraphQL\Relay\Schema
     factory: ['@graphql.schema_factory', getSchema]

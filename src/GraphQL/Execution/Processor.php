@@ -2,8 +2,11 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Exception\ResolveException;
 use Youshido\GraphQL\Execution\Processor as BaseProcessor;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
@@ -12,15 +15,21 @@ use Youshido\GraphQL\Parser\Ast\Interfaces\FieldInterface as AstFieldInterface;
 use Youshido\GraphQL\Parser\Ast\Query as AstQuery;
 use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\TypeService;
-use Youshido\GraphQL\Validator\Exception\ResolveException;
 
-class Processor extends BaseProcessor {
+class Processor extends BaseProcessor implements CacheableDependencyInterface {
   /**
    * The dependency injection container.
    *
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
   protected $container;
+
+  /**
+   * The cacheable metadata bag.
+   *
+   * @var \Drupal\Core\Cache\CacheableMetadata
+   */
+  protected $metadata;
 
   /**
    * Constructs a Processor object.
@@ -32,6 +41,7 @@ class Processor extends BaseProcessor {
    */
   public function __construct(ContainerInterface $container, AbstractSchema $schema) {
     $this->container = $container;
+    $this->metadata = new CacheableMetadata();
 
     parent::__construct($schema);
   }
@@ -40,6 +50,24 @@ class Processor extends BaseProcessor {
    * {@inheritdoc}
    */
   protected function doResolve(FieldInterface $field, AstFieldInterface $ast, $parentValue = NULL) {
+    $value = $this->doResolveValue($field, $ast, $parentValue);
+    if ($value instanceof CacheableDependencyInterface) {
+      $this->metadata->addCacheableDependency($value);
+    }
+
+    return $value;
+  }
+
+  /**
+   * Helper function to resolve a field value.
+   *
+   * @param \Youshido\GraphQL\Field\FieldInterface $field
+   * @param \Youshido\GraphQL\Parser\Ast\Interfaces\FieldInterface $ast
+   * @param null $parentValue
+   *
+   * @return mixed|null
+   */
+  protected function doResolveValue(FieldInterface $field, AstFieldInterface $ast, $parentValue = NULL) {
     $arguments = $this->parseArgumentsValues($field, $ast);
     $astFields = $ast instanceof AstQuery ? $ast->getFields() : [];
     $resolveInfo = $this->createResolveInfo($field, $astFields);
@@ -67,7 +95,7 @@ class Processor extends BaseProcessor {
    *
    * @return mixed
    *
-   * @throws \Youshido\GraphQL\Validator\Exception\ResolveException
+   * @throws \Youshido\GraphQL\Exception\ResolveException
    */
   protected function getResolveFunction(AbstractField $field) {
     if ($resolveFunction = $field->getConfig()->getResolveFunction()) {
@@ -89,5 +117,26 @@ class Processor extends BaseProcessor {
     }
 
     return $resolveFunction;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return $this->metadata->getCacheContexts();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return $this->metadata->getCacheTags();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    return $this->metadata->getCacheMaxAge();
   }
 }

@@ -7,23 +7,17 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\graphql\GraphQL\Execution\Processor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Youshido\GraphQL\Execution\Processor;
+use Youshido\GraphQL\Schema\AbstractSchema;
+use Youshido\GraphQL\Schema\Schema;
 
 /**
  * Handles GraphQL requests.
  */
 class RequestController implements ContainerInjectionInterface {
-
-  /**
-   * The processor service.
-   *
-   * @var \Youshido\GraphQL\Execution\Processor
-   */
-  protected $processor;
 
   /**
    * The system.performance config.
@@ -33,13 +27,29 @@ class RequestController implements ContainerInjectionInterface {
   protected $config;
 
   /**
+   * The dependency injection container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected $container;
+
+  /**
+   * The
+   *
+   * @var \Youshido\GraphQL\Schema\AbstractSchema
+   */
+  protected $schema;
+
+  /**
    * Constructs a RequestController object.
    *
-   * @param \Youshido\GraphQL\Execution\Processor $processor
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
    * @param \Drupal\Core\Config\Config $config
    */
-  public function __construct(Processor $processor, Config $config) {
-    $this->processor = $processor;
+  public function __construct(ContainerInterface $container, AbstractSchema $schema, Config $config) {
+    $this->container = $container;
+    $this->schema = $schema;
     $this->config = $config;
   }
 
@@ -48,7 +58,8 @@ class RequestController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('graphql.processor'),
+      $container,
+      $container->get('graphql.schema'),
       $container->get('config.factory')->get('system.performance')
     );
   }
@@ -79,7 +90,10 @@ class RequestController implements ContainerInjectionInterface {
 
     $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
     $variables = (array) ($variables ?: []);
-    $result = $this->processor->processPayload($query, $variables);
+
+
+    $processor = new Processor($this->container, $this->schema);
+    $result = $processor->processPayload($query, $variables);
     $response = new CacheableJsonResponse($result->getResponseData());
 
     // @todo This needs proper, context and tag based caching logic.
@@ -90,6 +104,9 @@ class RequestController implements ContainerInjectionInterface {
     // the custom CacheSubscriber provided by this module. Not cool.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(Cache::PERMANENT);
+    $metadata->addCacheableDependency($processor);
+
+    // Add the cache metadata into the response object.
     $response->addCacheableDependency($metadata);
 
     // Set the execution context on the request attributes for use in the
