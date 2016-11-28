@@ -21,6 +21,11 @@ services:
       - { name: cache.bin }
     factory: cache_factory:get
     arguments: [graphql_schema]
+  cache_context.graphql_query:
+    class: Drupal\graphql\Cache\Context\QueryContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
   graphql.processor:
     class: Drupal\graphql\GraphQL\Execution\Processor
     arguments: ['@service_container', '@graphql.schema']
@@ -52,3 +57,36 @@ services:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
       - { name: event_subscriber }
+  graphql.cache_subscriber:
+    class: Drupal\graphql\EventSubscriber\CacheSubscriber
+    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match']
+    tags:
+      - { name: event_subscriber }
+  graphql.request_policy:
+    class: Drupal\Core\PageCache\ChainRequestPolicy
+    tags:
+      - { name: service_collector, tag: graphql_request_policy, call: addPolicy }
+  graphql.response_policy:
+    class: Drupal\Core\PageCache\ChainResponsePolicy
+    tags:
+      - { name: service_collector, tag: graphql_response_policy, call: addPolicy }
+    lazy: true
+  graphql.request_policy.allow_no_session_open:
+    class: Drupal\Core\PageCache\RequestPolicy\NoSessionOpen
+    arguments: ['@session_configuration']
+    tags:
+      - { name: graphql_request_policy }
+  graphql.request_policy.deny_command_line:
+    class: Drupal\graphql\Cache\RequestPolicy\DenyCommandLine
+    tags:
+      - { name: graphql_request_policy }
+  graphql.request_policy.deny_unsafe_method_unless_query:
+    class: Drupal\graphql\Cache\RequestPolicy\DenyUnsafeMethodUnlessQuery
+    arguments: ['@current_route_match']
+    tags:
+      - { name: graphql_request_policy }
+  graphql.response_policy.deny_mutation:
+    class: Drupal\graphql\Cache\ResponsePolicy\DenyMutation
+    arguments: ['@current_route_match']
+    tags:
+      - { name: graphql_response_policy }

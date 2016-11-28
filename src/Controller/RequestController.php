@@ -2,17 +2,15 @@
 
 namespace Drupal\graphql\Controller;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Youshido\GraphQL\Execution\Processor;
-use Youshido\GraphQL\Field\AbstractField;
-use Youshido\GraphQL\Parser\Ast\Query;
 
 /**
  * Handles GraphQL requests.
@@ -27,12 +25,21 @@ class RequestController implements ContainerInjectionInterface {
   protected $processor;
 
   /**
+   * The system.performance config.
+   *
+   * @var \Drupal\Core\Config\Config
+   */
+  protected $config;
+
+  /**
    * Constructs a RequestController object.
    *
    * @param \Youshido\GraphQL\Execution\Processor $processor
+   * @param \Drupal\Core\Config\Config $config
    */
-  public function __construct(Processor $processor) {
+  public function __construct(Processor $processor, Config $config) {
     $this->processor = $processor;
+    $this->config = $config;
   }
 
   /**
@@ -40,7 +47,8 @@ class RequestController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('graphql.processor')
+      $container->get('graphql.processor'),
+      $container->get('config.factory')->get('system.performance')
     );
   }
 
@@ -70,33 +78,16 @@ class RequestController implements ContainerInjectionInterface {
 
     $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
     $result = $this->processor->processPayload($query, (array) ($variables ?: []));
-
-    $metadata = $this->getCacheableMetadata();
-
     $response = new CacheableJsonResponse($result->getResponseData());
+
+    $metadata = new CacheableMetadata();
+    $metadata->setCacheContexts(['graphql_query']);
     $response->addCacheableDependency($metadata);
 
-    return $response->setPrivate();
-  }
+    // Set the execution context on the request attributes for use in the
+    // request subscriber and cache policies.
+    $request->attributes->set('context', $result->getExecutionContext());
 
-  /**
-   * Determines the cacheable metadata.
-   *
-   * @return \Drupal\Core\Cache\CacheableMetadata
-   *   The cacheable metadata.
-   */
-  protected function getCacheableMetadata() {
-    $metadata = new CacheableMetadata();
-    // @todo why we do this here.
-    $queryType = $this->processor->getExecutionContext()
-      ->getSchema()
-      ->getQueryType();
-    foreach ($queryType->getFields() as $field) {
-      if ($field instanceof CacheableDependencyInterface) {
-        $metadata->addCacheableDependency($field);
-      }
-    }
-
-    return $metadata;
+    return $response;
   }
 }
