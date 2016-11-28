@@ -35,9 +35,9 @@ class QueryCacheContext extends RequestStackCacheContextBase implements CacheCon
     $query = $query ?: '';
 
     $variables = $request->query->has('variables') ? $request->query->get('variables') : $body['variables'];
-    $variables = json_encode($variables ?: []);
+    $variables = serialize($variables ?: []);
 
-    return md5("$query:$variables");
+    return hash('sha256', "$query:$variables");
   }
 
   /**
