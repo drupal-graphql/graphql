@@ -4,12 +4,12 @@ The simple way to install the module and its dependency is to use Composer, assu
 
 ## Preparing your Drupal instance
 
-If you used the `drupal-composer/drupal-project` template, skip directly to step 
+If you used the `drupal-composer/drupal-project` template, skip directly to step
 "[Adding the module](#adding-the-module)" below.
 
-Otherwise, if you used the `drupal/drupal` method - e.g. by 
-just cloning Drupal from its git repository - you have to add the 
-"[installer paths]" configuration, by adding this fragment to your 
+Otherwise, if you used the `drupal/drupal` method - e.g. by
+just cloning Drupal from its git repository - you have to add the
+"[installer paths]" configuration, by adding this fragment to your
 `composer.json` at the first level of the file:
 
     "extra": {
@@ -24,21 +24,21 @@ just cloning Drupal from its git repository - you have to add the
 
 This will ensure that the GraphQL module is correctly installed in the
 `modules/contrib/graphql` directory. Without this configuration, the module
-would default to being installed in `modules/graphql`, which is not the 
+would default to being installed in `modules/graphql`, which is not the
 recommended practice.
- 
+
 [installer paths]: https://www.drupal.org/node/2718229#installer-dirs
 
 
 ## Adding the module
 
-Until the module is stable enough to have releases on drupal.org, its 
-development versions are located on 
+Until the module is stable enough to have releases on drupal.org, its
+development versions are located on
 [https://github.com/fubhy/graphql-drupal](https://github.com/fubhy/graphql-drupal)
 which has no entry on [Packagist](https://packagist.org/search/). This means you
 need to tell Composer whence to download the module.
 
-To do this, edit your `composer.json` file, and add the Drupal GraphQL 
+To do this, edit your `composer.json` file, and add the Drupal GraphQL
 repository location, at the first level of the file:
 
     "repositories": [
@@ -48,7 +48,7 @@ repository location, at the first level of the file:
         }
     ],
 
-Ensure you can run [Composer](https://getcomposer.org/download/). Then, go to 
+Ensure you can run [Composer](https://getcomposer.org/download/). Then, go to
 the command line, and type (the `$ ` is your shell prompt, do not type it):
 
     $ cd (the_project_root_directory)
@@ -61,7 +61,7 @@ This will take some time, and end by something like:
     Generating autoload files
     > Drupal\Core\Composer\Composer::preAutoloadDump
     > Drupal\Core\Composer\Composer::ensureHtaccess
-    $ 
+    $
 
 At this point, all is ready, you can just enable the GraphQL module from the
 Drupal UI, Drush or Drupal console.
@@ -73,9 +73,9 @@ You can check that the installation process succeeded, by ensuring the module
 and its dependency are present:
 
     ls -d vendor/youshido/graphql modules/contrib/graphql/
-    
+
 This should return something like this:
-    
+
     modules/contrib/graphql/	vendor/youshido/graphql
 
 If you do not obtain these two paths, something went wrong with the Composer

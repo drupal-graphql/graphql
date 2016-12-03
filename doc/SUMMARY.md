@@ -2,8 +2,8 @@
 
 * [Getting started](README)
   * [Installing](install/README.md)
-  * [Exploring (TODO)](start/graphiql.md)
-  * [Running tests (REVIEW)](tests/README.md)
+  * [Exploring (FOR REVIEW)](start/graphiql.md)
+  * [Running tests (FOR REVIEW)](tests/README.md)
 * [Concepts (TODO)](concepts/README.md)
   * [Decoupling Drupal (TODO)](concepts/headless.md)
   * [GraphQL for Drupal (TODO)](concepts/drupal.md)
