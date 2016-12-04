@@ -48,7 +48,7 @@ class SchemaProvider implements SchemaProviderInterface {
   }
 
   /**
-   * Adds a active theme negotiation service.
+   * Adds a schema provider.
    *
    * @param \Drupal\graphql\SchemaProvider\SchemaProviderInterface $provider
    *   The schema provider to add.
