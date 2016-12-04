@@ -20,7 +20,7 @@ There are a few conventions that should be followed when contributing:
 
 ## Documentation
 
-Documentation is maintained in the `doc` directory in [GitBook] format, and can be edited just like code issues with the pull request process. 
+Documentation is maintained in the `doc` directory in [GitBook] format, and can be edited just like code issues with the pull request process.
 
 [GitBook]: https://www.gitbook.com/
 
@@ -29,5 +29,5 @@ To check a local copy of documentation while working on it, install Gitbook loca
     $ cd (your_drupal_site)
     $ cd modules/contrib/graphql
     $ gitbook serve
-    
+
 You then have documentation available on `http://localhost:4000/` with live-reload when you edit it.
