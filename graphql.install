@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ * Installer for the GraphQL module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function graphql_requirements($phase) {
+  // This is the first reference into the library performed by the module.
+  $youshidoAvailable = class_exists('\Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator');
+
+  $libraryArg = [
+    '@library' => 'youshido/graphql',
+  ];
+
+  $ret = [
+    'graphql' => [
+      'title' => 'GraphQL',
+      'description' => $youshidoAvailable
+      ? t('@library component available', $libraryArg)
+      : t('@library component not found', $libraryArg),
+      'severity' => $youshidoAvailable ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+    ],
+  ];
+
+  return $ret;
+}
