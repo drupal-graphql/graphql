@@ -93,3 +93,8 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: graphql_response_policy }
+  page_cache_request_policy:
+    class: Drupal\graphql\Cache\DefaultRequestPolicyOverride
+    arguments: ['@session_configuration']
+    tags:
+      - { name: service_collector, tag: page_cache_request_policy, call: addPolicy}
