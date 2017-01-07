@@ -1,5 +1,7 @@
 # Contributing
 
+## Contributing code
+
 For some time, development will happen on GitHub using the pull request model:
 in case you are not familiar with that, please take a few minutes to read the
 [GitHub article](https://help.github.com/articles/using-pull-requests) on using
@@ -18,16 +20,17 @@ There are a few conventions that should be followed when contributing:
   or at the [Git book](http://git-scm.com/book/en/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages)
   for more information on how to do that.
 
-## Documentation
+## Contributing documentation
 
-Documentation is maintained in the `doc` directory in [GitBook] format, and can be edited just like code issues with the pull request process.
+Documentation is maintained in the `doc` directory in [GitBook] format, so it 
+can be edited just like code issues with the pull request process.
 
 [GitBook]: https://www.gitbook.com/
 
 To check a local copy of documentation while working on it, install Gitbook locally, and type:
 
-    $ cd (your_drupal_site)
-    $ cd modules/contrib/graphql
+    $ cd (your_drupal_path)/modules/contrib/graphql
     $ gitbook serve
 
-You then have documentation available on `http://localhost:4000/` with live-reload when you edit it.
+You then have documentation available on `(your_drupal_url):4000` with 
+live-reload when you edit it.

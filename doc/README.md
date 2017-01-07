@@ -29,14 +29,26 @@ and includes full cacheability metadata for low overhead.
 ### Developer experience
 
 The module is meant as a basis for custom development rather than pure site
-building. As such, at this point it only exposes entity identifiers and labels,
+building. 
+
+As such, at this point it only exposes entity identifiers and labels,
 leaving it up to you as a developer to choose whether/how to expose fields and
 non-entity data. To help you with this task, it provides base objects you only
 need to extend to define your own schema.
 
-For ease of development, it includes the [GraphiQL] in-browser IDE, already
-configured for Drupal in authenticated mode.
+For ease of development:
+ 
+* it includes the [GraphiQL] in-browser IDE, already configured for Drupal in 
+  authenticated mode, available at `(your_drupal_url)/graphql/explorer`
+       
+* it includes its documentation in [GitBook] format. To read it, just install 
+  Gitbook locally, and type:
+                               
+       $ cd (your_drupal_path)/modules/contrib/graphql
+       $ gitbook serve 
+       $ open (your_drupal_url):4000/
 
+[GitBook]: https://www.gitbook.com/
 [GraphiQL]: https://github.com/graphql/graphiql
 
 
@@ -45,4 +57,3 @@ configured for Drupal in authenticated mode.
 * Documentation: https://www.gitbook.com/book/fgm/graphql-for-drupal
 * Project homepage: https://www.drupal.org/project/graphql
 * Contributing: https://github.com/fubhy/graphql-drupal
-
