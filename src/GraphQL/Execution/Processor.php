@@ -54,6 +54,10 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     if ($value instanceof CacheableDependencyInterface) {
       $this->metadata->addCacheableDependency($value);
     }
+    else {
+      // If any individual result is not cacheable, neither is the whole result.
+      $this->metadata->setCacheMaxAge(0);
+    }
 
     return $value;
   }
