@@ -9,6 +9,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\GraphQL\Execution\Processor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Youshido\GraphQL\Schema\AbstractSchema;
@@ -98,15 +99,16 @@ class RequestController implements ContainerInjectionInterface {
 
     // @todo This needs proper, context and tag based caching logic.
     //
-    // We need to add cache contexts and tags from the resolver functions in the
-    // schema and figure out a way to make this work with the dynamic page cache
+    // We need to figure out a way to make this work with the dynamic page cache
     // and fractional caching. For now, we only cache for anonymous users via
     // the custom CacheSubscriber provided by this module. Not cool.
     $metadata = new CacheableMetadata();
+    // Default to permanent cache.
     $metadata->setCacheMaxAge(Cache::PERMANENT);
+    // Add cache metadata from the processor and result stages.
     $metadata->addCacheableDependency($processor);
-
-    // Add the cache metadata into the response object.
+    $metadata->addCacheableDependency($result);
+    // Apply the metadata to the response object.
     $response->addCacheableDependency($metadata);
 
     // Set the execution context on the request attributes for use in the
