@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Field;
 
-use Drupal\graphql\GraphQL\ResolvedValue;
+use Drupal\graphql\GraphQL\CacheableGraphqlValue;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Field\AbstractField;
 
@@ -40,9 +40,9 @@ abstract class FieldBase extends AbstractField {
    * @param $value
    * @param array $args
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
-   * @return \Drupal\graphql\GraphQL\ResolvedValue
+   * @return \Drupal\graphql\GraphQL\CacheableGraphqlValue
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    return new ResolvedValue($value);
+    return new CacheableGraphqlValue($value);
   }
 }

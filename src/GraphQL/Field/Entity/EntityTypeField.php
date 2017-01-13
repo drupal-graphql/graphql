@@ -4,8 +4,8 @@ namespace Drupal\graphql\GraphQL\Field\Entity;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql\GraphQL\CacheableGraphqlValue;
 use Drupal\graphql\GraphQL\Field\FieldBase;
-use Drupal\graphql\GraphQL\ResolvedValue;
 use Drupal\graphql\GraphQL\Type\EntityType\EntityTypeObjectType;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\NonNullType;
@@ -36,11 +36,10 @@ class EntityTypeField extends FieldBase {
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
    *   The context information for which to resolve.
    *
-   * @return string The associated entity id as a string.
+   * @return CacheableGraphqlValue The associated entity id as a string.
    *   The associated entity id as a string.
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    $metadata = CacheableMetadata::createFromObject($value);
-    return new ResolvedValue($value->getEntityType(), $metadata);
+    return new CacheableGraphqlValue($value->getEntityType(), [$value]);
   }
 }
