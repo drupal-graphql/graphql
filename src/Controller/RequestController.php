@@ -92,7 +92,6 @@ class RequestController implements ContainerInjectionInterface {
     $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
     $variables = (array) ($variables ?: []);
 
-
     $processor = new Processor($this->container, $this->schema);
     $result = $processor->processPayload($query, $variables);
     $response = new CacheableJsonResponse($result->getResponseData());
