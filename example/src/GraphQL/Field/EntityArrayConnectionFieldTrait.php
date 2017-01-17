@@ -40,13 +40,6 @@ trait EntityArrayConnectionFieldTrait {
       }
 
       $edge['node'] = $entities[$edge['node']];
-      if ($edge['node']->hasField('field_paid_content') && $paid = $edge['node']->get('field_paid_content')->first()) {
-        if ($paid->get('value')->getValue()) {
-          // Do not grant access to paid content articles for now.
-          return $carry;
-        }
-      }
-
       if ($edge['node']->access('view')) {
         array_push($carry, $edge);
       }
