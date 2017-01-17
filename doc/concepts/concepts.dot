@@ -1,0 +1,155 @@
+digraph concepts {
+  rankdir = BT;
+  label="A conceptual example of the Drupal 8 GraphQL 3.x data\nUser entity is typical of all single-bundle entities.\nBlue: has_field, Light gray: takes argument, Green: is_a, Orange: is_array_of";
+  Schema;
+
+  node [ shape="rect" ]
+  Boolean;
+  DrupalEntityType;
+  Entity;
+  EntityUser;
+  EntityUserConnection;
+  EntityUserEdge;
+  ID;
+  Int;
+  NodeInterface;
+  PageInfo;
+  QueryRoot;
+  String;
+
+  node [ shape="none" ]
+  _node [ label="node"];
+  userNodeField [ label="node" ];
+  _content_id [ label="id" ];
+  entityByPath [ label="entityByPath"];
+  entityId;
+  entityType;
+  userEdges [ label="edges" ]
+
+  edge [ /* label="has_field", */ color="mediumblue" ]
+  DrupalEntityType -> label;
+  DrupalEntityType -> pluralLabel;
+  Entity -> entityId;
+  Entity -> entityType;
+  Entity -> id;
+  EntityUser -> id;
+  EntityUser -> entityId;
+  EntityUser -> entityType;
+  EntityUserConnection -> pageInfo;
+  EntityUserConnection -> userEdges;
+  EntityUserEdge -> userNodeField;
+  EntityUserEdge -> cursor;
+  NodeInterface -> id;
+  PageInfo -> endCursor;
+  PageInfo -> hasNextPage;
+  PageInfo -> hasPreviousPage;
+  PageInfo -> startCursor;
+  QueryRoot -> _node;
+  QueryRoot -> entityByPath;
+  QueryRoot -> root;
+  QueryRoot -> userById;
+  QueryRoot -> userByUuid;
+  QueryRoot -> userQuery;
+  Schema -> query;
+
+  subgraph cluster_core_types {
+    label="GraphQL core types";
+    Boolean;
+    ID;
+    Int;
+    String;
+  }
+
+  subgraph cluster_core {
+    label="GraphQL Core"
+    NodeInterface;
+    QueryRoot;
+    Schema;
+    query;
+    root;
+    _node;
+    id;
+  }
+
+  subgraph cluster_entity {
+    label="Entity system";
+    DrupalEntityType;
+    Entity;
+    entityType;
+    entityId;
+    entityByPath;
+    path;
+    label;
+    pluralLabel;
+    uuid;
+    _content_id;
+  }
+
+  subgraph cluster_userEntity {
+    label="User entity"
+    EntityUser;
+    EntityUserConnection;
+    EntityUserEdge;
+    userById;
+    userByUuid;
+    userEdges;
+    userNodeField;
+    userQuery;
+  }
+
+  subgraph cluster_relay {
+    label="Relay"
+    cursor;
+    endCursor;
+    hasNextPage;
+    hasPreviousPage;
+    PageInfo;
+    pageInfo;
+    startCursor;
+    first;
+    last;
+    before;
+    after;
+  }
+
+  edge [ /* label="takes", */ color="lightgray" ];
+  _node -> id;
+  entityByPath -> path;
+  userById -> _content_id;
+  userByUuid -> uuid;
+  userQuery -> after;
+  userQuery -> first;
+  userQuery -> before;
+  userQuery -> last;
+
+  edge [ /* label="is_a", */ color="green" ];
+  _content_id -> Int;
+  _node -> NodeInterface;
+  after -> String;
+  before -> String;
+  cursor -> String;
+  endCursor -> String;
+  entityByPath -> Entity;
+  entityId -> String
+  entityType -> DrupalEntityType;
+  first -> Int;
+  hasNextPage -> Boolean;
+  hasPreviousPage -> Boolean;
+  id -> ID;
+  label -> String;
+  last -> Int;
+  pageInfo -> PageInfo;
+  path -> String;
+  pluralLabel -> String;
+  query -> QueryRoot;
+  root -> QueryRoot;
+  startCursor -> String;
+  userById -> EntityUser;
+  userByUuid -> EntityUser;
+  userNodeField -> EntityUser;
+  userQuery -> EntityUserConnection;
+  uuid -> String;
+
+  edge [ /* label="is_array_of", */ color="orange" ];
+  userEdges -> EntityUserEdge;
+}
