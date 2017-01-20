@@ -52,7 +52,7 @@ Ensure you can run [Composer](https://getcomposer.org/download/). Then, go to
 the command line, and type (the `$ ` is your shell prompt, do not type it):
 
     $ cd (the_project_root_directory)
-    $ composer require drupal/graphql:8.x-3.x
+    $ composer require drupal/graphql:8.x-3.x-dev
 
 This will take some time, and end by something like:
 
@@ -72,11 +72,13 @@ Drupal UI, Drush or Drupal console.
 You can check that the installation process succeeded, by ensuring the module
 and its dependency are present:
 
-    ls -d vendor/youshido/graphql modules/contrib/graphql/
+    ls -d vendor/youshido/graphql web/modules/contrib/graphql
 
 This should return something like this:
 
-    modules/contrib/graphql/	vendor/youshido/graphql
+    vendor/youshido/graphql  web/modules/contrib/graphql
+
+If you aren't using the `drupal-composer/drupal-project` boilerplate, change `web/modules/contrib/graphql` to `modules/contrib/graphql`.
 
 If you do not obtain these two paths, something went wrong with the Composer
 installation process, and you will need to fix it before you can enable the
