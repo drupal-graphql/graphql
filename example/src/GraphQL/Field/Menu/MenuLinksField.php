@@ -39,10 +39,10 @@ class MenuLinksField extends SelfAwareField implements ContainerAwareInterface {
       $parameters = new MenuTreeParameters();
       $tree = $menuTree->load($value->id(), $parameters);
 
-      $manipulators = array(
-        array('callable' => 'menu.default_tree_manipulators:checkAccess'),
-        array('callable' => 'menu.default_tree_manipulators:generateIndexAndSort'),
-      );
+      $manipulators = [
+        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ];
 
       $tree = array_filter($menuTree->transform($tree, $manipulators), function (MenuLinkTreeElement $item) {
         if ($item->link instanceof MenuLinkInterface) {
