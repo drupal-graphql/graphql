@@ -34,15 +34,4 @@ abstract class FieldBase extends AbstractField {
   public function getName() {
     return $this->nameCache ?: ($this->nameCache = $this->getConfigValue('name'));
   }
-
-  /**
-   * Resolve function for this field.
-   * @param $value
-   * @param array $args
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
-   * @return \Drupal\graphql\GraphQL\CacheableLeafValue
-   */
-  public function resolve($value, array $args, ResolveInfo $info) {
-    return new CacheableLeafValue($value);
-  }
 }
