@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * This module provides a schema extension defining a new query field.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_graphql_help().
+ */
+function graphql_example_query_graphql_help() {
+  $help = t(<<<HELP
+The <code>graphql_example_query</code> module provides an example for the most
+basic GraphQL schema extension: adding a field of an existing type, and a query
+exposing it.
+HELP
+  );
+
+  return ['step1' => $help];
+}
+
+/**
+ * Implements hook_help().
+ */
+function graphql_example_query_help($route_name) {
+  return graphql_help_example($route_name, 'help.page.graphql_example_query');
+}
