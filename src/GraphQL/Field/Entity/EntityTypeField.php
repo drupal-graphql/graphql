@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql\GraphQL\Field\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql\GraphQL\CacheableLeafValue;
 use Drupal\graphql\GraphQL\Field\FieldBase;
 use Drupal\graphql\GraphQL\Type\EntityType\EntityTypeObjectType;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -34,10 +36,10 @@ class EntityTypeField extends FieldBase {
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
    *   The context information for which to resolve.
    *
-   * @return string The associated entity id as a string.
+   * @return CacheableLeafValue The associated entity id as a string.
    *   The associated entity id as a string.
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    return $value->getEntityType();
+    return new CacheableLeafValue($value->getEntityType(), [$value]);
   }
 }

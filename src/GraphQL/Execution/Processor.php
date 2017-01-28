@@ -4,6 +4,7 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\graphql\GraphQL\CacheableLeafValue;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Exception\ResolveException;
@@ -57,6 +58,11 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     else {
       // If any individual result is not cacheable, neither is the whole result.
       $this->metadata->setCacheMaxAge(0);
+    }
+
+    // If it's a GraphQL cacheable value wrapper, extract the real value to return.
+    if ($value instanceof CacheableLeafValue) {
+      $value = $value->getValue();
     }
 
     return $value;
