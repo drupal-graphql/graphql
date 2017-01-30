@@ -8,9 +8,18 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\TypeInterface;
 
+/**
+ * Class LatestUserField defines a "userLatest" field.
+ */
 class LatestUserField extends FieldBase implements ContainerAwareInterface {
   use ContainerAwareTrait;
 
+  /**
+   * LatestUserField constructor.
+   *
+   * @param \Youshido\GraphQL\Type\TypeInterface $type
+   *   A GraphQL type for entity:user.
+   */
   public function __construct(TypeInterface $type) {
     $config = [
       'name' => 'userLatest',
@@ -25,7 +34,7 @@ class LatestUserField extends FieldBase implements ContainerAwareInterface {
    *
    * Loads an entity by its entity id.
    *
-   * @param $value
+   * @param mixed $value
    *   The parent value. Irrelevant in this case.
    * @param array $args
    *   The array of arguments. Contains the id of the entity to load.
@@ -35,7 +44,7 @@ class LatestUserField extends FieldBase implements ContainerAwareInterface {
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The loaded entity object or NULL if there is no entity with the given id.
    */
-  public function resolve($value, array $args = [], ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveInfo $info) {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->container->get('entity_type.manager');
     $entityStorage = $entityTypeManager->getStorage('user');
@@ -47,4 +56,5 @@ class LatestUserField extends FieldBase implements ContainerAwareInterface {
     $uid = reset($uids);
     return $entityStorage->load($uid['uid_max']);
   }
+
 }

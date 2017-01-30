@@ -5,4 +5,4 @@ services:
       - '@typed_data_manager'
       - '@graphql.type_resolver'
     tags:
-        - name: 'graphql_schema_provider'
+      - name: 'graphql_schema_provider'

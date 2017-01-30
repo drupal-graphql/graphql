@@ -2,12 +2,14 @@
 
 namespace Drupal\graphql_example_query\SchemaProvider;
 
-use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\SchemaProvider\SchemaProviderBase;
 use Drupal\graphql\TypeResolver\TypeResolverInterface;
 use Drupal\graphql_example_query\GraphQL\Field\Root\LatestUserField;
 
+/**
+ * Class LatestUserSchemaProvider exposes a "latest user" field.
+ */
 class LatestUserSchemaProvider extends SchemaProviderBase {
 
   /**
@@ -24,6 +26,14 @@ class LatestUserSchemaProvider extends SchemaProviderBase {
    */
   protected $typedDataManager;
 
+  /**
+   * LatestUserSchemaProvider constructor.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   *   The typed_data_manager service.
+   * @param \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver
+   *   The graphql.type_resolver service.
+   */
   public function __construct(TypedDataManagerInterface $typedDataManager, TypeResolverInterface $typeResolver) {
     $this->typedDataManager = $typedDataManager;
     $this->typeResolver = $typeResolver;
@@ -41,4 +51,5 @@ class LatestUserSchemaProvider extends SchemaProviderBase {
     ];
     return $fields;
   }
+
 }
