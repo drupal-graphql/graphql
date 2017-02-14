@@ -97,4 +97,8 @@ services:
     class: Drupal\graphql\Cache\DefaultRequestPolicyOverride
     arguments: ['@session_configuration']
     tags:
-      - { name: service_collector, tag: page_cache_request_policy, call: addPolicy}
+      - { name: service_collector, tag: page_cache_request_policy, call: addPolicy }
+  graphql.route_enhancer.query:
+    class: Drupal\graphql\Routing\QueryRouteEnhancer
+    tags:
+      - { name: route_enhancer, priority: 100 }

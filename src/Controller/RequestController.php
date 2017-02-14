@@ -68,29 +68,20 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * Handles GraphQL requests.
    *
-   * @param \Symfony\Component\HttpFoundation\Request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
+   * @param $query
+   *   The query string.
+   * @param array $variables
+   *   The variables to process the query string with.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   *   The JSON formatted response.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @return \Symfony\Component\HttpFoundation\JsonResponse The JSON formatted response.
+   * The JSON formatted response.
    */
-  public function handleRequest(Request $request) {
-    $body = (array) json_decode($request->getContent()) + [
-      'query' => NULL,
-      'variables' => NULL,
-    ];
-
-    $query = $request->query->has('query') ? $request->query->get('query') : $body['query'];
-    $variables = $request->query->has('variables') ? $request->query->get('variables') : $body['variables'];
-
+  public function handleRequest(Request $request, $query, array $variables = []) {
     if (empty($query)) {
       throw new NotFoundHttpException();
     }
-
-    $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
-    $variables = (array) ($variables ?: []);
 
     $processor = new Processor($this->container, $this->schema);
     $result = $processor->processPayload($query, $variables);
