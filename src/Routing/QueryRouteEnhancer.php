@@ -23,27 +23,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return $defaults;
     }
 
-    $method = $request->getMethod();
-
-    if ($method === 'POST') {
-      $values = (array) json_decode($request->getContent());
-      return $this->doEnhance($defaults, $values);
-    }
-
-    if ($method === 'GET') {
-      $values = $request->query->all();
-      return $this->doEnhance($defaults, $values);
-    }
-
-    return $defaults;
-  }
-
-  /**
-   * @param $defaults
-   * @param array $values
-   * @return mixed
-   */
-  protected function doEnhance($defaults, array $values) {
+    $values = $this->getValuesFromRequest($request);
     if ($enhanced = $this->enhanceSingle($defaults, $values)) {
       return $enhanced;
     }
@@ -58,6 +38,32 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
     ];
+  }
+
+  /**
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @return array|mixed
+   */
+  protected function getValuesFromRequest(Request $request) {
+    if ($content = $request->getContent()) {
+      $values = json_decode($content, TRUE);
+    } else {
+      $values = $request->query->all();
+    }
+
+    // Only keep numerical keys or 'query', 'variables', 'id'.
+    $values = array_filter($values, function ($value, $index) {
+      return is_numeric($index) || in_array($index, ['query', 'variables', 'id']);
+    }, ARRAY_FILTER_USE_BOTH);
+
+    if (empty($content)) {
+      $values = array_map(function ($value) {
+        $decoded = json_decode($value, TRUE);
+        return ($decoded != $value) && $decoded ? $decoded : $value;
+      }, $values);
+    }
+
+    return $values;
   }
 
   /**
@@ -79,12 +85,6 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return FALSE;
     }
 
-    $queries = array_map(function ($query) {
-      $query = is_string($query) ? $query : json_encode($query);
-      $query = json_decode($query, TRUE);
-      return $query;
-    }, $queries);
-
     return $defaults + [
       '_controller' => $defaults['_graphql']['multiple'],
       'queries' => $queries,
@@ -97,44 +97,29 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    * @return bool
    */
   protected function enhanceSingle($defaults, $values) {
-    $values = $values + [
+    $values = array_intersect_key($values + [
       'query' => NULL,
       'variables' => NULL,
       'id' => NULL,
-    ];
+    ], array_flip(['query', 'variables', 'id']));
 
-    if (empty($values['query']) && empty($values['id'])) {
-      return FALSE;
-    }
-
-    if (!$query = $this->getQuery($values['query'], $values['id'])) {
-      return FALSE;
-    }
-
+    $query = $values['query'];
+    $id = $values['id'];
     $variables = $values['variables'];
-    $variables = is_string($variables) ? $variables : json_encode($variables);
-    $variables = json_decode($variables, TRUE);
+    if (empty($query) && empty($id)) {
+      return FALSE;
+    }
+
+    // If a query id was provided, try loading a persisted query.
+    if (empty($query) && !empty($id) && $json = file_get_contents(DRUPAL_ROOT . '/queries.json')) {
+      $json = (array) json_decode($json);
+      $query = array_search($id, $json) ?: NULL;
+    }
 
     return $defaults + [
       'query' => $query,
       'variables' => $variables,
       '_controller' => $defaults['_graphql']['single'],
     ];
-  }
-
-  /**
-   * @param $query
-   * @param $id
-   * @return null
-   */
-  protected function getQuery($query, $id) {
-    // If a query id was provided, try loading a persisted query.
-    // @todo Make the queries.json input configurable.
-    if (empty($query) && !empty($id) && $json = file_get_contents(DRUPAL_ROOT . '/queries.json')) {
-      $json = (array) json_decode($json);
-      $query = array_search($id, $json) ?: NULL;
-    }
-
-    return $query;
   }
 }
