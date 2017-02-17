@@ -4,7 +4,6 @@ namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Route;
 
 class QueryRouteEnhancer implements RouteEnhancerInterface {
@@ -55,7 +54,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
     // By default we assume a 'single' request. This is going to fail in the
     // graphql processor due to a missing query string but at least provides
-    // the right format for the client to act upon.
+    // the right format for the client to act upon.ge
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
     ];
@@ -81,7 +80,9 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     }
 
     $queries = array_map(function ($query) {
-      return  (array) json_decode($query);
+      $query = is_string($query) ? $query : json_encode($query);
+      $query = json_decode($query, TRUE);
+      return $query;
     }, $queries);
 
     return $defaults + [
@@ -110,7 +111,9 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return FALSE;
     }
 
-    $variables = $this->getVariables($values['variables']);
+    $variables = $values['variables'];
+    $variables = is_string($variables) ? $variables : json_encode($variables);
+    $variables = json_decode($variables, TRUE);
 
     return $defaults + [
       'query' => $query,
@@ -133,16 +136,5 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     }
 
     return $query;
-  }
-
-  /**
-   * @param $variables
-   * @return array|mixed
-   */
-  protected function getVariables($variables) {
-    $variables = ($variables && is_string($variables) ? json_decode($variables) : $variables);
-    $variables = (array) ($variables ?: []);
-
-    return $variables;
   }
 }

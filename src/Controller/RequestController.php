@@ -89,7 +89,10 @@ class RequestController implements ContainerInjectionInterface {
   public function handleBatchRequest(Request $request, array $queries = []) {
     // Walk over all queries and issue a sub-request for each.
     $responses = array_map(function ($query) use ($request) {
-      $subRequest = Request::create('/graphql', $request->getMethod(), $query, $request->cookies->all());
+      $method = $request->getMethod();
+      $parameters = $method === 'GET' ? $query : [];
+      $content = $method === 'POST' ? json_encode($query) : '';
+      $subRequest = Request::create('/graphql', $method, $parameters, $request->cookies->all(), [], [], $content);
       $subRequest->setSession($request->getSession());
       return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }, $queries);
