@@ -5,15 +5,15 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\GraphQL\Execution\Processor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Schema\AbstractSchema;
-use Youshido\GraphQL\Schema\Schema;
 
 /**
  * Handles GraphQL requests.
@@ -35,11 +35,18 @@ class RequestController implements ContainerInjectionInterface {
   protected $container;
 
   /**
-   * The
+   * The graphql schema.
    *
    * @var \Youshido\GraphQL\Schema\AbstractSchema
    */
   protected $schema;
+
+  /**
+   * The http kernel.
+   *
+   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   */
+  protected $httpKernel;
 
   /**
    * Constructs a RequestController object.
@@ -47,11 +54,13 @@ class RequestController implements ContainerInjectionInterface {
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
    * @param \Drupal\Core\Config\Config $config
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    */
-  public function __construct(ContainerInterface $container, AbstractSchema $schema, Config $config) {
+  public function __construct(ContainerInterface $container, AbstractSchema $schema, Config $config, HttpKernelInterface $httpKernel) {
     $this->container = $container;
     $this->schema = $schema;
     $this->config = $config;
+    $this->httpKernel = $httpKernel;
   }
 
   /**
@@ -61,8 +70,49 @@ class RequestController implements ContainerInjectionInterface {
     return new static(
       $container,
       $container->get('graphql.schema'),
-      $container->get('config.factory')->get('system.performance')
+      $container->get('config.factory')->get('system.performance'),
+      $container->get('http_kernel')
     );
+  }
+
+  /**
+   * Handles GraphQL batch requests.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param array $queries
+   *   An array of queries.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The JSON formatted response.
+   */
+  public function handleBatchRequest(Request $request, array $queries = []) {
+    // Walk over all queries and issue a sub-request for each.
+    $responses = array_map(function ($query) use ($request) {
+      $subRequest = Request::create('/graphql', $request->getMethod(), $query, $request->cookies->all());
+      $subRequest->setSession($request->getSession());
+      return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+    }, $queries);
+
+    // Gather all responses from all sub-requests.
+    $content = array_map(function (Response $response) {
+      return json_decode($response->getContent());
+    }, $responses);
+
+    $metadata = new CacheableMetadata();
+    // Default to permanent cache.
+    $metadata->setCacheMaxAge(Cache::PERMANENT);
+
+    // Collect all of the metadata from all sub-requests.
+    $metadata = array_reduce($responses, function (RefinableCacheableDependencyInterface $carry, $current) {
+      $carry->addCacheableDependency($current);
+      return $carry;
+    }, $metadata);
+
+    $response = new CacheableJsonResponse($content);
+    $response->addCacheableDependency($metadata);
+
+    return $response;
   }
 
   /**
@@ -70,19 +120,15 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
-   * @param $query
+   * @param string $query
    *   The query string.
    * @param array $variables
    *   The variables to process the query string with.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse The JSON formatted response.
-   * The JSON formatted response.
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The JSON formatted response.
    */
-  public function handleRequest(Request $request, $query, array $variables = []) {
-    if (empty($query)) {
-      throw new NotFoundHttpException();
-    }
-
+  public function handleRequest(Request $request, $query = '', array $variables = []) {
     $processor = new Processor($this->container, $this->schema);
     $result = $processor->processPayload($query, $variables);
     $response = new CacheableJsonResponse($result->getResponseData());

@@ -1,9 +1,12 @@
 graphql.request:
   path: '/graphql'
   defaults:
-    _controller: '\Drupal\graphql\Controller\RequestController::handleRequest'
+    _graphql:
+      single: '\Drupal\graphql\Controller\RequestController::handleRequest'
+      multiple: '\Drupal\graphql\Controller\RequestController::handleBatchRequest'
   requirements:
     _permission: 'execute graphql requests'
+
 graphql.explorer:
   path: '/graphql/explorer'
   defaults:

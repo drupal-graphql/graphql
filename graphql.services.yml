@@ -101,4 +101,4 @@ services:
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
     tags:
-      - { name: route_enhancer, priority: 100 }
+      - { name: route_enhancer }
