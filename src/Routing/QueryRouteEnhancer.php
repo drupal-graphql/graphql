@@ -5,8 +5,26 @@ namespace Drupal\graphql\Routing;
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 class QueryRouteEnhancer implements RouteEnhancerInterface {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Creates a new QueryRouteEnhancer instance.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
+  }
 
   /**
    * {@inheritdoc}
@@ -51,9 +69,9 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       $values = $request->query->all();
     }
 
-    // Only keep numerical keys or 'query', 'variables', 'id'.
+    // Only keep numerical keys or 'query', 'variables', 'id', 'version'.
     $values = array_filter($values, function ($value, $index) {
-      return is_numeric($index) || in_array($index, ['query', 'variables', 'id']);
+      return is_numeric($index) || in_array($index, ['query', 'variables', 'id', 'version']);
     }, ARRAY_FILTER_USE_BOTH);
 
     $values = array_map(function ($value) {
@@ -102,26 +120,42 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $values = array_intersect_key($values + [
       'query' => '',
       'variables' => [],
-      'id' => '',
-    ], array_flip(['query', 'variables', 'id']));
+      'id' => NULL,
+      'version' => NULL,
+    ], array_flip(['query', 'variables', 'id', 'version']));
 
-    $query = $values['query'];
-    $id = $values['id'];
-    $variables = $values['variables'];
-    if (empty($query) && empty($id)) {
+    if (empty($values['query']) && (empty($values['id']) || empty($values['version']))) {
       return FALSE;
     }
 
-    // If a query id was provided, try loading a persisted query.
-    if (empty($query) && !empty($id) && $json = file_get_contents(DRUPAL_ROOT . '/queries.json')) {
-      $json = (array) json_decode($json);
-      $query = array_search($id, $json) ?: NULL;
+    if (!$query = $this->getQuery($values['query'], $values['id'], $values['version'])) {
+      return FALSE;
     }
 
     return $defaults + [
       'query' => is_string($query) ? $query : '',
-      'variables' => is_array($variables) ? $variables : [],
+      'variables' => is_array($values['variables']) ? $values['variables'] : [],
       '_controller' => $defaults['_graphql']['single'],
     ];
   }
+
+  /**
+   * @param $query
+   * @param $id
+   * @param $version
+   * @return null
+   */
+  protected function getQuery($query, $id, $version) {
+    if (!empty($query)) {
+      return $query;
+    }
+
+    $queryMap = $this->entityTypeManager->getStorage('graphql_query_map')->load($version);
+    if ($queryMap) {
+      return $queryMap->getQuery($id);
+    }
+
+    return NULL;
+  }
+
 }
