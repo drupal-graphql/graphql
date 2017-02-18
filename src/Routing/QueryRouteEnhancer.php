@@ -56,12 +56,10 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return is_numeric($index) || in_array($index, ['query', 'variables', 'id']);
     }, ARRAY_FILTER_USE_BOTH);
 
-    if (empty($content)) {
-      $values = array_map(function ($value) {
-        $decoded = json_decode($value, TRUE);
-        return ($decoded != $value) && $decoded ? $decoded : $value;
-      }, $values);
-    }
+    $values = array_map(function ($value) {
+      $decoded = json_decode($value, TRUE);
+      return ($decoded != $value) && $decoded ? $decoded : $value;
+    }, $values);
 
     return $values;
   }
