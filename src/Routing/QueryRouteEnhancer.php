@@ -98,9 +98,9 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    */
   protected function enhanceSingle($defaults, $values) {
     $values = array_intersect_key($values + [
-      'query' => NULL,
-      'variables' => NULL,
-      'id' => NULL,
+      'query' => '',
+      'variables' => [],
+      'id' => '',
     ], array_flip(['query', 'variables', 'id']));
 
     $query = $values['query'];
@@ -117,8 +117,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     }
 
     return $defaults + [
-      'query' => $query,
-      'variables' => $variables,
+      'query' => $query ?: '',
+      'variables' => $variables ?: [],
       '_controller' => $defaults['_graphql']['single'],
     ];
   }
