@@ -112,6 +112,10 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
+    if (empty($request->attributes->get('query')) && empty($request->attributes->get('queries'))) {
+      return;
+    }
+
     $cid = $this->getCacheIdentifier($request);
     if (($cache = $this->requestCache->get($cid)) && $cache->data instanceof Response) {
       $response = $cache->data;
@@ -201,17 +205,12 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The generated cache identifier.
    */
   protected function getCacheIdentifier(Request $request) {
-    $body = (array) json_decode($request->getContent()) + [
-      'query' => NULL,
-      'variables' => NULL,
-    ];
+    if ($queries = $request->attributes->get('queries')) {
+      return hash('sha256', $queries);
+    }
 
-    $query = $request->query->has('query') ? $request->query->get('query') : $body['query'];
-    $query = $query ?: '';
-
-    $variables = $request->query->has('variables') ? $request->query->get('variables') : $body['variables'];
-    $variables = serialize($variables ?: []);
-
+    $query = $request->attributes->get('query');
+    $variables = json_encode($request->attributes->get('variables') ?: []);
     return hash('sha256', "$query:$variables");
   }
 

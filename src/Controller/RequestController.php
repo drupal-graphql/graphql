@@ -90,7 +90,7 @@ class RequestController implements ContainerInjectionInterface {
     // Walk over all queries and issue a sub-request for each.
     $responses = array_map(function ($query) use ($request) {
       $method = $request->getMethod();
-      $parameters = $method === 'GET' ? $query : [];
+      $parameters = $method === 'GET' ? json_decode($query, TRUE) : [];
       $content = $method === 'POST' ? json_encode($query) : '';
       $subRequest = Request::create('/graphql', $method, $parameters, $request->cookies->all(), [], [], $content);
       $subRequest->setSession($request->getSession());

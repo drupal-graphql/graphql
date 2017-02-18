@@ -57,6 +57,10 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     }, ARRAY_FILTER_USE_BOTH);
 
     $values = array_map(function ($value) {
+      if (is_string($value)) {
+        return $value;
+      }
+
       $decoded = json_decode($value, TRUE);
       return ($decoded != $value) && $decoded ? $decoded : $value;
     }, $values);
