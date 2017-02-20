@@ -100,5 +100,6 @@ services:
       - { name: service_collector, tag: page_cache_request_policy, call: addPolicy }
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
+    arguments: ['@entity_type.manager']
     tags:
       - { name: route_enhancer }
