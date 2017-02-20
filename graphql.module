@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\graphql\Utility\UuidHelper;
+
 /**
  * @file
  * The GraphQL module.
@@ -57,13 +59,56 @@ function graphql_help($route_name) {
   ':endpointUrl' => $endpointUrl,
 ]);
 
+  $examples_items = \Drupal::moduleHandler()->invokeAll('graphql_help');
+  if (!empty($examples_items)) {
+    ksort($examples_items);
+    $examples_list = [
+      '#theme' => 'item_list',
+      '#list_type' => 'ol',
+      '#items' => array_values($examples_items),
+    ];
+    $examples = render($examples_list);
+  }
+  else {
+    $examples = t('The module also include example submodules, but they are not currently enabled.');
+  }
+  $examples_title = t('Examples for developers');
+
   $help = <<<EOT
 <h3>$title</h3>
 $description
 
 <h3>$exploring</h3>
 $graphiql
+
+<h3>$examples_title</h3>
+$examples
 EOT;
+
+
+  return $help;
+}
+
+/**
+ * Return a link to the GraphQL help page if needed by an example module.
+ *
+ * @see graphql_example_query_help()
+ *
+ * @param string $actual
+ *   The name of the route on which hook_help() was called.
+ * @param $expected
+ *   The name of the example module help route.
+ *
+ * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
+ *   Help text, possibly null.
+ */
+function graphql_help_example($actual, $expected) {
+  $help = ($actual === $expected)
+    ? t('<p>Refer to the <a href=":help">GraphQL help page</a>', [
+      ':help' => Url::fromRoute('help.page', [
+        'name' => 'graphql',
+      ])->toString()])
+    : NULL;
 
   return $help;
 }
@@ -78,4 +123,28 @@ function graphql_theme() {
       'base hook' => 'block',
     ],
   ];
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function graphql_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
+  Drupal::database()
+    ->insert(UuidHelper::TABLE)
+    ->fields([
+      'uuid' => $entity->uuid(),
+      'type' => $entity->getEntityTypeId(),
+      'id' => $entity->id(),
+    ])
+    ->execute();
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function graphql_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
+  Drupal::database()
+    ->delete(UuidHelper::TABLE)
+    ->condition('uuid', $entity->uuid())
+    ->execute();
 }

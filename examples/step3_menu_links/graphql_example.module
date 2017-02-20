@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * A GraphQL module exposing menus and links.
+ */
+
+/**
+ * Implements hook_graphql_help().
+ */
+function graphql_example_graphql_help() {
+  $help = t(<<<HELP
+The <code>graphql_example</code> module provides an example for a complex
+GraphQL schema extension: exposing menu and links.
+HELP
+  );
+
+  return ['step3' => $help];
+}
+
+/**
+ * Implements hook_help().
+ */
+function graphql_example_help($route_name) {
+  return graphql_help_example($route_name, 'help.page.graphql_example');
+}

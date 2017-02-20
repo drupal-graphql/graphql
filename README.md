@@ -41,6 +41,14 @@ configured for Drupal in authenticated mode.
 
 [GraphiQL]: https://github.com/graphql/graphiql
 
+The `examples` directory contains several tutorial modules, of increasing
+complexity, demonstrating how to simply build your own queries, types, and 
+provide more advanced versions of these:
+
+* step 1: add a new query and field to the schema
+* step 2: add a new type to the schema
+* step 3: expose menus and links with Relay integration
+
 
 ## Resources
  

@@ -1,0 +1,7 @@
+name: GraphQL Query Example
+type: module
+description: 'Exposes a custom GraphQL Schema adding a new query for demo purposes.'
+package: Web services
+core: 8.x
+dependencies:
+  - graphql

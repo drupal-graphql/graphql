@@ -1,0 +1,8 @@
+services:
+  graphql_example_query.schema_provider:
+    class: 'Drupal\graphql_example_query\SchemaProvider\LatestUserSchemaProvider'
+    arguments:
+      - '@typed_data_manager'
+      - '@graphql.type_resolver'
+    tags:
+      - name: 'graphql_schema_provider'

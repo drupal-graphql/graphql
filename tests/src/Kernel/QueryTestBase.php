@@ -31,9 +31,10 @@ abstract class QueryTestBase extends KernelTestBase  {
     parent::setUp();
 
     $this->installSchema('system', 'router');
-    $this->installConfig('user');
+    $this->installSchema('graphql', 'graphql_uuid');
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
+    $this->installConfig('user');
 
     \Drupal::service('router.builder')->rebuild();
 
