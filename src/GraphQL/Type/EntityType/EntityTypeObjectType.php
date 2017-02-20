@@ -41,7 +41,7 @@ class EntityTypeObjectType extends AbstractObjectType {
    *   The label of the entity type.
    */
   public static function resolveLabelFieldValue(EntityTypeInterface $value) {
-    return $value->getLabel();
+    return (string) $value->getLabel();
   }
 
   /**
@@ -56,6 +56,6 @@ class EntityTypeObjectType extends AbstractObjectType {
    *   The label of the entity type.
    */
   public static function resolvePluralLabelFieldValue(EntityTypeInterface $value) {
-    return $value->getPluralLabel();
+    return (string) $value->getPluralLabel();
   }
 }

@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql\GraphQL\Field\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\GraphQL\CacheableLeafValue;
 use Drupal\graphql\GraphQL\Field\FieldBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -40,7 +38,7 @@ class EntityIdField extends FieldBase {
    *   The associated entity id as a string.
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    return new CacheableLeafValue($value->getEntityType(), [$value]);
+    return new CacheableLeafValue($value->id(), [$value]);
   }
 
 }
