@@ -13,7 +13,7 @@ class GraphQLQueryMapForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $formState) {
+  public function buildForm(array $form, FormStateInterface $formState = NULL) {
     $form = parent::buildForm($form, $formState);
     $form['#title'] = $this->t('GraphQL Query Map version %version', ['%version' => $this->entity->id()]);
 
