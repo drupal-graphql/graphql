@@ -75,7 +75,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     }, ARRAY_FILTER_USE_BOTH);
 
     $values = array_map(function ($value) {
-      if (is_string($value)) {
+      if (!is_string($value)) {
         return $value;
       }
 

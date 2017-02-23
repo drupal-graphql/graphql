@@ -206,7 +206,7 @@ class CacheSubscriber implements EventSubscriberInterface {
    */
   protected function getCacheIdentifier(Request $request) {
     if ($queries = $request->attributes->get('queries')) {
-      return hash('sha256', $queries);
+      return hash('sha256', json_encode($queries));
     }
 
     $query = $request->attributes->get('query');
