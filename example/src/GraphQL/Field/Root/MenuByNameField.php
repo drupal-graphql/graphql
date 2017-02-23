@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_example\GraphQL\Field\Root;
 
+use Drupal\graphql\GraphQL\UncacheableValue;
 use Drupal\graphql_example\GraphQL\Field\SelfAwareField;
 use Drupal\graphql_example\GraphQL\Type\MenuType;
 use Drupal\system\MenuInterface;
@@ -37,7 +38,7 @@ class MenuByNameField extends SelfAwareField implements ContainerAwareInterface 
       return $entity;
     }
 
-    return NULL;
+    return new UncacheableValue(NULL);
   }
 
   /**

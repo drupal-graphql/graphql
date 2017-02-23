@@ -6,14 +6,12 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 
 /**
- * Class CacheableLeafValue
- *
  * Wrapper class for values resolved through GraphQL resolvers, which includes
  * Drupal cache metadata.
  *
  * @package Drupal\graphql\GraphQL
  */
-class CacheableLeafValue extends CacheableMetadata {
+class CacheableValue extends CacheableMetadata implements ValueWrapperInterface {
 
   /**
    * @var mixed
@@ -22,7 +20,7 @@ class CacheableLeafValue extends CacheableMetadata {
   protected $value;
 
   /**
-   * CacheableLeafValue constructor.
+   * CacheableValue constructor.
    *
    * @param mixed $value
    *   The actual value to be wrapped.
@@ -39,18 +37,14 @@ class CacheableLeafValue extends CacheableMetadata {
   }
 
   /**
-   * Set the wrapped value.
-   *
-   * @param mixed $value
+   * {@inheritdoc}
    */
   public function setValue($value) {
     $this->value = $value;
   }
 
   /**
-   * Get the wrapped value.
-   *
-   * @return mixed
+   * {@inheritdoc}
    */
   public function getValue() {
     return $this->value;

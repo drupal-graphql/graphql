@@ -5,6 +5,7 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -108,6 +109,7 @@ class RequestController implements ContainerInjectionInterface {
 
     // Collect all of the metadata from all sub-requests.
     $metadata = array_reduce($responses, function (RefinableCacheableDependencyInterface $carry, $current) {
+      $current = $current instanceof CacheableResponseInterface ? $current->getCacheableMetadata() : $current;
       $carry->addCacheableDependency($current);
       return $carry;
     }, $metadata);

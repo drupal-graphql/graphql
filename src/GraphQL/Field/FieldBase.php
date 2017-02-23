@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Field;
 
-use Drupal\graphql\GraphQL\CacheableLeafValue;
+use Drupal\graphql\GraphQL\CacheableValue;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Field\AbstractField;
 

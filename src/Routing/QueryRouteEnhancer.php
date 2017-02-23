@@ -52,7 +52,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
     // By default we assume a 'single' request. This is going to fail in the
     // graphql processor due to a missing query string but at least provides
-    // the right format for the client to act upon.ge
+    // the right format for the client to act upon.
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
     ];
