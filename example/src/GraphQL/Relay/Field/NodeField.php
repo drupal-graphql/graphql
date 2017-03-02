@@ -60,6 +60,9 @@ class NodeField extends SelfAwareField implements ContainerAwareInterface {
       case 'menu':
         return $this->resolveMenu($id);
 
+      case 'page':
+        return $this->resolvePage($id);
+
       default:
         return NULL;
     }
@@ -77,6 +80,21 @@ class NodeField extends SelfAwareField implements ContainerAwareInterface {
   protected function resolveMenu($id) {
     /** @var \Drupal\system\MenuInterface $entity */
     $entity = $this->resolveEntity($id, 'menu');
+    return $entity;
+  }
+
+  /**
+   * Helper function to load nodes of type 'page'.
+   *
+   * @param $id
+   *   The id of the menu to be loaded.
+   *
+   * @return \Drupal\node\NodeInterface|null
+   *   The loaded page or NULL.
+   */
+  protected function resolvePage($id) {
+    /** @var \Drupal\node\NodeInterface $entity */
+    $entity = $this->resolveEntity($id, 'node', ['page']);
     return $entity;
   }
 
