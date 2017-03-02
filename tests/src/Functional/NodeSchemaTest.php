@@ -3,6 +3,8 @@
 namespace Drupal\Tests\graphql\Functional;
 
 use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
+use Drupal\simpletest\NodeCreationTrait;
 
 /**
  * Tests some custom schema.
@@ -10,6 +12,12 @@ use Drupal\node\Entity\Node;
  * @group GraphQL
  */
 class NodeSchemaTest extends QueryTestBase  {
+  use NodeCreationTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['node'];
 
   /**
    * @var \Drupal\node\NodeInterface
@@ -18,6 +26,13 @@ class NodeSchemaTest extends QueryTestBase  {
 
   public function setUp() {
     parent::setUp();
+
+    // Create a test content type for node testing.
+    NodeType::create([
+      'name' => 'article',
+      'type' => 'article',
+    ])->save();
+
     $node = Node::create([
       'type' => 'article',
       'title' => 'giraffe',
