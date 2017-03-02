@@ -2,19 +2,15 @@
 
 namespace Drupal\Tests\graphql\Functional;
 
-use Drupal\node\Entity\NodeType;
 use Drupal\simpletest\BrowserTestBase;
-use Drupal\simpletest\NodeCreationTrait;
 use Drupal\user\Entity\Role;
 
 abstract class QueryTestBase extends BrowserTestBase {
 
-  use NodeCreationTrait;
-
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql', 'node'];
+  public static $modules = ['graphql'];
 
   /**
    * The GraphQL resource.
@@ -35,12 +31,6 @@ abstract class QueryTestBase extends BrowserTestBase {
     Role::load('anonymous')
       ->grantPermission('execute graphql requests')
       ->save();
-
-    // Create a test content type for node testing.
-    NodeType::create([
-      'name' => 'article',
-      'type' => 'article',
-    ])->save();
   }
 
   /**
