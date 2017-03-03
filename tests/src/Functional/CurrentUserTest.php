@@ -30,7 +30,7 @@ class CurrentUserTest extends QueryTestBase {
   }
 
   /**
-   * @covers \Drupal\aava_cm\GraphQL\Field\Root\CurrentUserField
+   * @covers \Drupal\Tests\graphql\Functional\QueryTestBase::query
    */
   public function testCurrentUser() {
     $query = <<<GQL
