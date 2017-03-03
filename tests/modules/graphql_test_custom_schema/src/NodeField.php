@@ -2,9 +2,11 @@
 
 namespace Drupal\graphql_test_custom_schema;
 
+use Drupal\graphql_test_custom_schema\Types\UserType;
 use Drupal\node\NodeInterface;
 use Drupal\graphql\GraphQL\Relay\Field\NodeField as NodeFieldBase;
 use Drupal\graphql_test_custom_schema\Types\ArticleType;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Relay\Fetcher\FetcherInterface;
@@ -39,6 +41,11 @@ class NodeField extends NodeFieldBase implements ContainerAwareInterface, Fetche
         return $entityTypeManager
           ->getStorage('node')
           ->load($id);
+
+      case 'user':
+        return $entityTypeManager
+          ->getStorage('user')
+          ->load($id);
     }
 
     return NULL;
@@ -53,6 +60,10 @@ class NodeField extends NodeFieldBase implements ContainerAwareInterface, Fetche
         case 'sane_article':
           return new ArticleType();
       }
+    }
+
+    if ($object instanceof UserInterface) {
+      return new UserType();
     }
 
     return NULL;

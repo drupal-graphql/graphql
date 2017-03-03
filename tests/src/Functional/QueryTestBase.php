@@ -4,6 +4,8 @@ namespace Drupal\Tests\graphql\Functional;
 
 use Drupal\simpletest\BrowserTestBase;
 use Drupal\user\Entity\Role;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 
 abstract class QueryTestBase extends BrowserTestBase {
 
@@ -50,8 +52,20 @@ abstract class QueryTestBase extends BrowserTestBase {
       'operation' => $operation,
     ];
 
+    // Ensure that requests are made in the right session.
+    $minkSession = $this->getSession()->getCookie($this->getSessionName());
+
+    $cookie = new SetCookie();
+    $cookie->setName($this->getSessionName());
+    $cookie->setValue($minkSession);
+    $cookie->setDomain(parse_url($this->baseUrl, PHP_URL_HOST));
+
+    $jar = new CookieJar();
+    $jar->setCookie($cookie);
+
     $response = \Drupal::httpClient()->post($this->getAbsoluteUrl($this->queryUrl), [
       'body' => json_encode($body),
+      'cookies' => $jar,
     ]);
 
     return (string) $response->getBody();
