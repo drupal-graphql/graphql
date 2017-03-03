@@ -58,7 +58,7 @@ abstract class QueryTestBase extends BrowserTestBase {
     $cookie = new SetCookie();
     $cookie->setName($this->getSessionName());
     $cookie->setValue($minkSession);
-    $cookie->setDomain(parse_url($this->baseUrl)['host']);
+    $cookie->setDomain(parse_url($this->baseUrl, PHP_URL_HOST));
 
     $jar = new CookieJar();
     $jar->setCookie($cookie);
