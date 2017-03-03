@@ -53,11 +53,11 @@ abstract class QueryTestBase extends BrowserTestBase {
     ];
 
     // Ensure that requests are made in the right session.
-    $mink_session = $this->getSession()->getCookie($this->getSessionName());
+    $minkSession = $this->getSession()->getCookie($this->getSessionName());
 
     $cookie = new SetCookie();
     $cookie->setName($this->getSessionName());
-    $cookie->setValue($mink_session);
+    $cookie->setValue($minkSession);
     $cookie->setDomain(parse_url($this->baseUrl)['host']);
 
     $jar = new CookieJar();
