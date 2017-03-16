@@ -15,7 +15,7 @@ class DenyUnsafeMethodUnlessQuery implements RequestPolicyInterface {
    * {@inheritdoc}
    */
   public function check(Request $request) {
-    if (!$request->isMethodSafe() && !($request->getMethod() === 'POST' && $request->getRequestUri() === '/graphql')) {
+    if (!$request->isMethodSafe() && !($request->getMethod() === 'POST' && $request->getPathInfo() === '/graphql')) {
       return static::DENY;
     }
 
