@@ -93,11 +93,17 @@ services:
     arguments: ['@current_route_match']
     tags:
       - { name: graphql_response_policy }
-  page_cache_request_policy:
-    class: Drupal\graphql\Cache\DefaultRequestPolicyOverride
-    arguments: ['@session_configuration']
+  graphql.page_cache_request_policy.deny_page_cache:
+    class: Drupal\graphql\Cache\RequestPolicy\DenyPageCache
     tags:
-      - { name: service_collector, tag: page_cache_request_policy, call: addPolicy }
+      - { name: page_cache_request_policy }
+      - { name: dynamic_page_cache_request_policy }
+  graphql.page_cache_response_policy.deny_page_cache:
+    class: Drupal\graphql\Cache\ResponsePolicy\DenyPageCache
+    arguments: ['@current_route_match']
+    tags:
+      - { name: page_cache_response_policy }
+      - { name: dynamic_page_cache_response_policy }
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
     arguments: ['@entity_type.manager']
