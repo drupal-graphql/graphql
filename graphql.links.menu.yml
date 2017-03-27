@@ -3,3 +3,8 @@ entity.graphql_query_map.collection:
   route_name: entity.graphql_query_map.collection
   description: 'Configure GraphQL Query Maps.'
   parent: system.admin_structure
+graphql.config_page:
+  title: 'GraphQL'
+  description: 'GraphQL settings and extensions.'
+  parent: 'system.admin_config_services'
+  route_name: graphql.config_page
