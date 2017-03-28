@@ -7,6 +7,13 @@ graphql.request:
   requirements:
     _permission: 'execute graphql requests'
 
+graphql.config_page:
+  path: '/admin/config/graphql'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\GraphQLConfig::configPageRoot'
+    _title: 'GraphQL'
+  requirements:
+    _permission: 'administer site configuration'
 graphql.explorer:
   path: '/graphql/explorer'
   defaults:
