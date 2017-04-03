@@ -9,6 +9,8 @@ use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Execution\Processor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,6 +52,13 @@ class RequestController implements ContainerInjectionInterface {
   protected $httpKernel;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * Constructs a RequestController object.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -57,11 +66,12 @@ class RequestController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Config\Config $config
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    */
-  public function __construct(ContainerInterface $container, AbstractSchema $schema, Config $config, HttpKernelInterface $httpKernel) {
+  public function __construct(ContainerInterface $container, AbstractSchema $schema, Config $config, HttpKernelInterface $httpKernel, RendererInterface $renderer) {
     $this->container = $container;
     $this->schema = $schema;
     $this->config = $config;
     $this->httpKernel = $httpKernel;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -72,7 +82,8 @@ class RequestController implements ContainerInjectionInterface {
       $container,
       $container->get('graphql.schema'),
       $container->get('config.factory')->get('system.performance'),
-      $container->get('http_kernel')
+      $container->get('http_kernel'),
+      $container->get('renderer')
     );
   }
 
@@ -134,9 +145,20 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleRequest(Request $request, $query = '', array $variables = []) {
+    $context = new RenderContext();
     $processor = new Processor($this->container, $this->schema);
-    $result = $processor->processPayload($query, $variables);
-    $response = new CacheableJsonResponse($result->getResponseData());
+
+    // Evaluating the GraphQL request can potentially invoke rendering. We allow
+    // those to "leak" and collect them here in a render context.
+    $this->renderer->executeInRenderContext($context, function () use ($processor, $query, $variables) {
+      $processor->processPayload($query, $variables);
+    });
+
+    $result = $processor->getResponseData();
+    $response = new CacheableJsonResponse($result);
+    if (!$context->isEmpty()) {
+      $response->addCacheableDependency($context->pop());
+    }
 
     // @todo This needs proper, context and tag based caching logic.
     //
@@ -147,14 +169,14 @@ class RequestController implements ContainerInjectionInterface {
     // Default to permanent cache.
     $metadata->setCacheMaxAge(Cache::PERMANENT);
     // Add cache metadata from the processor and result stages.
-    $metadata->addCacheableDependency($processor);
     $metadata->addCacheableDependency($result);
+    $metadata->addCacheableDependency($processor);
     // Apply the metadata to the response object.
     $response->addCacheableDependency($metadata);
 
     // Set the execution context on the request attributes for use in the
     // request subscriber and cache policies.
-    $request->attributes->set('context', $result->getExecutionContext());
+    $request->attributes->set('context', $processor->getExecutionContext());
 
     return $response;
   }
