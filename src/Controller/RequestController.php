@@ -104,7 +104,7 @@ class RequestController implements ContainerInjectionInterface {
       $method = $request->getMethod();
       $parameters = $method === 'GET' ? $query : [];
       $content = $method === 'POST' ? json_encode($query) : '';
-      $subRequest = Request::create('/graphql', $method, $parameters, $request->cookies->all(), [], [], $content);
+      $subRequest = Request::create('/graphql', $method, $parameters, $request->cookies->all(), $request->files->all(), $request->server->all(), $content);
       $subRequest->setSession($request->getSession());
       return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }, $queries);
