@@ -169,7 +169,6 @@ class RequestController implements ContainerInjectionInterface {
     // Default to permanent cache.
     $metadata->setCacheMaxAge(Cache::PERMANENT);
     // Add cache metadata from the processor and result stages.
-    $metadata->addCacheableDependency($result);
     $metadata->addCacheableDependency($processor);
     // Apply the metadata to the response object.
     $response->addCacheableDependency($metadata);
