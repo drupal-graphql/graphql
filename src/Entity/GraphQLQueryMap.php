@@ -67,7 +67,8 @@ class GraphQLQueryMap extends ConfigEntityBase implements GraphQLQueryMapInterfa
     if (isset($this->queryMap[$queryId])) {
       return $this->queryMap[$queryId];
     }
-    throw new Exception("Query id $queryId not found in query map version $this->version");
+
+    return NULL;
   }
 
   /**

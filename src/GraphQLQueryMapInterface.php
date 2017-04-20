@@ -14,7 +14,7 @@ interface GraphQLQueryMapInterface extends ConfigEntityInterface
    * Returns a single GraphQL query from the map.
    *
    * @param $queryId
-   * @return string
+   * @return string|null
    *   A single GraphQL query.
    */
   function getQuery($queryId);
