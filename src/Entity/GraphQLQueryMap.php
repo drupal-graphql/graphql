@@ -3,7 +3,6 @@
 namespace Drupal\graphql\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\graphql\GraphQLQueryMapInterface;
 
 /**
  * Defines the GraphQLQueryMap entity.

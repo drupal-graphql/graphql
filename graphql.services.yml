@@ -9,10 +9,10 @@ parameters:
 
     # GraphQL schema class to be used:
     #
-    # By default, this uses the GraphQL Relay schema provided by the module.
+    # By default, this uses the GraphQL schema provided by the module.
     #
-    # @default \Drupal\graphql\Relay\Schema
-    schema_class: Drupal\graphql\GraphQL\Relay\Schema
+    # @default \Drupal\graphql\Schema
+    schema_class: Drupal\graphql\GraphQL\Schema
 
 services:
   cache.graphql_schema:
@@ -32,9 +32,10 @@ services:
     factory: ['@graphql.schema_factory', getSchema]
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory
-    arguments: ['@language_manager', '@graphql.schema_provider', '@graphql.reducer_manager', '@cache.graphql_schema']
+    arguments: ['@language_manager', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider\SchemaProvider
+    arguments: ['%graphql.config%']
     tags:
         - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
   graphql.reducer_manager:

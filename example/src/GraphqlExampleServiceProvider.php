@@ -20,13 +20,5 @@ class GraphqlExampleServiceProvider extends ServiceProviderBase  {
 
       $container->setParameter('graphql.config', $config);
     }
-
-    if ($container->has('graphql.schema_provider')) {
-      $definition = $container->getDefinition('graphql.schema_provider');
-      if ($definition->getClass() === 'Drupal\graphql\SchemaProvider\SchemaProvider') {
-        $definition->setClass('Drupal\graphql_example\SchemaProvider\SchemaProvider');
-        $definition->clearTag('service_collector');
-      }
-    }
   }
 }

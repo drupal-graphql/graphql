@@ -3,11 +3,12 @@
 namespace Drupal\graphql;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\graphql\GraphQL\Validator\ConfigValidator\Rules\TypeValidationRule;
 use Drupal\graphql\SchemaProvider\SchemaProviderInterface;
-use Drupal\graphql\TypeResolver\TypeResolverInterface;
 use Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator;
 
 /**
@@ -43,27 +44,18 @@ class SchemaFactory {
   protected $config;
 
   /**
-   * The type resolver service.
-   *
-   * @var \Drupal\graphql\TypeResolver\TypeResolverInterface
-   */
-  protected $typeResolver;
-
-  /**
    * Constructs a SchemaFactory object.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    * @param \Drupal\graphql\SchemaProvider\SchemaProviderInterface $schemaProvider
    *   The schema provider service.
-   * @param \Drupal\graphql\TypeResolver\TypeResolverInterface $typeResolver
-   *   The type resolver service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $schemaCache
    *   The schema cache backend.
    * @param array $config
    *   The configuration provided through the services.yml.
    */
-  public function __construct(LanguageManagerInterface $languageManager, SchemaProviderInterface $schemaProvider, TypeResolverInterface $typeResolver, CacheBackendInterface $schemaCache, array $config) {
+  public function __construct(LanguageManagerInterface $languageManager, SchemaProviderInterface $schemaProvider, CacheBackendInterface $schemaCache, array $config) {
     $this->config = $config;
 
     // Override the default type validator to enable services as field resolver
@@ -72,7 +64,6 @@ class SchemaFactory {
     $validator->addRule('type', new TypeValidationRule($validator));
 
     $this->schemaProvider = $schemaProvider;
-    $this->typeResolver = $typeResolver;
     $this->languageManager = $languageManager;
     $this->schemaCache = $schemaCache;
   }
@@ -80,7 +71,7 @@ class SchemaFactory {
   /**
    * Loads and caches the generated schema.
    *
-   * @return \Drupal\graphql\GraphQL\Relay\Schema
+   * @return \Youshido\GraphQL\Schema\AbstractSchema
    *   The generated GraphQL schema.
    */
   public function getSchema() {
@@ -90,17 +81,18 @@ class SchemaFactory {
       return $schema->data;
     }
 
-    $schemaClass = $this->config['schema_class'];
-    $query = $this->schemaProvider->getQuerySchema();
-    $mutation = $this->schemaProvider->getMutationSchema();
-    $types = $this->typeResolver->collectTypes();
-
-    $schema = new $schemaClass($query, $mutation, $types);
+    $schema = $this->schemaProvider->getSchema();
 
     if ($useCache) {
       // Cache the generated schema in the configured cache backend.
-      $tags = array_unique($this->schemaProvider->getCacheTags() ?: []);
-      $this->schemaCache->set($language->getId(), $schema, Cache::PERMANENT, $tags);
+      $metadata = new CacheableMetadata();
+      $metadata->setCacheMaxAge(Cache::PERMANENT);
+
+      if ($schema instanceof CacheableDependencyInterface) {
+        $metadata->addCacheableDependency($schema);
+      }
+
+      $this->schemaCache->set($language->getId(), $schema, $metadata->getCacheMaxAge(), $metadata->getCacheTags());
     }
 
     return $schema;

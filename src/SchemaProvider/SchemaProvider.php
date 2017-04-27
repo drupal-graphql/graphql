@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\graphql\SchemaProvider;
+use Drupal\graphql\GraphQL\Schema;
 
 /**
  * Generates a GraphQL Schema.
@@ -21,30 +22,40 @@ class SchemaProvider implements SchemaProviderInterface {
   protected $sortedProviders;
 
   /**
-   * {@inheritdoc}
+   * The configuration provided through the services.yml.
+   *
+   * @var array
    */
-  public function getCacheTags() {
-    return array_unique(call_user_func_array('array_merge', array_map(function (SchemaProviderInterface $provider) {
-      return $provider->getCacheTags();
-    }, $this->getSortedProviders())));
+  protected $config;
+
+  /**
+   * Constructs a SchemaProvider object.
+   *
+   * @param array $config
+   *   The configuration provided through the services.yml.
+   */
+  public function __construct(array $config) {
+    $this->config = $config;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getQuerySchema() {
-    return array_reduce($this->getSortedProviders(), function ($carry, SchemaProviderInterface $provider) {
-      return array_merge($carry, $provider->getQuerySchema() ?: []);
-    }, []);
-  }
+  public function getSchema() {
+    $schemaClass = $this->config['schema_class'];
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMutationSchema() {
-    return array_reduce($this->getSortedProviders(), function ($carry, SchemaProviderInterface $provider) {
-      return array_merge($carry, $provider->getMutationSchema() ?: []);
-    }, []);
+    return array_reduce($this->getSortedProviders(), function (Schema $carry, SchemaProviderInterface $provider) {
+      if ($schema = $provider->getSchema()) {
+        $carry->getTypesList()->addTypes($schema->getTypesList()->getTypes());
+        $carry->getQueryType()->addFields($schema->getQueryType()->getFields());
+
+        if ($schema->getMutationType()->hasFields()) {
+          $carry->getMutationType()->addFields($schema->getMutationType()->getFields());
+        }
+      }
+
+      return $carry;
+    }, new $schemaClass());
   }
 
   /**
