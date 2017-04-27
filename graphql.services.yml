@@ -27,11 +27,6 @@ services:
       - { name: cache.bin }
     factory: cache_factory:get
     arguments: [graphql_request]
-  cache_context.graphql_query:
-    class: Drupal\graphql\Cache\Context\QueryContext
-    arguments: ['@request_stack']
-    tags:
-      - { name: cache.context }
   graphql.schema:
     class: Drupal\graphql\GraphQL\Relay\Schema
     factory: ['@graphql.schema_factory', getSchema]
