@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
