@@ -12,6 +12,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Execution\Processor;
+use Drupal\graphql\Reducers\ReducerManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,16 +60,26 @@ class RequestController implements ContainerInjectionInterface {
   protected $renderer;
 
   /**
+   * The reducer manager service.
+   *
+   * @var \Drupal\graphql\Reducers\ReducerManager
+   */
+  protected $reducerManager;
+
+  /**
    * Constructs a RequestController object.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
+   * @param \Drupal\graphql\Reducers\ReducerManager $reducerManager
    * @param \Drupal\Core\Config\Config $config
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   * @param \Drupal\Core\Render\RendererInterface $renderer
    */
-  public function __construct(ContainerInterface $container, AbstractSchema $schema, Config $config, HttpKernelInterface $httpKernel, RendererInterface $renderer) {
+  public function __construct(ContainerInterface $container, AbstractSchema $schema, ReducerManager $reducerManager, Config $config, HttpKernelInterface $httpKernel, RendererInterface $renderer) {
     $this->container = $container;
     $this->schema = $schema;
+    $this->reducerManager = $reducerManager;
     $this->config = $config;
     $this->httpKernel = $httpKernel;
     $this->renderer = $renderer;
@@ -81,6 +92,7 @@ class RequestController implements ContainerInjectionInterface {
     return new static(
       $container,
       $container->get('graphql.schema'),
+      $container->get('graphql.reducer_manager'),
       $container->get('config.factory')->get('system.performance'),
       $container->get('http_kernel'),
       $container->get('renderer')
@@ -151,7 +163,7 @@ class RequestController implements ContainerInjectionInterface {
     // Evaluating the GraphQL request can potentially invoke rendering. We allow
     // those to "leak" and collect them here in a render context.
     $this->renderer->executeInRenderContext($context, function () use ($processor, $query, $variables) {
-      $processor->processPayload($query, $variables);
+      $processor->processPayload($query, $variables, $this->reducerManager->getAllServices());
     });
 
     $result = $processor->getResponseData();

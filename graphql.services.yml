@@ -32,25 +32,14 @@ services:
     factory: ['@graphql.schema_factory', getSchema]
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory
-    arguments: ['@language_manager', '@graphql.schema_provider', '@graphql.type_resolver', '@cache.graphql_schema', '%graphql.config%']
+    arguments: ['@language_manager', '@graphql.schema_provider', '@graphql.reducer_manager', '@cache.graphql_schema']
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider\SchemaProvider
     tags:
         - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
-  graphql.schema_provider.entity:
-    class: Drupal\graphql\SchemaProvider\EntitySchemaProvider
-    arguments: ['@entity_type.manager', '@typed_data_manager', '@graphql.type_resolver']
-    tags:
-      - { name: graphql_schema_provider }
-  graphql.type_resolver:
-    class: Drupal\graphql\TypeResolver\TypeResolver
-    tags:
-      - { name: service_collector, tag: graphql_type_resolver, call: addTypeResolver }
-  graphql.type_resolver.entity:
-    class: Drupal\graphql\TypeResolver\EntityTypeResolver
-    arguments: ['@entity_type.manager', '@typed_data_manager', '@graphql.type_resolver']
-    tags:
-      - { name: graphql_type_resolver }
+  graphql.reducer_manager:
+    class: Drupal\graphql\Reducers\ReducerManager
+    arguments: ['@service_container', '%graphql.reducers%']
   graphql.page_display_variant_subscriber:
     class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
