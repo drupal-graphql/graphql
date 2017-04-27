@@ -36,8 +36,7 @@ use Drupal\graphql\GraphQLQueryMapInterface;
  *   }
  * )
  */
-class GraphQLQueryMap extends ConfigEntityBase implements GraphQLQueryMapInterface
-{
+class GraphQLQueryMap extends ConfigEntityBase implements GraphQLQueryMapInterface {
 
   /**
    * The GraphQL query map version ID.
@@ -63,7 +62,7 @@ class GraphQLQueryMap extends ConfigEntityBase implements GraphQLQueryMapInterfa
   /**
    * {@inheritdoc}
    */
-  function getQuery($queryId) {
+  public function getQuery($queryId) {
     if (isset($this->queryMap[$queryId])) {
       return $this->queryMap[$queryId];
     }

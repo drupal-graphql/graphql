@@ -1,0 +1,12 @@
+description: 'Saves a query map for persisted queries.'
+options:
+  version: 'The version identifier.'
+arguments:
+  file: 'The query map file.'
+messages:
+  success: 'The query map has been saved successfully as "%s".'
+  errors:
+    nofile: 'You must provide a file path or pipe file contents to stdin.'
+    filenotfound: 'The file "%s" does not exist.'
+    exists: 'A query map with this version already exists.'
+

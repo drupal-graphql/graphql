@@ -28,6 +28,7 @@ class GraphQLQueryMapImportForm extends EntityForm {
     $form['actions'] = [
       '#type' => 'actions',
     ];
+
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
@@ -53,7 +54,7 @@ class GraphQLQueryMapImportForm extends EntityForm {
     // Save the file for use in the submit handler.
     $formState->set('file', $file);
 
-    $queryMapJson =  file_get_contents($file->getFileUri());
+    $queryMapJson = file_get_contents($file->getFileUri());
     $version = sha1($queryMapJson);
     if (GraphQLQueryMap::exists($version)) {
       $formState->setError($form['query_map_json'], $this->t('A query map with the same queries already exists.'));
@@ -64,7 +65,6 @@ class GraphQLQueryMapImportForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $formState) {
-
     $file = $formState->get('file');
     $queryMapJson = file_get_contents($file->getFileUri());
 
