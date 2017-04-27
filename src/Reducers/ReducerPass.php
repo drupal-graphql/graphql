@@ -15,7 +15,7 @@ class ReducerPass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container) {
     $reducers = [];
-    foreach ($container->findTaggedServiceIds('graphql.reducer') as $id => $tags) {
+    foreach ($container->findTaggedServiceIds('graphql_reducer') as $id => $tags) {
       foreach ($tags as $tag) {
         if (strpos($id, 'graphql.reducer.') !== 0) {
           throw new \InvalidArgumentException(sprintf('The service "%s" has an invalid id: Reducers must use the "graphql.reducer." prefix.', $id));
