@@ -1,59 +1,48 @@
 # GraphQL for Drupal
 
-This module generates and exposes a [GraphQL] schema for [Drupal 8] entities, and
-allows you to expose your own custom schema in a consistent way and with minimal
-effort.
+[![Build Status](https://travis-ci.org/fubhy/graphql-drupal.svg?branch=8.x-3.x)](https://travis-ci.org/fubhy/graphql-drupal)
 
-It is probably the easiest way to build headless Drupal sites using the popular
-[React] / [Relay] couple for the front-end, and on top of the traditional fast
-Drupal site building for the content modeling and management.
+This module lets you craft and expose a [GraphQL] schema for [Drupal 8].
+
+Currently, you can expose your own custom schema through custom code with
+minimal effort. In the near future, we will add the ability to automatically
+generate a full schema from the underlying Drupal data graph.
+
+The module is currently meant as a basis for custom development rather than pure
+site building. As such, it leaves it up to you as a developer to choose
+whether/how to expose fields and non-entity data. To help you with this task,
+it provides base a flexible integrations layer for you to define your own
+schema.
+
+For ease of development, it includes the [GraphiQL] interface at
+/graphql/explorer.
+
+This module is built around https://github.com/Youshido/GraphQL. As such, it
+supports the full official GraphQL specification with all its features.
 
 [Drupal 8]: https://www.drupal.org/8
 [GraphQL]: http://graphql.org/
-[React]: https://facebook.github.io/react/
-[Relay]: https://facebook.github.io/relay/
+[GraphiQL]: https://github.com/graphql/graphiql/
 
+## Examples
 
-## Features
+The module itself contains an submodule which serves as an example for how to
+build a custom schema.
 
-### Built-in schema
+Check out https://github.com/fubhy/drupal-decoupled-app for a complete example
+of a fully decoupled React and GraphQL application. Feel free to use that
+repository as a starting point for your own decoupled application.
 
-By default, the module exposes all content and configuration entities as a
-Relay-compliant schema making the whole Drupal entity reference graph model
-available to clients: entities, ids and references.
+## Future features
 
-It provides a fully data-based process, which does not trigger the theme system,
-and includes full cacheability metadata for low overhead. 
+### Built-in generated schema
 
-
-### Developer experience
-
-The module is meant as a basis for custom development rather than pure site
-building. 
-
-As such, at this point it only exposes entity identifiers and labels,
-leaving it up to you as a developer to choose whether/how to expose fields and
-non-entity data. To help you with this task, it provides base objects you only
-need to extend to define your own schema.
-
-For ease of development:
- 
-* it includes the [GraphiQL] in-browser IDE, already configured for Drupal in 
-  authenticated mode, available at `(your_drupal_url)/graphql/explorer`
-       
-* it includes its documentation in [GitBook] format. To read it, just install 
-  Gitbook locally, and type:
-                               
-       $ cd (your_drupal_path)/modules/contrib/graphql
-       $ gitbook serve 
-       $ open (your_drupal_url):4000/
-
-[GitBook]: https://www.gitbook.com/
-[GraphiQL]: https://github.com/graphql/graphiql
-
+We are currently working on a complementary module for automatically exposing
+all content and configuration entities as a GraphQL schema making the whole
+Drupal entity graph available to your client application. Stay tuned.
 
 ## Resources
-
+ 
 * Documentation: https://www.gitbook.com/book/fgm/graphql-for-drupal
 * Project homepage: https://www.drupal.org/project/graphql
 * Contributing: https://github.com/fubhy/graphql-drupal
