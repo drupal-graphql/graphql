@@ -9,6 +9,6 @@ abstract class AbstractInterfaceType extends BaseAbstractInterfaceType {
    * {@inheritdoc}
    */
   public function build($config) {
-    // This method should not be required by any of our Interface types.
+    // This method should not be required by any of our interface types.
   }
 }

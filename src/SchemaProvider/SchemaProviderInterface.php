@@ -3,18 +3,10 @@
 namespace Drupal\graphql\SchemaProvider;
 
 interface SchemaProviderInterface {
-  /**
-   * @return array
-   */
-  public function getCacheTags();
 
   /**
-   * @return array
+   * @return \Youshido\GraphQL\Schema\AbstractSchema
    */
-  public function getQuerySchema();
+  public function getSchema();
 
-  /**
-   * @return array
-   */
-  public function getMutationSchema();
 }
