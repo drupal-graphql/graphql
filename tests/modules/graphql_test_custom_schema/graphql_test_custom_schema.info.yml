@@ -1,4 +1,4 @@
-name: GraphQL - Custom schema test module
+name: GraphQL Custom schema test module
 type: module
 description: Provides a custom GraphQL Schema for testing purposes.
 core: 8.x

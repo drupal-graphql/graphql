@@ -42,9 +42,6 @@ class NodeSchemaTest extends QueryTestBase  {
     $this->node = $node;
   }
 
-  /**
-   * @covers \Drupal\graphql\GraphQL\\EntityByIdField
-   */
   public function testNodeById() {
     $nid = $this->node->id();
     $query = <<<GQL

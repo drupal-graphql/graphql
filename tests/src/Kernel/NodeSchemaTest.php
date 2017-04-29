@@ -15,7 +15,7 @@ class NodeSchemaTest extends QueryTestBase  {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql', 'graphql_test_custom_schema', 'node', 'system'];
+  public static $modules = ['graphql', 'graphql_test_custom_schema', 'node', 'user', 'system'];
 
   /**
    * {@inheritdoc}
