@@ -1,0 +1,9 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    entity {
+      ... on NodeTest {
+        body
+      }
+    }
+  }
+}

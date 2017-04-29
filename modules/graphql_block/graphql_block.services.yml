@@ -1,0 +1,6 @@
+services:
+
+  grapql.block_extractor:
+    class: Drupal\graphql_block\EventListener
+    tags:
+      - { name: event_subscriber }

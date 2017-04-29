@@ -1,0 +1,13 @@
+query {
+  garage {
+    type
+    wheels
+    ... on Car {
+      engine
+    }
+    ... on Bike {
+      gears
+      gadgets
+    }
+  }
+}

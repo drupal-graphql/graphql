@@ -1,0 +1,3 @@
+services:
+  graphql_test.garage:
+    class: Drupal\graphql_plugin_test\Garage

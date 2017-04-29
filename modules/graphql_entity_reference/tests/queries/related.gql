@@ -1,0 +1,19 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    node:entity {
+      ... on NodeTest {
+        entityLabel
+        related {
+          ... on NodeTest {
+            entityLabel
+            related {
+              ... on NodeTest {
+                entityLabel
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

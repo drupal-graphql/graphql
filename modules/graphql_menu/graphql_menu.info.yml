@@ -1,0 +1,7 @@
+name: GraphQL Menu
+type: module
+description: 'Query Drupal menu trees with GraphQL.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core

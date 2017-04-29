@@ -1,0 +1,7 @@
+name: GraphQL File
+type: module
+description: 'Retrieve detailed file field information with GraphQL.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_content
