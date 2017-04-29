@@ -15,6 +15,11 @@ class NodeSchemaTest extends QueryTestBase  {
   /**
    * {@inheritdoc}
    */
+  public static $modules = ['graphql', 'graphql_test_custom_schema', 'node', 'system'];
+
+  /**
+   * {@inheritdoc}
+   */
   public function register(ContainerBuilder $container) {
     parent::register($container);
 
@@ -28,11 +33,10 @@ class NodeSchemaTest extends QueryTestBase  {
     ]);
     $node->save();
     $nid = $node->id();
-    $uuid = $node->uuid();
 
     $query = <<<GQL
 {
-  nodeByUuid(uuid: "$uuid") {
+  nodeById(uuid: "$nid") {
     entityId
   }
 }
@@ -43,7 +47,7 @@ GQL;
     $data = json_decode($response->getContent(), TRUE);
     $this->assertEquals([
       'data' => [
-        'nodeByUuid' => [
+        'nodeById' => [
           'entityId' => $nid,
         ],
       ],

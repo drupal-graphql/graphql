@@ -17,7 +17,7 @@ class NodeSchemaTest extends QueryTestBase  {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node'];
+  public static $modules = ['graphql_test_custom_schema', 'node'];
 
   /**
    * @var \Drupal\node\NodeInterface
@@ -37,43 +37,13 @@ class NodeSchemaTest extends QueryTestBase  {
       'type' => 'article',
       'title' => 'giraffe',
     ]);
+
     $node->save();
     $this->node = $node;
   }
 
   /**
-   * @covers \Drupal\graphql\GraphQL\Field\Root\Entity\EntityByPathField
-   */
-  public function testNodeByPath() {
-    $nid = $this->node->id();
-    $query = <<<GQL
-{
-  entityByPath(path: "node/$nid") {
-    entityId
-    entityType {
-      label
-    }
-  }
-}
-    
-GQL;
-
-    $body = $this->query($query);
-    $data = json_decode($body, TRUE);
-    $this->assertEquals([
-      'data' => [
-        'entityByPath' => [
-          'entityId' => $nid,
-          'entityType' => [
-            'label' => 'Content',
-          ],
-        ],
-      ],
-    ], $data);
-  }
-
-  /**
-   * @covers \Drupal\graphql\GraphQL\Field\Root\Entity\EntityByIdField
+   * @covers \Drupal\graphql\GraphQL\\EntityByIdField
    */
   public function testNodeById() {
     $nid = $this->node->id();
@@ -96,37 +66,4 @@ GQL;
       ],
     ], $data);
   }
-
-  /**
-   * @covers \Drupal\graphql\GraphQL\Field\Root\Entity\EntityByUuidField
-   */
-  public function testNodeByUuid() {
-    $uuid = $this->node->uuid();
-    $nid = $this->node->id();
-    $query = <<<GQL
-{
-  nodeByUuid(uuid: "$uuid") {
-    entityId
-    entityType {
-      label
-    }
-  }
-}
-    
-GQL;
-
-    $body = $this->query($query);
-    $data = json_decode($body, TRUE);
-    $this->assertEquals([
-      'data' => [
-        'nodeByUuid' => [
-          'entityId' => $nid,
-          'entityType' => [
-            'label' => 'Content',
-          ],
-        ],
-      ],
-    ], $data);
-  }
-
 }

@@ -1,7 +1,7 @@
 name: GraphQL Example
 type: module
 description: 'Exposes a custom GraphQL Schema for demo purposes.'
-package: Web services
+package: GraphQL
 core: 8.x
 dependencies:
   - graphql

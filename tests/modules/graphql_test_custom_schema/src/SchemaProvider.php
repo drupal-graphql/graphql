@@ -4,29 +4,18 @@ namespace Drupal\graphql_test_custom_schema;
 
 use Drupal\graphql\SchemaProvider\SchemaProviderInterface;
 use Drupal\graphql_test_custom_schema\Fields\CurrentUserField;
+use Drupal\graphql_test_custom_schema\Fields\NodeByIdField;
+use Youshido\GraphQL\Schema\Schema;
 
 class SchemaProvider implements SchemaProviderInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function getQuerySchema() {
-    return [
-      new CurrentUserField(),
-    ];
-  }
+  public function getSchema() {
+    $schema = new Schema();
+    $schema->addQueryField(new NodeByIdField());
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getMutationSchema() {
-    return [];
-  }
-
-  /**
-   * @return array
-   */
-  public function getCacheTags() {
-    return [];
+    return $schema;
   }
 }

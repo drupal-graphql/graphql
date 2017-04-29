@@ -9,6 +9,7 @@ use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\Scalar\IntType;
 
 class NodeIdField extends AbstractField {
+
   /**
    * {@inheritdoc}
    */

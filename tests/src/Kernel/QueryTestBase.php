@@ -13,11 +13,6 @@ abstract class QueryTestBase extends KernelTestBase  {
   use NodeCreationTrait;
 
   /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql', 'node', 'user', 'system'];
-
-  /**
    * The GraphQL resource.
    *
    * @var string
@@ -40,7 +35,6 @@ abstract class QueryTestBase extends KernelTestBase  {
     Role::load('anonymous')
       ->grantPermission('execute graphql requests')
       ->save();
-
 
     // Create a test content type for node testing.
     NodeType::create([

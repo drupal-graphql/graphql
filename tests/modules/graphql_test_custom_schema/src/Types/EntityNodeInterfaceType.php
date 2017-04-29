@@ -7,6 +7,7 @@ use Drupal\node\NodeInterface;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
 class EntityNodeInterfaceType extends AbstractInterfaceType {
+
   /**
    * {@inheritdoc}
    */
@@ -14,6 +15,8 @@ class EntityNodeInterfaceType extends AbstractInterfaceType {
     if ($object instanceof NodeInterface && $object->bundle() === 'article') {
       return new ArticleType();
     }
+
+    return NULL;
   }
 
   /**

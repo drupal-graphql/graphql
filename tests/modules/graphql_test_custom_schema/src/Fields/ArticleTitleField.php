@@ -31,6 +31,10 @@ class ArticleTitleField extends AbstractField implements ContainerAwareInterface
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    return $value->getTitle();
+    if ($value instanceof NodeInterface) {
+      return $value->getTitle();
+    }
+
+    return NULL;
   }
 }

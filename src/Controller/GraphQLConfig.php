@@ -33,9 +33,9 @@ class GraphQLConfig {
       ],
     ];
 
-    return array(
+    return [
       '#theme' => 'admin_block_content',
       '#content' => $links,
-    );
+    ];
   }
 }
