@@ -11,13 +11,13 @@
  * {@inheritdoc}
  */
 function graphql_content_test_entity_extra_field_info() {
-  $extra = array();
+  $extra = [];
 
-  $extra['node']['test']['display']['test'] = array(
+  $extra['node']['test']['display']['test'] = [
     'label' => t('Test'),
     'description' => t('A virtual test field'),
     'weight' => 0,
-  );
+  ];
   return $extra;
 }
 

@@ -43,12 +43,12 @@ class DefaultViewModeTest extends GraphQLFileTest {
       'type' => 'test',
     ]);
 
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'field_keywords',
       'entity_type' => 'node',
       'type' => 'text',
       'cardinality' => -1,
-    ))->save();
+    ])->save();
 
     FieldConfig::create([
       'entity_type' => 'node',

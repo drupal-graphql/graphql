@@ -57,18 +57,18 @@ class ImageFieldTest extends GraphQLFileTest {
     ])->save();
 
 
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'image',
       'type' => 'image',
       'entity_type' => 'node',
-    ))->save();
+    ])->save();
 
-    FieldConfig::create(array(
+    FieldConfig::create([
       'field_name' => 'image',
       'entity_type' => 'node',
       'bundle' => 'test',
       'label' => 'Image',
-    ))->save();
+    ])->save();
 
     EntityViewDisplay::create([
       'targetEntityType' => 'node',

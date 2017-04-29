@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql_core;
 
 use Drupal\graphql\GraphQL\Execution\Processor;
-use Drupal\Tests\token\Kernel\KernelTestBase;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -15,6 +15,9 @@ abstract class GraphQLFileTest extends KernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'system',
+    'path',
+    'user',
     'graphql',
     'graphql_core',
   ];
@@ -24,6 +27,7 @@ abstract class GraphQLFileTest extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->installConfig('system');
     $this->installConfig('graphql');
     $this->installConfig('user');
     $this->installEntitySchema('user');

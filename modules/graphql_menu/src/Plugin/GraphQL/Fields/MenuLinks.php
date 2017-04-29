@@ -56,10 +56,10 @@ class MenuLinks extends FieldPluginBase implements ContainerFactoryPluginInterfa
     if ($value instanceof MenuInterface) {
       $tree = $this->menuLinkTree->load($value->id(), new MenuTreeParameters());
 
-      $manipulators = array(
-        array('callable' => 'menu.default_tree_manipulators:checkAccess'),
-        array('callable' => 'menu.default_tree_manipulators:generateIndexAndSort'),
-      );
+      $manipulators = [
+        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ];
 
       foreach (array_filter($this->menuLinkTree->transform($tree, $manipulators), function (MenuLinkTreeElement $item) {
         return $item->link instanceof MenuLinkInterface && $item->link->isEnabled();
