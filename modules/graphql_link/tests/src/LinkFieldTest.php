@@ -49,19 +49,19 @@ class LinkFieldTest extends GraphQLFileTest {
       ->grantPermission('access content')
       ->save();
 
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'links',
       'type' => 'link',
       'entity_type' => 'node',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
-    ))->save();
+    ])->save();
 
-    FieldConfig::create(array(
+    FieldConfig::create([
       'field_name' => 'links',
       'entity_type' => 'node',
       'bundle' => 'test',
       'label' => 'Links',
-    ))->save();
+    ])->save();
 
     EntityViewMode::create([
       'targetEntityType' => 'node',

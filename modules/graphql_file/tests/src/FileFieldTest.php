@@ -54,18 +54,18 @@ class FileFieldTest extends GraphQLFileTest {
     ])->save();
 
 
-    FieldStorageConfig::create(array(
+    FieldStorageConfig::create([
       'field_name' => 'file',
       'type' => 'file',
       'entity_type' => 'node',
-    ))->save();
+    ])->save();
 
-    FieldConfig::create(array(
+    FieldConfig::create([
       'field_name' => 'file',
       'entity_type' => 'node',
       'bundle' => 'test',
       'label' => 'File',
-    ))->save();
+    ])->save();
 
     EntityViewDisplay::create([
       'targetEntityType' => 'node',
