@@ -12,7 +12,7 @@ class SchemaProvider implements SchemaProviderInterface {
    *
    * @var \Drupal\graphql\SchemaProvider\SchemaProviderInterface[]
    */
-  protected $providers;
+  protected $providers = [];
 
   /**
    * Sorted list of schema providers.

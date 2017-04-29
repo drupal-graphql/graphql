@@ -16,6 +16,12 @@ class ArticleType extends AbstractObjectType {
     $config->addField(new ArticleTitleField());
   }
 
+  public function getInterfaces() {
+    return [
+      new NodeInterfaceType(),
+    ];
+  }
+
   /**
    * {@inheritdoc}
    */

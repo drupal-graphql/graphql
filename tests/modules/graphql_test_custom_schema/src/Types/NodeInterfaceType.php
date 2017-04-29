@@ -6,7 +6,7 @@ use Drupal\graphql_test_custom_schema\Fields\NodeIdField;
 use Drupal\node\NodeInterface;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
-class EntityNodeInterfaceType extends AbstractInterfaceType {
+class NodeInterfaceType extends AbstractInterfaceType {
 
   /**
    * {@inheritdoc}

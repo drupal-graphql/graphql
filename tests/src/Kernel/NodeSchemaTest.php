@@ -36,7 +36,7 @@ class NodeSchemaTest extends QueryTestBase  {
 
     $query = <<<GQL
 {
-  nodeById(uuid: "$nid") {
+  nodeById(id: $nid) {
     entityId
   }
 }

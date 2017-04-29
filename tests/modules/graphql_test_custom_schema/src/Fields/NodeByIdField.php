@@ -3,7 +3,7 @@
 namespace Drupal\graphql_test_custom_schema\Fields;
 
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\graphql_test_custom_schema\Types\EntityNodeInterfaceType;
+use Drupal\graphql_test_custom_schema\Types\NodeInterfaceType;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Youshido\GraphQL\Config\Field\FieldConfig;
@@ -30,7 +30,7 @@ class NodeByIdField extends AbstractField implements ContainerAwareInterface {
    * {@inheritdoc}
    */
   public function getType() {
-    return new EntityNodeInterfaceType();
+    return new NodeInterfaceType();
   }
 
   /**
