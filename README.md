@@ -33,13 +33,11 @@ Check out https://github.com/fubhy/drupal-decoupled-app for a complete example
 of a fully decoupled React and GraphQL application. Feel free to use that
 repository as a starting point for your own decoupled application.
 
-## Future features
+## Built-in generated schema
 
-### Built-in generated schema
-
-We are currently working on a complementary module for automatically exposing
-all content and configuration entities as a GraphQL schema making the whole
-Drupal entity graph available to your client application. Stay tuned.
+The `modules` directory contains a set of modules that help to automatically
+create a GraphQL schema from Drupal data structures and components. Please
+refer to `modules/README.md` for more information.
 
 ## Resources
  

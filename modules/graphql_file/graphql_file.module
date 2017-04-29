@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * GraphQL file field hook implementations.
+ */
+
+/**
+ * Implements hook_graphql_interfaces_alter().
+ */
+function graphql_file_graphql_interfaces_alter(&$definitions) {
+  foreach (array_keys($definitions) as $id) {
+    if ($definitions[$id]['name'] == 'File') {
+      $definitions[$id]['fields'][] = 'fileSize';
+      $definitions[$id]['fields'][] = 'mimeType';
+    }
+  }
+}

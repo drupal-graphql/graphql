@@ -1,0 +1,14 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    node:entity {
+      links {
+        label
+        route:url {
+          internalPath:path
+          aliasedPath:alias
+          isRouted:routed
+        }
+      }
+    }
+  }
+}

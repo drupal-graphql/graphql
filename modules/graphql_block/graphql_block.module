@@ -1,0 +1,11 @@
+<?php
+
+function graphql_block_graphql_types_alter(&$definitions) {
+  foreach (array_keys($definitions) as $id) {
+    if (array_key_exists('entity_type', $definitions[$id])) {
+      if ($definitions[$id]['entity_type'] == 'block_content') {
+        $definitions[$id]['interfaces'][] = 'Block';
+      }
+    }
+  }
+}

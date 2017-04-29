@@ -1,0 +1,9 @@
+query {
+  garage {
+    ... on Car {
+      backupCar {
+        engine
+      }
+    }
+  }
+}

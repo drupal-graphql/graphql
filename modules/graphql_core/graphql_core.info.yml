@@ -1,0 +1,7 @@
+name: GraphQL Core
+type: module
+description: 'Plugin based schema generation. To be merged into graphql module eventually.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql

@@ -1,0 +1,104 @@
+parameters:
+  graphql.config:
+    cache: true
+
+services:
+
+  graphql_core.interface_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+    - name: graphql_plugin_manager
+    arguments:
+    - 'Plugin/GraphQL/Interfaces'
+    - '@container.namespaces'
+    - '@module_handler'
+    - '\Drupal\graphql_core\GraphQL\InterfacePluginBase'
+    - '\Drupal\graphql_core\Annotation\GraphQLInterface'
+    - '@graphql.schema_manager'
+    - 'graphql_interfaces'
+  graphql_core.type_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+    - name: graphql_plugin_manager
+    arguments:
+    - 'Plugin/GraphQL/Types'
+    - '@container.namespaces'
+    - '@module_handler'
+    - '\Drupal\graphql_core\GraphQL\TypePluginBase'
+    - '\Drupal\graphql_core\Annotation\GraphQLType'
+    - '@graphql.schema_manager'
+    - 'graphql_types'
+  graphql_core.input_type_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+    - name: graphql_plugin_manager
+    arguments:
+    - 'Plugin/GraphQL/InputTypes'
+    - '@container.namespaces'
+    - '@module_handler'
+    - '\Drupal\graphql_core\GraphQL\InputTypePluginBase'
+    - '\Drupal\graphql_core\Annotation\GraphQLInputType'
+    - '@graphql.schema_manager'
+    - 'graphql_input_types'
+  graphql_core.field_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+    - name: graphql_plugin_manager
+    arguments:
+    - 'Plugin/GraphQL/Fields'
+    - '@container.namespaces'
+    - '@module_handler'
+    - '\Drupal\graphql_core\GraphQL\FieldPluginBase'
+    - '\Drupal\graphql_core\Annotation\GraphQLField'
+    - '@graphql.schema_manager'
+    - 'graphql_fields'
+  graphql_core.mutation_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+    - name: graphql_plugin_manager
+    arguments:
+    - 'Plugin/GraphQL/Mutations'
+    - '@container.namespaces'
+    - '@module_handler'
+    - '\Drupal\graphql_core\GraphQL\MutationPluginBase'
+    - '\Drupal\graphql_core\Annotation\GraphQLMutation'
+    - '@graphql.schema_manager'
+    - 'graphql_mutations'
+  graphql_core.scalar_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+    - name: graphql_plugin_manager
+    arguments:
+    - 'Plugin/GraphQL/Scalars'
+    - '@container.namespaces'
+    - '@module_handler'
+    - '\Youshido\GraphQL\Type\TypeInterface'
+    - '\Drupal\graphql_core\Annotation\GraphQLScalar'
+    - '@graphql.schema_manager'
+    - 'graphql_scalars'
+
+  graphql.schema_manager:
+    class: Drupal\graphql_core\GraphQLSchemaManager
+    tags:
+    - name: service_collector
+      tag: graphql_plugin_manager
+      call: addPluginManager
+
+  graphql_core.event_listener:
+    class: Drupal\graphql_core\EventListener
+    tags:
+      - { name: event_subscriber }
+
+  graphql.context_repository:
+    class: Drupal\graphql_core\GraphQLContextRepository
+    tags:
+    - name: service_collector
+      tag: context_provider
+      call: addContextProvider
+
+  graphql.schema_provider:
+    class: Drupal\graphql_core\PluggableSchemaProvider
+    arguments:
+    - '@graphql.schema_manager'
+    tags:
+        - { name: graphql_schema_provider }

@@ -1,0 +1,8 @@
+type: module
+name: GraphQL Override Test
+description: Test plugin overrides in graphql schema.
+package: Testing
+core: 8.x
+hidden: TRUE
+dependencies:
+- graphql_plugin_test

@@ -1,0 +1,14 @@
+graphql_test_menu.accessible:
+  path: '/graphql/test/accessible'
+  defaults:
+    _controller: '\Drupal\router_test\TestControllers::test'
+  requirements:
+    _access: 'TRUE'
+
+graphql_test_menu.inaccessible:
+  path: '/graphql/test/inaccessible'
+  defaults:
+    _controller: '\Drupal\router_test\TestControllers::test'
+  requirements:
+    _access: 'FALSE'
+

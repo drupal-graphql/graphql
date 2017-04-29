@@ -1,0 +1,28 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    node:nodeContext {
+      entityId,
+      entityUuid,
+      entityLabel,
+      entityType,
+      entityBundle,
+      entityRoute:entityUrl {
+        internalPath:path,
+        aliasedPath:alias
+      }
+    }
+    node_test:nodeContext {
+      ... on NodeTest {
+        entityId,
+        entityUuid,
+        entityLabel,
+        entityType,
+        entityBundle,
+        entityRoute:entityUrl {
+          internalPath:path,
+          aliasedPath:alias
+        }
+      }
+    }
+  }
+}

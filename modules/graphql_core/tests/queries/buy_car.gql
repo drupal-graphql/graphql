@@ -1,0 +1,3 @@
+mutation($car: CarInput!) {
+  buyCar(car: $car)
+}
