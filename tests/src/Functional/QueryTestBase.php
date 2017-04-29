@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\graphql\Functional;
 
-use Drupal\simpletest\BrowserTestBase;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
