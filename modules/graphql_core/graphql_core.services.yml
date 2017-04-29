@@ -84,18 +84,17 @@ services:
       tag: graphql_plugin_manager
       call: addPluginManager
 
+  graphql_core.event_listener:
+    class: Drupal\graphql_core\EventListener
+    tags:
+      - { name: event_subscriber }
+
   graphql.context_repository:
     class: Drupal\graphql_core\GraphQLContextRepository
     tags:
     - name: service_collector
       tag: context_provider
       call: addContextProvider
-
-  grapql.context_extractor:
-    class: Drupal\graphql_core\ContextExtractor
-    tags:
-      - { name: event_subscriber }
-
 
   graphql.schema_provider:
     class: Drupal\graphql_core\PluggableSchemaProvider

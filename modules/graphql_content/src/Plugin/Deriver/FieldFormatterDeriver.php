@@ -39,7 +39,10 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
-    return new static($container->get('entity_type.manager'), $container->get('entity_field.manager'), $base_plugin_id);
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager'),
+      $base_plugin_id);
   }
 
   /**
@@ -52,7 +55,11 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    * @param string $basePluginId
    *   The base plugin id.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, EntityFieldManagerInterface $entityFieldManager, $basePluginId) {
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    EntityFieldManagerInterface $entityFieldManager,
+    $basePluginId
+  ) {
     $this->basePluginId = $basePluginId;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
@@ -102,11 +109,8 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   public function getDerivativeDefinitions($base_plugin_definition) {
     $this->derivatives = [];
 
-    /** @var EntityTypeManagerInterface $typemanager */
-    $typemanager = \Drupal::service('entity_type.manager');
-
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays */
-    $displays = $typemanager->getStorage('entity_view_display')->loadByProperties([
+    $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadByProperties([
       'mode' => 'graphql',
     ]);
 

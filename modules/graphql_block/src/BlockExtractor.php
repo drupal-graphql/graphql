@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -44,13 +45,21 @@ class BlockExtractor extends ControllerBase {
   protected $entityRepository;
 
   /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('theme.manager'),
       $container->get('entity_type.manager'),
-      $container->get('entity.repository')
+      $container->get('entity.repository'),
+      $container->get('request_stack')
     );
   }
 
@@ -63,27 +72,19 @@ class BlockExtractor extends ControllerBase {
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   An entity repository instance.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   A symfony request stack.
    */
-  public function __construct(ThemeManagerInterface $themeManager, EntityTypeManagerInterface $entityTypeManager, EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    ThemeManagerInterface $themeManager,
+    EntityTypeManagerInterface $entityTypeManager,
+    EntityRepositoryInterface $entityRepository,
+    RequestStack $requestStack
+  ) {
     $this->themeManager = $themeManager;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityRepository = $entityRepository;
-  }
-
-  /**
-   * Handle kernel request events.
-   *
-   * If there is a `graphql_context` attribute on the current request, pass the
-   * request to a context extraction.
-   *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
-   *   The kernel event object.
-   */
-  public function onKernelRequest(GetResponseEvent $event) {
-    $request = $event->getRequest();
-    if ($request->attributes->has('graphql_block_region')) {
-      $request->attributes->set('_controller', '\Drupal\graphql_block\BlockExtractor:extract');
-    }
+    $this->requestStack = $requestStack;
   }
 
   /**
@@ -93,7 +94,7 @@ class BlockExtractor extends ControllerBase {
    *   A context response instance.
    */
   public function extract() {
-    $region = \Drupal::request()->attributes->get('graphql_block_region');
+    $region = $this->requestStack->getCurrentRequest()->attributes->get('graphql_block_region');
     $response = new BlockResponse();
 
     $active_theme = $this->themeManager->getActiveTheme();
@@ -123,12 +124,5 @@ class BlockExtractor extends ControllerBase {
     }, $blocks));
 
     return $response;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getSubscribedEvents() {
-    return [KernelEvents::REQUEST => 'onKernelRequest'];
   }
 }

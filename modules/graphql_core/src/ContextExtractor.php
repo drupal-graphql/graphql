@@ -2,9 +2,10 @@
 
 namespace Drupal\graphql_core;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
+use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Service using HTTP kernel to extract Drupal context objects.
@@ -13,22 +14,38 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * attribute with itself and returns a context response instead that will be
  * use as field value for graphql context fields.
  */
-class ContextExtractor implements EventSubscriberInterface {
+class ContextExtractor extends ControllerBase {
 
   /**
-   * Handle kernel request events.
+   * The context repository.
    *
-   * If there is a `graphql_context` attribute on the current request, pass the
-   * request to a context extraction.
-   *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
-   *   The kernel event object.
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
    */
-  public function onKernelRequest(GetResponseEvent $event) {
-    $request = $event->getRequest();
-    if ($request->attributes->has('graphql_context')) {
-      $request->attributes->set('_controller', '\Drupal\graphql_core\ContextExtractor:extract');
-    }
+  protected $contextRepository;
+
+  /**
+   * The symfony request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('graphql.context_repository'),
+      $container->get('request_stack')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(ContextRepositoryInterface $contextRepository, RequestStack $requestStack) {
+    $this->contextRepository = $contextRepository;
+    $this->requestStack = $requestStack;
   }
 
   /**
@@ -38,17 +55,10 @@ class ContextExtractor implements EventSubscriberInterface {
    *   A context response instance.
    */
   public function extract() {
-    $context_id = \Drupal::request()->attributes->get('graphql_context');
+    $context_id = $this->requestStack->getCurrentRequest()->attributes->get('graphql_context');
     $response = new ContextResponse();
-    $response->setContext(\Drupal::service('graphql.context_repository')->getRuntimeContexts([$context_id])[$context_id]);
+    $response->setContext($this->contextRepository->getRuntimeContexts([$context_id])[$context_id]);
     return $response;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getSubscribedEvents() {
-    return [KernelEvents::REQUEST => 'onKernelRequest'];
   }
 
 }
