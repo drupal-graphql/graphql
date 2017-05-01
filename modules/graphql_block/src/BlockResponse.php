@@ -12,14 +12,14 @@ class BlockResponse extends Response {
   /**
    * The retrieved context.
    *
-   * @var \Drupal\Block\Entity\Block[]
+   * @var \Drupal\block\Entity\Block[]
    */
   protected $blocks;
 
   /**
    * Set the list of blocks.
    *
-   * @param \Drupal\Block\Entity\Block[] $blocks
+   * @param \Drupal\block\Entity\Block[] $blocks
    *   The context object.
    */
   public function setBlocks(array $blocks) {
@@ -29,7 +29,7 @@ class BlockResponse extends Response {
   /**
    * Retrieve the context object.
    *
-   * @return \Drupal\Block\Entity\Block[]
+   * @return \Drupal\block\Entity\Block[]
    *   The contained context object.
    */
   public function getBlocks() {
