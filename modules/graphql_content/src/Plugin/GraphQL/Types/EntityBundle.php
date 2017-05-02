@@ -5,7 +5,7 @@ namespace Drupal\graphql_content\Plugin\GraphQL\Types;
 use Drupal\graphql_core\GraphQL\TypePluginBase;
 
 /**
- * Plugin for GraphQL interfaces derived from Drupal entity types.
+ * Plugin for GraphQL types derived from Drupal entity bundles.
  *
  * @GraphQLType(
  *   id = "entity_bundle",
