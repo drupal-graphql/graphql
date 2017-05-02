@@ -11,15 +11,13 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Service using HTTP kernel to extract Drupal context objects.
+ * Service using HTTP kernel to extract Drupal block objects.
  *
- * Replaces the controller of requests containing the "graphql_context"
- * attribute with itself and returns a context response instead that will be
- * use as field value for graphql context fields.
+ * Replaces the controller of requests containing the "graphql_block_reqion"
+ * attribute with itself and returns a block response instead that will be
+ * use as field value for graphql block fields.
  */
 class BlockExtractor extends ControllerBase {
 
@@ -88,10 +86,10 @@ class BlockExtractor extends ControllerBase {
   }
 
   /**
-   * Extract the required context and return it.
+   * Extract the blocks for the passed region and return it.
    *
    * @return \Drupal\graphql_block\BlockResponse
-   *   A context response instance.
+   *   A block response instance.
    */
   public function extract() {
     $region = $this->requestStack->getCurrentRequest()->attributes->get('graphql_block_region');
