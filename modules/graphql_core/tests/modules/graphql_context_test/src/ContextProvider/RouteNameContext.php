@@ -31,7 +31,7 @@ class RouteNameContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRuntimeContexts(array $unqualified_context_ids) {
+  public function getRuntimeContexts(array $unqualifiedContextIds) {
     $name = $this->routeMatch->getRouteName();
     return ['route_name' => new Context($this->contextDefinition, $name)];
   }

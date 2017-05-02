@@ -55,9 +55,9 @@ class ContextExtractor extends ControllerBase {
    *   A context response instance.
    */
   public function extract() {
-    $context_id = $this->requestStack->getCurrentRequest()->attributes->get('graphql_context');
+    $contextId = $this->requestStack->getCurrentRequest()->attributes->get('graphql_context');
     $response = new ContextResponse();
-    $response->setContext($this->contextRepository->getRuntimeContexts([$context_id])[$context_id]);
+    $response->setContext($this->contextRepository->getRuntimeContexts([$contextId])[$contextId]);
     return $response;
   }
 

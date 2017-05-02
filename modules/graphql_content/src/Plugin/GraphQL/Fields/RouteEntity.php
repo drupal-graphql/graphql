@@ -44,24 +44,24 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   public function __construct(
     array $configuration,
-    $plugin_id,
-    $plugin_definition,
+    $pluginId,
+    $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     LanguageManagerInterface $languageManager
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->languageManager = $languageManager;
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('entity_type.manager'),
       $container->get('language_manager')
     );

@@ -29,9 +29,9 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
   protected function prepareDefinitions() {
     if ($this->definitions == NULL) {
       foreach ($this->pluginManagers as $manager) {
-        foreach ($manager->getDefinitions() as $plugin_id => $definition) {
+        foreach ($manager->getDefinitions() as $pluginId => $definition) {
           $this->definitions[] = [
-            'plugin_id' => $plugin_id,
+            'plugin_id' => $pluginId,
             'definition' => $definition,
             'weight' => $definition['weight'],
             'manager' => $manager,
@@ -106,13 +106,13 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
     $this->prepareDefinitions();
 
     // Retrieve the list of fields that are explicitly attached to a type.
-    $attached_fields = array_reduce(array_filter(array_map(function ($def) {
+    $attachedFields = array_reduce(array_filter(array_map(function ($def) {
       return array_key_exists('fields', $def['definition']) ? $def['definition']['fields'] : NULL;
     }, $this->definitions)), 'array_merge', []);
 
     // Retrieve the list of fields that are not attached in any way.
-    return $this->find(function ($def) use ($attached_fields) {
-      return !in_array($def['name'], $attached_fields) && empty($def['types']);
+    return $this->find(function ($def) use ($attachedFields) {
+      return !in_array($def['name'], $attachedFields) && empty($def['types']);
     }, [GRAPHQL_CORE_FIELD_PLUGIN]);
   }
 

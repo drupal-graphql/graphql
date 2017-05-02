@@ -46,16 +46,16 @@ class Alias extends Path implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, AliasManagerInterface $aliasManager) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, AliasManagerInterface $aliasManager) {
     $this->aliasManager = $aliasManager;
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('path.alias_manager'));
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('path.alias_manager'));
   }
 
 }

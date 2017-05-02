@@ -8,8 +8,8 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  * Scalar string type.
  *
  * @GraphQLScalar(
- *   name="String",
- *   dataType="string"
+ *   name = "String",
+ *   data_type = "string"
  * )
  */
 class GraphQLString extends StringType {

@@ -95,10 +95,10 @@ class BlockExtractor extends ControllerBase {
     $region = $this->requestStack->getCurrentRequest()->attributes->get('graphql_block_region');
     $response = new BlockResponse();
 
-    $active_theme = $this->themeManager->getActiveTheme();
-    $block_storage = $this->entityTypeManager->getStorage('block');
-    $blocks = $block_storage->loadByProperties([
-      'theme' => $active_theme->getName(),
+    $activeTheme = $this->themeManager->getActiveTheme();
+    $blockStorage = $this->entityTypeManager->getStorage('block');
+    $blocks = $blockStorage->loadByProperties([
+      'theme' => $activeTheme->getName(),
       'region' => $region,
     ]);
 

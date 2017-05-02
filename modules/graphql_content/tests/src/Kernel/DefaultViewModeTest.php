@@ -81,7 +81,7 @@ class DefaultViewModeTest extends GraphQLFileTest {
       'path' => '/node/' . $node->id(),
     ]);
 
-    $error_result = $this->executeQueryFile('rendered_fields.gql', [
+    $errorResult = $this->executeQueryFile('rendered_fields.gql', [
       'path' => '/node/' . $node->id(),
     ], FALSE);
 
@@ -91,7 +91,7 @@ class DefaultViewModeTest extends GraphQLFileTest {
 
     $this->assertEquals('<p>test</p>', $node['body'], 'Body field retrieved properly.');
 
-    $this->assertNotEmpty($error_result['errors'], 'Default view mode is missing fields.');
+    $this->assertNotEmpty($errorResult['errors'], 'Default view mode is missing fields.');
   }
 
 }

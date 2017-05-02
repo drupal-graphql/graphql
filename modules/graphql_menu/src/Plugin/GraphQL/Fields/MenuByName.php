@@ -34,16 +34,16 @@ class MenuByName extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('entity_type.manager'));
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('entity_type.manager'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**

@@ -32,7 +32,7 @@ class MenuTest extends GraphQLFileTest {
     $this->installConfig('menu_link_content');
     $this->installConfig('graphql_test_menu');
 
-    $external_link = MenuLinkContent::create([
+    $externalLink = MenuLinkContent::create([
       'title' => 'Drupal',
       'link' => ['uri' => 'http://www.drupal.org'],
       'menu_name' => 'test',
@@ -41,31 +41,31 @@ class MenuTest extends GraphQLFileTest {
       'weight' => 5,
     ]);
 
-    $external_link->save();
+    $externalLink->save();
 
-    /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
-    $menu_link_manager = $this->container->get('plugin.manager.menu.link');
-    $menu_link_manager->rebuild();
+    /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager */
+    $menuLinkManager = $this->container->get('plugin.manager.menu.link');
+    $menuLinkManager->rebuild();
   }
 
   /**
    * Test if the test setup itself is successful.
    */
   public function testTestSetup() {
-    /** @var \Drupal\Core\Menu\MenuTreeStorageInterface $menu_storage */
-    $menu_storage = $this->container->get('entity_type.manager')->getStorage('menu');
-    $menu = $menu_storage->load('test');
+    /** @var \Drupal\Core\Menu\MenuTreeStorageInterface $menuStorage */
+    $menuStorage = $this->container->get('entity_type.manager')->getStorage('menu');
+    $menu = $menuStorage->load('test');
     $this->assertTrue($menu);
 
-    /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
-    $menu_tree = $this->container->get('menu.link_tree');
-    $this->assertEquals(count($menu_tree->load('test', new MenuTreeParameters())), 3);
+    /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menuTree */
+    $menuTree = $this->container->get('menu.link_tree');
+    $this->assertEquals(count($menuTree->load('test', new MenuTreeParameters())), 3);
 
-    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */
-    $http_kernel = $this->container->get('http_kernel');
+    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel */
+    $httpKernel = $this->container->get('http_kernel');
 
-    $this->assertEquals($http_kernel->handle(Request::create('/graphql/test/accessible'))->getStatusCode(), 200);
-    $this->assertEquals($http_kernel->handle(Request::create('/graphql/test/inaccessible'))->getStatusCode(), 403);
+    $this->assertEquals($httpKernel->handle(Request::create('/graphql/test/accessible'))->getStatusCode(), 200);
+    $this->assertEquals($httpKernel->handle(Request::create('/graphql/test/inaccessible'))->getStatusCode(), 403);
   }
 
   /**
@@ -157,8 +157,8 @@ class MenuTest extends GraphQLFileTest {
       ],
     ], $result['data'], 'Inaccessible root item is obfuscated.');
 
-    $inaccessible_children = $result['data']['menu']['links'][1]['links'];
-    $this->assertEmpty($inaccessible_children, 'Inaccessible items do not expose children.');
+    $inaccessibleChildren = $result['data']['menu']['links'][1]['links'];
+    $this->assertEmpty($inaccessibleChildren, 'Inaccessible items do not expose children.');
 
     $this->assertArraySubset([
       'menu' => [

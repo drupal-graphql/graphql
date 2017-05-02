@@ -31,7 +31,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info')
@@ -52,22 +52,22 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
     $bundles = $this->entityTypeBundleInfo->getAllBundleInfo();
-    foreach ($this->entityTypeManager->getDefinitions() as $type_id => $type) {
+    foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
-        foreach (array_keys($bundles[$type_id]) as $bundle) {
-          $this->derivatives[$type_id . '-' . $bundle] = [
-            'name' => graphql_core_camelcase([$type_id, $bundle]),
-            'entity_type' => $type_id,
-            'interfaces' => [graphql_core_camelcase($type_id), 'Entity'],
+        foreach (array_keys($bundles[$typeId]) as $bundle) {
+          $this->derivatives[$typeId . '-' . $bundle] = [
+            'name' => graphql_core_camelcase([$typeId, $bundle]),
+            'entity_type' => $typeId,
+            'interfaces' => [graphql_core_camelcase($typeId), 'Entity'],
             'bundle' => $bundle,
-          ] + $base_plugin_definition;
+          ] + $basePluginDefinition;
         }
       }
     }
-    return parent::getDerivativeDefinitions($base_plugin_definition);
+    return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 
 }

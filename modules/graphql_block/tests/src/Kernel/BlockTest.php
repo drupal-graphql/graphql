@@ -34,15 +34,15 @@ class BlockTest extends GraphQLFileTest {
   protected function setUp() {
     parent::setUp();
 
-    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
-    $theme_installer = $this->container->get('theme_installer');
-    $theme_installer->install(['stark']);
+    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $themeInstaller */
+    $themeInstaller = $this->container->get('theme_installer');
+    $themeInstaller->install(['stark']);
 
     $this->installEntitySchema('block_content');
     $this->installConfig('block_content');
     $this->installConfig('graphql_block_test');
 
-    $custom_block = BlockContent::create([
+    $customBlock = BlockContent::create([
       'type' => 'basic',
       'info' => 'Custom block test',
       'body' => [
@@ -51,9 +51,9 @@ class BlockTest extends GraphQLFileTest {
       ],
     ]);
 
-    $custom_block->save();
+    $customBlock->save();
 
-    $this->placeBlock('block_content:' . $custom_block->uuid(), [
+    $this->placeBlock('block_content:' . $customBlock->uuid(), [
       'region' => 'sidebar_first',
     ]);
   }

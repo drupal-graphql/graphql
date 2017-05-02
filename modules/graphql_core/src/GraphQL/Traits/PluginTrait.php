@@ -47,15 +47,15 @@ trait PluginTrait {
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
+   * @param string $pluginId
    *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param mixed $pluginDefinition
    *   The plugin implementation definition.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
     $this->configuration = $configuration;
-    $this->pluginId = $plugin_id;
-    $this->pluginDefinition = $plugin_definition;
+    $this->pluginId = $pluginId;
+    $this->pluginDefinition = $pluginDefinition;
   }
 
   /**
@@ -69,23 +69,23 @@ trait PluginTrait {
    * {@inheritdoc}
    */
   public function getBaseId() {
-    $plugin_id = $this->getPluginId();
-    if (strpos($plugin_id, PluginBase::DERIVATIVE_SEPARATOR)) {
-      list($plugin_id) = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    $pluginId = $this->getPluginId();
+    if (strpos($pluginId, PluginBase::DERIVATIVE_SEPARATOR)) {
+      list($pluginId) = explode(PluginBase::DERIVATIVE_SEPARATOR, $pluginId, 2);
     }
-    return $plugin_id;
+    return $pluginId;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDerivativeId() {
-    $plugin_id = $this->getPluginId();
-    $derivative_id = NULL;
-    if (strpos($plugin_id, PluginBase::DERIVATIVE_SEPARATOR)) {
-      list(, $derivative_id) = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    $pluginId = $this->getPluginId();
+    $derivativeId = NULL;
+    if (strpos($pluginId, PluginBase::DERIVATIVE_SEPARATOR)) {
+      list(, $derivativeId) = explode(PluginBase::DERIVATIVE_SEPARATOR, $pluginId, 2);
     }
-    return $derivative_id;
+    return $derivativeId;
   }
 
   /**

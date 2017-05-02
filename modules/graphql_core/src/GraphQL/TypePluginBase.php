@@ -59,11 +59,11 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
    * {@inheritdoc}
    */
   protected function buildFields(GraphQLSchemaManagerInterface $schemaManager) {
-    $interface_fields = array_reduce(array_map(function (AbstractInterfaceType $interface) {
+    $interfaceFields = array_reduce(array_map(function (AbstractInterfaceType $interface) {
       return $interface->getFields();
     }, $this->buildInterfaces($schemaManager)), 'array_merge', []);
-    $attached_fields = $this->buildAttachedFields($schemaManager);
-    return array_merge($interface_fields, $attached_fields);
+    $attachedFields = $this->buildAttachedFields($schemaManager);
+    return array_merge($interfaceFields, $attachedFields);
   }
 
 }

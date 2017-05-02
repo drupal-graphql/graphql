@@ -8,7 +8,7 @@ use Youshido\GraphQL\Type\Scalar\DateTimeType;
  * Scalar string type.
  *
  * @GraphQLScalar(
- *   name="DateTime"
+ *   name = "DateTime"
  * )
  */
 class GraphQLDateTime extends DateTimeType {

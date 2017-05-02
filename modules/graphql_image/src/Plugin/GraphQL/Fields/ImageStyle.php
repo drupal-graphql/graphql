@@ -43,17 +43,17 @@ class ImageStyle extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ImageFactory $imageFactory) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, ImageFactory $imageFactory) {
     $this->imageFactory = $imageFactory;
-    $this->imageStyle = $plugin_definition['image_style'];
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->imageStyle = $pluginDefinition['image_style'];
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('image.factory'));
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('image.factory'));
   }
 
   /**

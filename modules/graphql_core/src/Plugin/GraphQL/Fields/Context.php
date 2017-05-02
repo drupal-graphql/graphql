@@ -40,9 +40,9 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   protected function buildType(GraphQLSchemaManagerInterface $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
-      if (array_key_exists('dataType', $definition) && $definition['dataType']) {
+      if (array_key_exists('data_type', $definition) && $definition['data_type']) {
         $types = $schemaManager->find(function ($def) use ($definition) {
-          return array_key_exists('dataType', $def) && $def['dataType'] == $definition['dataType'];
+          return array_key_exists('data_type', $def) && $def['data_type'] == $definition['data_type'];
         }, [
           GRAPHQL_CORE_TYPE_PLUGIN,
           GRAPHQL_CORE_INTERFACE_PLUGIN,
@@ -61,19 +61,19 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, HttpKernelInterface $httpKernel) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel) {
     $this->httpKernel = $httpKernel;
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('http_kernel')
     );
   }
@@ -83,12 +83,12 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-      $context_id = $this->getPluginDefinition()['context_id'];
+      $contextId = $this->getPluginDefinition()['context_id'];
 
       // TODO: Pass url object directly to not re-run full routing?
       $request = Request::create($value->toString());
       $request->attributes->add([
-        'graphql_context' => $context_id,
+        'graphql_context' => $contextId,
       ]);
 
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);

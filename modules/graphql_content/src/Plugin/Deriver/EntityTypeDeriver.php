@@ -30,7 +30,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager')
     );
@@ -49,18 +49,18 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
-    foreach ($this->entityTypeManager->getDefinitions() as $type_id => $type) {
+    foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
-        $this->derivatives[$type_id] = [
-          'name' => graphql_core_camelcase($type_id),
-          'dataType' => 'entity:' . $type_id,
-          'entity_type' => $type_id,
-        ] + $base_plugin_definition;
+        $this->derivatives[$typeId] = [
+          'name' => graphql_core_camelcase($typeId),
+          'data_type' => 'entity:' . $typeId,
+          'entity_type' => $typeId,
+        ] + $basePluginDefinition;
       }
     }
-    return parent::getDerivativeDefinitions($base_plugin_definition);
+    return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 
 }

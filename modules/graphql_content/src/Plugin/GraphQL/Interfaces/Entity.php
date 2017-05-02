@@ -38,16 +38,16 @@ class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, GraphQLSchemaManagerInterface $schemaManager) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, GraphQLSchemaManagerInterface $schemaManager) {
     $this->schemaManager = $schemaManager;
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('graphql.schema_manager'));
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql.schema_manager'));
   }
 
   /**

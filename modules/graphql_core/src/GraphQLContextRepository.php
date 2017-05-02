@@ -33,10 +33,10 @@ class GraphQLContextRepository implements ContextRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRuntimeContexts(array $context_ids) {
+  public function getRuntimeContexts(array $contextIds) {
     $contexts = [];
     foreach ($this->contextProviders as $contextProvider) {
-      foreach ($contextProvider->getRuntimeContexts($context_ids) as $id => $context) {
+      foreach ($contextProvider->getRuntimeContexts($contextIds) as $id => $context) {
         $contexts[$id] = $context;
       }
     }

@@ -8,8 +8,8 @@ use Youshido\GraphQL\Type\Scalar\FloatType;
  * Scalar float type.
  *
  * @GraphQLScalar(
- *   name="Float",
- *   dataType="float"
+ *   name = "Float",
+ *   data_type = "float"
  * )
  */
 class GraphQLFloat extends FloatType {

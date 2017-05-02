@@ -38,11 +38,11 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
-      $base_plugin_id);
+      $basePluginId);
   }
 
   /**
@@ -106,7 +106,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
 
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays */
@@ -119,19 +119,19 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $bundle = $display->getTargetBundle();
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
 
-      foreach ($display->getComponents() as $field_name => $component) {
+      foreach ($display->getComponents() as $fieldName => $component) {
         if (isset($component['type']) && $component['type'] == $this->getFieldFormatterId()) {
-          $storage = array_key_exists($field_name, $storages) ? $storages[$field_name] : NULL;
+          $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
           /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
           $id = implode('-', [$entityType, $bundle, $storage->getName()]);
           $this->derivatives[$id] = [
             'id' => implode('-', [$entityType, $bundle, $storage->getName()]),
-          ] + $this->getDefinition($entityType, $bundle, $component, $storage) + $base_plugin_definition;
+          ] + $this->getDefinition($entityType, $bundle, $component, $storage) + $basePluginDefinition;
         }
       }
     }
 
-    return parent::getDerivativeDefinitions($base_plugin_definition);
+    return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 
 }

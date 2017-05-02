@@ -29,7 +29,7 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  public static function create(ContainerInterface $container, $basePluginId) {
     return new static($container->get('graphql.context_repository'), $container->get('graphql.schema_manager'));
   }
 
@@ -44,22 +44,22 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($basePluginDefinition) {
     if (empty($this->derivatives)) {
       foreach ($this->contextRepository->getAvailableContexts() as $id => $context) {
 
-        $dataType = $context->getContextDefinition()->getDataType();
+        $data_type = $context->getContextDefinition()->getDataType();
 
         $this->derivatives[$id] = [
           'name' => graphql_core_propcase($id) . 'Context',
           'context_id' => $id,
           'nullable' => TRUE,
           'multi' => FALSE,
-          'dataType' => $dataType,
-        ] + $base_plugin_definition;
+          'data_type' => $data_type,
+        ] + $basePluginDefinition;
       }
     }
-    return parent::getDerivativeDefinitions($base_plugin_definition);
+    return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 
 }

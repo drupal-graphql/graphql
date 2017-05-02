@@ -16,7 +16,7 @@ use Youshido\GraphQL\Field\AbstractField;
 /**
  * Base class for graphql field plugins.
  */
-abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInterface {
+abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInterface  {
   use PluginTrait;
   use NamedPluginTrait;
   use ArgumentAwarePluginTrait;

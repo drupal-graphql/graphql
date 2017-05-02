@@ -11,7 +11,7 @@ use Drupal\graphql_plugin_test\Plugin\GraphQL\Types\Bike;
  *
  * @GraphQLType(
  *   name = "Bike",
- *   interfaces = { "Vehicle" },
+ *   interfaces = {"Vehicle"},
  *   weight = 1
  * )
  */

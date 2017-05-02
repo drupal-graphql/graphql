@@ -8,8 +8,8 @@ use Youshido\GraphQL\Type\Scalar\IntType;
  * Scalar integer type.
  *
  * @GraphQLScalar(
- *   name="Int",
- *   dataType="integer"
+ *   name = "Int",
+ *   data_type = "integer"
  * )
  */
 class GraphQLInteger extends IntType {

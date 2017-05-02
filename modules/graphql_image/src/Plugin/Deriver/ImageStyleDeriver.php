@@ -13,7 +13,7 @@ class ImageStyleDeriver extends DeriverBase {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
     $styles = array_keys(ImageStyle::loadMultiple());
     $styles[] = 'original';
@@ -22,9 +22,9 @@ class ImageStyleDeriver extends DeriverBase {
         'id' => $style,
         'name' => graphql_core_propcase($style) . 'Image',
         'image_style' => $style,
-      ] + $base_plugin_definition;
+      ] + $basePluginDefinition;
     }
-    return parent::getDerivativeDefinitions($base_plugin_definition);
+    return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 
 }

@@ -34,7 +34,7 @@ class GraphQLPluginManager extends DefaultPluginManager {
   public function __construct(
     $pluginSubdirectory,
     Traversable $namespaces,
-    ModuleHandlerInterface $module_handler,
+    ModuleHandlerInterface $moduleHandler,
     $pluginInterface,
     $pluginAnnotationName,
     GraphQLSchemaManager $schemaManager,
@@ -45,7 +45,7 @@ class GraphQLPluginManager extends DefaultPluginManager {
     parent::__construct(
       $pluginSubdirectory,
       $namespaces,
-      $module_handler,
+      $moduleHandler,
       $pluginInterface,
       $pluginAnnotationName
     );
@@ -54,16 +54,16 @@ class GraphQLPluginManager extends DefaultPluginManager {
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id, array $configuration = []) {
-    if (!array_key_exists($plugin_id, $this->instances)) {
+  public function createInstance($pluginId, array $configuration = []) {
+    if (!array_key_exists($pluginId, $this->instances)) {
       // We deliberately ignore that $configuration could be different, because
       // GraphQL plugins don't contain user defined configuration.
-      $this->instances[$plugin_id] = parent::createInstance($plugin_id);
-      if ($this->instances[$plugin_id] instanceof GraphQLPluginInterface) {
-        $this->instances[$plugin_id]->buildConfig($this->schemaManager);
+      $this->instances[$pluginId] = parent::createInstance($pluginId);
+      if ($this->instances[$pluginId] instanceof GraphQLPluginInterface) {
+        $this->instances[$pluginId]->buildConfig($this->schemaManager);
       }
     }
-    return $this->instances[$plugin_id];
+    return $this->instances[$pluginId];
   }
 
 }
