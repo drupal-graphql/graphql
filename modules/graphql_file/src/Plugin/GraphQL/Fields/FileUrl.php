@@ -13,7 +13,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   name = "entityUrl",
  *   type = "Url",
- *   nullable = true,
  *   types = {"File"}
  * )
  */
