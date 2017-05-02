@@ -92,7 +92,6 @@ class ImageStyle extends FieldPluginBase implements ContainerFactoryPluginInterf
             'fileSize' => $derivative->getFileSize(),
           ];
         }
-
       }
     }
   }

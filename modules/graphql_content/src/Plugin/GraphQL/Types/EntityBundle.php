@@ -10,6 +10,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * @GraphQLType(
  *   id = "entity_bundle",
  *   weight = -1,
+ *   cache_tags = {"entity_types", "entity_bundles"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\EntityBundleDeriver"
  * )
  */

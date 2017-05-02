@@ -49,7 +49,7 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql.schema_manager'), $container->get('graphql_test.garage'));
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql_core.schema_manager'), $container->get('graphql_test.garage'));
   }
 
   /**

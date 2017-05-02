@@ -55,7 +55,6 @@ class MenuByName extends FieldPluginBase implements ContainerFactoryPluginInterf
     if ($entity instanceof MenuInterface) {
       return yield $entity;
     }
-
   }
 
 }

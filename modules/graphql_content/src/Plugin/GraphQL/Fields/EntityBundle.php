@@ -7,7 +7,7 @@ use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * GraphQL field resolving an Entity's id.
+ * GraphQL field resolving an entity's bundle.
  *
  * @GraphQLField(
  *   name = "entityBundle",
@@ -24,5 +24,4 @@ class EntityBundle extends FieldPluginBase {
       yield $value->bundle();
     }
   }
-
 }

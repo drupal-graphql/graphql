@@ -30,7 +30,7 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static($container->get('graphql.context_repository'), $container->get('graphql.schema_manager'));
+    return new static($container->get('graphql_core.context_repository'), $container->get('graphql_core.schema_manager'));
   }
 
   /**

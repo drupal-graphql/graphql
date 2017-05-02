@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\graphql\SchemaProvider;
+
 use Drupal\graphql\GraphQL\Schema;
 
 /**

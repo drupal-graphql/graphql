@@ -16,6 +16,7 @@ namespace Drupal\graphql_content\Plugin\GraphQL\Interfaces;
  *     "entityBundle",
  *     "entityUrl"
  *   },
+ *   cache_tags = {"entity_types"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\EntityTypeDeriver"
  * )
  */

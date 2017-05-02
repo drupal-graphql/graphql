@@ -35,7 +35,7 @@ class ContextExtractor extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('graphql.context_repository'),
+      $container->get('graphql_core.context_repository'),
       $container->get('request_stack')
     );
   }

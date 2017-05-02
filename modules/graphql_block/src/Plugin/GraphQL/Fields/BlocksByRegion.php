@@ -38,7 +38,6 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-
       $request = Request::create($value->toString());
       $request->attributes->add([
         'graphql_block_region' => $args['region'],

@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_reference_entity_view",
+ *   cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_entity_reference\Plugin\Deriver\EntityReferenceFields"
  * )
  */
@@ -28,5 +29,4 @@ class EntityReferenceField extends FieldPluginBase {
       }
     }
   }
-
 }

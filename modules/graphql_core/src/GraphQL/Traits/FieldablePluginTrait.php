@@ -32,7 +32,6 @@ trait FieldablePluginTrait {
         }, [GRAPHQL_CORE_FIELD_PLUGIN]);
       }
 
-
       $implicitFields = [];
       if ($definition['name']) {
         // Fields that are attached by annotating the type on the field.

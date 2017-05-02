@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql_core\GraphQL;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\Type\AbstractObjectType;
+use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\PluginTrait;
@@ -14,8 +16,9 @@ use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 /**
  * Base class for GraphQL type plugins.
  */
-abstract class TypePluginBase extends AbstractObjectType implements GraphQLPluginInterface {
+abstract class TypePluginBase extends AbstractObjectType implements GraphQLPluginInterface, CacheableDependencyInterface {
   use PluginTrait;
+  use CacheablePluginTrait;
   use NamedPluginTrait;
   use FieldablePluginTrait {
     buildFields as buildAttachedFields;
@@ -65,5 +68,4 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
     $attachedFields = $this->buildAttachedFields($schemaManager);
     return array_merge($interfaceFields, $attachedFields);
   }
-
 }

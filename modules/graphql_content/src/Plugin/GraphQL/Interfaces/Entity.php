@@ -47,7 +47,7 @@ class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql.schema_manager'));
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql_core.schema_manager'));
   }
 
   /**
@@ -60,4 +60,5 @@ class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterf
     }
     return NULL;
   }
+
 }

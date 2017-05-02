@@ -38,7 +38,7 @@ class Block extends InterfacePluginBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql.schema_manager'));
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql_core.schema_manager'));
   }
 
   /**
@@ -46,8 +46,10 @@ class Block extends InterfacePluginBase implements ContainerFactoryPluginInterfa
    */
   public function resolveType($object) {
     if ($object instanceof BlockContent) {
-      return $this->schemaManager
-        ->findByName(graphql_core_camelcase([$object->getEntityTypeId(), $object->bundle()]), [GRAPHQL_CORE_TYPE_PLUGIN]);
+      return $this->schemaManager->findByName(
+        graphql_core_camelcase([$object->getEntityTypeId(), $object->bundle()]),
+        [GRAPHQL_CORE_TYPE_PLUGIN]
+      );
     }
     else {
       // TODO: Detect custom block plugins?

@@ -124,6 +124,9 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
               'field' => $field,
               'virtual' => !array_key_exists($field, $storages),
               'multi' => array_key_exists($field, $storages) ? $storages[$field]->getCardinality() != 1 : FALSE,
+              'cache_tags' => $display->getCacheTags(),
+              'cache_contexts' => $display->getCacheContexts(),
+              'cache_max_age' => $display->getCacheMaxAge(),
             ] + $basePluginDefinition;
           }
         }

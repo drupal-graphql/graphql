@@ -68,7 +68,6 @@ class RenderedField extends FieldPluginBase implements ContainerFactoryPluginInt
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof FieldableEntityInterface) {
-
       if (!isset($value->_graphql_build)) {
         $value->_graphql_build = [$value->id() => []];
         $display = EntityViewDisplay::collectRenderDisplay($value, 'graphql');
@@ -77,7 +76,6 @@ class RenderedField extends FieldPluginBase implements ContainerFactoryPluginInt
       }
 
       $field = $this->getPluginDefinition()['field'];
-
       if ($this->getPluginDefinition()['virtual']) {
         yield $this->renderer->renderRoot($value->_graphql_build[$value->id()][$field]);
       }
@@ -88,5 +86,4 @@ class RenderedField extends FieldPluginBase implements ContainerFactoryPluginInt
       }
     }
   }
-
 }
