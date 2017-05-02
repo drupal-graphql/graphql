@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\graphql_content;
+namespace Drupal\Tests\graphql_content\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
 use Drupal\user\Entity\Role;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_file;
+namespace Drupal\Tests\graphql_image\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -8,13 +8,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
 use Drupal\user\Entity\Role;
 
 /**
  * Test file attachments.
  */
-class FileFieldTest extends GraphQLFileTest {
+class ImageFieldTest extends GraphQLFileTest {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
 
@@ -27,8 +27,10 @@ class FileFieldTest extends GraphQLFileTest {
     'text',
     'filter',
     'file',
+    'image',
     'graphql_content',
     'graphql_file',
+    'graphql_image',
   ];
 
   /**
@@ -38,6 +40,7 @@ class FileFieldTest extends GraphQLFileTest {
     parent::setUp();
     $this->installConfig('node');
     $this->installConfig('filter');
+    $this->installConfig('image');
     $this->installEntitySchema('node');
     $this->installSchema('node', 'node_access');
     $this->installSchema('file', 'file_usage');
@@ -55,16 +58,16 @@ class FileFieldTest extends GraphQLFileTest {
 
 
     FieldStorageConfig::create([
-      'field_name' => 'file',
-      'type' => 'file',
+      'field_name' => 'image',
+      'type' => 'image',
       'entity_type' => 'node',
     ])->save();
 
     FieldConfig::create([
-      'field_name' => 'file',
+      'field_name' => 'image',
       'entity_type' => 'node',
       'bundle' => 'test',
-      'label' => 'File',
+      'label' => 'Image',
     ])->save();
 
     EntityViewDisplay::create([
@@ -72,29 +75,30 @@ class FileFieldTest extends GraphQLFileTest {
       'bundle' => 'test',
       'mode' => 'graphql',
       'status' => TRUE,
-    ])->setComponent('file', ['type' => 'file_url_plain'])->save();
+    ])->setComponent('image', ['type' => 'image'])->save();
   }
 
   /**
    * Test a simple file field.
    */
-  public function testFileField() {
+  public function testImageField() {
     $a = $this->createNode([
       'title' => 'Node A',
       'type' => 'test',
     ]);
 
-    $a->file->generateSampleItems(1);
+    $a->image->generateSampleItems(1);
 
     $a->save();
 
-    $result = $this->executeQueryFile('files.gql', ['path' => '/node/' . $a->id()]);
-    $file = $result['data']['route']['node']['file'];
+    $result = $this->executeQueryFile('image.gql', ['path' => '/node/' . $a->id()]);
+    $image = $result['data']['route']['node']['image'];
 
-    $this->assertEquals($a->file->entity->getSize(), $file['fileSize'], 'Retrieve correct file size.');
-    $this->assertEquals($a->file->entity->getMimeType(), $file['mimeType'], 'Retrieve correct mime type.');
-    $this->assertEquals($a->file->entity->url(), $file['entityUrl']['internalPath'], 'Retrieve correct file path.');
-    $this->assertFalse($file['entityUrl']['routed'], 'File urls are not routed.');
+    $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
+    $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
+    $this->assertEquals($a->image->entity->url(), $image['originalImage']['route']['internalPath'], 'Retrieve correct image url.');
+    $this->assertFalse($image['originalImage']['route']['isRouted'], 'Image urls are not routed.');
+    $this->assertFalse($image['thumbnailImage']['route']['isRouted'], 'Image urls are not routed.');
   }
 
 }
