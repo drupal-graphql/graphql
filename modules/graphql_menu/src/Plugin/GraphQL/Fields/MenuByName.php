@@ -14,8 +14,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a menu by it's name.
  *
  * @GraphQLField(
- *   name="menuByName",
- *   type="Menu",
+ *   name = "menuByName",
+ *   type = "Menu",
  *   arguments = {
  *     "name" = "String"
  *   }

@@ -18,10 +18,10 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Request arbitrary drupal context objects with GraphQL.
  *
  * @GraphQLField(
- *   id="context",
- *   types={"Url"},
- *   nullable=true,
- *   deriver="\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
+ *   id = "context",
+ *   types = {"Url"},
+ *   nullable = true,
+ *   deriver = "\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
  * )
  */
 class Context extends FieldPluginBase implements ContainerFactoryPluginInterface {

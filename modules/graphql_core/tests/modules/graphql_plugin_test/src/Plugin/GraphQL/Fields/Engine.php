@@ -11,7 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   name = "engine",
  *   type = "String",
- *   types = { "Car", "CarInput" }
+ *   types = {"Car", "CarInput"}
  * )
  */
 class Engine extends FieldPluginBase {

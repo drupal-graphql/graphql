@@ -20,7 +20,7 @@ use Drupal\image\Entity\ImageStyle as ImageStylePlugin;
  *   type = "ImageStyle",
  *   types = {"Image"},
  *   nullable = true,
- *   deriver="Drupal\graphql_image\Plugin\Deriver\ImageStyleDeriver"
+ *   deriver = "Drupal\graphql_image\Plugin\Deriver\ImageStyleDeriver"
  * )
  */
 class ImageStyle extends FieldPluginBase implements ContainerFactoryPluginInterface {

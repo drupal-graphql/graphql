@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   name = "garage",
- *   type="Vehicle",
+ *   type = "Vehicle",
  *   multi = true
  * )
  */

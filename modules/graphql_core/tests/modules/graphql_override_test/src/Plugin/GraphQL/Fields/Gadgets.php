@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "gadgets",
  *   type = "String",
  *   multi = true,
- *   types = { "Bike" },
+ *   types = {"Bike"},
  *   weight = 1
  * )
  */

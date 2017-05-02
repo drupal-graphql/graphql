@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   name = "route",
  *   type = "Url",
- *   nullable=true,
+ *   nullable = true,
  *   arguments = {
  *     "path" = "String"
  *   }

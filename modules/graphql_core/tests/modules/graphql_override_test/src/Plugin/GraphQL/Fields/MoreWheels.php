@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   name = "wheels",
  *   type = "Int",
- *   types = { "Bike" },
+ *   types = {"Bike"},
  *   weight = 1
  * )
  */

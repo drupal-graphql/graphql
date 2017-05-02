@@ -14,11 +14,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLField(
- *   name="blocksByRegion",
- *   type="Block",
- *   types={"Url"},
- *   multi=true,
- *   arguments={
+ *   name = "blocksByRegion",
+ *   type = "Block",
+ *   types = {"Url"},
+ *   multi = true,
+ *   arguments = {
  *     "region" = "String"
  *   }
  * )

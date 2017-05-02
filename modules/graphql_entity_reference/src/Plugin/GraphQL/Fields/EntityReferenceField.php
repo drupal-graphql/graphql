@@ -11,8 +11,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Expose entity reference fields as objects.
  *
  * @GraphQLField(
- *   id="entity_reference_entity_view",
- *   deriver="Drupal\graphql_entity_reference\Plugin\Deriver\EntityReferenceFields"
+ *   id = "entity_reference_entity_view",
+ *   deriver = "Drupal\graphql_entity_reference\Plugin\Deriver\EntityReferenceFields"
  * )
  */
 class EntityReferenceField extends FieldPluginBase {
