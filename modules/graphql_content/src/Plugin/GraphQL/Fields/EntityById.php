@@ -5,7 +5,6 @@ namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -14,9 +13,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve an entity by its id.
  *
  * @GraphQLField(
- *   name = "entityById",
- *   type = "Url",
  *   nullable = true,
+ *   multi = false,
  *   arguments = {
  *     "id" = "String"
  *   },

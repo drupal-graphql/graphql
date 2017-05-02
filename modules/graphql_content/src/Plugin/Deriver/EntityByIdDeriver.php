@@ -42,9 +42,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
         if ($type instanceof ContentEntityTypeInterface) {
           $this->derivatives[$id] = [
             'name' => graphql_core_propcase($id) . 'ById',
-            'nullable' => TRUE,
-            'multi' => FALSE,
-            'dataType' => "entity:$id",
+            'type' => "entity:$id",
             'entity_type' => $id,
           ];
         }
