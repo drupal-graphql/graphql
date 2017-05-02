@@ -78,7 +78,7 @@ class SchemaFactory {
     $useCache = $this->config['cache'];
     $language = $this->languageManager->getCurrentLanguage();
     if ($useCache && $schema = $this->schemaCache->get($language->getId())) {
-      //return $schema->data;
+      return $schema->data;
     }
 
     $schema = $this->schemaProvider->getSchema();
