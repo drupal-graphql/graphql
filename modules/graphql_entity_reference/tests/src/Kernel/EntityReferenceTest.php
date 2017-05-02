@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\Tests\graphql_entity_reference;
+namespace Drupal\Tests\graphql_entity_reference\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
 use Drupal\user\Entity\Role;
 
 /**

@@ -47,7 +47,7 @@ class NodeSchemaTest extends QueryTestBase  {
     $query = <<<GQL
 {
   nodeById(id: $nid) {
-    entityId
+    nodeId
   }
 }
     
@@ -58,7 +58,7 @@ GQL;
     $this->assertEquals([
       'data' => [
         'nodeById' => [
-          'entityId' => (string) $nid,
+          'nodeId' => (string) $nid,
         ],
       ],
     ], $data);

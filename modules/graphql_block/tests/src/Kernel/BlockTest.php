@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\graphql_block;
+namespace Drupal\Tests\graphql_block\Kernel;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\simpletest\BlockCreationTrait;
-use Drupal\Tests\graphql_core\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
 
 /**
  * Test block retrieval via GraphQL.

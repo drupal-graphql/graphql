@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core;
+namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\graphql_plugin_test\GarageInterface;
 

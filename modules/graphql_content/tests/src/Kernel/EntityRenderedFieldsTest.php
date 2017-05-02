@@ -1,21 +1,20 @@
 <?php
 
-namespace Drupal\Tests\graphql_content;
+namespace Drupal\Tests\graphql_content\Kernel;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
 use Drupal\user\Entity\Role;
 
 /**
  * Test basic entity fields.
  */
-class DefaultViewModeTest extends GraphQLFileTest {
+class EntityRenderedFieldsTest extends GraphQLFileTest {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 
@@ -57,6 +56,13 @@ class DefaultViewModeTest extends GraphQLFileTest {
       'label' => 'Keywords',
     ])->save();
 
+    EntityViewMode::create(['id' => 'node.graphql', 'targetEntityType' => 'node'])->save();
+    entity_get_display('node', 'test', 'graphql')
+      ->setComponent('body')
+      ->setComponent('field_keywords')
+      ->setComponent('test')
+      ->save();
+
     Role::load('anonymous')
       ->grantPermission('access content')
       ->grantPermission('access user profiles')
@@ -64,9 +70,9 @@ class DefaultViewModeTest extends GraphQLFileTest {
   }
 
   /**
-   * Test if the proper view mode is selected.
+   * Test if the basic fields are available on the interface.
    */
-  public function testDefaultViewMode() {
+  public function testRenderedFields() {
     $node = $this->createNode([
       'title' => 'Test',
       'type' => 'test',
@@ -74,24 +80,26 @@ class DefaultViewModeTest extends GraphQLFileTest {
         'value' => 'test',
         'format' => filter_default_format(),
       ],
+      'field_keywords' => ['a', 'b', 'c'],
       'status' => 1,
     ]);
 
-    $result = $this->executeQueryFile('default_rendered_fields.gql', [
+    $result = $this->executeQueryFile('rendered_fields.gql', [
       'path' => '/node/' . $node->id(),
     ]);
-
-    $error_result = $this->executeQueryFile('rendered_fields.gql', [
-      'path' => '/node/' . $node->id(),
-    ], FALSE);
 
     $node = NestedArray::getValue($result, ['data', 'route', 'entity']);
 
     $this->assertNotNull($node, 'A node has been retrieved.');
 
     $this->assertEquals('<p>test</p>', $node['body'], 'Body field retrieved properly.');
+    $this->assertEquals([
+      '<p>a</p>',
+      '<p>b</p>',
+      '<p>c</p>',
+    ], $node['fieldKeywords'], 'Multi value rendered field works.');
 
-    $this->assertNotEmpty($error_result['errors'], 'Default view mode is missing fields.');
+    $this->assertEquals('This is a test.', $node['test'], 'Extra field is available.');
   }
 
 }

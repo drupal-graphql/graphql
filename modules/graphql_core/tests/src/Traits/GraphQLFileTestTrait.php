@@ -1,41 +1,13 @@
 <?php
 
-namespace Drupal\Tests\graphql_core;
+namespace Drupal\Tests\graphql_core\Traits;
 
 use Drupal\graphql\GraphQL\Execution\Processor;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\user\Entity\Role;
 
 /**
- * Run tests against a *.gql query file.
+ * Trait for running tests against GraphQL query files.
  */
-abstract class GraphQLFileTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'system',
-    'path',
-    'user',
-    'graphql',
-    'graphql_core',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->installConfig('system');
-    $this->installConfig('graphql');
-    $this->installConfig('user');
-    $this->installEntitySchema('user');
-
-    Role::load('anonymous')
-      ->grantPermission('execute graphql requests')
-      ->save();
-  }
+trait GraphQLFileTestTrait {
 
   /**
    * Get the path to the directory containing test query files.

@@ -37,7 +37,7 @@ class NodeSchemaTest extends QueryTestBase  {
     $query = <<<GQL
 {
   nodeById(id: $nid) {
-    entityId
+    nodeId
   }
 }
     
@@ -48,12 +48,14 @@ GQL;
     $this->assertEquals([
       'data' => [
         'nodeById' => [
-          'entityId' => $nid,
+          'nodeId' => $nid,
         ],
       ],
     ], $data);
 
-    $this->assertEquals("config:user.role.anonymous node:$nid", $response->headers->get('X-Drupal-Cache-Tags', NULL));
+    $tags = explode(' ', $response->headers->get('X-Drupal-Cache-Tags', NULL));
+    $this->assertContains('config:user.role.anonymous', $tags, "Cache is tagged for anonymous user.");
+    $this->assertContains("node:$nid", $tags, "Cache is tagged for the correct node id.");
   }
 
 }

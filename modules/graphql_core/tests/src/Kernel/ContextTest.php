@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core;
+namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;

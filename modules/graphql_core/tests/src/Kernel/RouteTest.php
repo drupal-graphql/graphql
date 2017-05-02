@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core;
+namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;

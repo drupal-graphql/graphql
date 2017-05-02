@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core;
+namespace Drupal\Tests\graphql_core\Kernel;
 
 /**
  * Test plugin based schema generation.
