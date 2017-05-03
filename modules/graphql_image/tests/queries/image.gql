@@ -9,20 +9,14 @@ query ($path: String!) {
           mimeType
           width
           height
-          route:url {
-            internalPath:path
-            isRouted:routed
-          }
+          url
         }
         thumbnailImage {
           fileSize
           mimeType
           width
           height
-          route:url {
-            internalPath:path
-            isRouted:routed
-          }
+          url
         }
       }
     }
