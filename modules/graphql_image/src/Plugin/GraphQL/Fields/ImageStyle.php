@@ -5,6 +5,7 @@ namespace Drupal\graphql_image\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
@@ -85,7 +86,7 @@ class ImageStyle extends FieldPluginBase implements ContainerFactoryPluginInterf
         // Return null if derivative generation didn't succeed.
         if ($derivative->isValid()) {
           yield [
-            'uri' => $style ? $style->buildUri($file->getFileUri()) : $file->getFileUri(),
+            'url' => $style ? $style->buildUrl($file->getFileUri()) : Url::fromUri(file_create_url($file->getFileUri()))->toString(),
             'mimeType' => $derivative->getMimeType(),
             'width' => $derivative->getWidth(),
             'height' => $derivative->getHeight(),

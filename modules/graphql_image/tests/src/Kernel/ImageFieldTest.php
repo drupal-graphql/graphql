@@ -96,9 +96,7 @@ class ImageFieldTest extends GraphQLFileTest {
 
     $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
     $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
-    $this->assertEquals($a->image->entity->url(), $image['originalImage']['route']['internalPath'], 'Retrieve correct image url.');
-    $this->assertFalse($image['originalImage']['route']['isRouted'], 'Image urls are not routed.');
-    $this->assertFalse($image['thumbnailImage']['route']['isRouted'], 'Image urls are not routed.');
+    $this->assertEquals($a->image->entity->url(), $image['originalImage']['url'], 'Retrieve correct image url.');
   }
 
 }
