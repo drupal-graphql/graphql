@@ -5,7 +5,6 @@ namespace Drupal\graphql_core\Plugin\Deriver;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,24 +19,16 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
   protected $contextRepository;
 
   /**
-   * A schema manager instance to identify graphql return types.
-   *
-   * @var \Drupal\graphql_core\GraphQLSchemaManagerInterface
-   */
-  protected $schemaManager;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static($container->get('graphql_core.context_repository'), $container->get('graphql_core.schema_manager'));
+    return new static($container->get('graphql_core.context_repository'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(ContextRepositoryInterface $contextRepository, GraphQLSchemaManagerInterface $schemaManager) {
-    $this->schemaManager = $schemaManager;
+  public function __construct(ContextRepositoryInterface $contextRepository) {
     $this->contextRepository = $contextRepository;
   }
 
@@ -47,18 +38,18 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($basePluginDefinition) {
     if (empty($this->derivatives)) {
       foreach ($this->contextRepository->getAvailableContexts() as $id => $context) {
-
-        $data_type = $context->getContextDefinition()->getDataType();
+        $dataType = $context->getContextDefinition()->getDataType();
 
         $this->derivatives[$id] = [
           'name' => graphql_core_propcase($id) . 'Context',
           'context_id' => $id,
           'nullable' => TRUE,
           'multi' => FALSE,
-          'data_type' => $data_type,
+          'data_type' => $dataType,
         ] + $basePluginDefinition;
       }
     }
+
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 

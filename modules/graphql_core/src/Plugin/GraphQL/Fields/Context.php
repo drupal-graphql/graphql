@@ -48,13 +48,11 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
           GRAPHQL_CORE_INTERFACE_PLUGIN,
           GRAPHQL_CORE_SCALAR_PLUGIN,
         ]);
-        $type = array_pop($types);
-        if (empty($type)) {
-          $type = $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
-        }
-        return $type;
+
+        return array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
       }
     }
+
     return NULL;
   }
 
