@@ -21,12 +21,15 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
    *
    * @var array
    */
-  private $definitions = NULL;
+  protected $definitions = NULL;
 
   /**
-   * Prepare the list of plugin definitions.
+   * Returns the list of sorted plugin definitions.
+   *
+   * @return array
+   *   The list of sorted plugin definitions.
    */
-  protected function prepareDefinitions() {
+  protected function getDefinitions() {
     if ($this->definitions == NULL) {
       foreach ($this->pluginManagers as $manager) {
         foreach ($manager->getDefinitions() as $pluginId => $definition) {
@@ -41,15 +44,16 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
       uasort($this->definitions, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
       $this->definitions = array_reverse($this->definitions);
     }
+
+    return $this->definitions;
   }
 
   /**
    * {@inheritdoc}
    */
   public function find(callable $selector, array $types, $invert = FALSE) {
-    $this->prepareDefinitions();
     $instances = [];
-    foreach ($this->definitions as $index => $def) {
+    foreach ($this->getDefinitions() as $index => $def) {
       $name = $def['definition']['name'];
       if (!$name) {
         throw new \Exception("Invalid GraphQL plugin definition. No name defined.");
@@ -103,12 +107,10 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
    * {@inheritdoc}
    */
   public function getRootFields() {
-    $this->prepareDefinitions();
-
     // Retrieve the list of fields that are explicitly attached to a type.
     $attachedFields = array_reduce(array_filter(array_map(function ($def) {
       return array_key_exists('fields', $def['definition']) ? $def['definition']['fields'] : NULL;
-    }, $this->definitions)), 'array_merge', []);
+    }, $this->getDefinitions())), 'array_merge', []);
 
     // Retrieve the list of fields that are not attached in any way or
     // explicitly attached to the artificial "Root" type.

@@ -9,4 +9,9 @@ interface SchemaProviderInterface {
    */
   public function getSchema();
 
+  /**
+   * @return string[]
+   */
+  public function getContexts();
+
 }

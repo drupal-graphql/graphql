@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql_core\GraphQL;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql_core\GraphQL\Traits\ArgumentAwarePluginTrait;
+use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\PluginTrait;
 use Drupal\graphql_core\GraphQLPluginInterface;
@@ -13,8 +15,9 @@ use Youshido\GraphQL\Field\AbstractField;
 /**
  * Base class for graphql field plugins.
  */
-abstract class MutationPluginBase extends AbstractField implements GraphQLPluginInterface {
+abstract class MutationPluginBase extends AbstractField implements GraphQLPluginInterface, CacheableDependencyInterface {
   use PluginTrait;
+  use CacheablePluginTrait;
   use NamedPluginTrait;
   use ArgumentAwarePluginTrait;
 

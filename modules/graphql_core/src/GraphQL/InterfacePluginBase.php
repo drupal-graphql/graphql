@@ -2,6 +2,8 @@
 
 namespace Drupal\graphql_core\GraphQL;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\PluginTrait;
@@ -13,8 +15,9 @@ use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 /**
  * Base class for GraphQL interface plugins.
  */
-abstract class InterfacePluginBase extends AbstractInterfaceType implements GraphQLPluginInterface {
+abstract class InterfacePluginBase extends AbstractInterfaceType implements GraphQLPluginInterface, CacheableDependencyInterface {
   use PluginTrait;
+  use CacheablePluginTrait;
   use NamedPluginTrait;
   use FieldablePluginTrait;
 

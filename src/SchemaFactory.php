@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\graphql\GraphQL\Validator\ConfigValidator\Rules\TypeValidationRule;
 use Drupal\graphql\SchemaProvider\SchemaProviderInterface;
@@ -16,11 +17,11 @@ use Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator;
  */
 class SchemaFactory {
   /**
-   * The language manager service.
+   * The cache contexts manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager
    */
-  protected $languageManager;
+  protected $contextsManager;
 
   /**
    * The schema provider service.
@@ -46,8 +47,8 @@ class SchemaFactory {
   /**
    * Constructs a SchemaFactory object.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager service.
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache contexts manager service.
    * @param \Drupal\graphql\SchemaProvider\SchemaProviderInterface $schemaProvider
    *   The schema provider service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $schemaCache
@@ -55,7 +56,7 @@ class SchemaFactory {
    * @param array $config
    *   The configuration provided through the services.yml.
    */
-  public function __construct(LanguageManagerInterface $languageManager, SchemaProviderInterface $schemaProvider, CacheBackendInterface $schemaCache, array $config) {
+  public function __construct(CacheContextsManager $contextsManager, SchemaProviderInterface $schemaProvider, CacheBackendInterface $schemaCache, array $config) {
     $this->config = $config;
 
     // Override the default type validator to enable services as field resolver
@@ -64,7 +65,7 @@ class SchemaFactory {
     $validator->addRule('type', new TypeValidationRule($validator));
 
     $this->schemaProvider = $schemaProvider;
-    $this->languageManager = $languageManager;
+    $this->contextsManager = $contextsManager;
     $this->schemaCache = $schemaCache;
   }
 
@@ -75,15 +76,17 @@ class SchemaFactory {
    *   The generated GraphQL schema.
    */
   public function getSchema() {
-    $useCache = $this->config['cache'];
-    $language = $this->languageManager->getCurrentLanguage();
-    if ($useCache && $schema = $this->schemaCache->get($language->getId())) {
+    $contexts = $this->schemaProvider->getContexts();
+    $parts = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
+    $cid = implode(':', array_merge(['schema'], $parts));
+
+    if ($this->config['cache'] && $schema = $this->schemaCache->get($cid)) {
       return $schema->data;
     }
 
     $schema = $this->schemaProvider->getSchema();
 
-    if ($useCache) {
+    if ($this->config['cache']) {
       // Cache the generated schema in the configured cache backend.
       $metadata = new CacheableMetadata();
       $metadata->setCacheMaxAge(Cache::PERMANENT);
@@ -92,7 +95,7 @@ class SchemaFactory {
         $metadata->addCacheableDependency($schema);
       }
 
-      $this->schemaCache->set($language->getId(), $schema, $metadata->getCacheMaxAge(), $metadata->getCacheTags());
+      $this->schemaCache->set($cid, $schema, $metadata->getCacheMaxAge(), $metadata->getCacheTags());
     }
 
     return $schema;

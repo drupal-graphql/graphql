@@ -32,7 +32,7 @@ services:
     factory: ['@graphql.schema_factory', getSchema]
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory
-    arguments: ['@language_manager', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
+    arguments: ['@cache_contexts_manager', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider\SchemaProvider
     arguments: ['%graphql.config%']
