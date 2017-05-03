@@ -12,7 +12,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   name = "url",
  *   type = "String",
- *   nullable = true,
  *   types = {"File"}
  * )
  */
