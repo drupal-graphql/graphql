@@ -96,7 +96,7 @@ class ImageFieldTest extends GraphQLFileTest {
 
     $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
     $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
-    $this->assertEquals($a->image->entity->toUrl()->toString(), $image['originalImage']['url'], 'Retrieve correct image url.');
+    $this->assertEquals($a->image->entity->url(), $image['originalImage']['url'], 'Retrieve correct image url.');
   }
 
 }

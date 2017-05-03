@@ -93,7 +93,7 @@ class FileFieldTest extends GraphQLFileTest {
 
     $this->assertEquals($a->file->entity->getSize(), $file['fileSize'], 'Retrieve correct file size.');
     $this->assertEquals($a->file->entity->getMimeType(), $file['mimeType'], 'Retrieve correct mime type.');
-    $this->assertEquals($a->file->entity->toUrl(), $file['url'], 'Retrieve correct file path.');
+    $this->assertEquals($a->file->entity->url(), $file['url'], 'Retrieve correct file path.');
   }
 
 }
