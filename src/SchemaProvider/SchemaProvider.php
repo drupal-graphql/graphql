@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\SchemaProvider;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Schema;
 
 /**
@@ -57,6 +58,21 @@ class SchemaProvider implements SchemaProviderInterface {
 
       return $carry;
     }, new $schemaClass());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContexts() {
+    $metadata = array_reduce($this->getSortedProviders(), function (CacheableMetadata $carry, SchemaProviderInterface $provider) {
+      if ($contexts = $provider->getContexts()) {
+        $carry->addCacheContexts($contexts);
+      }
+
+      return $carry;
+    }, new CacheableMetadata());
+
+    return $metadata->getCacheContexts();
   }
 
   /**
