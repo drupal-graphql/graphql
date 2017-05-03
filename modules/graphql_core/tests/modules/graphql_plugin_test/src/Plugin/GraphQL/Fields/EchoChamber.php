@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   name = "echo",
  *   type = "String",
+ *   types = {"Root"},
  *   arguments = {
  *     "input" = "String"
  *   }

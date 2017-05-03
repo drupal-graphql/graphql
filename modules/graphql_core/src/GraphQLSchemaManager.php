@@ -110,9 +110,10 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
       return array_key_exists('fields', $def['definition']) ? $def['definition']['fields'] : NULL;
     }, $this->definitions)), 'array_merge', []);
 
-    // Retrieve the list of fields that are not attached in any way.
+    // Retrieve the list of fields that are not attached in any way or
+    // explicitly attached to the artificial "Root" type.
     return $this->find(function ($def) use ($attachedFields) {
-      return !in_array($def['name'], $attachedFields) && empty($def['types']);
+      return (!in_array($def['name'], $attachedFields) && empty($def['types'])) || in_array('Root', $def['types']);
     }, [GRAPHQL_CORE_FIELD_PLUGIN]);
   }
 
