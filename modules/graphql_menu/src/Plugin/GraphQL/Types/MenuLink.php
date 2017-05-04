@@ -8,6 +8,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL type representing Drupal menu links.
  *
  * @GraphQLType(
+ *   id = "menu_link",
  *   name = "MenuLink"
  * )
  */
