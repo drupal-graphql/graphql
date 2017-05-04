@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "characters",
  *   name = "characters",
+ *   multi = true,
  *   type = {
  *     "a" = "Alpha",
  *     "b" = "Beta",
