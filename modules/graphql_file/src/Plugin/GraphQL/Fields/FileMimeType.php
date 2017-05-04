@@ -10,8 +10,10 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a files mime type.
  *
  * @GraphQLField(
+ *   id = "file_mime_type",
  *   name = "mimeType",
  *   type = "String",
+ *   types = {"File"}
  * )
  */
 class FileMimeType extends FieldPluginBase {

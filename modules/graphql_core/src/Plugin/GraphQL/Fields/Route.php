@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a route object based on a path.
  *
  * @GraphQLField(
+ *   id = "route",
  *   name = "route",
  *   type = "Url",
  *   nullable = true,

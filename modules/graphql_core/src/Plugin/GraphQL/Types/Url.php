@@ -8,6 +8,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL type for Drupal routes.
  *
  * @GraphQLType(
+ *   id = "url",
  *   name = "Url",
  *   fields = {"path", "alias", "routed"}
  * )

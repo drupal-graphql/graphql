@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieves the type of vehicle.
  *
  * @GraphQLField(
+ *   id = "type",
  *   name = "type",
  *   type = "String",
  *   types = {"Bike", "Car"}

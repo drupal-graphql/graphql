@@ -7,9 +7,10 @@ use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a routes canonical path.
+ * Check if an Url is routed.
  *
  * @GraphQLField(
+ *   id = "url_routed",
  *   name = "routed",
  *   type = "Boolean"
  * )

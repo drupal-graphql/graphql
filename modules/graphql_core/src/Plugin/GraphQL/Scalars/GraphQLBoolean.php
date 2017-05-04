@@ -8,6 +8,7 @@ use Youshido\GraphQL\Type\Scalar\BooleanType;
  * Scalar boolean type.
  *
  * @GraphQLScalar(
+ *   id = "boolean",
  *   name = "Boolean",
  *   data_type = "boolean"
  * )

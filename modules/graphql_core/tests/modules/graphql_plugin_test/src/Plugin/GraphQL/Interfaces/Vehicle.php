@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Vehicle interface definition.
  *
  * @GraphQLInterface(
+ *   id = "vehicle",
  *   name = "Vehicle",
  *   fields = {"type", "wheels"}
  * )

@@ -10,6 +10,7 @@ use Drupal\graphql_plugin_test\Plugin\GraphQL\Types\Bike;
  * Adds an inline gadget field. Because every bike needs gadgets.
  *
  * @GraphQLType(
+ *   id = "fancy_bike",
  *   name = "Bike",
  *   interfaces = {"Vehicle"},
  *   weight = 1
