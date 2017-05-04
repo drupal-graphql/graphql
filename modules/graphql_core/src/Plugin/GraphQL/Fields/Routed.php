@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a routes canonical path.
  *
  * @GraphQLField(
+ *   id = "routed",
  *   name = "routed",
  *   type = "Boolean"
  * )
