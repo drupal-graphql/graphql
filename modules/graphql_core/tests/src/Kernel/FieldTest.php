@@ -7,7 +7,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
  *
  * @group graphql_core
  */
-class FieldTest extends GraphQLFileTest {
+class FieldTest extends GraphQLFileTestBase {
   public static $modules = [
     'graphql_plugin_test',
   ];

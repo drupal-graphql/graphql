@@ -7,7 +7,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
  *
  * @group graphql_core
  */
-class OverrideFieldTest extends GraphQLFileTest {
+class OverrideFieldTest extends GraphQLFileTestBase {
   public static $modules = [
     'graphql_plugin_test',
     'graphql_override_test',

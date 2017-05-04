@@ -11,7 +11,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_core
  */
-abstract class GraphQLFileTest extends KernelTestBase {
+abstract class GraphQLFileTestBase extends KernelTestBase {
   use GraphQLFileTestTrait;
 
   /**
