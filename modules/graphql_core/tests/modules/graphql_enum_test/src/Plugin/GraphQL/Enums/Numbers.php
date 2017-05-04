@@ -20,7 +20,7 @@ class Numbers extends EnumPluginBase {
    *
    * @var string[]
    */
-  public const NUMBERS = [
+  public static $NUMBERS = [
     'zero',
     'one',
     'two',
@@ -38,7 +38,7 @@ class Numbers extends EnumPluginBase {
    */
   public function buildValues(GraphQLSchemaManagerInterface $schemaManager) {
     $values = [];
-    foreach (static::NUMBERS as $num => $word) {
+    foreach (static::$NUMBERS as $num => $word) {
       $values[] = [
         'value' => $num,
         'name' => strtoupper($word),
