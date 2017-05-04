@@ -7,19 +7,17 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
+use Drupal\Tests\graphql\Functional\QueryTestBase;
+use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 
 /**
  * Test if the cached schema gets updated automatically.
  */
-class SchemaCacheInvalidationTest extends GraphQLFileTest {
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
+class SchemaCacheInvalidationTest extends QueryTestBase {
+  use GraphQLFileTestTrait;
 
   public static $modules = [
     'node',
-    'field',
-    'filter',
     'text',
     'graphql_content',
     'graphql_content_test',
@@ -31,21 +29,9 @@ class SchemaCacheInvalidationTest extends GraphQLFileTest {
   protected function setUp() {
     parent::setUp();
 
-    $this->installConfig(['node']);
-    $this->installConfig(['filter']);
-    $this->installConfig(['text']);
-    $this->installEntitySchema('node');
-
     $this->createContentType([
       'type' => 'test',
     ]);
-  }
-
-  /**
-   * Test if the basic fields are available on the interface.
-   */
-  public function testSchemaInvalidation() {
-    $pre_update = $this->executeQueryFile('schema.gql');
 
     FieldStorageConfig::create([
       'field_name' => 'field_keywords',
@@ -60,15 +46,30 @@ class SchemaCacheInvalidationTest extends GraphQLFileTest {
       'field_name' => 'field_keywords',
       'label' => 'Keywords',
     ])->save();
+  }
 
+  /**
+   * Test if a field change invalidates the schema cache.
+   */
+  public function testSchemaInvalidation() {
+
+    // Retrieve the schema as string.
+    $old_schema = $this->query($this->getQuery('schema.gql'));
+
+    $this->assertEquals($old_schema, $this->query($this->getQuery('schema.gql')), 'Schema did not change yet.');
+
+    // Attach a new field to the default node display.
     EntityViewDisplay::load('node.test.default')
       ->setComponent('field_keywords')
       ->save();
 
-    $post_update = $this->executeQueryFile('schema.gql');
 
-    $this->assertNotEquals($pre_update, $post_update, 'The schema has changed.');
+    // Retrieve the updated schema.
+    $new_schema = $this->query($this->getQuery('schema.gql'));
 
+    // Make sure it updated correctly.
+    $this->assertNotEquals($old_schema, $new_schema, 'The schema has changed.');
+    $this->assertContains('fieldKeywords', $new_schema, 'Keywords field has been added.');
   }
 
 }
