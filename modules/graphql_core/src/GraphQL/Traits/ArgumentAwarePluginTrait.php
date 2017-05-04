@@ -30,18 +30,20 @@ trait ArgumentAwarePluginTrait {
       }
       $arguments = [];
       if ($definition['arguments']) {
-        foreach ($definition['arguments'] as $name => $typedef) {
-          $type = $schemaManager->findByName(is_array($typedef) ? $typedef['type'] : $typedef, [
+        foreach ($definition['arguments'] as $name => $argument) {
+          $typeinfo = is_array($argument) ? $argument['type'] : $argument;
+          $type = is_array($typeinfo) ? $this->buildEnumConfig($typeinfo) : $schemaManager->findByName($typeinfo, [
             GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
             GRAPHQL_CORE_SCALAR_PLUGIN,
+            GRAPHQL_CORE_ENUM_PLUGIN,
           ]);
           if ($type instanceof TypeInterface) {
             $arguments[$name] = new InputField([
               'name' => $name,
               'type' => $this->decorateType(
                 $type,
-                is_array($typedef) && $typedef['nullable'],
-                is_array($typedef) && $typedef['multi']
+                is_array($argument) && array_key_exists('nullable', $argument) && $argument['nullable'],
+                is_array($argument) && array_key_exists('multi', $argument) && $argument['multi']
               ),
             ]);
           }

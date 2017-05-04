@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Youshido\GraphQL\Type\Enum\EnumType;
 use Youshido\GraphQL\Type\ListType\ListType;
 use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\TypeInterface;
@@ -39,6 +40,27 @@ trait TypedPluginTrait {
   }
 
   /**
+   * Turn a list of options into an EnumType.
+   *
+   * @param string[] $options
+   *   A list of options.
+   *
+   * @return EnumType
+   *   The enumeration type.
+   */
+  protected function buildEnumConfig(array $options) {
+    $values = [];
+    foreach ($options as $value => $description) {
+      $values[] = [
+        'value' => $value,
+        'name' => strtoupper($value),
+        'description' => $description,
+      ];
+    }
+    return new EnumType(['values' => $values]);
+  }
+
+  /**
    * Build the plugin type.
    *
    * @param \Drupal\graphql_core\GraphQLSchemaManagerInterface $schemaManager
@@ -51,10 +73,11 @@ trait TypedPluginTrait {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       if (array_key_exists('type', $definition) && $definition['type']) {
-        $type = $schemaManager->findByName($definition['type'], [
+        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type']) : $schemaManager->findByName($definition['type'], [
           GRAPHQL_CORE_SCALAR_PLUGIN,
           GRAPHQL_CORE_TYPE_PLUGIN,
           GRAPHQL_CORE_INTERFACE_PLUGIN,
+          GRAPHQL_CORE_ENUM_PLUGIN,
         ]);
         if ($type instanceof TypeInterface) {
           return $this->decorateType($type, $definition['nullable'], $definition['multi']);
