@@ -8,6 +8,8 @@ use Drupal\simpletest\NodeCreationTrait;
 
 /**
  * Test plugin based schema generation.
+ *
+ * @group graphql_core
  */
 class RouteTest extends GraphQLFileTest {
   use ContentTypeCreationTrait;

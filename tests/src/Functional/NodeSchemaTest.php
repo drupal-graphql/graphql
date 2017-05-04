@@ -9,7 +9,7 @@ use Drupal\simpletest\NodeCreationTrait;
 /**
  * Tests some custom schema.
  *
- * @group GraphQL
+ * @group graphql
  */
 class NodeSchemaTest extends QueryTestBase  {
   use NodeCreationTrait;

@@ -8,6 +8,8 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
 
 /**
  * Test block retrieval via GraphQL.
+ *
+ * @group graphql_block
  */
 class BlockTest extends GraphQLFileTest {
   use BlockCreationTrait;

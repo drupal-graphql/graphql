@@ -12,6 +12,8 @@ use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 
 /**
  * Test if the cached schema gets updated automatically.
+ *
+ * @group graphql_content
  */
 class SchemaCacheInvalidationTest extends QueryTestBase {
   use GraphQLFileTestTrait;

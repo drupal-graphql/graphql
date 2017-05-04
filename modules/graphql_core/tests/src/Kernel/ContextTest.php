@@ -7,6 +7,8 @@ use Drupal\simpletest\NodeCreationTrait;
 
 /**
  * Test plugin based schema generation.
+ *
+ * @group graphql_core
  */
 class ContextTest extends GraphQLFileTest {
   use ContentTypeCreationTrait;

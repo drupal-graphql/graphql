@@ -12,6 +12,8 @@ use Drupal\user\Entity\Role;
 
 /**
  * Test entity reference traversal in GraphQL.
+ *
+ * @group graphql_entity_reference
  */
 class EntityReferenceTest extends GraphQLFileTest {
   use NodeCreationTrait;

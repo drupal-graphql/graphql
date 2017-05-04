@@ -6,8 +6,10 @@ use Drupal\graphql_plugin_test\GarageInterface;
 
 /**
  * Test plugin based schema generation.
+ *
+ * @group graphql_core
  */
-class OverrideTest extends GraphQLFileTest {
+class OverrideTypeTest extends GraphQLFileTest {
   public static $modules = [
     'graphql_plugin_test',
     'graphql_override_test',

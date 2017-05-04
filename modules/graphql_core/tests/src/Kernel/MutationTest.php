@@ -6,6 +6,8 @@ use Drupal\graphql_plugin_test\GarageInterface;
 
 /**
  * Test a simple mutation.
+ *
+ * @group graphql_core
  */
 class MutationTest extends GraphQLFileTest {
   public static $modules = [

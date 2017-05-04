@@ -8,6 +8,8 @@ use Drupal\Tests\language\Kernel\LanguageTestBase;
 
 /**
  * Test multilingual behavior of `graphql_core` features.
+ *
+ * @group graphql_core
  */
 class LanguageTest extends LanguageTestBase {
   use GraphQLFileTestTrait;
