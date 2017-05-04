@@ -8,6 +8,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * A bike type.
  *
  * @GraphQLType(
+ *   id = "bike",
  *   name = "Bike",
  *   interfaces = {"Vehicle"}
  * )

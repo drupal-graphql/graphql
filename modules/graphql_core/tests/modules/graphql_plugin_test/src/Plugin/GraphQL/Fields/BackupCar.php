@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * A car in a car. Not sure what's so funny about that.
  *
  * @GraphQLField(
+ *   id = "backup_car",
  *   name = "backupCar",
  *   type = "Car",
  *   types = {"Car"}

@@ -17,7 +17,7 @@ use Drupal\image\Entity\ImageStyle as ImageStylePlugin;
  * GraphQL field override for image field.
  *
  * @GraphQLField(
- *   id = "image_style",
+ *   id = "image_style_field",
  *   type = "ImageStyle",
  *   types = {"Image"},
  *   nullable = true,

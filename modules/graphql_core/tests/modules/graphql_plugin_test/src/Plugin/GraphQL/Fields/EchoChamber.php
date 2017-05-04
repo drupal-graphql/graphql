@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * The obligatory echo service.
  *
  * @GraphQLField(
+ *   id = "echo",
  *   name = "echo",
  *   type = "String",
  *   types = {"Root"},

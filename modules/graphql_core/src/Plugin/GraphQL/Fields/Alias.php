@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a routes canonical path.
  *
  * @GraphQLField(
+ *   id = "url_alias",
  *   name = "alias",
  *   type = "String"
  * )

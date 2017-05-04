@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Affects only bikes, not cars. A car with one more wheel would be ridiculous.
  *
  * @GraphQLField(
+ *   id = "more_wheels",
  *   name = "wheels",
  *   type = "Int",
  *   types = {"Bike"},

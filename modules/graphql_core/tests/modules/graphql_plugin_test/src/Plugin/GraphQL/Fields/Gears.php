@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * The number of gears a bike has.
  *
  * @GraphQLField(
+ *   id = "gears",
  *   name = "gears",
  *   type = "Int",
  *   types = {"Bike"}

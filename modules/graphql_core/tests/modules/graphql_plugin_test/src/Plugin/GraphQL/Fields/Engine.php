@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * A cars engine type.
  *
  * @GraphQLField(
+ *   id = "engine",
  *   name = "engine",
  *   type = "String",
  *   types = {"Car", "CarInput"}

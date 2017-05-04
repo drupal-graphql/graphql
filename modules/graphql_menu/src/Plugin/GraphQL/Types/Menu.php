@@ -8,6 +8,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL type representing Drupal menus.
  *
  * @GraphQLType(
+ *   id = "menu",
  *   name = "Menu"
  * )
  */

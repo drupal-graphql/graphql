@@ -13,7 +13,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve an entity by its id.
  *
  * @GraphQLField(
- *   id = "entityById",
+ *   id = "entity_by_id",
+ *   name = "entityById",
  *   nullable = true,
  *   multi = false,
  *   weight = -1,

@@ -9,7 +9,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Field override to implode multi value fields.
  *
  * @GraphQLField(
- *   id = "text_default",
+ *   id = "capslock",
+ *   field_formatter = "text_default",
  *   type = "String",
  *   deriver = "\Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
  * )

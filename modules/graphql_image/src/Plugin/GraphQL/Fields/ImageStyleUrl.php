@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image url.
  *
  * @GraphQLField(
+ *   id = "image_style_url",
  *   name = "url",
  *   type = "String",
  *   nullable = true,

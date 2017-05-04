@@ -2,8 +2,8 @@
 
 namespace Drupal\graphql_core\Annotation;
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Drupal\Component\Annotation\Plugin;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 
 /**
  * Annotation for GraphQL input type plugins.
@@ -24,12 +24,14 @@ abstract class GraphQLAnnotationBase extends Plugin {
 
   /**
    * {@inheritdoc}
+   *
+   * Enforce explicit id's on GraphQL plugin annotations.
    */
-  public function getId() {
-    if (!array_key_exists('id', $this->definition)) {
-      return $this->definition['provider'] . '-' . $this->definition['name'];
+  public function __construct($values) {
+    if (!array_key_exists('id', $values) || !$values['id']) {
+      throw new AnnotationException('GraphQL plugin is missing an "id" property.');
     }
-    return $this->definition['id'];
+    parent::__construct($values);
   }
 
   /**
