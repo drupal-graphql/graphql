@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a link fields label.
  *
  * @GraphQLField(
- *   id = "link_item_label",
  *   name = "label",
  *   type = "String",
  *   types = {"LinkItem"}

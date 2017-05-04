@@ -17,7 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Generic field plugin for rendering entity fields to string values.
  *
  * @GraphQLField(
- *   id = "rendered_field",
+ *   id = "rendered",
  *   type = "String",
  *   nullable = true,
  *   weight = -1,

@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a menu links route object.
  *
  * @GraphQLField(
- *   id = "menu_link_url",
  *   name = "url",
  *   type = "Url",
  *   types = {"MenuLink"}

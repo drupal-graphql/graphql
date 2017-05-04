@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image file size.
  *
  * @GraphQLField(
- *   id = "image_style_mime_type",
  *   name = "mimeType",
  *   type = "String",
  *   nullable = true,

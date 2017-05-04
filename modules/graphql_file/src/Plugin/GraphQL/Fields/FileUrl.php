@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Entity route field override for files.
  *
  * @GraphQLField(
- *   id = "file_url",
  *   name = "url",
  *   type = "String",
  *   types = {"File"}

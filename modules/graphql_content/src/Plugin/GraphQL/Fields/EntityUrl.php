@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * GraphQL field resolving an Entity's id.
  *
  * @GraphQLField(
- *   id = "entity_url",
  *   name = "entityUrl",
  *   type = "Url",
  * )

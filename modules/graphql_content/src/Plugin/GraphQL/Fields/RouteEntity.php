@@ -17,7 +17,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the current routes entity, if it is an entity route.
  *
  * @GraphQLField(
- *   id = "route_entity",
  *   name = "entity",
  *   types = {"Url"},
  *   type = "Entity"

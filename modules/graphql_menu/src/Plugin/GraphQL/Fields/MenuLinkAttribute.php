@@ -11,7 +11,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve specific attributes of a menu link.
  *
  * @GraphQLField(
- *   id = "menu_link_attribute",
  *   name = "attribute",
  *   type = "String",
  *   types = {"MenuLink"},

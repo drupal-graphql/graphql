@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a menu's name.
  *
  * @GraphQLField(
- *   id = "menu_name",
  *   name = "name",
  *   type = "String",
  *   types = {"Menu"}

@@ -13,13 +13,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a routes canonical path.
  *
  * @GraphQLField(
- *   id = "language_is_default",
  *   name = "alias",
- *   type = "String",
- *   types = {"Url"}
+ *   type = "String"
  * )
  */
-class UrlAlias extends UrlPath implements ContainerFactoryPluginInterface {
+class Alias extends Path implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**

@@ -18,14 +18,13 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Request arbitrary drupal context objects with GraphQL.
  *
  * @GraphQLField(
- *   id = "url_context",
  *   id = "context",
  *   types = {"Url"},
  *   nullable = true,
- *   deriver = "\Drupal\graphql_core\Plugin\Deriver\UrlContextDeriver"
+ *   deriver = "\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
  * )
  */
-class UrlContext extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class Context extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
@@ -43,7 +42,7 @@ class UrlContext extends FieldPluginBase implements ContainerFactoryPluginInterf
       $definition = $this->getPluginDefinition();
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {
         $types = $schemaManager->find(function ($def) use ($definition) {
-          return array_key_exists('data_type', $def) && $def['data_type'] === $definition['data_type'];
+          return array_key_exists('data_type', $def) && $def['data_type'] == $definition['data_type'];
         }, [
           GRAPHQL_CORE_TYPE_PLUGIN,
           GRAPHQL_CORE_INTERFACE_PLUGIN,
@@ -95,6 +94,7 @@ class UrlContext extends FieldPluginBase implements ContainerFactoryPluginInterf
         yield $response->getContext()->getContextValue();
       }
     }
+
   }
 
 }

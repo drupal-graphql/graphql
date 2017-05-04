@@ -10,10 +10,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a files mime type.
  *
  * @GraphQLField(
- *   id = "file_size",
  *   name = "fileSize",
  *   type = "Int",
- *   types = {"File"}
  * )
  */
 class FileSize extends FieldPluginBase {

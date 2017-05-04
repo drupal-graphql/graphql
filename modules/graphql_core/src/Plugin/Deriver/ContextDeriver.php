@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Create GraphQL context fields based on available Drupal contexts.
  */
-class UrlContextDeriver extends DeriverBase implements ContainerDeriverInterface {
+class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The context repository service.
    *

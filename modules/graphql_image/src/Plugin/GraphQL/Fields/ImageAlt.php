@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image field title.
  *
  * @GraphQLField(
- *   id = "image_alt",
  *   name = "alt",
  *   type = "String",
  *   nullable = true,

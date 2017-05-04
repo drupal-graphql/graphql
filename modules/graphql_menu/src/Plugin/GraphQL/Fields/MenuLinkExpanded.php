@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Check if the menu link is expanded.
  *
  * @GraphQLField(
- *   id = "menu_link_expanded",
  *   name = "expanded",
  *   type = "Boolean",
  *   types = {"MenuLink"}
