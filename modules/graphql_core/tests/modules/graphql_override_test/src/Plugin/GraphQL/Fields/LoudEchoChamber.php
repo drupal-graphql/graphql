@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * This field will replace the existing "echo" field with a CAPSLOCK version.
  *
  * @GraphQLField(
+ *   id = "loud_echo",
  *   name = "echo",
  *   type = "String",
  *   arguments = {

@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image height.
  *
  * @GraphQLField(
+ *   id = "image_style_height",
  *   name = "height",
  *   type = "Int",
  *   nullable = true,

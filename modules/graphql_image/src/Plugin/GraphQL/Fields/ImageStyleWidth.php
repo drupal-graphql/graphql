@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image width.
  *
  * @GraphQLField(
+ *   id = "image_style_width",
  *   name = "width",
  *   type = "Int",
  *   nullable = true,

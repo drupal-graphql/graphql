@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * List everything we've got in our garage.
  *
  * @GraphQLField(
+ *   id = "garage",
  *   name = "garage",
  *   type = "Vehicle",
  *   multi = true

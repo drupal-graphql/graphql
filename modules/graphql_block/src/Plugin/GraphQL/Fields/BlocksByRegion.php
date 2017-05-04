@@ -13,7 +13,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
+ * List all blocks within a theme region.
+ *
  * @GraphQLField(
+ *   id = "blocks_by_region",
  *   name = "blocksByRegion",
  *   type = "Block",
  *   types = {"Url"},

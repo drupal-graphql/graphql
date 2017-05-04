@@ -8,6 +8,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL Type for Drupal image derivatives.
  *
  * @GraphQLType(
+ *   id = "image_style",
  *   name = "ImageStyle",
  * )
  */
