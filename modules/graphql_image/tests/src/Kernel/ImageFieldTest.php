@@ -13,6 +13,8 @@ use Drupal\user\Entity\Role;
 
 /**
  * Test file attachments.
+ *
+ * @group graphql_image
  */
 class ImageFieldTest extends GraphQLFileTest {
   use NodeCreationTrait;

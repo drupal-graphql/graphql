@@ -8,7 +8,7 @@ use Drupal\node\Entity\Node;
 /**
  * Tests some custom schema.
  *
- * @group GraphQL
+ * @group graphql
  */
 class NodeSchemaTest extends QueryTestBase  {
 

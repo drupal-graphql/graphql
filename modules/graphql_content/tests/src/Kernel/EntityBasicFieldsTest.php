@@ -9,6 +9,8 @@ use Drupal\user\Entity\Role;
 
 /**
  * Test basic entity fields.
+ *
+ * @group graphql_content
  */
 class EntityBasicFieldsTest extends GraphQLFileTest {
   use ContentTypeCreationTrait;

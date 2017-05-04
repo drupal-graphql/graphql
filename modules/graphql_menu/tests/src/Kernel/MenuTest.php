@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test access to menu items.
+ *
+ * @group graphql_menu
  */
 class MenuTest extends GraphQLFileTest {
 

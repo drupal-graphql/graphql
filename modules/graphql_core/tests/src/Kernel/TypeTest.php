@@ -6,6 +6,8 @@ use Drupal\graphql_plugin_test\GarageInterface;
 
 /**
  * Test plugin based schema generation.
+ *
+ * @group graphql_core
  */
 class TypeTest extends GraphQLFileTest {
   public static $modules = [

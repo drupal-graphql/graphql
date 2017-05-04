@@ -13,6 +13,8 @@ use Drupal\user\Entity\Role;
 
 /**
  * Test basic entity fields.
+ *
+ * @group graphql_content
  */
 class EntityRenderedFieldsTest extends GraphQLFileTest {
   use ContentTypeCreationTrait;

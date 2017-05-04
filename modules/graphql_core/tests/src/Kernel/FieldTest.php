@@ -4,6 +4,8 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 /**
  * Test plugin based schema generation.
+ *
+ * @group graphql_core
  */
 class FieldTest extends GraphQLFileTest {
   public static $modules = [
