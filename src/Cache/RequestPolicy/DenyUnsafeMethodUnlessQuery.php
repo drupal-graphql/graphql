@@ -3,7 +3,6 @@
 namespace Drupal\graphql\Cache\RequestPolicy;
 
 use Drupal\Core\PageCache\RequestPolicyInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

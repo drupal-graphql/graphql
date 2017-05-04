@@ -5,11 +5,11 @@ namespace Drupal\graphql\EventSubscriber;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -55,11 +55,18 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $requestPolicyResults;
 
   /**
-   * The cache backend.
+   * The cache backend for caching responses.
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $requestCache;
+  protected $responseCache;
+
+  /**
+   * The cache backend for caching query cache contexts.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $contextsCache;
 
   /**
    * The request stack.
@@ -69,26 +76,47 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $requestStack;
 
   /**
+   * The cache contexts manager service.
+   *
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager
+   */
+  protected $contextsManager;
+
+  /**
    * Constructs a new CacheSubscriber object.
    *
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.
    * @param \Drupal\Core\PageCache\ResponsePolicyInterface $responsePolicy
    *   A policy rule determining the cacheability of the response.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   * @param \Drupal\Core\Routing\ResettableStackedRouteMatchInterface $routeMatch
    *   The current route match.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $requestCache
-   *   The cache backend.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $responseCache
+   *   The cache backend for caching responses.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $contextsCache
+   *   The cache backend for caching query cache contexts.
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache contexts manager service.
    */
-  public function __construct(RequestPolicyInterface $requestPolicy, ResponsePolicyInterface $responsePolicy, RouteMatchInterface $routeMatch, RequestStack $requestStack, CacheBackendInterface $requestCache) {
+  public function __construct(
+    RequestPolicyInterface $requestPolicy,
+    ResponsePolicyInterface $responsePolicy,
+    ResettableStackedRouteMatchInterface $routeMatch,
+    RequestStack $requestStack,
+    CacheBackendInterface $responseCache,
+    CacheBackendInterface $contextsCache,
+    CacheContextsManager $contextsManager
+  ) {
     $this->requestPolicy = $requestPolicy;
     $this->responsePolicy = $responsePolicy;
     $this->routeMatch = $routeMatch;
-    $this->requestCache = $requestCache;
+    $this->responseCache = $responseCache;
+    $this->contextsCache = $contextsCache;
     $this->requestStack = $requestStack;
     $this->requestPolicyResults = new \SplObjectStorage();
+    $this->contextsManager = $contextsManager;
   }
 
   /**
@@ -98,7 +126,7 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onRouteMatch(GetResponseEvent $event) {
-    if ($this->routeMatch->getRouteName() !== 'graphql.request') {
+    if ($this->routeMatch->getCurrentRouteMatch()->getRouteName() !== 'graphql.request') {
       return;
     }
 
@@ -108,19 +136,22 @@ class CacheSubscriber implements EventSubscriberInterface {
     $request = $event->getRequest();
     $requestPolicyResult = $this->requestPolicy->check($request);
     $this->requestPolicyResults[$request] = $requestPolicyResult;
-    if ($requestPolicyResult !== RequestPolicyInterface::ALLOW) {
+    if ($requestPolicyResult === RequestPolicyInterface::DENY) {
       return;
     }
 
-    if (empty($request->attributes->get('query')) && empty($request->attributes->get('queries'))) {
+    if (empty($request->attributes->get('query'))) {
       return;
     }
 
-    $cid = $this->getCacheIdentifier($request);
-    if (($cache = $this->requestCache->get($cid)) && $cache->data instanceof Response) {
-      $response = $cache->data;
-      $response->headers->set(self::HEADER, 'HIT');
-      $event->setResponse($response);
+    $ccid = $this->getCacheIdentifier();
+    if ($contextCache = $this->contextsCache->get($ccid)) {
+      $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
+
+      if (($responseCache = $this->responseCache->get($cid)) && ($response = $responseCache->data) instanceof Response) {
+        $response->headers->set(self::HEADER, 'HIT');
+        $event->setResponse($response);
+      }
     }
   }
 
@@ -131,7 +162,7 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The event to process.;
    */
   public function onResponse(FilterResponseEvent $event) {
-    if ($this->routeMatch->getRouteName() !== 'graphql.request') {
+    if ($this->routeMatch->getCurrentRouteMatch()->getRouteName() !== 'graphql.request') {
       return;
     }
 
@@ -158,22 +189,30 @@ class CacheSubscriber implements EventSubscriberInterface {
     // @see \Drupal\Core\EventSubscriber\DefaultExceptionHtmlSubscriber::on403()
     $request = $event->getRequest();
     if (!isset($this->requestPolicyResults[$request])) {
+      $response->headers->set(self::HEADER, 'UNCACHEABLE');
       return;
     }
 
     // Don't cache the response if the request & response policies are not met.
     // @see onRouteMatch()
-    if ($this->requestPolicyResults[$request] !== RequestPolicyInterface::ALLOW || $this->responsePolicy->check($response, $request) === ResponsePolicyInterface::DENY) {
+    if ($this->requestPolicyResults[$request] === RequestPolicyInterface::DENY || $this->responsePolicy->check($response, $request) === ResponsePolicyInterface::DENY) {
+
+      $response->headers->set(self::HEADER, 'UNCACHEABLE');
       return;
     }
 
-    $cid = $this->getCacheIdentifier($request);
     $metadata = $response->getCacheableMetadata();
+    $contexts = $metadata->getCacheContexts();
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
-    // Write the cache entry.
-    $this->requestCache->set($cid, $response, $expire, $tags);
+    // Write the cache entry for the cache contexts.
+    $ccid = $this->getCacheIdentifier();
+    $this->contextsCache->set($ccid, $contexts, $expire, $tags);
+
+    // Write the cache entry for the response object.
+    $cid = $this->getCacheIdentifier($contexts);
+    $this->responseCache->set($cid, $response, $expire, $tags);
 
     // The response was generated, mark the response as a cache miss. The next
     // time, it will be a cache hit.
@@ -196,22 +235,20 @@ class CacheSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Generates a cache identifier for the current request.
+   * Generates a cache identifier for the passed cache contexts.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
+   * Always adds the 'gql' cache context token.
    *
-   * @return string
+   * @param array $tokens
+   *   Optional array of cache context tokens.
+   *
+   * @return string The generated cache identifier.
    *   The generated cache identifier.
    */
-  protected function getCacheIdentifier(Request $request) {
-    if ($queries = $request->attributes->get('queries')) {
-      return hash('sha256', json_encode($queries));
-    }
-
-    $query = $request->attributes->get('query');
-    $variables = json_encode($request->attributes->get('variables') ?: []);
-    return hash('sha256', "$query:$variables");
+  protected function getCacheIdentifier(array $tokens = []) {
+    $tokens = array_unique(array_merge(['gql'], $tokens));
+    $keys = $this->contextsManager->convertTokensToKeys($tokens)->getKeys();
+    return implode(':', $keys);
   }
 
   /**

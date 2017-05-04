@@ -21,12 +21,23 @@ services:
       - { name: cache.bin }
     factory: cache_factory:get
     arguments: [graphql_schema]
-  cache.graphql_request:
+  cache.graphql_response:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory: cache_factory:get
-    arguments: [graphql_request]
+    arguments: [graphql_response]
+  cache.graphql_query_contexts:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_query_contexts]
+  cache_context.gql:
+    class: Drupal\graphql\Cache\Context\QueryCacheContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
   graphql.schema:
     class: Drupal\graphql\GraphQL\Schema
     factory: ['@graphql.schema_factory', getSchema]
@@ -47,7 +58,7 @@ services:
       - { name: event_subscriber }
   graphql.cache_subscriber:
     class: Drupal\graphql\EventSubscriber\CacheSubscriber
-    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_request']
+    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_query_contexts', '@cache_contexts_manager']
     tags:
       - { name: event_subscriber }
   graphql.request_policy:
