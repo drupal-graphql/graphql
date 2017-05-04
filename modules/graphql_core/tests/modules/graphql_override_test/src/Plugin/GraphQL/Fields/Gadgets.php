@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * A bikes gadgets.
  *
  * @GraphQLField(
+ *   id = "gadgets",
  *   name = "gadgets",
  *   type = "String",
  *   multi = true,

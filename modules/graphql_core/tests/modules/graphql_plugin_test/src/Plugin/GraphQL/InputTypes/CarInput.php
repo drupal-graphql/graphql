@@ -8,7 +8,8 @@ use Drupal\graphql_core\GraphQL\InputTypePluginBase;
  * Car input type.
  *
  * @GraphQLInputType(
- *   name = "CarInput",
+ *   id = "car_input",
+ *   name = "CarInput"
  * )
  */
 class CarInput extends InputTypePluginBase {

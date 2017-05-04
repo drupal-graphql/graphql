@@ -9,6 +9,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * The number of wheels a vehicle has.
  *
  * @GraphQLField(
+ *   id = "wheels",
  *   name = "wheels",
  *   type = "Int",
  *   types = {"Car", "Bike"}

@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a menu links label.
  *
  * @GraphQLField(
+ *   id = "menu_link_label",
  *   name = "label",
  *   type = "String",
  *   types = {"MenuLink"}

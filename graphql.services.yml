@@ -28,7 +28,7 @@ services:
     factory: cache_factory:get
     arguments: [graphql_request]
   graphql.schema:
-    class: Drupal\graphql\GraphQL\Relay\Schema
+    class: Drupal\graphql\GraphQL\Schema
     factory: ['@graphql.schema_factory', getSchema]
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory

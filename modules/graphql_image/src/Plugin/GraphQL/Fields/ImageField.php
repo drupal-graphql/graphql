@@ -10,7 +10,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * GraphQL field override for image field.
  *
  * @GraphQLField(
- *   id = "image",
+ *   id = "image_field",
+ *   field_formatter = "image",
  *   type = "Image",
  *   cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"

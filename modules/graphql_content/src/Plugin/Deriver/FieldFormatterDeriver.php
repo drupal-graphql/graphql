@@ -66,16 +66,6 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   }
 
   /**
-   * Return the targeted field formatter id.
-   *
-   * @return string
-   *   The field formatter machine name.
-   */
-  protected function getFieldFormatterId() {
-    return $this->basePluginId;
-  }
-
-  /**
    * Provide plugin definition values from field storage and display options.
    *
    * @param string $entityType
@@ -120,7 +110,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
 
       foreach ($display->getComponents() as $fieldName => $component) {
-        if (isset($component['type']) && $component['type'] == $this->getFieldFormatterId()) {
+        if (isset($component['type']) && $component['type'] === $basePluginDefinition['field_formatter']) {
           $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
           /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
           $id = implode('-', [$entityType, $bundle, $storage->getName()]);

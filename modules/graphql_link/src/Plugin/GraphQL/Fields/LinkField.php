@@ -10,7 +10,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Expose entity reference fields as objects.
  *
  * @GraphQLField(
- *   id = "link",
+ *   id = "link_item",
+ *   field_formatter = "link",
  *   type = "LinkItem",
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
  * )

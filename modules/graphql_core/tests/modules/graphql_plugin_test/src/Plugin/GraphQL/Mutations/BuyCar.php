@@ -14,6 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * A test mutation.
  *
  * @GraphQLMutation(
+ *   id = "buy_car",
  *   name="buyCar",
  *   type="Car",
  *   arguments = {

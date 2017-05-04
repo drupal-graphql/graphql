@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a link fields route object.
  *
  * @GraphQLField(
+ *   id = "link_item_url",
  *   name = "url",
  *   type = "Url",
  *   types = {"LinkItem"}

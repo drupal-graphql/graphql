@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Root interface for Drupal blocks exposed to GraphQL.
  *
  * @GraphQLInterface(
+ *   id = "block",
  *   name = "Block"
  * )
  */
