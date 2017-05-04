@@ -10,7 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Replace Drupal file fields with file entities.
  *
  * @GraphQLField(
- *   id = "file_url_plain",
+ *   id = "file",
  *   type = "File",
  *   cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"

@@ -14,6 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLField(
+ *   id = "blocks_by_region",
  *   name = "blocksByRegion",
  *   type = "Block",
  *   types = {"Url"},

@@ -5,12 +5,13 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 use Drupal\graphql_core\GraphQL\TypePluginBase;
 
 /**
- * GraphQL type for Drupal routes.
+ * GraphQL type for language objects.
  *
  * @GraphQLType(
- *   name = "Url"
+ *   name = "Language",
+ *   data_type = "language"
  * )
  */
-class Url extends TypePluginBase {
+class Language extends TypePluginBase {
 
 }

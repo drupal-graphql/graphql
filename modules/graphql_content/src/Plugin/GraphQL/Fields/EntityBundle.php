@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * GraphQL field resolving an entity's bundle.
  *
  * @GraphQLField(
+ *   id = "entity_bundle",
  *   name = "entityBundle",
  *   type = "String",
  * )

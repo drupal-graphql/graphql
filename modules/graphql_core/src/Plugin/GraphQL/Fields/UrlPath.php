@@ -10,11 +10,13 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve a routes canonical path.
  *
  * @GraphQLField(
+ *   id = "url_path",
  *   name = "path",
- *   type = "String"
+ *   type = "String",
+ *   types = {"Url"}
  * )
  */
-class Path extends FieldPluginBase {
+class UrlPath extends FieldPluginBase {
 
   /**
    * {@inheritdoc}

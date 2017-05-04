@@ -120,7 +120,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
 
       foreach ($display->getComponents() as $fieldName => $component) {
-        if (isset($component['type']) && $component['type'] == $this->getFieldFormatterId()) {
+        if (isset($component['type']) && $component['type'] === $this->getFieldFormatterId()) {
           $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
           /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
           $id = implode('-', [$entityType, $bundle, $storage->getName()]);
