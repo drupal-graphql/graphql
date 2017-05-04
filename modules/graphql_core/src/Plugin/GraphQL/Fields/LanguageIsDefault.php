@@ -10,7 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Whether the language is the default language.
  *
  * @GraphQLField(
- *   id = "language_default",
+ *   id = "language_is_default",
  *   name = "isDefault",
  *   type = "Boolean",
  *   types = {"Language"}
