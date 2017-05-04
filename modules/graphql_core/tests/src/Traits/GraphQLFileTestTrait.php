@@ -20,6 +20,19 @@ trait GraphQLFileTestTrait {
   }
 
   /**
+   * Retrieve the GraphQL query stored in a file as string.
+   *
+   * @param string $queryFile
+   *   The query file name.
+   *
+   * @return string
+   *   The graphql query string.
+   */
+  public function getQuery($queryFile) {
+    return file_get_contents($this->getQueriesDirectory() . '/' . $queryFile);
+  }
+
+  /**
    * Submit a GraphQL query.
    *
    * @param string $queryFile
@@ -32,8 +45,7 @@ trait GraphQLFileTestTrait {
    */
   public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE) {
     $processor = new Processor($this->container, $this->container->get('graphql.schema'));
-    $file = $this->getQueriesDirectory() . '/' . $queryFile;
-    $result = $processor->processPayload(file_get_contents($file), $variables);
+    $result = $processor->processPayload($this->getQuery($queryFile), $variables);
     $data = $result->getResponseData();
     if ($assertNoErrors) {
       $errors = array_map(function ($error) {
