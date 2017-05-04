@@ -4,6 +4,8 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 /**
  * Test enumeration support in different ways.
+ *
+ * @group graphql_core
  */
 class EnumTest extends GraphQLFileTest {
 
