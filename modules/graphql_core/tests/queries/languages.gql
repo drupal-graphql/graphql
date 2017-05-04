@@ -1,0 +1,26 @@
+query {
+  default:route(path: "/graphql/test/a") {
+    ... LanguageFragment
+  }
+
+  en:route(path: "/en/graphql/test/a") {
+    ... LanguageFragment
+  }
+
+  fr:route(path: "/fr/graphql/test/a") {
+    ... LanguageFragment
+  }
+}
+
+fragment LanguageFragment on Url {
+  languageInterfaceContext {
+    ... on Language {
+      id
+      name
+      isDefault
+      isLocked
+      direction
+      weight
+    }
+  }
+}

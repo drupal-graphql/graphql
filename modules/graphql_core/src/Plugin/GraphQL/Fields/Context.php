@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql_core\ContextResponse;
@@ -35,6 +36,13 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   protected $httpKernel;
 
   /**
+   * A language manager to reset language negotiation before resolving contexts.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function buildType(GraphQLSchemaManagerInterface $schemaManager) {
@@ -59,8 +67,9 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel, LanguageManagerInterface $languageManager) {
     $this->httpKernel = $httpKernel;
+    $this->languageManager = $languageManager;
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
@@ -72,7 +81,8 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('http_kernel')
+      $container->get('http_kernel'),
+      $container->get('language_manager')
     );
   }
 
@@ -83,11 +93,18 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
     if ($value instanceof Url) {
       $contextId = $this->getPluginDefinition()['context_id'];
 
-      // TODO: Pass url object directly to not re-run full routing?
-      $request = Request::create($value->toString());
+      $request = Request::create($value->getOption('routed_path') ?: $value->toString());
       $request->attributes->add([
         'graphql_context' => $contextId,
       ]);
+
+      // TODO:
+      // Language manager stores negotiation state between requests.
+      //
+      // This is a hack to ensure language get's re-negotiated.
+      // This will issue affect other sub-requests and potentially other
+      // services that keep a static cache.
+      $this->languageManager->reset();
 
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
       if ($response instanceof ContextResponse) {
