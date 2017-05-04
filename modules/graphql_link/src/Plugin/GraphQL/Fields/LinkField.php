@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "link",
+ *   field_formatter = "link",
  *   type = "LinkItem",
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
  * )

@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image",
+ *   field_formatter = "image",
  *   type = "Image",
  *   cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
