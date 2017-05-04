@@ -9,7 +9,7 @@ use Drupal\graphql_plugin_test\GarageInterface;
  *
  * @group graphql_core
  */
-class OverrideTypeTest extends GraphQLFileTest {
+class OverrideTypeTest extends GraphQLFileTestBase {
   public static $modules = [
     'graphql_plugin_test',
     'graphql_override_test',

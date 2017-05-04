@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_content\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -12,7 +12,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content
  */
-class EntityBasicFieldsTest extends GraphQLFileTest {
+class EntityBasicFieldsTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

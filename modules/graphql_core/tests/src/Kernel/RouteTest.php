@@ -11,7 +11,7 @@ use Drupal\simpletest\NodeCreationTrait;
  *
  * @group graphql_core
  */
-class RouteTest extends GraphQLFileTest {
+class RouteTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

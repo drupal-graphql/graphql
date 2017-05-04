@@ -7,7 +7,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
  *
  * @group graphql_core
  */
-class EnumTest extends GraphQLFileTest {
+class EnumTest extends GraphQLFileTestBase {
 
   public static $modules = [
     'graphql_enum_test',

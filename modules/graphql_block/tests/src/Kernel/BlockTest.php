@@ -4,14 +4,14 @@ namespace Drupal\Tests\graphql_block\Kernel;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\simpletest\BlockCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTest;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 
 /**
  * Test block retrieval via GraphQL.
  *
  * @group graphql_block
  */
-class BlockTest extends GraphQLFileTest {
+class BlockTest extends GraphQLFileTestBase {
   use BlockCreationTrait;
   /**
    * {@inheritdoc}

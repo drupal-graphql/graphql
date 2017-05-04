@@ -10,7 +10,7 @@ use Drupal\simpletest\NodeCreationTrait;
  *
  * @group graphql_core
  */
-class ContextTest extends GraphQLFileTest {
+class ContextTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

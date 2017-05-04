@@ -9,7 +9,7 @@ use Drupal\graphql_plugin_test\GarageInterface;
  *
  * @group graphql_core
  */
-class MutationTest extends GraphQLFileTest {
+class MutationTest extends GraphQLFileTestBase {
   public static $modules = [
     'graphql_plugin_test',
   ];
