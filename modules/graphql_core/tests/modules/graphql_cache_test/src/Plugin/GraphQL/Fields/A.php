@@ -12,20 +12,15 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * An uncacheable counter field.
  *
  * @GraphQLField(
- *   id = "uncacheable_field",
- *   name = "uncacheable",
+ *   id = "a",
+ *   name = "a",
  *   type = "Int",
  *   types = {"Root", "Object"},
- *   arguments={
- *     "amount" = {
- *       "type" = "Int",
- *       "default" = 1,
- *       "nullable" = true
- *     }
- *   }
+ *   cache_tags = {"a"},
+ *   cache_contexts = {"graphql_test"}
  * )
  */
-class UncacheableField extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class A extends FieldPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The counter service.
