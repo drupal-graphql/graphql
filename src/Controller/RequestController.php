@@ -70,11 +70,17 @@ class RequestController implements ContainerInjectionInterface {
    * Constructs a RequestController object.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The dependency injection container.
    * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
+   *   The graphql schema.
    * @param \Drupal\graphql\Reducers\ReducerManager $reducerManager
+   *   The reducer manager service.
    * @param \Drupal\Core\Config\Config $config
+   *   The config service.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   *   The http kernel service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
   public function __construct(ContainerInterface $container, AbstractSchema $schema, ReducerManager $reducerManager, Config $config, HttpKernelInterface $httpKernel, RendererInterface $renderer) {
     $this->container = $container;
@@ -177,11 +183,6 @@ class RequestController implements ContainerInjectionInterface {
       $response->addCacheableDependency($context->pop());
     }
 
-    // @todo This needs proper, context and tag based caching logic.
-    //
-    // We need to figure out a way to make this work with the dynamic page cache
-    // and fractional caching. For now, we only cache for anonymous users via
-    // the custom CacheSubscriber provided by this module. Not cool.
     $metadata = new CacheableMetadata();
     // Default to permanent cache.
     $metadata->setCacheMaxAge(Cache::PERMANENT);
