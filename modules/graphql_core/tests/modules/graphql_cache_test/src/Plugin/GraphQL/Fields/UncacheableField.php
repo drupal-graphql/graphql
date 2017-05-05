@@ -1,0 +1,59 @@
+<?php
+
+namespace Drupal\graphql_cache_test\Plugin\GraphQL\Fields;
+
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql_cache_test\Counter;
+use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Execution\ResolveInfo;
+
+/**
+ * An uncacheable counter field.
+ *
+ * @GraphQLField(
+ *   id = "uncacheable_field",
+ *   name = "uncacheable",
+ *   type = "Int",
+ *   types = {"Root", "Object"},
+ *   arguments={
+ *     "amount" = {
+ *       "type" = "Int",
+ *       "default" = 1,
+ *       "nullable" = true
+ *     }
+ *   }
+ * )
+ */
+class UncacheableField extends FieldPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The counter service.
+   *
+   * @var \Drupal\graphql_cache_test\Counter
+   */
+  protected $counter;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('graphql_test.counter'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, Counter $counter) {
+    $this->counter = $counter;
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resolveValues($value, array $args, ResolveInfo $info) {
+    yield $this->counter->count();
+  }
+
+}

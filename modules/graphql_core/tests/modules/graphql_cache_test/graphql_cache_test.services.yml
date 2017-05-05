@@ -1,0 +1,7 @@
+services:
+  graphql_test.counter:
+    class: Drupal\graphql_cache_test\Counter
+  cache_context.graphql_test:
+    class: Drupal\graphql_cache_test\TestCacheContext
+    tags:
+      - { name: cache.context }

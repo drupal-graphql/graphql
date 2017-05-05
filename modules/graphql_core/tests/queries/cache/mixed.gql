@@ -1,0 +1,6 @@
+query {
+  a:cacheable
+  b:object {
+    c:uncacheable
+  }
+}
