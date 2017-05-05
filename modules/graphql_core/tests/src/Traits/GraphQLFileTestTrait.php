@@ -87,9 +87,9 @@ trait GraphQLFileTestTrait {
       'query' => $this->getQuery($queryFile),
       'variables' => $variables,
     ];
-    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */
-    $http_kernel = \Drupal::service('http_kernel');
-    $response = $http_kernel->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($content)));
+    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel */
+    $httpKernel = \Drupal::service('http_kernel');
+    $response = $httpKernel->handle(Request::create('/graphql', 'POST', [], [], [], [], json_encode($content)));
     $data = json_decode($response->getContent(), TRUE);
     if ($assertNoErrors) {
       $this->assertNoErrors($data);

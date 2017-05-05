@@ -2,10 +2,10 @@
 
 namespace Drupal\Tests\graphql_core\Kernel;
 
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
-
 /**
  * Test caching of query results.
+ *
+ * @group graphql_core
  */
 class ResultCacheTest extends GraphQLFileTestBase {
 
