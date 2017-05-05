@@ -41,12 +41,11 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return $defaults;
     }
 
-    $values = $this->getValuesFromRequest($request);
-    if ($enhanced = $this->enhanceSingle($defaults, $values)) {
+    if ($enhanced = $this->enhanceSingle($defaults, $request)) {
       return $enhanced;
     }
 
-    if ($enhanced = $this->enhanceBatch($defaults, $values)) {
+    if ($enhanced = $this->enhanceBatch($defaults, $request)) {
       return $enhanced;
     }
 
@@ -59,46 +58,24 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
   }
 
   /**
+   * Attempts to enhance the request as a batch query.
+   *
+   * @param array $defaults
+   *   The controller defaults.
    * @param \Symfony\Component\HttpFoundation\Request $request
-   * @return array|mixed
+   *   The request object.
+   *
+   * @return array|boolean
+   *   The enhanced controller defaults.
    */
-  protected function getValuesFromRequest(Request $request) {
-    if ($content = $request->getContent()) {
-      $values = json_decode($content, TRUE);
-    } else {
-      $values = $request->query->all();
-    }
+  protected function enhanceBatch(array $defaults, Request $request) {
+    $queries = $this->filterRequestValues($request, function ($index) {
+      return is_numeric($index);
+    });
 
-    // Only keep numerical keys or 'query', 'variables', 'id', 'version'.
-    $values = array_filter($values, function ($value, $index) {
-      return is_numeric($index) || in_array($index, ['query', 'variables', 'id', 'version']);
-    }, ARRAY_FILTER_USE_BOTH);
-
-    $values = array_map(function ($value) {
-      if (!is_string($value)) {
-        return $value;
-      }
-
-      $decoded = json_decode($value, TRUE);
-      return ($decoded != $value) && $decoded ? $decoded : $value;
-    }, $values);
-
-    return $values;
-  }
-
-  /**
-   * @param $defaults
-   * @param $values
-   * @return bool
-   */
-  protected function enhanceBatch($defaults, $values) {
-    if (!isset($values[0])) {
+    if (!isset($queries[0])) {
       return FALSE;
     }
-
-    $queries = array_filter($values, function ($value, $index) {
-      return is_numeric($index);
-    }, ARRAY_FILTER_USE_BOTH);
 
     if (array_keys($queries) !== range(0, count($queries) - 1)) {
       // If this is not a continuously numeric array, don't do anything.
@@ -112,17 +89,25 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
   }
 
   /**
-   * @param $defaults
-   * @param $values
-   * @return bool
+   * Attempts to enhance the request as a single query.
+   *
+   * @param array $defaults
+   *   The controller defaults.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   *
+   * @return array|boolean
+   *   The enhanced controller defaults.
    */
-  protected function enhanceSingle($defaults, $values) {
-    $values = array_intersect_key($values + [
+  protected function enhanceSingle(array $defaults, Request $request) {
+    $values = $this->filterRequestValues($request, function ($index) {
+       return in_array($index, ['query', 'variables', 'id', 'version']);
+    }) + [
       'query' => '',
       'variables' => [],
       'id' => NULL,
       'version' => NULL,
-    ], array_flip(['query', 'variables', 'id', 'version']));
+    ];
 
     if (empty($values['query']) && (empty($values['id']) || empty($values['version']))) {
       return FALSE;
@@ -140,18 +125,55 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
   }
 
   /**
+   * Filters the request body or query parameters using a filter callback.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param callable $filter
+   *   The filter callback.
+   *
+   * @return array
+   *   The filtered request parameters.
+   */
+  protected function filterRequestValues(Request $request, callable $filter) {
+    $content = $request->getContent();
+
+    $values = !empty($content) ? json_decode($content, TRUE) : $request->query->all();
+    $values = array_filter($values, $filter, ARRAY_FILTER_USE_KEY);
+    $values = array_map(function ($value) {
+      if (!is_string($value)) {
+        return $value;
+      }
+
+      $decoded = json_decode($value, TRUE);
+      return ($decoded != $value) && $decoded ? $decoded : $value;
+    }, $values);
+
+    return $values;
+  }
+
+  /**
+   * Resolves a query string.
+   *
    * @param $query
+   *   The query string. If this is set, it will be returned immediately.
    * @param $id
+   *   The id of a query from the query map.
    * @param $version
-   * @return null
+   *   The version of the query map to load the query from.
+   *
+   * @return string|null
+   *   The resolved query string.
    */
   protected function getQuery($query, $id, $version) {
     if (!empty($query)) {
       return $query;
     }
 
-    $queryMap = $this->entityTypeManager->getStorage('graphql_query_map')->load($version);
-    if ($queryMap) {
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('graphql_query_map');
+    /** @var \Drupal\graphql\Entity\GraphQLQueryMap $queryMap */
+    if ($queryMap = $storage->load($version)) {
       return $queryMap->getQuery($id);
     }
 
