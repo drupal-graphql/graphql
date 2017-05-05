@@ -1,0 +1,6 @@
+query {
+  a
+  object {
+    b
+  }
+}
