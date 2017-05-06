@@ -18,7 +18,7 @@ class ImageStyleId extends EnumPluginBase {
   public function buildValues(GraphQLSchemaManagerInterface $schemaManager) {
     $items = [];
     foreach (ImageStyleConfig::loadMultiple() as $imageStyle) {
-      $items[] = [
+      $items[$imageStyle->id()] = [
         'value' => $imageStyle->id(),
         'name' => $imageStyle->id(),
         'description' => $imageStyle->label()
