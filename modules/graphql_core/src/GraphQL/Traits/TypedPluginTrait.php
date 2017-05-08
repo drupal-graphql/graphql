@@ -72,16 +72,29 @@ trait TypedPluginTrait {
   protected function buildType(GraphQLSchemaManagerInterface $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
-      if (array_key_exists('type', $definition) && $definition['type']) {
+
+      if (array_key_exists('data_type', $definition) && $definition['data_type']) {
+        $types = $schemaManager->find(function ($def) use ($definition) {
+          return array_key_exists('data_type', $def) && $def['data_type'] === $definition['data_type'];
+        }, [
+          GRAPHQL_CORE_TYPE_PLUGIN,
+          GRAPHQL_CORE_INTERFACE_PLUGIN,
+          GRAPHQL_CORE_SCALAR_PLUGIN,
+        ]);
+
+        $type = array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
+      }
+      else if (array_key_exists('type', $definition) && $definition['type']) {
         $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type']) : $schemaManager->findByName($definition['type'], [
           GRAPHQL_CORE_SCALAR_PLUGIN,
           GRAPHQL_CORE_TYPE_PLUGIN,
           GRAPHQL_CORE_INTERFACE_PLUGIN,
           GRAPHQL_CORE_ENUM_PLUGIN,
         ]);
-        if ($type instanceof TypeInterface) {
-          return $this->decorateType($type, $definition['nullable'], $definition['multi']);
-        }
+      }
+
+      if (isset($type) && $type instanceof TypeInterface) {
+        return $this->decorateType($type, $definition['nullable'], $definition['multi']);
       }
     }
     return NULL;

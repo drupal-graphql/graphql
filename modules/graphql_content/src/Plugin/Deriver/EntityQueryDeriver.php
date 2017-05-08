@@ -75,12 +75,11 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
 
             $mainProperty = $property->getMainPropertyName();
             $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
-            $mainPropertyType = $this->dataTypeToType($mainPropertyDataType);
 
             $derivative['arguments'][$argName] = [
-              'type' => $mainPropertyType,
               'multi' => FALSE,
               'nullable' => TRUE,
+              'data_type' => $mainPropertyDataType,
             ];
           }
         }
@@ -90,29 +89,6 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);
-  }
-
-  /**
-   * @param $dataType
-   * @return string
-   */
-  protected function dataTypeToType($dataType) {
-    switch ($dataType) {
-      case 'boolean':
-        return 'Boolean';
-
-      case 'integer':
-      case 'timestamp':
-        return 'Int';
-
-      case 'string':
-      case 'email':
-      case 'uri':
-        return 'String';
-
-      default:
-        return 'String';
-    }
   }
 
 }
