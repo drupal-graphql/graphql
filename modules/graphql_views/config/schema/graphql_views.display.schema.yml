@@ -1,0 +1,3 @@
+views.display.graphql:
+  type: views_display
+  label: 'GraphQL display options'
