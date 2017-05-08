@@ -38,7 +38,7 @@ class ViewsTest extends GraphQLFileTestBase {
     parent::setUp();
     $this->installEntitySchema('node');
     $this->installEntitySchema('view');
-    $this->installConfig(['node', 'views']);
+    $this->installConfig(['node', 'filter', 'views']);
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'test']);
 
