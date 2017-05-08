@@ -48,21 +48,24 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
   }
 
   /**
-   * Retrieves the entity type id of an entity by its base table.
+   * Retrieves the entity type id of an entity by its base or data table.
    *
-   * @param $table
-   *   The base table of an entity.
+   * @param string $table
+   *   The base or data table of an entity.
    *
    * @return string
    *   The id of the entity type that the given base table belongs to.
    */
-  protected function getEntityTypeByBaseTable($table) {
+  protected function getEntityTypeByTable($table) {
     if (!isset($this->dataTables)) {
       $this->dataTables = [];
 
       foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
         if ($dataTable = $entityType->getDataTable()) {
           $this->dataTables[$dataTable] = $entityType->id();
+        }
+        if ($baseTable = $entityType->getBaseTable()) {
+          $this->dataTables[$baseTable] = $entityType->id();
         }
       }
     }
@@ -78,7 +81,7 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
     $views = $this->entityTypeManager->getStorage('view')->loadMultiple();
 
     foreach ($views as $viewId => $view) {
-      if (!$type = $this->getEntityTypeByBaseTable($view->get('base_table'))) {
+      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         continue;
       }
 
