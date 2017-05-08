@@ -28,6 +28,7 @@ trait ArgumentAwarePluginTrait {
       if (!$definition['arguments']) {
         return [];
       }
+
       $arguments = [];
       if ($definition['arguments']) {
         foreach ($definition['arguments'] as $name => $argument) {
@@ -37,15 +38,22 @@ trait ArgumentAwarePluginTrait {
             GRAPHQL_CORE_SCALAR_PLUGIN,
             GRAPHQL_CORE_ENUM_PLUGIN,
           ]);
+
           if ($type instanceof TypeInterface) {
-            $arguments[$name] = new InputField([
+            $config = [
               'name' => $name,
               'type' => $this->decorateType(
                 $type,
                 is_array($argument) && array_key_exists('nullable', $argument) && $argument['nullable'],
                 is_array($argument) && array_key_exists('multi', $argument) && $argument['multi']
               ),
-            ]);
+            ];
+
+            if (is_array($argument) && isset($argument['default'])) {
+              $config['defaultValue'] = $argument['default'];
+            }
+
+            $arguments[$name] = new InputField($config);
           }
         }
       }
