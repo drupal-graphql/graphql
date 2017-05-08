@@ -1,8 +1,7 @@
 <?php
 
-namespace Drupal\graphql\Plugin\views\style;
+namespace Drupal\graphql_views\Plugin\views\style;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\views\Plugin\views\style\StylePluginBase;
 
 /**
