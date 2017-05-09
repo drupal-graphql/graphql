@@ -139,18 +139,19 @@ class CacheSubscriber implements EventSubscriberInterface {
     if ($this->routeMatch->getCurrentRouteMatch()->getRouteName() !== 'graphql.request') {
       return;
     }
+    
+    // We do not need to cache batch requests locally.
+    $request = $event->getRequest();
+    if (empty($request->attributes->get('query'))) {
+      return;
+    }
 
     // Don't cache the response if the request policies are not met. Store the
     // result in a static keyed by current request, so that onResponse() does
     // not have to redo the request policy check.
-    $request = $event->getRequest();
     $requestPolicyResult = $this->requestPolicy->check($request);
     $this->requestPolicyResults[$request] = $requestPolicyResult;
     if ($requestPolicyResult === RequestPolicyInterface::DENY) {
-      return;
-    }
-
-    if (empty($request->attributes->get('query'))) {
       return;
     }
 
@@ -186,6 +187,12 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
+    // We do not need to cache batch requests locally.
+    $request = $event->getRequest();
+    if (empty($request->attributes->get('query'))) {
+      return;
+    }
+
     // Don't cache the response if our request subscriber did not fire, because
     // that means it is impossible to have a cache hit. This can happen when the
     // master request is for example a 403 or 404, in which case a subrequest is
@@ -197,7 +204,6 @@ class CacheSubscriber implements EventSubscriberInterface {
     //
     // @see \Drupal\Core\Routing\AccessAwareRouter::checkAccess()
     // @see \Drupal\Core\EventSubscriber\DefaultExceptionHtmlSubscriber::on403()
-    $request = $event->getRequest();
     if (!isset($this->requestPolicyResults[$request])) {
       $response->headers->set(self::HEADER, 'UNCACHEABLE');
       return;
