@@ -3,6 +3,8 @@
 namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -62,11 +64,11 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $responseCache;
 
   /**
-   * The cache backend for caching query cache contexts.
+   * The cache backend for caching query cache metadata.
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $contextsCache;
+  protected $metadataCache;
 
   /**
    * The request stack.
@@ -83,6 +85,13 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $contextsManager;
 
   /**
+   * Extra cache metadata to add to every query.
+   *
+   * @var \Drupal\Core\Cache\CacheableMetadata
+   */
+  protected $metadata;
+
+  /**
    * Constructs a new CacheSubscriber object.
    *
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
@@ -95,7 +104,7 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The request stack.
    * @param \Drupal\Core\Cache\CacheBackendInterface $responseCache
    *   The cache backend for caching responses.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $contextsCache
+   * @param \Drupal\Core\Cache\CacheBackendInterface $metadataCache
    *   The cache backend for caching query cache contexts.
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
@@ -106,17 +115,18 @@ class CacheSubscriber implements EventSubscriberInterface {
     ResettableStackedRouteMatchInterface $routeMatch,
     RequestStack $requestStack,
     CacheBackendInterface $responseCache,
-    CacheBackendInterface $contextsCache,
+    CacheBackendInterface $metadataCache,
     CacheContextsManager $contextsManager
   ) {
     $this->requestPolicy = $requestPolicy;
     $this->responsePolicy = $responsePolicy;
     $this->routeMatch = $routeMatch;
     $this->responseCache = $responseCache;
-    $this->contextsCache = $contextsCache;
+    $this->metadataCache = $metadataCache;
     $this->requestStack = $requestStack;
     $this->requestPolicyResults = new \SplObjectStorage();
     $this->contextsManager = $contextsManager;
+    $this->metadata = new CacheableMetadata();
   }
 
   /**
@@ -144,8 +154,8 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $ccid = $this->getCacheIdentifier();
-    if ($contextCache = $this->contextsCache->get($ccid)) {
+    $ccid = $this->getCacheIdentifier($this->metadata);
+    if ($contextCache = $this->metadataCache->get($ccid)) {
       $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
 
       if (($responseCache = $this->responseCache->get($cid)) && ($response = $responseCache->data) instanceof Response) {
@@ -196,22 +206,24 @@ class CacheSubscriber implements EventSubscriberInterface {
     // Don't cache the response if the request & response policies are not met.
     // @see onRouteMatch()
     if ($this->requestPolicyResults[$request] === RequestPolicyInterface::DENY || $this->responsePolicy->check($response, $request) === ResponsePolicyInterface::DENY) {
-
       $response->headers->set(self::HEADER, 'UNCACHEABLE');
       return;
     }
 
-    $metadata = $response->getCacheableMetadata();
-    $contexts = $metadata->getCacheContexts();
+    // Merge the global cache metadata with the response cache metadata.
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheableDependency($this->metadata);
+    $metadata->addCacheableDependency($response->getCacheableMetadata());
+
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
-    // Write the cache entry for the cache contexts.
-    $ccid = $this->getCacheIdentifier();
-    $this->contextsCache->set($ccid, $contexts, $expire, $tags);
+    // Write the cache entry for the cache metadata. This one uses the
+    $ccid = $this->getCacheIdentifier($this->metadata);
+    $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
     // Write the cache entry for the response object.
-    $cid = $this->getCacheIdentifier($contexts);
+    $cid = $this->getCacheIdentifier($metadata);
     $this->responseCache->set($cid, $response, $expire, $tags);
 
     // The response was generated, mark the response as a cache miss. The next
@@ -237,18 +249,26 @@ class CacheSubscriber implements EventSubscriberInterface {
   /**
    * Generates a cache identifier for the passed cache contexts.
    *
-   * Always adds the 'gql' cache context token.
-   *
-   * @param array $tokens
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
    *   Optional array of cache context tokens.
    *
    * @return string The generated cache identifier.
    *   The generated cache identifier.
    */
-  protected function getCacheIdentifier(array $tokens = []) {
-    $tokens = array_unique(array_merge(['gql'], $tokens));
+  protected function getCacheIdentifier(CacheableDependencyInterface $metadata) {
+    $tokens = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($tokens)->getKeys();
     return implode(':', $keys);
+  }
+
+  /**
+   * Adds extra (global) cache metadata for every query.
+   *
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
+   *   Extra cache metadata to merge with the cache metadata of each query.
+   */
+  public function addExtraCacheMetadata(CacheableDependencyInterface $metadata) {
+    $this->metadata->addCacheableDependency($metadata);
   }
 
   /**
