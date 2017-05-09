@@ -10,20 +10,23 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image file size.
  *
  * @GraphQLField(
- *   id = "image_style_mime_type",
+ *   id = "image_mime_type",
  *   name = "mimeType",
  *   type = "String",
  *   nullable = true,
- *   types = {"ImageResource"}
+ *   types = {"Image"}
  * )
  */
-class ImageResourceMimeType extends FieldPluginBase {
+class ImageMimeType extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('mimeType', $value)) {
+    if ($value instanceof ImageItem) {
+      yield $value->entity->getMimeType();
+    }
+    if (is_array($value) && array_key_exists('mimeType', $value)) {
       yield $value['mimeType'];
     }
   }

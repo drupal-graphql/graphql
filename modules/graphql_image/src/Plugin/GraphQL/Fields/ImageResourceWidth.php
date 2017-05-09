@@ -23,7 +23,10 @@ class ImageResourceWidth extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('width', $value)) {
+    if ($value instanceof ImageItem) {
+      yield (int) $value->width;
+    }
+    if (is_array($value) && array_key_exists('width', $value)) {
       yield $value['width'];
     }
   }

@@ -23,7 +23,10 @@ class ImageResourceHeight extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('height', $value)) {
+    if ($value instanceof ImageItem) {
+      yield (int) $value->height;
+    }
+    if (is_array($value) && array_key_exists('height', $value)) {
       yield $value['height'];
     }
   }

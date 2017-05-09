@@ -10,6 +10,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * @GraphQLType(
  *   id = "image_resource",
  *   name = "ImageResource",
+ *   interfaces = {"ImageResource"}
  * )
  */
 class ImageResource extends TypePluginBase {

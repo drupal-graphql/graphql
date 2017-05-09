@@ -4,6 +4,7 @@ namespace Drupal\graphql_image\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Url;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -23,7 +24,10 @@ class ImageResourceUrl extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('url', $value)) {
+    if ($value instanceof ImageItem) {
+      yield file_create_url($value->entity->getFileUri());
+    }
+    if (is_array($value) && array_key_exists('url', $value)) {
       yield $value['url'];
     }
   }

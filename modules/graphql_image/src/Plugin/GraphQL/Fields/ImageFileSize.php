@@ -7,30 +7,27 @@ use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve the image field title.
+ * Retrieve the image file size.
  *
  * @GraphQLField(
- *   id = "image_original",
- *   name = "original",
- *   type = "ImageResource",
+ *   id = "image_file_size",
+ *   name = "fileSize",
+ *   type = "Int",
  *   nullable = true,
  *   types = {"Image"}
  * )
  */
-class ImageOriginal extends FieldPluginBase {
+class ImageFileSize extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ImageItem) {
-      /** @var \Drupal\file\FileInterface $file */
-      $file = $value->entity;
-      yield [
-        'url' => file_create_url($file->getFileUri()),
-        'width' => (int) $value->width,
-        'height' => (int) $value->height,
-      ];
+      yield (int) $value->entity->getSize();
+    }
+    if (is_array($value) && array_key_exists('fileSize', $value)) {
+      yield $value['fileSize'];
     }
   }
 
