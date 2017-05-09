@@ -23,7 +23,8 @@ define('GRAPHQL_CORE_ENUM_PLUGIN', 'enum');
  *   A camel-cased concatination of the input components.
  */
 function graphql_core_camelcase($components) {
-  return implode('', array_map('ucfirst', explode('_', is_array($components) ? implode('_', $components) : $components)));
+  $parts = is_array($components) ? $components : preg_split('/[^a-zA-Z0-9]/', $components);
+  return implode('', array_map('ucfirst', $parts));
 }
 
 /**
