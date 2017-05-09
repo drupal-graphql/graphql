@@ -117,14 +117,18 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleBatchRequest(Request $request, array $queries = []) {
+    $filterNumeric = function ($index) { return !is_numeric($index); };
+    $requestParameters = array_filter($request->query->all(), $filterNumeric, ARRAY_FILTER_USE_KEY);
+    $requestContent = array_filter($request->request->all(), $filterNumeric, ARRAY_FILTER_USE_KEY);
+
     // Walk over all queries and issue a sub-request for each.
-    $responses = array_map(function ($query) use ($request) {
+    $responses = array_map(function ($query) use ($request, $requestParameters, $requestContent) {
       $method = $request->getMethod();
 
       // Make sure we remove the 'queries' parameter, otherwise the subsequent
       // request could trigger the batch processing again.
-      $parameters = array_diff_key(array_merge($request->query->all(), $query), array_flip(['queries']));
-      $content = $method === 'POST' ? array_diff_key(array_merge($query, $request->request->all()), array_flip(['queries'])) : FALSE;
+      $parameters = array_merge($requestParameters, $query);
+      $content = $method === 'POST' ? array_merge($query, $requestContent) : FALSE;
       $content = $content ? json_encode($content) : '';
 
       $subRequest = Request::create('/graphql', $method, $parameters, $request->cookies->all(), $request->files->all(), $request->server->all(), $content);
