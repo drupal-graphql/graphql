@@ -5,10 +5,8 @@ namespace Drupal\graphql_image\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
-use function GuzzleHttp\Psr7\mimetype_from_extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\image\Entity\ImageStyle;
@@ -19,7 +17,7 @@ use Drupal\image\Entity\ImageStyle;
  * @GraphQLField(
  *   id = "image_derivative",
  *   name = "derivative",
- *   type = "ImageStyle",
+ *   type = "ImageResource",
  *   nullable = true,
  *   arguments = {
  *     "style" = "ImageStyleId"
@@ -72,7 +70,6 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
         'url' => $style->buildUrl($file->getFileUri()),
         'width' => $dimensions['width'],
         'height' => $dimensions['height'],
-        'extension' => $style->getDerivativeExtension(pathinfo($file->getFileUri(), PATHINFO_EXTENSION)),
       ];
     }
   }

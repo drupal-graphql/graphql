@@ -7,24 +7,24 @@ use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve the image file size.
+ * Retrieve the image height.
  *
  * @GraphQLField(
- *   id = "image_style_mime_type",
- *   name = "mimeType",
- *   type = "String",
+ *   id = "image_style_height",
+ *   name = "height",
+ *   type = "Int",
  *   nullable = true,
- *   types = {"ImageStyle"}
+ *   types = {"ImageResource"}
  * )
  */
-class ImageStyleMimeType extends FieldPluginBase {
+class ImageResourceHeight extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('mimeType', $value)) {
-      yield $value['mimeType'];
+    if (array_key_exists('height', $value)) {
+      yield $value['height'];
     }
   }
 
