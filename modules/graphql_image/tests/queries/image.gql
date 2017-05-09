@@ -4,16 +4,12 @@ query ($path: String!) {
       image {
         alt
         title
-        originalImage {
-          fileSize
-          mimeType
-          width
-          height
-          url
-        }
-        thumbnailImage {
-          fileSize
-          mimeType
+        fileSize
+        mimeType
+        width
+        height
+        url
+        thumbnailImage: derivative(style: thumbnail) {
           width
           height
           url
