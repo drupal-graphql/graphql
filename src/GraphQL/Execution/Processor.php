@@ -44,6 +44,11 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     $this->container = $container;
     $this->metadata = new CacheableMetadata();
 
+    // Add cache metadata from the active schema.
+    if ($schema instanceof CacheableDependencyInterface) {
+      $this->metadata->addCacheableDependency($schema);
+    }
+
     parent::__construct($schema);
   }
 
