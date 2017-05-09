@@ -28,7 +28,7 @@ trait EntityTypeResolverTrait {
         return $schemaManager->findByName($type, [GRAPHQL_CORE_TYPE_PLUGIN]);
       }
       catch (\Exception $exc) {
-        return $schemaManager->findByName("HiddenEntity", [GRAPHQL_CORE_TYPE_PLUGIN]);
+        return $schemaManager->findByName("UnexposedEntity", [GRAPHQL_CORE_TYPE_PLUGIN]);
       }
     }
     return NULL;

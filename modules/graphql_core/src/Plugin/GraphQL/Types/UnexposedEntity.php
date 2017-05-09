@@ -14,12 +14,12 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * but might be useful for debugging results.
  *
  * @GraphQLType(
- *   id = "hidden_entity",
- *   name = "HiddenEntity",
+ *   id = "unexposed_entity",
+ *   name = "UnexposedEntity",
  *   interfaces = {"Entity"},
  *   fields = {"entityUuid"}
  * )
  */
-class HiddenEntity extends TypePluginBase {
+class UnexposedEntity extends TypePluginBase {
 
 }
