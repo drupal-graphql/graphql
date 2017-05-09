@@ -2,6 +2,8 @@
 
 namespace Drupal\graphql_content\Plugin\GraphQL\Interfaces;
 
+use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity;
+
 /**
  * Plugin for GraphQL interfaces derived from Drupal entity types.
  *

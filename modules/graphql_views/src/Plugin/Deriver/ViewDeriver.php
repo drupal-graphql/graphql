@@ -96,7 +96,7 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
         $this->derivatives[$id] = [
           'id' => $id,
           'name' => graphql_core_propcase($name) . 'View',
-          'type' => graphql_core_camelcase($type),
+          'type' => "Entity",
           'view' => $viewId,
           'display' => $displayId,
           'cache_tags' => $view->getCacheTags(),

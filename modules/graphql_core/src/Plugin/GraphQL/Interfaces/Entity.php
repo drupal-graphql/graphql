@@ -1,11 +1,12 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Interfaces;
+namespace Drupal\graphql_core\Plugin\GraphQL\Interfaces;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\InterfacePluginBase;
+use Drupal\graphql_core\GraphQL\Traits\EntityTypeResolverTrait;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,17 +17,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "entity",
  *   name = "Entity",
  *   fields = {
- *     "entityId",
- *     "entityUuid",
- *     "entityLabel",
- *     "entityType",
- *     "entityBundle",
- *     "entityUrl"
+ *     "entityUuid"
  *   }
  * )
  */
 class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
+  use EntityTypeResolverTrait;
 
   /**
    * A schema manager instance.
@@ -54,11 +51,7 @@ class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function resolveType($object) {
-    if ($object instanceof EntityInterface) {
-      $type = graphql_core_camelcase([$object->getEntityTypeId(), $object->bundle()]);
-      return $this->schemaManager->findByName($type, [GRAPHQL_CORE_TYPE_PLUGIN]);
-    }
-    return NULL;
+    return $this->resolveEntityType($this->schemaManager, $object);
   }
 
 }

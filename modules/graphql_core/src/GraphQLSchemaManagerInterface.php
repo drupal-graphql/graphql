@@ -34,8 +34,8 @@ interface GraphQLSchemaManagerInterface {
    * @param integer[] $types
    *   A list of type constants.
    *
-   * @return object[]
-   *   The list of matching plugin instances, keyed by name.
+   * @return object
+   *   The highest weighted plugin with a specific name.
    */
   public function findByName($name, array $types);
 
