@@ -4,6 +4,7 @@ namespace Drupal\graphql\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
+use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Youshido\GraphQL\Parser\Parser;
 

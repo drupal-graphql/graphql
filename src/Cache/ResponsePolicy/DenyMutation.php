@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Cache\ResponsePolicy;
 
 use Drupal\Core\PageCache\ResponsePolicyInterface;
-use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
+use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Youshido\GraphQL\Execution\Context\ExecutionContext;
@@ -16,17 +16,17 @@ class DenyMutation implements ResponsePolicyInterface  {
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\ResettableStackedRouteMatchInterface
+   * @var \Drupal\Core\Routing\StackedRouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructs a new request policy instance.
    *
-   * @param \Drupal\Core\Routing\ResettableStackedRouteMatchInterface $routeMatch
+   * @param \Drupal\Core\Routing\StackedRouteMatchInterface $routeMatch
    *   The route provider service.
    */
-  public function __construct(ResettableStackedRouteMatchInterface $routeMatch) {
+  public function __construct(StackedRouteMatchInterface $routeMatch) {
     $this->routeMatch = $routeMatch;
   }
 
@@ -34,7 +34,7 @@ class DenyMutation implements ResponsePolicyInterface  {
    * {@inheritdoc}
    */
   public function check(Response $response, Request $request) {
-    if ($this->routeMatch->getCurrentRouteMatch()->getRouteName() !== 'graphql.request') {
+    if ($this->routeMatch->getRouteMatchFromRequest($request) !== 'graphql.request') {
       return NULL;
     }
 
