@@ -8,11 +8,11 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL Type for Drupal image derivatives.
  *
  * @GraphQLType(
- *   id = "image_resource",
- *   name = "ImageResource",
+ *   id = "image_derivative",
+ *   name = "ImageDerivative",
  *   interfaces = {"ImageResource"}
  * )
  */
-class ImageResource extends TypePluginBase {
+class ImageDerivative extends TypePluginBase {
 
 }
