@@ -59,9 +59,9 @@ abstract class QueryTestBase extends KernelTestBase  {
       'operation' => $operation,
     ];
 
-    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */
-    $http_kernel = \Drupal::service('http_kernel');
-    return $http_kernel->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($body)));
+    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel */
+    $httpKernel = \Drupal::service('http_kernel');
+    return $httpKernel->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($body)));
   }
 
   /**

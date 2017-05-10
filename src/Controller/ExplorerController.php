@@ -23,11 +23,11 @@ class ExplorerController implements ContainerInjectionInterface {
   /**
    * Constructs a ExplorerController object.
    *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The url generator service.
    */
-  public function __construct(UrlGeneratorInterface $url_generator) {
-    $this->urlGenerator = $url_generator;
+  public function __construct(UrlGeneratorInterface $urlGenerator) {
+    $this->urlGenerator = $urlGenerator;
   }
 
   /**
