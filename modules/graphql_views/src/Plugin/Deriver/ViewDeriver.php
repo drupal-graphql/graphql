@@ -96,9 +96,9 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
    *   Boolean flag indicating if the interface exists.
    */
   protected function interfaceExists($interface) {
-    return count(array_filter($this->interfacePluginManager->getDefinitions(), function ($definition) use ($interface) {
+    return (bool) array_filter($this->interfacePluginManager->getDefinitions(), function ($definition) use ($interface) {
       return $definition['name'] === $interface;
-    })) > 0;
+    });
   }
 
   /**
