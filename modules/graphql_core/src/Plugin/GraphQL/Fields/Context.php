@@ -132,7 +132,7 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
       // TODO:
       // Remove the request stack manipulation once the core issue described at
       // https://www.drupal.org/node/2613044 is resolved.
-      if ($this->requestStack->getCurrentRequest() === $request) {
+      while ($this->requestStack->getCurrentRequest() === $request) {
         $this->requestStack->pop();
       }
 
