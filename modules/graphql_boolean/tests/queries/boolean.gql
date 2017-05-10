@@ -1,0 +1,18 @@
+query ($true_path: String!, $false_path: String!) {
+  isTrue:route(path: $true_path) {
+    entity {
+      entityLabel
+      ... on EntityTestWithBundleGraphql {
+        flagged
+      }
+    }
+  }
+  isFalse:route(path: $false_path) {
+    entity {
+      entityLabel
+      ... on EntityTestWithBundleGraphql {
+        flagged
+      }
+    }
+  }
+}
