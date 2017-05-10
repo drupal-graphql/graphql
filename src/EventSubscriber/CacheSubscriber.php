@@ -142,11 +142,6 @@ class CacheSubscriber implements EventSubscriberInterface {
     if ($routeMatch->getRouteName() !== 'graphql.request') {
       return;
     }
-    
-    // We do not need to cache batch requests locally.
-    if (empty($request->attributes->get('query'))) {
-      return;
-    }
 
     // Don't cache the response if the request policies are not met. Store the
     // result in a static keyed by current request, so that onResponse() does
@@ -166,7 +161,7 @@ class CacheSubscriber implements EventSubscriberInterface {
         $event->setResponse($response);
       }
     }
-  }
+   }
 
   /**
    * Stores a response in case of a cache miss if applicable.
@@ -189,11 +184,6 @@ class CacheSubscriber implements EventSubscriberInterface {
 
     // There's no work left to be done if this is a cache hit.
     if ($response->headers->get(self::HEADER) === 'HIT') {
-      return;
-    }
-
-    // We do not need to cache batch requests locally.
-    if (empty($request->attributes->get('query'))) {
       return;
     }
 
