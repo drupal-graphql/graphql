@@ -107,7 +107,7 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
     $bundles = $this->bundleInfo->getAllBundleInfo();
 
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if (!($type instanceof ContentEntityTypeInterface)) {
+      if (!($type instanceof ContentEntityTypeInterface) || !array_key_exists($typeId, $bundles)) {
         continue;
       }
 
