@@ -24,7 +24,7 @@ class BooleanField extends FieldPluginBase {
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       foreach ($value->get($this->getPluginDefinition()['field']) as $item) {
-        yield $item->get('value')->getValue() === "1";
+        yield $item->get('value')->getValue() === '1';
       }
     }
   }
