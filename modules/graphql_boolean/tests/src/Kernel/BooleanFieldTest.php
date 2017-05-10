@@ -15,6 +15,8 @@ use Drupal\user\Entity\Role;
 
 /**
  * Test boolean graphql fields.
+ *
+ * @group graphql_boolean
  */
 class BooleanFieldTest extends KernelTestBase {
   use GraphQLFileTestTrait;
