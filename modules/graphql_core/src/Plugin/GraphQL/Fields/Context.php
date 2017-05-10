@@ -12,6 +12,7 @@ use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -43,6 +44,13 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   protected $languageManager;
 
   /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * {@inheritdoc}
    */
   protected function buildType(GraphQLSchemaManagerInterface $schemaManager) {
@@ -67,9 +75,11 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel, LanguageManagerInterface $languageManager) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel, RequestStack $requestStack, LanguageManagerInterface $languageManager) {
     $this->httpKernel = $httpKernel;
     $this->languageManager = $languageManager;
+    $this->requestStack = $requestStack;
+
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
@@ -82,6 +92,7 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
       $pluginId,
       $pluginDefinition,
       $container->get('http_kernel'),
+      $container->get('request_stack'),
       $container->get('language_manager')
     );
   }
@@ -91,12 +102,22 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-      $contextId = $this->getPluginDefinition()['context_id'];
+      $currentRequest = $this->requestStack->getCurrentRequest();
 
-      $request = Request::create($value->getOption('routed_path') ?: $value->toString());
-      $request->attributes->add([
-        'graphql_context' => $contextId,
-      ]);
+      $request = Request::create(
+        $value->getOption('routed_path') ?: $value->toString(),
+        'GET',
+        $currentRequest->query->all(),
+        $currentRequest->cookies->all(),
+        $currentRequest->files->all(),
+        $currentRequest->server->all()
+      );
+
+      $request->attributes->set('graphql_context', $this->getPluginDefinition()['context_id']);
+
+      if ($session = $currentRequest->getSession()) {
+        $request->setSession($session);
+      }
 
       // TODO:
       // Language manager stores negotiation state between requests.
@@ -111,7 +132,6 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
         yield $response->getContext()->getContextValue();
       }
     }
-
   }
 
 }
