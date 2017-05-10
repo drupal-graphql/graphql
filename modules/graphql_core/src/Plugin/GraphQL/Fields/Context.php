@@ -128,6 +128,14 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
       $this->languageManager->reset();
 
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+
+      // TODO:
+      // Remove the request stack manipulation once the core issue described at
+      // https://www.drupal.org/node/2613044 is resolved.
+      while ($this->requestStack->getCurrentRequest() === $request) {
+        $this->requestStack->pop();
+      }
+
       if ($response instanceof ContextResponse) {
         yield $response->getContext()->getContextValue();
       }

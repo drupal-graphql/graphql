@@ -4,7 +4,6 @@ namespace Drupal\graphql_block\Plugin\GraphQL\Fields;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\graphql_block\BlockResponse;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
@@ -68,6 +67,14 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
       }
 
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+
+      // TODO:
+      // Remove the request stack manipulation once the core issue described at
+      // https://www.drupal.org/node/2613044 is resolved.
+      while ($this->requestStack->getCurrentRequest() === $request) {
+        $this->requestStack->pop();
+      }
+
       if ($response instanceof BlockResponse) {
         foreach ($response->getBlocks() as $block) {
           yield $block;

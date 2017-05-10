@@ -10,7 +10,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
-use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
+use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,7 +98,7 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   A policy rule determining the cacheability of a request.
    * @param \Drupal\Core\PageCache\ResponsePolicyInterface $responsePolicy
    *   A policy rule determining the cacheability of the response.
-   * @param \Drupal\Core\Routing\ResettableStackedRouteMatchInterface $routeMatch
+   * @param \Drupal\Core\Routing\StackedRouteMatchInterface $routeMatch
    *   The current route match.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
@@ -112,7 +112,7 @@ class CacheSubscriber implements EventSubscriberInterface {
   public function __construct(
     RequestPolicyInterface $requestPolicy,
     ResponsePolicyInterface $responsePolicy,
-    ResettableStackedRouteMatchInterface $routeMatch,
+    StackedRouteMatchInterface $routeMatch,
     RequestStack $requestStack,
     CacheBackendInterface $responseCache,
     CacheBackendInterface $metadataCache,
@@ -136,12 +136,14 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onRouteMatch(GetResponseEvent $event) {
-    if ($this->routeMatch->getCurrentRouteMatch()->getRouteName() !== 'graphql.request') {
+    $request = $event->getRequest();
+    $routeMatch = $this->routeMatch->getRouteMatchFromRequest($request);
+
+    if ($routeMatch->getRouteName() !== 'graphql.request') {
       return;
     }
     
     // We do not need to cache batch requests locally.
-    $request = $event->getRequest();
     if (empty($request->attributes->get('query'))) {
       return;
     }
@@ -173,7 +175,10 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The event to process.;
    */
   public function onResponse(FilterResponseEvent $event) {
-    if ($this->routeMatch->getCurrentRouteMatch()->getRouteName() !== 'graphql.request') {
+    $request = $event->getRequest();
+    $routeMatch = $this->routeMatch->getRouteMatchFromRequest($request);
+
+    if ($routeMatch->getRouteName() !== 'graphql.request') {
       return;
     }
 
@@ -188,7 +193,6 @@ class CacheSubscriber implements EventSubscriberInterface {
     }
 
     // We do not need to cache batch requests locally.
-    $request = $event->getRequest();
     if (empty($request->attributes->get('query'))) {
       return;
     }
