@@ -1,6 +1,6 @@
-name: GraphQL Link
+name: GraphQL Boolean
 type: module
-description: 'Retrieve distinct properties from link fields.'
+description: 'Retrieve boolean values from boolean fields.'
 package: GraphQL
 core: 8.x
 dependencies:
