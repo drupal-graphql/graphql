@@ -54,11 +54,10 @@ class SchemaCacheInvalidationTest extends QueryTestBase {
    * Test if a field change invalidates the schema cache.
    */
   public function testSchemaInvalidation() {
-
     // Retrieve the schema as string.
-    $old_schema = $this->query($this->getQuery('schema.gql'));
+    $oldSchema = $this->query($this->getQuery('schema.gql'));
 
-    $this->assertEquals($old_schema, $this->query($this->getQuery('schema.gql')), 'Schema did not change yet.');
+    $this->assertEquals($oldSchema, $this->query($this->getQuery('schema.gql')), 'Schema did not change yet.');
 
     // Attach a new field to the default node display.
     EntityViewDisplay::load('node.test.default')
@@ -67,11 +66,11 @@ class SchemaCacheInvalidationTest extends QueryTestBase {
 
 
     // Retrieve the updated schema.
-    $new_schema = $this->query($this->getQuery('schema.gql'));
+    $newSchema = $this->query($this->getQuery('schema.gql'));
 
     // Make sure it updated correctly.
-    $this->assertNotEquals($old_schema, $new_schema, 'The schema has changed.');
-    $this->assertContains('fieldKeywords', $new_schema, 'Keywords field has been added.');
+    $this->assertNotEquals($oldSchema, $newSchema, 'The schema has changed.');
+    $this->assertContains('fieldKeywords', $newSchema, 'Keywords field has been added.');
   }
 
 }
