@@ -19,8 +19,4 @@ use Drupal\graphql_core\GraphQL\InterfacePluginBase;
  */
 class ImageResource extends InterfacePluginBase {
 
-  public function resolveType($object) {
-    $debug = 1;
-  }
-
 }
