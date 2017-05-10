@@ -71,9 +71,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     $storage = $this->entityTypeManager->getStorage($this->pluginDefinition['entity_type']);
+    $type = $this->entityTypeManager->getDefinition($this->pluginDefinition['entity_type']);
 
     $query = $storage->getQuery();
     $query->range($args['offset'], $args['limit']);
+    $query->sort($type->getKey('id'));
 
     foreach (array_diff_key($args, array_flip(['offset', 'limit'])) as $key => $arg) {
       $query->condition($key, $arg);
