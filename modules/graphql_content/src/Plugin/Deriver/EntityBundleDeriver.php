@@ -56,7 +56,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
     $this->derivatives = [];
     $bundles = $this->entityTypeBundleInfo->getAllBundleInfo();
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if ($type instanceof ContentEntityTypeInterface) {
+      if ($type instanceof ContentEntityTypeInterface && array_key_exists($typeId, $bundles)) {
         foreach (array_keys($bundles[$typeId]) as $bundle) {
           $this->derivatives[$typeId . '-' . $bundle] = [
             'name' => graphql_core_camelcase([$typeId, $bundle]),

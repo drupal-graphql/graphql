@@ -1,0 +1,7 @@
+name: GraphQL Boolean
+type: module
+description: 'Retrieve boolean values from boolean fields.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_content
