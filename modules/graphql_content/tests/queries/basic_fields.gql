@@ -9,6 +9,9 @@ query ($path: String!) {
       entityRoute:entityUrl {
         internalPath:path,
         aliasedPath:alias
+      },
+      entityTranslation("en") {
+        entityId
       }
     }
     node_test:nodeContext {
