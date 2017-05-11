@@ -3,6 +3,7 @@
 namespace Drupal\graphql_views\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,6 +21,13 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
   protected $entityTypeManager;
 
   /**
+   * The interface plugin manager to search for return type candidates.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $interfacePluginManager;
+
+  /**
    * An key value pair of data tables and the entities they belong to.
    *
    * @var string[]
@@ -31,7 +39,8 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('graphql_core.interface_manager')
     );
   }
 
@@ -40,10 +49,14 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   An entity type manager instance.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $interfacePluginManager
+   *   The plugin manager for graphql interfaces.
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager
+    EntityTypeManagerInterface $entityTypeManager,
+    PluginManagerInterface $interfacePluginManager
   ) {
+    $this->interfacePluginManager = $interfacePluginManager;
     $this->entityTypeManager = $entityTypeManager;
   }
 
@@ -74,6 +87,21 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
   }
 
   /**
+   * Check if a certain interface exists.
+   *
+   * @param string $interface
+   *   The GraphQL interface name.
+   *
+   * @return bool
+   *   Boolean flag indicating if the interface exists.
+   */
+  protected function interfaceExists($interface) {
+    return (bool) array_filter($this->interfacePluginManager->getDefinitions(), function ($definition) use ($interface) {
+      return $definition['name'] === $interface;
+    });
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
@@ -84,6 +112,8 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         continue;
       }
+
+      $typeName = graphql_core_camelcase($type);
 
       foreach ($view->get('display') as $displayId => $display) {
         if ($display['display_plugin'] !== 'graphql') {
@@ -96,7 +126,7 @@ class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
         $this->derivatives[$id] = [
           'id' => $id,
           'name' => graphql_core_propcase($name) . 'View',
-          'type' => graphql_core_camelcase($type),
+          'type' => $this->interfaceExists($typeName) ? $typeName : 'Entity',
           'view' => $viewId,
           'display' => $displayId,
           'cache_tags' => $view->getCacheTags(),

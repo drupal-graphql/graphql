@@ -2,6 +2,8 @@
 
 namespace Drupal\graphql_content\Plugin\GraphQL\Interfaces;
 
+use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity;
+
 /**
  * Plugin for GraphQL interfaces derived from Drupal entity types.
  *
@@ -14,7 +16,8 @@ namespace Drupal\graphql_content\Plugin\GraphQL\Interfaces;
  *     "entityLabel",
  *     "entityType",
  *     "entityBundle",
- *     "entityUrl"
+ *     "entityUrl",
+ *     "entityLanguage"
  *   },
  *   cache_tags = {"entity_types"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\EntityTypeDeriver"

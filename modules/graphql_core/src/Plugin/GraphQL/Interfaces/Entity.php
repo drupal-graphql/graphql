@@ -1,27 +1,32 @@
 <?php
 
-namespace Drupal\graphql_block\Plugin\GraphQL\Interfaces;
+namespace Drupal\graphql_core\Plugin\GraphQL\Interfaces;
 
-use Drupal\block_content\Entity\BlockContent;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\InterfacePluginBase;
+use Drupal\graphql_core\GraphQL\Traits\EntityTypeResolverTrait;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Root interface for Drupal blocks exposed to GraphQL.
+ * Plugin for GraphQL interfaces derived from Drupal entity types.
  *
  * @GraphQLInterface(
- *   id = "block",
- *   name = "Block"
+ *   id = "entity",
+ *   name = "Entity",
+ *   fields = {
+ *     "entityUuid"
+ *   }
  * )
  */
-class Block extends InterfacePluginBase implements ContainerFactoryPluginInterface {
+class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
+  use EntityTypeResolverTrait;
 
   /**
-   * The schema manager.
+   * A schema manager instance.
    *
    * @var \Drupal\graphql_core\GraphQLSchemaManagerInterface
    */
@@ -46,16 +51,7 @@ class Block extends InterfacePluginBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function resolveType($object) {
-    if ($object instanceof BlockContent) {
-      return $this->schemaManager->findByName(
-        graphql_core_camelcase([$object->getEntityTypeId(), $object->bundle()]),
-        [GRAPHQL_CORE_TYPE_PLUGIN]
-      );
-    }
-    else {
-      // TODO: Detect custom block plugins?
-      return $this->schemaManager->findByName('BlockConfig', [GRAPHQL_CORE_TYPE_PLUGIN]);
-    }
+    return $this->resolveEntityType($this->schemaManager, $object);
   }
 
 }
