@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "entityLabel",
  *     "entityType",
  *     "entityBundle",
+ *     "entityLanguage",
  *     "entityUrl"
  *   }
  * )
