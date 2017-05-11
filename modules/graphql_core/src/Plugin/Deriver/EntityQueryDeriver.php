@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -29,21 +30,45 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
   protected $typedDataManager;
 
   /**
+   * The graphql interface plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $interfaceManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('typed_data_manager')
+      $container->get('typed_data_manager'),
+      $container->get('graphql_core.interface_manager')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, TypedDataManager $typedDataManager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, TypedDataManager $typedDataManager, PluginManagerInterface $interfaceManager) {
     $this->entityTypeManager = $entityTypeManager;
     $this->typedDataManager = $typedDataManager;
+    $this->interfaceManager = $interfaceManager;
+  }
+
+  /**
+   * Check if a certain interface has been defined.
+   *
+   * @param string $interface
+   *   The interface name.
+   *
+   * @return bool
+   *   Flag indicating if the interface exists.
+   */
+  protected function interfaceExists($interface) {
+    return array_filter($this->interfaceManager->getDefinitions(), function ($definition) use ($interface) {
+      return $definition['name'] === $interface;
+    });
   }
 
   /**
@@ -52,9 +77,10 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
+        $typeName = graphql_core_camelcase($id);
         $derivative = [
           'name' => graphql_core_propcase($id) . 'Query',
-          'type' => graphql_core_camelcase($id),
+          'type' => $this->interfaceExists($typeName) ? $typeName : 'UnexposedEntity',
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
