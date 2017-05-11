@@ -3,6 +3,7 @@
 namespace Drupal\graphql_entity_reference\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -23,9 +24,10 @@ class EntityReferenceField extends FieldPluginBase {
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
-      /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items */
       foreach ($value->get($this->getPluginDefinition()['field']) as $item) {
-        yield $item->entity;
+        if ($item instanceof EntityReferenceItem && $item->getEntity()->access('view')) {
+          yield $item->entity;
+        }
       }
     }
   }
