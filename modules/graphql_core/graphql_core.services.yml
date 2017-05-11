@@ -83,22 +83,18 @@ services:
       - '\Drupal\graphql_core\Annotation\GraphQLEnum'
       - '@graphql_core.schema_manager'
       - 'graphql_enums'
-
   graphql_core.schema_manager:
     class: Drupal\graphql_core\GraphQLSchemaManager
     tags:
       - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
-
   graphql_core.event_listener:
     class: Drupal\graphql_core\EventListener
     tags:
       - { name: event_subscriber }
-
   graphql_core.context_repository:
     class: Drupal\graphql_core\GraphQLContextRepository
     tags:
       - { name: service_collector, tag: context_provider, call: addContextProvider }
-
   graphql_core.schema_provider:
     class: Drupal\graphql_core\PluggableSchemaProvider
     arguments:

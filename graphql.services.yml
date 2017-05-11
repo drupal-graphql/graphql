@@ -43,7 +43,16 @@ services:
     factory: ['@graphql.schema_factory', getSchema]
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory
-    arguments: ['@cache_contexts_manager', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
+    arguments: ['@cache_contexts_manager', '@request_stack', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
+    tags:
+        - { name: service_collector, tag: graphql_extra_schema_cache_metadata, call: addExtraCacheMetadata }
+  graphql.extra_schema_cache_metadata:
+    class: Drupal\Core\Cache\CacheableMetadata
+    calls:
+      - { method: addCacheContexts, arguments: [['languages:language_interface']] }
+      - { method: addCacheTags, arguments: [['graphql_schema']] }
+    tags:
+      - { name: graphql_extra_schema_cache_metadata }
   graphql.schema_provider:
     class: Drupal\graphql\SchemaProvider\SchemaProvider
     arguments: ['%graphql.config%']
@@ -62,10 +71,11 @@ services:
     tags:
       - { name: service_collector, tag: graphql_extra_cache_metadata, call: addExtraCacheMetadata }
       - { name: event_subscriber }
-  graphql.extra_cache_metadata.default:
+  graphql.extra_cache_metadata:
     class: Drupal\Core\Cache\CacheableMetadata
     calls:
       - { method: addCacheContexts, arguments: [['gql']] }
+      - { method: addCacheTags, arguments: [['graphql_response']] }
     tags:
       - { name: graphql_extra_cache_metadata }
   graphql.request_policy:

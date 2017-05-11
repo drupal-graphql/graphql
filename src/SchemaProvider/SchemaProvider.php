@@ -2,8 +2,9 @@
 
 namespace Drupal\graphql\SchemaProvider;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\Schema;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Generates a GraphQL Schema.
@@ -44,9 +45,7 @@ class SchemaProvider implements SchemaProviderInterface {
    * {@inheritdoc}
    */
   public function getSchema() {
-    $schemaClass = $this->config['schema_class'];
-
-    return array_reduce($this->getSortedProviders(), function (Schema $carry, SchemaProviderInterface $provider) {
+    return array_reduce($this->getSortedProviders(), function (AbstractSchema $carry, SchemaProviderInterface $provider) {
       if ($schema = $provider->getSchema()) {
         $carry->getTypesList()->addTypes($schema->getTypesList()->getTypes());
         $carry->getQueryType()->addFields($schema->getQueryType()->getFields());
@@ -56,23 +55,12 @@ class SchemaProvider implements SchemaProviderInterface {
         }
       }
 
-      return $carry;
-    }, new $schemaClass());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContexts() {
-    $metadata = array_reduce($this->getSortedProviders(), function (CacheableMetadata $carry, SchemaProviderInterface $provider) {
-      if ($contexts = $provider->getContexts()) {
-        $carry->addCacheContexts($contexts);
+      if ($carry instanceof RefinableCacheableDependencyInterface && $schema instanceof CacheableDependencyInterface) {
+        $carry->addCacheableDependency($schema);
       }
 
       return $carry;
-    }, new CacheableMetadata());
-
-    return $metadata->getCacheContexts();
+    }, new $this->config['schema_class']());
   }
 
   /**

@@ -218,7 +218,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
-    // Write the cache entry for the cache metadata. This one uses the
+    // Write the cache entry for the cache metadata.
     $ccid = $this->getCacheIdentifier($this->metadata);
     $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
@@ -258,7 +258,7 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected function getCacheIdentifier(CacheableDependencyInterface $metadata) {
     $tokens = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($tokens)->getKeys();
-    return implode(':', $keys);
+    return implode(':', array_merge(['graphql'], array_values($keys)));
   }
 
   /**
