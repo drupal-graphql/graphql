@@ -15,6 +15,7 @@ use Drupal\graphql\GraphQL\Execution\Processor;
 use Drupal\graphql\Reducers\ReducerManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Schema\AbstractSchema;
@@ -67,6 +68,13 @@ class RequestController implements ContainerInjectionInterface {
   protected $reducerManager;
 
   /**
+   * The request stack service.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * Constructs a RequestController object.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -79,15 +87,26 @@ class RequestController implements ContainerInjectionInterface {
    *   The config service.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The http kernel service.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(ContainerInterface $container, AbstractSchema $schema, ReducerManager $reducerManager, Config $config, HttpKernelInterface $httpKernel, RendererInterface $renderer) {
+  public function __construct(
+    ContainerInterface $container,
+    AbstractSchema $schema,
+    ReducerManager $reducerManager,
+    Config $config,
+    HttpKernelInterface $httpKernel,
+    RequestStack $requestStack,
+    RendererInterface $renderer
+  ) {
     $this->container = $container;
     $this->schema = $schema;
     $this->reducerManager = $reducerManager;
     $this->config = $config;
     $this->httpKernel = $httpKernel;
+    $this->requestStack = $requestStack;
     $this->renderer = $renderer;
   }
 
@@ -101,6 +120,7 @@ class RequestController implements ContainerInjectionInterface {
       $container->get('graphql.reducer_manager'),
       $container->get('config.factory')->get('system.performance'),
       $container->get('http_kernel'),
+      $container->get('request_stack'),
       $container->get('renderer')
     );
   }
@@ -145,7 +165,16 @@ class RequestController implements ContainerInjectionInterface {
         $subRequest->setSession($session);
       }
 
-      return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+      $output = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+
+      // TODO:
+      // Remove the request stack manipulation once the core issue described at
+      // https://www.drupal.org/node/2613044 is resolved.
+      while ($this->requestStack->getCurrentRequest() === $subRequest) {
+        $this->requestStack->pop();
+      }
+
+      return $output;
     }, $queries);
 
     // Gather all responses from all sub-requests.

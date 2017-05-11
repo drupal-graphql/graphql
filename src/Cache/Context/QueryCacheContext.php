@@ -5,7 +5,6 @@ namespace Drupal\graphql\Cache\Context;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Youshido\GraphQL\Parser\Parser;
 
 /**
  * Defines the QueryCacheContext service, for "per query" caching.
@@ -55,15 +54,33 @@ class QueryCacheContext implements CacheContextInterface {
       return $this->contextCache[$request];
     }
 
-    $parser = new Parser();
-    $ast = $parser->parse($request->attributes->get('query'));
-    $variables = $request->attributes->get('variables') ?: [];
-    ksort($variables);
+    if ($request->attributes->has('query')) {
+      $query = preg_replace('/\s{2,}/', ' ', $request->attributes->get('query') ?: '');
+      $variables = $request->attributes->get('variables') ?: [];
+      ksort($variables);
 
-    return $this->contextCache[$request] = hash('sha256', json_encode([
-      'query' => serialize($ast),
-      'variables' => $variables,
-    ]));
+      return $this->contextCache[$request] = hash('sha256', json_encode([
+        'query' => $query,
+        'variables' => $variables,
+      ]));
+    }
+
+    if ($request->attributes->has('queries')) {
+      $queries = $request->attributes->get('queries');
+
+      return $this->contextCache[$request] = hash('sha256', json_encode(array_map(function ($item) {
+        $query = preg_replace('/\s{2,}/', ' ', !empty($item['query']) ? $item['query'] : '');
+        $variables = !empty($item['variables']) ? $item['variables'] : [];
+        ksort($variables);
+
+        return [
+          'query' => $query,
+          'variables' => $variables,
+        ];
+      }, $queries)));
+    }
+
+    return $this->contextCache[$request] = '';
   }
 
   /**

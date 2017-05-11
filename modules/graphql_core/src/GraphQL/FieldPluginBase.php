@@ -30,14 +30,14 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   public function resolve($value, array $args, ResolveInfo $info) {
     $result = iterator_to_array($this->resolveValues($value, $args, $info));
     if ($this->getPluginDefinition()['multi']) {
-      return new CacheableValue($result, $this->getCacheDependencies($value, $args));
+      return new CacheableValue($result, $this->getCacheDependencies($value, $args, $result));
     }
     else {
-      if (count($result)) {
-        return new CacheableValue(reset($result), $this->getCacheDependencies($value, $args));
+      if ($result) {
+        return new CacheableValue(reset($result), $this->getCacheDependencies($value, $args, $result));
       }
       else {
-        return new UncacheableValue(NULL);
+        return new CacheableValue(NULL, $this->getCacheDependencies($value, $args, $result));
       }
     }
   }
@@ -45,17 +45,19 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   /**
    * Retrieve the list of cache dependencies for a given value and arguments.
    *
+   * @param mixed $result
+   *   The result of the field.
    * @param mixed $value
-   *   The current object value.
+   *   The parent value.
    * @param array $args
    *   The arguments passed to the field.
    *
    * @return array
-   *   A list of cachable dependencies.
+   *   A list of cacheable dependencies.
    */
-  protected function getCacheDependencies($value, array $args) {
+  protected function getCacheDependencies($result, $value, array $args) {
     // Default implementation just returns the value itself.
-    return [$value];
+    return isset($result) ? [$result, $value] : [$value];
   }
 
   /**

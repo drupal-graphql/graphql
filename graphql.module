@@ -10,8 +10,8 @@ use Drupal\Core\Url;
 /**
  * Implements hook_help().
  */
-function graphql_help($route_name) {
-  if ($route_name !== 'help.page.graphql') {
+function graphql_help($routeName) {
+  if ($routeName !== 'help.page.graphql') {
     return;
   }
 
