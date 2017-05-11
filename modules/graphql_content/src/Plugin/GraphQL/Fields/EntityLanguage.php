@@ -22,7 +22,7 @@ class EntityLanguage extends FieldPluginBase {
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof EntityInterface) {
-      yield $value->language()->getId();
+      yield $value->language();
     }
   }
 

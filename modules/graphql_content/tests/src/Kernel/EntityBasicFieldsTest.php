@@ -64,7 +64,12 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'entityLabel' => $node->label(),
       'entityType' => $node->getEntityTypeId(),
       'entityBundle' => $node->bundle(),
-      'entityLanguage' => $node->language()->getId(),
+      'entityLanguage' => [
+        'id' => $node->language()->getId(),
+        'name' => $node->language()->getName(),
+        'direction' => $node->language()->getDirection(),
+        'weight' => $node->language()->getWeight(),
+      ],
       'entityRoute' => [
         'internalPath' => '/node/' . $node->id(),
         'aliasedPath' => '/node/' . $node->id(),
