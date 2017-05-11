@@ -6,6 +6,12 @@ query ($path: String!) {
       entityLabel,
       entityType,
       entityBundle,
+      entityLanguage {
+        id,
+        name,
+        direction,
+        weight
+      },
       entityRoute:entityUrl {
         internalPath:path,
         aliasedPath:alias
@@ -18,6 +24,12 @@ query ($path: String!) {
         entityLabel,
         entityType,
         entityBundle,
+        entityLanguage {
+          id,
+          name,
+          direction,
+          weight
+        },
         entityRoute:entityUrl {
           internalPath:path,
           aliasedPath:alias

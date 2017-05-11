@@ -99,7 +99,11 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
               continue;
             }
 
-            $mainProperty = $property->getMainPropertyName();
+            // Some field types don't have a main property.
+            if (!$mainProperty = $property->getMainPropertyName()) {
+              continue;
+            }
+
             $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
 
             $derivative['arguments'][$argName] = [
