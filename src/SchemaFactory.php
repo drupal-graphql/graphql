@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\graphql\GraphQL\TypeCollector;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -105,35 +106,30 @@ class SchemaFactory {
    *   The generated GraphQL schema.
    */
   public function getSchema() {
+    // The cache key is made up of all of the globally known cache contexts.
     $cid = $this->getCacheIdentifier($this->metadata);
     if ($this->config['cache'] && ($schema = $this->schemaCache->get($cid)) && $schema->data instanceof AbstractSchema) {
       return $schema->data;
     }
 
+    // If the schema is not cacheable, just return it directly.
     $schema = $this->schemaProvider->getSchema();
+    if (!($schema instanceof CacheableDependencyInterface)) {
+      return $schema;
+    }
+
+    // Add global and field/type cache metadata to the schema.
+    if ($schema instanceof RefinableCacheableDependencyInterface) {
+      $schema->addCacheableDependency($this->metadata);
+      $schema->addCacheableDependency($this->getCacheMetadataFromTypes($schema));
+    }
 
     if ($this->config['cache']) {
-      // Cache the generated schema in the configured cache backend.
-      $metadata = new CacheableMetadata();
-      $metadata->setCacheMaxAge(Cache::PERMANENT);
+      $tags = $schema->getCacheTags();
+      $expire = $this->maxAgeToExpire($schema->getCacheMaxAge());
 
-      // Add global cache metadata.
-      $metadata->addCacheableDependency($this->metadata);
-
-      // Add cache metadata from all types and fields of the schema.
-      $metadata->addCacheableDependency($this->getCacheMetadataFromTypes($schema));
-
-      // Add cache metadata from the schema itself (if any).
-      if ($schema instanceof CacheableDependencyInterface) {
-        $metadata->addCacheableDependency($schema);
-      }
-
-      // We can't use the contexts from the actual schema cache metadata for
-      // caching. Instead, we just use the global cache contexts.
-      $tags = $metadata->getCacheTags();
-      $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
-
-      // Cache the schema itself.
+      // We use the cache key from the global cache metadata but the tags and
+      // expiry time from the entire cache metadata.
       $this->schemaCache->set($cid, $schema, $expire, $tags);
     }
 

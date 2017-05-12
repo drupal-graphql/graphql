@@ -41,6 +41,8 @@ services:
   graphql.schema:
     class: Drupal\graphql\GraphQL\Schema
     factory: ['@graphql.schema_factory', getSchema]
+    tags:
+      - { name: graphql_extra_cache_metadata }
   graphql.schema_factory:
     class: Drupal\graphql\SchemaFactory
     arguments: ['@cache_contexts_manager', '@request_stack', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']

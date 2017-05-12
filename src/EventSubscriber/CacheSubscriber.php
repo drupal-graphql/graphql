@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Disables any display variant on the explorer page.
@@ -211,10 +212,9 @@ class CacheSubscriber implements EventSubscriberInterface {
     }
 
     // Merge the global cache metadata with the response cache metadata.
-    $metadata = new CacheableMetadata();
-    $metadata->addCacheableDependency($this->metadata);
-    $metadata->addCacheableDependency($response->getCacheableMetadata());
+    $response->addCacheableDependency($this->metadata);
 
+    $metadata = $response->getCacheableMetadata();
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
