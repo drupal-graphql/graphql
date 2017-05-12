@@ -57,7 +57,7 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ImageItem && $style = ImageStyle::load($args['style'])) {
+    if ($value instanceof ImageItem && $value->entity->access('view') && $style = ImageStyle::load($args['style'])) {
       $file = $value->entity;
       // Determine the dimensions of the styled image.
       $dimensions = [

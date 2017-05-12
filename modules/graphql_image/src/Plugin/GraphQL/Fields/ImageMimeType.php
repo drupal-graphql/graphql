@@ -23,7 +23,7 @@ class ImageMimeType extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ImageItem) {
+    if ($value instanceof ImageItem && $value->entity->access('view')) {
       yield $value->entity->getMimeType();
     }
     if (is_array($value) && array_key_exists('mimeType', $value)) {
