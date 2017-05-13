@@ -65,13 +65,18 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       $container->get('entity_type.manager')
     );
   }
-  
+
   /**
    * {@inheritdoc}
    */
   protected function getCacheDependencies($result, $value, array $args) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
-    $metadata = (new CacheableMetadata())->addCacheTags(["{$entityTypeId}_list"]);
+    $type = $this->entityTypeManager->getDefinition($entityTypeId);
+
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheTags($type->getListCacheTags());
+    $metadata->addCacheContexts($type->getListCacheContexts());
+
     return [$metadata];
   }
 
