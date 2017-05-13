@@ -2,10 +2,12 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\CacheableValue;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -63,13 +65,23 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       $container->get('entity_type.manager')
     );
   }
+  
+  /**
+   * {@inheritdoc}
+   */
+  protected function getCacheDependencies($result, $value, array $args) {
+    $entityTypeId = $this->pluginDefinition['entity_type'];
+    $metadata = (new CacheableMetadata())->addCacheTags(["{$entityTypeId}_list"]);
+    return [$metadata];
+  }
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    $storage = $this->entityTypeManager->getStorage($this->pluginDefinition['entity_type']);
-    $type = $this->entityTypeManager->getDefinition($this->pluginDefinition['entity_type']);
+    $entityTypeId = $this->pluginDefinition['entity_type'];
+    $storage = $this->entityTypeManager->getStorage($entityTypeId);
+    $type = $this->entityTypeManager->getDefinition($entityTypeId);
 
     $query = $storage->getQuery();
     $query->range($args['offset'], $args['limit']);
