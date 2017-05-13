@@ -5,36 +5,24 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a list of entities through an entity query.
+ * Retrieve the entity result set of an entity query.
  *
  * @GraphQLField(
- *   id = "entity_query",
- *   name = "entityQuery",
- *   type = "EntityQueryResult",
- *   nullable = false,
- *   weight = -1,
- *   arguments = {
- *     "offset" = {
- *       "type" = "Int",
- *       "nullable" = true,
- *       "default" = 0
- *     },
- *     "limit" = {
- *       "type" = "Int",
- *       "nullable" = true,
- *       "default" = 10
- *     }
- *   },
- *   deriver = "\Drupal\graphql_core\Plugin\Deriver\EntityQueryDeriver"
+ *   id = "entity_query_entities",
+ *   name = "entities",
+ *   type = "Entity",
+ *   multi = true,
+ *   nullable = true
  * )
  */
-class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
@@ -68,18 +56,18 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    $storage = $this->entityTypeManager->getStorage($this->pluginDefinition['entity_type']);
-    $type = $this->entityTypeManager->getDefinition($this->pluginDefinition['entity_type']);
+    if ($value instanceof QueryInterface) {
+      $storage = $this->entityTypeManager->getStorage($value->getEntityTypeId());
 
-    $query = $storage->getQuery();
-    $query->range($args['offset'], $args['limit']);
-    $query->sort($type->getKey('id'));
+      $ids = $value->execute();
+      $entities = array_filter($storage->loadMultiple($ids), function (ContentEntityInterface $entity) {
+        return $entity->access('view');
+      });
 
-    foreach (array_diff_key($args, array_flip(['offset', 'limit'])) as $key => $arg) {
-      $query->condition($key, $arg);
+      foreach ($entities as $result) {
+        yield $result;
+      }
     }
-
-    yield $query;
   }
 
 }

@@ -43,7 +43,7 @@ class EntityQueryTest extends GraphQLFileTestBase {
   }
 
   /**
-   * Test that the entity query both nodes.
+   * Test that entity queries work.
    */
   public function testEntityQuery() {
     $a = $this->createNode([
@@ -77,26 +77,35 @@ class EntityQueryTest extends GraphQLFileTestBase {
       ['uuid' => $a->uuid()],
       ['uuid' => $b->uuid()],
       ['uuid' => $c->uuid()],
-    ], $result['data']['a'], 'Type A entities queried.');
+    ], $result['data']['a']['entities'], 'Type A entities queried.');
+
+    $this->assertEquals(3, $result['data']['a']['count'], 'Correct count is returned');
 
     $this->assertEquals([
       ['uuid' => $d->uuid()],
-    ], $result['data']['b'], 'Type B entity queried.');
+    ], $result['data']['b']['entities'], 'Type B entity queried.');
+
+    $this->assertEquals(1, $result['data']['b']['count'], 'Correct count is returned');
 
     $this->assertEquals([
       ['uuid' => $a->uuid()],
       ['uuid' => $b->uuid()],
-    ], $result['data']['limit'], 'Limit works as expected.');
+    ], $result['data']['limit']['entities'], 'Limit works as expected.');
+
+    $this->assertEquals(4, $result['data']['limit']['count'], 'Correct count is returned');
 
     $this->assertEquals([
       ['uuid' => $b->uuid()],
       ['uuid' => $c->uuid()],
-    ], $result['data']['offset'], 'Offset works as expected.');
+    ], $result['data']['offset']['entities'], 'Offset works as expected.');
+
+    $this->assertEquals(4, $result['data']['offset']['count'], 'Correct count is returned');
 
     $this->assertEquals([
       ['uuid' => $b->uuid()],
-    ], $result['data']['offset_limit'], 'Offset and limit combination works as expected.');
+    ], $result['data']['offset_limit']['entities'], 'Offset and limit combination works as expected.');
 
+    $this->assertEquals(4, $result['data']['offset_limit']['count'], 'Correct count is returned');
   }
 
 }

@@ -57,30 +57,13 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
   }
 
   /**
-   * Check if a certain interface has been defined.
-   *
-   * @param string $interface
-   *   The interface name.
-   *
-   * @return bool
-   *   Flag indicating if the interface exists.
-   */
-  protected function interfaceExists($interface) {
-    return array_filter($this->interfaceManager->getDefinitions(), function ($definition) use ($interface) {
-      return $definition['name'] === $interface;
-    });
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
-        $typeName = graphql_core_camelcase($id);
         $derivative = [
           'name' => graphql_core_propcase($id) . 'Query',
-          'type' => $this->interfaceExists($typeName) ? $typeName : 'UnexposedEntity',
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
