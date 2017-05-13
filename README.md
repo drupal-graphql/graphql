@@ -4,40 +4,41 @@
 
 This module lets you craft and expose a [GraphQL] schema for [Drupal 8].
 
-Currently, you can expose your own custom schema through custom code with
-minimal effort. In the near future, we will add the ability to automatically
-generate a full schema from the underlying Drupal data graph.
+It is is built around https://github.com/Youshido/GraphQL. As such, it supports
+the full official GraphQL specification with all its features.
 
-The module is currently meant as a basis for custom development rather than pure
-site building. As such, it leaves it up to you as a developer to choose
-whether/how to expose fields and non-entity data. To help you with this task,
-it provides base a flexible integrations layer for you to define your own
-schema.
+You can use this module as a foundation for building your own schema through
+custom code or you can use and extend the generated schema using the plugin
+architecture of the contained sub-modules.
 
 For ease of development, it includes the [GraphiQL] interface at
 /graphql/explorer.
-
-This module is built around https://github.com/Youshido/GraphQL. As such, it
-supports the full official GraphQL specification with all its features.
 
 [Drupal 8]: https://www.drupal.org/8
 [GraphQL]: http://graphql.org/
 [GraphiQL]: https://github.com/graphql/graphiql/
 
-## Examples
+## Built-in generated schema
 
-The module itself contains an submodule which serves as an example for how to
-build a custom schema.
+The `modules` directory contains a set of modules that help to automatically
+create a schema from Drupal data structures and components. By enabling these
+sub-modules you can expose much of the Drupal data graph without writing a
+single line of code.
+
+Please refer to `modules/README.md` for more information.
+
+## Example implementation
 
 Check out https://github.com/fubhy/drupal-decoupled-app for a complete example
 of a fully decoupled React and GraphQL application. Feel free to use that
 repository as a starting point for your own decoupled application.
 
-## Built-in generated schema
+## Documentation
 
-The `modules` directory contains a set of modules that help to automatically
-create a GraphQL schema from Drupal data structures and components. Please
-refer to `modules/README.md` for more information.
+Please note that our documentation is outdated and in dire need of rewriting.
+This is due to the vast amount of improvements and additional features we've
+added to the module recently. As we are finishing up the 3.x version of this
+module we will be re-doing the documentation and record a series of screencasts.
 
 ## Resources
  
