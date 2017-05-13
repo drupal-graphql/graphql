@@ -92,20 +92,20 @@ class EntityQueryTest extends GraphQLFileTestBase {
       ['uuid' => $b->uuid()],
     ], $result['data']['limit']['entities'], 'Limit works as expected.');
 
-    $this->assertEquals(4, $result['data']['limit']['count'], 'Correct count is returned');
+    $this->assertEquals(3, $result['data']['limit']['count'], 'Correct count is returned');
 
     $this->assertEquals([
       ['uuid' => $b->uuid()],
       ['uuid' => $c->uuid()],
     ], $result['data']['offset']['entities'], 'Offset works as expected.');
 
-    $this->assertEquals(4, $result['data']['offset']['count'], 'Correct count is returned');
+    $this->assertEquals(3, $result['data']['offset']['count'], 'Correct count is returned');
 
     $this->assertEquals([
       ['uuid' => $b->uuid()],
     ], $result['data']['offset_limit']['entities'], 'Offset and limit combination works as expected.');
 
-    $this->assertEquals(4, $result['data']['offset_limit']['count'], 'Correct count is returned');
+    $this->assertEquals(3, $result['data']['offset_limit']['count'], 'Correct count is returned');
   }
 
 }
