@@ -15,10 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @GraphQLInterface(
  *   id = "entity",
- *   name = "Entity",
- *   fields = {
- *     "entityUuid"
- *   }
+ *   name = "Entity"
  * )
  */
 class Entity extends InterfacePluginBase implements ContainerFactoryPluginInterface {

@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "wheels",
  *   name = "wheels",
  *   type = "Int",
- *   types = {"Car", "Bike"}
+ *   types = {"Vehicle"}
  * )
  */
 class Wheels extends FieldPluginBase {

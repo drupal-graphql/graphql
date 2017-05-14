@@ -16,8 +16,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * @GraphQLType(
  *   id = "unexposed_entity",
  *   name = "UnexposedEntity",
- *   interfaces = {"Entity"},
- *   fields = {"entityUuid"}
+ *   interfaces = {"Entity"}
  * )
  */
 class UnexposedEntity extends TypePluginBase {

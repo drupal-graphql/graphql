@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_language",
  *   name = "entityLanguage",
  *   type = "Language",
+ *   types = {"Entity"}
  * )
  */
 class EntityLanguage extends FieldPluginBase {

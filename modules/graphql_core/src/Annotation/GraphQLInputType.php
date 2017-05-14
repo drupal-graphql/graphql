@@ -14,11 +14,4 @@ class GraphQLInputType extends GraphQLAnnotationBase {
    */
   public $pluginType = GRAPHQL_CORE_INPUT_TYPE_PLUGIN;
 
-  /**
-   * The fields attached to this type.
-   *
-   * @var array
-   */
-  public $fields = [];
-
 }

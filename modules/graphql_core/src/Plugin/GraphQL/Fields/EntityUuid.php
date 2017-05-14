@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_uuid",
  *   name = "entityUuid",
  *   type = "String",
+ *   types = {"Entity"}
  * )
  */
 class EntityUuid extends FieldPluginBase {

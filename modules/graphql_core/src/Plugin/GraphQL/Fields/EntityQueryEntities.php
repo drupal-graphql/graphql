@@ -18,6 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_query_entities",
  *   name = "entities",
  *   type = "Entity",
+ *   types = {"EntityQueryResult"},
  *   multi = true,
  *   nullable = true
  * )

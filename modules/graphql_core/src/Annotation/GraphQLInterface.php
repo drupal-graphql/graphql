@@ -19,13 +19,6 @@ class GraphQLInterface extends GraphQLAnnotationBase {
    *
    * @var string
    */
-  public $data_type;
-
-  /**
-   * The fields attached to this interface.
-   *
-   * @var array
-   */
-  public $fields = [];
+  public $dataType;
 
 }

@@ -24,15 +24,8 @@ trait FieldablePluginTrait {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
 
-      $explicitFields = [];
-      if ($definition['fields']) {
-        // Fields that are annotated on the type itself.
-        $explicitFields = $schemaManager->find(function ($field) use ($definition) {
-          return in_array($field['name'], $definition['fields']);
-        }, [GRAPHQL_CORE_FIELD_PLUGIN]);
-      }
-
       $implicitFields = [];
+
       if ($definition['name']) {
         // Fields that are attached by annotating the type on the field.
         $implicitFields = $schemaManager->find(function ($field) use ($definition) {
@@ -42,7 +35,7 @@ trait FieldablePluginTrait {
 
       // Implicit fields have higher precedence than explicit ones.
       // This makes fields overridable.
-      return array_filter($implicitFields + $explicitFields, function ($type) {
+      return array_filter($implicitFields, function ($type) {
         return $type instanceof FieldInterface;
       });
     }
