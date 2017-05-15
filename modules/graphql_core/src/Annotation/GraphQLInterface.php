@@ -19,6 +19,6 @@ class GraphQLInterface extends GraphQLAnnotationBase {
    *
    * @var string
    */
-  public $dataType;
+  public $data_type;
 
 }
