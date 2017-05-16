@@ -21,4 +21,13 @@ class GraphQLInterface extends GraphQLAnnotationBase {
    */
   public $data_type;
 
+  /**
+   * The list of parent interfaces this interface extends.
+   *
+   * Fields attached to interfaces will be inherited.
+   *
+   * @var string[]
+   */
+  public $interfaces = [];
+
 }

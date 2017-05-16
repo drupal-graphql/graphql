@@ -27,9 +27,11 @@ trait FieldablePluginTrait {
       $implicitFields = [];
 
       if ($definition['name']) {
+        $types = array_merge([$definition['name']], array_key_exists('interfaces', $definition) ? $definition['interfaces'] : []);
+
         // Fields that are attached by annotating the type on the field.
-        $implicitFields = $schemaManager->find(function ($field) use ($definition) {
-          return in_array($definition['name'], $field['types']);
+        $implicitFields = $schemaManager->find(function ($field) use ($types) {
+          return array_intersect($types, $field['types']);
         }, [GRAPHQL_CORE_FIELD_PLUGIN]);
       }
 
