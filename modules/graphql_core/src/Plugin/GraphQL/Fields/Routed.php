@@ -12,7 +12,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "url_routed",
  *   name = "routed",
- *   type = "Boolean"
+ *   type = "Boolean",
+ *   types = {"Url"}
  * )
  */
 class Routed extends FieldPluginBase {

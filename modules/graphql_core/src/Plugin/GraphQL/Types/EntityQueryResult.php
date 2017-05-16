@@ -9,8 +9,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  *
  * @GraphQLType(
  *   id = "entity_query_result",
- *   name = "EntityQueryResult",
- *   fields = {"count", "entities"}
+ *   name = "EntityQueryResult"
  * )
  */
 class EntityQueryResult extends TypePluginBase {

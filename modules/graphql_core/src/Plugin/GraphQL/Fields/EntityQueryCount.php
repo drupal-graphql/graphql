@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_query_count",
  *   name = "count",
  *   type = "Int",
+ *   types = {"EntityQueryResult"},
  *   nullable = true
  * )
  */
