@@ -7,24 +7,27 @@ use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve the image width.
+ * Retrieve the image file size.
  *
  * @GraphQLField(
- *   id = "image_style_width",
- *   name = "width",
+ *   id = "image_file_size",
+ *   name = "fileSize",
  *   type = "Int",
  *   nullable = true,
- *   types = {"ImageStyle"}
+ *   types = {"Image"}
  * )
  */
-class ImageStyleWidth extends FieldPluginBase {
+class ImageFileSize extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('width', $value)) {
-      yield $value['width'];
+    if ($value instanceof ImageItem && $value->entity->access('view')) {
+      yield (int) $value->entity->getSize();
+    }
+    if (is_array($value) && array_key_exists('fileSize', $value)) {
+      yield $value['fileSize'];
     }
   }
 

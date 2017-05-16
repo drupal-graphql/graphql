@@ -14,16 +14,19 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "height",
  *   type = "Int",
  *   nullable = true,
- *   types = {"ImageStyle"}
+ *   types = {"ImageResource"}
  * )
  */
-class ImageStyleHeight extends FieldPluginBase {
+class ImageResourceHeight extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if (array_key_exists('height', $value)) {
+    if ($value instanceof ImageItem && $value->entity->access('view')) {
+      yield (int) $value->height;
+    }
+    if (is_array($value) && array_key_exists('height', $value)) {
       yield $value['height'];
     }
   }
