@@ -155,7 +155,9 @@ class SchemaFactory {
 
         if ($type instanceof AbstractObjectType || $type instanceof AbstractInputObjectType || $type instanceof AbstractInterfaceType) {
           foreach ($type->getFields() as $field) {
-            $metadata->addCacheableDependency($field);
+            if ($field instanceof CacheableDependencyInterface) {
+              $metadata->addCacheableDependency($field);
+            }
           }
         }
       }

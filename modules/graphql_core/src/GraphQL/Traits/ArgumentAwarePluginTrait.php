@@ -69,8 +69,7 @@ trait ArgumentAwarePluginTrait {
       $types = $schemaManager->find(function ($definition) use ($argument) {
         return array_key_exists('data_type', $definition) && $definition['data_type'] === $argument['data_type'];
       }, [
-        GRAPHQL_CORE_TYPE_PLUGIN,
-        GRAPHQL_CORE_INTERFACE_PLUGIN,
+        GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
         GRAPHQL_CORE_SCALAR_PLUGIN,
       ]);
 

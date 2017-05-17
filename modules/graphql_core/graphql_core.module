@@ -9,7 +9,7 @@ define('GRAPHQL_CORE_SCALAR_PLUGIN', 'scalar');
 define('GRAPHQL_CORE_FIELD_PLUGIN', 'field');
 define('GRAPHQL_CORE_MUTATION_PLUGIN', 'mutation');
 define('GRAPHQL_CORE_INTERFACE_PLUGIN', 'interface');
-define('GRAPHQL_CORE_INPUT_TYPE_PLUGIN', 'scalar');
+define('GRAPHQL_CORE_INPUT_TYPE_PLUGIN', 'input');
 define('GRAPHQL_CORE_TYPE_PLUGIN', 'type');
 define('GRAPHQL_CORE_ENUM_PLUGIN', 'enum');
 
