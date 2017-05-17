@@ -29,6 +29,7 @@ class ViewsTest extends GraphQLFileTestBase {
     'views',
     'graphql_content',
     'graphql_views',
+    'graphql_test_views',
   ];
 
   /**
@@ -38,13 +39,9 @@ class ViewsTest extends GraphQLFileTestBase {
     parent::setUp();
     $this->installEntitySchema('node');
     $this->installEntitySchema('view');
-    $this->installConfig(['node', 'filter', 'views']);
+    $this->installConfig(['node', 'filter', 'views', 'graphql_test_views']);
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'test']);
-
-    $view = View::create(['id' => 'my_view', 'base_table' => 'node']);
-    $view->addDisplay('graphql', NULL, 'my_display');
-    $view->save();
 
     Role::load('anonymous')
       ->grantPermission('access content')
@@ -74,6 +71,6 @@ class ViewsTest extends GraphQLFileTestBase {
       'entityLabel' => 'Node A',
     ], [
       'entityLabel' => 'Node B',
-    ]], $result['data']['myViewMyDisplayView']);
+    ]], $result['data']['graphqlTestSimpleView']);
   }
 }
