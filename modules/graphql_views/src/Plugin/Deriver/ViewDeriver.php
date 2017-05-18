@@ -58,6 +58,16 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ];
       }
 
+      $arguments += array_map(function ($filter) {
+        return [
+          'type' => 'String',
+          'nullable' => TRUE,
+          'multi' => $filter['expose']['multiple'],
+        ];
+      }, array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
+        return $sort['exposed'];
+      }));
+
       if (!$this->interfaceExists($typeName)) {
         $typeName = 'Entity';
       }

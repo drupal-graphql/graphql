@@ -66,13 +66,21 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if ($view = $storage->load($definition['view'])) {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
-      $args += ['sortBy' => NULL, 'sortDirection' => NULL];
-      $executable->setExposedInput([
-        'sort_by' => $args['sortBy'],
-        'sort_order' => $args['sortDirection'],
-      ]);
+
+      // Prepare arguments for use as exposed form input.
+      $input = array_filter([
+        // Sorting arguments.
+        'sort_by' => isset($args['sortBy']) ? $args['sortBy'] : NULL,
+        'sort_order' => isset($args['sortDirection']) ? $args['sortDirection'] : NULL,
+      ] + array_filter($args, function ($key) {
+        // Everything except sorting and paging parameters is a filter.
+        return !in_array($key, ['page', 'pageSize', 'sortBy', 'sortDirection']);
+      }, ARRAY_FILTER_USE_KEY));
+
+      $executable->setExposedInput($input);
 
       if ($definition['paged']) {
+        // Set paging parameters.
         $executable->setItemsPerPage($args['pageSize']);
         $executable->setCurrentPage($args['page']);
         $executable->execute();

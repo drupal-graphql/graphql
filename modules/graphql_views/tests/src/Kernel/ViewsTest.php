@@ -149,4 +149,18 @@ class ViewsTest extends GraphQLFileTestBase {
     ], $result['data'], 'Sorting works as expected.');
   }
 
+  /**
+   * Test filter behavior.
+   */
+  public function testFilteredView() {
+    $result = $this->executeQueryFile('filtered.gql');
+    $this->assertEquals([
+      'default' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+      ],
+    ], $result['data'], 'Filtering works as expected.');
+  }
+
 }
