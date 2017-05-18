@@ -1,0 +1,9 @@
+name: 'GraphQL Views Test'
+description: 'Test configurations for GraphQL views integration.'
+type: module
+core: 8.x
+dependencies:
+  - graphql_views
+  - node
+  - user
+  - views

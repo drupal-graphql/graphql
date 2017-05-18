@@ -20,7 +20,7 @@ class ViewResultTypeDeriver extends ViewDeriverBase {
       $view = $viewStorage->load($viewId);
       $display = $view->getDisplay($displayId);
 
-      if (!array_key_exists('pager', $display['display_options']) || $display['display_options']['pager']['type'] == 'none') {
+      if (!$this->isPaged($display)) {
         // Skip if the display doesn't expose a pager.
         continue;
       }

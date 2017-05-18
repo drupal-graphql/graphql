@@ -1,19 +1,26 @@
 {
-  page_one:graphqlTestPagerView(offset: 0, limit: 2) {
+  page_one:graphqlTestPagedView {
     count
     results {
       entityLabel
     }
   }
 
-  page_two:graphqlTestPagerView(offset: 2, limit: 2) {
+  page_two:graphqlTestPagedView(page: 1) {
     count
     results {
       entityLabel
     }
   }
 
-  page_three:graphqlTestPagerView(offset: 4, limit: 22) {
+  page_three:graphqlTestPagedView(page: 2, pageSize: 3) {
+    count
+    results {
+      entityLabel
+    }
+  }
+
+  page_four:graphqlTestPagedView(page: 3, pageSize: 3) {
     count
     results {
       entityLabel

@@ -4,6 +4,7 @@ namespace Drupal\graphql_views\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -57,6 +58,51 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   ) {
     $this->interfacePluginManager = $interfacePluginManager;
     $this->entityTypeManager = $entityTypeManager;
+  }
+
+  /**
+   * Check if a pager is configured.
+   *
+   * @param array $display
+   *   The display configuration.
+   *
+   * @return bool
+   *   Flag indicating if the view is configured with a pager.
+   */
+  protected function isPaged(array $display) {
+    return in_array(NestedArray::getValue($display, [
+      'display_options', 'pager', 'type',
+    ]) ?: 'none', ['full', 'mini']);
+  }
+
+  /**
+   * Get the configured default limit.
+   *
+   * @param array $display
+   *   The display configuration.
+   *
+   * @return int
+   *   The default limit.
+   */
+  protected function getPagerLimit(array $display) {
+    return NestedArray::getValue($display, [
+      'display_options', 'pager', 'options', 'items_per_page',
+    ]) ?: 0;
+  }
+
+  /**
+   * Get the configured default offset.
+   *
+   * @param array $display
+   *   The display configuration.
+   *
+   * @return int
+   *   The default offset.
+   */
+  protected function getPagerOffset(array $display) {
+    return NestedArray::getValue($display, [
+      'display_options', 'pager', 'options', 'offset',
+    ]) ?: 0;
   }
 
   /**

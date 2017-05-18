@@ -27,8 +27,15 @@ class ViewsTest extends GraphQLFileTestBase {
     'views',
     'graphql_content',
     'graphql_views',
-    'graphql_test_views',
+    'graphql_views_test',
   ];
+
+  /**
+   * A List of letters.
+   *
+   * @var string[]
+   */
+  protected $letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
   /**
    * {@inheritdoc}
@@ -37,31 +44,26 @@ class ViewsTest extends GraphQLFileTestBase {
     parent::setUp();
     $this->installEntitySchema('node');
     $this->installEntitySchema('view');
-    $this->installConfig(['node', 'filter', 'views', 'graphql_test_views']);
+    $this->installConfig(['node', 'filter', 'views', 'graphql_views_test']);
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'test']);
 
     Role::load('anonymous')
       ->grantPermission('access content')
       ->save();
+
+    foreach ($this->letters as $index => $letter) {
+      $this->createNode([
+        'title' => 'Node ' . $letter,
+        'type' => 'test',
+      ])->save();
+    }
   }
 
   /**
    * Test that the view returns both nodes.
    */
   public function testSimpleView() {
-    $a = $this->createNode([
-      'title' => 'Node A',
-      'type' => 'test',
-    ]);
-
-    $b = $this->createNode([
-      'title' => 'Node B',
-      'type' => 'test',
-    ]);
-
-    $a->save();
-    $b->save();
 
     $result = $this->executeQueryFile('simple.gql');
 
@@ -70,6 +72,8 @@ class ViewsTest extends GraphQLFileTestBase {
         'entityLabel' => 'Node A',
       ], [
         'entityLabel' => 'Node B',
+      ], [
+        'entityLabel' => 'Node C',
       ],
     ], $result['data']['graphqlTestSimpleView']);
   }
@@ -78,40 +82,34 @@ class ViewsTest extends GraphQLFileTestBase {
    * Test paging support.
    */
   public function testPagedView() {
-    $nodes = [];
-    foreach (range(1, 10) as $index) {
-      $nodes[$index] = $this->createNode([
-        'title' => 'Node ' . $index,
-        'type' => 'test',
-      ]);
-      $nodes[$index]->save();
-    }
-
     $result = $this->executeQueryFile('paged.gql');
     $this->assertEquals([
       'page_one' => [
         'count' => 10,
         'results' => [
-          ['entityLabel' => 'Node 1'],
-          ['entityLabel' => 'Node 2'],
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node B'],
         ],
       ],
       'page_two' => [
         'count' => 10,
         'results' => [
-          ['entityLabel' => 'Node 3'],
-          ['entityLabel' => 'Node 4'],
+          ['entityLabel' => 'Node C'],
+          ['entityLabel' => 'Node D'],
         ],
       ],
       'page_three' => [
         'count' => 10,
         'results' => [
-          ['entityLabel' => 'Node 5'],
-          ['entityLabel' => 'Node 6'],
-          ['entityLabel' => 'Node 7'],
-          ['entityLabel' => 'Node 8'],
-          ['entityLabel' => 'Node 9'],
-          ['entityLabel' => 'Node 10'],
+          ['entityLabel' => 'Node G'],
+          ['entityLabel' => 'Node H'],
+          ['entityLabel' => 'Node I'],
+        ],
+      ],
+      'page_four' => [
+        'count' => 10,
+        'results' => [
+          ['entityLabel' => 'Node J'],
         ],
       ],
     ], $result['data'], 'Paged views return the correct results.');

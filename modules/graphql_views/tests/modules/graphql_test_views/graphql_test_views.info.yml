@@ -1,6 +1,0 @@
-name: 'GraphQL views test module'
-type: module
-description: 'Provides views configurations for testing'
-package: Tests
-version: VERSION
-core: 8.x

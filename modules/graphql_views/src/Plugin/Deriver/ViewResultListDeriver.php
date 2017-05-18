@@ -18,6 +18,12 @@ class ViewResultListDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
+      $display = $view->getDisplay($displayId);
+
+      if (!$this->isPaged($display)) {
+        // Skip if the display doesn't expose a pager.
+        continue;
+      }
 
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when

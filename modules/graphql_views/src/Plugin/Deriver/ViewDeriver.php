@@ -40,15 +40,15 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
 
       // If a pager is configured we apply the matching ViewResult derivative
       // instead of the entity list.
-      if (array_key_exists('pager', $display['display_options']) && $display['display_options']['pager']['type'] != 'none') {
+      if ($this->isPaged($display)) {
         $typeName = graphql_core_camelcase(implode('-', [
           $viewId, $displayId, 'result',
         ]));
         $multi = FALSE;
         $paged = TRUE;
         $arguments = [
-          'offset' => 'Int',
-          'limit' => 'Int',
+          'page' => ['type' => 'Int', 'default' => $this->getPagerOffset($display)],
+          'pageSize' => ['type' => 'Int', 'default' => $this->getPagerLimit($display)],
         ];
       }
 

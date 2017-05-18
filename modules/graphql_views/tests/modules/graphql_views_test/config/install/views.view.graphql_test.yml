@@ -8,7 +8,7 @@ dependencies:
 id: graphql_test
 label: 'GraphQL Test'
 module: views
-description: ''
+description: 'Views configurations for GraphQL integration testing.'
 tag: ''
 base_table: node_field_data
 base_field: nid
@@ -25,7 +25,7 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: none
+        type: tag
         options: {  }
       query:
         type: views_query
@@ -125,34 +125,22 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-      filters:
-        status:
-          value: '1'
-          table: node_field_data
-          field: status
-          plugin_id: boolean
-          entity_type: node
-          entity_field: status
-          id: status
-          expose:
-            operator: ''
-          group: 1
+      filters: {  }
       sorts:
-        created:
-          id: created
+        nid:
+          id: nid
           table: node_field_data
-          field: created
-          order: DESC
-          entity_type: node
-          entity_field: created
-          plugin_id: date
+          field: nid
           relationship: none
           group_type: group
           admin_label: ''
+          order: ASC
           exposed: false
           expose:
             label: ''
-          granularity: second
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
       header: {  }
       footer: {  }
       empty: {  }
@@ -168,10 +156,79 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  pager:
+  filtered:
     display_plugin: graphql
-    id: pager
-    display_title: Pager
+    id: filtered
+    display_title: Filtered
+    position: 4
+    display_options:
+      display_extenders: {  }
+      display_description: ''
+      filters:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: title_op
+            label: Title
+            description: ''
+            use_operator: false
+            operator: title_op
+            identifier: title
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          entity_field: title
+          plugin_id: string
+      defaults:
+        filters: false
+        filter_groups: false
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
+      pager:
+        type: none
+        options:
+          offset: 0
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  paged:
+    display_plugin: graphql
+    id: paged
+    display_title: Paged
     position: 2
     display_options:
       display_extenders: {  }
@@ -179,7 +236,7 @@ display:
       pager:
         type: full
         options:
-          items_per_page: 10
+          items_per_page: 2
           offset: 0
           id: 0
           total_pages: null
@@ -215,14 +272,69 @@ display:
       display_extenders: {  }
       display_description: ''
       pager:
-        type: none
+        type: some
         options:
+          items_per_page: 3
           offset: 0
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  sorted:
+    display_plugin: graphql
+    id: sorted
+    display_title: Sorted
+    position: 3
+    display_options:
+      display_extenders: {  }
+      display_description: ''
+      sorts:
+        nid:
+          id: nid
+          table: node_field_data
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
+          exposed: true
+          expose:
+            label: ID
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
+          exposed: true
+          expose:
+            label: Title
+          entity_type: node
+          entity_field: title
+          plugin_id: standard
+      defaults:
+        sorts: false
+      pager:
+        type: some
+        options:
+          items_per_page: 3
+          offset: 0
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'url.query_args:sort_by'
+        - 'url.query_args:sort_order'
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
