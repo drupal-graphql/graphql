@@ -2,13 +2,12 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
-use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\views\Views;
 
 /**
  * Derive fields from configured views.
  */
-class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
+class ViewResultListDeriver extends ViewDeriverBase {
 
   /**
    * {@inheritdoc}
@@ -19,7 +18,6 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $display = $view->getDisplay($displayId);
 
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
@@ -27,41 +25,24 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         continue;
       }
 
-      $id = implode('-', [$viewId, $displayId, 'view']);
+      $id = implode('-', [$viewId, $displayId, 'result', 'list']);
 
       $typeName = graphql_core_camelcase($type);
-      $multi = TRUE;
-      $paged = FALSE;
-      $arguments = [];
 
       if (!$this->interfaceExists($typeName)) {
         $typeName = 'Entity';
       }
 
-      // If a pager is configured we apply the matching ViewResult derivative
-      // instead of the entity list.
-      if (array_key_exists('pager', $display['display_options']) && $display['display_options']['pager']['type'] != 'none') {
-        $typeName = graphql_core_camelcase(implode('-', [
-          $viewId, $displayId, 'result',
-        ]));
-        $multi = FALSE;
-        $paged = TRUE;
-        $arguments = [
-          'offset' => 'Int',
-          'limit' => 'Int',
-        ];
-      }
-
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => graphql_core_propcase($id),
-        'types' => ['Root'],
+        'name' => 'results',
         'type' => $typeName,
-        'multi' => $multi,
-        'arguments' => $arguments,
+        'types' => [
+          graphql_core_camelcase(implode('_', [$viewId, $displayId, 'result'])),
+        ],
+        'multi' => TRUE,
         'view' => $viewId,
         'display' => $displayId,
-        'paged' => $paged,
         'cache_tags' => $view->getCacheTags(),
         'cache_contexts' => $view->getCacheContexts(),
         'cache_max_age' => $view->getCacheMaxAge(),

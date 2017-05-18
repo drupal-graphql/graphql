@@ -66,10 +66,20 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if ($view = $storage->load($definition['view'])) {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
-      $executable->execute();
+      $executable->build($definition['display']);
 
-      foreach ($executable->result as $row) {
-        yield $row->_entity;
+      if ($definition['paged']) {
+        $executable->get_total_rows = TRUE;
+        $executable->query->setLimit($args['limit']);
+        $executable->query->setOffset($args['offset']);
+        $executable->execute();
+        yield $executable;
+      }
+      else {
+        $executable->execute();
+        foreach ($executable->result as $row) {
+          yield $row->_entity;
+        }
       }
     }
   }

@@ -19,6 +19,7 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
  *   title = @Translation("GraphQL"),
  *   help = @Translation("Creates a GraphQL entity list display."),
  *   admin = @Translation("GraphQL"),
+ *   graphql_display = TRUE,
  *   returns_response = TRUE
  * )
  */

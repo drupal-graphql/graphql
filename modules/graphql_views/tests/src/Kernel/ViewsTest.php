@@ -2,12 +2,10 @@
 
 namespace Drupal\Tests\graphql_views\Kernel;
 
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
-use Drupal\views\Entity\View;
 
 /**
  * Test views support in GraphQL.
@@ -51,7 +49,7 @@ class ViewsTest extends GraphQLFileTestBase {
   /**
    * Test that the view returns both nodes.
    */
-  public function testView() {
+  public function testSimpleView() {
     $a = $this->createNode([
       'title' => 'Node A',
       'type' => 'test',
@@ -65,12 +63,58 @@ class ViewsTest extends GraphQLFileTestBase {
     $a->save();
     $b->save();
 
-    $result = $this->executeQueryFile('view.gql');
+    $result = $this->executeQueryFile('simple.gql');
 
-    $this->assertEquals([[
-      'entityLabel' => 'Node A',
-    ], [
-      'entityLabel' => 'Node B',
-    ]], $result['data']['graphqlTestSimpleView']);
+    $this->assertEquals([
+      [
+        'entityLabel' => 'Node A',
+      ], [
+        'entityLabel' => 'Node B',
+      ],
+    ], $result['data']['graphqlTestSimpleView']);
   }
+
+  /**
+   * Test paging support.
+   */
+  public function testPagedView() {
+    $nodes = [];
+    foreach (range(1, 10) as $index) {
+      $nodes[$index] = $this->createNode([
+        'title' => 'Node ' . $index,
+        'type' => 'test',
+      ]);
+      $nodes[$index]->save();
+    }
+
+    $result = $this->executeQueryFile('paged.gql');
+    $this->assertEquals([
+      'page_one' => [
+        'count' => 10,
+        'results' => [
+          ['entityLabel' => 'Node 1'],
+          ['entityLabel' => 'Node 2'],
+        ],
+      ],
+      'page_two' => [
+        'count' => 10,
+        'results' => [
+          ['entityLabel' => 'Node 3'],
+          ['entityLabel' => 'Node 4'],
+        ],
+      ],
+      'page_three' => [
+        'count' => 10,
+        'results' => [
+          ['entityLabel' => 'Node 5'],
+          ['entityLabel' => 'Node 6'],
+          ['entityLabel' => 'Node 7'],
+          ['entityLabel' => 'Node 8'],
+          ['entityLabel' => 'Node 9'],
+          ['entityLabel' => 'Node 10'],
+        ],
+      ],
+    ], $result['data'], 'Paged views return the correct results.');
+  }
+
 }
