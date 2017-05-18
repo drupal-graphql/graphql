@@ -35,7 +35,7 @@ class ViewsTest extends GraphQLFileTestBase {
    *
    * @var string[]
    */
-  protected $letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  protected $letters = ['A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C'];
 
   /**
    * {@inheritdoc}
@@ -85,34 +85,68 @@ class ViewsTest extends GraphQLFileTestBase {
     $result = $this->executeQueryFile('paged.gql');
     $this->assertEquals([
       'page_one' => [
-        'count' => 10,
+        'count' => count($this->letters),
         'results' => [
           ['entityLabel' => 'Node A'],
           ['entityLabel' => 'Node B'],
         ],
       ],
       'page_two' => [
-        'count' => 10,
+        'count' => count($this->letters),
         'results' => [
           ['entityLabel' => 'Node C'],
-          ['entityLabel' => 'Node D'],
+          ['entityLabel' => 'Node A'],
         ],
       ],
       'page_three' => [
-        'count' => 10,
+        'count' => count($this->letters),
         'results' => [
-          ['entityLabel' => 'Node G'],
-          ['entityLabel' => 'Node H'],
-          ['entityLabel' => 'Node I'],
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node B'],
+          ['entityLabel' => 'Node C'],
         ],
       ],
       'page_four' => [
-        'count' => 10,
+        'count' => count($this->letters),
         'results' => [
-          ['entityLabel' => 'Node J'],
+          ['entityLabel' => 'Node C'],
         ],
       ],
     ], $result['data'], 'Paged views return the correct results.');
+  }
+
+  /**
+   * Test sorting behavior.
+   */
+  public function testSortedView() {
+    $result = $this->executeQueryFile('sorted.gql');
+    $this->assertEquals([
+      'default' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node B'],
+        ['entityLabel' => 'Node C'],
+      ],
+      'asc' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+      ],
+      'desc' => [
+        ['entityLabel' => 'Node C'],
+        ['entityLabel' => 'Node C'],
+        ['entityLabel' => 'Node C'],
+      ],
+      'asc_nid' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node B'],
+        ['entityLabel' => 'Node C'],
+      ],
+      'desc_nid' => [
+        ['entityLabel' => 'Node C'],
+        ['entityLabel' => 'Node B'],
+        ['entityLabel' => 'Node A'],
+      ],
+    ], $result['data'], 'Sorting works as expected.');
   }
 
 }

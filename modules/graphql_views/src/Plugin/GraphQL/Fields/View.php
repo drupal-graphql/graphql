@@ -66,6 +66,11 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if ($view = $storage->load($definition['view'])) {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
+      $args += ['sortBy' => NULL, 'sortDirection' => NULL];
+      $executable->setExposedInput([
+        'sort_by' => $args['sortBy'],
+        'sort_order' => $args['sortDirection'],
+      ]);
 
       if ($definition['paged']) {
         $executable->setItemsPerPage($args['pageSize']);

@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\views\Views;
 
@@ -34,6 +35,29 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $paged = FALSE;
       $arguments = [];
 
+
+      $sorts = array_filter(NestedArray::getValue($display, ['display_options', 'sorts']) ?: [], function ($sort) {
+        return $sort['exposed'];
+      });
+
+      if ($sorts) {
+        $arguments += [
+          'sortDirection' => [
+            "type" => [
+              "ASC" => "Ascending",
+              "DESC" => "Descending",
+            ],
+            "default" => TRUE,
+          ],
+          'sortBy' => [
+            "type" => array_map(function ($sort) {
+              return $sort['expose']['label'];
+            }, $sorts),
+            "nullable" => TRUE,
+          ],
+        ];
+      }
+
       if (!$this->interfaceExists($typeName)) {
         $typeName = 'Entity';
       }
@@ -46,7 +70,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ]));
         $multi = FALSE;
         $paged = TRUE;
-        $arguments = [
+        $arguments += [
           'page' => ['type' => 'Int', 'default' => $this->getPagerOffset($display)],
           'pageSize' => ['type' => 'Int', 'default' => $this->getPagerLimit($display)],
         ];

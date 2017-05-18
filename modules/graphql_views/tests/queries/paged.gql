@@ -20,7 +20,7 @@
     }
   }
 
-  page_four:graphqlTestPagedView(page: 3, pageSize: 3) {
+  page_four:graphqlTestPagedView(page: 2 pageSize: 4) {
     count
     results {
       entityLabel
