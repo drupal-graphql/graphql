@@ -1,0 +1,7 @@
+name: GraphQL Twig Tests
+type: module
+description: 'Test scenario for Twig graphql integration.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core

@@ -1,0 +1,12 @@
+{% grapqhl "
+query ($path: String!) {
+  route(path: $path) {
+    entity {
+      title:entityLabel
+    }
+  }
+}
+" %}
+<div>
+  <h1>Fetched with GraphQL: {{ route.entity.title }}</h1>
+</div>
