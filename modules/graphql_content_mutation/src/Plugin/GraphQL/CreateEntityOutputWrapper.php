@@ -1,9 +1,8 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL;
+namespace Drupal\graphql_content_mutation\Plugin\GraphQL;
 
 use Drupal\Core\Entity\EntityInterface;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class CreateEntityOutputWrapper {

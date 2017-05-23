@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver;
+namespace Drupal\graphql_content_mutation\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -10,20 +10,13 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterface {
+class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
-
-  /**
-   * The entity manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $entityTypeBundleInfo;
 
   /**
    * The entity field manager service.
@@ -37,7 +30,6 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
-      $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager')
     );
@@ -47,11 +39,9 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
    * {@inheritdoc}
    */
   public function __construct(
-    EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager
   ) {
-    $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
   }
@@ -65,26 +55,27 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
         continue;
       }
 
-      foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        $fields = [];
-        foreach ($this->entityFieldManager->getFieldDefinitions($entityTypeId, $bundleName) as $fieldName => $field) {
-          if ($field->isReadOnly() || $field->isComputed()) {
+      foreach ($this->entityFieldManager->getFieldStorageDefinitions($entityTypeId) as $fieldName => $field) {
+        $properties = [];
+
+        foreach ($field->getPropertyDefinitions() as $propertyName => $propertyDefinition) {
+          if ($propertyDefinition->isReadOnly() || $propertyDefinition->isComputed()) {
             continue;
           }
 
-          $fields[graphql_core_propcase($fieldName)] = [
-            'type' => graphql_core_camelcase("$entityTypeId:$fieldName") . 'FieldInput',
-            'nullable' => !$field->isRequired(),
-            'multi' => $field->getFieldStorageDefinition()->isMultiple(),
-            'field_name' => $fieldName,
+          $properties[graphql_core_propcase($propertyName)] = [
+            'type' => 'String',
+            'nullable' => !$propertyDefinition->isRequired(),
+            'multi' => $propertyDefinition->isList(),
+            'property_name' => $propertyName,
           ];
         }
 
-        $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => graphql_core_camelcase("$entityTypeId:$bundleName") . 'Input',
-          'fields' => $fields,
+        $this->derivatives["$entityTypeId:$fieldName"] = [
+          'name' => graphql_core_camelcase([$entityTypeId, $fieldName]) . 'FieldInput',
+          'fields' => $properties,
           'entity_type' => $entityTypeId,
-          'entity_bundle' => $bundleName,
+          'field_name' => $fieldName,
         ] + $basePluginDefinition;
       }
     }

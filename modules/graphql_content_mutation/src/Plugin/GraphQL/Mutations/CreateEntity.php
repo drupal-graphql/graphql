@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Mutations;
+namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Mutations;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql_core\GraphQL\MutationPluginBase;
-use Drupal\graphql_core\Plugin\GraphQL\CreateEntityOutputWrapper;
+use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -20,7 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "CreateEntityOutput",
  *   nullable = false,
  *   cache_tags = {"entity_types", "entity_bundles"},
- *   deriver = "\Drupal\graphql_core\Plugin\Deriver\CreateEntityDeriver"
+ *   deriver = "\Drupal\graphql_content_mutation\Plugin\Deriver\CreateEntityDeriver"
  * )
  */
 class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_core\Plugin\GraphQL\CreateEntityOutputWrapper;
+use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver;
+namespace Drupal\graphql_content_mutation\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -56,10 +56,10 @@ class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
         $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => 'create' . graphql_core_camelcase("$entityTypeId:$bundleName"),
+          'name' => 'create' . graphql_core_camelcase([$entityTypeId, $bundleName]),
           'arguments' => [
             'input' => [
-              'type' => graphql_core_camelcase("$entityTypeId:$bundleName") . 'Input',
+              'type' => graphql_core_camelcase([$entityTypeId, $bundleName]) . 'Input',
               'nullable' => FALSE,
               'multi' => FALSE,
             ],
