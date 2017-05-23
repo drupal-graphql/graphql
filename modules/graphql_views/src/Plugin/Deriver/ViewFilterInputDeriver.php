@@ -30,15 +30,22 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
       $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
+      $filters = array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
+        return $sort['exposed'];
+      });
+
+      // If there are no exposed filters, don't create the derivative.
+      if (!$filters) {
+        continue;
+      }
+
       $fields = array_map(function ($filter) {
         return [
           'type' => 'String',
           'nullable' => TRUE,
           'multi' => $filter['expose']['multiple'],
         ];
-      }, array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
-        return $sort['exposed'];
-      }));
+      }, $filters);
 
       $this->derivatives[$id] = [
         'id' => $id,

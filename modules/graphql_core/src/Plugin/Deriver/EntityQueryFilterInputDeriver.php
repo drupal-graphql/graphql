@@ -65,24 +65,31 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
+        $queryable_properties = array_filter($properties, function ($property) {
+          return $property instanceof BaseFieldDefinition && $property->isQueryable();
+        });
+
+        // Don't even create the type if there are no queryable properties.
+        if (!$queryable_properties) {
+          continue;
+        }
+
         // Add all queryable properties as fields.
-        foreach ($properties as $key => $property) {
-          if ($property instanceof BaseFieldDefinition && $property->isQueryable()) {
-            $fieldName = graphql_core_propcase($key);
+        foreach ($queryable_properties as $key => $property) {
+          $fieldName = graphql_core_propcase($key);
 
-            // Some field types don't have a main property.
-            if (!$mainProperty = $property->getMainPropertyName()) {
-              continue;
-            }
-
-            $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
-
-            $derivative['fields'][$fieldName] = [
-              'multi' => FALSE,
-              'nullable' => TRUE,
-              'data_type' => $mainPropertyDataType,
-            ];
+          // Some field types don't have a main property.
+          if (!$mainProperty = $property->getMainPropertyName()) {
+            continue;
           }
+
+          $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
+
+          $derivative['fields'][$fieldName] = [
+            'multi' => FALSE,
+            'nullable' => TRUE,
+            'data_type' => $mainPropertyDataType,
+          ];
         }
 
         $this->derivatives[$id] = $derivative;

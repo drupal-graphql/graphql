@@ -61,11 +61,21 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
-        $derivative['arguments']['filter'] = [
-          'multi' => FALSE,
-          'nullable' => TRUE,
-          'type' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
-        ];
+        /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition */
+        $definition = $this->typedDataManager->createDataDefinition("entity:$id");
+        $properties = $definition->getPropertyDefinitions();
+
+        $queryable_properties = array_filter($properties, function ($property) {
+          return $property instanceof BaseFieldDefinition && $property->isQueryable();
+        });
+
+        if ($queryable_properties) {
+          $derivative['arguments']['filter'] = [
+            'multi' => FALSE,
+            'nullable' => TRUE,
+            'type' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
+          ];
+        }
 
         $this->derivatives[$id] = $derivative;
       }
