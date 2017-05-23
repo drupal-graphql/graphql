@@ -30,30 +30,24 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
   protected $typedDataManager;
 
   /**
-   * The graphql interface plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $interfaceManager;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('typed_data_manager'),
-      $container->get('graphql_core.interface_manager')
+      $container->get('typed_data_manager')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, TypedDataManager $typedDataManager, PluginManagerInterface $interfaceManager) {
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    TypedDataManager $typedDataManager
+  ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->typedDataManager = $typedDataManager;
-    $this->interfaceManager = $interfaceManager;
   }
 
   /**
@@ -97,7 +91,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           }
         }
 
-        $this->derivatives["entity:$id"] = $derivative;
+        $this->derivatives[$id] = $derivative;
       }
     }
 

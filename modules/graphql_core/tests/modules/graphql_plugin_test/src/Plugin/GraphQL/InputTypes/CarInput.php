@@ -9,7 +9,10 @@ use Drupal\graphql_core\GraphQL\InputTypePluginBase;
  *
  * @GraphQLInputType(
  *   id = "car_input",
- *   name = "CarInput"
+ *   name = "CarInput",
+ *   fields = {
+ *     "engine" = "String"
+ *   }
  * )
  */
 class CarInput extends InputTypePluginBase {

@@ -4,7 +4,6 @@ namespace Drupal\graphql_core\GraphQL;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\CacheableValue;
-use Drupal\graphql\GraphQL\UncacheableValue;
 use Drupal\graphql_core\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
