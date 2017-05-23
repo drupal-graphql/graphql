@@ -34,7 +34,7 @@ class DenyMutation implements ResponsePolicyInterface  {
    * {@inheritdoc}
    */
   public function check(Response $response, Request $request) {
-    if ($this->routeMatch->getRouteMatchFromRequest($request) !== 'graphql.request') {
+    if ($this->routeMatch->getRouteMatchFromRequest($request)->getRouteName() !== 'graphql.request') {
       return NULL;
     }
 
@@ -42,7 +42,7 @@ class DenyMutation implements ResponsePolicyInterface  {
       return NULL;
     }
 
-    $context = $request->attributes->has('context');
+    $context = $request->attributes->get('context');
     if (!$context instanceof ExecutionContext) {
       return NULL;
     }
