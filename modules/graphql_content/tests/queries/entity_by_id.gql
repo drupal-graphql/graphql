@@ -1,5 +1,5 @@
 query($id: Int) {
-  onlyNodeWithId:nodeById(id: $id) {
+  nodeById(id: $id, language: en) {
     entityLabel
   }
 }

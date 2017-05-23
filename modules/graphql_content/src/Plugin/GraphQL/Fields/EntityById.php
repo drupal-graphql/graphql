@@ -19,12 +19,14 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   multi = false,
  *   weight = -1,
  *   arguments = {
- *     "id" = "String"
+ *     "id" = "Int",
+ *     "language" = "Language"
  *   },
  *   deriver = "\Drupal\graphql_content\Plugin\Deriver\EntityByIdDeriver"
  * )
  */
 class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterface {
+
   use DependencySerializationTrait;
 
   /**
@@ -64,4 +66,5 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
       yield $entity;
     }
   }
+
 }
