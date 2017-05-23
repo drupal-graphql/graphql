@@ -86,7 +86,7 @@ trait ArgumentAwarePluginTrait {
     }
 
     if (isset($type) && $type instanceof TypeInterface) {
-      $nullable = is_array($argument) && array_key_exists('nullable', $argument) && $argument['nullable'];
+      $nullable = is_array($argument) && (array_key_exists('nullable', $argument) && $argument['nullable'] || array_key_exists('default', $argument));
       $multi = is_array($argument) && array_key_exists('multi', $argument) && $argument['multi'];
 
       return $this->decorateType($type, $nullable, $multi);

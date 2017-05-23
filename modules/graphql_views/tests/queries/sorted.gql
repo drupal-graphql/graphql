@@ -1,0 +1,22 @@
+{
+
+  default:graphqlTestSortedView {
+    entityLabel
+  }
+
+  asc:graphqlTestSortedView(sortBy: TITLE) {
+    entityLabel
+  }
+
+  desc:graphqlTestSortedView(sortBy: TITLE, sortDirection: DESC) {
+    entityLabel
+  }
+
+  asc_nid:graphqlTestSortedView(sortBy: NID, sortDirection: ASC) {
+    entityLabel
+  }
+
+  desc_nid:graphqlTestSortedView(sortBy: NID, sortDirection: DESC) {
+    entityLabel
+  }
+}

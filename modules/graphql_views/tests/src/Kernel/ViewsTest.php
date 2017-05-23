@@ -2,12 +2,10 @@
 
 namespace Drupal\Tests\graphql_views\Kernel;
 
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
-use Drupal\views\Entity\View;
 
 /**
  * Test views support in GraphQL.
@@ -29,7 +27,15 @@ class ViewsTest extends GraphQLFileTestBase {
     'views',
     'graphql_content',
     'graphql_views',
+    'graphql_views_test',
   ];
+
+  /**
+   * A List of letters.
+   *
+   * @var string[]
+   */
+  protected $letters = ['A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C'];
 
   /**
    * {@inheritdoc}
@@ -38,42 +44,123 @@ class ViewsTest extends GraphQLFileTestBase {
     parent::setUp();
     $this->installEntitySchema('node');
     $this->installEntitySchema('view');
-    $this->installConfig(['node', 'filter', 'views']);
+    $this->installConfig(['node', 'filter', 'views', 'graphql_views_test']);
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'test']);
-
-    $view = View::create(['id' => 'my_view', 'base_table' => 'node']);
-    $view->addDisplay('graphql', NULL, 'my_display');
-    $view->save();
 
     Role::load('anonymous')
       ->grantPermission('access content')
       ->save();
+
+    foreach ($this->letters as $index => $letter) {
+      $this->createNode([
+        'title' => 'Node ' . $letter,
+        'type' => 'test',
+      ])->save();
+    }
   }
 
   /**
    * Test that the view returns both nodes.
    */
-  public function testView() {
-    $a = $this->createNode([
-      'title' => 'Node A',
-      'type' => 'test',
-    ]);
+  public function testSimpleView() {
 
-    $b = $this->createNode([
-      'title' => 'Node B',
-      'type' => 'test',
-    ]);
+    $result = $this->executeQueryFile('simple.gql');
 
-    $a->save();
-    $b->save();
-
-    $result = $this->executeQueryFile('view.gql');
-
-    $this->assertEquals([[
-      'entityLabel' => 'Node A',
-    ], [
-      'entityLabel' => 'Node B',
-    ]], $result['data']['myViewMyDisplayView']);
+    $this->assertEquals([
+      [
+        'entityLabel' => 'Node A',
+      ], [
+        'entityLabel' => 'Node B',
+      ], [
+        'entityLabel' => 'Node C',
+      ],
+    ], $result['data']['graphqlTestSimpleView']);
   }
+
+  /**
+   * Test paging support.
+   */
+  public function testPagedView() {
+    $result = $this->executeQueryFile('paged.gql');
+    $this->assertEquals([
+      'page_one' => [
+        'count' => count($this->letters),
+        'results' => [
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node B'],
+        ],
+      ],
+      'page_two' => [
+        'count' => count($this->letters),
+        'results' => [
+          ['entityLabel' => 'Node C'],
+          ['entityLabel' => 'Node A'],
+        ],
+      ],
+      'page_three' => [
+        'count' => count($this->letters),
+        'results' => [
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node B'],
+          ['entityLabel' => 'Node C'],
+        ],
+      ],
+      'page_four' => [
+        'count' => count($this->letters),
+        'results' => [
+          ['entityLabel' => 'Node C'],
+        ],
+      ],
+    ], $result['data'], 'Paged views return the correct results.');
+  }
+
+  /**
+   * Test sorting behavior.
+   */
+  public function testSortedView() {
+    $result = $this->executeQueryFile('sorted.gql');
+    $this->assertEquals([
+      'default' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node B'],
+        ['entityLabel' => 'Node C'],
+      ],
+      'asc' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+      ],
+      'desc' => [
+        ['entityLabel' => 'Node C'],
+        ['entityLabel' => 'Node C'],
+        ['entityLabel' => 'Node C'],
+      ],
+      'asc_nid' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node B'],
+        ['entityLabel' => 'Node C'],
+      ],
+      'desc_nid' => [
+        ['entityLabel' => 'Node C'],
+        ['entityLabel' => 'Node B'],
+        ['entityLabel' => 'Node A'],
+      ],
+    ], $result['data'], 'Sorting works as expected.');
+  }
+
+  /**
+   * Test filter behavior.
+   */
+  public function testFilteredView() {
+    $result = $this->executeQueryFile('filtered.gql');
+    $this->assertEquals([
+      'default' => [
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+        ['entityLabel' => 'Node A'],
+      ],
+    ], $result['data'], 'Filtering works as expected.');
+  }
+
 }

@@ -2,138 +2,104 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
-use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\views\Views;
 
 /**
  * Derive fields from configured views.
  */
-class ViewDeriver extends DeriverBase implements ContainerDeriverInterface {
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The interface plugin manager to search for return type candidates.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $interfacePluginManager;
-
-  /**
-   * An key value pair of data tables and the entities they belong to.
-   *
-   * @var string[]
-   */
-  protected $dataTables;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('graphql_core.interface_manager')
-    );
-  }
-
-  /**
-   * Creates a ViewDeriver object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   An entity type manager instance.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $interfacePluginManager
-   *   The plugin manager for graphql interfaces.
-   */
-  public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
-    PluginManagerInterface $interfacePluginManager
-  ) {
-    $this->interfacePluginManager = $interfacePluginManager;
-    $this->entityTypeManager = $entityTypeManager;
-  }
-
-  /**
-   * Retrieves the entity type id of an entity by its base or data table.
-   *
-   * @param string $table
-   *   The base or data table of an entity.
-   *
-   * @return string
-   *   The id of the entity type that the given base table belongs to.
-   */
-  protected function getEntityTypeByTable($table) {
-    if (!isset($this->dataTables)) {
-      $this->dataTables = [];
-
-      foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
-        if ($dataTable = $entityType->getDataTable()) {
-          $this->dataTables[$dataTable] = $entityType->id();
-        }
-        if ($baseTable = $entityType->getBaseTable()) {
-          $this->dataTables[$baseTable] = $entityType->id();
-        }
-      }
-    }
-
-    return !empty($this->dataTables[$table]) ? $this->dataTables[$table] : NULL;
-  }
-
-  /**
-   * Check if a certain interface exists.
-   *
-   * @param string $interface
-   *   The GraphQL interface name.
-   *
-   * @return bool
-   *   Boolean flag indicating if the interface exists.
-   */
-  protected function interfaceExists($interface) {
-    return (bool) array_filter($this->interfacePluginManager->getDefinitions(), function ($definition) use ($interface) {
-      return $definition['name'] === $interface;
-    });
-  }
+class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
 
   /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    /** @var \Drupal\views\Entity\View[] $views */
-    $views = $this->entityTypeManager->getStorage('view')->loadMultiple();
+    $viewStorage = $this->entityTypeManager->getStorage('view');
 
-    foreach ($views as $viewId => $view) {
+    foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
+      /** @var \Drupal\views\ViewEntityInterface $view */
+      $view = $viewStorage->load($viewId);
+      $display = $view->getDisplay($displayId);
+
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
+        // Skip for now, switch to different response type later when
+        // implementing fieldable views display support.
         continue;
       }
 
+      $id = implode('-', [$viewId, $displayId, 'view']);
+
       $typeName = graphql_core_camelcase($type);
+      $multi = TRUE;
+      $paged = FALSE;
+      $arguments = [];
 
-      foreach ($view->get('display') as $displayId => $display) {
-        if ($display['display_plugin'] !== 'graphql') {
-          continue;
-        }
 
-        $id = implode('-', [$viewId, $displayId]);
-        $name = implode('_', [$viewId, $displayId]);
+      $sorts = array_filter(NestedArray::getValue($display, ['display_options', 'sorts']) ?: [], function ($sort) {
+        return $sort['exposed'];
+      });
 
-        $this->derivatives[$id] = [
-          'id' => $id,
-          'name' => graphql_core_propcase($name) . 'View',
-          'type' => $this->interfaceExists($typeName) ? $typeName : 'Entity',
-          'view' => $viewId,
-          'display' => $displayId,
-          'cache_tags' => $view->getCacheTags(),
-          'cache_contexts' => $view->getCacheContexts(),
-          'cache_max_age' => $view->getCacheMaxAge(),
-        ] + $basePluginDefinition;
+      if ($sorts) {
+        $arguments += [
+          'sortDirection' => [
+            "type" => [
+              "ASC" => "Ascending",
+              "DESC" => "Descending",
+            ],
+            "default" => TRUE,
+          ],
+          'sortBy' => [
+            "type" => array_map(function ($sort) {
+              return $sort['expose']['label'];
+            }, $sorts),
+            "nullable" => TRUE,
+          ],
+        ];
       }
+
+      $arguments += array_map(function ($filter) {
+        return [
+          'type' => 'String',
+          'nullable' => TRUE,
+          'multi' => $filter['expose']['multiple'],
+        ];
+      }, array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
+        return $sort['exposed'];
+      }));
+
+      if (!$this->interfaceExists($typeName)) {
+        $typeName = 'Entity';
+      }
+
+      // If a pager is configured we apply the matching ViewResult derivative
+      // instead of the entity list.
+      if ($this->isPaged($display)) {
+        $typeName = graphql_core_camelcase(implode('-', [
+          $viewId, $displayId, 'result',
+        ]));
+        $multi = FALSE;
+        $paged = TRUE;
+        $arguments += [
+          'page' => ['type' => 'Int', 'default' => $this->getPagerOffset($display)],
+          'pageSize' => ['type' => 'Int', 'default' => $this->getPagerLimit($display)],
+        ];
+      }
+
+      $this->derivatives[$id] = [
+        'id' => $id,
+        'name' => graphql_core_propcase($id),
+        'types' => ['Root'],
+        'type' => $typeName,
+        'multi' => $multi,
+        'arguments' => $arguments,
+        'view' => $viewId,
+        'display' => $displayId,
+        'paged' => $paged,
+        'cache_tags' => $view->getCacheTags(),
+        'cache_contexts' => $view->getCacheContexts(),
+        'cache_max_age' => $view->getCacheMaxAge(),
+      ] + $basePluginDefinition;
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);
