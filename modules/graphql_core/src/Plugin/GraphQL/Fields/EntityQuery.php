@@ -90,8 +90,10 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $query->range($args['offset'], $args['limit']);
     $query->sort($type->getKey('id'));
 
-    foreach (array_diff_key($args, array_flip(['offset', 'limit'])) as $key => $arg) {
-      $query->condition($key, $arg);
+    if (array_key_exists('filter', $args) && $args['filter']) {
+      foreach ($args['filter'] as $key => $arg) {
+        $query->condition($key, $arg);
+      }
     }
 
     yield $query;
