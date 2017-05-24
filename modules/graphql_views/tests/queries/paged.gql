@@ -1,0 +1,29 @@
+{
+  page_one:graphqlTestPagedView {
+    count
+    results {
+      entityLabel
+    }
+  }
+
+  page_two:graphqlTestPagedView(page: 1) {
+    count
+    results {
+      entityLabel
+    }
+  }
+
+  page_three:graphqlTestPagedView(page: 2, pageSize: 3) {
+    count
+    results {
+      entityLabel
+    }
+  }
+
+  page_four:graphqlTestPagedView(page: 2 pageSize: 4) {
+    count
+    results {
+      entityLabel
+    }
+  }
+}

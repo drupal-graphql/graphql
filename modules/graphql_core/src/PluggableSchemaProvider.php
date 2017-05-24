@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql_core;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\SchemaProvider\SchemaProviderInterface;
 use Youshido\GraphQL\Schema\Schema;
 
@@ -47,36 +45,10 @@ class PluggableSchemaProvider implements SchemaProviderInterface {
       return TRUE;
     }, [
       GRAPHQL_CORE_TYPE_PLUGIN,
+      GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
     ]));
 
     return $schema;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getContexts() {
-    // TODO: Cache the cache contexts :).
-    $plugins = $this->pluginManager->find(function () {
-      return TRUE;
-    }, [
-      GRAPHQL_CORE_SCALAR_PLUGIN,
-      GRAPHQL_CORE_FIELD_PLUGIN,
-      GRAPHQL_CORE_MUTATION_PLUGIN,
-      GRAPHQL_CORE_INTERFACE_PLUGIN,
-      GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
-      GRAPHQL_CORE_TYPE_PLUGIN,
-    ]);
-
-    // Collect all cache contexts from all plugins.
-    $metadata = array_reduce($plugins, function (CacheableMetadata $carry, $plugin) {
-      if ($plugin instanceof CacheableDependencyInterface && $contexts = $plugin->getCacheContexts()) {
-        $carry->addCacheContexts($contexts);
-      }
-
-      return $carry;
-    }, new CacheableMetadata());
-
-    return $metadata->getCacheContexts();
-  }
 }

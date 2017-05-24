@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_url",
  *   name = "entityUrl",
  *   type = "Url",
+ *   types = {"Entity"}
  * )
  */
 class EntityUrl extends FieldPluginBase {

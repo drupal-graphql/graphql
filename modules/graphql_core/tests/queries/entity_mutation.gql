@@ -1,0 +1,13 @@
+mutation($node: NodeArticleInput!) {
+  create:createNodeArticle (input: $node) {
+    entity {
+      uuid:entityUuid
+    }
+    errors
+    violations {
+      code
+      path
+      message
+    }
+  }
+}

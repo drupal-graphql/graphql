@@ -20,9 +20,7 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;
-  use FieldablePluginTrait {
-    buildFields as buildAttachedFields;
-  }
+  use FieldablePluginTrait;
 
   /**
    * {@inheritdoc}
@@ -58,14 +56,4 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
     return [];
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function buildFields(GraphQLSchemaManagerInterface $schemaManager) {
-    $interfaceFields = array_reduce(array_map(function (AbstractInterfaceType $interface) {
-      return $interface->getFields();
-    }, $this->buildInterfaces($schemaManager)), 'array_merge', []);
-    $attachedFields = $this->buildAttachedFields($schemaManager);
-    return array_merge($interfaceFields, $attachedFields);
-  }
 }

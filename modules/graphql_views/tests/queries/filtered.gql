@@ -1,0 +1,7 @@
+{
+
+  default:graphqlTestFilteredView (filter: {title: "A"}) {
+    entityLabel
+  }
+
+}

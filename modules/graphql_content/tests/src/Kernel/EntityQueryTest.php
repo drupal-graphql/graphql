@@ -88,7 +88,7 @@ class EntityQueryTest extends GraphQLFileTestBase {
     }, $nodes));
 
     $result = $this->executeQueryFile('entity_query_no_args.gql');
-    $this->assertEquals($expected, $result['data']['allNodes']);
+    $this->assertEquals($expected, $result['data']['allNodes']['entities']);
   }
 
   /**
@@ -100,7 +100,7 @@ class EntityQueryTest extends GraphQLFileTestBase {
 
     $expected = [['entityLabel' => $node->label()]];
     $result = $this->executeQueryFile('entity_query_args.gql', ['id' => $node->id()]);
-    $this->assertEquals($expected, $result['data']['onlyNodeWithId']);
+    $this->assertEquals($expected, $result['data']['onlyNodeWithId']['entities']);
   }
 
   /**
@@ -113,6 +113,6 @@ class EntityQueryTest extends GraphQLFileTestBase {
     }, array_slice($nodes, 1)));
 
     $result = $this->executeQueryFile('entity_query_offset.gql');
-    $this->assertEquals($expected, $result['data']['allNodesExceptFirst']);
+    $this->assertEquals($expected, $result['data']['allNodesExceptFirst']['entities']);
   }
 }

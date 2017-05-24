@@ -12,7 +12,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "url_path",
  *   name = "path",
- *   type = "String"
+ *   type = "String",
+ *   types = {"Url"}
  * )
  */
 class Path extends FieldPluginBase {

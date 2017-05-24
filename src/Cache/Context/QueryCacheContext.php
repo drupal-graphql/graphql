@@ -54,33 +54,49 @@ class QueryCacheContext implements CacheContextInterface {
       return $this->contextCache[$request];
     }
 
+    $hash = '';
     if ($request->attributes->has('query')) {
-      $query = preg_replace('/\s{2,}/', ' ', $request->attributes->get('query') ?: '');
-      $variables = $request->attributes->get('variables') ?: [];
-      ksort($variables);
-
-      return $this->contextCache[$request] = hash('sha256', json_encode([
-        'query' => $query,
-        'variables' => $variables,
-      ]));
+      $hash = $this->contextCache[$request] = $this->getHash(
+        $request->attributes->get('query') ?: '',
+        $request->attributes->get('variables') ?: []
+      );
     }
-
-    if ($request->attributes->has('queries')) {
+    else if ($request->attributes->has('queries')) {
       $queries = $request->attributes->get('queries');
 
-      return $this->contextCache[$request] = hash('sha256', json_encode(array_map(function ($item) {
-        $query = preg_replace('/\s{2,}/', ' ', !empty($item['query']) ? $item['query'] : '');
-        $variables = !empty($item['variables']) ? $item['variables'] : [];
-        ksort($variables);
-
-        return [
-          'query' => $query,
-          'variables' => $variables,
-        ];
+      $hash = hash('sha256', json_encode(array_map(function ($item) {
+        return $this->getHash(
+          !empty($item['query']) ? $item['query'] : '',
+          !empty($item['variables']) ? $item['variables'] : []
+        );
       }, $queries)));
     }
 
-    return $this->contextCache[$request] = '';
+    return $this->contextCache[$request] = $hash;
+  }
+
+  /**
+   * Produces an optimized hashed string of the query and variables.
+   *
+   * Sorts the variables by their key and eliminates whitespace from the query
+   * to enable better reuse of the cache entries.
+   *
+   * @param string $query
+   *   The graphql query string.
+   * @param array $variables
+   *   The graphql query variables.
+   *
+   * @return string
+   *   The hashed string containing.
+   */
+  protected function getHash($query = '', array $variables = []) {
+    $query = preg_replace('/\s{2,}/', ' ', $query);
+    ksort($variables);
+
+    return hash('sha256', json_encode([
+      'query' => $query,
+      'variables' => $variables,
+    ]));
   }
 
   /**

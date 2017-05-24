@@ -9,8 +9,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  *
  * @GraphQLType(
  *   id = "url",
- *   name = "Url",
- *   fields = {"path", "alias", "routed"}
+ *   name = "Url"
  * )
  */
 class Url extends TypePluginBase {

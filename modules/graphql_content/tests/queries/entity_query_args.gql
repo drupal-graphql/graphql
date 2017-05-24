@@ -1,5 +1,7 @@
 query($id: Int) {
-  onlyNodeWithId:nodeQuery(nid: $id) {
-    entityLabel
+  onlyNodeWithId:nodeQuery(filter: {nid: $id}) {
+    entities {
+      entityLabel
+    }
   }
 }

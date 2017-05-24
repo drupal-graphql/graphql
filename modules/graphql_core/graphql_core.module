@@ -9,7 +9,7 @@ define('GRAPHQL_CORE_SCALAR_PLUGIN', 'scalar');
 define('GRAPHQL_CORE_FIELD_PLUGIN', 'field');
 define('GRAPHQL_CORE_MUTATION_PLUGIN', 'mutation');
 define('GRAPHQL_CORE_INTERFACE_PLUGIN', 'interface');
-define('GRAPHQL_CORE_INPUT_TYPE_PLUGIN', 'scalar');
+define('GRAPHQL_CORE_INPUT_TYPE_PLUGIN', 'input');
 define('GRAPHQL_CORE_TYPE_PLUGIN', 'type');
 define('GRAPHQL_CORE_ENUM_PLUGIN', 'enum');
 
@@ -40,4 +40,59 @@ function graphql_core_camelcase($components) {
  */
 function graphql_core_propcase($components) {
   return lcfirst(graphql_core_camelcase($components));
+}
+
+/**
+ * Implements hook_graphql_interfaces_alter().
+ *
+ * Flatten the interface inheritance tree.
+ */
+function graphql_core_graphql_interfaces_alter(&$definitions) {
+  $interfaces = array_map(function ($definition) use ($definitions) {
+    return graphql_core_list_interfaces($definitions, $definition);
+  }, $definitions);
+
+  foreach ($interfaces as $index => $list) {
+    $definition['interfaces'] = $list;
+  }
+}
+
+/**
+ * Implements hook_graphql_types_alter().
+ *
+ * Flatten the interface inheritance tree.
+ */
+function graphql_core_graphql_types_alter(&$definitions) {
+  $interface_definitions = \Drupal::service('graphql_core.interface_manager')->getDefinitions();
+
+  $interfaces = array_map(function ($definition) use ($interface_definitions) {
+    return graphql_core_list_interfaces($interface_definitions, $definition);
+  }, $definitions);
+
+  foreach ($interfaces as $index => $list) {
+    $definitions[$index]['interfaces'] = $list;
+  }
+}
+
+/**
+ * Get a flattened list of a plugins interface inheritance tree.
+ *
+ * @param array $definitions
+ *   The list of interface definitions.
+ * @param mixed $definition
+ *   A plugin definition.
+ *
+ * @return string[]
+ *   A list of interface names.
+ */
+function graphql_core_list_interfaces(array &$definitions, $definition) {
+  $parents = array_filter($definitions, function ($parent) use ($definition) {
+    return in_array($parent['name'], $definition['interfaces']);
+  });
+
+  $interfaces = array_reduce(array_map(function ($parent) use ($definitions) {
+    return graphql_core_list_interfaces($definitions, $parent);
+  }, $parents), 'array_merge', $definition['interfaces']);
+
+  return $interfaces;
 }

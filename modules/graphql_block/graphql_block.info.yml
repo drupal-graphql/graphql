@@ -4,4 +4,4 @@ description: 'Query Drupal blocks with GraphQL.'
 package: GraphQL
 core: 8.x
 dependencies:
-  - graphql
+  - graphql_core

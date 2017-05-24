@@ -13,8 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @GraphQLInterface(
  *   id = "vehicle",
- *   name = "Vehicle",
- *   fields = {"type", "wheels"}
+ *   name = "Vehicle"
  * )
  */
 class Vehicle extends InterfacePluginBase implements ContainerFactoryPluginInterface {

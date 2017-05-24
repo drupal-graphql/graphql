@@ -69,8 +69,7 @@ trait ArgumentAwarePluginTrait {
       $types = $schemaManager->find(function ($definition) use ($argument) {
         return array_key_exists('data_type', $definition) && $definition['data_type'] === $argument['data_type'];
       }, [
-        GRAPHQL_CORE_TYPE_PLUGIN,
-        GRAPHQL_CORE_INTERFACE_PLUGIN,
+        GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
         GRAPHQL_CORE_SCALAR_PLUGIN,
       ]);
 
@@ -87,7 +86,7 @@ trait ArgumentAwarePluginTrait {
     }
 
     if (isset($type) && $type instanceof TypeInterface) {
-      $nullable = is_array($argument) && array_key_exists('nullable', $argument) && $argument['nullable'];
+      $nullable = is_array($argument) && (array_key_exists('nullable', $argument) && $argument['nullable'] || array_key_exists('default', $argument));
       $multi = is_array($argument) && array_key_exists('multi', $argument) && $argument['multi'];
 
       return $this->decorateType($type, $nullable, $multi);

@@ -9,7 +9,6 @@
     <!-- Annotations must use the same property names as in the configuration. -->
     <exclude-pattern>src/Annotation</exclude-pattern>
     <exclude-pattern>src/Core/Annotation</exclude-pattern>
-    <exclude-pattern>src/Core/RulesUiDefinition.php</exclude-pattern>
   </rule>
 
   <!-- We always want short array syntax only. -->
