@@ -72,8 +72,18 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             continue;
           }
 
+          $type = graphql_core_camelcase([$entityTypeId, $fieldName]) . 'FieldInput';
+
+          $fieldStorage = $field->getFieldStorageDefinition();
+          $propertyDefinitions = $fieldStorage->getPropertyDefinitions();
+
+          // Skip this field input type if it's a single value field.
+          if (count($propertyDefinitions) == 1 && array_keys($propertyDefinitions)[0] === $fieldStorage->getMainPropertyName()) {
+            $type = "String";
+          }
+
           $fields[graphql_core_propcase($fieldName)] = [
-            'type' => graphql_core_camelcase([$entityTypeId, $fieldName]) . 'FieldInput',
+            'type' => $type,
             'nullable' => !$field->isRequired(),
             'multi' => $field->getFieldStorageDefinition()->isMultiple(),
             'field_name' => $fieldName,
