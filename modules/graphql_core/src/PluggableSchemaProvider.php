@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql_core;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\SchemaProvider\SchemaProviderInterface;
 use Youshido\GraphQL\Schema\Schema;
 
@@ -47,8 +45,10 @@ class PluggableSchemaProvider implements SchemaProviderInterface {
       return TRUE;
     }, [
       GRAPHQL_CORE_TYPE_PLUGIN,
+      GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
     ]));
 
     return $schema;
   }
+
 }
