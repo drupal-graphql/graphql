@@ -19,8 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   multi = false,
  *   weight = -1,
  *   arguments = {
- *     "id" = "Int",
- *     "language" = "Language"
+ *     "id" = "String"
  *   },
  *   deriver = "\Drupal\graphql_content\Plugin\Deriver\EntityByIdDeriver"
  * )
