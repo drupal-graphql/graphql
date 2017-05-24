@@ -23,7 +23,7 @@ class ImageTitle extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ImageItem) {
+    if ($value instanceof ImageItem && $value->entity->access('view')) {
       yield $value->title;
     }
   }

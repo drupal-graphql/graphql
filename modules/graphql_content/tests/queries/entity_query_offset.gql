@@ -1,5 +1,7 @@
 query {
   allNodesExceptFirst:nodeQuery(offset: 1, limit: 9999) {
-    entityLabel
+    entities {
+      entityLabel
+    }
   }
 }

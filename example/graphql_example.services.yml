@@ -1,5 +1,0 @@
-services:
-  graphql_example.schema_provider:
-    class: Drupal\graphql_example\SchemaProvider\SchemaProvider
-    tags:
-        - { name: graphql_schema_provider }

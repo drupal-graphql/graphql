@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Disables any display variant on the explorer page.
@@ -211,14 +212,13 @@ class CacheSubscriber implements EventSubscriberInterface {
     }
 
     // Merge the global cache metadata with the response cache metadata.
-    $metadata = new CacheableMetadata();
-    $metadata->addCacheableDependency($this->metadata);
-    $metadata->addCacheableDependency($response->getCacheableMetadata());
+    $response->addCacheableDependency($this->metadata);
 
+    $metadata = $response->getCacheableMetadata();
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
-    // Write the cache entry for the cache metadata. This one uses the
+    // Write the cache entry for the cache metadata.
     $ccid = $this->getCacheIdentifier($this->metadata);
     $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
@@ -258,7 +258,7 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected function getCacheIdentifier(CacheableDependencyInterface $metadata) {
     $tokens = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($tokens)->getKeys();
-    return implode(':', $keys);
+    return implode(':', array_merge(['graphql'], array_values($keys)));
   }
 
   /**

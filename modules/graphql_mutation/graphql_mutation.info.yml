@@ -1,0 +1,7 @@
+name: GraphQL Mutations
+type: module
+description: 'Core module with common fields and types for enabling mutations.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core

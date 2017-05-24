@@ -66,10 +66,28 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if ($view = $storage->load($definition['view'])) {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
-      $executable->execute();
 
-      foreach ($executable->result as $row) {
-        yield $row->_entity;
+      // Prepare arguments for use as exposed form input.
+      $input = array_filter([
+        // Sorting arguments.
+        'sort_by' => isset($args['sortBy']) ? $args['sortBy'] : NULL,
+        'sort_order' => isset($args['sortDirection']) ? $args['sortDirection'] : NULL,
+      ] + (array_key_exists('filter', $args) ? $args['filter'] : []));
+
+      $executable->setExposedInput($input);
+
+      if ($definition['paged']) {
+        // Set paging parameters.
+        $executable->setItemsPerPage($args['pageSize']);
+        $executable->setCurrentPage($args['page']);
+        $executable->execute();
+        yield $executable;
+      }
+      else {
+        $executable->execute();
+        foreach ($executable->result as $row) {
+          yield $row->_entity;
+        }
       }
     }
   }

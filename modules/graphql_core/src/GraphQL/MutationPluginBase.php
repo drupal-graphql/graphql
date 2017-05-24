@@ -11,9 +11,10 @@ use Drupal\graphql_core\GraphQLPluginInterface;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Youshido\GraphQL\Config\Field\FieldConfig;
 use Youshido\GraphQL\Field\AbstractField;
+use Youshido\GraphQL\Type\TypeInterface;
 
 /**
- * Base class for graphql field plugins.
+ * Base class for graphql mutation plugins.
  */
 abstract class MutationPluginBase extends AbstractField implements GraphQLPluginInterface, CacheableDependencyInterface {
   use PluginTrait;

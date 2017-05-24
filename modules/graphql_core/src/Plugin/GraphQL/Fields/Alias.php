@@ -15,7 +15,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "url_alias",
  *   name = "alias",
- *   type = "String"
+ *   type = "String",
+ *   types = {"Url"}
  * )
  */
 class Alias extends Path implements ContainerFactoryPluginInterface {

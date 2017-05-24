@@ -30,11 +30,4 @@ class GraphQLType extends GraphQLAnnotationBase {
    */
   public $interfaces = [];
 
-  /**
-   * The fields attached to this type.
-   *
-   * @var array
-   */
-  public $fields = [];
-
 }
