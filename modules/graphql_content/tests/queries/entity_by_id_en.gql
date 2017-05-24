@@ -1,0 +1,5 @@
+query($id: String) {
+  nodeById(id: $id, language: en) {
+    entityLabel
+  }
+}
