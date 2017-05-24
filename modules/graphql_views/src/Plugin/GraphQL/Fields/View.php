@@ -72,10 +72,7 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
         // Sorting arguments.
         'sort_by' => isset($args['sortBy']) ? $args['sortBy'] : NULL,
         'sort_order' => isset($args['sortDirection']) ? $args['sortDirection'] : NULL,
-      ] + array_filter($args, function ($key) {
-        // Everything except sorting and paging parameters is a filter.
-        return !in_array($key, ['page', 'pageSize', 'sortBy', 'sortDirection']);
-      }, ARRAY_FILTER_USE_KEY));
+      ] + (array_key_exists('filter', $args) ? $args['filter'] : []));
 
       $executable->setExposedInput($input);
 

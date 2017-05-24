@@ -35,6 +35,20 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $paged = FALSE;
       $arguments = [];
 
+      $filters = array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
+        return $sort['exposed'];
+      });
+
+      if ($filters) {
+        $arguments['filter'] = [
+          'type' => graphql_core_camelcase([
+            $viewId, $displayId, 'view', 'filter', 'input',
+          ]),
+          'multi' => FALSE,
+          'nullable' => TRUE,
+        ];
+      }
+
 
       $sorts = array_filter(NestedArray::getValue($display, ['display_options', 'sorts']) ?: [], function ($sort) {
         return $sort['exposed'];
@@ -57,16 +71,6 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
           ],
         ];
       }
-
-      $arguments += array_map(function ($filter) {
-        return [
-          'type' => 'String',
-          'nullable' => TRUE,
-          'multi' => $filter['expose']['multiple'],
-        ];
-      }, array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
-        return $sort['exposed'];
-      }));
 
       if (!$this->interfaceExists($typeName)) {
         $typeName = 'Entity';

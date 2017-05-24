@@ -1,33 +1,33 @@
 query {
-  a:nodeQuery(type: "a") {
+  a:nodeQuery(filter: {type: "a"}) {
     count
     entities {
       uuid:entityUuid
     }
   }
 
-  b:nodeQuery(type: "b") {
+  b:nodeQuery(filter: {type: "b"}) {
     count
     entities {
       uuid:entityUuid
     }
   }
 
-  limit:nodeQuery(type: "a", limit: 2) {
+  limit:nodeQuery(filter: {type: "a"}, limit: 2) {
     count
     entities {
       uuid:entityUuid
     }
   }
 
-  offset:nodeQuery(type: "a", offset: 1) {
+  offset:nodeQuery(filter: {type: "a"}, offset: 1) {
     count
     entities {
       uuid:entityUuid
     }
   }
 
-  offset_limit:nodeQuery(type: "a", offset: 1, limit: 1) {
+  offset_limit:nodeQuery(filter: {type: "a"}, offset: 1, limit: 1) {
     count
     entities {
       uuid:entityUuid

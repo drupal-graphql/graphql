@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Create GraphQL entityQuery fields based on available Drupal entity types.
  */
-class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterface {
+class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The entity type manager service.
    *
@@ -57,7 +57,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_core_propcase($id) . 'Query',
+          'name' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -69,11 +69,26 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
-        if ($queryable_properties) {
-          $derivative['arguments']['filter'] = [
+        // Don't even create the type if there are no queryable properties.
+        if (!$queryable_properties) {
+          continue;
+        }
+
+        // Add all queryable properties as fields.
+        foreach ($queryable_properties as $key => $property) {
+          $fieldName = graphql_core_propcase($key);
+
+          // Some field types don't have a main property.
+          if (!$mainProperty = $property->getMainPropertyName()) {
+            continue;
+          }
+
+          $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
+
+          $derivative['fields'][$fieldName] = [
             'multi' => FALSE,
             'nullable' => TRUE,
-            'type' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
+            'data_type' => $mainPropertyDataType,
           ];
         }
 

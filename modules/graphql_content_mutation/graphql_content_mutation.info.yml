@@ -1,6 +1,6 @@
-name: GraphQL Content
+name: GraphQL Content Mutations
 type: module
-description: 'Automatically create GraphQL types and fields from Drupal content entities.'
+description: 'Automatically create GraphQL mutations for Drupal content entities.'
 package: GraphQL
 core: 8.x
 dependencies:
