@@ -3,7 +3,6 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Interfaces;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\InterfacePluginBase;
 use Drupal\graphql_core\GraphQL\Traits\EntityTypeResolverTrait;
