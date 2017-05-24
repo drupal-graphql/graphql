@@ -74,10 +74,9 @@ class EntityByIdTest extends GraphQLFileTestBase {
 //      return ['entityLabel' => $node->label()];
 //    }, $nodes));
 
-
     $result = $this->executeQueryFile('entity_by_id.gql', [
       'id' => $node->id(),
-      'language' => $node->language()->getId(),
+      'language' => 'fr',
     ]);
 //    $this->assertEquals($expected, $result['data']['allNodes']);
   }
