@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -26,12 +27,20 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
   protected $entityFieldManager;
 
   /**
+   * The schema manager.
+   *
+   * @var \Drupal\graphql_core\GraphQLSchemaManagerInterface
+   */
+  protected $schemaManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('graphql_core.schema_manager')
     );
   }
 
@@ -40,10 +49,12 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    EntityFieldManagerInterface $entityFieldManager
+    EntityFieldManagerInterface $entityFieldManager,
+    GraphQLSchemaManagerInterface $schemaManager
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
+    $this->schemaManager = $schemaManager;
   }
 
   /**
@@ -57,8 +68,14 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
 
       foreach ($this->entityFieldManager->getFieldStorageDefinitions($entityTypeId) as $fieldName => $field) {
         $properties = [];
+        $propertyDefinitions = $field->getPropertyDefinitions();
 
-        foreach ($field->getPropertyDefinitions() as $propertyName => $propertyDefinition) {
+        // Skip this field input type if it's a single value field.
+        if (count($propertyDefinitions) == 1 && array_keys($propertyDefinitions)[0] === $field->getMainPropertyName()) {
+          continue;
+        }
+
+        foreach ($propertyDefinitions as $propertyName => $propertyDefinition) {
           if ($propertyDefinition->isReadOnly() || $propertyDefinition->isComputed()) {
             continue;
           }
