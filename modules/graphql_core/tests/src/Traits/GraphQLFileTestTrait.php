@@ -43,7 +43,7 @@ trait GraphQLFileTestTrait {
     $errors = array_map(function ($error) {
       return $error['message'];
     }, array_key_exists('errors', $data) ? $data['errors'] : []);
-    $this->assertEquals([], $errors);
+    $this->assertEquals([], $errors, 'Invalid GraphQL query. Errors: ' . implode("\n* ", $errors));
   }
 
   /**

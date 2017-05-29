@@ -39,11 +39,17 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
-        $this->derivatives["entity:$id"] = [
-          'name' => graphql_core_propcase($id) . 'ById',
-          'type' => graphql_core_camelcase($id),
-          'entity_type' => $id,
-        ] + $basePluginDefinition;
+        $derivative = [
+            'name' => graphql_core_propcase($id) . 'ById',
+            'type' => graphql_core_camelcase($id),
+            'entity_type' => $id,
+          ] + $basePluginDefinition;
+
+        if ($type->isTranslatable()) {
+          $derivative['arguments']['language'] = 'AvailableLanguages';
+        }
+
+        $this->derivatives["entity:$id"] = $derivative;
       }
     }
 

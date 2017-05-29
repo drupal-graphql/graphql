@@ -12,8 +12,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Generates an enumeration of numbers.
  *
  * @GraphQLEnum(
- *   id = "languages",
- *   name = "Languages"
+ *   id = "available_languages",
+ *   name = "AvailableLanguages"
  * )
  */
 class Languages extends EnumPluginBase implements ContainerFactoryPluginInterface {
@@ -54,10 +54,8 @@ class Languages extends EnumPluginBase implements ContainerFactoryPluginInterfac
 
     foreach ($this->languageManager->getLanguages() as $language) {
       $values[] = [
-        'id' => $language->getId(),
-        'name' => $language->getName(),
-        'weight' => $language->getWeight(),
-        'direction' => $language->getDirection(),
+        'name' => $language->getId(),
+        'value' => $language->getId(),
       ];
     }
 

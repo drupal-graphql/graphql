@@ -3,6 +3,7 @@
 namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
@@ -25,6 +26,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * )
  */
 class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterface {
+
   use DependencySerializationTrait;
 
   /**
@@ -35,10 +37,18 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
   protected $entityTypeManager;
 
   /**
+   * The repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager, EntityRepositoryInterface $entityRepository) {
     $this->entityTypeManager = $entityTypeManager;
+    $this->entityRepository = $entityRepository;
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
@@ -50,7 +60,8 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository')
     );
   }
 
@@ -61,7 +72,12 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
     $storage = $this->entityTypeManager->getStorage($this->pluginDefinition['entity_type']);
 
     if (($entity = $storage->load($args['id'])) && $entity->access('view')) {
+      if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
+        $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+      }
+
       yield $entity;
     }
   }
+
 }
