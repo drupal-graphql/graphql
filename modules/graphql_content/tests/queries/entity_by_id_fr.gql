@@ -1,5 +1,0 @@
-query($id: String) {
-  nodeById(id: $id, language: fr) {
-    entityLabel
-  }
-}

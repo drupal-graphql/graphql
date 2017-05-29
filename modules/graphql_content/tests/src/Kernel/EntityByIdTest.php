@@ -62,7 +62,7 @@ class EntityByIdTest extends GraphQLFileTestBase {
   /**
    * Test that the entity query returns all nodes if no args are given.
    */
-  public function testEntityQueryWithTranslation() {
+  public function testEntityByIdWithTranslation() {
     $node = $this->createNode([
       'title' => 'English node',
       'type' => 'test',
@@ -71,14 +71,16 @@ class EntityByIdTest extends GraphQLFileTestBase {
     $node->addTranslation($this->langcode, ['title' => 'French node'])->save();
 
     // Check English node.
-    $result = $this->executeQueryFile('entity_by_id_en.gql', [
+    $result = $this->executeQueryFile('entity_by_id.gql', [
       'id' => $node->id(),
+      'language' => 'en',
     ]);
     $this->assertEquals(['entityLabel' => 'English node'], $result['data']['nodeById']);
 
     // Check French translation.
-    $result = $this->executeQueryFile('entity_by_id_fr.gql', [
+    $result = $this->executeQueryFile('entity_by_id.gql', [
       'id' => $node->id(),
+      'language' => 'fr',
     ]);
     $this->assertEquals(['entityLabel' => 'French node'], $result['data']['nodeById']);
   }
