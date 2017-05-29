@@ -21,6 +21,8 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
     'field',
     'filter',
     'text',
+    'language',
+    'content_translation',
     'graphql_content',
   ];
 
@@ -33,6 +35,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
     $this->installConfig(['node']);
     $this->installConfig(['filter']);
     $this->installEntitySchema('node');
+    $this->installSchema('node', 'node_access');
 
     $this->createContentType([
       'type' => 'test',
@@ -42,6 +45,11 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->grantPermission('access user profiles')
       ->save();
+
+    $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
+      'id' => 'fr',
+    ]);
+    $language->save();
   }
 
   /**
@@ -49,10 +57,13 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
    */
   public function testBasicFields() {
     $node = $this->createNode([
-      'title' => 'Test',
+      'title' => 'Node in default language',
       'type' => 'test',
       'status' => 1,
     ]);
+
+    $translation = $node->addTranslation('fr', ['title' => 'French node']);
+    $translation->save();
 
     $result = $this->executeQueryFile('basic_fields.gql', [
       'path' => '/node/' . $node->id(),
@@ -74,6 +85,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
         'internalPath' => '/node/' . $node->id(),
         'aliasedPath' => '/node/' . $node->id(),
       ],
+      'entityTranslation' => [
+        'entityLabel' => $translation->label(),
+      ]
     ];
 
     $this->assertEquals($values, $result['data']['route']['node'], 'Content type Interface resolves basic entity fields.');

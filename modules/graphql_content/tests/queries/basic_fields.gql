@@ -16,8 +16,8 @@ query ($path: String!) {
         internalPath:path,
         aliasedPath:alias
       },
-      entityTranslation("en") {
-        entityId
+      entityTranslation(language: fr) {
+        entityLabel
       }
     }
     node_test:nodeContext {
@@ -36,6 +36,9 @@ query ($path: String!) {
         entityRoute:entityUrl {
           internalPath:path,
           aliasedPath:alias
+        },
+        entityTranslation(language: fr) {
+         entityLabel
         }
       }
     }

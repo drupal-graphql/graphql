@@ -19,12 +19,12 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   nullable = true,
  *   multi = false,
  *   weight = -1,
+ *   type = "Entity",
+ *   types = {"Entity"},
  *   arguments = {
- *     "language" = "Languages"
+ *     "language" = "AvailableLanguages"
  *   }
  * )
- *
- * not used now (deriver = "\Drupal\graphql_content\Plugin\Deriver\EntityTranslationDeriver")
  */
 class EntityTranslation extends FieldPluginBase implements ContainerFactoryPluginInterface {
 
@@ -62,11 +62,8 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-
-    // TODO Continue here. This class blows up EntityBasicFieldsTest. entity.repositry service might need special initialization in a Kernel test.
-
     if ($value instanceof EntityInterface) {
-      yield $this->entityRepository->getTranslationFromContext($value, $args['langcode']);
+      yield $this->entityRepository->getTranslationFromContext($value, $args['language']);
     }
   }
 
