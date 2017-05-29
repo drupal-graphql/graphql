@@ -44,7 +44,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
           'type' => graphql_core_camelcase($id),
           'entity_type' => $id,
         ] + $basePluginDefinition;
-
+        
         if ($type->isTranslatable()) {
           $derivative['arguments']['language'] = 'AvailableLanguages';
         }

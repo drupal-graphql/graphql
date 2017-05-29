@@ -32,6 +32,13 @@ class EntityByIdTest extends GraphQLFileTestBase {
   ];
 
   /**
+   * The added language.
+   *
+   * @var string
+   */
+  protected $langcode = 'fr';
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -47,7 +54,7 @@ class EntityByIdTest extends GraphQLFileTestBase {
       ->save();
 
     $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
-      'id' => 'fr',
+      'id' => $this->langcode,
     ]);
     $language->save();
   }
@@ -61,7 +68,7 @@ class EntityByIdTest extends GraphQLFileTestBase {
       'type' => 'test',
     ]);
     $node->save();
-    $node->addTranslation('fr', ['title' => 'French node'])->save();
+    $node->addTranslation($this->langcode, ['title' => 'French node'])->save();
 
     // Check English node.
     $result = $this->executeQueryFile('entity_by_id.gql', [
