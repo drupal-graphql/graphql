@@ -40,11 +40,11 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-            'name' => graphql_core_propcase($id) . 'ById',
-            'type' => graphql_core_camelcase($id),
-            'entity_type' => $id,
-          ] + $basePluginDefinition;
-
+          'name' => graphql_core_propcase($id) . 'ById',
+          'type' => graphql_core_camelcase($id),
+          'entity_type' => $id,
+        ] + $basePluginDefinition;
+        
         if ($type->isTranslatable()) {
           $derivative['arguments']['language'] = 'AvailableLanguages';
         }
