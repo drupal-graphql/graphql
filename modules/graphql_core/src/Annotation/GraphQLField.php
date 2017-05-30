@@ -48,7 +48,7 @@ class GraphQLField extends GraphQLAnnotationBase  {
    *
    * @var bool
    */
-  public $nullable = FALSE;
+  public $nullable = TRUE;
 
   /**
    * The field arguments.
