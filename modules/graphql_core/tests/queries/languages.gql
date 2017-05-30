@@ -6,6 +6,7 @@ query {
     isLocked
     direction
     weight
+    argument
   }
 
   default:route(path: "/graphql/test/a") {

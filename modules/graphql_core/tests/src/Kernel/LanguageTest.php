@@ -35,9 +35,15 @@ class LanguageTest extends LanguageTestBase {
       'id' => 'fr',
       'weight' => 1,
     ])->save();
+
     ConfigurableLanguage::create([
       'id' => 'es',
       'weight' => 2,
+    ])->save();
+
+    ConfigurableLanguage::create([
+      'id' => 'pt-br',
+      'weight' => 3,
     ])->save();
 
     $config = $this->config('language.negotiation');
@@ -89,6 +95,7 @@ class LanguageTest extends LanguageTestBase {
       'isLocked' => FALSE,
       'direction' => 'ltr',
       'weight' => 0,
+      'argument' => 'en',
     ];
 
     $french = [
@@ -98,6 +105,7 @@ class LanguageTest extends LanguageTestBase {
       'isLocked' => FALSE,
       'direction' => 'ltr',
       'weight' => 1,
+      'argument' => 'fr',
     ];
 
     $spanish = [
@@ -107,9 +115,20 @@ class LanguageTest extends LanguageTestBase {
       'isLocked' => FALSE,
       'direction' => 'ltr',
       'weight' => 2,
+      'argument' => 'es',
     ];
 
-    $this->assertEquals([$english, $french, $spanish], $result['data']['languages']);
+    $brazil = [
+      'id' => 'pt-br',
+      'name' => 'Portuguese, Brazil',
+      'isDefault' => FALSE,
+      'isLocked' => FALSE,
+      'direction' => 'ltr',
+      'weight' => 3,
+      'argument' => 'pt_br',
+    ];
+
+    $this->assertEquals([$english, $french, $spanish, $brazil], $result['data']['languages']);
   }
 
 }
