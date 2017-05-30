@@ -41,11 +41,12 @@ abstract class QueryTestBase extends BrowserTestBase {
    * @param $query
    * @param array $variables
    * @param string|null $operation
+   * @param string[] $parameters
    *
    * @return string The content returned from the request.
    * The content returned from the request.
    */
-  protected function query($query, array $variables = NULL, $operation = NULL) {
+  protected function query($query, array $variables = NULL, $operation = NULL, $parameters = []) {
     $body = [
       'query' => $query,
       'variables' => $variables,
@@ -66,6 +67,7 @@ abstract class QueryTestBase extends BrowserTestBase {
     $response = \Drupal::httpClient()->post($this->getAbsoluteUrl($this->queryUrl), [
       'body' => json_encode($body),
       'cookies' => $jar,
+      'query' => $parameters,
     ]);
 
     return (string) $response->getBody();

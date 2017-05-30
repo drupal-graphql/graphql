@@ -1,22 +1,24 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Enums;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQL\EnumPluginBase;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Generates an enumeration of numbers.
+ * List site-wide configured languages.
  *
- * @GraphQLEnum(
- *   id = "available_languages",
- *   name = "AvailableLanguages"
+ * @GraphqlField(
+ *   id = "available_languages_field",
+ *   name = "availableLanguages",
+ *   type = "Language",
+ *   multi = true
  * )
  */
-class Languages extends EnumPluginBase implements ContainerFactoryPluginInterface {
+class AvailableLanguages extends FieldPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The language manager.
@@ -49,17 +51,10 @@ class Languages extends EnumPluginBase implements ContainerFactoryPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public function buildValues(GraphQLSchemaManagerInterface $schemaManager) {
-    $values = [];
-
+  protected function resolveValues($value, array $args, ResolveInfo $info) {
     foreach ($this->languageManager->getLanguages() as $language) {
-      $values[] = [
-        'name' => str_replace('-', '_', $language->getId()),
-        'value' => $language->getId(),
-      ];
+      yield $language;
     }
-
-    return $values;
   }
 
 }
