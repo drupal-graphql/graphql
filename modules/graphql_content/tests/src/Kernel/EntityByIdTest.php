@@ -32,11 +32,18 @@ class EntityByIdTest extends GraphQLFileTestBase {
   ];
 
   /**
-   * The added language.
+   * The added French language.
    *
    * @var string
    */
-  protected $langcode = 'fr';
+  protected $frenchLangcode = 'fr';
+
+  /**
+   * The added Chinese simplified language.
+   *
+   * @var string
+   */
+  protected $chineseSimplifiedLangcode = 'zh-hans';
 
   /**
    * {@inheritdoc}
@@ -53,8 +60,14 @@ class EntityByIdTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->save();
 
-    $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
-      'id' => $this->langcode,
+    $language_storage = $this->container->get('entity.manager')->getStorage('configurable_language');
+    $language = $language_storage->create([
+      'id' => $this->frenchLangcode,
+    ]);
+    $language->save();
+
+    $language = $language_storage->create([
+      'id' => $this->chineseSimplifiedLangcode,
     ]);
     $language->save();
   }
@@ -68,7 +81,8 @@ class EntityByIdTest extends GraphQLFileTestBase {
       'type' => 'test',
     ]);
     $node->save();
-    $node->addTranslation($this->langcode, ['title' => 'French node'])->save();
+    $node->addTranslation($this->frenchLangcode, ['title' => 'French node'])->save();
+    $node->addTranslation($this->chineseSimplifiedLangcode, ['title' => 'Chinese simplified node'])->save();
 
     // Check English node.
     $result = $this->executeQueryFile('entity_by_id.gql', [
@@ -83,6 +97,13 @@ class EntityByIdTest extends GraphQLFileTestBase {
       'language' => 'fr',
     ]);
     $this->assertEquals(['entityLabel' => 'French node'], $result['data']['nodeById']);
+
+    // Check Chinese simplified translation.
+    $result = $this->executeQueryFile('entity_by_id.gql', [
+      'id' => $node->id(),
+      'language' => 'zh_hans',
+    ]);
+    $this->assertEquals(['entityLabel' => 'Chinese simplified node'], $result['data']['nodeById']);
   }
 
 }

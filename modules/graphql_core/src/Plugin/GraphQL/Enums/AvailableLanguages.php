@@ -54,7 +54,7 @@ class AvailableLanguages extends EnumPluginBase implements ContainerFactoryPlugi
 
     foreach ($this->languageManager->getLanguages() as $language) {
       $values[] = [
-        'name' => $language->getId(),
+        'name' => str_replace('-', '_', $language->getId()),
         'value' => $language->getId(),
       ];
     }
