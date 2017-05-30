@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Enums;
+namespace Drupal\graphql_core\Plugin\GraphQL\Enums;
 
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   name = "AvailableLanguages"
  * )
  */
-class Languages extends EnumPluginBase implements ContainerFactoryPluginInterface {
+class AvailableLanguages extends EnumPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The language manager.
