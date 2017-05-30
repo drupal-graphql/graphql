@@ -31,8 +31,14 @@ class LanguageTest extends LanguageTestBase {
     $this->installEntitySchema('configurable_language');
     $this->container->get('router.builder')->rebuild();
 
-    ConfigurableLanguage::create(['id' => 'es'])->save();
-    ConfigurableLanguage::create(['id' => 'fr'])->save();
+    ConfigurableLanguage::create([
+      'id' => 'fr',
+      'weight' => 1,
+    ])->save();
+    ConfigurableLanguage::create([
+      'id' => 'es',
+      'weight' => 2,
+    ])->save();
 
     $config = $this->config('language.negotiation');
     $config->set('url.prefixes', ['en' => 'en', 'es' => 'es', 'fr' => 'fr'])
@@ -62,12 +68,48 @@ class LanguageTest extends LanguageTestBase {
       'isDefault' => FALSE,
       'isLocked' => FALSE,
       'direction' => 'ltr',
-      'weight' => 0,
+      'weight' => 1,
     ];
 
     $this->assertEquals($english, $result['data']['default']['languageInterfaceContext']);
     $this->assertEquals($english, $result['data']['en']['languageInterfaceContext']);
     $this->assertEquals($french, $result['data']['fr']['languageInterfaceContext']);
+  }
+
+  /**
+   * Test listing of available languages.
+   */
+  public function testAvailableLanguages() {
+    $result = $this->executeQueryFile('languages.gql');
+
+    $english = [
+      'id' => 'en',
+      'name' => 'English',
+      'isDefault' => TRUE,
+      'isLocked' => FALSE,
+      'direction' => 'ltr',
+      'weight' => 0,
+    ];
+
+    $french = [
+      'id' => 'fr',
+      'name' => 'French',
+      'isDefault' => FALSE,
+      'isLocked' => FALSE,
+      'direction' => 'ltr',
+      'weight' => 1,
+    ];
+
+    $spanish = [
+      'id' => 'es',
+      'name' => 'Spanish',
+      'isDefault' => FALSE,
+      'isLocked' => FALSE,
+      'direction' => 'ltr',
+      'weight' => 2,
+    ];
+
+    $this->assertEquals([$english, $french, $spanish], $result['data']['languages']);
   }
 
 }

@@ -1,4 +1,13 @@
 query {
+  languages:availableLanguages {
+    id
+    name
+    isDefault
+    isLocked
+    direction
+    weight
+  }
+
   default:route(path: "/graphql/test/a") {
     ... LanguageFragment
   }
