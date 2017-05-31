@@ -25,7 +25,7 @@ class EntityReferenceField extends FieldPluginBase {
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       foreach ($value->get($this->getPluginDefinition()['field']) as $item) {
-        if ($item instanceof EntityReferenceItem && $item->entity->access('view')) {
+        if ($item instanceof EntityReferenceItem && $item->entity && $item->entity->access('view')) {
           yield $item->entity;
         }
       }
