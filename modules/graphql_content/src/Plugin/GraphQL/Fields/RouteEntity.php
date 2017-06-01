@@ -77,7 +77,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       $parameters = $value->getRouteParameters();
 
       if (!($prefix === 'entity' && $suffix === 'canonical') || !array_key_exists($entityType, $parameters)) {
-        return NULL;
+        return;
       }
 
       $entity = $this->entityTypeManager
