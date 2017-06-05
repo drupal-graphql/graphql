@@ -1,0 +1,12 @@
+{#graphql-query
+query {
+  garage {
+    ... graphql_vehicle
+  }
+}
+#}
+Garage:
+{% for vehicle in garage %}
+{# TODO: Make this more convenient. #}
+{{ render_var({'#theme': 'graphql_vehicle', '#vehicle': vehicle}) }}
+{% endfor %}

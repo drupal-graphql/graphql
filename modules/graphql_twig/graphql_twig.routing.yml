@@ -1,6 +1,0 @@
-graphql.page:
-  path: '/graphql/route'
-  defaults:
-    _controller: '\Drupal\graphql_twig\Controller\PageController::page'
-    _title: 'GraphQL'
-

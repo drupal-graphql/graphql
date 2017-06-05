@@ -1,7 +1,8 @@
-name: GraphQL Twig Tests
+name: 'GraphQL Tests: Twig'
 type: module
-description: 'Test scenario for Twig graphql integration.'
+description: 'Render twig templates with graphql data.'
 package: GraphQL
 core: 8.x
 dependencies:
   - graphql_core
+  - graphql_plugin_test

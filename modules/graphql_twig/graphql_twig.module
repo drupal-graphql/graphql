@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * GraphQL Twig hook implementations.
+ */
+
+use Drupal\graphql\GraphQL\Execution\Processor;
+use Drupal\graphql_twig\QueryAssembler;
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function graphql_twig_theme_registry_alter(&$themeRegistry) {
+  $queryRegex = '/\{#graphql-query\n(?<query>.*)\n#\}\n/s';
+  $fragmentRegex = '/\{#graphql-fragment\n(?<fragment>.*)\n#\}\n/s';
+  $assembler = new QueryAssembler();
+  $queries = [];
+
+  foreach ($themeRegistry as $hook => $info) {
+    if (!array_key_exists('template', $info)) {
+      continue;
+    }
+
+    $template = $info['theme path'] . '/templates/' . $info['template'] . '.html.twig';
+
+    if (file_exists($template)) {
+      $content = file_get_contents($template);
+      $matches = [];
+
+      preg_match($queryRegex, $content, $matches);
+      if (array_key_exists('query', $matches)) {
+        $queries[$hook] = $matches['query'];
+        $themeRegistry[$hook]['preprocess functions'] = ['graphql_twig_query'];
+      }
+
+      preg_match($fragmentRegex, $content, $matches);
+      if (array_key_exists('fragment', $matches)) {
+        $assembler->addFragment($hook, $matches['fragment']);
+      }
+    }
+  }
+
+  foreach ($queries as $hook => $query) {
+    $themeRegistry[$hook]['graphql_query'] = $assembler->assemble($query);
+  }
+}
+
+/**
+ * Implements hook_preprocess().
+ */
+function graphql_twig_query(&$variables, $hook, $info) {
+  if (array_key_exists('graphql_query', $info)) {
+    $processor = new Processor(\Drupal::getContainer(), \Drupal::service('graphql.schema'));
+    $result = $processor->processPayload($info['graphql_query'], $variables)->getResponseData();
+    $variables = $result['data'];
+  }
+}
