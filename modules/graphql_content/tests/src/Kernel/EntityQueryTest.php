@@ -99,7 +99,7 @@ class EntityQueryTest extends GraphQLFileTestBase {
     $node = reset($nodes);
 
     $expected = [['entityLabel' => $node->label()]];
-    $result = $this->executeQueryFile('entity_query_args.gql', ['id' => $node->id()]);
+    $result = $this->executeQueryFile('entity_query_args.gql', ['id' => (int) $node->id()]);
     $this->assertEquals($expected, $result['data']['onlyNodeWithId']['entities']);
   }
 

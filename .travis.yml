@@ -2,10 +2,8 @@ language: php
 sudo: false
 
 php:
-  # - 5.5
-  # We need to specify the latest version here because otherwise there are
-  # segmentation faults in PHP 5.6.5.
-  # - 5.6.18
+  - 5.5
+  - 5.6
   - 7
   # HHVM is disabled for now because we have not figured out yet how to start a
   # web server for the browser tests.
@@ -13,6 +11,8 @@ php:
 
 env:
   - DRUPAL_CORE=8.2.x
+  - DRUPAL_CORE=8.3.x
+  - DRUPAL_CORE=8.4.x
 
 matrix:
   allow_failures:
@@ -33,6 +33,12 @@ cache:
     - $HOME/.composer
 
 before_script:
+  # PHP Deprecated: Automatically populating $HTTP_RAW_POST_DATA is deprecated
+  # and will be removed in a future version. To avoid this warning set
+  # 'always_populate_raw_post_data' to '-1' in php.ini and use the php://input
+  # stream instead.
+  - sh -c 'if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+
   # Remove Xdebug as we don't need it and it causes
   # PHP Fatal error:  Maximum function nesting level of '256' reached.
   # We also don't care if that file exists or not on PHP 7.
@@ -61,7 +67,7 @@ before_script:
   - composer self-update
   # Bring in the module dependencies without requiring a merge plugin
   - composer require youshido/graphql
-  # The require already triggered the install.s
+  # The require already triggered the install.
 
   # Start a web server on port 8888, run in the background.
   - php -S localhost:8888 &
