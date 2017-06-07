@@ -138,8 +138,15 @@ class RequestController implements ContainerInjectionInterface {
    */
   public function handleBatchRequest(Request $request, array $queries = []) {
     $filterNumeric = function ($index) { return !is_numeric($index); };
-    $requestParameters = array_filter($request->query->all(), $filterNumeric, ARRAY_FILTER_USE_KEY);
-    $requestContent = array_filter($request->request->all(), $filterNumeric, ARRAY_FILTER_USE_KEY);
+
+    // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
+    $requestParameters = $request->query->all();
+    $requestParametersKeys = array_filter(array_keys($requestParameters), $filterNumeric);
+    $requestParameters = array_intersect_key($requestParameters, array_flip($requestParametersKeys));
+
+    $requestContent = $request->query->all();
+    $requestContentKeys = array_filter($requestContent, $filterNumeric);
+    $requestContent = array_intersect_key($requestContent, array_flip($requestContentKeys));
 
     // Walk over all queries and issue a sub-request for each.
     $responses = array_map(function ($query) use ($request, $requestParameters, $requestContent) {
