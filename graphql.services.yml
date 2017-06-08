@@ -60,6 +60,10 @@ services:
     arguments: ['%graphql.config%']
     tags:
         - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
+  graphql.query_map_provider:
+    class: Drupal\graphql\QueryMapProvider\QueryMapProvider
+    tags:
+        - { name: service_collector, tag: graphql_query_map_provider, call: addQueryMapProvider }
   graphql.reducer_manager:
     class: Drupal\graphql\Reducers\ReducerManager
     arguments: ['@service_container', '%graphql.reducers%']

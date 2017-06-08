@@ -1,0 +1,6 @@
+services:
+  graphql_query_map_entity.query_map_provider:
+    class: Drupal\graphql_query_map_entity\QueryMapProvider
+    arguments: ['@entity_type.manager']
+    tags:
+        - { name: graphql_query_map_provider }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Entity;
+namespace Drupal\graphql_query_map_entity\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
@@ -9,13 +9,13 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *
  * @ConfigEntityType(
  *   id = "graphql_query_map",
- *   label = @Translation("GraphQL Query Map"),
+ *   label = @Translation("Query map"),
  *   handlers = {
- *     "list_builder" = "Drupal\graphql\Controller\GraphQLQueryMapListBuilder",
+ *     "list_builder" = "Drupal\graphql_query_map_entity\Controller\GraphQLQueryMapListBuilder",
  *     "form" = {
- *       "import" = "Drupal\graphql\Form\GraphQLQueryMapImportForm",
+ *       "import" = "Drupal\graphql_query_map_entity\Form\GraphQLQueryMapImportForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
- *       "inspect" = "Drupal\graphql\Form\GraphQLQueryMapForm",
+ *       "inspect" = "Drupal\graphql_query_map_entity\Form\GraphQLQueryMapForm",
  *     }
  *   },
  *   config_prefix = "graphql_query_map",
@@ -28,10 +28,10 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "queryMap",
  *   },
  *   links = {
- *     "inspect-form" = "/admin/structure/graphql/{graphql_query_map}",
- *     "import-form" = "/admin/structure/graphql/import",
- *     "delete-form" = "/admin/structure/graphql/{graphql_query_map}/delete",
- *     "collection" = "/admin/structure/graphql",
+ *     "inspect-form" = "/admin/config/graphql/query-maps/{graphql_query_map}",
+ *     "import-form" = "/admin/config/graphql/query-maps/import",
+ *     "delete-form" = "/admin/config/graphql/query-maps/{graphql_query_map}/delete",
+ *     "collection" = "/admin/config/graphql/query-maps",
  *   }
  * )
  */

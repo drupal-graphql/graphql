@@ -1,4 +1,4 @@
-graphql.graphql_query_map.*:
+graphql_query_map_entity.graphql_query_map.*:
   type: config_entity
   label: 'GraphQL Query Map'
   mapping:
@@ -9,4 +9,4 @@ graphql.graphql_query_map.*:
       type: sequence
       label: 'QueryMap'
       sequence:
-        type: graphql.graphql_query_map.[%key]
+        type: graphql_query_map_entity.graphql_query_map.[%key]

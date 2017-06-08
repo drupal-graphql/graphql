@@ -1,0 +1,5 @@
+entity.graphql_query_map.collection:
+  title: 'Query maps'
+  description: 'Configure query maps.'
+  parent: 'graphql.config_page'
+  route_name: entity.graphql_query_map.collection

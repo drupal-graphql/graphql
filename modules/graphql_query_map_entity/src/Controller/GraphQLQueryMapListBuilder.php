@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Controller;
+namespace Drupal\graphql_query_map_entity\Controller;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
@@ -14,7 +14,7 @@ class GraphQLQueryMapListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['version'] = $this->t('GraphQL Query Maps');
+    $header['version'] = $this->t('Query maps');
     return $header + parent::buildHeader();
   }
 

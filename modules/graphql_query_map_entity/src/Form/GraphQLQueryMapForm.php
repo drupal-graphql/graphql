@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Form;
+namespace Drupal\graphql_query_map_entity\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,7 +15,7 @@ class GraphQLQueryMapForm extends EntityForm {
    */
   public function buildForm(array $form, FormStateInterface $formState = NULL) {
     $form = parent::buildForm($form, $formState);
-    $form['#title'] = $this->t('GraphQL Query Map version %version', ['%version' => $this->entity->id()]);
+    $form['#title'] = $this->t('Query map version %version', ['%version' => $this->entity->id()]);
 
     foreach ($this->entity->queryMap as $i => $query) {
       $form['queryMap'][$i] = [
