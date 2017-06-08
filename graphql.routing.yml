@@ -7,50 +7,17 @@ graphql.request:
   requirements:
     _permission: 'execute graphql requests'
 
-graphql.config_page:
-  path: '/admin/config/graphql'
-  defaults:
-    _controller: '\Drupal\graphql\Controller\GraphQLConfig::configPageRoot'
-    _title: 'GraphQL'
-  requirements:
-    _permission: 'administer site configuration'
 graphql.explorer:
-  path: '/graphql/explorer'
+  path: 'graphql/explorer'
   defaults:
     _controller: '\Drupal\graphql\Controller\ExplorerController::viewExplorer'
   requirements:
     _permission: 'use graphql explorer'
-entity.graphql_query_map.collection:
-  path: '/admin/structure/graphql'
+
+graphql.config_page:
+  path: '/admin/config/graphql'
   defaults:
-    _entity_list: 'graphql_query_map'
-    _title: 'GraphQL query maps'
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'GraphQL'
   requirements:
-    _permission: 'administer graphql query maps'
-  options:
-    _admin_route: TRUE
-entity.graphql_query_map.import_form:
-  path: '/admin/structure/graphql/import'
-  defaults:
-    _entity_form: 'graphql_query_map.import'
-    _title: 'Import GraphQL query map'
-  requirements:
-    _permission: 'administer graphql query maps'
-  options:
-    _admin_route: TRUE
-entity.graphql_query_map.delete_form:
-  path: '/admin/structure/graphql/{graphql_query_map}/delete'
-  defaults:
-    _entity_form: 'graphql_query_map.delete'
-    _title: 'Delete GraphQL query map'
-  requirements:
-    _permission: 'administer graphql query maps'
-  options:
-    _admin_route: TRUE
-entity.graphql_query_map.inspect_form:
-  path: '/admin/structure/graphql/{graphql_query_map}'
-  defaults:
-    _entity_form: 'graphql_query_map.inspect'
-    _title: 'GraphQL Query Map'
-  requirements:
-    _permission: 'administer graphql query maps'
+    _permission: 'administer site configuration'

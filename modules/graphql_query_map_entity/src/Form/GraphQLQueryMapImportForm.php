@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\graphql\Form;
+namespace Drupal\graphql_query_map_entity\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\graphql\Entity\GraphQLQueryMap;
+use Drupal\graphql_query_map_entity\Entity\GraphQLQueryMap;
 
 /**
  * Form controller for GraphQL query map forms.
@@ -17,12 +17,12 @@ class GraphQLQueryMapImportForm extends EntityForm {
   public function form(array $form, FormStateInterface $formState) {
     $form = parent::form($form, $formState);
 
-    $form['#title'] = $this->t('Import GraphQL Query Map');
+    $form['#title'] = $this->t('Import query map');
 
     $form['query_map_json'] = [
       '#type' => 'file',
-      '#title' => $this->t('Query Map JSON'),
-      '#description' => $this->t('Upload a graphql query map json file.'),
+      '#title' => $this->t('Query map'),
+      '#description' => $this->t('Upload a query map .json file.'),
     ];
 
     $form['actions'] = [
@@ -75,12 +75,12 @@ class GraphQLQueryMapImportForm extends EntityForm {
     $status = $graphqlQueryMap->save();
 
     if ($status) {
-      drupal_set_message($this->t('Saved the GraphQL Query Map version %id.', [
+      drupal_set_message($this->t('Saved the query map version %id.', [
         '%id' => $graphqlQueryMap->id(),
       ]));
     }
     else {
-      drupal_set_message($this->t('The GraphQL Query Map version %id was not saved.', [
+      drupal_set_message($this->t('The query map version %id was not saved.', [
         '%id' => $graphqlQueryMap->id(),
       ]));
     }

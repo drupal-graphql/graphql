@@ -4,6 +4,3 @@
 'use graphql explorer':
   title: 'Use the GraphQL explorer'
   description: 'Allows users to use the GraphiQL interface.'
-'administer graphql query maps':
-  title: 'Administer GraphQL Query Maps'
-  description: 'Allows users to import and edit the GraphiQL Query Maps.'

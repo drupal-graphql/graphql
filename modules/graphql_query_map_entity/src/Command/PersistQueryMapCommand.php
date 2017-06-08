@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Command;
+namespace Drupal\graphql_query_map_entity\Command;
 
 use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -15,7 +15,7 @@ use Drupal\Console\Annotations\DrupalCommand;
  * @package Drupal\graphql
  *
  * @DrupalCommand (
- *   extension="graphql",
+ *   extension="graphql_query_map_entity",
  *   extensionType="module"
  * )
  */
