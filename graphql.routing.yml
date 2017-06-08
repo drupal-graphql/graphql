@@ -8,7 +8,7 @@ graphql.request:
     _permission: 'execute graphql requests'
 
 graphql.explorer:
-  path: 'graphql/explorer'
+  path: '/graphql/explorer'
   defaults:
     _controller: '\Drupal\graphql\Controller\ExplorerController::viewExplorer'
   requirements:
