@@ -3,27 +3,27 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
+use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 class QueryRouteEnhancer implements RouteEnhancerInterface {
 
   /**
-   * The entity type manager.
+   * The query map provider service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\graphql\QueryMapProvider\QueryMapProviderInterface
    */
-  protected $entityTypeManager;
+  protected $queryMapProvider;
 
   /**
    * Creates a new QueryRouteEnhancer instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
+   * @param \Drupal\graphql\QueryMapProvider\QueryMapProviderInterface $queryMapProvider
+   *   The query map provider service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    $this->entityTypeManager = $entityTypeManager;
+  public function __construct(QueryMapProviderInterface $queryMapProvider) {
+    $this->queryMapProvider = $queryMapProvider;
   }
 
   /**
@@ -174,14 +174,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return $query;
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
-    $storage = $this->entityTypeManager->getStorage('graphql_query_map');
-    /** @var \Drupal\graphql\Entity\GraphQLQueryMap $queryMap */
-    if ($queryMap = $storage->load($version)) {
-      return $queryMap->getQuery($id);
-    }
-
-    return NULL;
+    return $this->queryMapProvider->getQuery($version, $id);
   }
 
 }
