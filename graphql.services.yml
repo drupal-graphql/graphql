@@ -114,6 +114,6 @@ services:
       - { name: graphql_response_policy }
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
-    arguments: ['@entity_type.manager']
+    arguments: ['@graphql.query_map_provider']
     tags:
       - { name: route_enhancer }

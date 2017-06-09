@@ -174,7 +174,11 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return $query;
     }
 
-    return $this->queryMapProvider->getQuery($version, $id);
+    if (!empty($id) && !empty($version)) {
+      return $this->queryMapProvider->getQuery($version, $id);
+    }
+
+    return NULL;
   }
 
 }
