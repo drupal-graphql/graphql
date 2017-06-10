@@ -60,17 +60,13 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->grantPermission('access user profiles')
       ->save();
-
-    // TODO Question: So the goal is to create a field formatter that can be
-    //                attached to each and every possible field type and then
-    //                set this formatter via the $options parameter of
-    //                EntityDisplayInterface::setComponent below?
+    $options = ['type' => 'raw_value'];
 
     EntityViewMode::create(['id' => 'node.graphql', 'targetEntityType' => 'node'])->save();
     entity_get_display('node', 'test', 'graphql')
-      ->setComponent('body')
-      ->setComponent('field_keywords')
-      ->setComponent('test')
+      ->setComponent('body', $options)
+      ->setComponent('field_keywords', $options)
+      ->setComponent('test', $options)
       ->save();
   }
 
@@ -92,7 +88,17 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'status' => 1,
     ]);
 
-    // TODO Execute query and check return value once ::setUp is finished.
+    $result = $this->executeQueryFile('rendered_fields.gql', [
+      'path' => '/node/' . $node->id(),
+    ]);
+
+    $resultNode = NestedArray::getValue($result, ['data', 'route', 'entity']);
+    $expected = [
+      'body' => $body + ['summary' => null],
+      'field_keywords' => ['value' => $keywords],
+      'status' => ['value' => 1],
+    ];
+    $this->assertEquals($expected, $resultNode, 'Correct raw node values are returned.');
   }
 
 }
