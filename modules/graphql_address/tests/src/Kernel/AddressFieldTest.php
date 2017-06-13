@@ -16,13 +16,12 @@ use Drupal\user\Entity\Role;
 /**
  * Test retrieving address field in GraphQL.
  *
- * @requires module address
  * @group graphql_address
+ * @requires module address
  */
 class AddressFieldTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
-  use EntityReferenceTestTrait;
 
   /**
    * {@inheritdoc}
