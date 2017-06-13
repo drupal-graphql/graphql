@@ -16,6 +16,7 @@ use Drupal\user\Entity\Role;
 /**
  * Test entity reference traversal in GraphQL.
  *
+ * @requires module address
  * @group graphql_address
  */
 class AddressFieldTest extends GraphQLFileTestBase {
