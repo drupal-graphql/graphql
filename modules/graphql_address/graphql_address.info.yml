@@ -1,0 +1,7 @@
+name: GraphQL Address
+type: module
+description: 'Retrieve address information with GraphQL.'
+core: 8.x
+package: GraphQL
+dependencies:
+  - graphql_core

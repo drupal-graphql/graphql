@@ -1,0 +1,20 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    node:entity {
+      address {
+        postal_code
+        address_line1
+        address_line2
+        given_name
+        sorting_code
+        additional_name
+        dependent_locality
+        administrative_area
+        family_name
+        country_code
+        organization
+        locality
+      }
+    }
+  }
+}
