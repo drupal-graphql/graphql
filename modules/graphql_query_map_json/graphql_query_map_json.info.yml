@@ -1,0 +1,5 @@
+name: GraphQL Query Map JSON
+type: module
+description: 'Store query maps in JSON files on your local file system.'
+package: GraphQL
+core: 8.x

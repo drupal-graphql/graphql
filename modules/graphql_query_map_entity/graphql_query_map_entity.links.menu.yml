@@ -1,5 +1,5 @@
 entity.graphql_query_map.collection:
   title: 'Query maps'
-  description: 'Configure query maps.'
+  description: 'Save and manage query maps in config.'
   parent: 'graphql.config_page'
   route_name: entity.graphql_query_map.collection

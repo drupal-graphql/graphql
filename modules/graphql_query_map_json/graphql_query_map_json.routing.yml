@@ -1,0 +1,9 @@
+graphql_query_map_json.config:
+  path: '/admin/config/graphql/query-maps-json'
+  defaults:
+    _form: 'Drupal\graphql_query_map_json\Form\QueryMapConfigForm'
+    _title: 'Query map config'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
