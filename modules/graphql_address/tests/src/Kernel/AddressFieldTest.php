@@ -14,7 +14,7 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
- * Test entity reference traversal in GraphQL.
+ * Test retrieving address field in GraphQL.
  *
  * @requires module address
  * @group graphql_address
@@ -44,6 +44,7 @@ class AddressFieldTest extends GraphQLFileTestBase {
     parent::setUp();
     $this->installConfig('node');
     $this->installConfig('filter');
+    $this->installConfig('address');
     $this->installEntitySchema('node');
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'test']);
