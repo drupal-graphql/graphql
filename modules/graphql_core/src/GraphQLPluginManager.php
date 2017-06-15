@@ -69,23 +69,23 @@ class GraphQLPluginManager extends DefaultPluginManager {
 
       // Objects without any fields are not valid.
       if (($instance instanceof AbstractObjectType || $instance instanceof AbstractInputObjectType) && !$instance->hasFields()) {
-        return NULL;
+        $instance = NULL;
       }
-
       // Fields without a valid type are not valid.
-      if ($instance instanceof Field) {
+      else if ($instance instanceof Field) {
         $type = $instance->getType();
         while ($type instanceof CompositeTypeInterface) {
           $type = $type->getTypeOf();
         }
 
         if (empty($type)) {
-          return NULL;
+          $instance = NULL;
         }
       }
 
       $this->instances[$pluginId] = $instance;
     }
+
     return $this->instances[$pluginId];
   }
 
