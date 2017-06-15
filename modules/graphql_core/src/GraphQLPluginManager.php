@@ -4,9 +4,11 @@ namespace Drupal\graphql_core;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\graphql\GraphQL\Type\AbstractObjectType;
 use Drupal\graphql_core\GraphQLPluginInterface;
 use Drupal\graphql_core\GraphQLSchemaManager;
 use Traversable;
+use Youshido\GraphQL\Type\InputObject\AbstractInputObjectType;
 
 /**
  * Base class for GraphQL Plugin managers.
@@ -58,10 +60,17 @@ class GraphQLPluginManager extends DefaultPluginManager {
     if (!array_key_exists($pluginId, $this->instances)) {
       // We deliberately ignore that $configuration could be different, because
       // GraphQL plugins don't contain user defined configuration.
-      $this->instances[$pluginId] = parent::createInstance($pluginId);
-      if ($this->instances[$pluginId] instanceof GraphQLPluginInterface) {
-        $this->instances[$pluginId]->buildConfig($this->schemaManager);
+      $instance = parent::createInstance($pluginId);
+      if ($instance instanceof GraphQLPluginInterface) {
+        $instance->buildConfig($this->schemaManager);
       }
+
+      // Objects without any fields are not valid.
+      if (($instance instanceof AbstractObjectType || $instance instanceof AbstractInputObjectType) && !$instance->hasFields()) {
+        return NULL;
+      }
+
+      $this->instances[$pluginId] = $instance;
     }
     return $this->instances[$pluginId];
   }

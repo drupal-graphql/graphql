@@ -62,7 +62,10 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
         if ((($invert && !$selector($def['definition'])) || $selector($def['definition']))) {
           /** @var PluginManagerInterface $manager */
           $manager = $def['manager'];
-          $instances[$name] = $manager->createInstance($def['plugin_id']);
+
+          if ($instance = $manager->createInstance($def['plugin_id'])) {
+            $instances[$name] = $instance;
+          }
         }
       }
     }
