@@ -8,6 +8,8 @@ use Drupal\graphql\GraphQL\Type\AbstractObjectType;
 use Drupal\graphql_core\GraphQLPluginInterface;
 use Drupal\graphql_core\GraphQLSchemaManager;
 use Traversable;
+use Youshido\GraphQL\Field\Field;
+use Youshido\GraphQL\Type\CompositeTypeInterface;
 use Youshido\GraphQL\Type\InputObject\AbstractInputObjectType;
 
 /**
@@ -68,6 +70,18 @@ class GraphQLPluginManager extends DefaultPluginManager {
       // Objects without any fields are not valid.
       if (($instance instanceof AbstractObjectType || $instance instanceof AbstractInputObjectType) && !$instance->hasFields()) {
         return NULL;
+      }
+
+      // Fields without a valid type are not valid.
+      if ($instance instanceof Field) {
+        $type = $instance->getType();
+        while ($type instanceof CompositeTypeInterface) {
+          $type = $type->getTypeOf();
+        }
+
+        if (empty($type)) {
+          return NULL;
+        }
       }
 
       $this->instances[$pluginId] = $instance;
