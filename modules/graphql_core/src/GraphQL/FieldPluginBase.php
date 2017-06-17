@@ -29,14 +29,14 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   public function resolve($value, array $args, ResolveInfo $info) {
     $result = iterator_to_array($this->resolveValues($value, $args, $info));
     if ($this->getPluginDefinition()['multi']) {
-      return new CacheableValue($result, $this->getCacheDependencies($value, $args, $result));
+      return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
     }
     else {
       if ($result) {
-        return new CacheableValue(reset($result), $this->getCacheDependencies($value, $args, $result));
+        return new CacheableValue(reset($result), $this->getCacheDependencies($result, $value, $args));
       }
       else {
-        return new CacheableValue(NULL, $this->getCacheDependencies($value, $args, $result));
+        return new CacheableValue(NULL, $this->getCacheDependencies($result, $value, $args));
       }
     }
   }
