@@ -152,12 +152,11 @@ class SchemaFactory {
     foreach (TypeCollector::collectTypes($schema) as $type) {
       if ($type instanceof CacheableDependencyInterface) {
         $metadata->addCacheableDependency($type);
-
-        if ($type instanceof AbstractObjectType || $type instanceof AbstractInputObjectType || $type instanceof AbstractInterfaceType) {
-          foreach ($type->getFields() as $field) {
-            if ($field instanceof CacheableDependencyInterface) {
-              $metadata->addCacheableDependency($field);
-            }
+      }
+      if ($type instanceof AbstractObjectType || $type instanceof AbstractInputObjectType || $type instanceof AbstractInterfaceType) {
+        foreach ($type->getFields() as $field) {
+          if ($field instanceof CacheableDependencyInterface) {
+            $metadata->addCacheableDependency($field);
           }
         }
       }
