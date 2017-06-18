@@ -89,7 +89,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'status' => 1,
     ]);
 
-    $result = $this->executeQueryFile('rendered_fields.gql', [
+    $result = $this->executeQueryFile('raw_field_values.gql', [
       'path' => '/node/' . $node->id(),
     ]);
 

@@ -127,6 +127,9 @@ abstract class FieldDeriverBase extends DeriverBase implements ContainerDeriverI
         if ($display = $this->getDisplay($typeId, $bundle)) {
           foreach ($display->getComponents() as $field => $displaySettings) {
             if ($this->isFieldSupported($displaySettings)) {
+              /** @var \Drupal\field\Entity\FieldStorageConfig $storage */
+              $storage = isset($storages[$field]) ? $storages[$field] : NULL;
+
               $definition = [
                 'name' => graphql_core_propcase($field),
                 'types' => [graphql_core_camelcase([$typeId, $bundle])],
@@ -134,13 +137,13 @@ abstract class FieldDeriverBase extends DeriverBase implements ContainerDeriverI
                 'bundle' => $bundle,
                 'field' => $field,
                 'virtual' => !array_key_exists($field, $storages),
-                'multi' => array_key_exists($field, $storages) ? $storages[$field]->getCardinality() != 1 : FALSE,
+                'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
                 'cache_tags' => $display->getCacheTags(),
                 'cache_contexts' => $display->getCacheContexts(),
                 'cache_max_age' => $display->getCacheMaxAge(),
               ] + $basePluginDefinition;
 
-              $this->getFieldPluginDefinition($definition, $type, $bundle, $field);
+              $this->getFieldPluginDefinition($definition, $type, $bundle, $field, $storage);
             }
           }
         }
@@ -161,11 +164,13 @@ abstract class FieldDeriverBase extends DeriverBase implements ContainerDeriverI
    *   Bundle id.
    * @param string $field
    *   Field id.
+   * @param \Drupal\field\Entity\FieldStorageConfig|NULL $storage
+   *   Field storage definition, if available.
    * @return array
    *   Plugin definition.
    */
-  protected function getFieldPluginDefinition($basePluginDefinition, EntityTypeInterface $type, $bundle, $field) {
-    $this->derivatives[$type->id() . '-' . $bundle . '-' . $field] = $basePluginDefinition;
+  protected function getFieldPluginDefinition($basePluginDefinition, EntityTypeInterface $type, $bundle, $field, $storage) {
+    $this->derivatives["{$type->id()}-$bundle-$field"] = $basePluginDefinition;
   }
 
 }

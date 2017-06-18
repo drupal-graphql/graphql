@@ -28,7 +28,7 @@ class RawValueField extends FieldPluginBase {
     if ($value instanceof FieldableEntityInterface) {
       $fieldName = $this->getPluginDefinition()['field'];
       if ($value->hasField($fieldName)) {
-        yield json_encode($value->get($fieldName)->getValue());
+        yield $value->get($fieldName)->getValue();
       }
     }
   }
