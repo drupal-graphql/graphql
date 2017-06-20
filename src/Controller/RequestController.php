@@ -245,7 +245,7 @@ class RequestController implements ContainerInjectionInterface {
 
     // Set the execution context on the request attributes for use in the
     // request subscriber and cache policies.
-    $request->attributes->set('context', $processor->getExecutionContext());
+    $request->attributes->set('graphql_execution_context', $processor->getExecutionContext());
 
     return $response;
   }
