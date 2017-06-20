@@ -44,7 +44,7 @@ class DenyMutation implements ResponsePolicyInterface  {
 
     $context = $request->attributes->get('graphql_execution_context');
     if ($context && $context instanceof ExecutionContext) {
-      if ($context->getRequest()->hasMutations()) {
+      if (($query = $context->getRequest()) && $query->hasMutations()) {
         return static::DENY;
       }
     }
