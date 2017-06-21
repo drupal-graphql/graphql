@@ -66,7 +66,7 @@ class QueryMapConfigForm extends ConfigFormBase {
     $form['lookup_paths'] = [
       '#type' => 'textarea',
       '#title' => t('Lookup paths'),
-      '#default_value' => implode($config->get('lookup_paths') ?: [], '/n'),
+      '#default_value' => implode($config->get('lookup_paths') ?: [], "\n"),
       '#description' => t('The path patterns to use for the query map lookup.'),
     ];
 
@@ -79,7 +79,7 @@ class QueryMapConfigForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $formState) {
     $this->cacheBackend->delete('graphql_query_map_json_versions');
 
-    $paths = array_map('trim', explode('/n', $formState->getValue('lookup_paths', '')));
+    $paths = array_map('trim', explode("\n", $formState->getValue('lookup_paths', '')));
     $this->config('graphql_query_map_json.config')
       ->set('lookup_paths', $paths)
       ->save();
