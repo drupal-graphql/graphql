@@ -1,0 +1,7 @@
+name: GraphQL Metatag
+type: module
+description: Expose a route\'s metatags to GraphQL
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core

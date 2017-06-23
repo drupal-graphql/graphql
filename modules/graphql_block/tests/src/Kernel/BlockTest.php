@@ -58,6 +58,19 @@ class BlockTest extends GraphQLFileTestBase {
     $this->placeBlock('block_content:' . $customBlock->uuid(), [
       'region' => 'sidebar_first',
     ]);
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'block_content' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'basic' => [
+              'exposed' => TRUE,
+              'view_mode' => 'block_content.graphql',
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**
