@@ -1,0 +1,5 @@
+graphql_content.content_entity_schema:
+  title: 'Exposed content'
+  description: 'Define which entities and fields are included in the GraphQL schema.'
+  parent: 'graphql.config_page'
+  route_name: graphql_content.content_entity_schema
