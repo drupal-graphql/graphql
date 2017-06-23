@@ -1,0 +1,18 @@
+query {
+  __schema {
+    types {
+      kind
+      name
+      fields {
+        name
+        type {
+          kind
+          name
+        }
+      }
+      interfaces {
+        name
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -46,6 +47,13 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
   protected $bundleInfo;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * DisplayedFieldDeriver constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -58,12 +66,14 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityTypeBundleInfoInterface $bundleInfo,
-    EntityFieldManagerInterface $entityFieldManager
+    EntityFieldManagerInterface $entityFieldManager,
+    ContentEntitySchemaConfig $schemaConfig
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
     $this->bundleInfo = $bundleInfo;
     $this->displayStorage = $entityTypeManager->getStorage('entity_view_display');
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -73,7 +83,8 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('graphql_content.schema_config')
     );
   }
 
@@ -84,14 +95,17 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
    *   The entity type id.
    * @param string $bundle
    *   The bundle name.
+   * @param string $viewMode
+   *   The desired view mode.
    *
    * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface
    *   The view display object.
    */
-  protected function getDisplay($entityType, $bundle) {
+  protected function getDisplay($entityType, $bundle, $viewMode) {
     /** @var EntityViewDisplayInterface $display */
-    $display = $this->displayStorage
-      ->load(implode('.', [$entityType, $bundle, 'graphql']));
+    $display = $this->displayStorage->load(implode('.', [
+      $entityType, $bundle, $viewMode,
+    ]));
     if (!$display || !$display->status()) {
       $display = $this->displayStorage
         ->load(implode('.', [$entityType, $bundle, 'default']));
@@ -114,20 +128,22 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($typeId);
 
       foreach (array_keys($bundles[$typeId]) as $bundle) {
-        if ($display = $this->getDisplay($typeId, $bundle)) {
-          foreach (array_keys($display->getComponents()) as $field) {
-            $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
-              'name' => graphql_core_propcase($field),
-              'types' => [graphql_core_camelcase([$typeId, $bundle])],
-              'entity_type' => $typeId,
-              'bundle' => $bundle,
-              'field' => $field,
-              'virtual' => !array_key_exists($field, $storages),
-              'multi' => array_key_exists($field, $storages) ? $storages[$field]->getCardinality() != 1 : FALSE,
-              'cache_tags' => $display->getCacheTags(),
-              'cache_contexts' => $display->getCacheContexts(),
-              'cache_max_age' => $display->getCacheMaxAge(),
-            ] + $basePluginDefinition;
+        if ($viewMode = $this->schemaConfig->getExposedViewMode($typeId, $bundle)) {
+          if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
+            foreach (array_keys($display->getComponents()) as $field) {
+              $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
+                'name' => graphql_core_propcase($field),
+                'types' => [graphql_core_camelcase([$typeId, $bundle])],
+                'entity_type' => $typeId,
+                'bundle' => $bundle,
+                'field' => $field,
+                'virtual' => !array_key_exists($field, $storages),
+                'multi' => array_key_exists($field, $storages) ? $storages[$field]->getCardinality() != 1 : FALSE,
+                'cache_tags' => $display->getCacheTags(),
+                'cache_contexts' => $display->getCacheContexts(),
+                'cache_max_age' => $display->getCacheMaxAge(),
+              ] + $basePluginDefinition;
+            }
           }
         }
       }
