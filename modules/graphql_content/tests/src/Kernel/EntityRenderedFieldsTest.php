@@ -69,6 +69,19 @@ class EntityRenderedFieldsTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->grantPermission('access user profiles')
       ->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'test' => [
+              'exposed' => TRUE,
+              'view_mode' => 'node.graphql',
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**

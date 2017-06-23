@@ -38,6 +38,19 @@ class NodeSchemaTest extends QueryTestBase  {
       'title' => 'giraffe',
     ]);
 
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'article' => [
+              'exposed' => TRUE,
+            ],
+          ],
+        ],
+      ])
+      ->save();
+
     $node->save();
     $this->node = $node;
   }
