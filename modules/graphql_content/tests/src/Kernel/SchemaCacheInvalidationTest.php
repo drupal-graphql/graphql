@@ -48,6 +48,20 @@ class SchemaCacheInvalidationTest extends QueryTestBase {
       'field_name' => 'field_keywords',
       'label' => 'Keywords',
     ])->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'test' => [
+              'exposed' => TRUE,
+              'view_mode' => 'node.graphql',
+            ],
+          ],
+        ],
+      ])
+      ->save();
   }
 
   /**
