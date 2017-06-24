@@ -2,11 +2,9 @@
 
 namespace Drupal\graphql_content\Form;
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -95,8 +93,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     $form['types'] = [
       '#type' => 'table',
       '#header' => [
-        '',
-        '',
+        $this->t('Expose type'),
         $this->t('Expose fields from view mode'),
       ],
     ];
@@ -110,13 +107,11 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
         $form['types'][$type->id()]['exposed'] = [
           '#type' => 'checkbox',
           '#default_value' => isset($defaults[$type->id()]['exposed']) ? $defaults[$type->id()]['exposed'] : 0,
-        ];
-
-        $form['types'][$type->id()]['label'] = [
-          '#type' => 'html_tag',
-          '#tag' => 'strong',
-          '#value' => $type->getLabel(),
-          '#wrapper_attributes' => ['colspan' => 2],
+          '#title' => '<strong>' . $type->getLabel() . '</strong>',
+          '#description' => $this->t('Will expose the %interface GraphQL interface.', [
+            '%interface' => graphql_core_camelcase($type->id()),
+          ]),
+          '#wrapper_attributes' => ['colspan' => 2, 'class' => ['highlight']],
         ];
 
         foreach ($this->bundleInfo->getBundleInfo($type->id()) as $bundle => $info) {
@@ -131,10 +126,10 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
                 ':input[name="types[' . $type->id() . '][exposed]"]' => ['checked' => TRUE],
               ],
             ],
-          ];
-
-          $form['types'][$key]['label'] = [
-            '#markup' => $info['label'],
+            '#title' => $info['label'],
+            '#description' => $this->t('Will expose the %interface GraphQL type.', [
+              '%interface' => graphql_core_camelcase([$type->id(), $bundle]),
+            ]),
           ];
 
           $options = [
