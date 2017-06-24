@@ -56,7 +56,7 @@ class SchemaCacheInvalidationTest extends QueryTestBase {
           'bundles' => [
             'test' => [
               'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
+              'view_mode' => 'node.default',
             ],
           ],
         ],
