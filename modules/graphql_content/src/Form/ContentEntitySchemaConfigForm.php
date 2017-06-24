@@ -120,7 +120,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
           $form['types'][$key]['exposed'] = [
             '#type' => 'checkbox',
             '#parents' => ['types', $type->id(), 'bundles', $bundle, 'exposed'],
-            '#default_value' => isset($defaults[$type->id()][$bundle]['exposed']) ? $defaults[$type->id()][$bundle]['exposed'] : 0,
+            '#default_value' => isset($defaults[$type->id()]['bundles'][$bundle]['exposed']) ? $defaults[$type->id()]['bundles'][$bundle]['exposed'] : 0,
             '#states' => [
               'enabled' => [
                 ':input[name="types[' . $type->id() . '][exposed]"]' => ['checked' => TRUE],
@@ -134,7 +134,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
 
           $options = [
             '__none__' => $this->t("Don't expose fields."),
-            $type->id() . 'default' => $this->t('Default'),
+            $type->id() . '.default' => $this->t('Default'),
           ];
 
           foreach ($modes as $mode) {
@@ -149,7 +149,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             '#parents' => [
               'types', $type->id(), 'bundles', $bundle, 'view_mode',
             ],
-            '#default_value' => isset($defaults[$type->id()][$bundle]['view_mode']) ? $defaults[$type->id()][$bundle]['view_mode'] : 0,
+            '#default_value' => isset($defaults[$type->id()]['bundles'][$bundle]['view_mode']) ? $defaults[$type->id()]['bundles'][$bundle]['view_mode'] : 0,
             '#options' => $options,
             '#attributes' => [
               'width' => '100%',
