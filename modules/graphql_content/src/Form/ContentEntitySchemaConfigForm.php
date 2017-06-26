@@ -90,11 +90,17 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
       $defaults = $config->get('types');
     }
 
+    $form['description'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $this->t('Configure which content entity types, bundles and fields will be added to the GraphQL schema.'),
+    ];
+
     $form['types'] = [
       '#type' => 'table',
       '#header' => [
-        $this->t('Expose type'),
-        $this->t('Expose fields from view mode'),
+        $this->t('Add interfaces and types'),
+        $this->t('Attach fields from view mode'),
       ],
     ];
 
@@ -108,7 +114,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
           '#type' => 'checkbox',
           '#default_value' => isset($defaults[$type->id()]['exposed']) ? $defaults[$type->id()]['exposed'] : 0,
           '#title' => '<strong>' . $type->getLabel() . '</strong>',
-          '#description' => $this->t('Will expose the %interface GraphQL interface.', [
+          '#description' => $this->t('Add the <strong>%interface</strong> interface to the schema.', [
             '%interface' => graphql_core_camelcase($type->id()),
           ]),
           '#wrapper_attributes' => ['colspan' => 2, 'class' => ['highlight']],
@@ -127,13 +133,13 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
               ],
             ],
             '#title' => $info['label'],
-            '#description' => $this->t('Will expose the %interface GraphQL type.', [
-              '%interface' => graphql_core_camelcase([$type->id(), $bundle]),
+            '#description' => $this->t('Add the <strong>%type</strong> type to the schema.', [
+              '%type' => graphql_core_camelcase([$type->id(), $bundle]),
             ]),
           ];
 
           $options = [
-            '__none__' => $this->t("Don't expose fields."),
+            '__none__' => $this->t("Don't attach fields."),
             $type->id() . '.default' => $this->t('Default'),
           ];
 
