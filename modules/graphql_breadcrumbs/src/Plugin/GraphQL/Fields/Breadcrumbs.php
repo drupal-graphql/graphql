@@ -65,10 +65,10 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The current route match.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BreadcrumbBuilderInterface $breadcrumb_manager, RouteMatchInterface $route_match) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, BreadcrumbBuilderInterface $breadcrumbManager, RouteMatchInterface $routeMatch) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->breadcrumbManager = $breadcrumb_manager;
-    $this->routeMatch = $route_match;
+    $this->breadcrumbManager = $breadcrumbManager;
+    $this->routeMatch = $routeMatch;
   }
 
   /**
