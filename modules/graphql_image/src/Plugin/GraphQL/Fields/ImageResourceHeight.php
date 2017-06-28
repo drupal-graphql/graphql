@@ -27,7 +27,7 @@ class ImageResourceHeight extends FieldPluginBase {
       yield (int) $value->height;
     }
     if (is_array($value) && array_key_exists('height', $value)) {
-      yield $value['height'];
+      yield (int) $value['height'];
     }
   }
 
