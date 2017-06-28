@@ -1,0 +1,6 @@
+graphql_breadcrumbs_test.test:
+  path: '/breadcrumbs-test'
+  defaults:
+    _controller: '\Drupal\graphql_breadcrumbs_test\Controller\TestController::test'
+  requirements:
+    _access: 'TRUE'
