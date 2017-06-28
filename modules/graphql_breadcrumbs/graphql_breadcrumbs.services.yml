@@ -1,0 +1,5 @@
+services:
+  graphql_breadcrumbs.event_listener:
+    class: Drupal\graphql_breadcrumbs\EventListener
+    tags:
+      - { name: event_subscriber }

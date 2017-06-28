@@ -2,12 +2,14 @@
 
 namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
 
-use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql_breadcrumbs\BreadcrumbsResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -25,18 +27,18 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
   use DependencySerializationTrait;
 
   /**
-   * The breadcrumb manager.
+   * The request stack.
    *
-   * @var \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $breadcrumbManager;
+  protected $requestStack;
 
   /**
-   * The current route match.
+   * A http kernel to issue sub-requests to.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
    */
-  protected $routeMatch;
+  protected $httpKernel;
 
   /**
    * {@inheritdoc}
@@ -46,38 +48,55 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('breadcrumb'),
-      $container->get('current_route_match')
+      $container->get('http_kernel'),
+      $container->get('request_stack')
     );
   }
 
   /**
-   * Constructs a new Breadcrumbs object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface $breadcrumb_manager
-   *   The breadcrumb manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
+   * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BreadcrumbBuilderInterface $breadcrumbManager, RouteMatchInterface $routeMatch) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, HttpKernelInterface $httpKernel, RequestStack $requestStack) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->breadcrumbManager = $breadcrumbManager;
-    $this->routeMatch = $routeMatch;
+    $this->requestStack = $requestStack;
+    $this->httpKernel = $httpKernel;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    $links = $this->breadcrumbManager->build($this->routeMatch)->getLinks();
-    foreach ($links as $link) {
-      yield $link;
+    if ($value instanceof \Drupal\Core\Url) {
+      $currentRequest = $this->requestStack->getCurrentRequest();
+      $request = Request::create(
+        $value->getOption('routed_path') ?: $value->toString(),
+        'GET',
+        $currentRequest->query->all(),
+        $currentRequest->cookies->all(),
+        $currentRequest->files->all(),
+        $currentRequest->server->all()
+      );
+
+      if ($session = $currentRequest->getSession()) {
+        $request->setSession($session);
+      }
+
+      $request->attributes->set('graphql_breadcrumbs', TRUE);
+      $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+
+      // TODO:
+      // Remove the request stack manipulation once the core issue described at
+      // https://www.drupal.org/node/2613044 is resolved.
+      while ($this->requestStack->getCurrentRequest() === $request) {
+        $this->requestStack->pop();
+      }
+
+      if ($response instanceof BreadcrumbsResponse) {
+        $links = $response->getBreadcrumbs();
+        foreach ($links as $link) {
+          yield $link;
+        }
+      }
     }
   }
 
