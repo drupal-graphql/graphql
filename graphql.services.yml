@@ -104,7 +104,7 @@ services:
       - { name: graphql_request_policy }
   graphql.request_policy.deny_unsafe_method_unless_query:
     class: Drupal\graphql\Cache\RequestPolicy\DenyUnsafeMethodUnlessQuery
-    arguments: ['@current_route_match']
+    arguments: ['@path_processor_manager']
     tags:
       - { name: graphql_request_policy }
   graphql.response_policy.deny_mutation:
