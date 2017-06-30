@@ -1,0 +1,7 @@
+types:
+  node:
+    exposed: true
+    bundles:
+      test:
+        exposed: true
+        view_mode: node.graphql

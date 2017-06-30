@@ -1,5 +1,3 @@
-# Schema for the configuration files of the Action module.
-
 graphql_content.schema:
   type: config_object
   label: 'Schema settings'

@@ -178,6 +178,16 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $types = $form_state->getValue('types');
+
+    // Sanitize boolean values.
+    foreach (array_keys($types) as $type) {
+      $types[$type]['exposed'] = (bool) $types[$type]['exposed'];
+      foreach (array_keys($types[$type]['bundles']) as $bundle) {
+        $types[$type]['bundles'][$bundle]['exposed'] = (bool) $types[$type]['bundles'][$bundle]['exposed'];
+      }
+    }
+
     $this->config('graphql_content.schema')
       ->set('types', $form_state->getValue('types'))
       ->save();
