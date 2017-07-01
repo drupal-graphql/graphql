@@ -2,6 +2,9 @@
 
 namespace Drupal\Tests\graphql_core\Kernel;
 
+use Drupal\graphql\GraphQL\TypeCollector;
+use Youshido\GraphQL\Type\Enum\EnumType;
+
 /**
  * Test enumeration support in different ways.
  *
@@ -39,6 +42,20 @@ class EnumTest extends GraphQLFileTestBase {
         'A', 'B', 'C',
       ],
     ], $result['data'], 'Annotated enums accept and return properly.');
+  }
+
+  /**
+   * Test enum type names.
+   */
+  public function testEnumTypeNames() {
+    /** @var \Youshido\GraphQL\Schema\AbstractSchema $schema */
+    $schema = \Drupal::service('graphql.schema');
+    $types = TypeCollector::collectTypes($schema);
+    foreach ($types as $type) {
+      if ($type instanceof EnumType && $type->getName() === NULL) {
+        $this->fail('Unnamed enum type found.');
+      }
+    }
   }
 
 }
