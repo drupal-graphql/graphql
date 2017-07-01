@@ -56,6 +56,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       if ($sorts) {
         $arguments += [
           'sortDirection' => [
+            "name" => "sortDirection",
             "type" => [
               "ASC" => "Ascending",
               "DESC" => "Descending",
@@ -63,6 +64,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
+            "name" => "sortBy",
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
