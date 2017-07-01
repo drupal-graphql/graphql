@@ -72,7 +72,14 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
         // Sorting arguments.
         'sort_by' => isset($args['sortBy']) ? $args['sortBy'] : NULL,
         'sort_order' => isset($args['sortDirection']) ? $args['sortDirection'] : NULL,
-      ] + (array_key_exists('filter', $args) ? $args['filter'] : []));
+      ]);
+
+      // If some filters are missing from the input, set them to an empty string
+      // explicitly. Otherwise views module generates "Undefined index" notice.
+      $filters = $executable->getDisplay()->getOption('filters');
+      foreach (array_keys($filters) as $filter) {
+        $input[$filter] = isset($args['filter'][$filter]) ? $args['filter'][$filter] : '';
+      }
 
       $executable->setExposedInput($input);
 
