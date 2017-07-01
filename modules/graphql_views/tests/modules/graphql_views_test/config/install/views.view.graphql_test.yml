@@ -125,45 +125,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-      filters: {  }
-      sorts:
-        nid:
-          id: nid
-          table: node_field_data
-          field: nid
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: ASC
-          exposed: false
-          expose:
-            label: ''
-          entity_type: node
-          entity_field: nid
-          plugin_id: standard
-      header: {  }
-      footer: {  }
-      empty: {  }
-      relationships: {  }
-      arguments: {  }
-      display_extenders: {  }
-    cache_metadata:
-      max-age: -1
-      contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - url.query_args
-        - 'user.node_grants:view'
-        - user.permissions
-      tags: {  }
-  filtered:
-    display_plugin: graphql
-    id: filtered
-    display_title: Filtered
-    position: 4
-    display_options:
-      display_extenders: {  }
-      display_description: ''
       filters:
         title:
           id: title
@@ -205,13 +166,52 @@ display:
           entity_type: node
           entity_field: title
           plugin_id: string
-      defaults:
-        filters: false
-        filter_groups: false
       filter_groups:
         operator: AND
         groups:
           1: AND
+      sorts:
+        nid:
+          id: nid
+          table: node_field_data
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
+          exposed: false
+          expose:
+            label: ''
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
+      header: {  }
+      footer: {  }
+      empty: {  }
+      relationships: {  }
+      arguments: {  }
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url.query_args
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  filtered:
+    display_plugin: graphql
+    id: filtered
+    display_title: Filtered
+    position: 4
+    display_options:
+      display_extenders: {  }
+      display_description: ''
+      filters: {  }
+      defaults:
+        filters: true
+        filter_groups: true
       pager:
         type: none
         options:
