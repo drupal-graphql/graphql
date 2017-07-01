@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\views\Views;
 
@@ -20,7 +19,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $display = $view->getDisplay($displayId);
+      $display = $this->getViewDisplay($view, $displayId);
 
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
@@ -35,8 +34,8 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $paged = FALSE;
       $arguments = [];
 
-      $filters = array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
-        return $sort['exposed'];
+      $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
+        return $filter['exposed'];
       });
 
       if ($filters) {
@@ -50,7 +49,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       }
 
 
-      $sorts = array_filter(NestedArray::getValue($display, ['display_options', 'sorts']) ?: [], function ($sort) {
+      $sorts = array_filter($display->getOption('sorts') ?: [], function ($sort) {
         return $sort['exposed'];
       });
 
