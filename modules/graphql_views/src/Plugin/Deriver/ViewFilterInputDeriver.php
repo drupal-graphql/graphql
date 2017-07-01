@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\views\Views;
 
@@ -20,7 +19,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $display = $view->getDisplay($displayId);
+      $display = $this->getViewDisplay($view, $displayId);
 
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
@@ -30,8 +29,8 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
       $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
-      $filters = array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
-        return $sort['exposed'];
+      $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
+        return $filter['exposed'];
       });
 
       // If there are no exposed filters, don't create the derivative.

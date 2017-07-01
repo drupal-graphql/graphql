@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\views\Plugin\views\display\DisplayPluginInterface;
+use Drupal\views\ViewEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -63,45 +65,46 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   /**
    * Check if a pager is configured.
    *
-   * @param array $display
+   * @param \Drupal\views\Plugin\views\display\DisplayPluginInterface $display
    *   The display configuration.
    *
    * @return bool
    *   Flag indicating if the view is configured with a pager.
    */
-  protected function isPaged(array $display) {
-    return in_array(NestedArray::getValue($display, [
-      'display_options', 'pager', 'type',
-    ]) ?: 'none', ['full', 'mini']);
+  protected function isPaged(DisplayPluginInterface $display) {
+    $pager_options = $display->getOption('pager');
+    return isset($pager_options['type']) && in_array($pager_options['type'], ['full', 'mini']);
   }
 
   /**
    * Get the configured default limit.
    *
-   * @param array $display
+   * @param \Drupal\views\Plugin\views\display\DisplayPluginInterface $display
    *   The display configuration.
    *
    * @return int
    *   The default limit.
    */
-  protected function getPagerLimit(array $display) {
-    return NestedArray::getValue($display, [
-      'display_options', 'pager', 'options', 'items_per_page',
+  protected function getPagerLimit(DisplayPluginInterface $display) {
+    $pager_options = $display->getOption('pager');
+    return NestedArray::getValue($pager_options, [
+      'options', 'items_per_page',
     ]) ?: 0;
   }
 
   /**
    * Get the configured default offset.
    *
-   * @param array $display
+   * @param \Drupal\views\Plugin\views\display\DisplayPluginInterface $display
    *   The display configuration.
    *
    * @return int
    *   The default offset.
    */
-  protected function getPagerOffset(array $display) {
-    return NestedArray::getValue($display, [
-      'display_options', 'pager', 'options', 'offset',
+  protected function getPagerOffset(DisplayPluginInterface $display) {
+    $pager_options = $display->getOption('pager');
+    return NestedArray::getValue($pager_options, [
+      'options', 'offset',
     ]) ?: 0;
   }
 
@@ -144,6 +147,23 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
     return (bool) array_filter($this->interfacePluginManager->getDefinitions(), function ($definition) use ($interface) {
       return $definition['name'] === $interface;
     });
+  }
+
+  /**
+   * Returns a view display object.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view object.
+   * @param string $displayId
+   *   The display ID to use.
+   *
+   * @return \Drupal\views\Plugin\views\display\DisplayPluginInterface
+   *   The view display object.
+   */
+  protected function getViewDisplay(ViewEntityInterface $view, $displayId) {
+    $viewExecutable = $view->getExecutable();
+    $viewExecutable->setDisplay($displayId);
+    return $viewExecutable->getDisplay();
   }
 
 }
