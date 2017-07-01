@@ -78,7 +78,7 @@ class EntityByIdTest extends GraphQLFileTestBase {
           'bundles' => [
             'test' => [
               'exposed' => TRUE,
-              'view_mode' => 'entity_test_with_bundle.graphql',
+              'view_mode' => 'node.graphql',
             ],
           ],
         ],

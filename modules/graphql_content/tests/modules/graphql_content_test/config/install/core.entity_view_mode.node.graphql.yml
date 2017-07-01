@@ -1,0 +1,9 @@
+langcode: en
+status: false
+dependencies:
+  module:
+    - node
+id: node.graphql
+label: 'GraphQL'
+targetEntityType: node
+cache: true
