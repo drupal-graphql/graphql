@@ -78,7 +78,7 @@ trait ArgumentAwarePluginTrait {
     else {
       $typeInfo = is_array($argument) ? $argument['type'] : $argument;
 
-      $type = is_array($typeInfo) ? $this->buildEnumConfig($typeInfo) : $schemaManager->findByName($typeInfo, [
+      $type = is_array($typeInfo) ? $this->buildEnumConfig($typeInfo, $argument['name']) : $schemaManager->findByName($typeInfo, [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
         GRAPHQL_CORE_SCALAR_PLUGIN,
         GRAPHQL_CORE_ENUM_PLUGIN,

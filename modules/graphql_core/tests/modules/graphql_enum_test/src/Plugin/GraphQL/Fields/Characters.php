@@ -19,6 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   },
  *   arguments = {
  *     "characters" = {
+ *       "name" = "characters",
  *       "multi" = true,
  *       "type" = {
  *         "a" = "Alpha",

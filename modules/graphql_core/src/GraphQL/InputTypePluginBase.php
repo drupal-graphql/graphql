@@ -107,7 +107,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Gr
     else {
       $typeInfo = is_array($field) ? $field['type'] : $field;
 
-      $type = is_array($typeInfo) ? $this->buildEnumConfig($typeInfo) : $schemaManager->findByName($typeInfo, [
+      $type = is_array($typeInfo) ? $this->buildEnumConfig($typeInfo, $field['name']) : $schemaManager->findByName($typeInfo, [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
         GRAPHQL_CORE_SCALAR_PLUGIN,
         GRAPHQL_CORE_ENUM_PLUGIN,
