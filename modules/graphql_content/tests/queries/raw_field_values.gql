@@ -3,12 +3,41 @@ query ($path: String!) {
     entity {
       ... on NodeTest {
         body {
+          value
+          format
           summary
         }
-        fieldKeywords {
+        fieldText {
           value
         }
-        test
+        fieldBoolean {
+          value
+        }
+        fieldLink {
+          title
+          uri
+        }
+        fieldInteger {
+          value
+        }
+        fieldFloat {
+          value
+        }
+        fieldDecimal {
+          value
+        }
+        fieldDatetime {
+          value
+        }
+        fieldTimestamp {
+          value
+        }
+        fieldEmail {
+          value
+        }
+        fieldString {
+          value
+        }
       }
     }
   }

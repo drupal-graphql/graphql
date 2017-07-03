@@ -9,13 +9,13 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\graphql_content\Plugin\GraphQL\Types\RawFieldValueType;
+use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Derive GraphQL types for raw values of drupal fields.
  */
-class RawFieldValueTypeDeriver extends DeriverBase implements ContainerDeriverInterface {
+class RawValueFieldTypeDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   /**
    * Entity type manager.
@@ -80,10 +80,7 @@ class RawFieldValueTypeDeriver extends DeriverBase implements ContainerDeriverIn
         foreach ($this->entityFieldManager->getFieldStorageDefinitions($typeId) as $fieldId => $fieldStorage) {
           if ($fieldStorage instanceof FieldStorageConfig) {
             $this->derivatives["$typeId-$fieldId"] = [
-              'name' => RawFieldValueType::getId($fieldStorage),
-              'entity_type' => $typeId,
-              'field_name' => $fieldId,
-              'data_type' => $fieldStorage->getType(),
+              'name' => RawValueFieldType::getId($typeId, $fieldId),
             ] + $basePluginDefinition;
           }
         }

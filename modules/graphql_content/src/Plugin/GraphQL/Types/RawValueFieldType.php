@@ -11,21 +11,23 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * @GraphQLType(
  *   id = "raw_field_value",
  *   weight = -1,
- *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawFieldValueTypeDeriver"
+ *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFieldTypeDeriver"
  * )
  */
-class RawFieldValueType extends TypePluginBase {
+class RawValueFieldType extends TypePluginBase {
 
   /**
    * Returns name of the GraphQL type.
    *
-   * @param FieldStorageConfig $storage
-   *   Field storage config.
+   * @param string $entityTypeId
+   *   Entity type id.
+   * @param string $fieldName
+   *   Field name.
    * @return string
    *   The GraphQL type name.
    */
-  public static function getId(FieldStorageConfig $storage) {
-    return graphql_core_camelcase([$storage->getTargetEntityTypeId(), $storage->getName(), 'raw_value']);
+  public static function getId($entityTypeId, $fieldName) {
+    return graphql_core_camelcase([$entityTypeId, $fieldName, 'raw_value']);
   }
 
 }
