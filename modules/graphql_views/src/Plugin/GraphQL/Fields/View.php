@@ -67,6 +67,17 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
 
+      // Set view arguments (contextual filters) if required.
+      /* @see \Drupal\graphql_views\Plugin\Deriver\ViewDeriver::getContextualSets() */
+      foreach ($definition['contextual_sets'] as $contextual_set) {
+        if (isset($contextual_set['argument_entity_class']) && is_a($value, $contextual_set['argument_entity_class'])) {
+          $executable->setArguments([
+            $contextual_set['argument'] => $value->id(),
+          ]);
+          break;
+        }
+      }
+
       // Prepare arguments for use as exposed form input.
       $input = array_filter([
         // Sorting arguments.
