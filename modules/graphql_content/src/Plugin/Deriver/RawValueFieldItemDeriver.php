@@ -2,33 +2,53 @@
 
 namespace Drupal\graphql_content\Plugin\Deriver;
 
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
+use Drupal\graphql_content\TypeMatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RawValueFieldItemDeriver extends FieldDeriverBase {
 
-  // TODO Provide more mappings.
+  /**
+   * The type matcher service.
+   *
+   * @var \Drupal\graphql_content\TypeMatcher
+   */
+  protected $typeMatcher;
 
   /**
-   * Mapping of graphql types to drupal types.
+   * RawValueFieldItemDeriver constructor.
    *
-   * @var array
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInfo
+   *   The entity type bundle info service.
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   *   The entity field manager service.
+   * @param \Drupal\graphql_content\TypeMatcher $typeMatcher
+   *   The graphql type matcher service.
    */
-  protected static $mapping = [
-    'String' => [
-      'text',
-      'varchar',
-      'varchar_ascii',
-      'blob',
-    ],
-    'Int' => [
-      'int',
-    ],
-    'Float' => [
-      'numeric',
-      'float',
-    ]
-  ];
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    EntityTypeBundleInfoInterface $bundleInfo,
+    EntityFieldManagerInterface $entityFieldManager,
+    TypeMatcher $typeMatcher
+  ) {
+    parent::__construct($entityTypeManager, $bundleInfo, $entityFieldManager);
+    $this->typeMatcher = $typeMatcher;
+  }
+
+  public static function create(ContainerInterface $container, $basePluginId) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('entity_field.manager'),
+      $container->get('graphql.type_matcher')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -53,36 +73,13 @@ class RawValueFieldItemDeriver extends FieldDeriverBase {
       foreach ($storage->getSchema()['columns'] as $columnName => $schema) {
         $this->derivatives["{$type->id()}-$fieldName-$columnName"] = [
           'name' => graphql_core_propcase($columnName),
-          'schemaColumn' => $columnName,
+          'schema_column' => $columnName,
           'multi' => FALSE,
-          'type' => $this->typedDataToGraphQLFieldType($schema['type']),
+          'type' => $this->typeMatcher->typedDataToGraphQLFieldType($schema['type']),
           'types' => [$dataType],
         ] + $basePluginDefinition;
       }
-
-      // TODO Investigate the feasibility of exposing the options array for link field.
     }
-  }
-
-  /**
-   * Maps drupal data type to graphql type.
-   *
-   * @param string $typedDataType
-   *   Drupal column type.
-   *
-   * @return string
-   * @throws \Drupal\graphql_content\Plugin\Deriver\TypeMappingNotFoundException
-   */
-  protected function typedDataToGraphQLFieldType($typedDataType) {
-    foreach (static::$mapping as $graphQlType => $typedDataTypes) {
-      if (in_array($typedDataType, $typedDataTypes)) {
-        return $graphQlType;
-      }
-    }
-
-    throw new TypeMappingNotFoundException("No mapping found for typed data type '$typedDataType'");
   }
 
 }
-
-class TypeMappingNotFoundException extends \Exception {};

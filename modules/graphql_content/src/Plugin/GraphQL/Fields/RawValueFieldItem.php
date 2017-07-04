@@ -28,7 +28,7 @@ class RawValueFieldItem extends FieldPluginBase {
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof FieldItemBase) {
-      $column = $this->getPluginDefinition()['schemaColumn'];
+      $column = $this->getPluginDefinition()['schema_column'];
       $item = $value->getValue();
       $result = $item[$column];
 

@@ -1,0 +1,3 @@
+services:
+  graphql.type_matcher:
+    class: Drupal\graphql_content\TypeMatcher
