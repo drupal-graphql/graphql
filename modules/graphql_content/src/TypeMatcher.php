@@ -9,21 +9,17 @@ class TypeMatcher {
    *
    * @var array
    */
-  protected static $mapping = [
-    'String' => [
-      'text',
-      'varchar',
-      'varchar_ascii',
-      'blob',
-    ],
-    'Int' => [
-      'int',
-    ],
-    'Float' => [
-      'numeric',
-      'float',
-    ]
-  ];
+  protected $typeMap;
+
+  /**
+   * TypeMatcher constructor.
+   *
+   * @param array $typeMap
+   *   The mapping of graphql types to drupal types.
+   */
+  public function __construct(array $typeMap) {
+    $this->typeMap = $typeMap;
+  }
 
   /**
    * Maps drupal data type to graphql type.
@@ -35,7 +31,7 @@ class TypeMatcher {
    * @throws \Drupal\graphql_content\Plugin\Deriver\TypeMappingNotFoundException
    */
   public function typedDataToGraphQLFieldType($typedDataType) {
-    foreach (static::$mapping as $graphQlType => $typedDataTypes) {
+    foreach ($this->typeMap as $graphQlType => $typedDataTypes) {
       if (in_array($typedDataType, $typedDataTypes)) {
         return $graphQlType;
       }
