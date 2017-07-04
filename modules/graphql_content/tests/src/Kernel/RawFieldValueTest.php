@@ -34,27 +34,6 @@ class RawFieldValueTest extends GraphQLFileTestBase {
   ];
 
   /**
-   * Set of field types and values to use in the test.
-   *
-   * @var array
-   */
-  public static $fields = [
-    'text' => ['a', 'b', 'c'],
-    'boolean' => [TRUE, FALSE],
-    'link' => [
-      ['title' => 'Internal link', 'uri' => 'internal:/node/1'],
-      ['title' => 'External link', 'uri' => 'http://drupal.org'],
-    ],
-    'integer' => [10, -5],
-    'float' => [3.14145, -8.8],
-    'decimal' => [10.5, -17.22],
-    'datetime' => ['2017-01-01', '1900-01-01'],
-    'timestamp' => [0, 300],
-    'email' => ['test@test.com'],
-    'string' => ['test', '123'],
-  ];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -69,9 +48,16 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'type' => 'test',
     ]);
 
-    foreach (static::$fields as $type => $values) {
-      $this->addField($type, "field_$type");
-    }
+    $this->addField('text', "field_text");
+    $this->addField('boolean', "field_boolean");
+    $this->addField('link', "field_link");
+    $this->addField('integer', "field_integer");
+    $this->addField('float', "field_float");
+    $this->addField('decimal', "field_decimal");
+    $this->addField('datetime', "field_datetime");
+    $this->addField('timestamp', "field_timestamp");
+    $this->addField('email', "field_email");
+    $this->addField('string', "field_string");
 
     // TODO Test files and images.
     // $this->addField('file', 'field_file');
@@ -85,18 +71,27 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $options = ['type' => 'raw_value'];
     EntityViewMode::create(['id' => 'node.graphql', 'targetEntityType' => 'node'])->save();
 
-    $display = entity_get_display('node', 'test', 'graphql');
-    $display->setComponent('body', $options);
-    foreach (static::$fields as $type => $value) {
-      $display->setComponent("field_$type", $options);
-    }
-    $display->save();
+    entity_get_display('node', 'test', 'graphql')
+      ->setComponent('body', $options)
+      ->setComponent("field_text", $options)
+      ->setComponent("field_boolean", $options)
+      ->setComponent("field_link", $options)
+      ->setComponent("field_integer", $options)
+      ->setComponent("field_float", $options)
+      ->setComponent("field_decimal", $options)
+      ->setComponent("field_datetime", $options)
+      ->setComponent("field_timestamp", $options)
+      ->setComponent("field_email", $options)
+      ->setComponent("field_string", $options)
+      ->save();
   }
 
   /**
    * Test if the basic fields are available on the interface.
+   *
+   * @dataProvider nodeValuesProvider
    */
-  public function testRawValues() {
+  public function testRawValues($actualFieldValues, $expectedFieldValues) {
     $values = [
       'title' => 'Test',
       'type' => 'test',
@@ -106,10 +101,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
         'summary' => 'test summary',
       ],
     ];
-    foreach (static::$fields as $type => $value) {
-      $values["field_$type"] = $value;
-    }
-    $node = $this->createNode($values);
+    $node = $this->createNode($values + $actualFieldValues);
 
     $result = $this->executeQueryFile('raw_field_values.gql', [
       'path' => '/node/' . $node->id(),
@@ -117,13 +109,79 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $resultNode = NestedArray::getValue($result, ['data', 'route', 'entity']);
     $expected = [
       'body' => $values['body'],
-    ];
-    foreach (static::$fields as $type => $fieldValues) {
-      $expected['field' . ucfirst($type)] = array_map(function ($value) {
-        return is_array($value) ? $value : ['value' => $value];
-      }, $fieldValues);
-    }
+    ] + $expectedFieldValues;
+
     $this->assertEquals($expected, $resultNode, 'Correct raw node values are returned.');
+  }
+
+  /**
+   * Data provider for testRawValues.
+   *
+   * @return array
+   */
+  public function nodeValuesProvider() {
+    $fieldValues = [
+      'field_text' => ['a', 'b', 'c'],
+      'field_boolean' => [TRUE, FALSE],
+      'field_link' => [
+        ['title' => 'Internal link', 'uri' => 'internal:/node/1'],
+        ['title' => 'External link', 'uri' => 'http://drupal.org'],
+      ],
+      'field_integer' => [10, -5],
+      'field_float' => [3.14145, -8.8],
+      'field_decimal' => [10.5, -17.22],
+      'field_datetime' => ['2017-01-01', '1900-01-01'],
+      'field_timestamp' => [0, 300],
+      'field_email' => ['test@test.com'],
+      'field_string' => ['test', '123'],
+    ];
+
+    $expected = [
+      'fieldText' => [
+        ['value' => 'a'],
+        ['value' => 'b'],
+        ['value' => 'c'],
+      ],
+      'fieldBoolean' => [
+        ['value' => TRUE],
+        ['value' => FALSE],
+      ],
+      'fieldLink' => [
+        ['title' => 'Internal link', 'uri' => 'internal:/node/1'],
+        ['title' => 'External link', 'uri' => 'http://drupal.org'],
+      ],
+      'fieldInteger' => [
+        ['value' => 10],
+        ['value' => -5],
+      ],
+      'fieldFloat' => [
+        ['value' => 3.14145],
+        ['value' => -8.8],
+      ],
+      'fieldDecimal' => [
+        ['value' => 10.5],
+        ['value' => -17.22],
+      ],
+      'fieldDatetime' => [
+        ['value' => '2017-01-01'],
+        ['value' => '1900-01-01'],
+      ],
+      'fieldTimestamp' => [
+        ['value' => 0],
+        ['value' => 300],
+      ],
+      'fieldEmail' => [
+        ['value' => 'test@test.com'],
+      ],
+      'fieldString' => [
+        ['value' => 'test'],
+        ['value' => '123'],
+      ],
+    ];
+
+    return [
+      [$fieldValues, $expected],
+    ];
   }
 
   /**
