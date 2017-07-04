@@ -12,7 +12,7 @@ use Drupal\Core\Url;
  *
  * @FieldFormatter(
  *   id = "raw_value",
- *   label = @Translation("Raw value"),
+ *   label = @Translation("Raw value (GraphQL use only)"),
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFormatterDeriver"
  * )
  */
@@ -22,16 +22,7 @@ class RawValue extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $element = [];
-
-    // TODO The following code triggers and error in Drupal\Core\Render\Element::children,
-    //      line 92 "'value' is an invalid render key".
-
-    foreach ($items as $delta => $item) {
-      $element[] = $item->getValue();
-    }
-
-    return $element;
+    return ['#markup' => $this->t('Raw value formatter only makes sense in graphql context.')];
   }
 
 }
