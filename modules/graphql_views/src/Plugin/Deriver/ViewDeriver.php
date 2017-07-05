@@ -58,12 +58,21 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
           'multi' => FALSE,
           'nullable' => TRUE,
         ];
-        $types = array_merge(
-          $types,
-          call_user_func_array('array_merge', array_map(function ($argumentInfo) {
-            return $argumentInfo['graphql_types'];
-          }, $argumentsInfo))
-        );
+        foreach ($argumentsInfo as $argumentInfo) {
+          // 1) Depending on whether bundles are known, we expose the view field
+          // either on the interface (e.g. Node) or on the type (e.g. NodePage)
+          // level.
+          // 2) Here we specify types managed by other graphql_* modules, yet we
+          // don't define these modules as dependencies. If types are not in the
+          // schema, the resulting GraphQL field will be attached to nowhere, so
+          // it won't go into the schema.
+          $argumentTypes = empty($argumentInfo['bundles'])
+            ? [graphql_core_camelcase($argumentInfo['entity_type'])]
+            : array_map(function ($bundle) use ($argumentInfo) {
+              return graphql_core_camelcase([$argumentInfo['entity_type'], $bundle]);
+            }, $argumentInfo['bundles']);
+          $types = array_merge($types, $argumentTypes);
+        }
       }
 
       $sorts = array_filter($display->getOption('sorts') ?: [], function ($sort) {
@@ -108,7 +117,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ];
       }
 
-        $this->derivatives[$id] = [
+      $this->derivatives[$id] = [
         'id' => $id,
         'name' => graphql_core_propcase($id),
         'types' => $types,
