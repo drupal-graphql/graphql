@@ -166,4 +166,63 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
     return $viewExecutable->getDisplay();
   }
 
+  /**
+   * Returns contextual sets based on the view arguments.
+   *
+   * @param array $viewArguments
+   *   The "arguments" option of a view display.
+   *
+   * @return array
+   *   Arguments information keyed by the argument ID. Subsequent array keys:
+   *     - index: argument index.
+   *     - entity_type: target entity type.
+   *     - bundles: target bundles (can be empty).
+   *     - graphql_types: GraphQL types which can be used to set the argument.
+   */
+  protected function getArgumentsInfo(array $viewArguments) {
+    $argumentsInfo = [];
+
+    $index = -1;
+    foreach ($viewArguments as $argumentId => $argument) {
+      $index++;
+      $info = [
+        'index' => $index,
+        'entity_type' => NULL,
+        'bundles' => [],
+        'graphql_types' => [],
+      ];
+      if (isset($argument['entity_type']) && isset($argument['entity_field'])) {
+        $entityType = $this->entityTypeManager->getDefinition($argument['entity_type']);
+        if ($entityType) {
+          $idField = $entityType->getKey('id');
+          if ($idField === $argument['entity_field']) {
+            $info['entity_type'] = $argument['entity_type'];
+            if (
+              $argument['specify_validation'] &&
+              strpos($argument['validate']['type'], 'entity:') === 0 &&
+              !empty($argument['validate_options']['bundles'])
+            ) {
+              $info['bundles'] = $argument['validate_options']['bundles'];
+            }
+            // 1) Depending on whether bundles are known, we expose the view
+            // either on the interface (e.g. Node) or on the type (e.g.
+            // NodePage) level.
+            // 2) Here we specify types managed by other graphql_* modules, yet
+            // we don't define these modules as dependencies. If types are not
+            // in the schema, the resulting GraphQL field will be attached to
+            // nowhere, so it won't go into the schema.
+            $interface = graphql_core_camelcase($info['entity_type']);
+            $types = array_map(function ($bundle) use ($argument) {
+              return graphql_core_camelcase([$argument['entity_type'], $bundle]);
+            }, $info['bundles']);
+            $info['graphql_types'] = $types ?: [$interface];
+          }
+        }
+      }
+      $argumentsInfo[$argumentId] = $info;
+    }
+
+    return $argumentsInfo;
+  }
+
 }

@@ -3,6 +3,7 @@
 namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
@@ -67,15 +68,27 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
 
-      // Set view arguments (contextual filters) if required.
-      /* @see \Drupal\graphql_views\Plugin\Deriver\ViewDeriver::getContextualSets() */
-      foreach ($definition['contextual_sets'] as $contextual_set) {
-        if (isset($contextual_set['argument_entity_class']) && is_a($value, $contextual_set['argument_entity_class'])) {
-          $executable->setArguments([
-            $contextual_set['argument'] => $value->id(),
-          ]);
-          break;
+      // Set view contextual filters.
+      /* @see \Drupal\graphql_views\Plugin\Deriver\ViewDeriverBase::getArgumentsInfo() */
+      if (!empty($definition['arguments_info'])) {
+        $viewArguments = [];
+        foreach ($definition['arguments_info'] as $argumentId => $argumentInfo) {
+          if (isset($args['contextual_filter'][$argumentId])) {
+            $viewArguments[$argumentInfo['index']] = $args['contextual_filter'][$argumentId];
+          }
+          elseif (
+            $value instanceof EntityInterface &&
+            $value->getEntityTypeId() === $argumentInfo['entity_type'] &&
+            (empty($argumentInfo['bundles']) ||
+              in_array($value->bundle(), $argumentInfo['bundles'], TRUE))
+          ) {
+            $viewArguments[$argumentInfo['index']] = $value->id();
+          }
+          else {
+            $viewArguments[$argumentInfo['index']] = NULL;
+          }
         }
+        $executable->setArguments($viewArguments);
       }
 
       // Prepare arguments for use as exposed form input.
