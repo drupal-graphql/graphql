@@ -110,10 +110,6 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       'version' => NULL,
     ];
 
-    if (empty($values['query']) && (empty($values['id']) || empty($values['version']))) {
-      return FALSE;
-    }
-
     if (!$query = $this->getQuery($values['query'], $values['id'], $values['version'])) {
       return FALSE;
     }
