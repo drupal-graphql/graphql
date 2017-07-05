@@ -12,6 +12,6 @@ parameters:
       - float
 
 services:
-  graphql.type_matcher:
-    class: Drupal\graphql_content\TypeMatcher
+  graphql.type_mapper:
+    class: Drupal\graphql_content\TypeMapper
     arguments: ['%graphql.type_map%']

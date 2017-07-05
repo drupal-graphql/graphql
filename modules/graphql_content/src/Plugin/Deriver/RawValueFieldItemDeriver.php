@@ -7,17 +7,17 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
-use Drupal\graphql_content\TypeMatcher;
+use Drupal\graphql_content\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RawValueFieldItemDeriver extends FieldDeriverBase {
 
   /**
-   * The type matcher service.
+   * The type mapper service.
    *
-   * @var \Drupal\graphql_content\TypeMatcher
+   * @var \Drupal\graphql_content\TypeMapper
    */
-  protected $typeMatcher;
+  protected $typeMapper;
 
   /**
    * RawValueFieldItemDeriver constructor.
@@ -28,17 +28,17 @@ class RawValueFieldItemDeriver extends FieldDeriverBase {
    *   The entity type bundle info service.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager service.
-   * @param \Drupal\graphql_content\TypeMatcher $typeMatcher
-   *   The graphql type matcher service.
+   * @param \Drupal\graphql_content\TypeMapper $typeMapper
+   *   The graphql type mapper service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityTypeBundleInfoInterface $bundleInfo,
     EntityFieldManagerInterface $entityFieldManager,
-    TypeMatcher $typeMatcher
+    TypeMapper $typeMapper
   ) {
     parent::__construct($entityTypeManager, $bundleInfo, $entityFieldManager);
-    $this->typeMatcher = $typeMatcher;
+    $this->typeMapper = $typeMapper;
   }
 
   public static function create(ContainerInterface $container, $basePluginId) {
@@ -46,7 +46,7 @@ class RawValueFieldItemDeriver extends FieldDeriverBase {
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('entity_field.manager'),
-      $container->get('graphql.type_matcher')
+      $container->get('graphql.type_mapper')
     );
   }
 
@@ -75,7 +75,7 @@ class RawValueFieldItemDeriver extends FieldDeriverBase {
           'name' => graphql_core_propcase($columnName),
           'schema_column' => $columnName,
           'multi' => FALSE,
-          'type' => $this->typeMatcher->typedDataToGraphQLFieldType($schema['type']),
+          'type' => $this->typeMapper->typedDataToGraphQLFieldType($schema['type']),
           'types' => [$dataType],
         ] + $basePluginDefinition;
       }

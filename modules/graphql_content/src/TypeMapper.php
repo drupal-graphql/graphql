@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_content;
 
-class TypeMatcher {
+class TypeMapper {
 
   /**
    * Mapping of graphql types to drupal types.
@@ -12,7 +12,7 @@ class TypeMatcher {
   protected $typeMap;
 
   /**
-   * TypeMatcher constructor.
+   * TypeMapper constructor.
    *
    * @param array $typeMap
    *   The mapping of graphql types to drupal types.
