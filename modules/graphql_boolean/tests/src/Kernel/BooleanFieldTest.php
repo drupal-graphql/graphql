@@ -75,7 +75,7 @@ class BooleanFieldTest extends KernelTestBase {
       'bundle' => 'graphql',
       'mode' => 'graphql',
       'status' => TRUE,
-    ])->setComponent('flagged', ['type' => 'boolean'])->save();
+    ])->setComponent('flagged', ['type' => 'graphql_boolean'])->save();
   }
 
   /**

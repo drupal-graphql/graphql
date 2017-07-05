@@ -58,7 +58,7 @@ class EntityReferenceTest extends GraphQLFileTestBase {
     ])->save();
 
     entity_get_display('node', 'test', 'graphql')
-      ->setComponent('related', ['type' => 'entity_reference_entity_view'])
+      ->setComponent('related', ['type' => 'graphql_entity_reference'])
       ->save();
 
     Role::load('anonymous')

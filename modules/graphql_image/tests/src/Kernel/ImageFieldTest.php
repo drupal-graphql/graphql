@@ -77,7 +77,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
       'bundle' => 'test',
       'mode' => 'graphql',
       'status' => TRUE,
-    ])->setComponent('image', ['type' => 'image'])->save();
+    ])->setComponent('image', ['type' => 'graphql_image'])->save();
   }
 
   /**

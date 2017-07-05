@@ -74,7 +74,7 @@ class FileFieldTest extends GraphQLFileTestBase {
       'bundle' => 'test',
       'mode' => 'graphql',
       'status' => TRUE,
-    ])->setComponent('file', ['type' => 'file_url_plain'])->save();
+    ])->setComponent('file', ['type' => 'graphql_file'])->save();
   }
 
   /**
