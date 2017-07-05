@@ -1,5 +1,5 @@
 parameters:
-  graphql.type_map:
+  graphql_content.type_map:
     String:
       - text
       - varchar
@@ -12,6 +12,6 @@ parameters:
       - float
 
 services:
-  graphql.type_mapper:
+  graphql_content.type_mapper:
     class: Drupal\graphql_content\TypeMapper
-    arguments: ['%graphql.type_map%']
+    arguments: ['%graphql_content.type_map%']

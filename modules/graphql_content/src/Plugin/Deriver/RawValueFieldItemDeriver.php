@@ -46,7 +46,7 @@ class RawValueFieldItemDeriver extends FieldDeriverBase {
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('entity_field.manager'),
-      $container->get('graphql.type_mapper')
+      $container->get('graphql_content.type_mapper')
     );
   }
 
