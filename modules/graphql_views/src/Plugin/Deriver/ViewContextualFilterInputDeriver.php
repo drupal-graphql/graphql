@@ -37,7 +37,8 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
           'name' => graphql_core_camelcase($id),
           'fields' => array_fill_keys(array_keys($argumentsInfo), [
             'type' => 'String',
-            // Always expose contextual filters as nullable.
+            // Always expose contextual filters as nullable. Let views module
+            // decide what to do if value is missing.
             'nullable' => TRUE,
             'multi' => FALSE,
           ]),

@@ -167,7 +167,7 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   }
 
   /**
-   * Returns contextual sets based on the view arguments.
+   * Returns information about view arguments (contextual filters).
    *
    * @param array $viewArguments
    *   The "arguments" option of a view display.

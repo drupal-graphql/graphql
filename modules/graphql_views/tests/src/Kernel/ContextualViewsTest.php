@@ -36,7 +36,7 @@ class ContextualViewsTest extends ViewsTestBase {
   }
 
   /**
-   * Test if view contextual arguments are set properly.
+   * Test if view contextual filters are set properly.
    */
   public function testContextualViewArgs() {
     $test2Node = $this->createNode(['type' => 'test2']);
