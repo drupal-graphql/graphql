@@ -109,10 +109,6 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       'version' => NULL,
     ];
 
-    if (empty($values['query']) && (empty($values['id']) || empty($values['version']))) {
-      return FALSE;
-    }
-
     if (!$query = $this->getQuery($values['query'], $values['id'], $values['version'])) {
       return FALSE;
     }
@@ -120,6 +116,9 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     return $defaults + [
       'query' => is_string($query) ? $query : '',
       'variables' => is_array($values['variables']) ? $values['variables'] : [],
+      // If the 'query' parameter was empty and we reached this point, this is
+      // a persisted query.
+      'persisted' => empty($values['query']),
       '_controller' => $defaults['_graphql']['single'],
     ];
   }
