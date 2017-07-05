@@ -36,7 +36,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $types = ['Root'];
 
       $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
-        return $filter['exposed'];
+        return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
       if ($filters) {

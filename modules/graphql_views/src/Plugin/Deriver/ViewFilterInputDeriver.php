@@ -30,7 +30,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
       $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
-        return $filter['exposed'];
+        return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
       // If there are no exposed filters, don't create the derivative.
