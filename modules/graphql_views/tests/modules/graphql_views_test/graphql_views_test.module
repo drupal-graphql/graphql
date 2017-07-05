@@ -1,0 +1,12 @@
+<?php
+
+use Drupal\views\ViewExecutable;
+
+function graphql_views_test_views_pre_build(ViewExecutable $view) {
+  $args =& drupal_static('graphql_views_test:view:args', []);
+  $id = $view->storage->id() . ':' . $view->current_display;
+  if (!isset($args[$id])) {
+    $args[$id] = [];
+  }
+  $args[$id][] = $view->args;
+}

@@ -3,6 +3,7 @@
 namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
@@ -66,6 +67,29 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if ($view = $storage->load($definition['view'])) {
       $executable = $view->getExecutable();
       $executable->setDisplay($definition['display']);
+
+      // Set view contextual filters.
+      /* @see \Drupal\graphql_views\Plugin\Deriver\ViewDeriverBase::getArgumentsInfo() */
+      if (!empty($definition['arguments_info'])) {
+        $viewArguments = [];
+        foreach ($definition['arguments_info'] as $argumentId => $argumentInfo) {
+          if (isset($args['contextual_filter'][$argumentId])) {
+            $viewArguments[$argumentInfo['index']] = $args['contextual_filter'][$argumentId];
+          }
+          elseif (
+            $value instanceof EntityInterface &&
+            $value->getEntityTypeId() === $argumentInfo['entity_type'] &&
+            (empty($argumentInfo['bundles']) ||
+              in_array($value->bundle(), $argumentInfo['bundles'], TRUE))
+          ) {
+            $viewArguments[$argumentInfo['index']] = $value->id();
+          }
+          else {
+            $viewArguments[$argumentInfo['index']] = NULL;
+          }
+        }
+        $executable->setArguments($viewArguments);
+      }
 
       // Prepare arguments for use as exposed form input.
       $input = array_filter([

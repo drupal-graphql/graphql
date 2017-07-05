@@ -166,4 +166,49 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
     return $viewExecutable->getDisplay();
   }
 
+  /**
+   * Returns information about view arguments (contextual filters).
+   *
+   * @param array $viewArguments
+   *   The "arguments" option of a view display.
+   *
+   * @return array
+   *   Arguments information keyed by the argument ID. Subsequent array keys:
+   *     - index: argument index.
+   *     - entity_type: target entity type.
+   *     - bundles: target bundles (can be empty).
+   */
+  protected function getArgumentsInfo(array $viewArguments) {
+    $argumentsInfo = [];
+
+    $index = -1;
+    foreach ($viewArguments as $argumentId => $argument) {
+      $index++;
+      $info = [
+        'index' => $index,
+        'entity_type' => NULL,
+        'bundles' => [],
+      ];
+      if (isset($argument['entity_type']) && isset($argument['entity_field'])) {
+        $entityType = $this->entityTypeManager->getDefinition($argument['entity_type']);
+        if ($entityType) {
+          $idField = $entityType->getKey('id');
+          if ($idField === $argument['entity_field']) {
+            $info['entity_type'] = $argument['entity_type'];
+            if (
+              $argument['specify_validation'] &&
+              strpos($argument['validate']['type'], 'entity:') === 0 &&
+              !empty($argument['validate_options']['bundles'])
+            ) {
+              $info['bundles'] = $argument['validate_options']['bundles'];
+            }
+          }
+        }
+      }
+      $argumentsInfo[$argumentId] = $info;
+    }
+
+    return $argumentsInfo;
+  }
+
 }

@@ -33,6 +33,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $multi = TRUE;
       $paged = FALSE;
       $arguments = [];
+      $types = ['Root'];
 
       $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
         return $filter['exposed'];
@@ -48,6 +49,31 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ];
       }
 
+      $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
+      if ($argumentsInfo) {
+        $arguments['contextual_filter'] = [
+          'type' => graphql_core_camelcase([
+            $viewId, $displayId, 'view', 'contextual_filter', 'input',
+          ]),
+          'multi' => FALSE,
+          'nullable' => TRUE,
+        ];
+        foreach ($argumentsInfo as $argumentInfo) {
+          // 1) Depending on whether bundles are known, we expose the view field
+          // either on the interface (e.g. Node) or on the type (e.g. NodePage)
+          // level.
+          // 2) Here we specify types managed by other graphql_* modules, yet we
+          // don't define these modules as dependencies. If types are not in the
+          // schema, the resulting GraphQL field will be attached to nowhere, so
+          // it won't go into the schema.
+          $argumentTypes = empty($argumentInfo['bundles'])
+            ? [graphql_core_camelcase($argumentInfo['entity_type'])]
+            : array_map(function ($bundle) use ($argumentInfo) {
+              return graphql_core_camelcase([$argumentInfo['entity_type'], $bundle]);
+            }, $argumentInfo['bundles']);
+          $types = array_merge($types, $argumentTypes);
+        }
+      }
 
       $sorts = array_filter($display->getOption('sorts') ?: [], function ($sort) {
         return $sort['exposed'];
@@ -94,7 +120,8 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $this->derivatives[$id] = [
         'id' => $id,
         'name' => graphql_core_propcase($id),
-        'types' => ['Root'],
+        'types' => $types,
+        'arguments_info' => $argumentsInfo,
         'type' => $typeName,
         'multi' => $multi,
         'arguments' => $arguments,
