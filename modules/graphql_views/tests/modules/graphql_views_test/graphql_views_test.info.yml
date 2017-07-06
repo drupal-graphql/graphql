@@ -5,5 +5,6 @@ core: 8.x
 dependencies:
   - graphql_views
   - node
+  - taxonomy
   - user
   - views

@@ -4,4 +4,8 @@
     entityLabel
   }
 
+  multi:graphqlTestFilteredView (filter: {field_tags_target_id: ["1", "2"]}) {
+    entityLabel
+  }
+
 }
