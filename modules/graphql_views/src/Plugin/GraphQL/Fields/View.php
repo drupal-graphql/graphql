@@ -106,6 +106,11 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       }
 
       $executable->setExposedInput($input);
+      // This is a workaround for the Taxonomy Term filter which requires a full
+      // exposed form to be sent OR the display being an attachment to just
+      // accept input values.
+      $executable->is_attachment = TRUE;
+      $executable->exposed_raw_input = $input;
 
       if ($definition['paged']) {
         // Set paging parameters.
