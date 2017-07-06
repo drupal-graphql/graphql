@@ -90,7 +90,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
-            "name" => "sortBy",
+            "name" => graphql_core_propcase([$id, 'SortBy']),
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
