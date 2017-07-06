@@ -110,7 +110,12 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       if ($definition['paged']) {
         // Set paging parameters.
         $executable->setItemsPerPage($args['pageSize']);
-        $executable->setCurrentPage($args['page']);
+        if (isset($args['offset'])) {
+          $executable->setOffset($args['offset']);
+        }
+        else {
+          $executable->setCurrentPage($args['page']);
+        }
         $executable->execute();
         yield $executable;
       }
