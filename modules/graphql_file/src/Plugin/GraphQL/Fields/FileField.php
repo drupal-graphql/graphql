@@ -11,7 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "file",
- *   field_formatter = "file_url_plain",
+ *   field_formatter = "graphql_file",
  *   type = "File",
  *   cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"

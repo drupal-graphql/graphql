@@ -87,9 +87,12 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       $lang = $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
 
       if ($entity instanceof TranslatableInterface && $entity->hasTranslation($lang)) {
-        yield $entity->getTranslation($lang);
+        $translation = $entity->getTranslation($lang);
+        if ($translation->access('view')) {
+          yield $translation;
+        }
       }
-      else {
+      else if ($entity->access('view')) {
         yield $entity;
       }
 

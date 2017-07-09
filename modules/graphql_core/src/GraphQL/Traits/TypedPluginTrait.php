@@ -44,11 +44,13 @@ trait TypedPluginTrait {
    *
    * @param string[] $options
    *   A list of options.
+   * @param string $parentName
+   *   A base name for generating name for the enum type.
    *
    * @return EnumType
    *   The enumeration type.
    */
-  protected function buildEnumConfig(array $options) {
+  protected function buildEnumConfig(array $options, $parentName) {
     $values = [];
     foreach ($options as $value => $description) {
       $values[] = [
@@ -57,7 +59,10 @@ trait TypedPluginTrait {
         'description' => $description,
       ];
     }
-    return new EnumType(['values' => $values]);
+    return new EnumType([
+      'name' => graphql_core_camelcase([$parentName, 'Enum']),
+      'values' => $values,
+    ]);
   }
 
   /**
@@ -85,7 +90,7 @@ trait TypedPluginTrait {
         $type = array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
       }
       else if (array_key_exists('type', $definition) && $definition['type']) {
-        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type']) : $schemaManager->findByName($definition['type'], [
+        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type'], $definition['name']) : $schemaManager->findByName($definition['type'], [
           GRAPHQL_CORE_SCALAR_PLUGIN,
           GRAPHQL_CORE_TYPE_PLUGIN,
           GRAPHQL_CORE_INTERFACE_PLUGIN,

@@ -1,0 +1,105 @@
+query ($test2NodeId: String!) {
+
+  # graphql_test:contextual_title_arg
+  title_arg0:graphqlTestContextualTitleArgView {
+    entityId
+  }
+  title_arg1:graphqlTestContextualTitleArgView (contextual_filter: {title: "X"}) {
+    entityId
+  }
+
+  # graphql_test:contextual_node
+  node0:graphqlTestContextualNodeView {
+    entityId
+  }
+  node1:graphqlTestContextualNodeView (contextual_filter: {nid: "X"}) {
+    entityId
+  }
+  node2:nodeById (id: "1", language: en) {
+    ... on Node {
+      graphqlTestContextualNodeView {
+        entityId
+      }
+    }
+  }
+  node3:nodeById (id: "1", language: en) {
+    ... on Node {
+      graphqlTestContextualNodeView (contextual_filter: {nid: "X"}) {
+        entityId
+      }
+    }
+  }
+  node4:nodeById (id: "1", language: en) {
+    ... on NodeTest {
+      graphqlTestContextualNodeView {
+        entityId
+      }
+    }
+  }
+  node5:nodeById (id: "1", language: en) {
+    ... on NodeTest {
+      graphqlTestContextualNodeView (contextual_filter: {nid: "X"}) {
+        entityId
+      }
+    }
+  }
+
+  # graphql_test:contextual_nodetest
+  nodetest0:graphqlTestContextualNodetestView {
+    entityId
+  }
+  nodetest1:graphqlTestContextualNodetestView (contextual_filter: {nid: "X"}) {
+    entityId
+  }
+  nodetest2:nodeById (id: "1", language: en) {
+    ... on NodeTest {
+      graphqlTestContextualNodetestView {
+        entityId
+      }
+    }
+  }
+  nodetest3:nodeById (id: "1", language: en) {
+    ... on NodeTest {
+      graphqlTestContextualNodetestView (contextual_filter: {nid: "X"}) {
+        entityId
+      }
+    }
+  }
+
+  # graphql_test:contextual_node_and_nodetest
+  node_and_nodetest0:graphqlTestContextualNodeAndNodetestView {
+    entityId
+  }
+  node_and_nodetest1:graphqlTestContextualNodeAndNodetestView (contextual_filter: {nid: "X", nid_1: "X"}) {
+    entityId
+  }
+  node_and_nodetest2:nodeById (id: $test2NodeId, language: en) {
+    ... on Node {
+      graphqlTestContextualNodeAndNodetestView {
+        entityId
+      }
+    }
+  }
+  node_and_nodetest3:nodeById (id: $test2NodeId, language: en) {
+    ... on Node {
+      graphqlTestContextualNodeAndNodetestView (contextual_filter: {nid: "X", nid_1: "X"}) {
+        entityId
+      }
+    }
+  }
+  node_and_nodetest4:nodeById (id: "1", language: en) {
+    ... on NodeTest {
+      graphqlTestContextualNodeAndNodetestView {
+        entityId
+      }
+    }
+  }
+  node_and_nodetest5:nodeById (id: "1", language: en) {
+    ... on NodeTest {
+      graphqlTestContextualNodeAndNodetestView (contextual_filter: {nid: "X", nid_1: "X"}) {
+        entityId
+      }
+    }
+  }
+
+}

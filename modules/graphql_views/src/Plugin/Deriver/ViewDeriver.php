@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\views\Views;
 
@@ -20,7 +19,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $display = $view->getDisplay($displayId);
+      $display = $this->getViewDisplay($view, $displayId);
 
       if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
@@ -34,9 +33,10 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $multi = TRUE;
       $paged = FALSE;
       $arguments = [];
+      $types = ['Root'];
 
-      $filters = array_filter(NestedArray::getValue($display, ['display_options', 'filters']) ?: [], function ($sort) {
-        return $sort['exposed'];
+      $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
+        return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
       if ($filters) {
@@ -49,14 +49,40 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ];
       }
 
+      $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
+      if ($argumentsInfo) {
+        $arguments['contextual_filter'] = [
+          'type' => graphql_core_camelcase([
+            $viewId, $displayId, 'view', 'contextual_filter', 'input',
+          ]),
+          'multi' => FALSE,
+          'nullable' => TRUE,
+        ];
+        foreach ($argumentsInfo as $argumentInfo) {
+          // 1) Depending on whether bundles are known, we expose the view field
+          // either on the interface (e.g. Node) or on the type (e.g. NodePage)
+          // level.
+          // 2) Here we specify types managed by other graphql_* modules, yet we
+          // don't define these modules as dependencies. If types are not in the
+          // schema, the resulting GraphQL field will be attached to nowhere, so
+          // it won't go into the schema.
+          $argumentTypes = empty($argumentInfo['bundles'])
+            ? [graphql_core_camelcase($argumentInfo['entity_type'])]
+            : array_map(function ($bundle) use ($argumentInfo) {
+              return graphql_core_camelcase([$argumentInfo['entity_type'], $bundle]);
+            }, $argumentInfo['bundles']);
+          $types = array_merge($types, $argumentTypes);
+        }
+      }
 
-      $sorts = array_filter(NestedArray::getValue($display, ['display_options', 'sorts']) ?: [], function ($sort) {
+      $sorts = array_filter($display->getOption('sorts') ?: [], function ($sort) {
         return $sort['exposed'];
       });
 
       if ($sorts) {
         $arguments += [
           'sortDirection' => [
+            "name" => "sortDirection",
             "type" => [
               "ASC" => "Ascending",
               "DESC" => "Descending",
@@ -64,6 +90,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
+            "name" => "sortBy",
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
@@ -93,7 +120,8 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $this->derivatives[$id] = [
         'id' => $id,
         'name' => graphql_core_propcase($id),
-        'types' => ['Root'],
+        'types' => $types,
+        'arguments_info' => $argumentsInfo,
         'type' => $typeName,
         'multi' => $multi,
         'arguments' => $arguments,

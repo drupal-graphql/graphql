@@ -18,6 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   },
  *   arguments = {
  *     "character" = {
+ *       "name" = "character",
  *       "type" = {
  *         "a" = "Alpha",
  *         "b" = "Beta",
