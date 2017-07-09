@@ -1,0 +1,12 @@
+voyager:
+  version: VERSION
+  js:
+    assets/dist/voyager.worker.js: {minified: true}
+    assets/dist/bundle.min.js: {minified: true}
+  css:
+    component:
+      assets/dist/voyager.css: {minified: true}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
