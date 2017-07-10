@@ -85,6 +85,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     return $defaults + [
       '_controller' => $defaults['_graphql']['multiple'],
       'queries' => $queries,
+      'type' => 'batch',
     ];
   }
 
@@ -114,12 +115,13 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     }
 
     return $defaults + [
+      '_controller' => $defaults['_graphql']['single'],
       'query' => is_string($query) ? $query : '',
       'variables' => is_array($values['variables']) ? $values['variables'] : [],
       // If the 'query' parameter was empty and we reached this point, this is
       // a persisted query.
       'persisted' => empty($values['query']),
-      '_controller' => $defaults['_graphql']['single'],
+      'type' => 'single',
     ];
   }
 
