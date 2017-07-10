@@ -11,6 +11,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Execution\Processor;
 use Drupal\graphql\Reducers\ReducerManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -157,9 +158,10 @@ class RequestController implements ContainerInjectionInterface {
       $parameters = array_merge($requestParameters, $query);
       $content = $method === 'POST' ? array_merge($query, $requestContent) : FALSE;
       $content = $content ? json_encode($content) : '';
+      $graphqlUrl = Url::fromUri('internal:/graphql')->toString(TRUE)->getGeneratedUrl();
 
       $subRequest = Request::create(
-        '/graphql',
+        $graphqlUrl,
         $method,
         $parameters,
         $request->cookies->all(),
