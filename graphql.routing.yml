@@ -5,7 +5,7 @@ graphql.request:
       single: '\Drupal\graphql\Controller\RequestController::handleRequest'
       multiple: '\Drupal\graphql\Controller\RequestController::handleBatchRequest'
   requirements:
-    _permission: 'execute graphql requests'
+    _graphql_query_access: 'TRUE'
 
 graphql.explorer:
   path: '/graphql/explorer'

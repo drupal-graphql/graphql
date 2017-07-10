@@ -15,6 +15,11 @@ parameters:
     schema_class: Drupal\graphql\GraphQL\Schema
 
 services:
+  access_check.graphql.query:
+    class: Drupal\graphql\Access\QueryAccessCheck
+    arguments: ['@request_stack']
+    tags:
+      - { name: access_check, applies_to: _graphql_query_access }
   cache.graphql_schema:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
