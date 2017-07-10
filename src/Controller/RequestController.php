@@ -158,10 +158,10 @@ class RequestController implements ContainerInjectionInterface {
       $parameters = array_merge($requestParameters, $query);
       $content = $method === 'POST' ? array_merge($query, $requestContent) : FALSE;
       $content = $content ? json_encode($content) : '';
-      $graphql_url = Url::fromUri('internal:/graphql')->toString(TRUE)->getGeneratedUrl();
+      $graphqlUrl = Url::fromUri('internal:/graphql')->toString(TRUE)->getGeneratedUrl();
 
       $subRequest = Request::create(
-        $graphql_url,
+        $graphqlUrl,
         $method,
         $parameters,
         $request->cookies->all(),
