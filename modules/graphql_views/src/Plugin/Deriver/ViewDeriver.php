@@ -90,7 +90,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
-            "enum_type_name" => graphql_core_camelcase([$id, 'SortByEnum']),
+            "enum_type_name" => graphql_core_camelcase(['SortBy', $id, 'Enum']),
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
