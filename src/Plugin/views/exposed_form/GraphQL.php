@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\views\exposed_form;
+namespace Drupal\graphql\Plugin\views\exposed_form;
 
 use Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase;
 
