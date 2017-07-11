@@ -5,6 +5,7 @@ namespace Drupal\graphql_voyager\Controller;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql\GraphQL\Utilities\Introspection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -14,20 +15,20 @@ class VoyagerController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
-   * The URL generator service.
+   * The Introspection service.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var \Drupal\graphql\GraphQL\Utilities\Introspection
    */
-  protected $urlGenerator;
+  protected $introspection;
 
   /**
    * Constructs a VoyagerController object.
    *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
-   *   The url generator service.
+   * @param \Drupal\graphql\GraphQL\Utilities\Introspection $introspection
+   *   The GraphQL introspection service.
    */
-  public function __construct(UrlGeneratorInterface $urlGenerator) {
-    $this->urlGenerator = $urlGenerator;
+  public function __construct(Introspection $introspection) {
+    $this->introspection = $introspection;
   }
 
   /**
@@ -35,7 +36,7 @@ class VoyagerController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('url_generator')
+      $container->get('graphql.introspection')
     );
   }
 
@@ -46,15 +47,14 @@ class VoyagerController implements ContainerInjectionInterface {
    *   The render array.
    */
   public function viewExplorer() {
-    $url = $this->urlGenerator->generate('graphql.request');
-
+    $introspection_data = $this->introspection->introspect();
     return [
       '#type' => 'page',
       '#theme' => 'page__graphql_voyager',
       '#attached' => [
         'library' => ['graphql_voyager/voyager'],
         'drupalSettings' => [
-          'graphQLRequestUrl' => $url,
+          'graphQLIntrospectionData' => $introspection_data,
         ],
       ],
     ];

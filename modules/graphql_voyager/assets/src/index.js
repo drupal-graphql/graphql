@@ -11,23 +11,11 @@ import jQuery from 'jquery';
 Drupal.behaviors.graphQLRenderVoyager = {
   attach: (context, settings) => {
     const container = jQuery('#graphql-voyager', context).once('graphql-voyager')[0] || undefined;
-    const INTROSPECTION_URL = settings.graphQLRequestUrl || `${window.location.origin}/graphql`;
+    const INTROSPECTION_DATA = settings.graphQLIntrospectionData;
 
     if (typeof container === 'undefined') {
       return;
     }
-    function introspectionProvider(query) {
-      return fetch(INTROSPECTION_URL, {
-        method: 'post',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-        credentials: 'include',
-      }).then(response => response.json());
-    }
-
-    ReactDOM.render(<Voyager introspection={introspectionProvider} displayOptions={{ skipRelay: true }}/>, container);
+    ReactDOM.render(<Voyager introspection={INTROSPECTION_DATA} displayOptions={{ skipRelay: true }}/>, container);
   },
 };
