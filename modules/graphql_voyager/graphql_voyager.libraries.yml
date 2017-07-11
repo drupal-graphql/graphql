@@ -1,8 +1,8 @@
 voyager:
   version: VERSION
   js:
-    assets/dist/voyager.worker.js: {minified: true}
-    assets/dist/bundle.min.js: {minified: true}
+    assets/dist/voyager.worker.js: {preprocess: false}
+    assets/dist/bundle.min.js: {preprocess: false}
   css:
     component:
       assets/dist/voyager.css: {minified: true}

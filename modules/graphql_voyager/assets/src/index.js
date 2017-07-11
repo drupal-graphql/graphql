@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { Voyager } from 'graphql-voyager';
 import fetch from 'isomorphic-fetch';
@@ -16,32 +16,18 @@ Drupal.behaviors.graphQLRenderVoyager = {
     if (typeof container === 'undefined') {
       return;
     }
-
-    class VoyagerWrapper extends Component {
-      constructor() {
-        super();
-      }
-
-      render() {
-        return (
-          <Voyager introspection={this.introspectionProvider} displayOptions={{ skipRelay: true }}/>
-        );
-      }
-
-      introspectionProvider(query) {
-        return fetch(INTROSPECTION_URL, {
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ query }),
-          credentials: 'include',
-        }).then(response => response.json());
-      }
+    function introspectionProvider(query) {
+      return fetch(INTROSPECTION_URL, {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+        credentials: 'include',
+      }).then(response => response.json());
     }
 
-    // Render <VoyagerWrapper /> into the container.
-    ReactDOM.render(<VoyagerWrapper />, container);
+    ReactDOM.render(<Voyager introspection={introspectionProvider} displayOptions={{ skipRelay: true }}/>, container);
   },
 };
