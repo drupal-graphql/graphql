@@ -54,9 +54,6 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
   public function find(callable $selector, array $types, $invert = FALSE) {
     $instances = [];
     foreach ($this->getDefinitions() as $index => $def) {
-      if (!isset($def['definition']['name'])) {
-        var_dump($def['definition']);
-      }
       $name = $def['definition']['name'];
       if (!$name) {
         throw new \Exception("Invalid GraphQL plugin definition. No name defined.");

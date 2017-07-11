@@ -90,9 +90,6 @@ trait TypedPluginTrait {
         $type = array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
       }
       else if (array_key_exists('type', $definition) && $definition['type']) {
-        if (is_array($definition['type']) && !isset($definition['enum_type_name'])) {
-          var_dump($definition);
-        }
         $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type'], $definition['enum_type_name']) : $schemaManager->findByName($definition['type'], [
           GRAPHQL_CORE_SCALAR_PLUGIN,
           GRAPHQL_CORE_TYPE_PLUGIN,
