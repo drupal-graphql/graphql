@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\views\style;
+namespace Drupal\graphql\Plugin\views\style;
 
 use Drupal\views\Plugin\views\style\StylePluginBase;
 
