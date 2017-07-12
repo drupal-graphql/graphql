@@ -82,7 +82,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       if ($sorts) {
         $arguments += [
           'sortDirection' => [
-            "name" => "sortDirection",
+            "enum_type_name" => "ViewsSortDirectionEnum",
             "type" => [
               "ASC" => "Ascending",
               "DESC" => "Descending",
@@ -90,7 +90,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
-            "name" => "sortBy",
+            "enum_type_name" => graphql_core_camelcase(['SortBy', $id, 'Enum']),
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
