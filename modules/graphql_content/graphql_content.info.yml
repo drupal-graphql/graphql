@@ -2,6 +2,7 @@ name: GraphQL Content
 type: module
 description: 'Automatically create GraphQL types and fields from Drupal content entities.'
 package: GraphQL
+configure: graphql_content.content_entity_schema
 core: 8.x
 dependencies:
   - graphql_core

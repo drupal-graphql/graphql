@@ -1,0 +1,7 @@
+graphql_content.content_entity_schema:
+  path: '/admin/config/graphql/content'
+  defaults:
+    _form: '\Drupal\graphql_content\Form\ContentEntitySchemaConfigForm'
+    _title: 'Exposed content'
+  requirements:
+    _permission: 'administer site configuration'
