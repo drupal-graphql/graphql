@@ -122,3 +122,7 @@ services:
     arguments: ['@graphql.query_map_provider']
     tags:
       - { name: route_enhancer }
+  graphql.introspection:
+    class: Drupal\graphql\GraphQL\Utilities\Introspection
+    arguments: ['@graphql.schema_factory']
+
