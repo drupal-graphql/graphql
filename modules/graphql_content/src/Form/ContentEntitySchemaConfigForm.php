@@ -183,8 +183,10 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     // Sanitize boolean values.
     foreach (array_keys($types) as $type) {
       $types[$type]['exposed'] = (bool) $types[$type]['exposed'];
-      foreach (array_keys($types[$type]['bundles']) as $bundle) {
-        $types[$type]['bundles'][$bundle]['exposed'] = (bool) $types[$type]['bundles'][$bundle]['exposed'];
+      if (array_key_exists('bundles', $types[$type])) {
+        foreach (array_keys($types[$type]['bundles']) as $bundle) {
+          $types[$type]['bundles'][$bundle]['exposed'] = (bool) $types[$type]['bundles'][$bundle]['exposed'];
+        }
       }
     }
 
