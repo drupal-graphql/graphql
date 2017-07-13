@@ -6,6 +6,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\graphql_core\GraphQLPluginInterface;
 use Drupal\graphql_core\GraphQLSchemaManager;
+use Psr\Log\LoggerInterface;
 use Traversable;
 
 /**
@@ -29,6 +30,13 @@ class GraphQLPluginManager extends DefaultPluginManager {
   protected $schemaManager;
 
   /**
+   * A logger instance.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -38,10 +46,12 @@ class GraphQLPluginManager extends DefaultPluginManager {
     $pluginInterface,
     $pluginAnnotationName,
     GraphQLSchemaManager $schemaManager,
-    $alterInfo
+    $alterInfo,
+    LoggerInterface $logger
   ) {
     $this->schemaManager = $schemaManager;
     $this->alterInfo($alterInfo);
+    $this->logger = $logger;
     parent::__construct(
       $pluginSubdirectory,
       $namespaces,
@@ -60,7 +70,13 @@ class GraphQLPluginManager extends DefaultPluginManager {
       // GraphQL plugins don't contain user defined configuration.
       $this->instances[$pluginId] = parent::createInstance($pluginId);
       if ($this->instances[$pluginId] instanceof GraphQLPluginInterface) {
-        $this->instances[$pluginId]->buildConfig($this->schemaManager);
+        try {
+          $this->instances[$pluginId]->buildConfig($this->schemaManager);
+        }
+        catch (\Exception $exception) {
+          $this->logger->warning('Plugin ' . $pluginId . ' could not be added to the GraphQL schema: ' . $exception->getMessage());
+          $this->instances[$pluginId] = NULL;
+        }
       }
     }
     return $this->instances[$pluginId];

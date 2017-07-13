@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,6 +30,13 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   protected $entityFieldManager;
 
   /**
+   * The content entity schema configuration service.
+   *
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
+   */
+  protected $config;
+
+  /**
    * The base plugin id.
    *
    * @var string
@@ -42,6 +50,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
+      $container->get('graphql_content.schema_config'),
       $basePluginId);
   }
 
@@ -52,17 +61,21 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $config
+   *   A schema configuration service.
    * @param string $basePluginId
    *   The base plugin id.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager,
+    ContentEntitySchemaConfig $config,
     $basePluginId
   ) {
     $this->basePluginId = $basePluginId;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
+    $this->config = $config;
   }
 
   /**
@@ -100,9 +113,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
     $this->derivatives = [];
 
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays */
-    $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadByProperties([
-      'mode' => 'graphql',
-    ]);
+    $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadMultiple();
 
     foreach ($displays as $display) {
       $entityType = $display->getTargetEntityTypeId();
@@ -110,6 +121,9 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
 
       foreach ($display->getComponents() as $fieldName => $component) {
+        if ($this->config->getExposedViewMode($entityType, $bundle) != $display->getMode()) {
+          continue;
+        }
         if (isset($component['type']) && $component['type'] === $basePluginDefinition['field_formatter']) {
           $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
           /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
