@@ -50,6 +50,18 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'id' => 'fr',
     ]);
     $language->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'test' => [
+              'exposed' => TRUE,
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**
@@ -87,7 +99,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       ],
       'entityTranslation' => [
         'entityLabel' => $translation->label(),
-      ]
+      ],
     ];
 
     $this->assertEquals($values, $result['data']['route']['node'], 'Content type Interface resolves basic entity fields.');

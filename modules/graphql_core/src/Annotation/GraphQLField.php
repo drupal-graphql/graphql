@@ -28,7 +28,11 @@ class GraphQLField extends GraphQLAnnotationBase  {
    *
    * Must be a registered Interface, Type, Scalar or Enum.
    *
-   * @var string
+   * If an associative array is provided - the Enum type will be created
+   * automatically for the given set of values. But $enum_type_name has to be
+   * defined in this case.
+   *
+   * @var string|array
    */
   public $type = NULL;
 
@@ -58,5 +62,14 @@ class GraphQLField extends GraphQLAnnotationBase  {
    * @var array
    */
   public $arguments = [];
+
+  /**
+   * The name for the Enum type.
+   *
+   * Only required if $type is provided as an associative array.
+   *
+   * @var string|null
+   */
+  public $enum_type_name = NULL;
 
 }

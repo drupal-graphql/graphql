@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "characters",
  *   name = "characters",
  *   multi = true,
+ *   enum_type_name = "CharactersEnum",
  *   type = {
  *     "a" = "Alpha",
  *     "b" = "Beta",
@@ -19,7 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   },
  *   arguments = {
  *     "characters" = {
- *       "name" = "characters",
+ *       "enum_type_name" = "CharactersEnum",
  *       "multi" = true,
  *       "type" = {
  *         "a" = "Alpha",

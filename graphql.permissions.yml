@@ -1,6 +1,9 @@
 'execute graphql requests':
-  title: 'Execute GraphQL requests'
-  description: 'Allows users to execute GraphQL requests.'
+  title: 'Execute abitrary GraphQL requests'
+  description: 'Allows users to execute abritrary GraphQL requests.'
+'execute persisted graphql requests':
+  title: 'Execute persisted GraphQL requests'
+  description: 'Allows users to execute persisted GraphQL requests.'
 'use graphql explorer':
   title: 'Use the GraphQL explorer'
   description: 'Allows users to use the GraphiQL interface.'

@@ -48,6 +48,22 @@ abstract class ViewsTestBase extends GraphQLFileTestBase {
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'test']);
 
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'test' => [
+              'exposed' => TRUE,
+            ],
+            'test2' => [
+              'exposed' => TRUE,
+            ],
+          ],
+        ],
+      ])
+      ->save();
+
     Role::load('anonymous')
       ->grantPermission('access content')
       ->save();

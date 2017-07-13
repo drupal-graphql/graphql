@@ -1,12 +1,8 @@
 <?php
 
-namespace Drupal\Tests\graphql_content\Kernel;
+namespace Drupal\Tests\graphql_content\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql\Functional\QueryTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 
@@ -26,51 +22,31 @@ class SchemaCacheInvalidationTest extends QueryTestBase {
   ];
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->createContentType([
-      'type' => 'test',
-    ]);
-
-    FieldStorageConfig::create([
-      'field_name' => 'field_keywords',
-      'entity_type' => 'node',
-      'type' => 'text',
-      'cardinality' => -1,
-    ])->save();
-
-    FieldConfig::create([
-      'entity_type' => 'node',
-      'bundle' => 'test',
-      'field_name' => 'field_keywords',
-      'label' => 'Keywords',
-    ])->save();
-  }
-
-  /**
    * Test if a field change invalidates the schema cache.
    */
   public function testSchemaInvalidation() {
     // Retrieve the schema as string.
-    $oldSchema = $this->query($this->getQuery('schema.gql'));
+    $schemaConfig = $this->container->get('graphql_content.schema_config');
 
+    // Check if configuration is loaded correctly.
+    $this->assertTrue($schemaConfig->isEntityTypeExposed('node'));
+    $this->assertTrue($schemaConfig->isEntityBundleExposed('node', 'test'));
+    $this->assertEquals('graphql', $schemaConfig->getExposedViewMode('node', 'test'));
+
+    $oldSchema = $this->query($this->getQuery('schema.gql'));
     $this->assertEquals($oldSchema, $this->query($this->getQuery('schema.gql')), 'Schema did not change yet.');
 
     // Attach a new field to the default node display.
-    EntityViewDisplay::load('node.test.default')
-      ->setComponent('field_keywords')
+    EntityViewDisplay::load('node.test.graphql')
+      ->setComponent('body')
       ->save();
-
 
     // Retrieve the updated schema.
     $newSchema = $this->query($this->getQuery('schema.gql'));
 
     // Make sure it updated correctly.
     $this->assertNotEquals($oldSchema, $newSchema, 'The schema has changed.');
-    $this->assertContains('fieldKeywords', $newSchema, 'Keywords field has been added.');
+    $this->assertContains('body', $newSchema, 'Body field has been added.');
   }
 
 }

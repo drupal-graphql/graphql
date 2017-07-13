@@ -24,7 +24,7 @@ class Path extends FieldPluginBase {
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
       if ($value->isRouted()) {
-        yield Url::fromUri('internal:/' . $value->getInternalPath())->toString();
+        yield '/' . Url::fromUri('internal:/' . $value->getInternalPath())->getInternalPath();
       }
       else {
         yield $value->toString();
