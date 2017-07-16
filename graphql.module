@@ -5,8 +5,6 @@
  * The GraphQL module.
  */
 
-use Drupal\Core\Url;
-
 /**
  * Implements hook_help().
  */
@@ -21,61 +19,12 @@ function graphql_help($routeName) {
   <a href="http://graphql.org/" target="_blank">GraphQL</a> schema for
   <a href="https://www.drupal.org/8" target="_blank">Drupal 8</a> entities,
   and allows you to expose your own custom schema in a consistent way and with
-  minimal effort.</p>
-
-<p>It is probably the easiest way to build headless Drupal sites using the popular
-  <a href="https://facebook.github.io/react/" target="_blank">React</a> /
-  <a href="https://facebook.github.io/relay/" target="_blank">Relay</a> couple
-  for the front-end, on top of the traditional fast Drupal site building for 
-  content modeling and management.</p>
-
-<p>Its complete redacted documentation (not a generated API) is available on 
-  <a href="https://fgm.gitbooks.io/graphql-for-drupal/content">Github</a>, 
-  including an introduction, a "Getting started" section, documentation about 
-  the concepts, various ways to build a front-end using the module, how to
-  extend the module schema to support custom data, how to debug, and how to
-  contribute to the module.</p>
-');
-
-  $endpointRoute = 'graphql.request';
-  $endpointPath = \Drupal::urlGenerator()->generateFromRoute($endpointRoute, [], ['absolute' => TRUE]);
-  $endpointUrl = Url::fromRoute($endpointRoute)->toString();
-
-  $explorerRoute = 'graphql.explorer';
-  $explorerPath = \Drupal::urlGenerator()->getPathFromRoute($explorerRoute);
-  $explorerUrl = Url::fromRoute($explorerRoute)->toString();
-
-  $exploring = t('Exploring / consuming the API');
-  $graphiql = t('
-<p>The module comes with a bundled version of the standard GraphQL explorer
-  graphiql, available at <a href=":explorerUrl">:explorerPath</a></p>
-   
-<p>The GraphQL endpoint for clients is exposed at <a href=":endpointUrl">:endpointPath</a></p>', [
-  ':explorerPath' => $explorerPath,
-  ':explorerUrl' => $explorerUrl,
-  ':endpointPath' => $endpointPath,
-  ':endpointUrl' => $endpointUrl,
-]);
+  minimal effort.</p>');
 
   $help = <<<EOT
 <h3>$title</h3>
 $description
-
-<h3>$exploring</h3>
-$graphiql
 EOT;
 
   return $help;
-}
-
-/**
- * Implements hook_theme().
- */
-function graphql_theme() {
-  return [
-    'page__graphql_explorer' => [
-      'render element' => 'elements',
-      'base hook' => 'block',
-    ],
-  ];
 }

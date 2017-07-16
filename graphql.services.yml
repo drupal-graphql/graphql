@@ -72,10 +72,6 @@ services:
   graphql.reducer_manager:
     class: Drupal\graphql\Reducers\ReducerManager
     arguments: ['@service_container', '%graphql.reducers%']
-  graphql.page_display_variant_subscriber:
-    class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
-    tags:
-      - { name: event_subscriber }
   graphql.cache_subscriber:
     class: Drupal\graphql\EventSubscriber\CacheSubscriber
     arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager']
