@@ -118,6 +118,6 @@ services:
     tags:
       - { name: route_enhancer }
   graphql.introspection:
-    class: Drupal\graphql\GraphQL\Utilities\Introspection
-    arguments: ['@graphql.schema_factory']
+    class: Drupal\graphql\Introspection
+    arguments: ['@service_container', '@graphql.reducer_manager', '@graphql.schema']
 
