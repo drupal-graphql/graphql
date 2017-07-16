@@ -1,0 +1,6 @@
+graphql_graphiql.explorer:
+  path: '/graphql/explorer'
+  defaults:
+    _controller: '\Drupal\graphql_graphiql\Controller\ExplorerController::viewExplorer'
+  requirements:
+    _permission: 'use graphql explorer'

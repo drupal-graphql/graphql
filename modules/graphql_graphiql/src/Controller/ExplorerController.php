@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Controller;
+namespace Drupal\graphql_graphiql\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -52,7 +52,7 @@ class ExplorerController implements ContainerInjectionInterface {
       '#type' => 'page',
       '#theme' => 'page__graphql_explorer',
       '#attached' => [
-       'library' => ['graphql/explorer'],
+       'library' => ['graphql_graphiql/explorer'],
         'drupalSettings' => [
           'graphQLRequestUrl' => $url
         ],

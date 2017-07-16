@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\EventSubscriber;
+namespace Drupal\graphql_graphiql\EventSubscriber;
 
 use Drupal\Core\Render\PageDisplayVariantSelectionEvent;
 use Drupal\Core\Render\RenderEvents;
@@ -17,7 +17,7 @@ class ExplorerPageDisplayVariantSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event) {
-    if ($event->getRouteMatch()->getRouteName() === 'graphql.explorer') {
+    if ($event->getRouteMatch()->getRouteName() === 'graphql_graphiql.explorer') {
       $event->setPluginId(NULL)->stopPropagation();
     }
   }
