@@ -1,0 +1,6 @@
+graphql_voyager.voyager:
+  path: '/graphql/voyager'
+  defaults:
+    _controller: '\Drupal\graphql_voyager\Controller\VoyagerController::viewExplorer'
+  requirements:
+    _permission: 'use graphql voyager'

@@ -122,3 +122,7 @@ services:
     arguments: ['@graphql.query_map_provider']
     tags:
       - { name: route_enhancer }
+  graphql.introspection:
+    class: Drupal\graphql\Introspection
+    arguments: ['@service_container', '@graphql.reducer_manager', '@graphql.schema']
+
