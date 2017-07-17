@@ -128,7 +128,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         'view' => $viewId,
         'display' => $displayId,
         'paged' => $paged,
-        'cache_tags' => $view->getCacheTags(),
+        'cache_tags' => $view->getExecutable()->getCacheTags(),
         'cache_contexts' => $view->getCacheContexts(),
         'cache_max_age' => $view->getCacheMaxAge(),
       ] + $basePluginDefinition;
