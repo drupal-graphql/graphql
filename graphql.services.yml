@@ -1,11 +1,18 @@
 parameters:
   graphql.config:
+    # GraphQL result cache:
+    #
+    # By default, the GraphQL results get cached. This can be disabled during development.
+    #
+    # @default true
+    result_cache: true
+
     # GraphQL schema cache:
     #
     # By default, the GraphQL schema gets cached. This can be disabled during development.
     #
     # @default true
-    cache: true
+    schema_cache: true
 
     # GraphQL schema class to be used:
     #
@@ -74,7 +81,7 @@ services:
     arguments: ['@service_container', '%graphql.reducers%']
   graphql.cache_subscriber:
     class: Drupal\graphql\EventSubscriber\CacheSubscriber
-    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager']
+    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager', '%graphql.config%']
     tags:
       - { name: service_collector, tag: graphql_extra_cache_metadata, call: addExtraCacheMetadata }
       - { name: event_subscriber }

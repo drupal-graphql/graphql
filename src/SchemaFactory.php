@@ -108,7 +108,7 @@ class SchemaFactory {
   public function getSchema() {
     // The cache key is made up of all of the globally known cache contexts.
     $cid = $this->getCacheIdentifier($this->metadata);
-    if ($this->config['cache'] && ($schema = $this->schemaCache->get($cid)) && $schema->data instanceof AbstractSchema) {
+    if ($this->config['schema_cache'] && ($schema = $this->schemaCache->get($cid)) && $schema->data instanceof AbstractSchema) {
       return $schema->data;
     }
 
@@ -124,7 +124,7 @@ class SchemaFactory {
       $schema->addCacheableDependency($this->getCacheMetadataFromTypes($schema));
     }
 
-    if ($this->config['cache']) {
+    if ($this->config['schema_cache']) {
       $tags = $schema->getCacheTags();
       $expire = $this->maxAgeToExpire($schema->getCacheMaxAge());
 
