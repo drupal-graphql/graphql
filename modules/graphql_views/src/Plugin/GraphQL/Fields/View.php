@@ -70,7 +70,7 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
           $metadata->addCacheTags($row->getCacheTags());
         }
       }
-      return [$metadata];
+      return [$metadata, $value, $args];
     }
     return parent::getCacheDependencies($result, $value, $args);
   }
