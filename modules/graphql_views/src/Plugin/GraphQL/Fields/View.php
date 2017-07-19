@@ -61,7 +61,7 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheDependencies($result, $value, array $args) {
+  public function getCacheDependencies($result, $parent, array $args) {
     if (isset($result)) {
       $dependencies = [
         'metadata' => new CacheableMetadata(),
@@ -76,7 +76,7 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       }
       return $dependencies;
     }
-    return parent::getCacheDependencies($result, $value, $args);
+    return parent::getCacheDependencies($result, $parent, $args);
   }
 
   /**
