@@ -29,14 +29,14 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   public function resolve($value, array $args, ResolveInfo $info) {
     $result = iterator_to_array($this->resolveValues($value, $args, $info));
     if ($this->getPluginDefinition()['multi']) {
-      return new CacheableValue($result, $this->getCacheDependencies($result));
+      return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
     }
     else {
       if ($result) {
-        return new CacheableValue(reset($result), $this->getCacheDependencies($result));
+        return new CacheableValue(reset($result), $this->getCacheDependencies($result, $value, $args));
       }
       else {
-        return new CacheableValue(NULL, $this->getCacheDependencies($result));
+        return new CacheableValue(NULL, $this->getCacheDependencies($result, $value, $args));
       }
     }
   }
@@ -46,11 +46,15 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    *
    * @param mixed $result
    *   The result of the field.
+   * @param mixed $parent
+   *   The parent value.
+   * @param array $args
+   *   The arguments passed to the field.
    *
    * @return array
    *   A list of cacheable dependencies.
    */
-  protected function getCacheDependencies($result) {
+  protected function getCacheDependencies($result, $parent, array $args) {
     // Default implementation just returns the value itself.
     return $this->getPluginDefinition()['multi'] ? $result : [$result];
   }
@@ -104,4 +108,5 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   public function build(FieldConfig $config) {
     // May be overridden, but not required any more.
   }
+
 }
