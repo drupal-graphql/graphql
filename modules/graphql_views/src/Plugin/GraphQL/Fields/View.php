@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
@@ -64,13 +63,18 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
    */
   public function getCacheDependencies($result, $value, array $args) {
     if (isset($result)) {
-      $metadata = new CacheableMetadata();
+      $dependencies = [
+        'metadata' => new CacheableMetadata(),
+      ];
       foreach ($result as $row) {
-        if ($row instanceof CacheableDependencyInterface || $row instanceof ViewExecutable) {
-          $metadata->addCacheTags($row->getCacheTags());
+        if ($row instanceof ViewExecutable) {
+          $dependencies['metadata']->addCacheTags($row->getCacheTags());
+        }
+        else {
+          $dependencies[] = $row;
         }
       }
-      return [$metadata, $value, $args];
+      return $dependencies;
     }
     return parent::getCacheDependencies($result, $value, $args);
   }
