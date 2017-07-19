@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -121,6 +122,24 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
         }
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getCacheDependencies($result, $value, array $args) {
+    // If the view is not paged, it's simply a list of rows. Since these are
+    // entities, they should implement CacheableDependencyInterface anyways.
+    if (!$this->getPluginDefinition()['paged']) {
+      return parent::getCacheDependencies($result, $value, $args);
+    }
+
+    /** @var \Drupal\Views\ViewExecutable $executable */
+    $executable = reset($result);
+    $metadata = new CacheableMetadata();
+    $metadata->setCacheTags($executable->getCacheTags());
+
+    return $metadata;
   }
 
 }
