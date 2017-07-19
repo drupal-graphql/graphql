@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -55,6 +56,27 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $pluginDefinition,
       $container->get('entity_type.manager')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheDependencies($result, $parent, array $args) {
+    if (isset($result)) {
+      $dependencies = [
+        'metadata' => new CacheableMetadata(),
+      ];
+      foreach ($result as $row) {
+        if ($row instanceof ViewExecutable) {
+          $dependencies['metadata']->addCacheTags($row->getCacheTags());
+        }
+        else {
+          $dependencies[] = $row;
+        }
+      }
+      return $dependencies;
+    }
+    return parent::getCacheDependencies($result, $parent, $args);
   }
 
   /**
