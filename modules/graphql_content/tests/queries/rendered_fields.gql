@@ -3,6 +3,7 @@ query ($path: String!) {
     entity {
       ... on NodeTest {
         body
+        content:body
         fieldKeywords
         test
       }
