@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "xml_attribute",
  *   type = "String",
  *   name = "attribute",
- *   arguments={ "name": "String" },
+ *   arguments = { "name": "String" },
  *   types = { "XMLElement" }
  * )
  */

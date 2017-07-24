@@ -22,16 +22,17 @@ class XMLContent extends FieldPluginBase {
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof \DOMElement) {
-      $content = '';
-      foreach ($value->childNodes as $child) {
+      yield implode('', array_map(function ($child) {
         if ($child instanceof \DOMText) {
-          $content .= $child->nodeValue;
+          return $child->nodeValue;
         }
         elseif ($child instanceof \DOMElement) {
-          $content .= $child->ownerDocument->saveXML($child);
+          return $child->ownerDocument->saveXML($child);
         }
-      }
-      yield $content;
+        else {
+          return '';
+        }
+      }, iterator_to_array($value->childNodes)));
     }
   }
 
