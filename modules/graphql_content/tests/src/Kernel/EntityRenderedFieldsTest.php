@@ -108,6 +108,7 @@ class EntityRenderedFieldsTest extends GraphQLFileTestBase {
     $this->assertNotNull($node, 'A node has been retrieved.');
 
     $this->assertEquals('<p>test</p>', $node['body'], 'Body field retrieved properly.');
+    $this->assertEquals('<p>test</p>', $node['content'], 'Body alias field retrieved properly.');
     $this->assertEquals([
       '<p>a</p>',
       '<p>b</p>',
