@@ -2,5 +2,7 @@ graphql_graphiql.explorer:
   path: '/graphql/explorer'
   defaults:
     _controller: '\Drupal\graphql_graphiql\Controller\ExplorerController::viewExplorer'
+  options:
+    _admin_route: TRUE
   requirements:
     _permission: 'use graphql explorer'
