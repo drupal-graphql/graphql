@@ -117,9 +117,10 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ];
       }
 
+      $name = $display->getGraphQLQueryName();
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => graphql_core_propcase($id),
+        'name' => $name,
         'types' => $types,
         'arguments_info' => $argumentsInfo,
         'type' => $typeName,

@@ -8,6 +8,7 @@
 namespace Drupal\graphql\Plugin\views\display;
 
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a display plugin for GraphQL views.
@@ -94,7 +95,20 @@ class GraphQL extends DisplayPluginBase {
     unset($options['exposed_block']);
     unset($options['css_class']);
 
+    $options['graphql_query_name'] = ['default' => ''];
     return $options;
+  }
+
+  public function getGraphQLQueryName() {
+    $graphql_query_name = strip_tags($this->getOption('graphql_query_name'));
+    if (empty($graphql_query_name)) {
+      $viewId = $this->view->id();
+      $displayId = $this->display['id'];
+      // @todo: fix PHP fatal when graphql_core is not installed.
+      // fix: move this GraphQL display plugin under graphql_views module.
+      $graphql_query_name = graphql_core_camelcase([$viewId, $displayId, 'view']);
+    }
+    return lcfirst($graphql_query_name);
   }
 
   /**
@@ -112,6 +126,51 @@ class GraphQL extends DisplayPluginBase {
     unset($options['style'], $options['row'], $options['title'], $options['access']);
     unset($options['exposed_block'], $options['css_class']);
     unset($options['query'], $options['group_by']);
+
+    $categories['graphql'] = [
+      'title' => $this->t('GraphQL'),
+      'column' => 'second',
+      'build' => [
+        '#weight' => -10,
+      ],
+    ];
+
+    $options['graphql_query_name'] = [
+      'category' => 'graphql',
+      'title' => $this->t('Query name'),
+      'value' => views_ui_truncate($this->getGraphQLQueryName(), 24),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    switch ($form_state->get('section')) {
+      case 'graphql_query_name':
+        $form['#title'] .= $this->t('Query name');
+        $form['graphql_query_name'] = [
+          '#type' => 'textfield',
+          '#description' => $this->t('This will be the graphQL query name.'),
+          '#default_value' => $this->getGraphQLQueryName(),
+        ];
+        break;
+     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::submitOptionsForm($form, $form_state);
+    $section = $form_state->get('section');
+    switch ($section) {
+      case 'graphql_query_name':
+        $this->setOption($section, $form_state->getValue($section));
+        break;
+    }
   }
 
   /**
