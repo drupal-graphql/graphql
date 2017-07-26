@@ -82,7 +82,7 @@ class ContentEntitySchemaConfig {
 
     list($type, $mode) = explode('.', $viewMode);
 
-    return $viewMode !== '__none__' ? $mode : FALSE;
+    return $mode;
 
   }
 
