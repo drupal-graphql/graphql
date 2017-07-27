@@ -131,7 +131,21 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     // If the view is not paged, it's simply a list of rows. Since these are
     // entities, they should implement CacheableDependencyInterface anyways.
     if (!$this->getPluginDefinition()['paged']) {
-      return parent::getCacheDependencies($result, $value, $args);
+      $dependencies = parent::getCacheDependencies($result, $value, $args);
+
+      // We still have to add the executable view as a dependency, otherwise
+      // the cache will not be invalidated when new entities are created.
+      // Also, the view may have custom cache tags, which we should really keep.
+      $storage = $this->entityTypeManager->getStorage('view');
+      $definition = $this->getPluginDefinition();
+      if ($view = $storage->load($definition['view'])) {
+        /** @var \Drupal\Views\ViewExecutable $executable */
+        $executable = $view->getExecutable();
+        $metadata = new CacheableMetadata();
+        $metadata->setCacheTags($executable->getCacheTags());
+        $dependencies[] = $metadata;
+      }
+      return $dependencies;
     }
 
     /** @var \Drupal\Views\ViewExecutable $executable */
@@ -139,7 +153,7 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     $metadata = new CacheableMetadata();
     $metadata->setCacheTags($executable->getCacheTags());
 
-    return $metadata;
+    return [$metadata];
   }
 
 }
