@@ -155,8 +155,8 @@ class RequestController implements ContainerInjectionInterface {
 
       // Make sure we remove the 'queries' parameter, otherwise the subsequent
       // request could trigger the batch processing again.
-      $parameters = array_merge($requestParameters, $query);
-      $content = $method === 'POST' ? array_merge($query, $requestContent) : FALSE;
+      $parameters = array_merge((array) $requestParameters, (array) $query);
+      $content = $method === 'POST' ? array_merge((array) $query, (array) $requestContent) : FALSE;
       $content = $content ? json_encode($content) : '';
       $graphqlUrl = Url::fromUri('internal:/graphql')->toString(TRUE)->getGeneratedUrl();
 
