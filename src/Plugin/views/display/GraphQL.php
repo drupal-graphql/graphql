@@ -104,9 +104,7 @@ class GraphQL extends DisplayPluginBase {
     if (empty($graphql_query_name)) {
       $viewId = $this->view->id();
       $displayId = $this->display['id'];
-      // @todo: fix PHP fatal when graphql_core is not installed.
-      // fix: move this GraphQL display plugin under graphql_views module.
-      $graphql_query_name = graphql_core_camelcase([$viewId, $displayId, 'view']);
+      $graphql_query_name = graphql_camelcase([$viewId, $displayId, 'view']);
     }
     return lcfirst($graphql_query_name);
   }

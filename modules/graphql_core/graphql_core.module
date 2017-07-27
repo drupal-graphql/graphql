@@ -16,30 +16,21 @@ define('GRAPHQL_CORE_ENUM_PLUGIN', 'enum');
 /**
  * Turn a list of machine names into a camel-cased string.
  *
- * @param string[]|string $components
- *   Name components to be concatenated.
- *
- * @return string
- *   A camel-cased concatenation of the input components.
+ * @deprecated in graphql 3.x and will be removed before 3.0-alpha2.
+ *   Use graphql_camelcase() instead.
  */
 function graphql_core_camelcase($components) {
-  $components = is_array($components) ? implode('_', $components) : $components;
-  $components = preg_split('/[^a-zA-Z0-9]/', $components);
-
-  return implode('', array_map('ucfirst', $components));
+  return graphql_camelcase($components);
 }
 
 /**
  * Turn a list of machine names into a property-cased string.
  *
- * @param string[]|string $components
- *   Name components to be concatenated.
- *
- * @return string
- *   A camel-cased concatenation of the input components.
+ * @deprecated in graphql 3.x and will be removed before 3.0-alpha2.
+ *   Use graphql_propcase() instead.
  */
 function graphql_core_propcase($components) {
-  return lcfirst(graphql_core_camelcase($components));
+  return graphql_propcase($components);
 }
 
 /**
