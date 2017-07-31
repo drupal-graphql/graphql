@@ -28,7 +28,6 @@ class TypeMapper {
    *   Drupal column type.
    *
    * @return string
-   * @throws \Drupal\graphql_content\Plugin\Deriver\TypeMappingNotFoundException
    */
   public function typedDataToGraphQLFieldType($typedDataType) {
     foreach ($this->typeMap as $graphQlType => $typedDataTypes) {

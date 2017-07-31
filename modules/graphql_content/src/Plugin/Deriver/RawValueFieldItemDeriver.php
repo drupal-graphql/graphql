@@ -4,6 +4,7 @@ namespace Drupal\graphql_content\Plugin\Deriver;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Drupal\graphql_content\TypeMapper;
@@ -56,48 +57,22 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDerivativeDefinitions($basePluginDefinition) {
-    $this->derivatives = [];
+  protected function getDefinitions($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
+    $fieldName = $storage->getName();
+    $dataType = RawValueFieldType::getId($entityType, $fieldName);
 
-    /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays */
-    $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadMultiple();
-
-    foreach ($displays as $display) {
-      $entityType = $display->getTargetEntityTypeId();
-      $bundle = $display->getTargetBundle();
-
-      if ($this->config->getExposedViewMode($entityType, $bundle) != $display->getMode()) {
-        continue;
-      }
-
-      $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
-
-      foreach ($display->getComponents() as $fieldName => $component) {
-        if (isset($component['type']) && $component['type'] === $basePluginDefinition['field_formatter']) {
-          $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
-          if ($storage) {
-            // Object type in GraphQL, eg. NodeBodyRawValue.
-            $dataType = RawValueFieldType::getId($entityType, $fieldName);
-
-            // Add the subfields, eg. value, summary.
-            foreach ($storage->getSchema()['columns'] as $columnName => $schema) {
-              $this->derivatives["{$entityType}-$fieldName-$columnName"] = [
-                  'name' => graphql_core_propcase($columnName),
-                  'schema_column' => $columnName,
-                  'multi' => FALSE,
-                  'type' => $this->typeMapper->typedDataToGraphQLFieldType($schema['type']),
-                  'types' => [$dataType],
-                ] + $basePluginDefinition;
-            }
-          }
-        }
-      }
+    // Add the subfields, eg. value, summary.
+    $definitions = [];
+    foreach ($storage->getSchema()['columns'] as $columnName => $schema) {
+      $definitions["$entityType-$fieldName-$columnName"] = [
+        'name' => graphql_core_propcase($columnName),
+        'schema_column' => $columnName,
+        'multi' => FALSE,
+        'type' => $this->typeMapper->typedDataToGraphQLFieldType($schema['type']),
+        'types' => [$dataType],
+      ];
     }
 
-    return $this->derivatives;
+    return $definitions;
   }
-
 }
