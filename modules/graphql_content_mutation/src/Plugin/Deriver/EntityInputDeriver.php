@@ -79,7 +79,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
 
           // Skip this field input type if it's a single value field.
           if (count($propertyDefinitions) == 1 && array_keys($propertyDefinitions)[0] === $fieldStorage->getMainPropertyName()) {
-            $type = "String";
+            $type = 'String';
           }
 
           $fields[graphql_core_propcase($fieldName)] = [
