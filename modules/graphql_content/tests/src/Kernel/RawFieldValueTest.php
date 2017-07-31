@@ -108,11 +108,6 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $values = [
       'title' => 'Test',
       'type' => 'test',
-      'body' => [
-        'value' => 'test',
-        'format' => filter_default_format(),
-        'summary' => 'test summary',
-      ],
     ];
     $node = $this->createNode($values + $actualFieldValues);
 
@@ -120,11 +115,8 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'path' => '/node/' . $node->id(),
     ]);
     $resultNode = NestedArray::getValue($result, ['data', 'route', 'entity']);
-    $expected = [
-      'body' => $values['body'],
-    ] + $expectedFieldValues;
 
-    $this->assertEquals($expected, $resultNode, 'Correct raw node values are returned.');
+    $this->assertEquals($expectedFieldValues, $resultNode, 'Correct raw node values are returned.');
   }
 
   /**
@@ -134,6 +126,10 @@ class RawFieldValueTest extends GraphQLFileTestBase {
    */
   public function nodeValuesProvider() {
     $fieldValues = [
+      'body' => [
+        'value' => 'test',
+        'summary' => 'test summary',
+      ],
       'field_text' => ['a', 'b', 'c'],
       'field_boolean' => [TRUE, FALSE],
       'field_link' => [
@@ -150,6 +146,10 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     ];
 
     $expected = [
+      'body' => [
+        'value' => 'test',
+        'summary' => 'test summary',
+      ],
       'fieldText' => [
         ['value' => 'a'],
         ['value' => 'b'],

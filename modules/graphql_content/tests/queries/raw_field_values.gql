@@ -2,6 +2,10 @@ query ($path: String!) {
   route:route(path: $path) {
     entity {
       ... on NodeTest {
+        body {
+          value
+          summary
+        }
         fieldText {
           value
         }
@@ -32,11 +36,6 @@ query ($path: String!) {
         }
         fieldString {
           value
-        }
-        body {
-          value
-          format
-          summary
         }
       }
     }
