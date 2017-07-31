@@ -13,7 +13,7 @@ use Drupal\graphql_content\GraphQLFieldFormatterBase;
  *
  * @FieldFormatter(
  *   id = "graphql_raw_value",
- *   label = @Translation("Raw value (GraphQL use only)"),
+ *   label = @Translation("GraphQL Raw value"),
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFormatterDeriver"
  * )
  */
