@@ -11,6 +11,7 @@ use Drupal\graphql_core\GraphQL\Traits\PluginTrait;
 use Drupal\graphql_core\GraphQLPluginInterface;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Youshido\GraphQL\Config\Field\FieldConfig;
+use Youshido\GraphQL\Execution\DeferredResolver;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Field\AbstractField;
 
@@ -27,7 +28,32 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveInfo $info) {
+    if ($this instanceof BatchedFieldInterface) {
+      $promise = $this->getBatchedFieldResolver()->enqueue($this, $value, $args);
+      return new DeferredResolver(function () use ($promise, $args, $info) {
+        $value = $this->getBatchedFieldResolver()->resolve($promise);
+        $result = iterator_to_array($this->resolveValues($value, $args, $info));
+        return $this->cacheable($result, $value, $args);
+      });
+    }
     $result = iterator_to_array($this->resolveValues($value, $args, $info));
+    return $this->cacheable($result, $value, $args);
+  }
+
+  /**
+   * Wrap the result in a CacheableValue.
+   *
+   * @param mixed $result
+   *   The field result.
+   * @param mixed $value
+   *   The parent value.
+   * @param array $args
+   *   The field arguments.
+   *
+   * @return CacheableValue
+   *   The cacheable value.
+   */
+  protected function cacheable($result, $value, array $args) {
     if ($this->getPluginDefinition()['multi']) {
       return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
     }
