@@ -118,19 +118,25 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
     foreach ($displays as $display) {
       $entityType = $display->getTargetEntityTypeId();
       $bundle = $display->getTargetBundle();
+
+      if ($this->config->getExposedViewMode($entityType, $bundle) != $display->getMode()) {
+        continue;
+      }
+
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
 
       foreach ($display->getComponents() as $fieldName => $component) {
-        if ($this->config->getExposedViewMode($entityType, $bundle) != $display->getMode()) {
-          continue;
-        }
         if (isset($component['type']) && $component['type'] === $basePluginDefinition['field_formatter']) {
           $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
           /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
           $id = implode('-', [$entityType, $bundle, $storage->getName()]);
-          $this->derivatives[$id] = [
-            'id' => implode('-', [$entityType, $bundle, $storage->getName()]),
-          ] + $this->getDefinition($entityType, $bundle, $component, $storage) + $basePluginDefinition;
+
+          $definition = $this->getDefinition($entityType, $bundle, $component, $storage) + $basePluginDefinition;
+          if ($definition) {
+            $this->derivatives[$id] = [
+              'id' => implode('-', [$entityType, $bundle, $storage->getName()]),
+            ] + $definition;
+          }
         }
       }
     }
