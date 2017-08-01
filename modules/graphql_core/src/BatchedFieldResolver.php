@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core;
 
 use Drupal\graphql_core\GraphQL\BatchedFieldInterface;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Queueing service for deferred field resolution.
@@ -25,15 +26,18 @@ class BatchedFieldResolver {
    *   The parent value.
    * @param array $args
    *   The arguments it has been invoked with.
+   * @param ResolveInfo $info
+   *   The graphql resolve info object.
    *
    * @return \Drupal\graphql_core\BatchedFieldResult
    *   A lazily evaluated batched field result.
    */
-  public function add(BatchedFieldInterface $batchedField, $value, array $args) {
-    $buffer = $batchedField->getBatchId($value, $args);
+  public function add(BatchedFieldInterface $batchedField, $value, array $args, ResolveInfo $info) {
+    $buffer = $batchedField->getBatchId($value, $args, $info);
     $this->buffers[$buffer][] = [
       'parent' => $value,
       'arguments' => $args,
+      'info' => $info,
       'field' => $batchedField,
     ];
     return new BatchedFieldResult($this, $buffer, max(array_keys($this->buffers[$buffer])));
