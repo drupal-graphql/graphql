@@ -25,6 +25,29 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   use ArgumentAwarePluginTrait;
 
   /**
+   * Dummy implementation for `getBatchId` in `BatchedFieldInterface`.
+   *
+   * This provides an empty implementation of `getBatchId` in case the subclass
+   * implements `BatchedFieldInterface`. In may cases this will suffice since
+   * the batches are already grouped by the class implementing `resolveBatch`.
+   * `getBatchId` is only necessary for cases where batch grouping depends on
+   * runtime arguments.
+   *
+   * @param mixed $parent
+   *   The parent value in the result tree.
+   * @param array $arguments
+   *   The list of arguments.
+   * @param ResolveInfo $info
+   *   The graphql resolve info object.
+   *
+   * @return string
+   *   The batch key.
+   */
+  public function getBatchId($parent, array $arguments, ResolveInfo $info) {
+    return '';
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveInfo $info) {

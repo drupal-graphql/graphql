@@ -11,11 +11,37 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 class BatchedFieldResolver {
 
   /**
+   * Maps classes to the parent class that implements `resolveBatch`.
+   *
+   * Use to guarantee that two different implementations of `resolveBatch` are
+   * never grouped into one batch.
+   *
+   * @var string[]
+   */
+  protected $implementationMap = [];
+
+  /**
    * The queues of field evaluation requests.
    *
    * @var array
    */
   protected $buffers;
+
+  /**
+   * Retrieve the parent class implementing `resolveBatched`.
+   *
+   * @return string
+   *   The parent class name.
+   */
+  protected function getImplementingClass(BatchedFieldInterface $field) {
+    $class = get_class($field);
+    if (!array_key_exists($class, $this->implementationMap)) {
+      $reflection = new \ReflectionClass($field);
+      $method = $reflection->getMethod('resolveBatch');
+      $this->implementationMap[$class] = $method->class;
+    }
+    return $this->implementationMap[$class];
+  }
 
   /**
    * Add a new field evaluation to a buffer.
@@ -33,7 +59,7 @@ class BatchedFieldResolver {
    *   A lazily evaluated batched field result.
    */
   public function add(BatchedFieldInterface $batchedField, $value, array $args, ResolveInfo $info) {
-    $buffer = $batchedField->getBatchId($value, $args, $info);
+    $buffer = $this->getImplementingClass($batchedField) . ':' . $batchedField->getBatchId($value, $args, $info);
     $this->buffers[$buffer][] = [
       'parent' => $value,
       'arguments' => $args,

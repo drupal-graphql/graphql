@@ -45,13 +45,6 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
   /**
    * {@inheritdoc}
    */
-  public function getBatchId($parent, array $arguments, ResolveInfo $info) {
-    return 'users';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getBatchedFieldResolver() {
     return $this->batchedFieldResolver;
   }
