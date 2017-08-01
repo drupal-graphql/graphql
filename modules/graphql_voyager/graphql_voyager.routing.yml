@@ -2,6 +2,7 @@ graphql_voyager.voyager:
   path: '/graphql/voyager'
   defaults:
     _controller: '\Drupal\graphql_voyager\Controller\VoyagerController::viewExplorer'
+    _title: 'GraphQL Voyager'
   options:
     _admin_route: TRUE
   requirements:
