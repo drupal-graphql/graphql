@@ -41,7 +41,7 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
         $dataType = $context->getContextDefinition()->getDataType();
 
         $this->derivatives[$id] = [
-          'name' => graphql_core_propcase($id) . 'Context',
+          'name' => graphql_propcase($id) . 'Context',
           'context_id' => $id,
           'nullable' => TRUE,
           'multi' => FALSE,

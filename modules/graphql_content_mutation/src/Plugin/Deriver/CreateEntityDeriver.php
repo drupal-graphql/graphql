@@ -56,10 +56,10 @@ class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
         $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => 'create' . graphql_core_camelcase([$entityTypeId, $bundleName]),
+          'name' => 'create' . graphql_camelcase([$entityTypeId, $bundleName]),
           'arguments' => [
             'input' => [
-              'type' => graphql_core_camelcase([$entityTypeId, $bundleName]) . 'Input',
+              'type' => graphql_camelcase([$entityTypeId, $bundleName]) . 'Input',
               'nullable' => FALSE,
               'multi' => FALSE,
             ],

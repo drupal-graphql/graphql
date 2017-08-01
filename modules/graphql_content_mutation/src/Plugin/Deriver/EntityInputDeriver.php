@@ -72,7 +72,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             continue;
           }
 
-          $type = graphql_core_camelcase([$entityTypeId, $fieldName]) . 'FieldInput';
+          $type = graphql_camelcase([$entityTypeId, $fieldName]) . 'FieldInput';
 
           $fieldStorage = $field->getFieldStorageDefinition();
           $propertyDefinitions = $fieldStorage->getPropertyDefinitions();
@@ -82,7 +82,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             $type = 'String';
           }
 
-          $fields[graphql_core_propcase($fieldName)] = [
+          $fields[graphql_propcase($fieldName)] = [
             'type' => $type,
             'nullable' => !$field->isRequired(),
             'multi' => $field->getFieldStorageDefinition()->isMultiple(),
@@ -91,7 +91,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
         }
 
         $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => graphql_core_camelcase([$entityTypeId, $bundleName]) . 'Input',
+          'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'Input',
           'fields' => $fields,
           'entity_type' => $entityTypeId,
           'entity_bundle' => $bundleName,

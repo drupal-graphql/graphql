@@ -81,9 +81,9 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
             continue;
           }
           $this->derivatives[$typeId . '-' . $bundle] = [
-            'name' => graphql_core_camelcase([$typeId, $bundle]),
+            'name' => graphql_camelcase([$typeId, $bundle]),
             'entity_type' => $typeId,
-            'interfaces' => [graphql_core_camelcase($typeId)],
+            'interfaces' => [graphql_camelcase($typeId)],
             'bundle' => $bundle,
           ] + $basePluginDefinition;
         }

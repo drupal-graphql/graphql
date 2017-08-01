@@ -56,7 +56,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_core_propcase($id) . 'Query',
+          'name' => graphql_propcase($id) . 'Query',
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -72,7 +72,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,
-            'type' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
+            'type' => graphql_camelcase([$id, 'query', 'filter', 'input']),
           ];
         }
 

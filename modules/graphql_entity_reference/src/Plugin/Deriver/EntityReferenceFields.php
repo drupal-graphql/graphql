@@ -15,7 +15,7 @@ class EntityReferenceFields extends FieldFormatterDeriver {
    */
   protected function getDefinition($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
     return [
-      'type' => graphql_core_camelcase($storage->getSetting('target_type')),
+      'type' => graphql_camelcase($storage->getSetting('target_type')),
     ] + parent::getDefinition($entityType, $bundle, $displayOptions, $storage);
   }
 
