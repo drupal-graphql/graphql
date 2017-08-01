@@ -8,10 +8,16 @@ use Drupal\graphql_core\GraphQL\BatchedFieldInterface;
  * Queueing service for deferred field resolution.
  */
 class BatchedFieldResolver {
-  protected $queue;
 
   /**
-   * Add a new field evaluation to the queue.
+   * The queues of field evaluation requests.
+   *
+   * @var array
+   */
+  protected $buffers;
+
+  /**
+   * Add a new field evaluation to a buffer.
    *
    * @param \Drupal\graphql_core\GraphQL\BatchedFieldInterface $batchedField
    *   The field instance.
@@ -20,43 +26,46 @@ class BatchedFieldResolver {
    * @param array $args
    *   The arguments it has been invoked with.
    *
-   * @return array
-   *   A ticket that has to be used to retrieve the evaluation result.
+   * @return \Drupal\graphql_core\BatchedFieldResult
+   *   A lazily evaluated batched field result.
    */
-  public function enqueue(BatchedFieldInterface $batchedField, $value, array $args) {
-    $id = $batchedField->getBatchId($value, $args);
-    $this->queue[$id][] = [
+  public function add(BatchedFieldInterface $batchedField, $value, array $args) {
+    $buffer = $batchedField->getBatchId($value, $args);
+    $this->buffers[$buffer][] = [
       'parent' => $value,
       'arguments' => $args,
       'field' => $batchedField,
     ];
-    return [$id, max(array_keys($this->queue[$id]))];
+    return new BatchedFieldResult($this, $buffer, max(array_keys($this->buffers[$buffer])));
   }
 
   /**
    * Retrieve a result for a specific ticket.
    *
-   * @param array $key
-   *   The deferred evaluation ticket.
+   * @param string $buffer
+   *   The batch queue.
+   * @param string $item
+   *   The batch item identifier.
    *
    * @return mixed
    *   The evaluation result.
    *
    * @throws \Exception
-   *   In case the ticket is not valid any more.
+   *   In case the batch item is not valid any more.
    */
-  public function resolve(array $key) {
-    list($id, $item) = $key;
-    if (!array_key_exists($id, $this->queue) || !array_key_exists($item, $this->queue[$id])) {
-      throw new \Exception("Requesting unregistered batched result: " . serialize($key));
+  public function resolve($buffer, $item) {
+    if (!array_key_exists($buffer, $this->buffers) || !array_key_exists($item, $this->buffers[$buffer])) {
+      throw new \Exception(sprintf("Requesting unregistered batched result: %s[%s].", $buffer, $item));
     }
-    if (!array_key_exists('result', $this->queue[$id][$item])) {
-      foreach ($this->queue[$id][$item]['field']->prepareBatch($this->queue[$id]) as $index => $result) {
-        $this->queue[$id][$index]['result'] = $result;
+
+    if (!array_key_exists('result', $this->buffers[$buffer][$item])) {
+      foreach ($this->buffers[$buffer][$item]['field']->resolveBatch($this->buffers[$buffer]) as $index => $result) {
+        $this->buffers[$buffer][$index]['result'] = $result;
       }
     }
-    $result = $this->queue[$id][$item]['result'];
-    unset($this->queue[$id][$item]);
+
+    $result = $this->buffers[$buffer][$item]['result'];
+    unset($this->buffers[$buffer][$item]);
     return $result;
   }
 

@@ -29,10 +29,9 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    */
   public function resolve($value, array $args, ResolveInfo $info) {
     if ($this instanceof BatchedFieldInterface) {
-      $promise = $this->getBatchedFieldResolver()->enqueue($this, $value, $args);
-      return new DeferredResolver(function () use ($promise, $args, $info) {
-        $value = $this->getBatchedFieldResolver()->resolve($promise);
-        $result = iterator_to_array($this->resolveValues($value, $args, $info));
+      $result = $this->getBatchedFieldResolver()->add($this, $value, $args);
+      return new DeferredResolver(function () use ($result, $args, $info, $value) {
+        $result = iterator_to_array($this->resolveValues($result(), $args, $info));
         return $this->cacheable($result, $value, $args);
       });
     }

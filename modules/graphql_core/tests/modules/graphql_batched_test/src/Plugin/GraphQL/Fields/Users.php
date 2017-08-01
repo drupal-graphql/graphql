@@ -46,7 +46,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
    * {@inheritdoc}
    */
   public function getBatchId($parent, array $arguments) {
-    return "users";
+    return 'users';
   }
 
   /**
@@ -59,7 +59,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
   /**
    * {@inheritdoc}
    */
-  public function prepareBatch(array $batch) {
+  public function resolveBatch(array $batch) {
     // Turn the list of method arguments into a list of user requirements.
     $resultMap = array_map(function ($item) {
       return $this->getRequirementsFromArgs($item['parent'], $item['arguments']);
@@ -80,7 +80,6 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
         return $users[$uid];
       }, $item);
     }, $resultMap);
-
   }
 
   /**
@@ -101,9 +100,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
         isset($parent['foe']) ? [$parent['foe']] : []
       );
     }
-    else {
-      return array_key_exists('uids', $arguments) ? $arguments['uids'] : [];
-    }
+    return array_key_exists('uids', $arguments) ? $arguments['uids'] : [];
   }
 
   /**

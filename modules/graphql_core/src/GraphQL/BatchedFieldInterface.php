@@ -31,7 +31,7 @@ interface BatchedFieldInterface {
   public function getBatchId($parent, array $arguments);
 
   /**
-   * Prepare multiple field values at once.
+   * Resolve multiple field values at once.
    *
    * The `$batch` input argument is a list of associative arrays with "value"
    * and "arguments", reflecting the parent value and argument parameters
@@ -43,6 +43,6 @@ interface BatchedFieldInterface {
    * @return array
    *   The prepared values for each batch item.
    */
-  public function prepareBatch(array $batch);
+  public function resolveBatch(array $batch);
 
 }
