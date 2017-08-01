@@ -55,5 +55,5 @@ function graphql_camelcase($components) {
  *   A camel-cased concatenation of the input components.
  */
 function graphql_propcase($components) {
-  return lcfirst(graphql_core_camelcase($components));
+  return lcfirst(graphql_camelcase($components));
 }
