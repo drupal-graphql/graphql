@@ -23,7 +23,7 @@ trait EntityTypeResolverTrait {
    */
   public function resolveEntityType(GraphQLSchemaManagerInterface $schemaManager, $entity) {
     if ($entity instanceof EntityInterface) {
-      $type = graphql_core_camelcase([$entity->getEntityTypeId(), $entity->bundle()]);
+      $type = graphql_camelcase([$entity->getEntityTypeId(), $entity->bundle()]);
       try {
         return $schemaManager->findByName($type, [GRAPHQL_CORE_TYPE_PLUGIN]);
       }

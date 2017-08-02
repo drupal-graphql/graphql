@@ -80,7 +80,7 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
             continue;
           }
 
-          $properties[graphql_core_propcase($propertyName)] = [
+          $properties[graphql_propcase($propertyName)] = [
             'type' => 'String',
             'nullable' => !$propertyDefinition->isRequired(),
             'multi' => $propertyDefinition->isList(),
@@ -89,7 +89,7 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
         }
 
         $this->derivatives["$entityTypeId:$fieldName"] = [
-          'name' => graphql_core_camelcase([$entityTypeId, $fieldName]) . 'FieldInput',
+          'name' => graphql_camelcase([$entityTypeId, $fieldName]) . 'FieldInput',
           'fields' => $properties,
           'entity_type' => $entityTypeId,
           'field_name' => $fieldName,

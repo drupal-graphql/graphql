@@ -28,3 +28,32 @@ EOT;
 
   return $help;
 }
+
+/**
+ * Turn a list of machine names into a camel-cased string.
+ *
+ * @param string[]|string $components
+ *   Name components to be concatenated.
+ *
+ * @return string
+ *   A camel-cased concatenation of the input components.
+ */
+function graphql_camelcase($components) {
+  $components = is_array($components) ? implode('_', $components) : $components;
+  $components = preg_split('/[^a-zA-Z0-9]/', $components);
+
+  return implode('', array_map('ucfirst', $components));
+}
+
+/**
+ * Turn a list of machine names into a property-cased string.
+ *
+ * @param string[]|string $components
+ *   Name components to be concatenated.
+ *
+ * @return string
+ *   A camel-cased concatenation of the input components.
+ */
+function graphql_propcase($components) {
+  return lcfirst(graphql_camelcase($components));
+}

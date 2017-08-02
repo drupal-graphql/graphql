@@ -35,7 +35,7 @@ class ViewResultTypeDeriver extends ViewDeriverBase {
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => graphql_core_camelcase($id),
+        'name' => graphql_camelcase($id),
         'view' => $viewId,
         'display' => $displayId,
       ] + $basePluginDefinition;

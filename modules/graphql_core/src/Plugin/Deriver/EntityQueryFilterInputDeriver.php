@@ -57,7 +57,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
+          'name' => graphql_camelcase([$id, 'query', 'filter', 'input']),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -76,7 +76,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
 
         // Add all queryable properties as fields.
         foreach ($queryableProperties as $key => $property) {
-          $fieldName = graphql_core_propcase($key);
+          $fieldName = graphql_propcase($key);
 
           // Some field types don't have a main property.
           if (!$mainProperty = $property->getMainPropertyName()) {
