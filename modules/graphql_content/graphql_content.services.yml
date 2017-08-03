@@ -1,5 +1,21 @@
+parameters:
+  graphql_content.type_map:
+    String:
+      - text
+      - varchar
+      - varchar_ascii
+      - blob
+    Int:
+      - int
+    Float:
+      - numeric
+      - float
+
 services:
   graphql_content.schema_config:
     class: Drupal\graphql_content\ContentEntitySchemaConfig
     arguments:
       - '@config.factory'
+  graphql_content.type_mapper:
+    class: Drupal\graphql_content\TypeMapper
+    arguments: ['%graphql_content.type_map%']

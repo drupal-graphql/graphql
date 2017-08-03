@@ -107,6 +107,32 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   }
 
   /**
+   * Provide an array of plugin definition values from field storage and display
+   * options.
+   *
+   * @param string $entityType
+   *   The host entity type.
+   * @param string $bundle
+   *   The host entity bundle.
+   * @param array $displayOptions
+   *   Array of display options.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface|null $storage
+   *   Field storage definition object.
+   *
+   * @return array
+   *   An array of plugin definition arrays.
+   */
+  protected function getDefinitions($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
+    if ($definition = $this->getDefinition($entityType, $bundle, $displayOptions, $storage)) {
+      $id = implode('-', [$entityType, $bundle, $storage->getName()]);
+      return [$id => $definition + [
+        'id' => $id,
+      ]];
+    }
+
+    return [];
+  }
+  /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
@@ -114,28 +140,35 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
 
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays */
     $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadMultiple();
-
     foreach ($displays as $display) {
       $entityType = $display->getTargetEntityTypeId();
       $bundle = $display->getTargetBundle();
-      $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
 
+      if ($this->config->getExposedViewMode($entityType, $bundle) !== $display->getMode()) {
+        continue;
+      }
+
+      $storages = $this->entityFieldManager->getFieldStorageDefinitions($entityType);
       foreach ($display->getComponents() as $fieldName => $component) {
-        if ($this->config->getExposedViewMode($entityType, $bundle) != $display->getMode()) {
+        if (!isset($component['type']) || $component['type'] !== $basePluginDefinition['field_formatter']) {
           continue;
         }
-        if (isset($component['type']) && $component['type'] === $basePluginDefinition['field_formatter']) {
-          $storage = array_key_exists($fieldName, $storages) ? $storages[$fieldName] : NULL;
-          /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
-          $id = implode('-', [$entityType, $bundle, $storage->getName()]);
-          $this->derivatives[$id] = [
-            'id' => implode('-', [$entityType, $bundle, $storage->getName()]),
-          ] + $this->getDefinition($entityType, $bundle, $component, $storage) + $basePluginDefinition;
+
+        if (!array_key_exists($fieldName, $storages)) {
+          continue;
+        }
+
+        /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $storage */
+        $storage = $storages[$fieldName];
+        if ($definitions = $this->getDefinitions($entityType, $bundle, $component, $storage)) {
+          foreach ($definitions as $id => $definition) {
+            $this->derivatives[$id] = $definition + $basePluginDefinition;
+          }
         }
       }
     }
 
-    return parent::getDerivativeDefinitions($basePluginDefinition);
+    return $this->derivatives;
   }
 
 }

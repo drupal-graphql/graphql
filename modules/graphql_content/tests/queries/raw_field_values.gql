@@ -1,0 +1,43 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    entity {
+      ... on NodeTest {
+        body {
+          value
+          summary
+        }
+        fieldText {
+          value
+        }
+        fieldBoolean {
+          value
+        }
+        fieldLink {
+          title
+          uri
+        }
+        fieldInteger {
+          value
+        }
+        fieldFloat {
+          value
+        }
+        fieldDecimal {
+          value
+        }
+        fieldDatetime {
+          value
+        }
+        fieldTimestamp {
+          value
+        }
+        fieldEmail {
+          value
+        }
+        fieldString {
+          value
+        }
+      }
+    }
+  }
+}
