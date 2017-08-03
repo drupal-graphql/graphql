@@ -63,12 +63,18 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
 
     // Add the subfields, eg. value, summary.
     $definitions = [];
-    foreach ($storage->getSchema()['columns'] as $columnName => $schema) {
-      $definitions["$entityType-$fieldName-$columnName"] = [
-        'name' => graphql_core_propcase($columnName),
-        'schema_column' => $columnName,
+
+    foreach ($storage->getPropertyDefinitions() as $property => $definition) {
+      if ($definition['type'] == 'map') {
+        continue;
+        // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
+      }
+
+      $definitions["$entityType-$fieldName-$property"] = [
+        'name' => graphql_core_propcase($property),
+        'property' => $property,
         'multi' => FALSE,
-        'type' => $this->typeMapper->typedDataToGraphQLFieldType($schema['type']),
+        'type' => $this->typeMapper->typedDataToGraphQLFieldType($definition['type']),
         'types' => [$dataType],
       ];
     }
