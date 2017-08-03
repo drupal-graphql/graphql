@@ -12,7 +12,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "raw_field",
  *   nullable = true,
- *   weight = -1,
  *   type = "String",
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFieldDeriver",
  *   field_formatter = "graphql_raw_value"
