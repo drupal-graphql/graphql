@@ -31,14 +31,12 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
     if ($this->getPluginDefinition()['multi']) {
       return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
     }
-    else {
-      if ($result) {
-        return new CacheableValue(reset($result), $this->getCacheDependencies($result, $value, $args));
-      }
-      else {
-        return new CacheableValue(NULL, $this->getCacheDependencies($result, $value, $args));
-      }
+
+    if ($result) {
+      return new CacheableValue(reset($result), $this->getCacheDependencies($result, $value, $args));
     }
+
+    return new CacheableValue(NULL, $this->getCacheDependencies($result, $value, $args));
   }
 
   /**
@@ -56,7 +54,7 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    */
   protected function getCacheDependencies($result, $parent, array $args) {
     // Default implementation just returns the value itself.
-    return $this->getPluginDefinition()['multi'] ? $result : [$result];
+    return $result;
   }
 
   /**
