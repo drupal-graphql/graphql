@@ -26,6 +26,13 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function resolve($value, array $args, ResolveInfo $info) {
     $result = iterator_to_array($this->resolveValues($value, $args, $info));
     if ($this->getPluginDefinition()['multi']) {
