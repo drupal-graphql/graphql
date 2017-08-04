@@ -52,7 +52,7 @@ trait PluginTrait {
    * @param mixed $pluginDefinition
    *   The plugin implementation definition.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+  public function constructPlugin(array $configuration, $pluginId, $pluginDefinition) {
     $this->configuration = $configuration;
     $this->pluginId = $pluginId;
     $this->pluginDefinition = $pluginDefinition;

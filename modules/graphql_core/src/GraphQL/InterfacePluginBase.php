@@ -24,6 +24,13 @@ abstract class InterfacePluginBase extends AbstractInterfaceType implements Grap
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(GraphQLSchemaManagerInterface $schemaManager) {
     $this->config = new InterfaceTypeConfig([
       'name' => $this->buildName(),

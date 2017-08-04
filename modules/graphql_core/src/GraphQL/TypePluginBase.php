@@ -25,6 +25,13 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(GraphQLSchemaManagerInterface $schemaManager) {
     $this->config = new ObjectTypeConfig([
       'name' => $this->buildName(),
