@@ -39,7 +39,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       }
 
       $fields = array_map(function ($filter) use ($basePluginDefinition) {
-        if (count($filter['value']) && is_string( array_keys($filter['value'])[0] )) {
+        if ( $this->isGenericInputFilter($filter) ) {
           return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
         } else {
           return [
@@ -60,6 +60,19 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);
+  }
+
+
+  public function isGenericInputFilter($filter) {
+    if (!is_array($filter['value'])) {
+      return false;
+    }
+
+    if (count($filter['value']) == 0) {
+      return false;
+    }
+
+    return is_string( array_keys($filter['value'] )[0] );
   }
 
 
