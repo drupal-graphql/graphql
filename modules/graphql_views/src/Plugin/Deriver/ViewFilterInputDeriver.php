@@ -38,12 +38,16 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
         continue;
       }
 
-      $fields = array_map(function ($filter) {
-        return [
-          'type' => 'String',
-          'nullable' => TRUE,
-          'multi' => $filter['expose']['multiple'],
-        ];
+      $fields = array_map(function ($filter) use ($basePluginDefinition) {
+        if (count($filter['value']) && is_string( array_keys($filter['value'])[0] )) {
+          return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
+        } else {
+          return [
+            'type' => 'String',
+            'nullable' => TRUE,
+            'multi' => $filter['expose']['multiple'],
+          ];
+        }
       }, $filters);
 
       $this->derivatives[$id] = [
@@ -56,6 +60,45 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);
+  }
+
+
+  public function createGenericInputFilterDefinition($filter, $basePluginDefinition) {
+
+    $filterId = $filter['expose']['identifier'];
+
+    $id = implode('_', [
+      $filter['expose']['multiple'] ? $filterId : $filterId . '_multi',
+      'view',
+      'filter',
+      'input'
+    ]);
+
+    $fields = [];
+    foreach ($filter['value'] as $fieldKey => $fieldDefaultValue) {
+      $fields[ $fieldKey ] = [
+        'type' => 'String',
+        'nullable' => TRUE,
+        'multi' => FALSE,
+      ];
+    }
+
+
+    $genericInputFilter = [
+      'id' => $id,
+      'name' => graphql_core_camelcase($id),
+      'fields' => $fields,
+      'view' => $viewId,
+      'display' => $displayId,
+    ] + $basePluginDefinition;
+
+    $this->derivatives[$id] = $genericInputFilter;
+
+    return [
+      'type' => $genericInputFilter['name'],
+      'nullable' => TRUE,
+      'multi' => $filter['expose']['multiple'],
+    ];
   }
 
 }
