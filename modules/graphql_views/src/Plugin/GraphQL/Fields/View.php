@@ -101,8 +101,12 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       // If some filters are missing from the input, set them to an empty string
       // explicitly. Otherwise views module generates "Undefined index" notice.
       $filters = $executable->getDisplay()->getOption('filters');
-      foreach (array_keys($filters) as $filter) {
-        $input[$filter] = isset($args['filter'][$filter]) ? $args['filter'][$filter] : '';
+      foreach ($filters as $filterKey => $filterRow) {
+        if (!isset($args['filter'][$filterKey])) {
+          $input[$filterKey] = $filterRow['value'];
+        } else {
+          $input[$filterKey] = $args['filter'][$filterKey];
+        }
       }
 
       $executable->setExposedInput($input);
