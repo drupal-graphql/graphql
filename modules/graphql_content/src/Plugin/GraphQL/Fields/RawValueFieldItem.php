@@ -29,14 +29,16 @@ class RawValueFieldItem extends FieldPluginBase {
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof FieldItemBase) {
-      $column = $this->getPluginDefinition()['schema_column'];
+      $definition = $this->getPluginDefinition();
+      $column = $definition['schema_column'];
+      $type = $definition['type'];
       $item = $value->getValue();
       $result = $item[$column];
 
-      if ($value instanceof BooleanItem || $value instanceof IntegerItem || $value instanceof TimestampItem) {
+      if ($type == 'Int') {
         $result = (int) $result;
       }
-      elseif ($value instanceof FloatItem || $value instanceof DecimalItem) {
+      elseif ($type == 'Float') {
         $result = (float) $result;
       }
 

@@ -31,6 +31,8 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     'graphql_content',
     'link',
     'datetime',
+    'image',
+    'file',
   ];
 
   /**
@@ -43,6 +45,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $this->installConfig(['filter']);
     $this->installConfig(['text']);
     $this->installEntitySchema('node');
+    $this->installEntitySchema('file');
 
     $this->createContentType([
       'type' => 'test',
@@ -59,9 +62,9 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $this->addField('email', "field_email");
     $this->addField('string', "field_string");
 
-    // TODO Test files and images.
-    // $this->addField('file', 'field_file');
-    // $this->addField('image', 'field_image');
+    $this->addField('entity_reference', 'field_reference');
+    $this->addField('file', 'field_file');
+    $this->addField('image', 'field_image');
 
     Role::load('anonymous')
       ->grantPermission('access content')
@@ -83,6 +86,9 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       ->setComponent('field_timestamp', $options)
       ->setComponent('field_email', $options)
       ->setComponent('field_string', $options)
+      ->setComponent('field_reference', $options)
+      ->setComponent('field_file', $options)
+      ->setComponent('field_image', $options)
       ->save();
 
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
@@ -143,6 +149,38 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'field_timestamp' => [0, 300],
       'field_email' => ['test@test.com'],
       'field_string' => ['test', '123'],
+      'field_reference' => [
+        ['target_id' => 1],
+        ['target_id' => 1],
+      ],
+      'field_file' => [
+        [
+          'target_id' => 1,
+          'display' => 0,
+          'description' => 'description test 1',
+        ],
+        [
+          'target_id' => 2,
+          'display' => 1,
+          'description' => 'description test 2',
+        ],
+      ],
+      'field_image' => [
+        [
+          'target_id' => 1,
+          'alt' => 'alt test 1',
+          'title' => 'title test 1',
+          'width' => 100,
+          'height' => 50,
+        ],
+        [
+          'target_id' => 2,
+          'alt' => 'alt test 2',
+          'title' => 'title test 2',
+          'width' => 200,
+          'height' => 100,
+        ],
+      ],
     ];
 
     $expected = [
@@ -189,6 +227,38 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'fieldString' => [
         ['value' => 'test'],
         ['value' => '123'],
+      ],
+      'fieldReference' => [
+        ['targetId' => 1],
+        ['targetId' => 1],
+      ],
+      'fieldFile' => [
+        [
+          'targetId' => 1,
+          'display' => 0,
+          'description' => 'description test 1',
+        ],
+        [
+          'targetId' => 2,
+          'display' => 1,
+          'description' => 'description test 2',
+        ],
+      ],
+      'fieldImage' => [
+        [
+          'targetId' => 1,
+          'alt' => 'alt test 1',
+          'title' => 'title test 1',
+          'width' => 100,
+          'height' => 50,
+        ],
+        [
+          'targetId' => 2,
+          'alt' => 'alt test 2',
+          'title' => 'title test 2',
+          'width' => 200,
+          'height' => 100,
+        ],
       ],
     ];
 
