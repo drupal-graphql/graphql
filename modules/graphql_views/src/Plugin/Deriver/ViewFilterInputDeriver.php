@@ -39,15 +39,15 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       }
 
       $fields = array_map(function ($filter) use ($basePluginDefinition) {
-        if ( $this->isGenericInputFilter($filter) ) {
+        if ($this->isGenericInputFilter($filter)) {
           return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
-        } else {
-          return [
-            'type' => 'String',
-            'nullable' => TRUE,
-            'multi' => $filter['expose']['multiple'],
-          ];
         }
+
+        return [
+          'type' => 'String',
+          'nullable' => TRUE,
+          'multi' => $filter['expose']['multiple'],
+        ];
       }, $filters);
 
       $this->derivatives[$id] = [
@@ -62,20 +62,46 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 
+  /**
+   * check if a filter definetion is a generice input filter
+   *
+   * @param mixed $filter
+   *   $filter['value'] = array();
+   *   $filter['value'] = array(
+   *     "text",
+   *     "test"
+   *   );
+   *   $filter['value'] = array(
+   *     'distance' => 10,
+   *     'distance2' => 30,
+   *     ...
+   *   );
+   */
+   public function isGenericInputFilter($filter) {
+     if (!is_array($filter['value']) || count($filter['value']) == 0) {
+       return false;
+     }
 
-  public function isGenericInputFilter($filter) {
-    if (!is_array($filter['value'])) {
-      return false;
-    }
+     $firstKey = array_keys($filter['value'])[0];
+     return is_string( $firstKey );
+   }
 
-    if (count($filter['value']) == 0) {
-      return false;
-    }
-
-    return is_string( array_keys($filter['value'] )[0] );
-  }
-
-
+  /**
+   * create a definition for a generice input filter
+   *
+   * @param mixed $filter
+   *   $filter['value'] = array();
+   *   $filter['value'] = array(
+   *     "text",
+   *     "test"
+   *   );
+   *   $filter['value'] = array(
+   *     'distance' => 10,
+   *     'distance2' => 30,
+   *     ...
+   *   );
+   * @param mixed $basePluginDefinition
+   */
   public function createGenericInputFilterDefinition($filter, $basePluginDefinition) {
 
     $filterId = $filter['expose']['identifier'];
@@ -96,7 +122,6 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       ];
     }
 
-
     $genericInputFilter = [
       'id' => $id,
       'name' => graphql_core_camelcase($id),
@@ -113,5 +138,4 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       'multi' => $filter['expose']['multiple'],
     ];
   }
-
 }
