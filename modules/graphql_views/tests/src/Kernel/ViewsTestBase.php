@@ -7,8 +7,6 @@ use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\taxonomy\Tests\TaxonomyTestTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -16,11 +14,10 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_views
  */
-abstract class ViewsTestBase extends GraphQLFileTestBase {
+abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
   use EntityReferenceTestTrait;
-  use TaxonomyTestTrait;
 
   /**
    * {@inheritdoc}
