@@ -102,11 +102,20 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       // If some filters are missing from the input, set them to an empty string
       // explicitly. Otherwise views module generates "Undefined index" notice.
       $filters = $executable->getDisplay()->getOption('filters');
-      foreach (array_keys($filters) as $filter) {
-        $input[$filter] = isset($args['filter'][$filter]) ? $args['filter'][$filter] : '';
+      foreach ($filters as $filterKey => $filterRow) {
+        if (!isset($args['filter'][$filterKey])) {
+          $input[$filterKey] = $filterRow['value'];
+        } else {
+          $input[$filterKey] = $args['filter'][$filterKey];
+        }
       }
 
       $executable->setExposedInput($input);
+      // This is a workaround for the Taxonomy Term filter which requires a full
+      // exposed form to be sent OR the display being an attachment to just
+      // accept input values.
+      $executable->is_attachment = TRUE;
+      $executable->exposed_raw_input = $input;
 
       if ($definition['paged']) {
         // Set paging parameters.

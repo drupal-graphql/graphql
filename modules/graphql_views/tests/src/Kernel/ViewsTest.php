@@ -104,12 +104,25 @@ class ViewsTest extends ViewsTestBase {
   public function testFilteredView() {
     $result = $this->executeQueryFile('filtered.gql');
     $this->assertEquals([
-      'default' => [
-        ['entityLabel' => 'Node A'],
-        ['entityLabel' => 'Node A'],
-        ['entityLabel' => 'Node A'],
-      ],
-    ], $result['data'], 'Filtering works as expected.');
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node A'],
+    ], $result['data']['default'], 'Filtering works as expected.');
+  }
+
+  /**
+   * Test filter behavior.
+   */
+  public function testMultiValueFilteredView() {
+    $result = $this->executeQueryFile('filtered.gql');
+    $this->assertEquals([
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node B'],
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node B'],
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node B'],
+    ], $result['data']['multi'], 'Filtering works as expected.');
   }
 
 }
