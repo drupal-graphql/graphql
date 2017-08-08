@@ -7,7 +7,6 @@ use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-
 use Drupal\user\Entity\Role;
 
 /**
