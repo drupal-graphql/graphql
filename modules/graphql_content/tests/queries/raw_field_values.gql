@@ -37,6 +37,21 @@ query ($path: String!) {
         fieldString {
           value
         }
+        fieldReference {
+          targetId
+        }
+        fieldFile {
+          targetId,
+          display,
+          description,
+        }
+        fieldImage {
+          targetId
+          alt
+          title
+          width
+          height
+        }
       }
     }
   }
