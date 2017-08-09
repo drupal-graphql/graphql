@@ -7,6 +7,7 @@ use Drupal\simpletest\NodeCreationTrait;
 use Drupal\simpletest\UserCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
+use DateTime;
 
 /**
  * Test basic entity fields.
@@ -95,6 +96,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'path' => '/node/' . $node->id(),
     ]);
 
+    $created = (new DateTime())->setTimestamp($node->getCreatedTime())->format(DateTime::ISO8601);
+    $changed = (new DateTime())->setTimestamp($node->getChangedTime())->format(DateTime::ISO8601);
+
     $values = [
       'entityId' => $node->id(),
       'entityUuid' => $node->uuid(),
@@ -118,6 +122,8 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
         'entityLabel' => $translation->label(),
       ],
       'entityPublished' => TRUE,
+      'entityCreated' => $created,
+      'entityChanged' => $changed,
     ];
 
     $this->assertEquals($values, $result['data']['route']['node'], 'Content type Interface resolves basic entity fields.');

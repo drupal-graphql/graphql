@@ -23,6 +23,8 @@ query ($path: String!) {
         entityLabel
       }
       entityPublished
+      entityCreated
+      entityChanged
     }
     node_test:nodeContext {
       ... on NodeTest {
@@ -48,6 +50,8 @@ query ($path: String!) {
          entityLabel
         }
         entityPublished
+        entityCreated
+        entityChanged
       }
     }
   }
