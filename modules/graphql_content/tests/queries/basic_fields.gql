@@ -16,6 +16,9 @@ query ($path: String!) {
         internalPath:path,
         aliasedPath:alias
       },
+      entityOwner {
+        entityLabel
+      }
       entityTranslation(language: fr) {
         entityLabel
       }
@@ -37,6 +40,9 @@ query ($path: String!) {
           internalPath:path,
           aliasedPath:alias
         },
+        entityOwner {
+          entityLabel
+        }
         entityTranslation(language: fr) {
          entityLabel
         }

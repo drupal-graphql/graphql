@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql_content\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
+use Drupal\simpletest\UserCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
@@ -15,6 +16,7 @@ use Drupal\user\Entity\Role;
 class EntityBasicFieldsTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
+  use UserCreationTrait;
 
   public static $modules = [
     'node',
@@ -35,7 +37,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
     $this->installConfig(['node']);
     $this->installConfig(['filter']);
     $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
     $this->installSchema('node', 'node_access');
+    $this->installSchema('system', 'sequences');
 
     $this->createContentType([
       'type' => 'test',
@@ -61,6 +65,14 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
             ],
           ],
         ],
+        'user' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'user' => [
+              'exposed' => TRUE,
+            ],
+          ],
+        ],
       ])->save();
   }
 
@@ -68,10 +80,12 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
    * Test if the basic fields are available on the interface.
    */
   public function testBasicFields() {
+    $user = $this->createUser();
     $node = $this->createNode([
       'title' => 'Node in default language',
       'type' => 'test',
       'status' => 1,
+      'uid' => $user->id(),
     ]);
 
     $translation = $node->addTranslation('fr', ['title' => 'French node']);
@@ -96,6 +110,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'entityRoute' => [
         'internalPath' => '/node/' . $node->id(),
         'aliasedPath' => '/node/' . $node->id(),
+      ],
+      'entityOwner' => [
+        'entityLabel' => $user->label(),
       ],
       'entityTranslation' => [
         'entityLabel' => $translation->label(),
