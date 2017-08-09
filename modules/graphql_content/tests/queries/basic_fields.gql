@@ -22,6 +22,7 @@ query ($path: String!) {
       entityTranslation(language: fr) {
         entityLabel
       }
+      entityPublished
     }
     node_test:nodeContext {
       ... on NodeTest {
@@ -46,6 +47,7 @@ query ($path: String!) {
         entityTranslation(language: fr) {
          entityLabel
         }
+        entityPublished
       }
     }
   }

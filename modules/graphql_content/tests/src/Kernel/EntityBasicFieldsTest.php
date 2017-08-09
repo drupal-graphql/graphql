@@ -117,6 +117,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'entityTranslation' => [
         'entityLabel' => $translation->label(),
       ],
+      'entityPublished' => TRUE,
     ];
 
     $this->assertEquals($values, $result['data']['route']['node'], 'Content type Interface resolves basic entity fields.');
