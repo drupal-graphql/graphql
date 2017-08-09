@@ -121,7 +121,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'entityTranslation' => [
         'entityLabel' => $translation->label(),
       ],
-      'entityPublished' => TRUE,
+      // EntityPublishedInterface has been added with 8.3.
+      // Below the field will return false.
+      'entityPublished' => version_compare(\Drupal::VERSION, '8.2', '>'),
       'entityCreated' => $created,
       'entityChanged' => $changed,
     ];
