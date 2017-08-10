@@ -103,10 +103,11 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       // explicitly. Otherwise views module generates "Undefined index" notice.
       $filters = $executable->getDisplay()->getOption('filters');
       foreach ($filters as $filterKey => $filterRow) {
+        $inputKey = $filterRow['expose']['identifier'];
         if (!isset($args['filter'][$filterKey])) {
-          $input[$filterKey] = $filterRow['value'];
+          $input[$inputKey] = $filterRow['value'];
         } else {
-          $input[$filterKey] = $args['filter'][$filterKey];
+          $input[$inputKey] = $args['filter'][$filterKey];
         }
       }
 
