@@ -38,6 +38,12 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
         continue;
       }
 
+      //Re-key $filters by filter_identifier
+      foreach ($filters as $key => $value) {
+        $new_filters[$value['expose']['identifier']] = $value;
+      }
+      $filters = $new_filters;
+
       $fields = array_map(function ($filter) {
         return [
           'type' => 'String',

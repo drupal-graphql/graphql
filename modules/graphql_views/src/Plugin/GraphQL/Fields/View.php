@@ -104,9 +104,10 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $filters = $executable->getDisplay()->getOption('filters');
       foreach ($filters as $filterKey => $filterRow) {
         if (!isset($args['filter'][$filterKey])) {
-          $input[$filterKey] = $filterRow['value'];
+          $inputKey = $filterRow['expose']['identifier'];
+          $input[$inputKey] = $filterRow['value'];
         } else {
-          $input[$filterKey] = $args['filter'][$filterKey];
+          $input[$inputKey] = $args['filter'][$filterKey];
         }
       }
 
