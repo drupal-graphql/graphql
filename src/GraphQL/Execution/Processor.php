@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\CacheableValue;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Exception\ResolveException;
+use Youshido\GraphQL\Execution\DeferredResolverInterface;
 use Youshido\GraphQL\Execution\Processor as BaseProcessor;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Field\Field;
@@ -69,6 +70,23 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     }
 
     return $value;
+  }
+
+  /**
+   * Override deferred resolving to use our own DeferredResult class.
+   *
+   * {@inheritdoc}
+   */
+  protected function deferredResolve($resolvedValue, callable $callback) {
+    if ($resolvedValue instanceof DeferredResolverInterface) {
+      $deferredResult = new DeferredResult($this->metadata, $resolvedValue, $callback);
+      // Whenever we stumble upon a deferred resolver, append it to the
+      // queue to be resolved later.
+      $this->deferredResults[] = $deferredResult;
+      return $deferredResult;
+    }
+    // For simple values, invoke the callback immediately.
+    return $callback($resolvedValue);
   }
 
   /**
