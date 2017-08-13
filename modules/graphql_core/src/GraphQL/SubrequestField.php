@@ -193,7 +193,14 @@ abstract class SubrequestField extends FieldPluginBase implements ContainerFacto
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    yield $value;
+    if ($this->getPluginDefinition()['multi']) {
+      foreach ($value as $item) {
+        yield $item;
+      }
+    }
+    else {
+      yield $value;
+    }
   }
 
 }
