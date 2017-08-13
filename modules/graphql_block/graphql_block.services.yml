@@ -1,6 +1,0 @@
-services:
-
-  graphql_block.event_listener:
-    class: Drupal\graphql_block\EventListener
-    tags:
-      - { name: event_subscriber }

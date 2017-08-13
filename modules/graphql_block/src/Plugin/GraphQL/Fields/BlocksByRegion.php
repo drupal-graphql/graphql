@@ -2,13 +2,15 @@
 
 namespace Drupal\graphql_block\Plugin\GraphQL\Fields;
 
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
-use Drupal\graphql_block\BlockResponse;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\block\Entity\Block;
+use Drupal\block_content\Plugin\Block\BlockContentBlock;
+use Drupal\Core\Condition\ConditionInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\graphql_core\BatchedFieldResolver;
+use Drupal\graphql_core\GraphQL\SubrequestField;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -27,83 +29,110 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   }
  * )
  */
-class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
-
+class BlocksByRegion extends SubrequestField {
   /**
-   * The http kernel to issue subrequest.
+   * The theme manager.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
-  protected $httpKernel;
+  protected $themeManager;
 
   /**
-   * The request stack.
+   * The entity type manager.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $requestStack;
+  protected $entityTypeManager;
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
 
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof Url) {
-      $currentRequest = $this->requestStack->getCurrentRequest();
-
-      $request = Request::create(
-        $value->toString(),
-        'GET',
-        $currentRequest->query->all(),
-        $currentRequest->cookies->all(),
-        $currentRequest->files->all(),
-        $currentRequest->server->all()
-      );
-
-      $request->attributes->set('graphql_block_region', $args['region']);
-
-      if ($session = $currentRequest->getSession()) {
-        $request->setSession($session);
-      }
-
-      $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-
-      // TODO:
-      // Remove the request stack manipulation once the core issue described at
-      // https://www.drupal.org/node/2613044 is resolved.
-      while ($this->requestStack->getCurrentRequest() === $request) {
-        $this->requestStack->pop();
-      }
-
-      if ($response instanceof BlockResponse) {
-        foreach ($response->getBlocks() as $block) {
-          yield $block;
-        }
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel, RequestStack $requestStack) {
-    $this->httpKernel = $httpKernel;
-    $this->requestStack = $requestStack;
-
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(
+    ContainerInterface $container,
+    array $configuration,
+    $pluginId,
+    $pluginDefinition
+  ) {
     return new static(
       $configuration,
       $pluginId,
       $pluginDefinition,
       $container->get('http_kernel'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('graphql_core.batched_resolver'),
+      $container->get('theme.manager'),
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    HttpKernelInterface $httpKernel,
+    RequestStack $requestStack,
+    BatchedFieldResolver $batchedFieldResolver,
+    ThemeManagerInterface $themeManager,
+    EntityTypeManager $entityTypeManager,
+    EntityRepositoryInterface $entityRepository
+  ) {
+    $this->themeManager = $themeManager;
+    $this->entityTypeManager = $entityTypeManager;
+    $this->entityRepository = $entityRepository;
+    parent::__construct(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $httpKernel,
+      $requestStack,
+      $batchedFieldResolver
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resolveSubrequest($value, array $args, ResolveInfo $info) {
+    $region = $args['region'];
+
+    $activeTheme = $this->themeManager->getActiveTheme();
+    $blockStorage = $this->entityTypeManager->getStorage('block');
+    $blocks = $blockStorage->loadByProperties([
+      'theme' => $activeTheme->getName(),
+      'region' => $region,
+    ]);
+
+    $blocks = array_filter($blocks, function (Block $block) {
+      return array_reduce(iterator_to_array($block->getVisibilityConditions()), function ($value, ConditionInterface $condition) {
+        return $value && (!$condition->isNegated() == $condition->evaluate());
+      }, TRUE);
+    });
+
+    uasort($blocks, '\Drupal\Block\Entity\Block::sort');
+
+    $result = array_map(function (Block $block) {
+      $plugin = $block->getPlugin();
+      if ($plugin instanceof BlockContentBlock) {
+        return $this->entityRepository->loadEntityByUuid('block_content', $plugin->getDerivativeId());
+      }
+      else {
+        return $block;
+      }
+    }, $blocks);
+
+    return $result;
+
   }
 
 }

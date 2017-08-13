@@ -3,15 +3,11 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
-use Drupal\graphql_core\ContextResponse;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\graphql_core\BatchedFieldResolver;
+use Drupal\graphql_core\GraphQL\SubrequestField;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -26,29 +22,45 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   deriver = "\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
  * )
  */
-class Context extends FieldPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
+class Context extends SubrequestField {
 
   /**
-   * A http kernel to issue sub-requests to.
+   * The context repository.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
    */
-  protected $httpKernel;
+  protected $contextRepository;
 
   /**
-   * A language manager to reset language negotiation before resolving contexts.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * {@inheritdoc}
    */
-  protected $languageManager;
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('http_kernel'),
+      $container->get('request_stack'),
+      $container->get('graphql_core.batched_resolver'),
+      $container->get('graphql_core.context_repository')
+    );
+  }
 
   /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * {@inheritdoc}
    */
-  protected $requestStack;
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    HttpKernelInterface $httpKernel,
+    RequestStack $requestStack,
+    BatchedFieldResolver $batchedFieldResolver,
+    ContextRepositoryInterface $contextRepository
+  ) {
+    $this->contextRepository = $contextRepository;
+    parent::__construct($configuration, $pluginId, $pluginDefinition, $httpKernel, $requestStack, $batchedFieldResolver);
+  }
 
   /**
    * {@inheritdoc}
@@ -75,71 +87,20 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, HttpKernelInterface $httpKernel, RequestStack $requestStack, LanguageManagerInterface $languageManager) {
-    $this->httpKernel = $httpKernel;
-    $this->languageManager = $languageManager;
-    $this->requestStack = $requestStack;
-
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  public function resolve($value, array $args, ResolveInfo $info) {
+    $definition = $this->getPluginDefinition();
+    return parent::resolve($value, [
+      'context' => $definition['context_id'],
+    ], $info);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $container->get('http_kernel'),
-      $container->get('request_stack'),
-      $container->get('language_manager')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof Url) {
-      $currentRequest = $this->requestStack->getCurrentRequest();
-
-      $request = Request::create(
-        $value->getOption('routed_path') ?: $value->toString(),
-        'GET',
-        $currentRequest->query->all(),
-        $currentRequest->cookies->all(),
-        $currentRequest->files->all(),
-        $currentRequest->server->all()
-      );
-
-      $request->attributes->set('graphql_context', $this->getPluginDefinition()['context_id']);
-
-      if ($session = $currentRequest->getSession()) {
-        $request->setSession($session);
-      }
-
-      // TODO:
-      // Language manager stores negotiation state between requests.
-      //
-      // This is a hack to ensure language get's re-negotiated.
-      // This will issue affect other sub-requests and potentially other
-      // services that keep a static cache.
-      $this->languageManager->reset();
-
-      $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-
-      // TODO:
-      // Remove the request stack manipulation once the core issue described at
-      // https://www.drupal.org/node/2613044 is resolved.
-      while ($this->requestStack->getCurrentRequest() === $request) {
-        $this->requestStack->pop();
-      }
-
-      if ($response instanceof ContextResponse) {
-        yield $response->getContext()->getContextValue();
-      }
-    }
+  protected function resolveSubrequest($value, array $args, ResolveInfo $info) {
+    $contextId = $args['context'];
+    $contexts = $this->contextRepository->getRuntimeContexts([$args['context']]);
+    return isset($contexts[$contextId]) ? $contexts[$contextId]->getContextValue() : NULL;
   }
 
 }
