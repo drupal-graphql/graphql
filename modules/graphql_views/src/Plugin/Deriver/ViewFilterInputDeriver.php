@@ -133,8 +133,6 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       'id' => $id,
       'name' => graphql_core_camelcase($id),
       'fields' => $fields,
-      'view' => $viewId,
-      'display' => $displayId,
     ] + $basePluginDefinition;
 
     $this->derivatives[$id] = $genericInputFilter;

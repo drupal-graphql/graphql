@@ -125,4 +125,22 @@ class ViewsTest extends ViewsTestBase {
     ], $result['data']['multi'], 'Filtering works as expected.');
   }
 
+  /**
+   * Test complex filters.
+   */
+  public function testComplextFilteredView() {
+    $result = $this->executeQueryFile('filtered.gql');
+    $this->assertEquals([
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node B'],
+      ['entityLabel' => 'Node C'],
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node B'],
+      ['entityLabel' => 'Node C'],
+      ['entityLabel' => 'Node A'],
+      ['entityLabel' => 'Node B'],
+      ['entityLabel' => 'Node C'],
+    ], $result['data']['complex'], 'Filtering works as expected.');
+  }
+
 }
