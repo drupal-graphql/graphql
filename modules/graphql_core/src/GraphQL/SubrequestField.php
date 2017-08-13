@@ -4,8 +4,8 @@ namespace Drupal\graphql_core\GraphQL;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Url;
 use Drupal\graphql_core\BatchedFieldResolver;
-use Drupal\graphql_core\SubrequestResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,7 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * Requests to the same url are automatically batched.
  */
-class SubrequestField extends FieldPluginBase implements ContainerFactoryPluginInterface, BatchedFieldInterface {
+abstract class SubrequestField extends FieldPluginBase implements ContainerFactoryPluginInterface, BatchedFieldInterface {
   use DependencySerializationTrait;
 
   /**
@@ -70,8 +70,8 @@ class SubrequestField extends FieldPluginBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function getBatchId($parent, array $arguments, ResolveInfo $info) {
-    if (array_key_exists('path', $arguments)) {
-      return $arguments['path'];
+    if ($parent instanceof Url) {
+      return $parent->toString();
     }
     return parent::getBatchId($parent, $arguments, $info);
   }
@@ -84,20 +84,77 @@ class SubrequestField extends FieldPluginBase implements ContainerFactoryPluginI
   }
 
   /**
+   * The result of this specific subrequest.
+   *
+   * @var mixed
+   */
+  protected $subrequestResult;
+
+  /**
+   * @param $value
+   *   The GraphQL parent value.
+   * @param array $args
+   *   The field arguments.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   GraphQL resolve info
+   */
+  public function doResolveSubrequest($value, $args, ResolveInfo $info) {
+    $this->subrequestResult = $this->resolveSubrequest($value, $args, $info);
+  }
+
+  /**
+   * Retrieve the subrequest result.
+   *
+   * @return mixed
+   */
+  public function getSubrequestResult() {
+    return $this->subrequestResult;
+  }
+
+  /**
+   * Resolve the subrequest value.
+   *
+   * Will be executed within a subrequest context.
+   *
+   * @param $value
+   *   The parent GraphQL result value.
+   * @param array $args
+   *   The field arguments.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   GraphQL resolve info
+   *
+   * @return mixed
+   *   The result value.
+   */
+  abstract protected function resolveSubrequest($value, array $args, ResolveInfo $info);
+
+  /**
+   * Evaluate all batched SubrequestFields.
+   *
+   * Called either from within the current request or a subrequest context.
+   *
+   * @param mixed $batch
+   *   The batch queue.
+   */
+  final public static function processSubrequestBatch($batch) {
+    foreach ($batch as $item) {
+      if ($item['field'] instanceof SubrequestField) {
+        $item['field']->doResolveSubrequest($item['parent'], $item['arguments'], $item['info']);
+      }
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resolveBatch(array $batch) {
     $first = reset($batch);
+    $url = $first['parent'];
 
-    // First, create an empty result set.
-    $result = array_map(function () {
-      return NULL;
-    }, $batch);
-
-    if ($first['arguments']['path']) {
+    if ($url instanceof Url) {
       $currentRequest = $this->requestStack->getCurrentRequest();
       $request = Request::create(
-        $first['arguments']['path'],
+        $url->toString(),
         'GET',
         $currentRequest->query->all(),
         $currentRequest->cookies->all(),
@@ -105,18 +162,13 @@ class SubrequestField extends FieldPluginBase implements ContainerFactoryPluginI
         $currentRequest->server->all()
       );
 
-      $request->attributes->set(
-        'graphql_subrequest',
-        array_unique(array_map(function ($item) {
-          return $item['arguments']['extract'];
-        }, $batch))
-      );
+      $request->attributes->set('graphql_subrequest', $batch);
 
       if ($session = $currentRequest->getSession()) {
         $request->setSession($session);
       }
 
-      $response = $this->httpKernel->handle($request);
+      $this->httpKernel->handle($request);
 
       // TODO:
       // Remove the request stack manipulation once the core issue described at
@@ -124,19 +176,16 @@ class SubrequestField extends FieldPluginBase implements ContainerFactoryPluginI
       while ($this->requestStack->getCurrentRequest() === $request) {
         $this->requestStack->pop();
       }
-
-      $result = [];
-      if ($response instanceof SubrequestResponse) {
-        foreach ($batch as $key => $item) {
-          $result[$key] = $response->get($item['arguments']['extract']);
-        }
-      }
-
     }
     else {
-      // TODO: get values from current request.
+      static::processSubrequestBatch($batch);
     }
 
+    $result = array_map(function ($item) {
+      if ($item['field'] instanceof SubrequestField) {
+        return $item['field']->getSubrequestResult();
+      }
+    }, $batch);
     return $result;
   }
 

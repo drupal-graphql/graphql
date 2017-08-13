@@ -3,9 +3,13 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\Url;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\graphql_core\BatchedFieldResolver;
 use Drupal\graphql_core\GraphQL\SubrequestField;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -19,6 +23,44 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * )
  */
 class Context extends SubrequestField {
+
+  /**
+   * The context repository.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   */
+  protected $contextRepository;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('http_kernel'),
+      $container->get('request_stack'),
+      $container->get('graphql_core.batched_resolver'),
+      $container->get('graphql_core.context_repository')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    HttpKernelInterface $httpKernel,
+    RequestStack $requestStack,
+    BatchedFieldResolver $batchedFieldResolver,
+    ContextRepositoryInterface $contextRepository
+  ) {
+    $this->contextRepository = $contextRepository;
+    parent::__construct($configuration, $pluginId, $pluginDefinition, $httpKernel, $requestStack, $batchedFieldResolver);
+  }
 
   /**
    * {@inheritdoc}
@@ -47,10 +89,18 @@ class Context extends SubrequestField {
    */
   public function resolve($value, array $args, ResolveInfo $info) {
     $definition = $this->getPluginDefinition();
-    return parent::resolve(NULL, [
-      'extract' => $definition['context_id'],
-      'path' => $value instanceof Url ? $value->toString() : NULL,
+    return parent::resolve($value, [
+      'context' => $definition['context_id'],
     ], $info);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resolveSubrequest($value, array $args, ResolveInfo $info) {
+    $contextId = $args['context'];
+    $contexts = $this->contextRepository->getRuntimeContexts([$args['context']]);
+    return isset($contexts[$contextId]) ? $contexts[$contextId]->getContextValue() : NULL;
   }
 
 }

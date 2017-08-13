@@ -3,9 +3,10 @@
 namespace Drupal\graphql_core;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\graphql_core\GraphQL\SubrequestField;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Extract arbitrary information from subrequests.
@@ -20,41 +21,27 @@ class SubrequestExtractor extends ControllerBase {
   protected $requestStack;
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('request_stack'),
-      $container->get('module_handler')
-    );
+    return new static($container->get('request_stack'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(RequestStack $requestStack) {
     $this->requestStack = $requestStack;
-    $this->moduleHandler = $moduleHandler;
   }
 
   /**
-   * Extract the required context and return it.
-   *
-   * @return \Drupal\graphql_core\SubrequestResponse
-   *   A subrequest response instance.
+   * Process the subrequest batch.
    */
   public function extract() {
-    $requirements = $this->requestStack->getCurrentRequest()->attributes->get('graphql_subrequest');
-    $data = [];
-    $this->moduleHandler->alter('graphql_subrequest', $data, $requirements);
-    return new SubrequestResponse($data);
+    $batch = $this->requestStack->getCurrentRequest()
+      ->attributes->get('graphql_subrequest');
+    SubrequestField::processSubrequestBatch($batch);
+    return Response::create();
   }
 
 }
