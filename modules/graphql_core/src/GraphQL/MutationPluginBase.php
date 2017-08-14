@@ -25,6 +25,13 @@ abstract class MutationPluginBase extends AbstractField implements GraphQLPlugin
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(GraphQLSchemaManagerInterface $schemaManager) {
     $this->config = new FieldConfig([
       'name' => $this->buildName(),

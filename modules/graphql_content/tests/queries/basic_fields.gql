@@ -16,9 +16,15 @@ query ($path: String!) {
         internalPath:path,
         aliasedPath:alias
       },
+      entityOwner {
+        entityLabel
+      }
       entityTranslation(language: fr) {
         entityLabel
       }
+      entityPublished
+      entityCreated
+      entityChanged
     }
     node_test:nodeContext {
       ... on NodeTest {
@@ -37,9 +43,15 @@ query ($path: String!) {
           internalPath:path,
           aliasedPath:alias
         },
+        entityOwner {
+          entityLabel
+        }
         entityTranslation(language: fr) {
          entityLabel
         }
+        entityPublished
+        entityCreated
+        entityChanged
       }
     }
   }

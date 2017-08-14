@@ -27,6 +27,13 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Gr
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(GraphQLSchemaManagerInterface $schemaManager) {
     $this->config = new InputObjectTypeConfig([
       'name' => $this->buildName(),
