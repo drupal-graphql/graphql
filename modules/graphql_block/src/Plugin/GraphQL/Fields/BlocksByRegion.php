@@ -22,7 +22,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "blocks_by_region",
  *   name = "blocksByRegion",
  *   type = "Entity",
- *   types = {"Url"},
+ *   types = {"Url", "Root"},
  *   multi = true,
  *   arguments = {
  *     "region" = "String"
