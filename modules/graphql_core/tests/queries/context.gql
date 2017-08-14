@@ -1,4 +1,5 @@
 query {
+  name:routeNameContext
   a:route(path: "/graphql/test/a") {
     name:routeNameContext
   }
