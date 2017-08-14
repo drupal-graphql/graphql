@@ -3,11 +3,6 @@
 namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Field\FieldItemBase;
-use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\DecimalItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\FloatItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\IntegerItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

@@ -2,6 +2,9 @@
 
 namespace Drupal\graphql_content;
 
+use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
+
 class TypeMapper {
 
   /**
@@ -24,14 +27,21 @@ class TypeMapper {
   /**
    * Maps drupal data type to graphql type.
    *
-   * @param string $typedDataType
-   *   Drupal column type.
+   * @param \Drupal\Core\TypedData\DataDefinitionInterface $dataDefinition
+   *   The property definition.
    *
    * @return string
    */
-  public function typedDataToGraphQLFieldType($typedDataType) {
+  public function typedDataToGraphQLFieldType(DataDefinitionInterface $dataDefinition) {
+    if ($dataDefinition instanceof DataReferenceDefinitionInterface) {
+      $targetDefinition = $dataDefinition->getTargetDefinition();
+      $entityType = $targetDefinition->getEntityTypeId();
+
+      return graphql_camelcase($entityType);
+    }
+
     foreach ($this->typeMap as $graphQlType => $typedDataTypes) {
-      if (in_array($typedDataType, $typedDataTypes)) {
+      if (in_array($dataDefinition->getDataType(), $typedDataTypes)) {
         return $graphQlType;
       }
     }
