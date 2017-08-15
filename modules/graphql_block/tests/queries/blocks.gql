@@ -1,4 +1,7 @@
 query {
+  content:blocksByRegion(region: "content") {
+    __typename
+  }
   route:route(path: "/user/login") {
     content:blocksByRegion(region: "content") {
       __typename

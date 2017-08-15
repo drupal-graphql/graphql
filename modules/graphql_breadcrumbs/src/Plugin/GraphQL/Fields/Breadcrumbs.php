@@ -2,12 +2,11 @@
 
 namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
 
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_breadcrumbs\BreadcrumbsResponse;
+use Drupal\Core\Breadcrumb\BreadcrumbManager;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\graphql_core\BatchedFieldResolver;
+use Drupal\graphql_core\GraphQL\SubrequestField;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -23,8 +22,21 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   types = {"Url"},
  * )
  */
-class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
+class Breadcrumbs extends SubrequestField {
+
+  /**
+   * The breadcrumb manager.
+   *
+   * @var \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface
+   */
+  protected $breadcrumbManager;
+
+  /**
+   * The current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
 
   /**
    * The request stack.
@@ -40,6 +52,7 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   protected $httpKernel;
 
+
   /**
    * {@inheritdoc}
    */
@@ -49,55 +62,36 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
       $pluginId,
       $pluginDefinition,
       $container->get('http_kernel'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('graphql_core.batched_resolver'),
+      $container->get('breadcrumb'),
+      $container->get('current_route_match')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, HttpKernelInterface $httpKernel, RequestStack $requestStack) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->requestStack = $requestStack;
-    $this->httpKernel = $httpKernel;
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    HttpKernelInterface $httpKernel,
+    RequestStack $requestStack,
+    BatchedFieldResolver $batchedFieldResolver,
+    BreadcrumbManager $breadcrumbManager,
+    RouteMatchInterface $routeMatch
+  ) {
+    $this->breadcrumbManager = $breadcrumbManager;
+    $this->routeMatch = $routeMatch;
+    parent::__construct($configuration, $pluginId, $pluginDefinition, $httpKernel, $requestStack, $batchedFieldResolver);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof \Drupal\Core\Url) {
-      $currentRequest = $this->requestStack->getCurrentRequest();
-      $request = Request::create(
-        $value->getOption('routed_path') ?: $value->toString(),
-        'GET',
-        $currentRequest->query->all(),
-        $currentRequest->cookies->all(),
-        $currentRequest->files->all(),
-        $currentRequest->server->all()
-      );
-
-      if ($session = $currentRequest->getSession()) {
-        $request->setSession($session);
-      }
-
-      $request->attributes->set('graphql_breadcrumbs', TRUE);
-      $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-
-      // TODO:
-      // Remove the request stack manipulation once the core issue described at
-      // https://www.drupal.org/node/2613044 is resolved.
-      while ($this->requestStack->getCurrentRequest() === $request) {
-        $this->requestStack->pop();
-      }
-
-      if ($response instanceof BreadcrumbsResponse) {
-        $links = $response->getBreadcrumbs();
-        foreach ($links as $link) {
-          yield $link;
-        }
-      }
-    }
+  protected function resolveSubrequest($value, array $args, ResolveInfo $info) {
+    return $this->breadcrumbManager->build($this->routeMatch)->getLinks();
   }
 
 }

@@ -1,0 +1,15 @@
+query {
+  a:users(uids: ["a"]) {
+    name
+    friends {
+      name
+    }
+  }
+
+  b:users(uids: ["b"]) {
+    name
+    foe {
+      name
+    }
+  }
+}

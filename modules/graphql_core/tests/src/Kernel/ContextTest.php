@@ -24,6 +24,8 @@ class ContextTest extends GraphQLFileTestBase {
   public function testSimpleContext() {
     $values = $this->executeQueryFile('context.gql');
     $this->assertEquals([
+      // There is no root level route executed in Kernel tests.
+      'name' => '<none>',
       'a' => ['name' => 'graphql_context_test.a'],
       'b' => ['name' => 'graphql_context_test.b'],
     ], $values['data']);
