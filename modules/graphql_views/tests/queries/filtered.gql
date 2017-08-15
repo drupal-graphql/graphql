@@ -8,4 +8,8 @@
     entityLabel
   }
 
+  complex:graphqlTestFilteredView(filter: {type:{test:"test"}}) {
+    entityLabel
+  }
+
 }

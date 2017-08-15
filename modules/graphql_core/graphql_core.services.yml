@@ -106,6 +106,8 @@ services:
     class: Drupal\graphql_core\GraphQLContextRepository
     tags:
       - { name: service_collector, tag: context_provider, call: addContextProvider }
+  graphql_core.batched_resolver:
+    class: Drupal\graphql_core\BatchedFieldResolver
   graphql_core.schema_provider:
     class: Drupal\graphql_core\PluggableSchemaProvider
     arguments:

@@ -87,3 +87,18 @@ function graphql_core_list_interfaces(array &$definitions, $definition) {
 
   return $interfaces;
 }
+
+/**
+ * Alter the subrequest payload and add contextual data.
+ */
+function graphql_core_graphql_subrequest_alter(&$data, $requirements) {
+  /** @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface $repository */
+  $repository = \Drupal::service('graphql_core.context_repository');
+  $requiredContexts = array_intersect(array_keys($repository->getAvailableContexts()), $requirements);
+  $runtimeContexts = $repository->getRuntimeContexts($requiredContexts);
+  foreach ($requiredContexts as $contextId) {
+    if (array_key_exists($contextId, $runtimeContexts)) {
+      $data[$contextId] = $runtimeContexts[$contextId]->getContextValue();
+    }
+  }
+}

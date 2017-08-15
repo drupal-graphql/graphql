@@ -38,6 +38,13 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
         continue;
       }
 
+      //Re-key $filters by filter_identifier
+      $new_filters = [];
+      foreach ($filters as $key => $value) {
+        $new_filters[$value['expose']['identifier']] = $value;
+      }
+      $filters = $new_filters;
+
       $fields = array_map(function ($filter) use ($basePluginDefinition) {
         if ($this->isGenericInputFilter($filter)) {
           return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
@@ -126,8 +133,6 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       'id' => $id,
       'name' => graphql_core_camelcase($id),
       'fields' => $fields,
-      'view' => $viewId,
-      'display' => $displayId,
     ] + $basePluginDefinition;
 
     $this->derivatives[$id] = $genericInputFilter;
