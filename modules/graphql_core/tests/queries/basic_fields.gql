@@ -1,0 +1,24 @@
+query ($nid: Int!) {
+  node:nodeQuery(filter: {nid: $nid}) {
+    entities {
+      entityId,
+      entityUuid,
+      entityLabel,
+      entityType,
+      entityBundle,
+      entityLanguage {
+        id,
+        name,
+        direction,
+        weight
+      },
+      entityRoute:entityUrl {
+        internalPath:path,
+        aliasedPath:alias
+      },
+      entityTranslation(language: fr) {
+        entityLabel
+      }
+    }
+  }
+}
