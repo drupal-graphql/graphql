@@ -41,12 +41,20 @@ query ($path: String!) {
           targetId
         }
         fieldFile {
-          targetId,
-          display,
-          description,
+          targetId
+          entity {
+            mimeType
+            fileSize
+          }
+          display
+          description
         }
         fieldImage {
           targetId
+          entity {
+            mimeType
+            fileSize
+          }
           alt
           title
           width

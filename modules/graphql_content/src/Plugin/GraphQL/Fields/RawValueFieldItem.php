@@ -3,11 +3,6 @@
 namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Field\FieldItemBase;
-use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\DecimalItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\FloatItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\IntegerItem;
-use Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -30,10 +25,9 @@ class RawValueFieldItem extends FieldPluginBase {
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof FieldItemBase) {
       $definition = $this->getPluginDefinition();
-      $column = $definition['schema_column'];
+      $property = $definition['property'];
       $type = $definition['type'];
-      $item = $value->getValue();
-      $result = $item[$column];
+      $result = $value->$property;
 
       if ($type == 'Int') {
         $result = (int) $result;
