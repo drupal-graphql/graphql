@@ -8,10 +8,11 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL type for Drupal routes.
  *
  * @GraphQLType(
- *   id = "url",
- *   name = "Url"
+ *   id = "internal_url",
+ *   name = "InternalUrl",
+ *   interfaces={"Url"}
  * )
  */
-class Url extends TypePluginBase {
+class InternalUrl extends TypePluginBase {
 
 }
