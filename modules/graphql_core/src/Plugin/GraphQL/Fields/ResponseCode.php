@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Get the response code of an internal or external request.
  *
  * @GraphQLField(
- *   id = "internal_response_code",
+ *   id = "response_code",
  *   name = "code",
  *   type = "Int",
  *   types = {"InternalResponse", "ExternalResponse"}

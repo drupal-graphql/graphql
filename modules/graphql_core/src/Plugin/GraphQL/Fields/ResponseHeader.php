@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Get the a specific response header of an internal or external request.
  *
  * @GraphQLField(
- *   id = "internal_response_header",
+ *   id = "response_header",
  *   name = "header",
  *   type = "String",
  *   types = {"InternalResponse", "ExternalResponse"},

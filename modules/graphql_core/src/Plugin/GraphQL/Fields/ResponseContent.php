@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Get the response content of an internal or external request.
  *
  * @GraphQLField(
- *   id = "internal_response_content",
+ *   id = "response_content",
  *   name = "content",
  *   type = "String",
  *   types = {"InternalResponse", "ExternalResponse"}
