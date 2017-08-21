@@ -102,13 +102,13 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
   public static function create(
     ContainerInterface $container,
     array $configuration,
-    $plugin_id,
-    $plugin_definition
+    $pluginId,
+    $pluginDefinition
   ) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('graphql_batched_test.user_database'),
       $container->get('graphql_core.batched_resolver')
     );
