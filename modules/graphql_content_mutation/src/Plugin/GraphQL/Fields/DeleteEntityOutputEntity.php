@@ -10,7 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the deleted entity object.
  *
  * @GraphQLField(
- *   id = "create_entity_output_entity",
+ *   id = "delete_entity_output_entity",
  *   name = "entity",
  *   type = "Entity",
  *   types = {"DeleteEntityOutput"},
