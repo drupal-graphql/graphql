@@ -60,7 +60,7 @@ class QueryMapConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $formState) {
     $config = $this->config('graphql_query_map_json.config');
 
     $form['lookup_paths'] = [
@@ -70,7 +70,7 @@ class QueryMapConfigForm extends ConfigFormBase {
       '#description' => t('The path patterns to use for the query map lookup.'),
     ];
 
-    return parent::buildForm($form, $form_state);
+    return parent::buildForm($form, $formState);
   }
 
   /**

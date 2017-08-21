@@ -64,11 +64,11 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
-        $queryable_properties = array_filter($properties, function ($property) {
+        $queryableProperties = array_filter($properties, function ($property) {
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
-        if ($queryable_properties) {
+        if ($queryableProperties) {
           $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,

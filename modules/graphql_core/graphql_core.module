@@ -54,10 +54,10 @@ function graphql_core_graphql_interfaces_alter(&$definitions) {
  * Flatten the interface inheritance tree.
  */
 function graphql_core_graphql_types_alter(&$definitions) {
-  $interface_definitions = \Drupal::service('graphql_core.interface_manager')->getDefinitions();
+  $interfaceDefinitions = \Drupal::service('graphql_core.interface_manager')->getDefinitions();
 
-  $interfaces = array_map(function ($definition) use ($interface_definitions) {
-    return graphql_core_list_interfaces($interface_definitions, $definition);
+  $interfaces = array_map(function ($definition) use ($interfaceDefinitions) {
+    return graphql_core_list_interfaces($interfaceDefinitions, $definition);
   }, $definitions);
 
   foreach ($interfaces as $index => $list) {
