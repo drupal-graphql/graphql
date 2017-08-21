@@ -4,11 +4,6 @@ namespace Drupal\graphql_requests_test;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-/**
- * Class RequestTestController
- *
- * @package Drupal\graphql_requests_test
- */
 class RequestTestController {
 
   /**
