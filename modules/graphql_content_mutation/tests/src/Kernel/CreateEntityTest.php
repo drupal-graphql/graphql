@@ -118,7 +118,7 @@ class CreateEntityTest extends GraphQLFileTestBase {
    */
   public function testCreationWithoutPermission() {
     Role::load('anonymous')
-      ->revokePermission('access content')
+      ->revokePermission('create test content')
       ->save();
 
     $result = $this->executeQueryFile('create.gql', ['input' => []]);
