@@ -11,7 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * List site-wide configured languages.
  *
- * @GraphqlField(
+ * @GraphQLField(
  *   id = "available_languages_field",
  *   name = "availableLanguages",
  *   type = "Language",

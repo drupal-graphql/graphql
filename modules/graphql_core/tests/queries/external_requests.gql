@@ -1,0 +1,9 @@
+query {
+  route(path: "http://drupal.graphql") {
+    request {
+      code
+      content
+      header(key: "graphql")
+    }
+  }
+}

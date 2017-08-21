@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Url;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -25,9 +26,14 @@ class Route extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    $url = Url::fromUri("internal:{$args['path']}", ['routed_path' => $args['path']]);
-    if ($url && $url->isRouted() && $url->access()) {
-      yield $url;
+    if (UrlHelper::isExternal($args['path'])) {
+      yield Url::fromUri($args['path']);
+    }
+    else {
+      $url = Url::fromUri("internal:{$args['path']}", ['routed_path' => $args['path']]);
+      if ($url && $url->isRouted() && $url->access()) {
+        yield $url;
+      }
     }
   }
 

@@ -15,6 +15,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * Request arbitrary drupal context objects with GraphQL.
  *
+ * TODO: Move this to `InternalUrl` (breaking change).
+ *
  * @GraphQLField(
  *   id = "context",
  *   types = {"Url", "Root"},
