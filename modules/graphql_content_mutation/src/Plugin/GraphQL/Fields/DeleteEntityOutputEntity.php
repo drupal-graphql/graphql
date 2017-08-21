@@ -2,28 +2,28 @@
 
 namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Fields;
 
+use Drupal\graphql_content_mutation\Plugin\GraphQL\DeleteEntityOutputWrapper;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a the created entity.
+ * Retrieve the deleted entity object.
  *
  * @GraphQLField(
- *   id = "create_entity_output_entity",
+ *   id = "delete_entity_output_entity",
  *   name = "entity",
  *   type = "Entity",
- *   types = {"CreateEntityOutput"},
+ *   types = {"DeleteEntityOutput"},
  *   nullable = true
  * )
  */
-class CreateEntityOutputEntity extends FieldPluginBase {
+class DeleteEntityOutputEntity extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof CreateEntityOutputWrapper) {
+    if ($value instanceof DeleteEntityOutputWrapper) {
       if (($entity = $value->getEntity()) && $entity->access('view')) {
         yield $entity;
       }

@@ -39,11 +39,11 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       }
 
       //Re-key $filters by filter_identifier
-      $new_filters = [];
+      $newFilters = [];
       foreach ($filters as $key => $value) {
-        $new_filters[$value['expose']['identifier']] = $value;
+        $newFilters[$value['expose']['identifier']] = $value;
       }
-      $filters = $new_filters;
+      $filters = $newFilters;
 
       $fields = array_map(function ($filter) use ($basePluginDefinition) {
         if ($this->isGenericInputFilter($filter)) {
