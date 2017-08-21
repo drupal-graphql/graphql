@@ -8,11 +8,9 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
 /**
- * Class JsonResultTest
- *
- * @package Drupal\Tests\graphql_json\Kernel
+ * Test json data retrieval.
  */
-class JsonResultTest extends GraphQLFileTestBase {
+class JsonStructureTest extends GraphQLFileTestBase {
 
   /**
    * {@inheritdoc}

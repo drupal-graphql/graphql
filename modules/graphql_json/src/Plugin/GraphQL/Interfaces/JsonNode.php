@@ -3,6 +3,7 @@
 namespace Drupal\graphql_json\Plugin\GraphQL\Interfaces;
 
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\InterfacePluginBase;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class JsonNode extends InterfacePluginBase implements ContainerFactoryPluginInterface {
+  use DependencySerializationTrait;
 
   /**
    * The GraphQL schema manager.
