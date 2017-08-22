@@ -12,17 +12,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Create an entity.
+ * Update an entity.
+ *
+ * TODO: Add revision support.
  *
  * @GraphQLMutation(
- *   id = "create_entity",
+ *   id = "update_entity",
  *   type = "EntityCrudOutput",
  *   nullable = false,
  *   cache_tags = {"entity_types", "entity_bundles"},
- *   deriver = "\Drupal\graphql_content_mutation\Plugin\Deriver\CreateEntityDeriver"
+ *   deriver = "\Drupal\graphql_content_mutation\Plugin\Deriver\UpdateEntityDeriver"
  * )
  */
-class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
+class UpdateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
   use StringTranslationTrait;
   use EntityMutationInputTrait;
@@ -60,8 +62,26 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
   public function resolve($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $bundleName = $this->pluginDefinition['entity_bundle'];
-    $bundleKey = $this->entityTypeManager->getDefinition($entityTypeId)->getKey('bundle');
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
+
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    if (!$entity = $storage->load($args['id'])) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('The requested @bundle could not be loaded.', ['@bundle' => $bundleName]),
+      ]);
+    }
+
+    if (!$entity->bundle() === $bundleName) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('The requested entity is not of the expected type @bundle.', ['@bundle' => $bundleName]),
+      ]);
+    }
+
+    if (!$entity->access('update')) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('You do not have the necessary permissions to update this @bundle.', ['@bundle' => $bundleName]),
+      ]);
+    }
 
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
@@ -71,14 +91,14 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
     $inputType = $this->config->getArgument('input')->getType()->getNamedType();
     $input = $this->extractEntityInput($inputArgs, $inputType);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create($input + [
-      $bundleKey => $bundleName,
-    ]);
-
-    if (!$entity->access('create')) {
+    try {
+      foreach ($input as $key => $value) {
+        $entity->get($key)->setValue($value);
+      }
+    }
+    catch (\InvalidArgumentException $exception) {
       return new EntityCrudOutputWrapper(NULL, NULL, [
-        $this->t('You do not have the necessary permissions to create entities of this type.'),
+        $this->t('The entity update failed with exception: @exception.', ['@exception' => $exception->getMessage()]),
       ]);
     }
 
@@ -86,11 +106,12 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
       return new EntityCrudOutputWrapper(NULL, $violations);
     }
 
-    if (($status = $entity->save()) && $status === SAVED_NEW) {
+    if (($status = $entity->save()) && $status === SAVED_UPDATED) {
       return new EntityCrudOutputWrapper($entity);
     }
 
     return NULL;
   }
+
 
 }

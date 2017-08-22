@@ -66,7 +66,9 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        $fields = [];
+        $createFields = [];
+        $updateFields = [];
+
         foreach ($this->entityFieldManager->getFieldDefinitions($entityTypeId, $bundleName) as $fieldName => $field) {
           if ($field->isReadOnly() || $field->isComputed()) {
             continue;
@@ -82,17 +84,32 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             $type = 'String';
           }
 
-          $fields[graphql_propcase($fieldName)] = [
+          $fieldKey = graphql_propcase($fieldName);
+          $fieldDefinition = [
             'type' => $type,
-            'nullable' => !$field->isRequired(),
             'multi' => $field->getFieldStorageDefinition()->isMultiple(),
             'field_name' => $fieldName,
           ];
+
+          $createFields[$fieldKey] = $fieldDefinition + [
+            'nullable' => !$field->isRequired(),
+          ];
+
+          $updateFields[$fieldKey] = $fieldDefinition + [
+            'nullable' => TRUE,
+          ];
         }
 
-        $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'Input',
-          'fields' => $fields,
+        $this->derivatives["$entityTypeId:$bundleName:create"] = [
+          'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'CreateInput',
+          'fields' => $createFields,
+          'entity_type' => $entityTypeId,
+          'entity_bundle' => $bundleName,
+        ] + $basePluginDefinition;
+
+        $this->derivatives["$entityTypeId:$bundleName:update"] = [
+          'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'UpdateInput',
+          'fields' => $updateFields,
           'entity_type' => $entityTypeId,
           'entity_bundle' => $bundleName,
         ] + $basePluginDefinition;

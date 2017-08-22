@@ -2,28 +2,28 @@
 
 namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Fields;
 
+use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a the created entity.
+ * Retrieve a the mutated entity.
  *
  * @GraphQLField(
- *   id = "create_entity_output_entity",
+ *   id = "entity_crud_output_entity",
  *   name = "entity",
  *   type = "Entity",
- *   types = {"CreateEntityOutput"},
+ *   types = {"EntityCrudOutput"},
  *   nullable = true
  * )
  */
-class CreateEntityOutputEntity extends FieldPluginBase {
+class EntityCrudOutputEntity extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof CreateEntityOutputWrapper) {
+    if ($value instanceof EntityCrudOutputWrapper) {
       if (($entity = $value->getEntity()) && $entity->access('view')) {
         yield $entity;
       }

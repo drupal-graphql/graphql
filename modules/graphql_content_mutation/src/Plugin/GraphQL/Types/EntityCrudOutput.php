@@ -8,10 +8,10 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * GraphQL type for entity mutation results.
  *
  * @GraphQLType(
- *   id = "create_entity_output",
- *   name = "CreateEntityOutput"
+ *   id = "entity_crud_output",
+ *   name = "EntityCrudOutput"
  * )
  */
-class CreateEntityOutput extends TypePluginBase {
+class EntityCrudOutput extends TypePluginBase {
 
 }
