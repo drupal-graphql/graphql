@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -33,13 +34,21 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
   protected $entityFieldManager;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('graphql_content_mutation.schema_config')
     );
   }
 
@@ -49,11 +58,13 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
   public function __construct(
     EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     EntityTypeManagerInterface $entityTypeManager,
-    EntityFieldManagerInterface $entityFieldManager
+    EntityFieldManagerInterface $entityFieldManager,
+    ContentEntityMutationSchemaConfig $schemaConfig
   ) {
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -66,16 +77,21 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
+        $createExposed = $this->schemaConfig->exposeCreate($entityTypeId, $bundleName);
+        $updateExposed = $this->schemaConfig->exposeUpdate($entityTypeId, $bundleName);
+
+        if (!$createExposed && !$updateExposed) {
+          continue;
+        }
+
         $createFields = [];
         $updateFields = [];
-
         foreach ($this->entityFieldManager->getFieldDefinitions($entityTypeId, $bundleName) as $fieldName => $field) {
           if ($field->isReadOnly() || $field->isComputed()) {
             continue;
           }
 
           $type = graphql_camelcase([$entityTypeId, $fieldName]) . 'FieldInput';
-
           $fieldStorage = $field->getFieldStorageDefinition();
           $propertyDefinitions = $fieldStorage->getPropertyDefinitions();
 
@@ -100,19 +116,23 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
           ];
         }
 
-        $this->derivatives["$entityTypeId:$bundleName:create"] = [
-          'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'CreateInput',
-          'fields' => $createFields,
-          'entity_type' => $entityTypeId,
-          'entity_bundle' => $bundleName,
-        ] + $basePluginDefinition;
+        if ($createExposed) {
+          $this->derivatives["$entityTypeId:$bundleName:create"] = [
+            'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'CreateInput',
+            'fields' => $createFields,
+            'entity_type' => $entityTypeId,
+            'entity_bundle' => $bundleName,
+          ] + $basePluginDefinition;
+        }
 
-        $this->derivatives["$entityTypeId:$bundleName:update"] = [
-          'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'UpdateInput',
-          'fields' => $updateFields,
-          'entity_type' => $entityTypeId,
-          'entity_bundle' => $bundleName,
-        ] + $basePluginDefinition;
+        if ($updateExposed) {
+          $this->derivatives["$entityTypeId:$bundleName:update"] = [
+            'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'UpdateInput',
+            'fields' => $updateFields,
+            'entity_type' => $entityTypeId,
+            'entity_bundle' => $bundleName,
+          ] + $basePluginDefinition;
+        }
       }
     }
 

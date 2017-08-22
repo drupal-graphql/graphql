@@ -73,6 +73,17 @@ class UpdateEntityTest extends GraphQLFileTestBase {
         ],
       ])
       ->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
+      ->set('types', [
+        'node' => [
+          'bundles' => [
+            'test' => [
+              'update' => TRUE,
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**

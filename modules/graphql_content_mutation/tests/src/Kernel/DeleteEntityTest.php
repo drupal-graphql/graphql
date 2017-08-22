@@ -45,6 +45,13 @@ class DeleteEntityTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->grantPermission('delete any test content')
       ->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
+      ->set('types', [
+        'node' => [
+          'delete' => TRUE,
+        ],
+      ])->save();
   }
 
   /**
