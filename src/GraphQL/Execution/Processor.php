@@ -6,7 +6,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\CacheableValue;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Masterminds\HTML5\Exception;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Exception\ResolveException;
@@ -68,7 +67,7 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     // TODO: Investigate if we also should check other fields.
     if (!$this->executionContext->getContainer()->get('secure') && $field instanceof FieldPluginBase) {
       if (!($field instanceof SecureFieldInterface && $field->isSecure())) {
-        throw new Exception(sprintf("Unable to resolve insecure field '%s' (%s).", $field->getName(), get_class($field)));
+        throw new \Exception(sprintf("Unable to resolve insecure field '%s' (%s).", $field->getName(), get_class($field)));
       }
     }
     $value = $this->doResolveValue($field, $ast, $parentValue);
