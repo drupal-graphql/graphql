@@ -57,7 +57,7 @@ class GraphQLQueryMapImportForm extends EntityForm {
     $queryMapJson = file_get_contents($file->getFileUri());
     $version = sha1($queryMapJson);
     if (GraphQLQueryMap::exists($version)) {
-      $formState->setError($form['query_map_json'], $this->t('A query map with the same queries already exists.'));
+      $formState->setError($form['query_map_json'], $this->t('A query map with the same version @version already exists.', ['@version' => $version]));
     }
   }
 
