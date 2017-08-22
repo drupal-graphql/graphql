@@ -4,6 +4,8 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 /**
  * Test internal requests.
+ *
+ * @group graphql_core
  */
 class InternalRequestTest extends GraphQLFileTestBase {
 
