@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "capslock",
+ *   secure = true,
  *   field_formatter = "text_default",
  *   type = "String",
  *   deriver = "\Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"

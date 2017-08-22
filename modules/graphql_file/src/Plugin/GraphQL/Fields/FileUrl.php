@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "file_url",
+ *   secure = true,
  *   name = "url",
  *   type = "String",
  *   types = {"File"}

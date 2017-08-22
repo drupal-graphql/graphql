@@ -14,6 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "a",
  *   name = "a",
+ *   secure = true,
  *   type = "Int",
  *   types = {"Root", "Object"},
  *   cache_tags = {"a"},

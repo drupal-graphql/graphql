@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_owner",
+ *   secure = true,
  *   name = "entityOwner",
  *   types = {"Entity"}
  * )

@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "create_entity_output_violations",
+ *   secure = true,
  *   name = "violations",
  *   type = "ConstraintViolation",
  *   types = {"CreateEntityOutput"},

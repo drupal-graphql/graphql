@@ -19,6 +19,7 @@ use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
  *
  * @GraphQLMutation(
  *   id = "create_entity",
+ *   secure = true,
  *   name = "createEntity",
  *   type = "CreateEntityOutput",
  *   nullable = false,

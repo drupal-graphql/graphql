@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "xml_xpath",
+ *   secure = true,
  *   type = "XMLElement",
  *   multi = true,
  *   arguments = {

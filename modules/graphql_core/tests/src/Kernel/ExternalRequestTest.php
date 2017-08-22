@@ -24,7 +24,7 @@ class ExternalRequestTest extends GraphQLFileTestBase {
 
     $this->container->set('http_client', $client->reveal());
 
-    $result = $this->executeQueryFile('external_requests.gql');
+    $result = $this->executeQueryFile('external_requests.gql', [], TRUE, TRUE);
 
     $this->assertEquals(200, $result['data']['route']['request']['code']);
     $this->assertContains('<p>GraphQL is awesome!</p>', $result['data']['route']['request']['content']);

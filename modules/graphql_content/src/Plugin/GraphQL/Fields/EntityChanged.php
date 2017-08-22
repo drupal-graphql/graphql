@@ -12,6 +12,7 @@ use DateTime;
  *
  * @GraphQLField(
  *   id = "entity_changed",
+ *   secure = true,
  *   name = "entityChanged",
  *   type = "String",
  *   types = {"Entity"}

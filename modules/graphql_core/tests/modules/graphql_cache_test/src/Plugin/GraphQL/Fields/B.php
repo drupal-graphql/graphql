@@ -7,6 +7,7 @@ namespace Drupal\graphql_cache_test\Plugin\GraphQL\Fields;
  *
  * @GraphQLField(
  *   id = "b",
+ *   secure = true,
  *   name = "b",
  *   type = "Int",
  *   types = {"Root", "Object"},

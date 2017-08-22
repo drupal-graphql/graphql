@@ -19,6 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "context",
+ *   secure = true,
  *   types = {"Url", "Root"},
  *   nullable = true,
  *   deriver = "\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"

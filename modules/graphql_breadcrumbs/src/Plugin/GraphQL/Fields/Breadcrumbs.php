@@ -18,6 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "breadcrumb",
+ *   secure = true,
  *   name = "breadcrumb",
  *   type = "Link",
  *   multi = true,

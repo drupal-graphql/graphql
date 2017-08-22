@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "raw_field_item",
+ *   secure = true,
  *   nullable = true,
  *   weight = -1,
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFieldItemDeriver",

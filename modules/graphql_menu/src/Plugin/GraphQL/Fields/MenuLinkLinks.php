@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "menu_link_links",
+ *   secure = true,
  *   name = "links",
  *   type = "MenuLink",
  *   multi = true,

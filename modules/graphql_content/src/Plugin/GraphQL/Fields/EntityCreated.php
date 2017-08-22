@@ -11,6 +11,7 @@ use DateTime;
  *
  * @GraphQLField(
  *   id = "entity_created",
+ *   secure = true,
  *   name = "entityCreated",
  *   type = "String",
  *   types = {"Entity"}
