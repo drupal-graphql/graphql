@@ -14,8 +14,8 @@ class GraphQLQueryMapImportForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $formState) {
-    $form = parent::form($form, $formState);
+  public function form(array $form, FormStateInterface $form_state) {
+    $form = parent::form($form, $form_state);
 
     $form['#title'] = $this->t('Import query map');
 
@@ -40,32 +40,32 @@ class GraphQLQueryMapImportForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $formState) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     $files = file_save_upload('query_map_json', [
       'file_validate_extensions' => ['json'], // Validate extensions.
     ]);
 
     if (!isset($files[0])) {
-      $formState->setError($form['query_map_json'], $this->t('No file was uploaded.'));
+      $form_state->setError($form['query_map_json'], $this->t('No file was uploaded.'));
     }
 
     /** @var \Drupal\file\Entity\File $file */
     $file = $files[0];
     // Save the file for use in the submit handler.
-    $formState->set('file', $file);
+    $form_state->set('file', $file);
 
     $queryMapJson = file_get_contents($file->getFileUri());
     $version = sha1($queryMapJson);
     if (GraphQLQueryMap::exists($version)) {
-      $formState->setError($form['query_map_json'], $this->t('A query map with the same version @version already exists.', ['@version' => $version]));
+      $form_state->setError($form['query_map_json'], $this->t('A query map with the same version @version already exists.', ['@version' => $version]));
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $formState) {
-    $file = $formState->get('file');
+  public function save(array $form, FormStateInterface $form_state) {
+    $file = $form_state->get('file');
     $queryMapJson = file_get_contents($file->getFileUri());
 
     $graphqlQueryMap = $this->entity;
@@ -85,7 +85,7 @@ class GraphQLQueryMapImportForm extends EntityForm {
       ]));
     }
 
-    $formState->setRedirect('entity.graphql_query_map.collection');
+    $form_state->setRedirect('entity.graphql_query_map.collection');
   }
 
 }
