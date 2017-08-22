@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "xml_attribute",
+ *   secure = true,
  *   type = "String",
  *   name = "attribute",
  *   arguments = { "name": "String" },

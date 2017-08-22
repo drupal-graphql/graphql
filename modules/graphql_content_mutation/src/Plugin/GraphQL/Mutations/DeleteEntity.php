@@ -18,6 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLMutation(
  *   id = "delete_entity",
  *   type = "EntityCrudOutput",
+ *   secure = true,
  *   arguments = {
  *     "id" = "String"
  *   },

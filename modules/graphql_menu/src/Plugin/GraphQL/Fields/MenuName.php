@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "menu_name",
+ *   secure = true,
  *   name = "name",
  *   type = "String",
  *   types = {"Menu"}

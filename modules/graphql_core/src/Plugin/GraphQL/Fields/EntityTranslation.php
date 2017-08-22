@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_translation",
+ *   secure = true,
  *   name = "entityTranslation",
  *   nullable = true,
  *   multi = false,

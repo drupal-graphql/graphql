@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_crud_output_errors",
+ *   secure = true,
  *   name = "errors",
  *   type = "String",
  *   types = {"EntityCrudOutput"},

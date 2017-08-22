@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "users",
+ *   secure = true,
  *   name = "users",
  *   type = "User",
  *   multi = true,

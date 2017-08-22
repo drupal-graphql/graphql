@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "url_route",
+ *   secure = true,
  *   name = "route",
  *   type = "Url",
  *   nullable = true,

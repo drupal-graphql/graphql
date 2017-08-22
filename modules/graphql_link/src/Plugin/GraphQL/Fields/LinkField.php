@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "link_item",
+ *   secure = true,
  *   field_formatter = "graphql_link",
  *   type = "LinkItem",
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
