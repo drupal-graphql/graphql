@@ -14,6 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "garage",
+ *   secure = true,
  *   name = "garage",
  *   type = "Vehicle",
  *   multi = true

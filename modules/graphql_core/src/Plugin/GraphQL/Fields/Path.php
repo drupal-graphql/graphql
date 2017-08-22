@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "url_path",
+ *   secure = true,
  *   name = "path",
  *   type = "String",
  *   arguments = {

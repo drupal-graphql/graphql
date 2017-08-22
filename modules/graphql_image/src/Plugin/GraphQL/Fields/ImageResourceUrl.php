@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_style_url",
+ *   secure = true,
  *   name = "url",
  *   type = "String",
  *   nullable = true,

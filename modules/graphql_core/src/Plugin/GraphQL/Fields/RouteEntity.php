@@ -20,6 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "route_entity",
+ *   secure = true,
  *   name = "entity",
  *   types = {"Url"},
  *   type = "Entity"

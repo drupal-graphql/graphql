@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "available_languages_field",
+ *   secure = true,
  *   name = "availableLanguages",
  *   type = "Language",
  *   multi = true

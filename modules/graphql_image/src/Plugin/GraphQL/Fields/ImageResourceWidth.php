@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_style_width",
+ *   secure = true,
  *   name = "width",
  *   type = "Int",
  *   nullable = true,

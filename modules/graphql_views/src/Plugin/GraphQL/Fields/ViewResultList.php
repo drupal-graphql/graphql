@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "view_result",
+ *   secure = true,
  *   multi = true,
  *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewResultListDeriver"
  * )

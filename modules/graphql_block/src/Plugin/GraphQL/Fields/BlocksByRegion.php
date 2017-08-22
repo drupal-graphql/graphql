@@ -22,6 +22,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "blocks_by_region",
+ *   secure = true,
  *   name = "blocksByRegion",
  *   type = "Entity",
  *   types = {"Url", "Root"},

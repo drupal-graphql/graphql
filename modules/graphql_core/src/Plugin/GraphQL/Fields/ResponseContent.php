@@ -14,6 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "response_content",
+ *   secure = true,
  *   name = "content",
  *   type = "String",
  *   types = {"InternalResponse", "ExternalResponse"}

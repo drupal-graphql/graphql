@@ -16,6 +16,7 @@ use Drupal\image\Entity\ImageStyle;
  *
  * @GraphQLField(
  *   id = "image_derivative",
+ *   secure = true,
  *   name = "derivative",
  *   type = "ImageResource",
  *   nullable = true,

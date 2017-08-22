@@ -16,6 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "url_alias",
+ *   secure = true,
  *   name = "alias",
  *   type = "String",
  *   types = {"Url"}

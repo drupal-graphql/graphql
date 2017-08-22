@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_bundle",
+ *   secure = true,
  *   name = "entityBundle",
  *   type = "String",
  *   types = {"Entity"}

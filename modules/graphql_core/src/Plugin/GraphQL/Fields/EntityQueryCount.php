@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_query_count",
+ *   secure = true,
  *   name = "count",
  *   type = "Int",
  *   types = {"EntityQueryResult"},

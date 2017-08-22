@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "create_entity_output_entity",
+ *   secure = true,
  *   name = "entity",
  *   type = "Entity",
  *   types = {"CreateEntityOutput"},
