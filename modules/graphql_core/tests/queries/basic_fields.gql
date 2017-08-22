@@ -16,9 +16,15 @@ query ($nid: Int!) {
         internalPath:path,
         aliasedPath:alias
       },
+      entityOwner {
+        entityLabel
+      }
       entityTranslation(language: fr) {
         entityLabel
       }
+      entityPublished
+      entityCreated
+      entityChanged
     }
   }
 }
