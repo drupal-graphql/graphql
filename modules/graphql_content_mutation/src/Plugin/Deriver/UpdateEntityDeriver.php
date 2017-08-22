@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
+class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The entity type manager service.
    *
@@ -56,10 +56,15 @@ class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
         $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => 'create' . graphql_camelcase([$entityTypeId, $bundleName]),
+          'name' => 'update' . graphql_camelcase([$entityTypeId, $bundleName]),
           'arguments' => [
+            'id' => [
+              'type' => 'String',
+              'nullable' => FALSE,
+              'multi' => FALSE,
+            ],
             'input' => [
-              'type' => graphql_camelcase([$entityTypeId, $bundleName]) . 'CreateInput',
+              'type' => graphql_camelcase([$entityTypeId, $bundleName]) . 'UpdateInput',
               'nullable' => FALSE,
               'multi' => FALSE,
             ],

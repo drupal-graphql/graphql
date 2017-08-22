@@ -5,7 +5,7 @@ namespace Drupal\graphql_content_mutation\Plugin\GraphQL;
 use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class CreateEntityOutputWrapper {
+class EntityCrudOutputWrapper {
   /**
    * The create entity.
    *

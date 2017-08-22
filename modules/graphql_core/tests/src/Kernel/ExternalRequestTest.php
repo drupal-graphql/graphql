@@ -7,6 +7,8 @@ use GuzzleHttp\Psr7\Response;
 
 /**
  * Test external requests.
+ *
+ * @group graphql_core
  */
 class ExternalRequestTest extends GraphQLFileTestBase {
 

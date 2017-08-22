@@ -1,5 +1,5 @@
-mutation ($input: NodeTestCreateInput!) {
-  createNodeTest(input: $input) {
+mutation ($id: String!, $input: NodeTestUpdateInput!) {
+  updateNodeTest(id: $id, input: $input) {
     violations {
       path
       message

@@ -2,30 +2,30 @@
 
 namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Fields;
 
+use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Retrieve a list of error messages.
  *
  * @GraphQLField(
- *   id = "create_entity_output_errors",
+ *   id = "entity_crud_output_errors",
  *   secure = true,
  *   name = "errors",
  *   type = "String",
- *   types = {"CreateEntityOutput"},
+ *   types = {"EntityCrudOutput"},
  *   multi = true,
  *   nullable = false
  * )
  */
-class CreateEntityOutputErrors extends FieldPluginBase {
+class EntityCrudOutputErrors extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof CreateEntityOutputWrapper) {
+    if ($value instanceof EntityCrudOutputWrapper) {
       if ($errors = $value->getErrors()) {
         foreach ($errors as $error) {
           yield $error;

@@ -3,7 +3,6 @@
 namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Mutations;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -13,23 +12,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Delete an entity.
+ * Update an entity.
+ *
+ * TODO: Add revision support.
  *
  * @GraphQLMutation(
- *   id = "delete_entity",
+ *   id = "update_entity",
  *   type = "EntityCrudOutput",
  *   secure = true,
- *   arguments = {
- *     "id" = "String"
- *   },
  *   nullable = false,
- *   cache_tags = {"entity_types"},
- *   deriver = "\Drupal\graphql_content_mutation\Plugin\Deriver\DeleteEntityDeriver"
+ *   cache_tags = {"entity_types", "entity_bundles"},
+ *   deriver = "\Drupal\graphql_content_mutation\Plugin\Deriver\UpdateEntityDeriver"
  * )
  */
-class DeleteEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
+class UpdateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
   use StringTranslationTrait;
+  use EntityMutationInputTrait;
 
   /**
    * The entity type manager.
@@ -63,33 +62,57 @@ class DeleteEntity extends MutationPluginBase implements ContainerFactoryPluginI
    */
   public function resolve($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
+    $bundleName = $this->pluginDefinition['entity_bundle'];
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     if (!$entity = $storage->load($args['id'])) {
       return new EntityCrudOutputWrapper(NULL, NULL, [
-        $this->t('The requested entity could not be loaded.'),
+        $this->t('The requested @bundle could not be loaded.', ['@bundle' => $bundleName]),
       ]);
     }
 
-    if (!$entity->access('delete')) {
+    if (!$entity->bundle() === $bundleName) {
       return new EntityCrudOutputWrapper(NULL, NULL, [
-        $this->t('You do not have the necessary permissions to delete this entity.'),
+        $this->t('The requested entity is not of the expected type @bundle.', ['@bundle' => $bundleName]),
       ]);
     }
+
+    if (!$entity->access('update')) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('You do not have the necessary permissions to update this @bundle.', ['@bundle' => $bundleName]),
+      ]);
+    }
+
+    // The raw input needs to be converted to use the proper field and property
+    // keys because we usually convert them to camel case when adding them to
+    // the schema.
+    $inputArgs = $args['input'];
+    /** @var \Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInput $inputType */
+    $inputType = $this->config->getArgument('input')->getType()->getNamedType();
+    $input = $this->extractEntityInput($inputArgs, $inputType);
 
     try {
-      $entity->delete();
+      foreach ($input as $key => $value) {
+        $entity->get($key)->setValue($value);
+      }
     }
-    catch (EntityStorageException $exception) {
+    catch (\InvalidArgumentException $exception) {
       return new EntityCrudOutputWrapper(NULL, NULL, [
-        $this->t('Entity deletion failed with exception: @exception.', [
-          '@exception' => $exception->getMessage(),
-        ]),
+        $this->t('The entity update failed with exception: @exception.', ['@exception' => $exception->getMessage()]),
       ]);
     }
 
-    return new EntityCrudOutputWrapper($entity);
+    if (($violations = $entity->validate()) && $violations->count()) {
+      return new EntityCrudOutputWrapper(NULL, $violations);
+    }
+
+    if (($status = $entity->save()) && $status === SAVED_UPDATED) {
+      return new EntityCrudOutputWrapper($entity);
+    }
+
+    return NULL;
   }
+
 
 }

@@ -2,30 +2,30 @@
 
 namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Fields;
 
+use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a list of entity creation constraint violations.
+ * Retrieve a list of entity mutation constraint violations.
  *
  * @GraphQLField(
- *   id = "create_entity_output_violations",
+ *   id = "entity_crud_output_violations",
  *   secure = true,
  *   name = "violations",
  *   type = "ConstraintViolation",
- *   types = {"CreateEntityOutput"},
+ *   types = {"EntityCrudOutput"},
  *   multi = true,
  *   nullable = false
  * )
  */
-class CreateEntityOutputViolations extends FieldPluginBase {
+class EntityCrudOutputViolations extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof CreateEntityOutputWrapper) {
+    if ($value instanceof EntityCrudOutputWrapper) {
       if ($violations = $value->getViolations()) {
         foreach ($violations as $violation) {
           yield $violation;
