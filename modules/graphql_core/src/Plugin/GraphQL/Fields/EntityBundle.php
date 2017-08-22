@@ -1,31 +1,30 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * GraphQL field resolving an Entity's id.
+ * GraphQL field resolving an entity's bundle.
  *
  * @GraphQLField(
- *   id = "entity_id",
+ *   id = "entity_bundle",
  *   secure = true,
- *   name = "entityId",
- *   type = "Int",
+ *   name = "entityBundle",
+ *   type = "String",
  *   types = {"Entity"}
  * )
  */
-class EntityId extends FieldPluginBase {
+class EntityBundle extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof EntityInterface) {
-      yield intval($value->id());
+      yield $value->bundle();
     }
   }
-
 }

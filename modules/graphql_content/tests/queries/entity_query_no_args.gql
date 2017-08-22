@@ -1,7 +1,0 @@
-query {
-  allNodes:nodeQuery {
-    entities {
-      entityLabel
-    }
-  }
-}
