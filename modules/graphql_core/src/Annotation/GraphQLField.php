@@ -15,6 +15,13 @@ class GraphQLField extends GraphQLAnnotationBase  {
   public $pluginType = GRAPHQL_CORE_FIELD_PLUGIN;
 
   /**
+   * Mark this field as "secure" to be resolved by untrusted consumers.
+   *
+   * @var bool
+   */
+  public $secure = FALSE;
+
+  /**
    * The id of the GraphQLType or GraphQLInterface this field is bound to.
    *
    * If omitted, the field is considered a "root" field.

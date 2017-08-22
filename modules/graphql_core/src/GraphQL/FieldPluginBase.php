@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\GraphQL;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\SecureFieldInterface;
 use Drupal\graphql_core\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
@@ -18,7 +19,7 @@ use Youshido\GraphQL\Field\AbstractField;
 /**
  * Base class for graphql field plugins.
  */
-abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInterface, CacheableDependencyInterface {
+abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInterface, CacheableDependencyInterface, SecureFieldInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;
@@ -160,6 +161,13 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    */
   public function build(FieldConfig $config) {
     // May be overridden, but not required any more.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isSecure() {
+    return isset($this->getPluginDefinition()['secure']) && $this->getPluginDefinition()['secure'];
   }
 
 }
