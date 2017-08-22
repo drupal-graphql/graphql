@@ -129,7 +129,7 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
 
           $form['types'][$key]['operations'] = [
             '#type' => 'container',
-            '#wrapper_attributes' => array('class' => array('form--inline')),
+            '#wrapper_attributes' => ['class' => ['form--inline']],
           ];
 
           $form['types'][$key]['operations']['create'] = [

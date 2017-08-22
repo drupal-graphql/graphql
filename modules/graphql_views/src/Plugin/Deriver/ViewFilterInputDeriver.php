@@ -70,19 +70,20 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
   }
 
   /**
-   * check if a filter definetion is a generice input filter
+   * Checks if a filter definition is a generic input filter.
    *
    * @param mixed $filter
-   *   $filter['value'] = array();
-   *   $filter['value'] = array(
+   *   $filter['value'] = [];
+   *   $filter['value'] = [
    *     "text",
    *     "test"
-   *   );
-   *   $filter['value'] = array(
+   *   ];
+   *   $filter['value'] = [
    *     'distance' => 10,
    *     'distance2' => 30,
    *     ...
-   *   );
+   *   ];
+   * @return bool
    */
    public function isGenericInputFilter($filter) {
      if (!is_array($filter['value']) || count($filter['value']) == 0) {
@@ -90,24 +91,25 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
      }
 
      $firstKey = array_keys($filter['value'])[0];
-     return is_string( $firstKey );
+     return is_string($firstKey);
    }
 
   /**
-   * create a definition for a generice input filter
+   * Creates a definition for a generic input filter.
    *
    * @param mixed $filter
-   *   $filter['value'] = array();
-   *   $filter['value'] = array(
+   *   $filter['value'] = [];
+   *   $filter['value'] = [
    *     "text",
    *     "test"
-   *   );
-   *   $filter['value'] = array(
+   *   ];
+   *   $filter['value'] = [
    *     'distance' => 10,
    *     'distance2' => 30,
    *     ...
-   *   );
+   *   ];
    * @param mixed $basePluginDefinition
+   * @return array
    */
   public function createGenericInputFilterDefinition($filter, $basePluginDefinition) {
 
@@ -131,7 +133,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
     $genericInputFilter = [
       'id' => $id,
-      'name' => graphql_core_camelcase($id),
+      'name' => graphql_camelcase($id),
       'fields' => $fields,
     ] + $basePluginDefinition;
 
