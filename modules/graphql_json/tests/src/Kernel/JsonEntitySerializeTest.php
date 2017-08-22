@@ -10,20 +10,21 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
 /**
- * Test loading entities from json.
+ * Test traversing serialized entities.
  */
-class JsonEntityTest extends GraphQLFileTestBase {
+class JsonEntitySerializeTest extends GraphQLFileTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
     'node',
+    'serialization',
     'graphql_json',
   ];
 
   /**
-   * Test loading entities from json.
+   * Test traversing serialized entities.
    */
   public function testJsonEntity() {
     $httpClient = $this->prophesize(ClientInterface::class);
@@ -41,13 +42,16 @@ class JsonEntityTest extends GraphQLFileTestBase {
     ]));
     $this->container->set('entity.repository', $entityRepository->reveal());
 
-
-    $result = $this->executeQueryFile('entity.gql');
+    $result = $this->executeQueryFile('serialize.gql');
 
     $this->assertEquals([
       'json' => [
         'node' => [
-          'uuid' => 'abc',
+          'toJson' => [
+            'uuid' => [
+              'value' => 'abc',
+            ],
+          ],
         ],
       ],
     ], $result['data']['route']['request']);
