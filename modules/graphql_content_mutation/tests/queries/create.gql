@@ -1,4 +1,4 @@
-mutation ($input: NodeTestInput!) {
+mutation ($input: NodeTestCreateInput!) {
   createNodeTest(input: $input) {
     violations {
       path
