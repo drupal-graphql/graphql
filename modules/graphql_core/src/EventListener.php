@@ -23,6 +23,7 @@ class EventListener implements EventSubscriberInterface {
   public function onKernelRequest(GetResponseEvent $event) {
     $request = $event->getRequest();
     if ($request->attributes->has('graphql_subrequest')) {
+      $request->attributes->set('_graphql_controller', $request->attributes->get('_controller'));
       $request->attributes->set('_controller', '\Drupal\graphql_core\SubrequestExtractor:extract');
     }
   }

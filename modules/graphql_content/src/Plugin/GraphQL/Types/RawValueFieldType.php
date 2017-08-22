@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_content\Plugin\GraphQL\Types;
 
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\graphql_core\GraphQL\TypePluginBase;
 
 /**
@@ -28,7 +27,7 @@ class RawValueFieldType extends TypePluginBase {
    *   The GraphQL type name.
    */
   public static function getId($entityTypeId, $fieldName) {
-    return graphql_core_camelcase([$entityTypeId, $fieldName, 'raw_value']);
+    return graphql_camelcase([$entityTypeId, $fieldName, 'raw_value']);
   }
 
 }

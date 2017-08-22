@@ -1,15 +1,12 @@
 parameters:
   graphql_content.type_map:
-    String:
-      - text
-      - varchar
-      - varchar_ascii
-      - blob
     Int:
-      - int
+      - integer
+      - boolean
+      - timestamp
     Float:
-      - numeric
       - float
+    # All other types are considered strings.
 
 services:
   graphql_content.schema_config:

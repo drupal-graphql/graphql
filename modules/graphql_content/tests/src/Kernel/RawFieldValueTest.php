@@ -6,6 +6,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\Entity\File;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
@@ -29,6 +30,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     'filter',
     'text',
     'graphql_content',
+    'graphql_file',
     'link',
     'datetime',
     'image',
@@ -46,6 +48,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $this->installConfig(['text']);
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
+    $this->installSchema('file', ['file_usage']);
 
     $this->createContentType([
       'type' => 'test',
@@ -61,7 +64,6 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     $this->addField('timestamp', "field_timestamp");
     $this->addField('email', "field_email");
     $this->addField('string', "field_string");
-
     $this->addField('entity_reference', 'field_reference');
     $this->addField('file', 'field_file');
     $this->addField('image', 'field_image');
@@ -91,6 +93,18 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       ->setComponent('field_image', $options)
       ->save();
 
+    // File 1
+    file_put_contents('public://example.txt', $this->randomMachineName());
+    File::create([
+      'uri' => 'public://example.txt',
+    ])->save();
+
+    // File 2
+    file_put_contents('public://example.png', $this->randomMachineName());
+    File::create([
+      'uri' => 'public://example.png',
+    ])->save();
+
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
         'node' => [
@@ -99,6 +113,15 @@ class RawFieldValueTest extends GraphQLFileTestBase {
             'test' => [
               'exposed' => TRUE,
               'view_mode' => 'node.graphql',
+            ],
+          ],
+        ],
+        'file' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'file' => [
+              'exposed' => TRUE,
+              'view_mode' => 'file.default',
             ],
           ],
         ],
@@ -237,11 +260,19 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'targetId' => 1,
           'display' => 0,
           'description' => 'description test 1',
+          'entity' => [
+            'mimeType' => 'text/plain',
+            'fileSize' => 8,
+          ]
         ],
         [
           'targetId' => 2,
           'display' => 1,
           'description' => 'description test 2',
+          'entity' => [
+            'mimeType' => 'image/png',
+            'fileSize' => 8,
+          ]
         ],
       ],
       'fieldImage' => [
@@ -251,6 +282,10 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'title' => 'title test 1',
           'width' => 100,
           'height' => 50,
+          'entity' => [
+            'mimeType' => 'text/plain',
+            'fileSize' => 8,
+          ]
         ],
         [
           'targetId' => 2,
@@ -258,6 +293,10 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'title' => 'title test 2',
           'width' => 200,
           'height' => 100,
+          'entity' => [
+            'mimeType' => 'image/png',
+            'fileSize' => 8,
+          ]
         ],
       ],
     ];

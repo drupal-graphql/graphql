@@ -7,7 +7,7 @@ use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a list of entity creation errors.
+ * Retrieve a the created entity.
  *
  * @GraphQLField(
  *   id = "create_entity_output_entity",

@@ -20,6 +20,11 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   protected $typeMapper;
 
   /**
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityBundleInfo;
+
+  /**
    * RawValueFieldItemDeriver constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -63,16 +68,23 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
 
     // Add the subfields, eg. value, summary.
     $definitions = [];
-    foreach ($storage->getSchema()['columns'] as $columnName => $schema) {
-      $definitions["$entityType-$fieldName-$columnName"] = [
-        'name' => graphql_core_propcase($columnName),
-        'schema_column' => $columnName,
+
+    foreach ($storage->getPropertyDefinitions() as $property => $definition) {
+      if ($definition->getDataType() == 'map') {
+        continue;
+        // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
+      }
+
+      $definitions["$entityType-$fieldName-$property"] = [
+        'name' => graphql_propcase($property),
+        'property' => $property,
         'multi' => FALSE,
-        'type' => $this->typeMapper->typedDataToGraphQLFieldType($schema['type']),
+        'type' => $this->typeMapper->typedDataToGraphQLFieldType($definition),
         'types' => [$dataType],
       ];
     }
 
     return $definitions;
   }
+
 }

@@ -18,6 +18,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * List all blocks within a theme region.
  *
+ * TODO: Move this to `InternalUrl` (breaking change).
+ *
  * @GraphQLField(
  *   id = "blocks_by_region",
  *   name = "blocksByRegion",
