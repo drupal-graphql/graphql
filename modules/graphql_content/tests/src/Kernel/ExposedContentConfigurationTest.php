@@ -97,6 +97,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if the interface for nodes is created.
    */
   public function testNodeInterface() {
+	// @todo: fix config
     $this->configFactory->getEditable('graphql_content.schema')
       ->set('types', [
         'node' => [

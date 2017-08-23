@@ -38,6 +38,7 @@ class EntityMutationTest extends GraphQLFileTestBase {
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'article']);
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
       ->set('types', [
         'node' => [

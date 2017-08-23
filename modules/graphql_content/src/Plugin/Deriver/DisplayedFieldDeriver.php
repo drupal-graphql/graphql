@@ -84,6 +84,7 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('entity_field.manager'),
+	  // @todo: fix config?
       $container->get('graphql_content.schema_config')
     );
   }

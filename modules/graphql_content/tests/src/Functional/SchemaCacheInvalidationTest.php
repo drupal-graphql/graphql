@@ -26,6 +26,7 @@ class SchemaCacheInvalidationTest extends QueryTestBase {
    */
   public function testSchemaInvalidation() {
     // Retrieve the schema as string.
+	// @todo: fix config
     $schemaConfig = $this->container->get('graphql_content.schema_config');
 
     // Check if configuration is loaded correctly.

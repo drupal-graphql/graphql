@@ -85,6 +85,7 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     $defaults = [];
+	// @todo: fix config
     $config = $this->config('graphql_content_mutation.schema');
     if ($config) {
       $defaults = $config->get('types');

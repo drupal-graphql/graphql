@@ -48,6 +48,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
+	  // @todo: fix config
       $container->get('graphql_content_mutation.schema_config')
     );
   }

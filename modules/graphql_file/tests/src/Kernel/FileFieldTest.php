@@ -76,6 +76,7 @@ class FileFieldTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('file', ['type' => 'graphql_file'])->save();
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
         'node' => [

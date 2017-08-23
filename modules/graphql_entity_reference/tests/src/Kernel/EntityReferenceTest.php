@@ -65,6 +65,7 @@ class EntityReferenceTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->save();
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
         'node' => [

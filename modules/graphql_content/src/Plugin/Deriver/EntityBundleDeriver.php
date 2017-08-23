@@ -44,6 +44,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
+	  // @todo: fix config?
       $container->get('graphql_content.schema_config')
     );
   }

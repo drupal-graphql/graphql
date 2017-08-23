@@ -59,6 +59,7 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
       'vid' => 'tags',
     ])->save();
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
         'node' => [

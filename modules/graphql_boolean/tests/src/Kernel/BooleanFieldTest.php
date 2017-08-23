@@ -77,6 +77,7 @@ class BooleanFieldTest extends KernelTestBase {
       'status' => TRUE,
     ])->setComponent('flagged', ['type' => 'graphql_boolean'])->save();
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
         'entity_test_with_bundle' => [

@@ -50,6 +50,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
+	  // @todo: fix config?
       $container->get('graphql_content.schema_config'),
       $basePluginId);
   }

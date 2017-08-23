@@ -19,6 +19,7 @@ class ContentEntitySchemaConfig {
    *   The config factory.
    */
   public function __construct(ConfigFactoryInterface $configFactory) {
+	// @todo: fix config
     $config = $configFactory->get('graphql_content.schema');
     $this->types = $config ? $config->get('types') : [];
     $this->types = $this->types ?: [];

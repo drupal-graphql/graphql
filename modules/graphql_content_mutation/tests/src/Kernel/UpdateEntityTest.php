@@ -60,6 +60,7 @@ class UpdateEntityTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('body', ['type' => 'graphql_raw_value'])->save();
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
         'node' => [
@@ -74,6 +75,7 @@ class UpdateEntityTest extends GraphQLFileTestBase {
       ])
       ->save();
 
+	// @todo: fix config
     $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
       ->set('types', [
         'node' => [

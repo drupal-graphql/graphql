@@ -42,6 +42,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
+	  // @todo: fix config?
       $container->get('graphql_content.schema_config')
     );
   }
