@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "url_routed",
+ *   secure = true,
  *   name = "routed",
  *   type = "Boolean",
  *   types = {"Url"}

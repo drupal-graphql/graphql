@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Implements hook_graphql_types_alter().
+ *
+ * Attach the Block interface to all block entities.
+ */
 function graphql_block_graphql_types_alter(&$definitions) {
   foreach (array_keys($definitions) as $id) {
     if (array_key_exists('entity_type', $definitions[$id])) {

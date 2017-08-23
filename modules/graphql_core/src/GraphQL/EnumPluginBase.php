@@ -20,6 +20,13 @@ abstract class EnumPluginBase extends AbstractEnumType implements GraphQLPluginI
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   abstract public function buildValues(GraphQLSchemaManagerInterface $schemaManager);
 
   /**

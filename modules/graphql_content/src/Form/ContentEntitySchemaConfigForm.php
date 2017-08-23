@@ -115,7 +115,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
           '#default_value' => isset($defaults[$type->id()]['exposed']) ? $defaults[$type->id()]['exposed'] : 0,
           '#title' => '<strong>' . $type->getLabel() . '</strong>',
           '#description' => $this->t('Add the <strong>%interface</strong> interface to the schema.', [
-            '%interface' => graphql_core_camelcase($type->id()),
+            '%interface' => graphql_camelcase($type->id()),
           ]),
           '#wrapper_attributes' => ['colspan' => 2, 'class' => ['highlight']],
         ];
@@ -134,7 +134,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             ],
             '#title' => $info['label'],
             '#description' => $this->t('Add the <strong>%type</strong> type to the schema.', [
-              '%type' => graphql_core_camelcase([$type->id(), $bundle]),
+              '%type' => graphql_camelcase([$type->id(), $bundle]),
             ]),
           ];
 

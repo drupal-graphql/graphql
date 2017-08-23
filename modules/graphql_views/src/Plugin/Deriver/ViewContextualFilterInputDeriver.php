@@ -34,7 +34,7 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
         ]);
         $this->derivatives[$id] = [
           'id' => $id,
-          'name' => graphql_core_camelcase($id),
+          'name' => graphql_camelcase($id),
           'fields' => array_fill_keys(array_keys($argumentsInfo), [
             'type' => 'String',
             // Always expose contextual filters as nullable. Let views module

@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_style_height",
+ *   secure = true,
  *   name = "height",
  *   type = "Int",
  *   nullable = true,

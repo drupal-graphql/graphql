@@ -1,0 +1,21 @@
+mutation ($id: String!, $input: NodeTestUpdateInput!) {
+  updateNodeTest(id: $id, input: $input) {
+    violations {
+      path
+      message
+    }
+
+    errors
+    entity {
+      entityId
+      entityBundle
+      entityLabel
+
+      ... on NodeTest {
+        body {
+          value
+        }
+      }
+    }
+  }
+}

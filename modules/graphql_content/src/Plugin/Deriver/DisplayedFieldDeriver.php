@@ -132,8 +132,8 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
           if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
             foreach (array_keys($display->getComponents()) as $field) {
               $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
-                'name' => graphql_core_propcase($field),
-                'types' => [graphql_core_camelcase([$typeId, $bundle])],
+                'name' => graphql_propcase($field),
+                'types' => [graphql_camelcase([$typeId, $bundle])],
                 'entity_type' => $typeId,
                 'bundle' => $bundle,
                 'field' => $field,

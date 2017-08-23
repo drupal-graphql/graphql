@@ -54,35 +54,6 @@ class LanguageTest extends LanguageTestBase {
   }
 
   /**
-   * Test default language.
-   */
-  public function testDefaultLanguage() {
-    $result = $this->executeQueryFile('languages.gql');
-
-    $english = [
-      'id' => 'en',
-      'name' => 'English',
-      'isDefault' => TRUE,
-      'isLocked' => FALSE,
-      'direction' => 'ltr',
-      'weight' => 0,
-    ];
-
-    $french = [
-      'id' => 'fr',
-      'name' => 'French',
-      'isDefault' => FALSE,
-      'isLocked' => FALSE,
-      'direction' => 'ltr',
-      'weight' => 1,
-    ];
-
-    $this->assertEquals($english, $result['data']['default']['languageInterfaceContext']);
-    $this->assertEquals($english, $result['data']['en']['languageInterfaceContext']);
-    $this->assertEquals($french, $result['data']['fr']['languageInterfaceContext']);
-  }
-
-  /**
    * Test listing of available languages.
    */
   public function testAvailableLanguages() {

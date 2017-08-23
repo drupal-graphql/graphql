@@ -60,13 +60,13 @@ class EntityByIdTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->save();
 
-    $language_storage = $this->container->get('entity.manager')->getStorage('configurable_language');
-    $language = $language_storage->create([
+    $languageStorage = $this->container->get('entity.manager')->getStorage('configurable_language');
+    $language = $languageStorage->create([
       'id' => $this->frenchLangcode,
     ]);
     $language->save();
 
-    $language = $language_storage->create([
+    $language = $languageStorage->create([
       'id' => $this->chineseSimplifiedLangcode,
     ]);
     $language->save();

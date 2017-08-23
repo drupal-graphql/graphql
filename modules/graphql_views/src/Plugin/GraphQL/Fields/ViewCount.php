@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "view_count",
+ *   secure = true,
  *   name = "count",
  *   nullable = false,
  *   type = "Int"

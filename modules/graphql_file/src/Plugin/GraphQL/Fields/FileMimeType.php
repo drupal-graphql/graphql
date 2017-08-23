@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "file_mime_type",
+ *   secure = true,
  *   name = "mimeType",
  *   type = "String",
  *   types = {"File"}

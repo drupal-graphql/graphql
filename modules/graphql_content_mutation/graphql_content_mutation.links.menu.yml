@@ -1,0 +1,5 @@
+graphql_content_mutation.content_entity_mutation_schema:
+  title: 'Exposed mutations'
+  description: 'Define which entity mutations are included in the GraphQL schema.'
+  parent: 'graphql.config_page'
+  route_name: graphql_content_mutation.content_entity_mutation_schema

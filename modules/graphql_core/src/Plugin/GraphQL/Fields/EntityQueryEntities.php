@@ -16,6 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_query_entities",
+ *   secure = true,
  *   name = "entities",
  *   type = "Entity",
  *   types = {"EntityQueryResult"},

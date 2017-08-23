@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_field",
+ *   secure = true,
  *   field_formatter = "graphql_image",
  *   type = "Image",
  *   cache_tags = {"entity_field_info"},

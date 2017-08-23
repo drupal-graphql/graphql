@@ -72,8 +72,8 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   Flag indicating if the view is configured with a pager.
    */
   protected function isPaged(DisplayPluginInterface $display) {
-    $pager_options = $display->getOption('pager');
-    return isset($pager_options['type']) && in_array($pager_options['type'], ['full', 'mini']);
+    $pagerOptions = $display->getOption('pager');
+    return isset($pagerOptions['type']) && in_array($pagerOptions['type'], ['full', 'mini']);
   }
 
   /**
@@ -86,8 +86,8 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   The default limit.
    */
   protected function getPagerLimit(DisplayPluginInterface $display) {
-    $pager_options = $display->getOption('pager');
-    return NestedArray::getValue($pager_options, [
+    $pagerOptions = $display->getOption('pager');
+    return NestedArray::getValue($pagerOptions, [
       'options', 'items_per_page',
     ]) ?: 0;
   }
@@ -102,8 +102,8 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   The default offset.
    */
   protected function getPagerOffset(DisplayPluginInterface $display) {
-    $pager_options = $display->getOption('pager');
-    return NestedArray::getValue($pager_options, [
+    $pagerOptions = $display->getOption('pager');
+    return NestedArray::getValue($pagerOptions, [
       'options', 'offset',
     ]) ?: 0;
   }

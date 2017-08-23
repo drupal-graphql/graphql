@@ -6,8 +6,8 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql_core\GraphQL\MutationPluginBase;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\CreateEntityOutputWrapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -16,8 +16,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLMutation(
  *   id = "create_entity",
- *   name = "createEntity",
- *   type = "CreateEntityOutput",
+ *   type = "EntityCrudOutput",
+ *   secure = true,
  *   nullable = false,
  *   cache_tags = {"entity_types", "entity_bundles"},
  *   deriver = "\Drupal\graphql_content_mutation\Plugin\Deriver\CreateEntityDeriver"
@@ -26,6 +26,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
   use StringTranslationTrait;
+  use EntityMutationInputTrait;
 
   /**
    * The entity type manager.
@@ -63,23 +64,31 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
     $bundleKey = $this->entityTypeManager->getDefinition($entityTypeId)->getKey('bundle');
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
 
+    // The raw input needs to be converted to use the proper field and property
+    // keys because we usually convert them to camel case when adding them to
+    // the schema.
+    $inputArgs = $args['input'];
+    /** @var \Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInput $inputType */
+    $inputType = $this->config->getArgument('input')->getType()->getNamedType();
+    $input = $this->extractEntityInput($inputArgs, $inputType);
+
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create($args['input'] + [
+    $entity = $storage->create($input + [
       $bundleKey => $bundleName,
     ]);
 
     if (!$entity->access('create')) {
-      return new CreateEntityOutputWrapper(NULL, NULL, [
+      return new EntityCrudOutputWrapper(NULL, NULL, [
         $this->t('You do not have the necessary permissions to create entities of this type.'),
       ]);
     }
 
     if (($violations = $entity->validate()) && $violations->count()) {
-      return new CreateEntityOutputWrapper(NULL, $violations);
+      return new EntityCrudOutputWrapper(NULL, $violations);
     }
 
     if (($status = $entity->save()) && $status === SAVED_NEW) {
-      return new CreateEntityOutputWrapper($entity);
+      return new EntityCrudOutputWrapper($entity);
     }
 
     return NULL;

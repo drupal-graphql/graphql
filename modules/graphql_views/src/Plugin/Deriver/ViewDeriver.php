@@ -29,7 +29,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
 
       $id = implode('-', [$viewId, $displayId, 'view']);
 
-      $typeName = graphql_core_camelcase($type);
+      $typeName = graphql_camelcase($type);
       $multi = TRUE;
       $paged = FALSE;
       $arguments = [];
@@ -41,7 +41,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
 
       if ($filters) {
         $arguments['filter'] = [
-          'type' => graphql_core_camelcase([
+          'type' => graphql_camelcase([
             $viewId, $displayId, 'view', 'filter', 'input',
           ]),
           'multi' => FALSE,
@@ -52,7 +52,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
       if ($argumentsInfo) {
         $arguments['contextual_filter'] = [
-          'type' => graphql_core_camelcase([
+          'type' => graphql_camelcase([
             $viewId, $displayId, 'view', 'contextual_filter', 'input',
           ]),
           'multi' => FALSE,
@@ -67,9 +67,9 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
           // schema, the resulting GraphQL field will be attached to nowhere, so
           // it won't go into the schema.
           $argumentTypes = empty($argumentInfo['bundles'])
-            ? [graphql_core_camelcase($argumentInfo['entity_type'])]
+            ? [graphql_camelcase($argumentInfo['entity_type'])]
             : array_map(function ($bundle) use ($argumentInfo) {
-              return graphql_core_camelcase([$argumentInfo['entity_type'], $bundle]);
+              return graphql_camelcase([$argumentInfo['entity_type'], $bundle]);
             }, $argumentInfo['bundles']);
           $types = array_merge($types, $argumentTypes);
         }
@@ -90,7 +90,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
-            "enum_type_name" => graphql_core_camelcase(['SortBy', $id, 'Enum']),
+            "enum_type_name" => graphql_camelcase(['SortBy', $id, 'Enum']),
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
@@ -106,7 +106,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       // If a pager is configured we apply the matching ViewResult derivative
       // instead of the entity list.
       if ($this->isPaged($display)) {
-        $typeName = graphql_core_camelcase(implode('-', [
+        $typeName = graphql_camelcase(implode('-', [
           $viewId, $displayId, 'result',
         ]));
         $multi = FALSE;
@@ -117,9 +117,10 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         ];
       }
 
+      $name = $display->getGraphQLQueryName();
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => graphql_core_propcase($id),
+        'name' => $name,
         'types' => $types,
         'arguments_info' => $argumentsInfo,
         'type' => $typeName,

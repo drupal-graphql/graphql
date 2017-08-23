@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "menu_link_label",
+ *   secure = true,
  *   name = "label",
  *   type = "String",
  *   types = {"MenuLink"}

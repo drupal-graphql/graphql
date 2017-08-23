@@ -1,0 +1,10 @@
+mutation ($id: String!) {
+  deleteNode(id: $id) {
+    errors
+    entity {
+      entityId
+      entityBundle
+      entityLabel
+    }
+  }
+}
