@@ -84,11 +84,6 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $defaults = [];
-    $config = $this->config('graphql_content.schema');
-    if ($config) {
-      $defaults = $config->get('types');
-    }
 
     $form['description'] = [
       '#type' => 'html_tag',
@@ -110,9 +105,12 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     foreach ($this->entityTypeManager->getDefinitions() as $type) {
       if ($type instanceof ContentEntityTypeInterface) {
 
+        $config_name = 'graphql.exposed.' . $type->id();
+        $config = \Drupal::configFactory()->getEditable($config_name);
+
         $form['types'][$type->id()]['exposed'] = [
           '#type' => 'checkbox',
-          '#default_value' => isset($defaults[$type->id()]['exposed']) ? $defaults[$type->id()]['exposed'] : 0,
+          '#default_value' => $config->get('exposed'),
           '#title' => '<strong>' . $type->getLabel() . '</strong>',
           '#description' => $this->t('Add the <strong>%interface</strong> interface to the schema.', [
             '%interface' => graphql_camelcase($type->id()),
@@ -123,10 +121,13 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
         foreach ($this->bundleInfo->getBundleInfo($type->id()) as $bundle => $info) {
           $key = $type->id() . '__' . $bundle;
 
+          $config_name = 'graphql.exposed.' . $type->id() . '.' . $bundle;
+          $config = \Drupal::configFactory()->getEditable($config_name);
+
           $form['types'][$key]['exposed'] = [
             '#type' => 'checkbox',
             '#parents' => ['types', $type->id(), 'bundles', $bundle, 'exposed'],
-            '#default_value' => isset($defaults[$type->id()]['bundles'][$bundle]['exposed']) ? $defaults[$type->id()]['bundles'][$bundle]['exposed'] : 0,
+            '#default_value' => $config->get('exposed'),
             '#states' => [
               'enabled' => [
                 ':input[name="types[' . $type->id() . '][exposed]"]' => ['checked' => TRUE],
@@ -155,7 +156,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             '#parents' => [
               'types', $type->id(), 'bundles', $bundle, 'view_mode',
             ],
-            '#default_value' => isset($defaults[$type->id()]['bundles'][$bundle]['view_mode']) ? $defaults[$type->id()]['bundles'][$bundle]['view_mode'] : 0,
+            '#default_value' => $config->get('view_mode'),
             '#options' => $options,
             '#attributes' => [
               'width' => '100%',
@@ -182,17 +183,24 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
 
     // Sanitize boolean values.
     foreach (array_keys($types) as $type) {
-      $types[$type]['exposed'] = (bool) $types[$type]['exposed'];
+      $config_name = 'graphql.exposed.' . $type;
+      $config = \Drupal::configFactory()->getEditable($config_name);
+      $config->set('exposed', (bool) $types[$type]['exposed'])->save();
+
       if (array_key_exists('bundles', $types[$type])) {
         foreach (array_keys($types[$type]['bundles']) as $bundle) {
-          $types[$type]['bundles'][$bundle]['exposed'] = (bool) $types[$type]['bundles'][$bundle]['exposed'];
+          $config_name = 'graphql.exposed.' . $type . '.' . $bundle;
+          $config = \Drupal::configFactory()->getEditable($config_name);
+          $bundle_config = $types[$type]['bundles'][$bundle];
+
+          $config
+            ->set('exposed', (bool) $bundle_config['exposed'])
+            ->set('view_mode', $bundle_config['view_mode'])
+            ->save();
         }
       }
     }
 
-    $this->config('graphql_content.schema')
-      ->set('types', $form_state->getValue('types'))
-      ->save();
     $this->invalidator->invalidateTags(['graphql_schema', 'graphql_request']);
     parent::submitForm($form, $form_state);
   }
