@@ -7,17 +7,18 @@ use Drupal\views\ViewExecutable;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Expose views as root fields.
+ * Expose result count of a view.
  *
  * @GraphQLField(
- *   id = "view_count",
- *   secure = true,
+ *   id = "view_result_count",
  *   name = "count",
+ *   secure = true,
  *   nullable = false,
- *   type = "Int"
+ *   type = "Int",
+ *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewResultCountDeriver"
  * )
  */
-class ViewCount extends FieldPluginBase {
+class ViewResultCount extends FieldPluginBase {
 
   /**
    * {@inheritdoc}

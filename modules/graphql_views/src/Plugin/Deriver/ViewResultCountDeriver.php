@@ -7,7 +7,7 @@ use Drupal\views\Views;
 /**
  * Derive fields from configured views.
  */
-class ViewResultListDeriver extends ViewDeriverBase {
+class ViewResultCountDeriver extends ViewDeriverBase {
 
   /**
    * {@inheritdoc}
@@ -31,19 +31,14 @@ class ViewResultListDeriver extends ViewDeriverBase {
         continue;
       }
 
-      $id = implode('-', [$viewId, $displayId, 'result', 'list']);
-      $typeName = graphql_camelcase($type);
-      if (!$this->interfaceExists($typeName)) {
-        $typeName = 'Entity';
-      }
+      $id = implode('-', [$viewId, $displayId, 'result', 'count']);
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'type' => $typeName,
+        'type' => 'Int',
         'types' => [
           graphql_camelcase(implode('_', [$viewId, $displayId, 'result'])),
         ],
-        'multi' => TRUE,
         'view' => $viewId,
         'display' => $displayId,
         'cache_tags' => $view->getCacheTags(),
