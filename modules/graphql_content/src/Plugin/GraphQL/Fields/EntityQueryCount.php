@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;

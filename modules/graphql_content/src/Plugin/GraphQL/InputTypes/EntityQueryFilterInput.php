@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\InputTypes;
+namespace Drupal\graphql_content\Plugin\GraphQL\InputTypes;
 
 use Drupal\graphql_core\GraphQL\InputTypePluginBase;
 
@@ -9,7 +9,7 @@ use Drupal\graphql_core\GraphQL\InputTypePluginBase;
  *
  * @GraphQLInputType(
  *   id = "entity_query_filter_input",
- *   deriver = "\Drupal\graphql_core\Plugin\Deriver\EntityQueryFilterInputDeriver"
+ *   deriver = "\Drupal\graphql_content\Plugin\Deriver\EntityQueryFilterInputDeriver"
  * )
  */
 class EntityQueryFilterInput extends InputTypePluginBase {

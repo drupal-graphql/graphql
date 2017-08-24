@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -32,7 +32,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *       "default" = 10
  *     }
  *   },
- *   deriver = "\Drupal\graphql_core\Plugin\Deriver\EntityQueryDeriver"
+ *   deriver = "\Drupal\graphql_content\Plugin\Deriver\EntityQueryDeriver"
  * )
  */
 class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInterface {

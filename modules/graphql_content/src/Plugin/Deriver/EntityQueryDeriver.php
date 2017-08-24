@@ -1,20 +1,20 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver;
+namespace Drupal\graphql_content\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Create GraphQL entityQuery fields based on available Drupal entity types.
  */
-class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeriverInterface {
+class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The entity type manager service.
    *
@@ -30,12 +30,20 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
   protected $typedDataManager;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('typed_data_manager')
+      $container->get('typed_data_manager'),
+      $container->get('graphql_content.schema_config')
     );
   }
 
@@ -44,10 +52,12 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    TypedDataManager $typedDataManager
+    TypedDataManager $typedDataManager,
+    ContentEntitySchemaConfig $schemaConfig
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->typedDataManager = $typedDataManager;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -55,9 +65,13 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
+      if (!$this->schemaConfig->isEntityTypeExposed($id)) {
+        continue;
+      }
+
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_camelcase([$id, 'query', 'filter', 'input']),
+          'name' => graphql_propcase($id) . 'Query',
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -69,27 +83,11 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
-        // Don't even create the type if there are no queryable properties.
-        if (!$queryableProperties) {
-          continue;
-        }
-
-        // Add all queryable properties as fields.
-        foreach ($queryableProperties as $key => $property) {
-          $fieldName = graphql_propcase($key);
-
-          // Some field types don't have a main property.
-          if (!$mainProperty = $property->getMainPropertyName()) {
-            continue;
-          }
-
-          $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
-
-          $derivative['fields'][$fieldName] = [
+        if ($queryableProperties) {
+          $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,
-            'field_name' => $key,
-            'data_type' => $mainPropertyDataType,
+            'type' => graphql_camelcase([$id, 'query', 'filter', 'input']),
           ];
         }
 
