@@ -63,4 +63,17 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
     return [];
   }
 
+  /**
+   * Check if a value conforms to this type.
+   *
+   * @param mixed $value
+   *   The current value.
+   *
+   * @return boolean
+   *   TRUE if the type applies, else false.
+   */
+  public function applies($value) {
+    return FALSE;
+  }
+
 }

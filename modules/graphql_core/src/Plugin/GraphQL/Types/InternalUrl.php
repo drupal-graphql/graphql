@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 
+use Drupal\Core\Url;
 use Drupal\graphql_core\GraphQL\TypePluginBase;
 
 /**
@@ -14,5 +15,12 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * )
  */
 class InternalUrl extends TypePluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return $value instanceof Url && !$value->isExternal();
+  }
 
 }
