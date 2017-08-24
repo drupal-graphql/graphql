@@ -4,11 +4,11 @@
     entityLabel
   }
 
-  multi:graphqlTestFilteredView (filter: {field_tags_target_id: ["1", "2"]}) {
+  multi:graphqlTestFilteredView (filter: {field_tags: ["1", "2"]}) {
     entityLabel
   }
 
-  complex:graphqlTestFilteredView(filter: {type:{test:"test"}}) {
+  complex:graphqlTestFilteredView(filter: {node_type:{test:"test"}}) {
     entityLabel
   }
 

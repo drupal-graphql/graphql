@@ -187,7 +187,7 @@ display:
             description: ''
             use_operator: false
             operator: field_tags_target_id_op
-            identifier: field_tags_target_id
+            identifier: field_tags
             required: false
             remember: false
             multiple: true
@@ -233,7 +233,7 @@ display:
             description: ''
             use_operator: false
             operator: type_op
-            identifier: type
+            identifier: node_type
             required: false
             remember: false
             multiple: false
