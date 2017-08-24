@@ -109,10 +109,11 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
         }
 
         $inputKey = $filterRow['expose']['identifier'];
-        if (!isset($args['filter'][$filterKey])) {
+
+        if (!isset($args['filter'][$inputKey])) {
           $input[$inputKey] = $filterRow['value'];
         } else {
-          $input[$inputKey] = $args['filter'][$filterKey];
+          $input[$inputKey] = $args['filter'][$inputKey];
         }
       }
 
