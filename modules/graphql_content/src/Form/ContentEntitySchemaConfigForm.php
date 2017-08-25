@@ -82,8 +82,8 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $formState) {
-    $form = parent::buildForm($form, $formState);
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
     $defaults = [];
     $config = $this->config('graphql_content.schema');
     if ($config) {
@@ -177,8 +177,8 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $formState) {
-    $types = $formState->getValue('types');
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $types = $form_state->getValue('types');
 
     // Sanitize boolean values.
     foreach (array_keys($types) as $type) {
@@ -191,10 +191,10 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     }
 
     $this->config('graphql_content.schema')
-      ->set('types', $formState->getValue('types'))
+      ->set('types', $form_state->getValue('types'))
       ->save();
     $this->invalidator->invalidateTags(['graphql_schema', 'graphql_request']);
-    parent::submitForm($form, $formState);
+    parent::submitForm($form, $form_state);
   }
 
 }

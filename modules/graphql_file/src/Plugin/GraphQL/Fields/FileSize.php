@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "file_size",
+ *   secure = true,
  *   name = "fileSize",
  *   type = "Int",
  *   types = {"File"}

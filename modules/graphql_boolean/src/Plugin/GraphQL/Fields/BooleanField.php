@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "boolean_field",
+ *   secure = true,
  *   field_formatter = "graphql_boolean",
  *   type = "Boolean",
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"

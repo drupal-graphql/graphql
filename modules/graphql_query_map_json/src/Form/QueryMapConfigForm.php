@@ -60,7 +60,7 @@ class QueryMapConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $formState) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('graphql_query_map_json.config');
 
     $form['lookup_paths'] = [
@@ -70,21 +70,21 @@ class QueryMapConfigForm extends ConfigFormBase {
       '#description' => t('The path patterns to use for the query map lookup.'),
     ];
 
-    return parent::buildForm($form, $formState);
+    return parent::buildForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $formState) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->cacheBackend->delete('graphql_query_map_json_versions');
 
-    $paths = array_map('trim', explode("\n", $formState->getValue('lookup_paths', '')));
+    $paths = array_map('trim', explode("\n", $form_state->getValue('lookup_paths', '')));
     $this->config('graphql_query_map_json.config')
       ->set('lookup_paths', $paths)
       ->save();
 
-    parent::submitForm($form, $formState);
+    parent::submitForm($form, $form_state);
   }
 
 }

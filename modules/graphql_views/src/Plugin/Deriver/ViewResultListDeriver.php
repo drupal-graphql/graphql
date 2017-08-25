@@ -32,16 +32,13 @@ class ViewResultListDeriver extends ViewDeriverBase {
       }
 
       $id = implode('-', [$viewId, $displayId, 'result', 'list']);
-
       $typeName = graphql_camelcase($type);
-
       if (!$this->interfaceExists($typeName)) {
         $typeName = 'Entity';
       }
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => 'results',
         'type' => $typeName,
         'types' => [
           graphql_camelcase(implode('_', [$viewId, $displayId, 'result'])),

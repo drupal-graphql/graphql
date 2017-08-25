@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_title",
+ *   secure = true,
  *   name = "title",
  *   type = "String",
  *   nullable = true,

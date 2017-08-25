@@ -1,0 +1,7 @@
+graphql_content_mutation.content_entity_mutation_schema:
+  path: '/admin/config/graphql/mutations'
+  defaults:
+    _form: '\Drupal\graphql_content_mutation\Form\ContentEntityMutationSchemaConfigForm'
+    _title: 'Exposed mutations'
+  requirements:
+    _permission: 'administer site configuration'

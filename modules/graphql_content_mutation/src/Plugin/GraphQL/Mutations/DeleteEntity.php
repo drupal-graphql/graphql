@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\DeleteEntityOutputWrapper;
+use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql_core\GraphQL\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -17,8 +17,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLMutation(
  *   id = "delete_entity",
- *   name = "deleteEntity",
- *   type = "DeleteEntityOutput",
+ *   type = "EntityCrudOutput",
+ *   secure = true,
  *   arguments = {
  *     "id" = "String"
  *   },
@@ -67,13 +67,13 @@ class DeleteEntity extends MutationPluginBase implements ContainerFactoryPluginI
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     if (!$entity = $storage->load($args['id'])) {
-      return new DeleteEntityOutputWrapper(NULL, [
+      return new EntityCrudOutputWrapper(NULL, NULL, [
         $this->t('The requested entity could not be loaded.'),
       ]);
     }
 
     if (!$entity->access('delete')) {
-      return new DeleteEntityOutputWrapper(NULL, [
+      return new EntityCrudOutputWrapper(NULL, NULL, [
         $this->t('You do not have the necessary permissions to delete this entity.'),
       ]);
     }
@@ -82,14 +82,14 @@ class DeleteEntity extends MutationPluginBase implements ContainerFactoryPluginI
       $entity->delete();
     }
     catch (EntityStorageException $exception) {
-      return new DeleteEntityOutputWrapper(NULL, [
+      return new EntityCrudOutputWrapper(NULL, NULL, [
         $this->t('Entity deletion failed with exception: @exception.', [
           '@exception' => $exception->getMessage(),
         ]),
       ]);
     }
 
-    return new DeleteEntityOutputWrapper($entity);
+    return new EntityCrudOutputWrapper($entity);
   }
 
 }

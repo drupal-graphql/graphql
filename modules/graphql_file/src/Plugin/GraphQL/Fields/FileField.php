@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "file",
+ *   secure = true,
  *   field_formatter = "graphql_file",
  *   type = "File",
  *   cache_tags = {"entity_field_info"},

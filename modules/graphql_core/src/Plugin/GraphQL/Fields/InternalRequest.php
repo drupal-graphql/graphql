@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "internal_request",
+ *   secure = true,
  *   name = "request",
  *   type = "InternalResponse",
  *   types = {"InternalUrl"}

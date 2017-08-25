@@ -5,6 +5,7 @@ namespace Drupal\graphql\GraphQL\Execution;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\CacheableValue;
+use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Exception\ResolveException;
@@ -40,8 +41,10 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    *   The dependency injection container.
    * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
    *   The GraphQL schema.
+   * @param boolean $secure
+   *   Indicate that this processor is executing trusted queries.
    */
-  public function __construct(ContainerInterface $container, AbstractSchema $schema) {
+  public function __construct(ContainerInterface $container, AbstractSchema $schema, $secure = FALSE) {
     $this->container = $container;
     $this->metadata = new CacheableMetadata();
 
@@ -51,12 +54,22 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     }
 
     parent::__construct($schema);
+
+    $this->executionContext->getContainer()->set('secure', $secure);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function doResolve(FieldInterface $field, AstFieldInterface $ast, $parentValue = NULL) {
+    // If not resolving in a trusted environment, check if the field is secure.
+    // Only check our own fields.
+    // TODO: Investigate if we also should check other fields.
+    if (!$this->executionContext->getContainer()->get('secure') && $field instanceof FieldPluginBase) {
+      if (!($field instanceof SecureFieldInterface && $field->isSecure())) {
+        throw new \Exception(sprintf("Unable to resolve insecure field '%s' (%s).", $field->getName(), get_class($field)));
+      }
+    }
     $value = $this->doResolveValue($field, $ast, $parentValue);
 
     if ($value instanceof CacheableDependencyInterface) {

@@ -55,12 +55,14 @@ trait GraphQLFileTestTrait {
    *   Variables to be passed to the query file.
    * @param bool $assertNoErrors
    *   Assert the absence of errors.
+   * @param bool $bypassSecurity
+   *   Bypass field security for this query.
    *
    * @return array
    *   The GraphQL result object.
    */
-  public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE) {
-    $processor = new Processor($this->container, \Drupal::service('graphql.schema'));
+  public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE, $bypassSecurity = FALSE) {
+    $processor = new Processor($this->container, \Drupal::service('graphql.schema'), $bypassSecurity);
     $result = $processor->processPayload($this->getQuery($queryFile), $variables);
     $data = $result->getResponseData();
     if ($assertNoErrors) {

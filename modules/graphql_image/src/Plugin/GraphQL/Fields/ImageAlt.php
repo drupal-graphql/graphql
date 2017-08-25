@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_alt",
+ *   secure = true,
  *   name = "alt",
  *   type = "String",
  *   nullable = true,

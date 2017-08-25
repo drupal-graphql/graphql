@@ -14,6 +14,13 @@ parameters:
     # @default true
     schema_cache: true
 
+    # Development mode:
+    #
+    # Disables field security. All fields can be resolved without restrictions.
+    #
+    # @default false
+    development: false
+
     # GraphQL schema class to be used:
     #
     # By default, this uses the GraphQL schema provided by the module.

@@ -12,6 +12,7 @@ use Drupal\Core\Link;
  *
  * @GraphQLField(
  *   id = "link_text",
+ *   secure = true,
  *   name = "text",
  *   type = "String",
  *   types = {"Link"}
