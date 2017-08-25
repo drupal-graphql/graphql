@@ -19,7 +19,7 @@ class Bike extends TypePluginBase {
    * {@inheritdoc}
    */
   public function applies($value) {
-    return $value['type'] == 'bike';
+    return $value['type'] == 'Bike';
   }
 
 }

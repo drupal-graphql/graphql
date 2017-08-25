@@ -19,7 +19,7 @@ class Car extends TypePluginBase {
    * {@inheritdoc}
    */
   public function applies($value) {
-    return $value['type'] == 'car';
+    return $value['type'] == 'Car';
   }
 
 }
