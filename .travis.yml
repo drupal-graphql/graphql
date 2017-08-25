@@ -1,26 +1,42 @@
 language: php
 sudo: false
 
-php:
-  - 5.5
-  - 5.6
-  - 7
-  # HHVM is disabled for now because we have not figured out yet how to start a
-  # web server for the browser tests.
-  #- hhvm
-
-env:
-  - DRUPAL_CORE=8.2.x
-  - DRUPAL_CORE=8.3.x
-  - DRUPAL_CORE=8.4.x
-
 matrix:
-  allow_failures:
-    # We cannot use hhvm-nightly since that does not work in Travis CI's old
-    # Ubuntu 12.04.
-    #- php: hhvm
   # Don't wait for the allowed failures to build.
   fast_finish: true
+  include:
+    - php: 5.5
+      env:
+        - DRUPAL_CORE=8.2.x
+    - php: 5.5
+      env:
+        - DRUPAL_CORE=8.3.x
+    - php: 5.5
+      env:
+        - DRUPAL_CORE=8.4.x
+    - php: 5.6
+      env:
+        - DRUPAL_CORE=8.2.x
+    - php: 5.6
+      env:
+        - DRUPAL_CORE=8.3.x
+    - php: 5.6
+      env:
+        - DRUPAL_CORE=8.4.x
+    - php: 7
+      env:
+        - DRUPAL_CORE=8.2.x
+    - php: 7
+      env:
+        - DRUPAL_CORE=8.3.x
+    - php: 7
+      env:
+        - DRUPAL_CORE=8.4.x
+    - php: 7
+      env:
+        - DRUPAL_CORE=8.4.x
+        # Only run code coverage on the latest php and drupal versions.
+        - WITH_PHPDBG_COVERAGE=true
 
 mysql:
   database: graphql
@@ -33,20 +49,30 @@ cache:
     - $HOME/.composer
 
 before_script:
+  # Disable xdebug.
+  - phpenv config-rm xdebug.ini
+
+  # Determine the php settings file location.
+  - if [[ $TRAVIS_PHP_VERSION = hhvm* ]];
+      then export PHPINI=/etc/hhvm/php.ini;
+      else export PHPINI=$HOME/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini;
+    fi
+
   # PHP Deprecated: Automatically populating $HTTP_RAW_POST_DATA is deprecated
   # and will be removed in a future version. To avoid this warning set
   # 'always_populate_raw_post_data' to '-1' in php.ini and use the php://input
   # stream instead.
-  - sh -c 'if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then echo "always_populate_raw_post_data = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+  - if [[ "$TRAVIS_PHP_VERSION" == "5.6" ]];
+      then echo always_populate_raw_post_data = -1 >> $PHPINI;
+    fi;
 
-  # Remove Xdebug as we don't need it and it causes
-  # PHP Fatal error:  Maximum function nesting level of '256' reached.
-  # We also don't care if that file exists or not on PHP 7.
-  - phpenv config-rm xdebug.ini || true
+  # Disable the default memory limit.
+  - echo memory_limit = -1 >> $PHPINI
 
   # Remember the current graphql test directory for later use in the Drupal
   # installation.
-  - TESTDIR=$(pwd)
+  - export TESTDIR=$(pwd)
+
   # Navigate out of module directory to prevent blown stack by recursive module
   # lookup.
   - cd ..
@@ -59,13 +85,13 @@ before_script:
   - travis_retry git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git
   - cd drupal
 
-  # Reference graphql in build site.
+  # Reference the module in the build site.
   - ln -s $TESTDIR modules/graphql
 
   # Run composer install for Drupal 8.2. We need an up-to-date composer when
   # installing Drupal 8.2.
   - composer self-update
-  # Bring in the module dependencies without requiring a merge plugin
+  # Bring in the module dependencies without requiring a merge plugin.
   - composer require youshido/graphql:~1.5
   # The require already triggered the install.
 
@@ -77,10 +103,24 @@ before_script:
 
   # Install PHPCS to check for Drupal coding standards.
   - travis_retry composer global require drupal/coder
-  - ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/drupal/coder/coder_sniffer
+  - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
 
 script:
-  # Run the PHPUnit tests which also include the kernel tests.
-  - ./vendor/bin/phpunit -c ./core/phpunit.xml.dist ./modules/graphql
+  # Run the unit tests which also include the kernel tests. When running with
+  # phpdbg we need to replace all code occurrences that check for 'cli' with
+  # 'phpdbg'. Some files might be write protected, hence the '|| true'.
+  - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
+      then
+        grep -rl 'cli' core modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
+        phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
+      else
+        vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
+    fi
+
   # Check for coding standards violations
-  - cd modules/graphql && ~/.composer/vendor/bin/phpcs
+  - cd modules/graphql && $HOME/.composer/vendor/bin/phpcs
+
+after_success:
+  - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
+      then bash <(curl -s https://codecov.io/bash);
+    fi
