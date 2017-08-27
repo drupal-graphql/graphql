@@ -42,6 +42,7 @@ added to the module recently. As we are finishing up the 3.x version of this
 module we will be re-doing the documentation and record a series of screencasts.
 
 For now we recommend to read these blog posts to learn what is graphQL module and how to use it :
+https://www.amazeelabs.com/en/blog/graphql-introduction
 https://www.amazeelabs.com/en/blog/drupal-graphql-batteries-included
 https://www.amazeelabs.com/en/blog/extending-graphql-part1-fields
 https://www.amazeelabs.com/en/blog/extending-graphql-part-2
