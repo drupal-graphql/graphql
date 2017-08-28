@@ -1,15 +1,16 @@
 <?php
 
-namespace Drupal\Tests\graphql_core\Kernel;
+namespace Drupal\Tests\graphql_content\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
  * Test entity query support in GraphQL.
  *
- * @group graphql_core
+ * @group graphql_content
  */
 class EntityQueryTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
@@ -40,6 +41,23 @@ class EntityQueryTest extends GraphQLFileTestBase {
     Role::load('anonymous')
       ->grantPermission('access content')
       ->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'a' => [
+              'exposed' => TRUE,
+              'view_mode' => 'node.graphql',
+            ],
+            'b' => [
+              'exposed' => TRUE,
+              'view_mode' => 'node.graphql',
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**
