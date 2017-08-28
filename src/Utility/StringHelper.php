@@ -19,8 +19,8 @@ class StringHelper {
    */
   public static function camelCase($components) {
     $string = is_array($components) ? implode('_', $components) : $components;
-    $string = preg_replace('/^[^_a-zA-Z]+/', '', $string);
-    $components = array_filter(preg_split('/[^a-zA-Z0-9]/', $string));
+    $filtered = preg_replace('/^[^_a-zA-Z]+/', '', $string);
+    $components = array_filter(preg_split('/[^a-zA-Z0-9]/', $filtered));
 
     if (!count($components)) {
       throw new \InvalidArgumentException(sprintf("Failed to create a specification compliant string representation for '%s'.", $string));

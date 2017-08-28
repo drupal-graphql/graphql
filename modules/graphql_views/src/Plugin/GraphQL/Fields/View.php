@@ -75,8 +75,8 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       if (!empty($definition['arguments_info'])) {
         $viewArguments = [];
         foreach ($definition['arguments_info'] as $argumentId => $argumentInfo) {
-          if (isset($args['contextual_filter'][$argumentId])) {
-            $viewArguments[$argumentInfo['index']] = $args['contextual_filter'][$argumentId];
+          if (isset($args['contextualFilter'][$argumentId])) {
+            $viewArguments[$argumentInfo['index']] = $args['contextualFilter'][$argumentId];
           }
           elseif (
             $value instanceof EntityInterface &&

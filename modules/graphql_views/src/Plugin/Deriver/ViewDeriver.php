@@ -52,27 +52,33 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
 
       $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
       if ($argumentsInfo) {
-        $arguments['contextual_filter'] = [
+        $arguments['contextualFilter'] = [
           'type' => StringHelper::camelCase([
-            $viewId, $displayId, 'view', 'contextual_filter', 'input',
+            $viewId, $displayId, 'view', 'contextual', 'filter', 'input',
           ]),
           'multi' => FALSE,
           'nullable' => TRUE,
         ];
+
         foreach ($argumentsInfo as $argumentInfo) {
-          // 1) Depending on whether bundles are known, we expose the view field
+          // Depending on whether bundles are known, we expose the view field
           // either on the interface (e.g. Node) or on the type (e.g. NodePage)
-          // level.
-          // 2) Here we specify types managed by other graphql_* modules, yet we
-          // don't define these modules as dependencies. If types are not in the
-          // schema, the resulting GraphQL field will be attached to nowhere, so
-          // it won't go into the schema.
-          $argumentTypes = empty($argumentInfo['bundles'])
-            ? [StringHelper::camelCase($argumentInfo['entity_type'])]
-            : array_map(function ($bundle) use ($argumentInfo) {
+          // level. Here we specify types managed by other graphql_* modules,
+          // yet we don't define these modules as dependencies. If types are not
+          // in the schema, the resulting GraphQL field will be attached to
+          // nowhere, so it won't go into the schema.
+          if (empty($argumentInfo['bundles']) && empty($argumentInfo['entity_type'])) {
+            continue;
+          }
+
+          if (empty($argumentInfo['bundles'])) {
+            $types = array_merge($types, [StringHelper::camelCase($argumentInfo['entity_type'])]);
+          }
+          else {
+            $types = array_merge($types, array_map(function ($bundle) use ($argumentInfo) {
               return StringHelper::camelCase([$argumentInfo['entity_type'], $bundle]);
-            }, $argumentInfo['bundles']);
-          $types = array_merge($types, $argumentTypes);
+            }, $argumentInfo['bundles']));
+          }
         }
       }
 
@@ -91,7 +97,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             "default" => TRUE,
           ],
           'sortBy' => [
-            "enum_type_name" => StringHelper::camelCase(['SortBy', $id, 'Enum']),
+            "enum_type_name" => StringHelper::camelCase(['sort', 'by', $id, 'enum']),
             "type" => array_map(function ($sort) {
               return $sort['expose']['label'];
             }, $sorts),
