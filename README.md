@@ -1,8 +1,8 @@
 # GraphQL for Drupal
 
-[![Build Status](https://travis-ci.org/fubhy/graphql-drupal.svg?branch=8.x-3.x)](https://travis-ci.org/fubhy/graphql-drupal)
-[![Code Coverage](https://codecov.io/gh/fubhy/graphql-drupal/branch/8.x-3.x/graph/badge.svg)](https://codecov.io/gh/fubhy/graphql-drupal)
-[![Code Quality](https://scrutinizer-ci.com/g/fubhy/graphql-drupal/badges/quality-score.png?b=8.x-3.x)](https://scrutinizer-ci.com/g/fubhy/graphql-drupal/?branch=8.x-3.x)
+[![Build Status](https://img.shields.io/travis/fubhy/graphql-drupal.svg)](https://travis-ci.org/fubhy/graphql-drupal)
+[![Code Coverage](https://img.shields.io/codecov/c/github/fubhy/graphql-drupal.svg)](https://codecov.io/gh/fubhy/graphql-drupal)
+[![Code Quality](https://img.shields.io/scrutinizer/g/fubhy/graphql-drupal.svg)](https://scrutinizer-ci.com/g/fubhy/graphql-drupal/?branch=8.x-3.x)
 
 This module lets you craft and expose a [GraphQL] schema for [Drupal 8].
 
