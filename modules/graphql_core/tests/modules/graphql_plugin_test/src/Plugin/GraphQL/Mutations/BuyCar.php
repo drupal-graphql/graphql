@@ -34,6 +34,13 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
   protected $pluginManager;
 
   /**
+   * The schema manager.
+   *
+   * @var \Drupal\graphql_core\GraphQLSchemaManagerInterface
+   */
+  protected $schemaManager;
+
+  /**
    * The garage.
    *
    * @var \Drupal\graphql_plugin_test\GarageInterface

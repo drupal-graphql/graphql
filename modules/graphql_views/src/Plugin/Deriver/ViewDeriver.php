@@ -40,7 +40,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
-      if ($filters) {
+      if (!empty($filters)) {
         $arguments['filter'] = [
           'type' => StringHelper::camelCase([
             $viewId, $displayId, 'view', 'filter', 'input',
@@ -51,7 +51,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       }
 
       $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
-      if ($argumentsInfo) {
+      if (!empty($argumentsInfo)) {
         $arguments['contextualFilter'] = [
           'type' => StringHelper::camelCase([
             $viewId, $displayId, 'view', 'contextual', 'filter', 'input',
@@ -86,7 +86,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         return $sort['exposed'];
       });
 
-      if ($sorts) {
+      if (!empty($sorts)) {
         $arguments += [
           'sortDirection' => [
             "enum_type_name" => "ViewsSortDirectionEnum",

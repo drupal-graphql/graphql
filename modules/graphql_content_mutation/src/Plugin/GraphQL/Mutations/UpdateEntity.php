@@ -88,8 +88,10 @@ class UpdateEntity extends MutationPluginBase implements ContainerFactoryPluginI
     // keys because we usually convert them to camel case when adding them to
     // the schema.
     $inputArgs = $args['input'];
+    /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $type */
+    $type = $this->config->getArgument('input')->getType();
     /** @var \Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInput $inputType */
-    $inputType = $this->config->getArgument('input')->getType()->getNamedType();
+    $inputType = $type->getNamedType();
     $input = $this->extractEntityInput($inputArgs, $inputType);
 
     try {

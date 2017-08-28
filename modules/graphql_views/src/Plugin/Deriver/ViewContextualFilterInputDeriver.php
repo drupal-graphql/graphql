@@ -22,14 +22,14 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
       $view = $viewStorage->load($viewId);
       $display = $this->getViewDisplay($view, $displayId);
 
-      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
+      if (!$this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
         // implementing fieldable views display support.
         continue;
       }
 
       $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
-      if ($argumentsInfo) {
+      if (!empty($argumentsInfo)) {
         $id = implode('_', [
           $viewId, $displayId, 'view', 'contextual', 'filter', 'input'
         ]);

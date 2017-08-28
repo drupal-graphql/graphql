@@ -49,10 +49,10 @@ trait PluginTrait {
    *   A configuration array containing information about the plugin instance.
    * @param string $pluginId
    *   The plugin_id for the plugin instance.
-   * @param mixed $pluginDefinition
+   * @param array $pluginDefinition
    *   The plugin implementation definition.
    */
-  public function constructPlugin(array $configuration, $pluginId, $pluginDefinition) {
+  public function constructPlugin(array $configuration, $pluginId, array $pluginDefinition) {
     $this->configuration = $configuration;
     $this->pluginId = $pluginId;
     $this->pluginDefinition = $pluginDefinition;

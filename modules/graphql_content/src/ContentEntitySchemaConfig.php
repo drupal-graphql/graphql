@@ -64,12 +64,12 @@ class ContentEntitySchemaConfig {
    * @param string $bundle
    *   The bundle machine name.
    *
-   * @return string
-   *   The view mode machine name, or FALSE if no fields are exposed.
+   * @return string|null
+   *   The view mode machine name, or NULL if no fields are exposed.
    */
   public function getExposedViewMode($entityType, $bundle) {
     if (!$this->isEntityBundleExposed($entityType, $bundle)) {
-      return FALSE;
+      return NULL;
     }
 
     $viewMode = NestedArray::getValue($this->types, [
@@ -77,7 +77,7 @@ class ContentEntitySchemaConfig {
     ]);
 
     if (!$viewMode || $viewMode == '__none__') {
-      return FALSE;
+      return NULL;
     }
 
     list($type, $mode) = explode('.', $viewMode);
