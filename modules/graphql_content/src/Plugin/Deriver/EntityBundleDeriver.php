@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -81,9 +82,9 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
             continue;
           }
           $this->derivatives[$typeId . '-' . $bundle] = [
-            'name' => graphql_camelcase([$typeId, $bundle]),
+            'name' => StringHelper::camelCase([$typeId, $bundle]),
             'entity_type' => $typeId,
-            'interfaces' => [graphql_camelcase($typeId)],
+            'interfaces' => [StringHelper::camelCase($typeId)],
             'bundle' => $bundle,
           ] + $basePluginDefinition;
         }

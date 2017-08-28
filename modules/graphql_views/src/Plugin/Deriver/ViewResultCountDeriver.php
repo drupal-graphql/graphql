@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Views;
 
 /**
@@ -36,9 +37,7 @@ class ViewResultCountDeriver extends ViewDeriverBase {
       $this->derivatives[$id] = [
         'id' => $id,
         'type' => 'Int',
-        'types' => [
-          graphql_camelcase(implode('_', [$viewId, $displayId, 'result'])),
-        ],
+        'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
         'view' => $viewId,
         'display' => $displayId,
         'cache_tags' => $view->getCacheTags(),

@@ -14,26 +14,6 @@ define('GRAPHQL_CORE_TYPE_PLUGIN', 'type');
 define('GRAPHQL_CORE_ENUM_PLUGIN', 'enum');
 
 /**
- * Turn a list of machine names into a camel-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha2.
- *   Use graphql_camelcase() instead.
- */
-function graphql_core_camelcase($components) {
-  return graphql_camelcase($components);
-}
-
-/**
- * Turn a list of machine names into a property-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha2.
- *   Use graphql_propcase() instead.
- */
-function graphql_core_propcase($components) {
-  return graphql_propcase($components);
-}
-
-/**
  * Implements hook_graphql_interfaces_alter().
  *
  * Flatten the interface inheritance tree.

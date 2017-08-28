@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -83,7 +84,7 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
             continue;
           }
 
-          $properties[graphql_propcase($propertyName)] = [
+          $properties[StringHelper::propCase($propertyName)] = [
             'type' => 'String',
             'nullable' => !$propertyDefinition->isRequired(),
             'multi' => $propertyDefinition->isList(),
@@ -92,7 +93,7 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
         }
 
         $this->derivatives["$entityTypeId:$fieldName"] = [
-          'name' => graphql_camelcase([$entityTypeId, $fieldName]) . 'FieldInput',
+          'name' => StringHelper::camelCase([$entityTypeId, $fieldName, 'field', 'input']),
           'fields' => $properties,
           'entity_type' => $entityTypeId,
           'field_name' => $fieldName,

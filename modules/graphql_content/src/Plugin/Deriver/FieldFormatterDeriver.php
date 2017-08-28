@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -96,9 +97,9 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   protected function getDefinition($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
     return [
       'types' => [
-        graphql_camelcase([$entityType, $bundle]),
+        StringHelper::camelCase([$entityType, $bundle]),
       ],
-      'name' => graphql_propcase($storage->getName()),
+      'name' => StringHelper::propCase($storage->getName()),
       'virtual' => !$storage,
       'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
       'nullable' => TRUE,

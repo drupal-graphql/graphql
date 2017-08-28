@@ -3,6 +3,7 @@
 namespace Drupal\graphql_views\Plugin\Deriver;
 
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Views;
 
 /**
@@ -59,7 +60,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => graphql_camelcase($id),
+        'name' => StringHelper::camelCase($id),
         'fields' => $fields,
         'view' => $viewId,
         'display' => $displayId,
@@ -133,7 +134,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
     $genericInputFilter = [
       'id' => $id,
-      'name' => graphql_camelcase($id),
+      'name' => StringHelper::camelCase($id),
       'fields' => $fields,
     ] + $basePluginDefinition;
 
