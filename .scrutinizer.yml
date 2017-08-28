@@ -18,7 +18,7 @@ tools:
   # Code Sniffer
   php_code_sniffer:
     enabled: true
-    command: phpcs
+    command: phpcs-run
     config:
       standard: PSR2
     filter:
