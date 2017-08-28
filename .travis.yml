@@ -7,9 +7,14 @@ php:
   - 7
 
 env:
-  - DRUPAL_CORE=8.2.x
-  - DRUPAL_CORE=8.3.x
-  - DRUPAL_CORE=8.4.x
+  global:
+    - DRUPAL_BUILD_DIR=$TRAVIS_BUILD_DIR/../drupal
+    - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
+    - SIMPLETEST_BASE_URL=http://localhost:8888
+  matrix:
+    - DRUPAL_CORE=8.2.x
+    - DRUPAL_CORE=8.3.x
+    - DRUPAL_CORE=8.4.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -22,19 +27,23 @@ matrix:
         - WITH_PHPDBG_COVERAGE=true
   allow_failures:
     # Allow the code coverage report to fail.
-    - env: WITH_PHPDBG_COVERAGE=true DRUPAL_CORE=8.4.x
+    - php: 7
+      env:
+        - DRUPAL_CORE=8.4.x
+        # Only run code coverage on the latest php and drupal versions.
+        - WITH_PHPDBG_COVERAGE=true
 
 mysql:
   database: graphql
   username: root
   encoding: utf8
 
-# Cache composer downloads because cloning Coder from drupal.org is very slow :-(
+# Cache composer downloads.
 cache:
   directories:
     - $HOME/.composer
 
-before_script:
+before_install:
   # Disable xdebug.
   - phpenv config-rm xdebug.ini
 
@@ -55,54 +64,48 @@ before_script:
   # Disable the default memory limit.
   - echo memory_limit = -1 >> $PHPINI
 
-  # Remember the current graphql test directory for later use in the Drupal
-  # installation.
-  - export TESTDIR=$(pwd)
+  # Update composer.
+  - composer self-update
 
-  # Navigate out of module directory to prevent blown stack by recursive module
-  # lookup.
-  - cd ..
-
-  # Create database.
+install:
+  # Create the database.
   - mysql -e 'create database graphql'
-  # Export database variable for kernel tests.
-  - export SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
+
   # Download Drupal 8 core from the Github mirror because it is faster.
-  - travis_retry git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git
-  - cd drupal
+  - git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git $DRUPAL_BUILD_DIR
 
   # Reference the module in the build site.
-  - ln -s $TESTDIR modules/graphql
+  - ln -s $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
 
-  # Run composer install for Drupal 8.2. We need an up-to-date composer when
-  # installing Drupal 8.2.
-  - composer self-update
-  # Bring in the module dependencies without requiring a merge plugin.
-  - composer require youshido/graphql:~1.5
-  # The require already triggered the install.
+  # When running with phpdbg we need to replace all code occurrences that check
+  # for 'cli' with 'phpdbg'. Some files might be write protected, hence the
+  # fallback.
+  - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
+      then grep -rl 'cli' $DRUPAL_BUILD_DIR/core $DRUPAL_BUILD_DIR/modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
+    fi
+
+  # Bring in the module depe  ndencies without requiring a merge plugin. The
+  # require also triggers a full 'composer install'.
+  - composer --working-dir=$DRUPAL_BUILD_DIR require youshido/graphql:~1.5
+
+script:
+  # Navigate into the drupal build directory.
+  - cd $DRUPAL_BUILD_DIR
 
   # Start a web server on port 8888, run in the background.
   - php -S localhost:8888 &
 
-  # Export web server URL for browser tests.
-  - export SIMPLETEST_BASE_URL=http://localhost:8888
-
-script:
-  # Run the unit tests which also include the kernel tests. When running with
-  # phpdbg we need to replace all code occurrences that check for 'cli' with
-  # 'phpdbg'. Some files might be write protected, hence the '|| true'.
+  # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then
-        grep -rl 'cli' core modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
-        phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
-      else
-        vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
+      then phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
+    fi
+
+  # Run the unit tests with standdard php otherwise.
+  - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
+      then vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
     fi
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then
-        bash <(curl -s https://codecov.io/bash);
-        wget https://scrutinizer-ci.com/ocular.phar;
-        php ocular.phar code-coverage:upload --format=php-clover coverage.xml;
+      then bash <(curl -s https://codecov.io/bash);
     fi
