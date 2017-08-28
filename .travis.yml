@@ -1,42 +1,28 @@
 language: php
 sudo: false
 
+php:
+  - 5.5
+  - 5.6
+  - 7
+
+env:
+  - DRUPAL_CORE=8.2.x
+  - DRUPAL_CORE=8.3.x
+  - DRUPAL_CORE=8.4.x
+
 matrix:
   # Don't wait for the allowed failures to build.
   fast_finish: true
   include:
-    - php: 5.5
-      env:
-        - DRUPAL_CORE=8.2.x
-    - php: 5.5
-      env:
-        - DRUPAL_CORE=8.3.x
-    - php: 5.5
-      env:
-        - DRUPAL_CORE=8.4.x
-    - php: 5.6
-      env:
-        - DRUPAL_CORE=8.2.x
-    - php: 5.6
-      env:
-        - DRUPAL_CORE=8.3.x
-    - php: 5.6
-      env:
-        - DRUPAL_CORE=8.4.x
-    - php: 7
-      env:
-        - DRUPAL_CORE=8.2.x
-    - php: 7
-      env:
-        - DRUPAL_CORE=8.3.x
-    - php: 7
-      env:
-        - DRUPAL_CORE=8.4.x
     - php: 7
       env:
         - DRUPAL_CORE=8.4.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
+  allow_failures:
+    # Allow the code coverage report to fail.
+    - env: WITH_PHPDBG_COVERAGE=true DRUPAL_CORE=8.4.x
 
 mysql:
   database: graphql
@@ -101,10 +87,6 @@ before_script:
   # Export web server URL for browser tests.
   - export SIMPLETEST_BASE_URL=http://localhost:8888
 
-  # Install PHPCS to check for Drupal coding standards.
-  - travis_retry composer global require drupal/coder
-  - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
-
 script:
   # Run the unit tests which also include the kernel tests. When running with
   # phpdbg we need to replace all code occurrences that check for 'cli' with
@@ -117,10 +99,10 @@ script:
         vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
     fi
 
-  # Check for coding standards violations
-  - cd modules/graphql && $HOME/.composer/vendor/bin/phpcs
-
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then bash <(curl -s https://codecov.io/bash);
+      then
+        bash <(curl -s https://codecov.io/bash);
+        wget https://scrutinizer-ci.com/ocular.phar;
+        php ocular.phar code-coverage:upload --format=php-clover coverage.xml;
     fi

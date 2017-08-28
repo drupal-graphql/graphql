@@ -3,12 +3,12 @@
 namespace Drupal\graphql_core\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -57,7 +57,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_camelcase([$id, 'query', 'filter', 'input']),
+          'name' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -65,18 +65,18 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
-        $queryableProperties = array_filter($properties, function ($property) {
+        $queryableProperties = array_filter($properties, function($property) {
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
         // Don't even create the type if there are no queryable properties.
-        if (!$queryableProperties) {
+        if (empty($queryableProperties)) {
           continue;
         }
 
         // Add all queryable properties as fields.
         foreach ($queryableProperties as $key => $property) {
-          $fieldName = graphql_propcase($key);
+          $fieldName = StringHelper::propCase($key);
 
           // Some field types don't have a main property.
           if (!$mainProperty = $property->getMainPropertyName()) {

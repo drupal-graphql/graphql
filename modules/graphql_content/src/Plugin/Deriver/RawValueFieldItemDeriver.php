@@ -5,6 +5,7 @@ namespace Drupal\graphql_content\Plugin\Deriver;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Drupal\graphql_content\TypeMapper;
@@ -63,6 +64,10 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   }
 
   protected function getDefinitions($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
+    if (!isset($storage)) {
+      return NULL;
+    }
+
     $fieldName = $storage->getName();
     $dataType = RawValueFieldType::getId($entityType, $fieldName);
 
@@ -76,7 +81,7 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
       }
 
       $definitions["$entityType-$fieldName-$property"] = [
-        'name' => graphql_propcase($property),
+        'name' => StringHelper::propCase($property),
         'property' => $property,
         'multi' => FALSE,
         'type' => $this->typeMapper->typedDataToGraphQLFieldType($definition),

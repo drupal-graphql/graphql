@@ -69,7 +69,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *   The enhanced controller defaults.
    */
   protected function enhanceBatch(array $defaults, Request $request) {
-    $queries = $this->filterRequestValues($request, function ($index) {
+    $queries = $this->filterRequestValues($request, function($index) {
       return is_numeric($index);
     });
 
@@ -101,8 +101,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *   The enhanced controller defaults.
    */
   protected function enhanceSingle(array $defaults, Request $request) {
-    $values = $this->filterRequestValues($request, function ($index) {
-       return in_array($index, ['query', 'variables', 'id', 'version']);
+    $values = $this->filterRequestValues($request, function($index) {
+      return in_array($index, ['query', 'variables', 'id', 'version']);
     }) + [
       'query' => '',
       'variables' => [],
@@ -145,7 +145,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $keys = array_filter(array_keys($values), $filter);
     $values = array_intersect_key($values, array_flip($keys));
 
-    $values = array_map(function ($value) {
+    $values = array_map(function($value) {
       if (!is_string($value)) {
         return $value;
       }

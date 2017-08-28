@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Views;
 
 /**
@@ -25,7 +26,7 @@ class ViewResultCountDeriver extends ViewDeriverBase {
         continue;
       }
 
-      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
+      if (!$this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
         // implementing fieldable views display support.
         continue;
@@ -36,9 +37,7 @@ class ViewResultCountDeriver extends ViewDeriverBase {
       $this->derivatives[$id] = [
         'id' => $id,
         'type' => 'Int',
-        'types' => [
-          graphql_camelcase(implode('_', [$viewId, $displayId, 'result'])),
-        ],
+        'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
         'view' => $viewId,
         'display' => $displayId,
         'cache_tags' => $view->getCacheTags(),

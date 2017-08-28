@@ -7,6 +7,7 @@
 
 namespace Drupal\graphql\Plugin\views\display;
 
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -110,7 +111,7 @@ class GraphQL extends DisplayPluginBase {
     if (empty($queryName)) {
       $viewId = $this->view->id();
       $displayId = $this->display['id'];
-      $queryName = graphql_camelcase([$viewId, $displayId, 'view']);
+      $queryName = StringHelper::camelCase([$viewId, $displayId, 'view']);
     }
     return lcfirst($queryName);
   }
@@ -161,7 +162,7 @@ class GraphQL extends DisplayPluginBase {
           '#default_value' => $this->getGraphQLQueryName(),
         ];
         break;
-     }
+    }
   }
 
   /**

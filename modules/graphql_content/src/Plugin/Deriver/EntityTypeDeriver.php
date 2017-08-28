@@ -3,10 +3,10 @@
 namespace Drupal\graphql_content\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -70,7 +70,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
       }
       if ($type instanceof ContentEntityTypeInterface) {
         $this->derivatives[$typeId] = [
-          'name' => graphql_camelcase($typeId),
+          'name' => StringHelper::camelCase($typeId),
           'data_type' => 'entity:' . $typeId,
           'entity_type' => $typeId,
         ] + $basePluginDefinition;

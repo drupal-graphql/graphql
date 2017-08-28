@@ -14,17 +14,18 @@ class GraphQLQueryMapListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['version'] = $this->t('Query maps');
-    return $header + parent::buildHeader();
+    return [
+      'version' => $this->t('Query maps'),
+    ] + parent::buildHeader();
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['version'] = $entity->id();
-    // You probably want a few more properties here...
-    return $row + parent::buildRow($entity);
+    return [
+      'version' => $entity->id(),
+    ] + parent::buildRow($entity);
   }
 
   /**

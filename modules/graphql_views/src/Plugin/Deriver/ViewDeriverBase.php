@@ -144,7 +144,7 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   Boolean flag indicating if the interface exists.
    */
   protected function interfaceExists($interface) {
-    return (bool) array_filter($this->interfacePluginManager->getDefinitions(), function ($definition) use ($interface) {
+    return (bool) array_filter($this->interfacePluginManager->getDefinitions(), function($definition) use ($interface) {
       return $definition['name'] === $interface;
     });
   }

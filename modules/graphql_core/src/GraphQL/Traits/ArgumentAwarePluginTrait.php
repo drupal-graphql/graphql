@@ -66,7 +66,7 @@ trait ArgumentAwarePluginTrait {
    */
   protected function buildArgumentType(GraphQLSchemaManagerInterface $schemaManager, $argument) {
     if (is_array($argument) && array_key_exists('data_type', $argument) && $argument['data_type']) {
-      $types = $schemaManager->find(function ($definition) use ($argument) {
+      $types = $schemaManager->find(function($definition) use ($argument) {
         return array_key_exists('data_type', $definition) && $definition['data_type'] === $argument['data_type'];
       }, [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,

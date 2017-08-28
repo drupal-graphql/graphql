@@ -102,7 +102,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Gr
    */
   protected function buildFieldType(GraphQLSchemaManagerInterface $schemaManager, $field) {
     if (is_array($field) && array_key_exists('data_type', $field) && $field['data_type']) {
-      $types = $schemaManager->find(function ($definition) use ($field) {
+      $types = $schemaManager->find(function($definition) use ($field) {
         return array_key_exists('data_type', $definition) && $definition['data_type'] === $field['data_type'];
       }, [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,

@@ -33,7 +33,7 @@ trait EntityMutationInputTrait {
       }
 
       if ($fieldType instanceof EntityInputField) {
-        $fieldValue = $isMulti ? array_map(function ($value) use ($fieldType) {
+        $fieldValue = $isMulti ? array_map(function($value) use ($fieldType) {
           return $this->extractEntityFieldInput($value, $fieldType);
         }, $fieldValue) : $this->extractEntityFieldInput($fieldValue, $fieldType);
 
@@ -59,7 +59,7 @@ trait EntityMutationInputTrait {
    */
   protected function extractEntityFieldInput(array $fieldValue, EntityInputField $fieldType) {
     $properties = $fieldType->getPluginDefinition()['fields'];
-    return array_reduce(array_keys($fieldValue), function ($carry, $current) use ($properties, $fieldValue) {
+    return array_reduce(array_keys($fieldValue), function($carry, $current) use ($properties, $fieldValue) {
       $key = $properties[$current]['property_name'];
       $value = $fieldValue[$current];
 

@@ -92,8 +92,10 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $query->sort($type->getKey('id'));
 
     if (array_key_exists('filter', $args) && $args['filter']) {
+      /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
+      $filter = $this->config->getArgument('filter')->getType();
       /** @var \Drupal\graphql_core\Plugin\GraphQL\InputTypes\EntityQueryFilterInput $filterType */
-      $filterType = $this->config->getArgument('filter')->getType()->getNamedType();
+      $filterType = $filter->getNamedType();
       $filterFields = $filterType->getPluginDefinition()['fields'];
 
       foreach ($args['filter'] as $key => $arg) {
