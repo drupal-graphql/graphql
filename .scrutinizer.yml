@@ -18,7 +18,6 @@ tools:
   # Code Sniffer
   php_code_sniffer:
     enabled: true
-    command: phpcs-run
     config:
       standard: PSR2
     filter:
@@ -28,21 +27,18 @@ tools:
   # Copy/Paste Detector
   php_cpd:
     enabled: true
-    command: phpcpd
     excluded_dirs:
       - 'vendor'
 
   # Analyzes the size and structure of a PHP project.
   php_loc:
     enabled: true
-    command: phploc
     excluded_dirs:
       - vendor
 
   # PHP Mess Detector (http://phpmd.org).
   php_mess_detector:
     enabled: true
-    command: phpmd
     config:
       rulesets:
         - codesize
@@ -57,7 +53,6 @@ tools:
   # Analyzes the size and structure of a PHP project.
   php_pdepend:
     enabled: true
-    command: pdepend
     excluded_dirs:
       - vendor
 
