@@ -63,6 +63,10 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   }
 
   protected function getDefinitions($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
+    if (!isset($storage)) {
+      return NULL;
+    }
+
     $fieldName = $storage->getName();
     $dataType = RawValueFieldType::getId($entityType, $fieldName);
 

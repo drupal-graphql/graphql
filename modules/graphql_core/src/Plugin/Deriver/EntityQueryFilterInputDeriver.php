@@ -70,7 +70,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
         });
 
         // Don't even create the type if there are no queryable properties.
-        if (!$queryableProperties) {
+        if (empty($queryableProperties)) {
           continue;
         }
 

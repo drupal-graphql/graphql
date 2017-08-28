@@ -68,7 +68,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
-        if ($queryableProperties) {
+        if (!empty($queryableProperties)) {
           $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,

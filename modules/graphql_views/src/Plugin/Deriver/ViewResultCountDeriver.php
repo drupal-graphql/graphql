@@ -25,7 +25,7 @@ class ViewResultCountDeriver extends ViewDeriverBase {
         continue;
       }
 
-      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
+      if (!$this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
         // implementing fieldable views display support.
         continue;

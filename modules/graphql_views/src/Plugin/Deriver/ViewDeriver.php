@@ -39,7 +39,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
-      if ($filters) {
+      if (!empty($filters)) {
         $arguments['filter'] = [
           'type' => graphql_camelcase([
             $viewId, $displayId, 'view', 'filter', 'input',
@@ -50,7 +50,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       }
 
       $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
-      if ($argumentsInfo) {
+      if (!empty($argumentsInfo)) {
         $arguments['contextual_filter'] = [
           'type' => graphql_camelcase([
             $viewId, $displayId, 'view', 'contextual_filter', 'input',
@@ -58,6 +58,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
           'multi' => FALSE,
           'nullable' => TRUE,
         ];
+
         foreach ($argumentsInfo as $argumentInfo) {
           // 1) Depending on whether bundles are known, we expose the view field
           // either on the interface (e.g. Node) or on the type (e.g. NodePage)
@@ -79,7 +80,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         return $sort['exposed'];
       });
 
-      if ($sorts) {
+      if (!empty($sorts)) {
         $arguments += [
           'sortDirection' => [
             "enum_type_name" => "ViewsSortDirectionEnum",

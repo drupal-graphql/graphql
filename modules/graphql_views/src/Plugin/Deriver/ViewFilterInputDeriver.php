@@ -21,7 +21,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       $view = $viewStorage->load($viewId);
       $display = $this->getViewDisplay($view, $displayId);
 
-      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
+      if (!$this->getEntityTypeByTable($view->get('base_table'))) {
         // Skip for now, switch to different response type later when
         // implementing fieldable views display support.
         continue;
@@ -34,7 +34,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       });
 
       // If there are no exposed filters, don't create the derivative.
-      if (!$filters) {
+      if (empty($filters)) {
         continue;
       }
 

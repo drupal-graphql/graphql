@@ -90,20 +90,24 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface|null $storage
    *   Field storage definition object.
    *
-   * @return array
+   * @return array|null
    *   Associative array of additional plugin definition values.
    */
   protected function getDefinition($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
-    return [
-      'types' => [
-        graphql_camelcase([$entityType, $bundle]),
-      ],
-      'name' => graphql_propcase($storage->getName()),
-      'virtual' => !$storage,
-      'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
-      'nullable' => TRUE,
-      'field' => $storage->getName(),
-    ];
+    if (isset($storage)) {
+      return [
+        'types' => [
+          graphql_camelcase([$entityType, $bundle]),
+        ],
+        'name' => graphql_propcase($storage->getName()),
+        'virtual' => !$storage,
+        'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
+        'nullable' => TRUE,
+        'field' => $storage->getName(),
+      ];
+    }
+
+    return NULL;
   }
 
   /**
