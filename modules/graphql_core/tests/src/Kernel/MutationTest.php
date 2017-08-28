@@ -31,7 +31,7 @@ class MutationTest extends GraphQLFileTestBase {
 
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $values = $this->executeQueryFile('buy_car.gql', [
+    $this->executeQueryFile('buy_car.gql', [
       'car' => $car,
     ]);
   }

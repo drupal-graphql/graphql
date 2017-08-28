@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -59,8 +60,8 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
       }
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_propcase($id) . 'ById',
-          'type' => graphql_camelcase($id),
+          'name' => StringHelper::propCase([$id, 'by', 'id']),
+          'type' => StringHelper::camelCase($id),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 

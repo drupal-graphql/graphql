@@ -24,7 +24,7 @@ class ConstraintViolationPath extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ConstraintViolationInterface){
+    if ($value instanceof ConstraintViolationInterface) {
       yield $value->getPropertyPath();
     }
   }

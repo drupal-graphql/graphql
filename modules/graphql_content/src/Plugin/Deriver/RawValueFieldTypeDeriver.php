@@ -14,9 +14,13 @@ class RawValueFieldTypeDeriver extends FieldFormatterDeriver {
    * {@inheritdoc}
    */
   protected function getDefinition($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
-    return [
-      'name' => RawValueFieldType::getId($entityType, $storage->getName()),
-    ];
+    if (isset($storage)) {
+      return [
+        'name' => RawValueFieldType::getId($entityType, $storage->getName()),
+      ];
+    }
+
+    return NULL;
   }
 
 }

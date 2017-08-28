@@ -73,7 +73,7 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
    * {@inheritdoc}
    */
   public function findByName($name, array $types) {
-    $result = $this->find(function ($definition) use ($name) {
+    $result = $this->find(function($definition) use ($name) {
       return $definition['name'] == $name;
     }, $types);
 
@@ -98,7 +98,7 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
    * {@inheritdoc}
    */
   public function getMutations() {
-    return $this->find(function () {
+    return $this->find(function() {
       return TRUE;
     }, [GRAPHQL_CORE_MUTATION_PLUGIN]);
   }
@@ -108,13 +108,13 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
    */
   public function getRootFields() {
     // Retrieve the list of fields that are explicitly attached to a type.
-    $attachedFields = array_reduce(array_filter(array_map(function ($def) {
+    $attachedFields = array_reduce(array_filter(array_map(function($def) {
       return array_key_exists('fields', $def['definition']) ? $def['definition']['fields'] : NULL;
     }, $this->getDefinitions())), 'array_merge', []);
 
     // Retrieve the list of fields that are not attached in any way or
     // explicitly attached to the artificial "Root" type.
-    return $this->find(function ($def) use ($attachedFields) {
+    return $this->find(function($def) use ($attachedFields) {
       return (!in_array($def['name'], $attachedFields) && empty($def['types'])) || in_array('Root', $def['types']);
     }, [GRAPHQL_CORE_FIELD_PLUGIN]);
   }

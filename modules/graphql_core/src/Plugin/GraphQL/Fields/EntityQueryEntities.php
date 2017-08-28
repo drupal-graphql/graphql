@@ -62,7 +62,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
       $storage = $this->entityTypeManager->getStorage($value->getEntityTypeId());
 
       $ids = $value->execute();
-      $entities = array_filter($storage->loadMultiple($ids), function (ContentEntityInterface $entity) {
+      $entities = array_filter($storage->loadMultiple($ids), function(ContentEntityInterface $entity) {
         return $entity->access('view');
       });
 
