@@ -2,7 +2,6 @@ build:
   tests:
     override:
       - php-scrutinizer-run
-      - 'phpcs-run --standard=phpcs.xml.dist'
 filter:
   excluded_paths:
       - 'tests/*'
