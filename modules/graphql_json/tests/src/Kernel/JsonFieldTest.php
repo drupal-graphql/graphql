@@ -8,6 +8,7 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -31,11 +32,14 @@ class JsonFieldTest extends KernelTestBase {
     'field',
     'text',
     'filter',
+    'file',
+    'graphql_file',
     'node',
     'user',
     'graphql',
     'graphql_core',
     'graphql_content',
+    'graphql_file',
     'graphql_json',
   ];
 
@@ -47,6 +51,8 @@ class JsonFieldTest extends KernelTestBase {
     $this->installConfig('user');
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
+    $this->installSchema('file', 'file_usage');
+    $this->installEntitySchema('file');
 
     Role::load('anonymous')
       ->grantPermission('access content')
@@ -67,7 +73,20 @@ class JsonFieldTest extends KernelTestBase {
       'field_name' => 'json',
       'entity_type' => 'node',
       'bundle' => 'graphql',
-      'label' => 'XML',
+      'label' => 'Json',
+    ])->save();
+
+    FieldStorageConfig::create([
+      'field_name' => 'file',
+      'type' => 'file',
+      'entity_type' => 'node',
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'file',
+      'entity_type' => 'node',
+      'bundle' => 'graphql',
+      'label' => 'File',
     ])->save();
 
     EntityViewMode::create([
@@ -80,7 +99,10 @@ class JsonFieldTest extends KernelTestBase {
       'bundle' => 'graphql',
       'mode' => 'graphql',
       'status' => TRUE,
-    ])->setComponent('json', ['type' => 'graphql_json'])->save();
+    ])
+      ->setComponent('json', ['type' => 'graphql_json'])
+      ->setComponent('file', ['type' => 'graphql_file'])
+      ->save();
 
     $this->container->get('config.factory')->getEditable('graphql_content.schema')
       ->set('types', [
@@ -93,12 +115,20 @@ class JsonFieldTest extends KernelTestBase {
             ],
           ],
         ],
+        'file' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'file' => [
+              'exposed' => TRUE,
+            ],
+          ],
+        ],
       ])
       ->save();
   }
 
   /**
-   * Test tag name retrieval.
+   * Test json text fields.
    */
   public function testJsonTextField() {
     $entity = Node::create([
@@ -117,6 +147,32 @@ class JsonFieldTest extends KernelTestBase {
         'value' => 'test',
       ],
     ], $result['data']['route']['entity']['json']);
+  }
+
+  /**
+   * Test json file fields.
+   */
+  public function testJsonFileField() {
+    $file = File::create([
+      'uri' => drupal_get_path('module', 'graphql_json') . '/tests/files/test.json',
+    ]);
+    $file->save();
+    $entity = Node::create([
+      'type' => 'graphql',
+      'title' => 'Json text field test',
+      'file' => $file,
+    ]);
+    $entity->save();
+
+    $result = $this->executeQueryFile('field_file.gql', [
+      'path' => '/node/' . $entity->id(),
+    ]);
+
+    $this->assertEquals([
+      'path' => [
+        'value' => 'test',
+      ],
+    ], $result['data']['route']['entity']['file']['json']);
   }
 
 }
