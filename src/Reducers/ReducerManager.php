@@ -51,7 +51,7 @@ class ReducerManager {
    *   An array of available query reducer services.
    */
   public function getAllServices() {
-    return array_map(function ($id) {
+    return array_map(function($id) {
       return $this->getService($id);
     }, $this->reducers);
   }

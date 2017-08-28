@@ -30,7 +30,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
       $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
-      $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
+      $filters = array_filter($display->getOption('filters') ?: [], function($filter) {
         return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
@@ -46,7 +46,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
       }
       $filters = $newFilters;
 
-      $fields = array_map(function ($filter) use ($basePluginDefinition) {
+      $fields = array_map(function($filter) use ($basePluginDefinition) {
         if ($this->isGenericInputFilter($filter)) {
           return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
         }
@@ -125,7 +125,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
     $fields = [];
     foreach ($filter['value'] as $fieldKey => $fieldDefaultValue) {
-      $fields[ $fieldKey ] = [
+      $fields[$fieldKey] = [
         'type' => 'String',
         'nullable' => TRUE,
         'multi' => FALSE,

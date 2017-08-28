@@ -36,7 +36,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $arguments = [];
       $types = ['Root'];
 
-      $filters = array_filter($display->getOption('filters') ?: [], function ($filter) {
+      $filters = array_filter($display->getOption('filters') ?: [], function($filter) {
         return array_key_exists('exposed', $filter) && $filter['exposed'];
       });
 
@@ -75,14 +75,14 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
             $types = array_merge($types, [StringHelper::camelCase($argumentInfo['entity_type'])]);
           }
           else {
-            $types = array_merge($types, array_map(function ($bundle) use ($argumentInfo) {
+            $types = array_merge($types, array_map(function($bundle) use ($argumentInfo) {
               return StringHelper::camelCase([$argumentInfo['entity_type'], $bundle]);
             }, $argumentInfo['bundles']));
           }
         }
       }
 
-      $sorts = array_filter($display->getOption('sorts') ?: [], function ($sort) {
+      $sorts = array_filter($display->getOption('sorts') ?: [], function($sort) {
         return $sort['exposed'];
       });
 
@@ -98,7 +98,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
           ],
           'sortBy' => [
             "enum_type_name" => StringHelper::camelCase(['sort', 'by', $id, 'enum']),
-            "type" => array_map(function ($sort) {
+            "type" => array_map(function($sort) {
               return $sort['expose']['label'];
             }, $sorts),
             "nullable" => TRUE,

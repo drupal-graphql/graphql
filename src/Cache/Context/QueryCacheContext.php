@@ -64,7 +64,7 @@ class QueryCacheContext implements CacheContextInterface {
     else if ($request->attributes->has('queries')) {
       $queries = $request->attributes->get('queries');
 
-      $hash = hash('sha256', json_encode(array_map(function ($item) {
+      $hash = hash('sha256', json_encode(array_map(function($item) {
         return $this->getHash(
           !empty($item['query']) ? $item['query'] : '',
           !empty($item['variables']) ? $item['variables'] : []

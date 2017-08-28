@@ -87,7 +87,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    */
   public function testUnexposedEntity() {
     $schema = $this->executeQueryFile('schema.gql');
-    $types = array_filter($schema['data']['__schema']['types'], function ($type) {
+    $types = array_filter($schema['data']['__schema']['types'], function($type) {
       return in_array($type['name'], ['Node', 'NodeTest']);
     });
     $this->assertEmpty($types, 'No types exposed.');
@@ -105,7 +105,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
       ])->save();
 
     $schema = $this->executeQueryFile('schema.gql');
-    $types = array_filter($schema['data']['__schema']['types'], function ($type) {
+    $types = array_filter($schema['data']['__schema']['types'], function($type) {
       return in_array($type['name'], ['Node', 'NodeTest']);
     });
     $this->assertEquals(1, count($types), 'No types exposed.');
@@ -128,7 +128,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
       ])->save();
 
     $schema = $this->executeQueryFile('schema.gql');
-    $types = array_filter($schema['data']['__schema']['types'], function ($type) {
+    $types = array_filter($schema['data']['__schema']['types'], function($type) {
       return in_array($type['name'], ['Node', 'NodeTest']);
     });
     $this->assertEquals(2, count($types), 'No types exposed.');

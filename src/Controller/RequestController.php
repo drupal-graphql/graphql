@@ -161,7 +161,7 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleBatchRequest(Request $request, array $queries = []) {
-    $filterNumeric = function ($index) { return !is_numeric($index); };
+    $filterNumeric = function($index) { return !is_numeric($index); };
 
     // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
     $requestParameters = $request->query->all();
@@ -173,7 +173,7 @@ class RequestController implements ContainerInjectionInterface {
     $requestContent = array_intersect_key($requestContent, array_flip($requestContentKeys));
 
     // Walk over all queries and issue a sub-request for each.
-    $responses = array_map(function ($query) use ($request, $requestParameters, $requestContent) {
+    $responses = array_map(function($query) use ($request, $requestParameters, $requestContent) {
       $method = $request->getMethod();
 
       // Make sure we remove the 'queries' parameter, otherwise the subsequent
@@ -210,7 +210,7 @@ class RequestController implements ContainerInjectionInterface {
     }, $queries);
 
     // Gather all responses from all sub-requests.
-    $content = array_map(function (Response $response) {
+    $content = array_map(function(Response $response) {
       return json_decode($response->getContent());
     }, $responses);
 
@@ -219,7 +219,7 @@ class RequestController implements ContainerInjectionInterface {
     $metadata->setCacheMaxAge(Cache::PERMANENT);
 
     // Collect all of the metadata from all sub-requests.
-    $metadata = array_reduce($responses, function (RefinableCacheableDependencyInterface $carry, $current) {
+    $metadata = array_reduce($responses, function(RefinableCacheableDependencyInterface $carry, $current) {
       $current = $current instanceof CacheableResponseInterface ? $current->getCacheableMetadata() : $current;
       $carry->addCacheableDependency($current);
       return $carry;
@@ -256,7 +256,7 @@ class RequestController implements ContainerInjectionInterface {
 
     // Evaluating the GraphQL request can potentially invoke rendering. We allow
     // those to "leak" and collect them here in a render context.
-    $this->renderer->executeInRenderContext($context, function () use ($processor, $query, $variables) {
+    $this->renderer->executeInRenderContext($context, function() use ($processor, $query, $variables) {
       $processor->processPayload($query, $variables, $this->reducerManager->getAllServices());
     });
 

@@ -66,7 +66,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
-        $queryableProperties = array_filter($properties, function ($property) {
+        $queryableProperties = array_filter($properties, function($property) {
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 

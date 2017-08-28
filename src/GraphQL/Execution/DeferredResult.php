@@ -40,7 +40,7 @@ class DeferredResult extends OriginalDeferredResult {
   public function __construct(CacheableMetadata $metadata, DeferredResolverInterface $resolver, callable $callback) {
     $this->metadata = $metadata;
     $this->originalCallback = $callback;
-    parent::__construct($resolver, function ($result) {
+    parent::__construct($resolver, function($result) {
       if ($result instanceof CacheableDependencyInterface) {
         $this->metadata->addCacheableDependency($this);
       }
