@@ -79,7 +79,7 @@ trait TypedPluginTrait {
       $definition = $this->getPluginDefinition();
 
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {
-        $types = $schemaManager->find(function ($def) use ($definition) {
+        $types = $schemaManager->find(function($def) use ($definition) {
           return array_key_exists('data_type', $def) && $def['data_type'] === $definition['data_type'];
         }, [
           GRAPHQL_CORE_TYPE_PLUGIN,

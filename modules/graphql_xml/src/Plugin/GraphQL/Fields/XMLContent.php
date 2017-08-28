@@ -23,7 +23,7 @@ class XMLContent extends FieldPluginBase {
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof \DOMElement) {
-      yield implode('', array_map(function ($child) {
+      yield implode('', array_map(function($child) {
         if ($child instanceof \DOMText) {
           return $child->nodeValue;
         }

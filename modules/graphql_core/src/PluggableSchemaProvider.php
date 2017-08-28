@@ -41,7 +41,7 @@ class PluggableSchemaProvider implements SchemaProviderInterface {
       $schema->addMutationField($mutation);
     }
 
-    $schema->getTypesList()->addTypes($this->pluginManager->find(function () {
+    $schema->getTypesList()->addTypes($this->pluginManager->find(function() {
       return TRUE;
     }, [
       GRAPHQL_CORE_TYPE_PLUGIN,

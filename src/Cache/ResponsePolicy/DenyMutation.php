@@ -11,7 +11,7 @@ use Youshido\GraphQL\Execution\Context\ExecutionContext;
 /**
  * Reject if the query contains a mutation.
  */
-class DenyMutation implements ResponsePolicyInterface  {
+class DenyMutation implements ResponsePolicyInterface {
 
   /**
    * The route match.

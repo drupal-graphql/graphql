@@ -19,7 +19,7 @@ define('GRAPHQL_CORE_ENUM_PLUGIN', 'enum');
  * Flatten the interface inheritance tree.
  */
 function graphql_core_graphql_interfaces_alter(&$definitions) {
-  $interfaces = array_map(function ($definition) use ($definitions) {
+  $interfaces = array_map(function($definition) use ($definitions) {
     return graphql_core_list_interfaces($definitions, $definition);
   }, $definitions);
 
@@ -36,7 +36,7 @@ function graphql_core_graphql_interfaces_alter(&$definitions) {
 function graphql_core_graphql_types_alter(&$definitions) {
   $interfaceDefinitions = \Drupal::service('graphql_core.interface_manager')->getDefinitions();
 
-  $interfaces = array_map(function ($definition) use ($interfaceDefinitions) {
+  $interfaces = array_map(function($definition) use ($interfaceDefinitions) {
     return graphql_core_list_interfaces($interfaceDefinitions, $definition);
   }, $definitions);
 
@@ -57,11 +57,11 @@ function graphql_core_graphql_types_alter(&$definitions) {
  *   A list of interface names.
  */
 function graphql_core_list_interfaces(array &$definitions, $definition) {
-  $parents = array_filter($definitions, function ($parent) use ($definition) {
+  $parents = array_filter($definitions, function($parent) use ($definition) {
     return in_array($parent['name'], $definition['interfaces']);
   });
 
-  $interfaces = array_reduce(array_map(function ($parent) use ($definitions) {
+  $interfaces = array_reduce(array_map(function($parent) use ($definitions) {
     return graphql_core_list_interfaces($definitions, $parent);
   }, $parents), 'array_merge', $definition['interfaces']);
 

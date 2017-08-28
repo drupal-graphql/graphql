@@ -28,7 +28,7 @@ class ReducerPass implements CompilerPassInterface {
 
     krsort($reducers);
 
-    $container->setParameter('graphql.reducers', array_reduce($reducers, function (array $carry, $current) {
+    $container->setParameter('graphql.reducers', array_reduce($reducers, function(array $carry, $current) {
       return array_merge($carry, $current);
     }, []));
   }
