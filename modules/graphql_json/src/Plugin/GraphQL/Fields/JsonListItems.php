@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "json_list_items",
+ *   secure = true,
  *   name = "items",
  *   type = "JsonNode",
  *   multi = true,

@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "json_path_entity",
+ *   secure = true,
  *   name = "pathToEntity",
  *   type = "Entity",
  *   types = {"JsonObject", "JsonList"},
@@ -71,7 +72,11 @@ class JsonPathToEntity extends JsonPath implements ContainerFactoryPluginInterfa
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     foreach (parent::resolveValues($value, $args, $info) as $item) {
-      yield $this->entityRepository->loadEntityByUuid($args['type'], $item);
+      if ($entity = $this->entityRepository->loadEntityByUuid($args['type'], $item)) {
+        if ($entity->access('view')) {
+          yield $entity;
+        }
+      }
     }
   }
 

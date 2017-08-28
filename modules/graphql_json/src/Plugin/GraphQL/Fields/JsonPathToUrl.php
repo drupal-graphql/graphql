@@ -12,6 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "json_path_url",
  *   name = "pathToUrl",
+ *   secure = true,
  *   type = "Url",
  *   types = {"JsonObject", "JsonList"},
  *   arguments={

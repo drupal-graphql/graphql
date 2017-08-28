@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "json_object_keys",
+ *   secure = true,
  *   name = "keys",
  *   type = "String",
  *   multi = true,

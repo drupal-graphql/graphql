@@ -22,4 +22,12 @@ class JsonLeaf extends TypePluginBase {
     return !(is_object($value) || is_array($value));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return !is_array($value);
+  }
+
+
 }

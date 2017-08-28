@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "json_response_content",
+ *   secure = true,
  *   name = "json",
  *   type = "JsonNode",
  *   types = {"InternalResponse", "ExternalResponse"}

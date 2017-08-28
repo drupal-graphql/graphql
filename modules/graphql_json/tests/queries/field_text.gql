@@ -1,0 +1,15 @@
+query ($path: String!) {
+  route (path: $path) {
+    entity {
+      ... on NodeGraphql {
+        json {
+          path(steps:["test"]) {
+            ... on JsonLeaf {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+}

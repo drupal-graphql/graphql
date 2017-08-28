@@ -15,4 +15,11 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  */
 class JsonList extends TypePluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return is_array($value) && count(array_filter(array_keys($value), 'is_string')) == 0;
+  }
+
 }

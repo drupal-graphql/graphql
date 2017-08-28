@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "json_leaf_value",
+ *   secure = true,
  *   name = "value",
  *   type = "String",
  *   types = {"JsonLeaf"}
