@@ -162,7 +162,7 @@ class GraphQL extends DisplayPluginBase {
           '#default_value' => $this->getGraphQLQueryName(),
         ];
         break;
-     }
+    }
   }
 
   /**

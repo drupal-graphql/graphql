@@ -102,7 +102,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    */
   protected function enhanceSingle(array $defaults, Request $request) {
     $values = $this->filterRequestValues($request, function($index) {
-       return in_array($index, ['query', 'variables', 'id', 'version']);
+      return in_array($index, ['query', 'variables', 'id', 'version']);
     }) + [
       'query' => '',
       'variables' => [],

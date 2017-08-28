@@ -86,14 +86,14 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
    *   ];
    * @return bool
    */
-   public function isGenericInputFilter($filter) {
-     if (!is_array($filter['value']) || count($filter['value']) == 0) {
-       return false;
-     }
+  public function isGenericInputFilter($filter) {
+    if (!is_array($filter['value']) || count($filter['value']) == 0) {
+      return false;
+    }
 
-     $firstKey = array_keys($filter['value'])[0];
-     return is_string($firstKey);
-   }
+    $firstKey = array_keys($filter['value'])[0];
+    return is_string($firstKey);
+  }
 
   /**
    * Creates a definition for a generic input filter.

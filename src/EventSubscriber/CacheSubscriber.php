@@ -177,7 +177,7 @@ class CacheSubscriber implements EventSubscriberInterface {
         $event->setResponse($response);
       }
     }
-   }
+  }
 
   /**
    * Stores a response in case of a cache miss if applicable.
