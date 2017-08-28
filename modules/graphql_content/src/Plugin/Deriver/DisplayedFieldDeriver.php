@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -132,8 +133,8 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
           if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
             foreach (array_keys($display->getComponents()) as $field) {
               $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
-                'name' => graphql_propcase($field),
-                'types' => [graphql_camelcase([$typeId, $bundle])],
+                'name' => StringHelper::propCase($field),
+                'types' => [StringHelper::camelCase([$typeId, $bundle])],
                 'entity_type' => $typeId,
                 'bundle' => $bundle,
                 'field' => $field,

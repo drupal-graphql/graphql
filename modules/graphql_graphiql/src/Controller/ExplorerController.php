@@ -52,7 +52,7 @@ class ExplorerController implements ContainerInjectionInterface {
       '#type' => 'page',
       '#theme' => 'page__graphql_explorer',
       '#attached' => [
-       'library' => ['graphql_graphiql/explorer'],
+        'library' => ['graphql_graphiql/explorer'],
         'drupalSettings' => [
           'graphQLRequestUrl' => $url
         ],

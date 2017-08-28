@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -71,7 +72,7 @@ class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
         }
 
         $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => 'update' . graphql_camelcase([$entityTypeId, $bundleName]),
+          'name' => 'update' . StringHelper::camelCase([$entityTypeId, $bundleName]),
           'arguments' => [
             'id' => [
               'type' => 'String',
@@ -79,7 +80,7 @@ class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
               'multi' => FALSE,
             ],
             'input' => [
-              'type' => graphql_camelcase([$entityTypeId, $bundleName]) . 'UpdateInput',
+              'type' => StringHelper::camelCase([$entityTypeId, $bundleName, 'update', 'input']),
               'nullable' => FALSE,
               'multi' => FALSE,
             ],

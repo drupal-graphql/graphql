@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -91,7 +92,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             continue;
           }
 
-          $type = graphql_camelcase([$entityTypeId, $fieldName]) . 'FieldInput';
+          $type = StringHelper::camelCase([$entityTypeId, $fieldName, 'field', 'input']);
           $fieldStorage = $field->getFieldStorageDefinition();
           $propertyDefinitions = $fieldStorage->getPropertyDefinitions();
 
@@ -100,7 +101,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             $type = 'String';
           }
 
-          $fieldKey = graphql_propcase($fieldName);
+          $fieldKey = StringHelper::propCase($fieldName);
           $fieldDefinition = [
             'type' => $type,
             'multi' => $field->getFieldStorageDefinition()->isMultiple(),
@@ -118,7 +119,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
 
         if ($createExposed) {
           $this->derivatives["$entityTypeId:$bundleName:create"] = [
-            'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'CreateInput',
+            'name' => StringHelper::camelCase([$entityTypeId, $bundleName, 'create', 'input']),
             'fields' => $createFields,
             'entity_type' => $entityTypeId,
             'entity_bundle' => $bundleName,
@@ -127,7 +128,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
 
         if ($updateExposed) {
           $this->derivatives["$entityTypeId:$bundleName:update"] = [
-            'name' => graphql_camelcase([$entityTypeId, $bundleName]) . 'UpdateInput',
+            'name' => StringHelper::camelCase([$entityTypeId, $bundleName, 'update', 'input']),
             'fields' => $updateFields,
             'entity_type' => $entityTypeId,
             'entity_bundle' => $bundleName,

@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Views;
 
 /**
@@ -32,10 +33,9 @@ class ViewResultTypeDeriver extends ViewDeriverBase {
       }
 
       $id = implode('-', [$viewId, $displayId, 'result']);
-
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => graphql_camelcase($id),
+        'name' => StringHelper::camelCase([$viewId, $displayId, 'result']),
         'view' => $viewId,
         'display' => $displayId,
       ] + $basePluginDefinition;
