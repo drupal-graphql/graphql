@@ -51,7 +51,7 @@ class JsonEntityTest extends GraphQLFileTestBase {
     $entityRepository->loadEntityByUuid('node', 'abc')->willReturn(Node::create([
       'uuid' => 'abc',
       'type' => 'article',
-      'status' => NodeInterface::PUBLISHED,
+      'status' => 1,
     ]));
     $this->container->set('entity.repository', $entityRepository->reveal());
 
