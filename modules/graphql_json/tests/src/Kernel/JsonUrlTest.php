@@ -15,7 +15,10 @@ class JsonUrlTest extends GraphQLFileTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql_json'];
+  public static $modules = [
+    'graphql_content',
+    'graphql_json',
+  ];
 
   /**
    * Test json data spanning multiple urls.
@@ -36,7 +39,7 @@ class JsonUrlTest extends GraphQLFileTestBase {
 
     $this->container->set('http_client', $httpClient->reveal());
 
-    $result = $this->executeQueryFile('url.gql');
+    $result = $this->executeQueryFile('url.gql', [], TRUE, TRUE);
 
     $this->assertEquals([
       'json' => [

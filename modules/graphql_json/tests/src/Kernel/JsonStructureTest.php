@@ -15,7 +15,10 @@ class JsonStructureTest extends GraphQLFileTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql_json'];
+  public static $modules = [
+    'graphql_content',
+    'graphql_json',
+  ];
 
   /**
    * Ensure that all leave types are casted into strings.
@@ -41,7 +44,7 @@ class JsonStructureTest extends GraphQLFileTestBase {
 
     $this->container->set('http_client', $httpClient->reveal());
 
-    $result = $this->executeQueryFile('leaves.gql');
+    $result = $this->executeQueryFile('leaves.gql', [], TRUE, TRUE);
 
     $this->assertEquals([
       'data' => [
@@ -69,7 +72,7 @@ class JsonStructureTest extends GraphQLFileTestBase {
 
     $this->container->set('http_client', $httpClient->reveal());
 
-    $result = $this->executeQueryFile('object.gql');
+    $result = $this->executeQueryFile('object.gql', [], TRUE, TRUE);
 
     $this->assertEquals([
       'keys' => ['a', 'b', 'c'],
@@ -87,7 +90,7 @@ class JsonStructureTest extends GraphQLFileTestBase {
 
     $this->container->set('http_client', $httpClient->reveal());
 
-    $result = $this->executeQueryFile('list.gql');
+    $result = $this->executeQueryFile('list.gql', [], TRUE, TRUE);
     $this->assertEquals([
       'a' => ['value' => 'A'],
       'b' => ['value' => 'B'],

@@ -5,7 +5,9 @@ namespace Drupal\Tests\graphql_json\Kernel;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\user\Entity\Role;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
@@ -19,8 +21,19 @@ class JsonEntityTest extends GraphQLFileTestBase {
    */
   public static $modules = [
     'node',
+    'graphql_content',
     'graphql_json',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    Role::load('anonymous')
+      ->grantPermission('access content')
+      ->save();
+  }
 
   /**
    * Test loading entities from json.
@@ -38,11 +51,12 @@ class JsonEntityTest extends GraphQLFileTestBase {
     $entityRepository->loadEntityByUuid('node', 'abc')->willReturn(Node::create([
       'uuid' => 'abc',
       'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
     ]));
     $this->container->set('entity.repository', $entityRepository->reveal());
 
 
-    $result = $this->executeQueryFile('entity.gql');
+    $result = $this->executeQueryFile('entity.gql', [], TRUE, TRUE);
 
     $this->assertEquals([
       'json' => [

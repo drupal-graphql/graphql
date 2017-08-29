@@ -140,7 +140,7 @@ class JsonFieldTest extends KernelTestBase {
 
     $result = $this->executeQueryFile('field_text.gql', [
       'path' => '/node/' . $entity->id(),
-    ]);
+    ], TRUE, TRUE);
 
     $this->assertEquals([
       'path' => [
@@ -166,7 +166,7 @@ class JsonFieldTest extends KernelTestBase {
 
     $result = $this->executeQueryFile('field_file.gql', [
       'path' => '/node/' . $entity->id(),
-    ]);
+    ], TRUE, TRUE);
 
     $this->assertEquals([
       'path' => [
