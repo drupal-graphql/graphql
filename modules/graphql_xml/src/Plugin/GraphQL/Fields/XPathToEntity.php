@@ -38,13 +38,13 @@ class XPathToEntity extends XMLXPath implements ContainerFactoryPluginInterface 
   public static function create(
     ContainerInterface $container,
     array $configuration,
-    $plugin_id,
-    $plugin_definition
+    $pluginId,
+    $pluginDefinition
   ) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('entity.repository')
     );
   }
@@ -66,7 +66,6 @@ class XPathToEntity extends XMLXPath implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-
     foreach (parent::resolveValues($value, $args, $info) as $item) {
       /** @var \DOMElement $item */
       if ($entity = $this->entityRepository->loadEntityByUuid($args['type'], $item->textContent)) {
