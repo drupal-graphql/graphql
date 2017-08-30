@@ -18,6 +18,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  */
 class XMLResponseContent extends ResponseContent {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     foreach (parent::resolveValues($value, $args, $info) as $item) {
       $document = new \DOMDocument();
