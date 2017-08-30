@@ -34,9 +34,7 @@ class XPathToUrl extends Route {
         $result = iterator_to_array($iterator);
         reset($result);
         foreach ($result as $row) {
-
           yield $row;
-
         }
       }
     }
