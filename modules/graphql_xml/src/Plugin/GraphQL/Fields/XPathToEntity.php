@@ -18,7 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "Entity",
  *   types = {"XMLElement"},
  *   multi = true,
- *   arguments={
+ *   arguments = {
  *     "type" = "String",
  *     "query" = "String"
  *   }
@@ -28,6 +28,8 @@ class XPathToEntity extends XMLXPath implements ContainerFactoryPluginInterface 
   use DependencySerializationTrait;
 
   /**
+   * The entity repository service.
+   *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
   protected $entityRepository;
