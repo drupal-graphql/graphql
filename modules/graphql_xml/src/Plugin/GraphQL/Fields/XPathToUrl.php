@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "Url",
  *   types = {"XMLElement"},
  *   multi = true,
- *   arguments={
+ *   arguments = {
  *     "query" = "String"
  *   }
  * )
