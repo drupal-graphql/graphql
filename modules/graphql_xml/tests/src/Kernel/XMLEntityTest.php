@@ -52,7 +52,6 @@ class XMLEntityTest extends GraphQLFileTestBase {
     ]));
     $this->container->set('entity.repository', $entityRepository->reveal());
 
-
     $result = $this->executeQueryFile('entity.gql', [], TRUE, TRUE);
 
     $this->assertEquals([
