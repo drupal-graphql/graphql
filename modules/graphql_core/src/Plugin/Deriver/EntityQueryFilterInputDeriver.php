@@ -83,13 +83,16 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
             continue;
           }
 
-          $mainPropertyDataType = $property->getPropertyDefinition($mainProperty)->getDataType();
+          // Some field types are broken and define a non-existant main property.
+          if (!$mainPropertyDefinition = $property->getPropertyDefinition($mainProperty)) {
+            continue;
+          }
 
           $derivative['fields'][$fieldName] = [
             'multi' => FALSE,
             'nullable' => TRUE,
             'field_name' => $key,
-            'data_type' => $mainPropertyDataType,
+            'data_type' => $mainPropertyDefinition->getDataType(),
           ];
         }
 
