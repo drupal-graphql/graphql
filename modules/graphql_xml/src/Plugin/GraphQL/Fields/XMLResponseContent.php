@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_xml\Plugin\Graphql\Fields;
+namespace Drupal\graphql_xml\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_core\Plugin\GraphQL\Fields\ResponseContent;
 use Youshido\GraphQL\Execution\ResolveInfo;
