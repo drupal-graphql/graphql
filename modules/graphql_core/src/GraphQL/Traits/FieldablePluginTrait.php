@@ -30,14 +30,14 @@ trait FieldablePluginTrait {
         $types = array_merge([$definition['name']], array_key_exists('interfaces', $definition) ? $definition['interfaces'] : []);
 
         // Fields that are attached by annotating the type on the field.
-        $implicitFields = $schemaManager->find(function ($field) use ($types) {
+        $implicitFields = $schemaManager->find(function($field) use ($types) {
           return array_intersect($types, $field['types']);
         }, [GRAPHQL_CORE_FIELD_PLUGIN]);
       }
 
       // Implicit fields have higher precedence than explicit ones.
       // This makes fields overridable.
-      return array_filter($implicitFields, function ($type) {
+      return array_filter($implicitFields, function($type) {
         return $type instanceof FieldInterface;
       });
     }

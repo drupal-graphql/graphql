@@ -1,11 +1,25 @@
 parameters:
   graphql.config:
+    # GraphQL result cache:
+    #
+    # By default, the GraphQL results get cached. This can be disabled during development.
+    #
+    # @default true
+    result_cache: true
+
     # GraphQL schema cache:
     #
     # By default, the GraphQL schema gets cached. This can be disabled during development.
     #
     # @default true
-    cache: true
+    schema_cache: true
+
+    # Development mode:
+    #
+    # Disables field security. All fields can be resolved without restrictions.
+    #
+    # @default false
+    development: false
 
     # GraphQL schema class to be used:
     #
@@ -15,6 +29,11 @@ parameters:
     schema_class: Drupal\graphql\GraphQL\Schema
 
 services:
+  access_check.graphql.query:
+    class: Drupal\graphql\Access\QueryAccessCheck
+    arguments: ['@request_stack']
+    tags:
+      - { name: access_check, applies_to: _graphql_query_access }
   cache.graphql_schema:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -60,16 +79,16 @@ services:
     arguments: ['%graphql.config%']
     tags:
         - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
+  graphql.query_map_provider:
+    class: Drupal\graphql\QueryMapProvider\QueryMapProvider
+    tags:
+        - { name: service_collector, tag: graphql_query_map_provider, call: addQueryMapProvider }
   graphql.reducer_manager:
     class: Drupal\graphql\Reducers\ReducerManager
     arguments: ['@service_container', '%graphql.reducers%']
-  graphql.page_display_variant_subscriber:
-    class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
-    tags:
-      - { name: event_subscriber }
   graphql.cache_subscriber:
     class: Drupal\graphql\EventSubscriber\CacheSubscriber
-    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager']
+    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager', '%graphql.config%']
     tags:
       - { name: service_collector, tag: graphql_extra_cache_metadata, call: addExtraCacheMetadata }
       - { name: event_subscriber }
@@ -100,7 +119,7 @@ services:
       - { name: graphql_request_policy }
   graphql.request_policy.deny_unsafe_method_unless_query:
     class: Drupal\graphql\Cache\RequestPolicy\DenyUnsafeMethodUnlessQuery
-    arguments: ['@current_route_match']
+    arguments: ['@path_processor_manager']
     tags:
       - { name: graphql_request_policy }
   graphql.response_policy.deny_mutation:
@@ -110,6 +129,10 @@ services:
       - { name: graphql_response_policy }
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
-    arguments: ['@entity_type.manager']
+    arguments: ['@graphql.query_map_provider']
     tags:
       - { name: route_enhancer }
+  graphql.introspection:
+    class: Drupal\graphql\Introspection
+    arguments: ['@service_container', '@graphql.reducer_manager', '@graphql.schema']
+

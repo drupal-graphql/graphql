@@ -1,0 +1,34 @@
+entity.graphql_query_map.collection:
+  path: '/admin/config/graphql/query-maps'
+  defaults:
+    _entity_list: 'graphql_query_map'
+    _title: 'Query maps'
+  requirements:
+    _permission: 'administer graphql query maps'
+  options:
+    _admin_route: TRUE
+entity.graphql_query_map.import_form:
+  path: '/admin/config/graphql/query-maps/import'
+  defaults:
+    _entity_form: 'graphql_query_map.import'
+    _title: 'Import query map'
+  requirements:
+    _permission: 'administer graphql query maps'
+  options:
+    _admin_route: TRUE
+entity.graphql_query_map.delete_form:
+  path: '/admin/config/graphql/query-maps/{graphql_query_map}/delete'
+  defaults:
+    _entity_form: 'graphql_query_map.delete'
+    _title: 'Delete query map'
+  requirements:
+    _permission: 'administer graphql query maps'
+  options:
+    _admin_route: TRUE
+entity.graphql_query_map.inspect_form:
+  path: '/admin/config/graphql/query-maps/{graphql_query_map}'
+  defaults:
+    _entity_form: 'graphql_query_map.inspect'
+    _title: 'Query map'
+  requirements:
+    _permission: 'administer graphql query maps'

@@ -1,0 +1,5 @@
+graphql_graphiql.explorer:
+  title: 'Explorer'
+  description: 'Explore your schema with the GraphiQL explorer.'
+  parent: 'graphql.config_page'
+  route_name: graphql_graphiql.explorer

@@ -75,8 +75,21 @@ class LinkFieldTest extends GraphQLFileTestBase {
       'bundle' => 'test',
       'mode' => 'graphql',
       'status' => TRUE,
-    ])->setComponent('links', ['type' => 'link'])->save();
+    ])->setComponent('links', ['type' => 'graphql_link'])->save();
 
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'test' => [
+              'exposed' => TRUE,
+              'view_mode' => 'node.graphql',
+            ],
+          ],
+        ],
+      ])
+      ->save();
   }
 
   /**

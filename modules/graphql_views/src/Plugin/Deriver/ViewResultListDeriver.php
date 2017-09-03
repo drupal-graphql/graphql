@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\Deriver;
 
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Views;
 
 /**
@@ -18,7 +19,7 @@ class ViewResultListDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $display = $view->getDisplay($displayId);
+      $display = $this->getViewDisplay($view, $displayId);
 
       if (!$this->isPaged($display)) {
         // Skip if the display doesn't expose a pager.
@@ -32,20 +33,15 @@ class ViewResultListDeriver extends ViewDeriverBase {
       }
 
       $id = implode('-', [$viewId, $displayId, 'result', 'list']);
-
-      $typeName = graphql_core_camelcase($type);
-
+      $typeName = StringHelper::camelCase($type);
       if (!$this->interfaceExists($typeName)) {
         $typeName = 'Entity';
       }
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => 'results',
         'type' => $typeName,
-        'types' => [
-          graphql_core_camelcase(implode('_', [$viewId, $displayId, 'result'])),
-        ],
+        'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
         'multi' => TRUE,
         'view' => $viewId,
         'display' => $displayId,

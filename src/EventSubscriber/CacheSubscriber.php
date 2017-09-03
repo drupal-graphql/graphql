@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Disables any display variant on the explorer page.
@@ -93,6 +92,13 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $metadata;
 
   /**
+   * The service configuration.
+   *
+   * @var array
+   */
+  protected $config;
+
+  /**
    * Constructs a new CacheSubscriber object.
    *
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
@@ -109,6 +115,8 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The cache backend for caching query cache contexts.
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
+   * @param array $config
+   *   The service configuration.
    */
   public function __construct(
     RequestPolicyInterface $requestPolicy,
@@ -117,8 +125,10 @@ class CacheSubscriber implements EventSubscriberInterface {
     RequestStack $requestStack,
     CacheBackendInterface $responseCache,
     CacheBackendInterface $metadataCache,
-    CacheContextsManager $contextsManager
+    CacheContextsManager $contextsManager,
+    array $config
   ) {
+    $this->config = $config;
     $this->requestPolicy = $requestPolicy;
     $this->responsePolicy = $responsePolicy;
     $this->routeMatch = $routeMatch;
@@ -137,6 +147,10 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onRouteMatch(GetResponseEvent $event) {
+    if (!$this->config['result_cache']) {
+      return;
+    }
+
     $request = $event->getRequest();
     $routeMatch = $this->routeMatch->getRouteMatchFromRequest($request);
 
@@ -162,7 +176,7 @@ class CacheSubscriber implements EventSubscriberInterface {
         $event->setResponse($response);
       }
     }
-   }
+  }
 
   /**
    * Stores a response in case of a cache miss if applicable.
@@ -171,6 +185,10 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The event to process.;
    */
   public function onResponse(FilterResponseEvent $event) {
+    if (!$this->config['result_cache']) {
+      return;
+    }
+
     $request = $event->getRequest();
     $routeMatch = $this->routeMatch->getRouteMatchFromRequest($request);
 

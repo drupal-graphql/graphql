@@ -33,4 +33,11 @@ query {
       uuid:entityUuid
     }
   }
+
+  all_nodes:nodeQuery {
+    count
+    entities {
+      uuid:entityUuid
+    }
+  }
 }

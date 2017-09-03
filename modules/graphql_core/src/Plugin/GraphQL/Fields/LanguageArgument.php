@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "language_argument",
+ *   secure = true,
  *   name = "argument",
  *   description = "The language id prepared as a language enum value.",
  *   type = "String",

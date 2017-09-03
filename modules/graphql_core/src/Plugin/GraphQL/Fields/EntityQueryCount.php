@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_query_count",
+ *   secure = true,
  *   name = "count",
  *   type = "Int",
  *   types = {"EntityQueryResult"},
@@ -25,7 +26,8 @@ class EntityQueryCount extends FieldPluginBase {
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof QueryInterface) {
       // Clone the query and execute it as a count query.
-      yield (int) (clone $value)->range()->count()->execute();
+      $clone = clone $value;
+      yield (int) $clone->range()->count()->execute();
     }
   }
 

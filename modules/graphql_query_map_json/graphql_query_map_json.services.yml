@@ -1,0 +1,6 @@
+services:
+  graphql_query_map_json.query_map_provider:
+    class: Drupal\graphql_query_map_json\QueryMapProvider
+    arguments: ['@cache.default', '@config.factory']
+    tags:
+        - { name: graphql_query_map_provider }

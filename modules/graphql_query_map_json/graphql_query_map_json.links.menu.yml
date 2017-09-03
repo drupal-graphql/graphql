@@ -1,0 +1,5 @@
+graphql_query_map_json.config:
+  title: 'Query maps'
+  description: 'Manage configuration for query maps stored on the local filesystem.'
+  parent: 'graphql.config_page'
+  route_name: graphql_query_map_json.config

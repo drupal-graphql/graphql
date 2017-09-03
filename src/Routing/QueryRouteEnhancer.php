@@ -3,27 +3,27 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
+use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 class QueryRouteEnhancer implements RouteEnhancerInterface {
 
   /**
-   * The entity type manager.
+   * The query map provider service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\graphql\QueryMapProvider\QueryMapProviderInterface
    */
-  protected $entityTypeManager;
+  protected $queryMapProvider;
 
   /**
    * Creates a new QueryRouteEnhancer instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
+   * @param \Drupal\graphql\QueryMapProvider\QueryMapProviderInterface $queryMapProvider
+   *   The query map provider service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    $this->entityTypeManager = $entityTypeManager;
+  public function __construct(QueryMapProviderInterface $queryMapProvider) {
+    $this->queryMapProvider = $queryMapProvider;
   }
 
   /**
@@ -69,7 +69,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *   The enhanced controller defaults.
    */
   protected function enhanceBatch(array $defaults, Request $request) {
-    $queries = $this->filterRequestValues($request, function ($index) {
+    $queries = $this->filterRequestValues($request, function($index) {
       return is_numeric($index);
     });
 
@@ -85,6 +85,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     return $defaults + [
       '_controller' => $defaults['_graphql']['multiple'],
       'queries' => $queries,
+      'type' => 'batch',
     ];
   }
 
@@ -100,8 +101,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *   The enhanced controller defaults.
    */
   protected function enhanceSingle(array $defaults, Request $request) {
-    $values = $this->filterRequestValues($request, function ($index) {
-       return in_array($index, ['query', 'variables', 'id', 'version']);
+    $values = $this->filterRequestValues($request, function($index) {
+      return in_array($index, ['query', 'variables', 'id', 'version']);
     }) + [
       'query' => '',
       'variables' => [],
@@ -109,18 +110,18 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       'version' => NULL,
     ];
 
-    if (empty($values['query']) && (empty($values['id']) || empty($values['version']))) {
-      return FALSE;
-    }
-
     if (!$query = $this->getQuery($values['query'], $values['id'], $values['version'])) {
       return FALSE;
     }
 
     return $defaults + [
+      '_controller' => $defaults['_graphql']['single'],
       'query' => is_string($query) ? $query : '',
       'variables' => is_array($values['variables']) ? $values['variables'] : [],
-      '_controller' => $defaults['_graphql']['single'],
+      // If the 'query' parameter was empty and we reached this point, this is
+      // a persisted query.
+      'persisted' => empty($values['query']),
+      'type' => 'single',
     ];
   }
 
@@ -139,8 +140,12 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $content = $request->getContent();
 
     $values = !empty($content) ? json_decode($content, TRUE) : $request->query->all();
-    $values = array_filter($values, $filter, ARRAY_FILTER_USE_KEY);
-    $values = array_map(function ($value) {
+
+    // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
+    $keys = array_filter(array_keys($values), $filter);
+    $values = array_intersect_key($values, array_flip($keys));
+
+    $values = array_map(function($value) {
       if (!is_string($value)) {
         return $value;
       }
@@ -170,11 +175,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return $query;
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
-    $storage = $this->entityTypeManager->getStorage('graphql_query_map');
-    /** @var \Drupal\graphql\Entity\GraphQLQueryMap $queryMap */
-    if ($queryMap = $storage->load($version)) {
-      return $queryMap->getQuery($id);
+    if (!empty($id) && !empty($version)) {
+      return $this->queryMapProvider->getQuery($version, $id);
     }
 
     return NULL;

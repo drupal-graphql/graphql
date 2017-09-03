@@ -7,12 +7,19 @@ namespace Drupal\graphql_core\Annotation;
  *
  * @Annotation
  */
-class GraphQLField extends GraphQLAnnotationBase  {
+class GraphQLField extends GraphQLAnnotationBase {
 
   /**
    * {@inheritdoc}
    */
   public $pluginType = GRAPHQL_CORE_FIELD_PLUGIN;
+
+  /**
+   * Mark this field as "secure" to be resolved by untrusted consumers.
+   *
+   * @var bool
+   */
+  public $secure = FALSE;
 
   /**
    * The id of the GraphQLType or GraphQLInterface this field is bound to.
@@ -28,7 +35,11 @@ class GraphQLField extends GraphQLAnnotationBase  {
    *
    * Must be a registered Interface, Type, Scalar or Enum.
    *
-   * @var string
+   * If an associative array is provided - the Enum type will be created
+   * automatically for the given set of values. But $enum_type_name has to be
+   * defined in this case.
+   *
+   * @var string|array
    */
   public $type = NULL;
 
@@ -58,5 +69,14 @@ class GraphQLField extends GraphQLAnnotationBase  {
    * @var array
    */
   public $arguments = [];
+
+  /**
+   * The name for the Enum type.
+   *
+   * Only required if $type is provided as an associative array.
+   *
+   * @var string|null
+   */
+  public $enum_type_name = NULL;
 
 }

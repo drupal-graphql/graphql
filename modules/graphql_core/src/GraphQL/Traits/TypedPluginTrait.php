@@ -44,11 +44,13 @@ trait TypedPluginTrait {
    *
    * @param string[] $options
    *   A list of options.
+   * @param string $typeName
+   *   The name for the enum type.
    *
    * @return EnumType
    *   The enumeration type.
    */
-  protected function buildEnumConfig(array $options) {
+  protected function buildEnumConfig(array $options, $typeName) {
     $values = [];
     foreach ($options as $value => $description) {
       $values[] = [
@@ -57,7 +59,10 @@ trait TypedPluginTrait {
         'description' => $description,
       ];
     }
-    return new EnumType(['values' => $values]);
+    return new EnumType([
+      'name' => $typeName,
+      'values' => $values,
+    ]);
   }
 
   /**
@@ -74,18 +79,10 @@ trait TypedPluginTrait {
       $definition = $this->getPluginDefinition();
 
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {
-        $types = $schemaManager->find(function ($def) use ($definition) {
-          return array_key_exists('data_type', $def) && $def['data_type'] === $definition['data_type'];
-        }, [
-          GRAPHQL_CORE_TYPE_PLUGIN,
-          GRAPHQL_CORE_INTERFACE_PLUGIN,
-          GRAPHQL_CORE_SCALAR_PLUGIN,
-        ]);
-
-        $type = array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
+        $type = $schemaManager->findByDataType($definition['data_type']);
       }
       else if (array_key_exists('type', $definition) && $definition['type']) {
-        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type']) : $schemaManager->findByName($definition['type'], [
+        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type'], $definition['enum_type_name']) : $schemaManager->findByName($definition['type'], [
           GRAPHQL_CORE_SCALAR_PLUGIN,
           GRAPHQL_CORE_TYPE_PLUGIN,
           GRAPHQL_CORE_INTERFACE_PLUGIN,

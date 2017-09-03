@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_style_height",
+ *   secure = true,
  *   name = "height",
  *   type = "Int",
  *   nullable = true,
@@ -27,7 +28,7 @@ class ImageResourceHeight extends FieldPluginBase {
       yield (int) $value->height;
     }
     if (is_array($value) && array_key_exists('height', $value)) {
-      yield $value['height'];
+      yield (int) $value['height'];
     }
   }
 

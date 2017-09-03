@@ -58,11 +58,25 @@ class EntityReferenceTest extends GraphQLFileTestBase {
     ])->save();
 
     entity_get_display('node', 'test', 'graphql')
-      ->setComponent('related', ['type' => 'entity_reference_entity_view'])
+      ->setComponent('related', ['type' => 'graphql_entity_reference'])
       ->save();
 
     Role::load('anonymous')
       ->grantPermission('access content')
+      ->save();
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'node' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'test' => [
+              'exposed' => TRUE,
+              'view_mode' => 'node.graphql',
+            ],
+          ],
+        ],
+      ])
       ->save();
   }
 

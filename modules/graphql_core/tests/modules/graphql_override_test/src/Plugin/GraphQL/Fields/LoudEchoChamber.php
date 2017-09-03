@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "loud_echo",
+ *   secure = true,
  *   name = "echo",
  *   type = "String",
  *   arguments = {
@@ -25,6 +26,7 @@ class LoudEchoChamber extends EchoChamber {
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     foreach (parent::resolveValues($value, $args, $info) as $echo) {
+      /** @var string $echo */
       yield strtoupper($echo);
     }
   }

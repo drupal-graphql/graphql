@@ -12,8 +12,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * Retrieve a routes canonical path.
  *
+ * TODO: Move this to `InternalUrl` (breaking change).
+ *
  * @GraphQLField(
  *   id = "url_alias",
+ *   secure = true,
  *   name = "alias",
  *   type = "String",
  *   types = {"Url"}

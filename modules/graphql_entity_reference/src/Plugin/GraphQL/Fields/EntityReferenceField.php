@@ -12,7 +12,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_reference",
- *   field_formatter = "entity_reference_entity_view",
+ *   secure = true,
+ *   field_formatter = "graphql_entity_reference",
  *   cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_entity_reference\Plugin\Deriver\EntityReferenceFields"
  * )
@@ -25,7 +26,7 @@ class EntityReferenceField extends FieldPluginBase {
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       foreach ($value->get($this->getPluginDefinition()['field']) as $item) {
-        if ($item instanceof EntityReferenceItem && $item->entity->access('view')) {
+        if ($item instanceof EntityReferenceItem && $item->entity && $item->entity->access('view')) {
           yield $item->entity;
         }
       }

@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "entity_query",
+ *   secure = true,
  *   name = "entityQuery",
  *   type = "EntityQueryResult",
  *   nullable = false,
@@ -91,8 +92,14 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $query->sort($type->getKey('id'));
 
     if (array_key_exists('filter', $args) && $args['filter']) {
+      /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
+      $filter = $this->config->getArgument('filter')->getType();
+      /** @var \Drupal\graphql_core\Plugin\GraphQL\InputTypes\EntityQueryFilterInput $filterType */
+      $filterType = $filter->getNamedType();
+      $filterFields = $filterType->getPluginDefinition()['fields'];
+
       foreach ($args['filter'] as $key => $arg) {
-        $query->condition($key, $arg);
+        $query->condition($filterFields[$key]['field_name'], $arg);
       }
     }
 

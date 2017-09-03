@@ -18,6 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "rendered_field",
+ *   secure = true,
  *   type = "String",
  *   nullable = true,
  *   weight = -1,
@@ -81,7 +82,10 @@ class RenderedField extends FieldPluginBase implements ContainerFactoryPluginInt
       }
       else {
         foreach (Element::children($value->_graphql_build[$value->id()][$field]) as $index) {
-          yield trim($this->renderer->renderRoot($value->_graphql_build[$value->id()][$field][$index]));
+          // Copy the field elements to $elements to avoid changes to the
+          // original element array.
+          $elements = $value->_graphql_build[$value->id()][$field][$index];
+          yield trim($this->renderer->renderRoot($elements));
         }
       }
     }

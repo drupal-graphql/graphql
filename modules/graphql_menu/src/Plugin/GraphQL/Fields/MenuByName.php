@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "menu_by_name",
+ *   secure = true,
  *   name = "menuByName",
  *   type = "Menu",
  *   arguments = {
@@ -54,7 +55,7 @@ class MenuByName extends FieldPluginBase implements ContainerFactoryPluginInterf
     $entity = $this->entityTypeManager->getStorage('menu')->load($args['name']);
 
     if ($entity instanceof MenuInterface) {
-      return yield $entity;
+      yield $entity;
     }
   }
 

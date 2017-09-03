@@ -40,6 +40,27 @@ interface GraphQLSchemaManagerInterface {
   public function findByName($name, array $types);
 
   /**
+   * Find the matching GraphQL data type for a Drupal type data identifier.
+   *
+   * Respects type chains. `entity:node:article` should return the
+   * `NodeArticle` type if it is exposed or fall back to either `Node` or even
+   * `Entity` otherwise.
+   *
+   * @param string $dataType
+   *   The typed data identifier. E.g. `string` or `entity:node:article`.
+   * @param string[] $types
+   *   A list of type constants.
+   *
+   * @return object
+   *   The matching type with the highest weight.
+   */
+  public function findByDataType($dataType, array $types = [
+    GRAPHQL_CORE_TYPE_PLUGIN,
+    GRAPHQL_CORE_INTERFACE_PLUGIN,
+    GRAPHQL_CORE_SCALAR_PLUGIN,
+  ]);
+
+  /**
    * Retrieve all mutations.
    *
    * @return object[]

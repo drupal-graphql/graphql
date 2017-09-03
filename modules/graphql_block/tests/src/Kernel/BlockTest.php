@@ -58,6 +58,19 @@ class BlockTest extends GraphQLFileTestBase {
     $this->placeBlock('block_content:' . $customBlock->uuid(), [
       'region' => 'sidebar_first',
     ]);
+
+    $this->container->get('config.factory')->getEditable('graphql_content.schema')
+      ->set('types', [
+        'block_content' => [
+          'exposed' => TRUE,
+          'bundles' => [
+            'basic' => [
+              'exposed' => TRUE,
+              'view_mode' => 'block_content.graphql',
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**
@@ -65,6 +78,7 @@ class BlockTest extends GraphQLFileTestBase {
    */
   public function testStaticBlocks() {
     $result = $this->executeQueryFile('blocks.gql');
+    $this->assertEquals(1, count($result['data']['content']), 'Blocks can be retrieved on root level.');
     $this->assertEquals(1, count($result['data']['route']['content']), 'Block listing respects visibility settings.');
   }
 

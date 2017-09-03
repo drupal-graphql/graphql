@@ -27,6 +27,13 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Gr
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(GraphQLSchemaManagerInterface $schemaManager) {
     $this->config = new InputObjectTypeConfig([
       'name' => $this->buildName(),
@@ -95,7 +102,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Gr
    */
   protected function buildFieldType(GraphQLSchemaManagerInterface $schemaManager, $field) {
     if (is_array($field) && array_key_exists('data_type', $field) && $field['data_type']) {
-      $types = $schemaManager->find(function ($definition) use ($field) {
+      $types = $schemaManager->find(function($definition) use ($field) {
         return array_key_exists('data_type', $definition) && $definition['data_type'] === $field['data_type'];
       }, [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
@@ -107,7 +114,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Gr
     else {
       $typeInfo = is_array($field) ? $field['type'] : $field;
 
-      $type = is_array($typeInfo) ? $this->buildEnumConfig($typeInfo) : $schemaManager->findByName($typeInfo, [
+      $type = is_array($typeInfo) ? $this->buildEnumConfig($typeInfo, $field['enum_type_name']) : $schemaManager->findByName($typeInfo, [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
         GRAPHQL_CORE_SCALAR_PLUGIN,
         GRAPHQL_CORE_ENUM_PLUGIN,

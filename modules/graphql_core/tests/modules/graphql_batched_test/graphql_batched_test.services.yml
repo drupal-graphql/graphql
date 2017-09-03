@@ -1,0 +1,3 @@
+services:
+  graphql_batched_test.user_database:
+    class: '\Drupal\graphql_batched_test\UserDatabase'

@@ -3,12 +3,12 @@
 namespace Drupal\graphql_core\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -57,7 +57,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_core_propcase($id) . 'Query',
+          'name' => StringHelper::propCase([$id, 'query']),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -65,15 +65,15 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
-        $queryable_properties = array_filter($properties, function ($property) {
+        $queryableProperties = array_filter($properties, function ($property) {
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
-        if ($queryable_properties) {
+        if (!empty($queryableProperties)) {
           $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,
-            'type' => graphql_core_camelcase([$id, 'query', 'filter', 'input']),
+            'type' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
           ];
         }
 

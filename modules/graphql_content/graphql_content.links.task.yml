@@ -1,0 +1,4 @@
+graphql_content.content_entity_schema:
+  route_name: graphql_content.content_entity_schema
+  title: 'Queries'
+  base_route: graphql_content.content_entity_schema

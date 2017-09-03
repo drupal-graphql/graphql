@@ -11,8 +11,16 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "url_path",
+ *   secure = true,
  *   name = "path",
  *   type = "String",
+ *   arguments = {
+ *     "internal" = {
+ *        "type"= "Boolean",
+ *        "nullable" = true,
+ *        "default" = false,
+ *      }
+ *   },
  *   types = {"Url"}
  * )
  */
@@ -24,7 +32,12 @@ class Path extends FieldPluginBase {
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
       if ($value->isRouted()) {
-        yield Url::fromUri('internal:/' . $value->getInternalPath())->toString();
+        if (!empty($args['internal'])) {
+          yield '/' . Url::fromUri('internal:/' . $value->getInternalPath())->getInternalPath();
+        }
+        else {
+          yield Url::fromUri('internal:/' . $value->getInternalPath())->toString();
+        }
       }
       else {
         yield $value->toString();

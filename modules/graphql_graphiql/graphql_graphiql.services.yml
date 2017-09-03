@@ -1,0 +1,5 @@
+services:
+  graphql_graphiql.page_display_variant_subscriber:
+    class: Drupal\graphql_graphiql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }

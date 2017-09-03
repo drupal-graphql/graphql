@@ -1,0 +1,13 @@
+graphql_requests_test.ok:
+  path: '/graphql-request/test/ok'
+  defaults:
+    _controller: '\Drupal\graphql_requests_test\RequestTestController::test'
+  requirements:
+    _access: 'TRUE'
+
+graphql_requests_test.redirect:
+  path: '/graphql-request/test/redirect'
+  defaults:
+    _controller: '\Drupal\graphql_requests_test\RequestTestController::redirect'
+  requirements:
+    _access: 'TRUE'

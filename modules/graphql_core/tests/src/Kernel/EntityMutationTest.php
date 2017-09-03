@@ -38,6 +38,16 @@ class EntityMutationTest extends GraphQLFileTestBase {
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'article']);
 
+    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
+      ->set('types', [
+        'node' => [
+          'bundles' => [
+            'article' => [
+              'create' => TRUE,
+            ],
+          ],
+        ],
+      ])->save();
   }
 
   /**
@@ -70,7 +80,6 @@ class EntityMutationTest extends GraphQLFileTestBase {
    * Test entity creation permission.
    */
   public function testCreateEntityMutationNoPermitted() {
-
     $result = $this->executeQueryFile('entity_mutation.gql', [
       'node' => [
         'title' => 'Test',

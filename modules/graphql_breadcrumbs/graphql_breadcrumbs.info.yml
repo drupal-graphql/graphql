@@ -1,0 +1,7 @@
+name: GraphQL Breadcrumbs
+type: module
+description: Expose a route\'s breadcrumbs to GraphQL
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core

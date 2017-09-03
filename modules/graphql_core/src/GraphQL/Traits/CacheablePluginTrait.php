@@ -17,6 +17,11 @@ trait CacheablePluginTrait {
   /**
    * {@inheritdoc}
    */
+  abstract public function getPluginDefinition();
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheContexts() {
     $definition = $this->getPluginDefinition();
     return isset($definition['cache_contexts']) ? $definition['cache_contexts'] : [];

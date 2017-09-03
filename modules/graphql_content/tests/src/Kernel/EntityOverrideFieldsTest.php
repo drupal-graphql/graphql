@@ -28,6 +28,7 @@ class EntityOverrideFieldsTest extends EntityRenderedFieldsTest {
    * Test if the basic fields are available on the interface.
    */
   public function testRenderedFields() {
+
     $node = $this->createNode([
       'title' => 'Test',
       'type' => 'test',

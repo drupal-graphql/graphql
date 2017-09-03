@@ -11,8 +11,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * List site-wide configured languages.
  *
- * @GraphqlField(
+ * @GraphQLField(
  *   id = "available_languages_field",
+ *   secure = true,
  *   name = "availableLanguages",
  *   type = "Language",
  *   multi = true
@@ -39,11 +40,11 @@ class AvailableLanguages extends FieldPluginBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('language_manager')
     );
   }

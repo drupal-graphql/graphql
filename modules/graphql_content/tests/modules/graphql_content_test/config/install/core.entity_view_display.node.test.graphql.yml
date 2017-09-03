@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.graphql
+    - node.type.test
+  module:
+    - text
+id: node.test.graphql
+targetEntityType: node
+bundle: test
+mode: graphql

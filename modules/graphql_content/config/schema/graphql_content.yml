@@ -1,0 +1,25 @@
+graphql_content.schema:
+  type: config_object
+  label: 'Schema settings'
+  mapping:
+    types:
+      type: sequence
+      label: 'Exposed entity types'
+      sequence:
+        type: mapping
+        mapping:
+          exposed:
+            type: boolean
+            label: 'Expose the entity interface'
+          bundles:
+            type: sequence
+            label: 'Exposed bundle types'
+            sequence:
+              type: mapping
+              mapping:
+                exposed:
+                  type: boolean
+                  label: 'Expose the bundle type'
+                view_mode:
+                  type: string
+                  label: 'Attach view mode fields'
