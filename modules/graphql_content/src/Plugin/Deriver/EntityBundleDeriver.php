@@ -84,6 +84,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
           $this->derivatives[$typeId . '-' . $bundle] = [
             'name' => StringHelper::camelCase([$typeId, $bundle]),
             'entity_type' => $typeId,
+            'data_type' => 'entity:' . $typeId . ':' . $bundle,
             'interfaces' => [StringHelper::camelCase($typeId)],
             'bundle' => $bundle,
           ] + $basePluginDefinition;

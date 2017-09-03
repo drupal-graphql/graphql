@@ -9,7 +9,8 @@ use Drupal\graphql_core\GraphQL\InterfacePluginBase;
  *
  * @GraphQLInterface(
  *   id = "entity",
- *   name = "Entity"
+ *   name = "Entity",
+ *   data_type = "entity"
  * )
  */
 class Entity extends InterfacePluginBase {
