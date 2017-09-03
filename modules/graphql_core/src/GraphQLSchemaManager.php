@@ -85,6 +85,34 @@ class GraphQLSchemaManager implements GraphQLSchemaManagerInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function findByDataType($dataType, array $types = [
+    GRAPHQL_CORE_TYPE_PLUGIN,
+    GRAPHQL_CORE_INTERFACE_PLUGIN,
+    GRAPHQL_CORE_SCALAR_PLUGIN,
+  ]) {
+    $chain = explode(':', $dataType);
+
+    while ($chain) {
+      $dataType = implode(':', $chain);
+
+      $types = $this->find(function($def) use ($dataType) {
+        return isset($def['data_type']) && $def['data_type'] == $dataType;
+      }, $types);
+
+      if ($types) {
+        return array_pop($types);
+      }
+
+      array_pop($chain);
+
+    }
+
+    return NULL;
+  }
+
+  /**
    * Add a plugin manager.
    *
    * @param PluginManagerInterface $pluginManager

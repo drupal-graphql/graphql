@@ -123,6 +123,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             'fields' => $createFields,
             'entity_type' => $entityTypeId,
             'entity_bundle' => $bundleName,
+            'data_type' => implode(':', ['entity', $entityTypeId, $bundleName]),
           ] + $basePluginDefinition;
         }
 
@@ -132,6 +133,7 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
             'fields' => $updateFields,
             'entity_type' => $entityTypeId,
             'entity_bundle' => $bundleName,
+            'data_type' => implode(':', ['entity', $entityTypeId, $bundleName]),
           ] + $basePluginDefinition;
         }
       }

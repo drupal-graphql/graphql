@@ -66,14 +66,10 @@ trait ArgumentAwarePluginTrait {
    */
   protected function buildArgumentType(GraphQLSchemaManagerInterface $schemaManager, $argument) {
     if (is_array($argument) && array_key_exists('data_type', $argument) && $argument['data_type']) {
-      $types = $schemaManager->find(function($definition) use ($argument) {
-        return array_key_exists('data_type', $definition) && $definition['data_type'] === $argument['data_type'];
-      }, [
+      $type = $schemaManager->findByDataType($argument['data_type'], [
         GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
         GRAPHQL_CORE_SCALAR_PLUGIN,
-      ]);
-
-      $type = array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
+      ]) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
     }
     else {
       $typeInfo = is_array($argument) ? $argument['type'] : $argument;
