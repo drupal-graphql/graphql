@@ -7,6 +7,7 @@
 
 namespace Drupal\graphql\Plugin\views\display;
 
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -110,7 +111,7 @@ class GraphQL extends DisplayPluginBase {
     if (empty($queryName)) {
       $viewId = $this->view->id();
       $displayId = $this->display['id'];
-      $queryName = graphql_camelcase([$viewId, $displayId, 'view']);
+      $queryName = StringHelper::camelCase([$viewId, $displayId, 'view']);
     }
     return lcfirst($queryName);
   }
@@ -149,10 +150,10 @@ class GraphQL extends DisplayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $formState) {
-    parent::buildOptionsForm($form, $formState);
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
 
-    switch ($formState->get('section')) {
+    switch ($form_state->get('section')) {
       case 'graphql_query_name':
         $form['#title'] .= $this->t('Query name');
         $form['graphql_query_name'] = [
@@ -161,18 +162,18 @@ class GraphQL extends DisplayPluginBase {
           '#default_value' => $this->getGraphQLQueryName(),
         ];
         break;
-     }
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitOptionsForm(&$form, FormStateInterface $formState) {
-    parent::submitOptionsForm($form, $formState);
-    $section = $formState->get('section');
+  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::submitOptionsForm($form, $form_state);
+    $section = $form_state->get('section');
     switch ($section) {
       case 'graphql_query_name':
-        $this->setOption($section, $formState->getValue($section));
+        $this->setOption($section, $form_state->getValue($section));
         break;
     }
   }

@@ -7,12 +7,19 @@ namespace Drupal\graphql_core\Annotation;
  *
  * @Annotation
  */
-class GraphQLField extends GraphQLAnnotationBase  {
+class GraphQLField extends GraphQLAnnotationBase {
 
   /**
    * {@inheritdoc}
    */
   public $pluginType = GRAPHQL_CORE_FIELD_PLUGIN;
+
+  /**
+   * Mark this field as "secure" to be resolved by untrusted consumers.
+   *
+   * @var bool
+   */
+  public $secure = FALSE;
 
   /**
    * The id of the GraphQLType or GraphQLInterface this field is bound to.

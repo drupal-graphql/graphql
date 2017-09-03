@@ -15,4 +15,11 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  */
 class Car extends TypePluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return $value['type'] == 'Car';
+  }
+
 }

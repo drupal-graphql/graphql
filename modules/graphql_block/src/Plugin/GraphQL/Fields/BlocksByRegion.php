@@ -18,8 +18,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * List all blocks within a theme region.
  *
+ * TODO: Move this to `InternalUrl` (breaking change).
+ *
  * @GraphQLField(
  *   id = "blocks_by_region",
+ *   secure = true,
  *   name = "blocksByRegion",
  *   type = "Entity",
  *   types = {"Url", "Root"},
@@ -113,15 +116,15 @@ class BlocksByRegion extends SubrequestField {
       'region' => $region,
     ]);
 
-    $blocks = array_filter($blocks, function (Block $block) {
-      return array_reduce(iterator_to_array($block->getVisibilityConditions()), function ($value, ConditionInterface $condition) {
+    $blocks = array_filter($blocks, function(Block $block) {
+      return array_reduce(iterator_to_array($block->getVisibilityConditions()), function($value, ConditionInterface $condition) {
         return $value && (!$condition->isNegated() == $condition->evaluate());
       }, TRUE);
     });
 
     uasort($blocks, '\Drupal\Block\Entity\Block::sort');
 
-    $result = array_map(function (Block $block) {
+    $result = array_map(function(Block $block) {
       $plugin = $block->getPlugin();
       if ($plugin instanceof BlockContentBlock) {
         return $this->entityRepository->loadEntityByUuid('block_content', $plugin->getDerivativeId());

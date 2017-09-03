@@ -3,7 +3,6 @@
 namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\link\LinkItemInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\Core\Link;
 
@@ -12,6 +11,7 @@ use Drupal\Core\Link;
  *
  * @GraphQLField(
  *   id = "link_url",
+ *   secure = true,
  *   name = "url",
  *   type = "Url",
  *   types = {"Link"}

@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "menu_by_name",
+ *   secure = true,
  *   name = "menuByName",
  *   type = "Menu",
  *   arguments = {

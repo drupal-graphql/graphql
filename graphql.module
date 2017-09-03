@@ -4,6 +4,7 @@
  * @file
  * The GraphQL module.
  */
+use Drupal\graphql\Utility\StringHelper;
 
 /**
  * Implements hook_help().
@@ -32,28 +33,19 @@ EOT;
 /**
  * Turn a list of machine names into a camel-cased string.
  *
- * @param string[]|string $components
- *   Name components to be concatenated.
- *
- * @return string
- *   A camel-cased concatenation of the input components.
+ * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
+ *   Use \Drupal\graphql\Utility\StringHelper::camelCase() instead.
  */
 function graphql_camelcase($components) {
-  $components = is_array($components) ? implode('_', $components) : $components;
-  $components = preg_split('/[^a-zA-Z0-9]/', $components);
-
-  return implode('', array_map('ucfirst', $components));
+  return StringHelper::camelCase($components);
 }
 
 /**
  * Turn a list of machine names into a property-cased string.
  *
- * @param string[]|string $components
- *   Name components to be concatenated.
- *
- * @return string
- *   A camel-cased concatenation of the input components.
+ * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
+ *   Use \Drupal\graphql\Utility\StringHelper::propCase() instead.
  */
 function graphql_propcase($components) {
-  return lcfirst(graphql_camelcase($components));
+  return StringHelper::propCase($components);
 }

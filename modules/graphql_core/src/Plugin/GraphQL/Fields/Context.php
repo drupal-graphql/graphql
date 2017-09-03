@@ -15,8 +15,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * Request arbitrary drupal context objects with GraphQL.
  *
+ * TODO: Move this to `InternalUrl` (breaking change).
+ *
  * @GraphQLField(
  *   id = "context",
+ *   secure = true,
  *   types = {"Url", "Root"},
  *   nullable = true,
  *   deriver = "\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
@@ -69,15 +72,7 @@ class Context extends SubrequestField {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {
-        $types = $schemaManager->find(function ($def) use ($definition) {
-          return array_key_exists('data_type', $def) && $def['data_type'] == $definition['data_type'];
-        }, [
-          GRAPHQL_CORE_TYPE_PLUGIN,
-          GRAPHQL_CORE_INTERFACE_PLUGIN,
-          GRAPHQL_CORE_SCALAR_PLUGIN,
-        ]);
-
-        return array_pop($types) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
+        return $schemaManager->findByDataType($definition['data_type']) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
       }
     }
 

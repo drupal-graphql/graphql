@@ -5,6 +5,7 @@ namespace Drupal\graphql_content\Plugin\Deriver;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Drupal\graphql_content\TypeMapper;
@@ -18,6 +19,11 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
    * @var \Drupal\graphql_content\TypeMapper
    */
   protected $typeMapper;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityBundleInfo;
 
   /**
    * RawValueFieldItemDeriver constructor.
@@ -58,21 +64,32 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   }
 
   protected function getDefinitions($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
+    if (!isset($storage)) {
+      return NULL;
+    }
+
     $fieldName = $storage->getName();
     $dataType = RawValueFieldType::getId($entityType, $fieldName);
 
     // Add the subfields, eg. value, summary.
     $definitions = [];
-    foreach ($storage->getSchema()['columns'] as $columnName => $schema) {
-      $definitions["$entityType-$fieldName-$columnName"] = [
-        'name' => graphql_core_propcase($columnName),
-        'schema_column' => $columnName,
+
+    foreach ($storage->getPropertyDefinitions() as $property => $definition) {
+      if ($definition->getDataType() == 'map') {
+        continue;
+        // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
+      }
+
+      $definitions["$entityType-$fieldName-$property"] = [
+        'name' => StringHelper::propCase($property),
+        'property' => $property,
         'multi' => FALSE,
-        'type' => $this->typeMapper->typedDataToGraphQLFieldType($schema['type']),
+        'type' => $this->typeMapper->typedDataToGraphQLFieldType($definition),
         'types' => [$dataType],
       ];
     }
 
     return $definitions;
   }
+
 }

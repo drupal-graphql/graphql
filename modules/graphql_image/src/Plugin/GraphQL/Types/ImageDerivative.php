@@ -15,4 +15,11 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  */
 class ImageDerivative extends TypePluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return is_array($value);
+  }
+
 }

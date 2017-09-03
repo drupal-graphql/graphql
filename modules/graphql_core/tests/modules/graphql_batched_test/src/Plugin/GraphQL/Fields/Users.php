@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "users",
+ *   secure = true,
  *   name = "users",
  *   type = "User",
  *   multi = true,
@@ -54,7 +55,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
    */
   public function resolveBatch(array $batch) {
     // Turn the list of method arguments into a list of user requirements.
-    $resultMap = array_map(function ($item) {
+    $resultMap = array_map(function($item) {
       return $this->getRequirementsFromArgs($item['parent'], $item['arguments']);
     }, $batch);
 
@@ -68,8 +69,8 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
     $users = $this->userDatabase->fetchUsers($uids);
 
     // Map the fetched users back into the result map.
-    return array_map(function ($item) use ($users) {
-      return array_map(function ($uid) use ($users) {
+    return array_map(function($item) use ($users) {
+      return array_map(function($uid) use ($users) {
         return $users[$uid];
       }, $item);
     }, $resultMap);
@@ -102,13 +103,13 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
   public static function create(
     ContainerInterface $container,
     array $configuration,
-    $plugin_id,
-    $plugin_definition
+    $pluginId,
+    $pluginDefinition
   ) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('graphql_batched_test.user_database'),
       $container->get('graphql_core.batched_resolver')
     );

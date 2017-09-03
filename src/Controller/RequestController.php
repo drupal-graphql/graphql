@@ -11,6 +11,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Execution\Processor;
 use Drupal\graphql\Reducers\ReducerManager;
@@ -76,6 +77,20 @@ class RequestController implements ContainerInjectionInterface {
   protected $requestStack;
 
   /**
+   * The current user account.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
+   * The graphql container parameters.
+   *
+   * @var array
+   */
+  protected $graphqlParams;
+
+  /**
    * Constructs a RequestController object.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -92,6 +107,8 @@ class RequestController implements ContainerInjectionInterface {
    *   The request stack service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   * @param array $graphqlParams
+   *   The set of graphql container parameters.
    */
   public function __construct(
     ContainerInterface $container,
@@ -100,7 +117,9 @@ class RequestController implements ContainerInjectionInterface {
     Config $config,
     HttpKernelInterface $httpKernel,
     RequestStack $requestStack,
-    RendererInterface $renderer
+    RendererInterface $renderer,
+    AccountProxyInterface $currentUser,
+    array $graphqlParams
   ) {
     $this->container = $container;
     $this->schema = $schema;
@@ -109,6 +128,8 @@ class RequestController implements ContainerInjectionInterface {
     $this->httpKernel = $httpKernel;
     $this->requestStack = $requestStack;
     $this->renderer = $renderer;
+    $this->currentUser = $currentUser;
+    $this->graphqlParams = $graphqlParams;
   }
 
   /**
@@ -122,7 +143,9 @@ class RequestController implements ContainerInjectionInterface {
       $container->get('config.factory')->get('system.performance'),
       $container->get('http_kernel'),
       $container->get('request_stack'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('current_user'),
+      $container->getParameter('graphql.config')
     );
   }
 
@@ -138,7 +161,7 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleBatchRequest(Request $request, array $queries = []) {
-    $filterNumeric = function ($index) { return !is_numeric($index); };
+    $filterNumeric = function($index) { return !is_numeric($index); };
 
     // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
     $requestParameters = $request->query->all();
@@ -150,7 +173,7 @@ class RequestController implements ContainerInjectionInterface {
     $requestContent = array_intersect_key($requestContent, array_flip($requestContentKeys));
 
     // Walk over all queries and issue a sub-request for each.
-    $responses = array_map(function ($query) use ($request, $requestParameters, $requestContent) {
+    $responses = array_map(function($query) use ($request, $requestParameters, $requestContent) {
       $method = $request->getMethod();
 
       // Make sure we remove the 'queries' parameter, otherwise the subsequent
@@ -187,7 +210,7 @@ class RequestController implements ContainerInjectionInterface {
     }, $queries);
 
     // Gather all responses from all sub-requests.
-    $content = array_map(function (Response $response) {
+    $content = array_map(function(Response $response) {
       return json_decode($response->getContent());
     }, $responses);
 
@@ -196,7 +219,7 @@ class RequestController implements ContainerInjectionInterface {
     $metadata->setCacheMaxAge(Cache::PERMANENT);
 
     // Collect all of the metadata from all sub-requests.
-    $metadata = array_reduce($responses, function (RefinableCacheableDependencyInterface $carry, $current) {
+    $metadata = array_reduce($responses, function(RefinableCacheableDependencyInterface $carry, $current) {
       $current = $current instanceof CacheableResponseInterface ? $current->getCacheableMetadata() : $current;
       $carry->addCacheableDependency($current);
       return $carry;
@@ -223,11 +246,17 @@ class RequestController implements ContainerInjectionInterface {
    */
   public function handleRequest(Request $request, $query = '', array $variables = []) {
     $context = new RenderContext();
-    $processor = new Processor($this->container, $this->schema);
+    $processor = new Processor($this->container, $this->schema, (
+      $this->currentUser->hasPermission('bypass graphql field security')
+      || $this->graphqlParams['development']
+      /*//
+      TODO: Bypass security for persisted queries.
+      //*/
+    ));
 
     // Evaluating the GraphQL request can potentially invoke rendering. We allow
     // those to "leak" and collect them here in a render context.
-    $this->renderer->executeInRenderContext($context, function () use ($processor, $query, $variables) {
+    $this->renderer->executeInRenderContext($context, function() use ($processor, $query, $variables) {
       $processor->processPayload($query, $variables, $this->reducerManager->getAllServices());
     });
 

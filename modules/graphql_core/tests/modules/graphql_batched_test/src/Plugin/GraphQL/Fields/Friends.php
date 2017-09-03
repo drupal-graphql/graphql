@@ -7,6 +7,7 @@ namespace Drupal\graphql_batched_test\Plugin\GraphQL\Fields;
  *
  * @GraphQLField(
  *   id = "friends",
+ *   secure = true,
  *   name = "friends",
  *   types = {"User"},
  *   type = "User",

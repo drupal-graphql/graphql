@@ -1,0 +1,15 @@
+query ($path: String!) {
+  route(path: $path) {
+    entity {
+      ... on NodeGraphql {
+        file {
+          xml {
+            xpath(query: "a") {
+              content
+            }
+          }
+        }
+      }
+    }
+  }
+}

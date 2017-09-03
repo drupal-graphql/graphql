@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "gadgets",
+ *   secure = true,
  *   name = "gadgets",
  *   type = "String",
  *   multi = true,

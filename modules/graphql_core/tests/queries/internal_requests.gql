@@ -1,0 +1,15 @@
+query {
+  ok:route(path: "/graphql-request/test/ok") {
+    request {
+      code
+      content
+    }
+  }
+
+  redirect:route(path: "/graphql-request/test/redirect") {
+    request {
+      code
+      location:header(key: "location")
+    }
+  }
+}

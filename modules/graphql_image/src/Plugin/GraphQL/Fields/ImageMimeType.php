@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "image_mime_type",
+ *   secure = true,
  *   name = "mimeType",
  *   type = "String",
  *   nullable = true,

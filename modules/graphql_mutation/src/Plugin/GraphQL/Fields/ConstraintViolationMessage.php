@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "constraint_violation_message",
+ *   secure = true,
  *   name = "message",
  *   type = "String",
  *   types = {"ConstraintViolation"},

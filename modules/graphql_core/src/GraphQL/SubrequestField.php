@@ -181,7 +181,7 @@ abstract class SubrequestField extends FieldPluginBase implements ContainerFacto
       static::processSubrequestBatch($batch);
     }
 
-    $result = array_map(function ($item) {
+    $result = array_map(function($item) {
       if ($item['field'] instanceof SubrequestField) {
         return $item['field']->getSubrequestResult();
       }

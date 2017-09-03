@@ -7,7 +7,7 @@ use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Youshido\GraphQL\Config\Schema\SchemaConfig;
 use Youshido\GraphQL\Schema\AbstractSchema;
 
-class Schema extends AbstractSchema implements RefinableCacheableDependencyInterface  {
+class Schema extends AbstractSchema implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**

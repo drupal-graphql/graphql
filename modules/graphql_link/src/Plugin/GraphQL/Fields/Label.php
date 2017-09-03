@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "link_item_label",
+ *   secure = true,
  *   name = "label",
  *   type = "String",
  *   types = {"LinkItem"}

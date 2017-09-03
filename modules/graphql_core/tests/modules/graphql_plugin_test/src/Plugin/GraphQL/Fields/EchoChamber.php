@@ -10,6 +10,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "echo",
+ *   secure = true,
  *   name = "echo",
  *   type = "String",
  *   types = {"Root"},

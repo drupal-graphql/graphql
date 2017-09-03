@@ -22,7 +22,6 @@ class NodeSchemaTest extends QueryTestBase  {
    */
   public function register(ContainerBuilder $container) {
     parent::register($container);
-
     $container->setParameter('http.response.debug_cacheability_headers', TRUE);
   }
 

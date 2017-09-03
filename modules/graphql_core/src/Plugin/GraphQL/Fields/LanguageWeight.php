@@ -11,6 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "language_weight",
+ *   secure = true,
  *   name = "weight",
  *   type = "Int",
  *   types = {"Language"}

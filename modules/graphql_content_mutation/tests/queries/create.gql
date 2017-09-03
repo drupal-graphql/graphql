@@ -1,0 +1,21 @@
+mutation ($input: NodeTestCreateInput!) {
+  createNodeTest(input: $input) {
+    violations {
+      path
+      message
+    }
+
+    errors
+    entity {
+      entityId
+      entityBundle
+      entityLabel
+
+      ... on NodeTest {
+        body {
+          value
+        }
+      }
+    }
+  }
+}

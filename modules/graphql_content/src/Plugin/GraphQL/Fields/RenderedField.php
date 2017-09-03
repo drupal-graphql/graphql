@@ -18,6 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "rendered_field",
+ *   secure = true,
  *   type = "String",
  *   nullable = true,
  *   weight = -1,

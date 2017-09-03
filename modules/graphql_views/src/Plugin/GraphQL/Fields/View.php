@@ -16,6 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLField(
  *   id = "view",
+ *   secure = true,
  *   nullable = true,
  *   multi = true,
  *   types = {"Root"},
@@ -74,8 +75,8 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       if (!empty($definition['arguments_info'])) {
         $viewArguments = [];
         foreach ($definition['arguments_info'] as $argumentId => $argumentInfo) {
-          if (isset($args['contextual_filter'][$argumentId])) {
-            $viewArguments[$argumentInfo['index']] = $args['contextual_filter'][$argumentId];
+          if (isset($args['contextualFilter'][$argumentId])) {
+            $viewArguments[$argumentInfo['index']] = $args['contextualFilter'][$argumentId];
           }
           elseif (
             $value instanceof EntityInterface &&
@@ -103,11 +104,16 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       // explicitly. Otherwise views module generates "Undefined index" notice.
       $filters = $executable->getDisplay()->getOption('filters');
       foreach ($filters as $filterKey => $filterRow) {
+        if (!isset($filterRow['expose']['identifier'])) {
+          continue;
+        }
+
         $inputKey = $filterRow['expose']['identifier'];
-        if (!isset($args['filter'][$filterKey])) {
+
+        if (!isset($args['filter'][$inputKey])) {
           $input[$inputKey] = $filterRow['value'];
         } else {
-          $input[$inputKey] = $args['filter'][$filterKey];
+          $input[$inputKey] = $args['filter'][$inputKey];
         }
       }
 

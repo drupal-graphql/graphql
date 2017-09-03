@@ -1,0 +1,25 @@
+graphql_content_mutation.schema:
+  type: config_object
+  label: 'Mutation settings'
+  mapping:
+    types:
+      type: sequence
+      label: 'Exposed entity types'
+      sequence:
+        type: mapping
+        mapping:
+          delete:
+            type: boolean
+            label: 'Expose entity deletion'
+          bundles:
+            type: sequence
+            label: 'Exposed bundle types'
+            sequence:
+              type: mapping
+              mapping:
+                create:
+                  type: boolean
+                  label: 'Expose entity creation'
+                update:
+                  type: boolean
+                  label: 'Expose entity update'

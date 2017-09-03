@@ -1,0 +1,8 @@
+type: module
+name: GraphQL Requests Test
+description: Dummy callbacks for internal request testing.
+package: Testing
+core: 8.x
+hidden: TRUE
+dependencies:
+- graphql_core
