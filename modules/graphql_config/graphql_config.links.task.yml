@@ -1,0 +1,4 @@
+graphql_config.config_entity_schema:
+  route_name: graphql_config.config_entity_schema
+  title: 'Queries'
+  base_route: graphql_config.config_entity_schema

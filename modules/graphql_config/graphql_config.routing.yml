@@ -1,0 +1,7 @@
+graphql_config.config_entity_schema:
+  path: '/admin/config/graphql/config'
+  defaults:
+    _form: '\Drupal\graphql_config\Form\ConfigEntitySchemaConfigForm'
+    _title: 'Exposed configuration'
+  requirements:
+    _permission: 'administer site configuration'

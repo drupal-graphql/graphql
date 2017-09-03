@@ -1,0 +1,13 @@
+graphql_config.schema:
+  type: config_object
+  label: 'Schema settings'
+  mapping:
+    types:
+      type: sequence
+      label: 'Exposed config entity types'
+      sequence:
+        type: mapping
+        mapping:
+          exposed:
+            type: boolean
+            label: 'Expose the config entity interface'

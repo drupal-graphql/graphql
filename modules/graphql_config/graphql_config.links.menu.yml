@@ -1,0 +1,5 @@
+graphql_config.config_entity_schema:
+  title: 'Exposed config'
+  description: 'Define which config entities are included in the GraphQL schema.'
+  parent: 'graphql.config_page'
+  route_name: graphql_config.config_entity_schema

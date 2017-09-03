@@ -1,0 +1,18 @@
+parameters:
+  graphql_config.type_map:
+    Int:
+      - integer
+      - boolean
+      - timestamp
+    Float:
+      - float
+    # All other types are considered strings.
+
+services:
+  graphql_config.schema_config:
+    class: Drupal\graphql_config\ConfigEntitySchemaConfig
+    arguments:
+      - '@config.factory'
+  graphql_config.type_mapper:
+    class: Drupal\graphql_config\TypeMapper
+    arguments: ['%graphql_config.type_map%']
