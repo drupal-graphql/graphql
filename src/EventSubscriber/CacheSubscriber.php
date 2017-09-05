@@ -167,7 +167,8 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $ccid = $this->getCacheIdentifier($this->metadata);
+    $queryHash = md5(serialize($request->attributes->get('queries')));
+    $ccid = $this->getCacheIdentifier($this->metadata) . ':' . $queryHash;
     if ($contextCache = $this->metadataCache->get($ccid)) {
       $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
 
@@ -237,7 +238,9 @@ class CacheSubscriber implements EventSubscriberInterface {
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
     // Write the cache entry for the cache metadata.
-    $ccid = $this->getCacheIdentifier($this->metadata);
+
+    $queryHash = md5(serialize($request->attributes->get('queries')));
+    $ccid = $this->getCacheIdentifier($this->metadata) . ':' . $queryHash;
     $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
     // Write the cache entry for the response object.
