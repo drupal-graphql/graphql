@@ -167,9 +167,10 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $ccid = $this->getCacheIdentifier($this->metadata);
+    $queryHash = md5(serialize($request->attributes->get('queries')));
+    $ccid = $this->getCacheIdentifier($this->metadata) . ':' . $queryHash;
     if ($contextCache = $this->metadataCache->get($ccid)) {
-      $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
+      $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) . ':' . $queryHash : $ccid;
 
       if (($responseCache = $this->responseCache->get($cid)) && ($response = $responseCache->data) instanceof Response) {
         $response->headers->set(self::HEADER, 'HIT');
@@ -237,11 +238,13 @@ class CacheSubscriber implements EventSubscriberInterface {
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
     // Write the cache entry for the cache metadata.
-    $ccid = $this->getCacheIdentifier($this->metadata);
+
+    $queryHash = md5(serialize($request->attributes->get('queries')));
+    $ccid = $this->getCacheIdentifier($this->metadata) . ':' . $queryHash;
     $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
     // Write the cache entry for the response object.
-    $cid = $this->getCacheIdentifier($metadata);
+    $cid = $this->getCacheIdentifier($metadata) . ':' . $queryHash;
     $this->responseCache->set($cid, $response, $expire, $tags);
 
     // The response was generated, mark the response as a cache miss. The next
