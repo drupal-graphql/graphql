@@ -181,6 +181,8 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    return $this->metadata->getCacheMaxAge();
+    // Already controlled by cache metadata on mutation plugins. This
+    // is a safety net for custom schemas.
+    return $this->executionContext->getRequest()->hasMutations() ? 0 : $this->metadata->getCacheMaxAge();
   }
 }

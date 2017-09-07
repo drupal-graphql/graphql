@@ -67,6 +67,14 @@ services:
     arguments: ['@cache_contexts_manager', '@request_stack', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
     tags:
         - { name: service_collector, tag: graphql_extra_schema_cache_metadata, call: addExtraCacheMetadata }
+  graphql.query_processor:
+    class: Drupal\graphql\QueryProcessor
+    arguments:
+    - '@service_container'
+    - '@graphql.schema'
+    - '@graphql.reducer_manager'
+    - '@current_user'
+    - '%graphql.config%'
   graphql.extra_schema_cache_metadata:
     class: Drupal\Core\Cache\CacheableMetadata
     calls:
@@ -122,11 +130,6 @@ services:
     arguments: ['@path_processor_manager']
     tags:
       - { name: graphql_request_policy }
-  graphql.response_policy.deny_mutation:
-    class: Drupal\graphql\Cache\ResponsePolicy\DenyMutation
-    arguments: ['@current_route_match']
-    tags:
-      - { name: graphql_response_policy }
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
     arguments: ['@graphql.query_map_provider']
