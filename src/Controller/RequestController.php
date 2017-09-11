@@ -62,8 +62,6 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * Constructs a RequestController object.
    *
-   * @param \Drupal\graphql\Reducers\ReducerManager $reducerManager
-   *   The reducer manager service.
    * @param \Drupal\Core\Config\Config $config
    *   The config service.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
