@@ -12,6 +12,8 @@ use GuzzleHttp\Psr7\Response;
 
 /**
  * Test loading entities from xml.
+ *
+ * @group graphql_xml
  */
 class XMLEntityTest extends GraphQLFileTestBase {
 
