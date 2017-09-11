@@ -11,16 +11,13 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
-use Drupal\graphql\GraphQL\Execution\Processor;
-use Drupal\graphql\Reducers\ReducerManager;
+use Drupal\graphql\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Handles GraphQL requests.
@@ -33,20 +30,6 @@ class RequestController implements ContainerInjectionInterface {
    * @var \Drupal\Core\Config\Config
    */
   protected $config;
-
-  /**
-   * The dependency injection container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
-
-  /**
-   * The graphql schema.
-   *
-   * @var \Youshido\GraphQL\Schema\AbstractSchema
-   */
-  protected $schema;
 
   /**
    * The http kernel.
@@ -63,13 +46,6 @@ class RequestController implements ContainerInjectionInterface {
   protected $renderer;
 
   /**
-   * The reducer manager service.
-   *
-   * @var \Drupal\graphql\Reducers\ReducerManager
-   */
-  protected $reducerManager;
-
-  /**
    * The request stack service.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack
@@ -77,28 +53,15 @@ class RequestController implements ContainerInjectionInterface {
   protected $requestStack;
 
   /**
-   * The current user account.
+   * The query processor.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var \Drupal\graphql\QueryProcessor
    */
-  protected $currentUser;
-
-  /**
-   * The graphql container parameters.
-   *
-   * @var array
-   */
-  protected $graphqlParams;
+  protected $queryProcessor;
 
   /**
    * Constructs a RequestController object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The dependency injection container.
-   * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
-   *   The graphql schema.
-   * @param \Drupal\graphql\Reducers\ReducerManager $reducerManager
-   *   The reducer manager service.
    * @param \Drupal\Core\Config\Config $config
    *   The config service.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
@@ -107,29 +70,21 @@ class RequestController implements ContainerInjectionInterface {
    *   The request stack service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
-   * @param array $graphqlParams
-   *   The set of graphql container parameters.
+   * @param \Drupal\graphql\QueryProcessor $queryProcessor
+   *   The query processor.
    */
   public function __construct(
-    ContainerInterface $container,
-    AbstractSchema $schema,
-    ReducerManager $reducerManager,
     Config $config,
     HttpKernelInterface $httpKernel,
     RequestStack $requestStack,
     RendererInterface $renderer,
-    AccountProxyInterface $currentUser,
-    array $graphqlParams
+    QueryProcessor $queryProcessor
   ) {
-    $this->container = $container;
-    $this->schema = $schema;
-    $this->reducerManager = $reducerManager;
     $this->config = $config;
     $this->httpKernel = $httpKernel;
     $this->requestStack = $requestStack;
     $this->renderer = $renderer;
-    $this->currentUser = $currentUser;
-    $this->graphqlParams = $graphqlParams;
+    $this->queryProcessor = $queryProcessor;
   }
 
   /**
@@ -137,15 +92,11 @@ class RequestController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container,
-      $container->get('graphql.schema'),
-      $container->get('graphql.reducer_manager'),
       $container->get('config.factory')->get('system.performance'),
       $container->get('http_kernel'),
       $container->get('request_stack'),
       $container->get('renderer'),
-      $container->get('current_user'),
-      $container->getParameter('graphql.config')
+      $container->get('graphql.query_processor')
     );
   }
 
@@ -246,37 +197,24 @@ class RequestController implements ContainerInjectionInterface {
    */
   public function handleRequest(Request $request, $query = '', array $variables = []) {
     $context = new RenderContext();
-    $processor = new Processor($this->container, $this->schema, (
-      $this->currentUser->hasPermission('bypass graphql field security')
-      || $this->graphqlParams['development']
-      /*//
-      TODO: Bypass security for persisted queries.
-      //*/
-    ));
+
+    /** @var \Drupal\graphql\QueryResult $result */
+    $result = NULL;
 
     // Evaluating the GraphQL request can potentially invoke rendering. We allow
     // those to "leak" and collect them here in a render context.
-    $this->renderer->executeInRenderContext($context, function() use ($processor, $query, $variables) {
-      $processor->processPayload($query, $variables, $this->reducerManager->getAllServices());
+    $this->renderer->executeInRenderContext($context, function() use ($query, $variables, &$result) {
+      $result = $this->queryProcessor->processQuery($query, $variables);
     });
 
-    $result = $processor->getResponseData();
-    $response = new CacheableJsonResponse($result);
+    $response = new CacheableJsonResponse($result->getData());
+
     if (!$context->isEmpty()) {
       $response->addCacheableDependency($context->pop());
     }
 
-    $metadata = new CacheableMetadata();
-    // Default to permanent cache.
-    $metadata->setCacheMaxAge(Cache::PERMANENT);
-    // Add cache metadata from the processor and result stages.
-    $metadata->addCacheableDependency($processor);
     // Apply the metadata to the response object.
-    $response->addCacheableDependency($metadata);
-
-    // Set the execution context on the request attributes for use in the
-    // request subscriber and cache policies.
-    $request->attributes->set('graphql_execution_context', $processor->getExecutionContext());
+    $response->addCacheableDependency($result);
 
     return $response;
   }

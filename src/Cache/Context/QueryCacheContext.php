@@ -57,17 +57,21 @@ class QueryCacheContext implements CacheContextInterface {
     $hash = '';
     if ($request->attributes->has('query')) {
       $hash = $this->contextCache[$request] = $this->getHash(
+        $request->attributes->get('id') ?: '',
         $request->attributes->get('query') ?: '',
-        $request->attributes->get('variables') ?: []
+        $request->attributes->get('variables') ?: [],
+        $request->attributes->get('version') ?: ''
       );
     }
     else if ($request->attributes->has('queries')) {
       $queries = $request->attributes->get('queries');
 
-      $hash = hash('sha256', json_encode(array_map(function($item) {
+      return hash('sha256', json_encode(array_map(function($item) {
         return $this->getHash(
+          !empty($item['id']) ? $item['id'] : '',
           !empty($item['query']) ? $item['query'] : '',
-          !empty($item['variables']) ? $item['variables'] : []
+          !empty($item['variables']) ? $item['variables'] : [],
+          !empty($item['version']) ? $item['version'] : NULL
         );
       }, $queries)));
     }
@@ -81,21 +85,27 @@ class QueryCacheContext implements CacheContextInterface {
    * Sorts the variables by their key and eliminates whitespace from the query
    * to enable better reuse of the cache entries.
    *
+   * @param string $id
+   *   The query id in case of a persisted query.
    * @param string $query
    *   The graphql query string.
    * @param array $variables
    *   The graphql query variables.
+   * @param string $version
+   *   The query map version in case of a persisted query.
    *
    * @return string
    *   The hashed string containing.
    */
-  protected function getHash($query = '', array $variables = []) {
+  protected function getHash($id = '', $query = '', array $variables = [], $version = '') {
     $query = preg_replace('/\s{2,}/', ' ', $query);
     ksort($variables);
 
     return hash('sha256', json_encode([
+      'id' => $id,
       'query' => $query,
       'variables' => $variables,
+      'version' => $version,
     ]));
   }
 
