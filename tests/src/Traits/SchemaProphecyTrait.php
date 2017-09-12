@@ -97,6 +97,7 @@ trait SchemaProphecyTrait {
     $root->getCacheTags()->willReturn($metadata->getCacheTags());
     $root->getCacheContexts()->willReturn($metadata->getCacheContexts());
     $root->getCacheMaxAge()->willReturn($metadata->getCacheMaxAge());
+    $root->getArguments()->willReturn([]);
 
     return $root;
   }

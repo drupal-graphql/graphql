@@ -20,9 +20,12 @@ trait QueryTrait {
    *   The query string.
    * @param array $variables
    *   Query variables.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The http response object.
    */
   protected function query($query, $variables = []) {
-    $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
+    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
       'query' => $query,
       'variables' => $variables,
     ]));
@@ -37,9 +40,12 @@ trait QueryTrait {
    *   The query map version.
    * @param array $variables
    *   Query variables.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The http response object.
    */
   protected function persistedQuery($id, $version, $variables = []) {
-    $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
+    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
       'id' => $id,
       'version' => $version,
       'variables' => $variables,
@@ -51,9 +57,11 @@ trait QueryTrait {
    *
    * @param $queries
    *   A set of queries to be executed in one go.
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The http response object.
    */
   protected function batchedQueries($queries) {
-    $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($queries)));
+    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($queries)));
   }
 
   /**
@@ -78,6 +86,8 @@ trait QueryTrait {
     // Replace the current user with one that is allowed to do GraphQL requests.
     $user = $this->prophesize(AccountProxyInterface::class);
     $user->hasPermission('execute graphql requests')
+      ->willReturn(AccessResult::allowed());
+    $user->hasPermission('bypass graphql field security')
       ->willReturn(AccessResult::allowed());
     $user->id()->willReturn(0);
     $user->isAnonymous()->willReturn(TRUE);
