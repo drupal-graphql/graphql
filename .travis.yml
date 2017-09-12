@@ -92,9 +92,6 @@ script:
   # Navigate into the drupal build directory.
   - cd $DRUPAL_BUILD_DIR
 
-  # Start a web server on port 8888, run in the background.
-  - php -S localhost:8888 &
-
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
       then phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
