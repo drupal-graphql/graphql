@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Tests\graphql\Functional\QueryTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 
 /**
