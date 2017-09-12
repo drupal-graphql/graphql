@@ -9,6 +9,7 @@ use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
 use Drupal\graphql\QueryProcessor;
 use Drupal\graphql\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Traits\QueryTrait;
 use Prophecy\Argument;
 
 /**
@@ -18,21 +19,12 @@ use Prophecy\Argument;
  * @group cache
  */
 class ResultCacheTest extends KernelTestBase {
-  use QueryTestTrait;
+  use QueryTrait;
 
   /**
    * {@inheritdoc}
    */
   public static $modules = ['graphql'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->enableCliCache();
-    $this->byPassAccess();
-  }
 
   /**
    * Check basic result caching.

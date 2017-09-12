@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql\Kernel;
+namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\PageCache\RequestPolicyInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Common methods for GraphQL query tests.
  */
-trait QueryTestTrait {
+trait QueryTrait {
 
   /**
    * Issue a simple query without caring about the result.
@@ -58,6 +58,8 @@ trait QueryTestTrait {
 
   /**
    * Enable caching in CLI environments.
+   *
+   * @before
    */
   protected function enableCliCache() {
     // Disable the cli deny policy because we actually want caching on cli
@@ -69,6 +71,8 @@ trait QueryTestTrait {
 
   /**
    * Bypass user access.
+   *
+   * @before
    */
   protected function byPassAccess() {
     // Replace the current user with one that is allowed to do GraphQL requests.

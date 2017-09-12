@@ -7,27 +7,19 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\QueryProcessor;
 use Drupal\graphql\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Traits\QueryTrait;
 use Prophecy\Argument;
 
 /**
  * Test disabled result cache.
  */
 class DisabledResultCacheTest extends KernelTestBase {
-  use QueryTestTrait;
+  use QueryTrait;
 
   /**
    * {@inheritdoc}
    */
   public static $modules = ['graphql'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->enableCliCache();
-    $this->byPassAccess();
-  }
 
   /**
    * {@inheritdoc}

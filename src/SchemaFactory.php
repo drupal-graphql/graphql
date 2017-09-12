@@ -124,7 +124,7 @@ class SchemaFactory {
       $schema->addCacheableDependency($this->getCacheMetadataFromTypes($schema));
     }
 
-    if ($this->config['schema_cache']) {
+    if ($this->config['schema_cache'] && $schema->getCacheMaxAge() !== 0) {
       $tags = $schema->getCacheTags();
       $expire = $this->maxAgeToExpire($schema->getCacheMaxAge());
 
