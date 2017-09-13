@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -73,51 +74,14 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       // Set view contextual filters.
       /* @see \Drupal\graphql_views\Plugin\Deriver\ViewDeriverBase::getArgumentsInfo() */
       if (!empty($definition['arguments_info'])) {
-        $viewArguments = [];
-        foreach ($definition['arguments_info'] as $argumentId => $argumentInfo) {
-          if (isset($args['contextualFilter'][$argumentId])) {
-            $viewArguments[$argumentInfo['index']] = $args['contextualFilter'][$argumentId];
-          }
-          elseif (
-            $value instanceof EntityInterface &&
-            $value->getEntityTypeId() === $argumentInfo['entity_type'] &&
-            (empty($argumentInfo['bundles']) ||
-              in_array($value->bundle(), $argumentInfo['bundles'], TRUE))
-          ) {
-            $viewArguments[$argumentInfo['index']] = $value->id();
-          }
-          else {
-            $viewArguments[$argumentInfo['index']] = NULL;
-          }
-        }
-        $executable->setArguments($viewArguments);
+        $arguments = $this->extractContextualFilters($value, $args);
+        $executable->setArguments($arguments);
       }
 
-      // Prepare arguments for use as exposed form input.
-      $input = array_filter([
-        // Sorting arguments.
-        'sort_by' => isset($args['sortBy']) ? $args['sortBy'] : NULL,
-        'sort_order' => isset($args['sortDirection']) ? $args['sortDirection'] : NULL,
-      ]);
-
-      // If some filters are missing from the input, set them to an empty string
-      // explicitly. Otherwise views module generates "Undefined index" notice.
-      $filters = $executable->getDisplay()->getOption('filters');
-      foreach ($filters as $filterKey => $filterRow) {
-        if (!isset($filterRow['expose']['identifier'])) {
-          continue;
-        }
-
-        $inputKey = $filterRow['expose']['identifier'];
-
-        if (!isset($args['filter'][$inputKey])) {
-          $input[$inputKey] = $filterRow['value'];
-        } else {
-          $input[$inputKey] = $args['filter'][$inputKey];
-        }
-      }
-
+      $filters = $executable->getDisplay()->getOption('filters');;
+      $input = $this->extractExposedInput($value, $args, $filters);
       $executable->setExposedInput($input);
+
       // This is a workaround for the Taxonomy Term filter which requires a full
       // exposed form to be sent OR the display being an attachment to just
       // accept input values.
@@ -156,6 +120,56 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     $metadata->setCacheTags($executable->getCacheTags());
 
     return $metadata;
+  }
+
+  protected function extractContextualFilters($value, $args) {
+    $definition = $this->getPluginDefinition();
+    $arguments = [];
+
+    foreach ($definition['arguments_info'] as $argumentId => $argumentInfo) {
+      if (isset($args['contextualFilter'][$argumentId])) {
+        $arguments[$argumentInfo['index']] = $args['contextualFilter'][$argumentId];
+      }
+      elseif (
+        $value instanceof EntityInterface &&
+        $value->getEntityTypeId() === $argumentInfo['entity_type'] &&
+        (empty($argumentInfo['bundles']) ||
+          in_array($value->bundle(), $argumentInfo['bundles'], TRUE))
+      ) {
+        $arguments[$argumentInfo['index']] = $value->id();
+      }
+      else {
+        $arguments[$argumentInfo['index']] = NULL;
+      }
+    }
+
+    return $arguments;
+  }
+
+  protected function extractExposedInput($value, $args, $filters) {
+    // Prepare arguments for use as exposed form input.
+    $input = array_filter([
+      // Sorting arguments.
+      'sort_by' => isset($args['sortBy']) ? $args['sortBy'] : NULL,
+      'sort_order' => isset($args['sortDirection']) ? $args['sortDirection'] : NULL,
+    ]);
+
+    // If some filters are missing from the input, set them to an empty string
+    // explicitly. Otherwise views module generates "Undefined index" notice.
+    foreach ($filters as $filterKey => $filterRow) {
+      if (!isset($filterRow['expose']['identifier'])) {
+        continue;
+      }
+
+      $inputKey = $filterRow['expose']['identifier'];
+      if (!isset($args['filter'][$inputKey])) {
+        $input[$inputKey] = $filterRow['value'];
+      } else {
+        $input[$inputKey] = $args['filter'][$inputKey];
+      }
+    }
+
+    return $input;
   }
 
 }

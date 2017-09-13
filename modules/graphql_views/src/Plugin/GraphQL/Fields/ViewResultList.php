@@ -25,7 +25,9 @@ class ViewResultList extends FieldPluginBase {
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ViewExecutable) {
       foreach ($value->result as $row) {
-        yield $row->_entity;
+        if (isset($row->_entity)) {
+          yield $row->_entity;
+        }
       }
     }
   }

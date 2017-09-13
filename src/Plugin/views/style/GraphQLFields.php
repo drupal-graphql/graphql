@@ -8,13 +8,13 @@ use Drupal\views\Plugin\views\style\StylePluginBase;
  * Provides a style plugin for GraphQL views.
  *
  * @ViewsStyle(
- *   id = "graphql",
- *   title = @Translation("GraphQL Entities"),
- *   help = @Translation("Returns a list of entities."),
+ *   id = "graphql_fields",
+ *   title = @Translation("GraphQL Fields"),
+ *   help = @Translation("Returns a list of raw fields."),
  *   display_types = {"graphql"}
  * )
  */
-class GraphQL extends StylePluginBase {
+class GraphQLFields extends StylePluginBase {
 
   /**
    * {@inheritdoc}
@@ -24,17 +24,11 @@ class GraphQL extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
-  protected $usesFields = FALSE;
+  protected $usesFields = TRUE;
 
   /**
    * {@inheritdoc}
    */
   protected $usesGrouping = FALSE;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render() {
-    return '';
-  }
 }

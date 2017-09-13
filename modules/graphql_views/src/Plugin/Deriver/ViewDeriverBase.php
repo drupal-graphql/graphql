@@ -7,7 +7,9 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginInterface;
+use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\views\ViewEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -135,6 +137,32 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   }
 
   /**
+   * Retrieves the type the view's rows resolve to.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   * @param $displayId
+   *   The id of the current display.
+   *
+   * @return null|string
+   *   The name of the type or NULL if the type could not be derived.
+   */
+  protected function getRowResolveType(ViewEntityInterface $view, $displayId) {
+    if (!$entityType = $this->getEntityTypeByTable($view->get('base_table'))) {
+      // Skip for now, switch to different response type later when
+      // implementing fieldable views display support.
+      return NULL;
+    }
+
+    $typeName = StringHelper::camelCase($entityType);
+    if ($this->interfaceExists($typeName)) {
+      return $typeName;
+    }
+
+    return 'Entity';
+  }
+
+  /**
    * Check if a certain interface exists.
    *
    * @param string $interface
@@ -164,6 +192,23 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
     $viewExecutable = $view->getExecutable();
     $viewExecutable->setDisplay($displayId);
     return $viewExecutable->getDisplay();
+  }
+
+  /**
+   * Returns a view style object.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view object.
+   * @param string $displayId
+   *   The display ID to use.
+   *
+   * @return \Drupal\views\Plugin\views\style\StylePluginBase
+   *   The view style object.
+   */
+  protected function getViewStyle(ViewEntityInterface $view, $displayId) {
+    $viewExecutable = $view->getExecutable();
+    $viewExecutable->setDisplay($displayId);
+    return $viewExecutable->getStyle();
   }
 
   /**
@@ -210,5 +255,4 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
 
     return $argumentsInfo;
   }
-
 }

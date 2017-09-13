@@ -26,21 +26,12 @@ class ViewResultListDeriver extends ViewDeriverBase {
         continue;
       }
 
-      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
-        // Skip for now, switch to different response type later when
-        // implementing fieldable views display support.
-        continue;
-      }
-
       $id = implode('-', [$viewId, $displayId, 'result', 'list']);
-      $typeName = StringHelper::camelCase($type);
-      if (!$this->interfaceExists($typeName)) {
-        $typeName = 'Entity';
-      }
+      $type = $this->getRowResolveType($view, $displayId);
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'type' => $typeName,
+        'type' => $type,
         'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
         'multi' => TRUE,
         'view' => $viewId,

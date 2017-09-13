@@ -14,8 +14,6 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Provides a display plugin for GraphQL views.
  *
- * @ingroup views_display_plugins
- *
  * @ViewsDisplay(
  *   id = "graphql",
  *   title = @Translation("GraphQL"),
@@ -62,7 +60,7 @@ class GraphQL extends DisplayPluginBase {
    * {@inheritdoc}
    */
   public function usesFields() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -122,13 +120,13 @@ class GraphQL extends DisplayPluginBase {
   public function optionsSummary(&$categories, &$options) {
     parent::optionsSummary($categories, $options);
 
-    unset($categories['format'], $categories['fields'], $categories['title']);
+    unset($categories['title']);
     unset($categories['pager'], $categories['exposed'], $categories['access']);
 
     unset($options['show_admin_links'], $options['analyze-theme'], $options['link_display']);
     unset($options['show_admin_links'], $options['analyze-theme'], $options['link_display']);
 
-    unset($options['style'], $options['row'], $options['title'], $options['access']);
+    unset($options['title'], $options['access']);
     unset($options['exposed_block'], $options['css_class']);
     unset($options['query'], $options['group_by']);
 
