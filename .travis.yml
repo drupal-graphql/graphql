@@ -10,7 +10,6 @@ env:
   global:
     - DRUPAL_BUILD_DIR=$TRAVIS_BUILD_DIR/../drupal
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
-    - SIMPLETEST_BASE_URL=http://localhost:8888
   matrix:
     - DRUPAL_CORE=8.2.x
     - DRUPAL_CORE=8.3.x
@@ -97,12 +96,12 @@ script:
       then phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
     fi
 
-  # Run the unit tests with standdard php otherwise.
+  # Run the unit tests with standard php otherwise.
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
       then vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
     fi
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then bash <(curl -s https://codecov.io/bash);
+      then bash <(curl -s https://codecov.io/bash) -f modules/graphql/coverage.xml;
     fi
