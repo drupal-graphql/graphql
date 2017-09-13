@@ -85,10 +85,6 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    *   The cacheable value.
    */
   protected function cacheable($result, $value, array $args) {
-    if ($result instanceof ValueWrapperInterface) {
-      return $result;
-    }
-
     if ($this->getPluginDefinition()['multi']) {
       return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
     }
@@ -134,7 +130,10 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    * @return \Generator
    *   The value generator.
    */
-  protected abstract function resolveValues($value, array $args, ResolveInfo $info);
+  protected function resolveValues($value, array $args, ResolveInfo $info) {
+    // Allow overriding this class without having to declare this method.
+    yield NULL;
+  }
 
   /**
    * {@inheritdoc}
