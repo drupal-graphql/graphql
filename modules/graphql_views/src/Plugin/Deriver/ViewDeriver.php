@@ -118,6 +118,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         $paged = TRUE;
         $arguments += [
           'page' => ['type' => 'Int', 'default' => $this->getPagerOffset($display)],
+          'offset' => ['type' => 'Int', 'default' => $this->getPagerOffset($display)],
           'pageSize' => ['type' => 'Int', 'default' => $this->getPagerLimit($display)],
         ];
       }
