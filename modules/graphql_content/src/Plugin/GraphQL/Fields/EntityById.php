@@ -102,7 +102,7 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
       $entityType = $this->entityTypeManager->getDefinition($pluginDefinition['entity_type']);
       $metadata = new CacheableMetadata();
       $metadata->addCacheTags($entityType->getListCacheTags());
-      return $metadata;
+      return [$metadata];
     }
 
     return parent::getCacheDependencies($result, $parent, $args);
