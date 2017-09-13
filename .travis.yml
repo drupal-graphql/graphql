@@ -1,19 +1,19 @@
 language: php
 sudo: false
 
-#php:
-#  - 5.5
-#  - 5.6
-#  - 7
+php:
+  - 5.5
+  - 5.6
+  - 7
 
 env:
   global:
     - DRUPAL_BUILD_DIR=$TRAVIS_BUILD_DIR/../drupal
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
-#  matrix:
-#    - DRUPAL_CORE=8.2.x
-#    - DRUPAL_CORE=8.3.x
-#    - DRUPAL_CORE=8.4.x
+  matrix:
+    - DRUPAL_CORE=8.2.x
+    - DRUPAL_CORE=8.3.x
+    - DRUPAL_CORE=8.4.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -90,17 +90,15 @@ install:
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist --coverage-clover coverage.xml;
+      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist --coverage-clover $TRAVIS_BUILD_DIR/coverage.xml $TRAVIS_BUILD_DIR;
     fi
 
   # Run the unit tests with standard php otherwise.
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
-      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist;
+      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist $TRAVIS_BUILD_DIR;
     fi
 
 after_success:
-  - ls -la
-  - pwd
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
       then bash <(curl -s https://codecov.io/bash);
     fi
