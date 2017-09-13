@@ -1,19 +1,19 @@
 language: php
 sudo: false
 
-php:
-  - 5.5
-  - 5.6
-  - 7
+#php:
+#  - 5.5
+#  - 5.6
+#  - 7
 
 env:
   global:
     - DRUPAL_BUILD_DIR=$TRAVIS_BUILD_DIR/../drupal
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
-  matrix:
-    - DRUPAL_CORE=8.2.x
-    - DRUPAL_CORE=8.3.x
-    - DRUPAL_CORE=8.4.x
+#  matrix:
+#    - DRUPAL_CORE=8.2.x
+#    - DRUPAL_CORE=8.3.x
+#    - DRUPAL_CORE=8.4.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -88,20 +88,19 @@ install:
   - composer --working-dir=$DRUPAL_BUILD_DIR require youshido/graphql:~1.5
 
 script:
-  # Navigate into the drupal build directory.
-  - cd $DRUPAL_BUILD_DIR
-
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
+      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist --coverage-clover coverage.xml;
     fi
 
   # Run the unit tests with standard php otherwise.
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
-      then vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
+      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist;
     fi
 
 after_success:
+  - ls -la
+  - pwd
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then bash <(curl -s https://codecov.io/bash) -f modules/graphql/coverage.xml;
+      then bash <(curl -s https://codecov.io/bash);
     fi
