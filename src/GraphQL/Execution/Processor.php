@@ -69,11 +69,6 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
       if (!$secure && !$field->isSecure()) {
         throw new \Exception(sprintf("Unable to resolve insecure field '%s' (%s).", $field->getName(), get_class($field)));
       }
-      // If resolving in a trusted environment, add the current user as a cache
-      // context when resolving insecure fields.
-      else if ($secure && !$field->isSecure()) {
-        $this->metadata->addCacheContexts(['user']);
-      }
     }
 
     $value = $this->doResolveValue($field, $ast, $parentValue);
