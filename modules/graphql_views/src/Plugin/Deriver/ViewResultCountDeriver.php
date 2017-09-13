@@ -20,9 +20,7 @@ class ViewResultCountDeriver extends ViewDeriverBase {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
       $display = $this->getViewDisplay($view, $displayId);
-
       if (!$this->isPaged($display)) {
-        // Skip if the display doesn't expose a pager.
         continue;
       }
 

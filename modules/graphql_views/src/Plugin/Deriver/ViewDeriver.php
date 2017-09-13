@@ -24,13 +24,6 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $view = $viewStorage->load($viewId);
       /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
       $display = $this->getViewDisplay($view, $displayId);
-      $paged = $this->isPaged($display);
-
-      // If a pager is configured we apply the matching views result derivative
-      // instead of the entity list.
-      $type = $paged ?
-        StringHelper::camelCase([$viewId, $displayId, 'result']) :
-        $this->getRowResolveType($view, $displayId);
 
       $id = implode('-', [$viewId, $displayId, 'view']);
       $info = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
@@ -39,19 +32,18 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $arguments += $this->getPagerArguments($display);
       $arguments += $this->getSortArguments($display, $id);
       $arguments += $this->getFilterArguments($display, $id);
-      $types = ['Root'] + $this->getContextualTypes($info);
+      $types = $this->getTypes($info);
 
-      $name = $display->getGraphQLQueryName();
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => $name,
+        'name' => $display->getGraphQLQueryName(),
+        'type' => StringHelper::camelCase([$viewId, $displayId, 'result']),
         'types' => $types,
-        'type' => $type,
-        'multi' => $paged,
+        'multi' => FALSE,
         'arguments' => $arguments,
         'view' => $viewId,
         'display' => $displayId,
-        'paged' => $paged,
+        'paged' => $this->isPaged($display),
         'arguments_info' => $info,
         'cache_tags' => $view->getCacheTags(),
         'cache_contexts' => $view->getCacheContexts(),
@@ -171,12 +163,13 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
    * @return array
    *   An array of additional types the view can be embedded in.
    */
-  protected function getContextualTypes(array $arguments) {
+  protected function getTypes(array $arguments) {
+    $types = ['Root'];
+
     if (empty($arguments)) {
-      return [];
+      return $types;
     }
 
-    $types = [];
     foreach ($arguments as $argument) {
       // Depending on whether bundles are known, we expose the view field
       // either on the interface (e.g. Node) or on the type (e.g. NodePage)
@@ -194,7 +187,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       else {
         $types = array_merge($types, array_map(function($bundle) use ($argument) {
           return StringHelper::camelCase([$argument['entity_type'], $bundle]);
-        }, $argument['bundles']));
+        }, array_keys($argument['bundles'])));
       }
     }
 

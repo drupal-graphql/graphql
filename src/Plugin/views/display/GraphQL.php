@@ -7,6 +7,7 @@
 
 namespace Drupal\graphql\Plugin\views\display;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -181,5 +182,22 @@ class GraphQL extends DisplayPluginBase {
    */
   public function execute() {
     return $this->view->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    $rows = (!empty($this->view->result) || $this->view->style_plugin->evenEmpty()) ? $this->view->style_plugin->render($this->view->result) : [];
+
+    // Apply the cache metadata from the display plugin. This comes back as a
+    // cache render array so we have to transform it back afterwards.
+    $this->applyDisplayCachablityMetadata($this->view->element);
+
+    return [
+      'view' => $this->view,
+      'rows' => $rows,
+      'cache' => CacheableMetadata::createFromRenderArray($this->view->element),
+    ];
   }
 }

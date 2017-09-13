@@ -1,8 +1,8 @@
+uuid: 287a1f02-3fd1-4b5b-8c77-76855fa7f308
 langcode: en
 status: true
 dependencies:
   config:
-    - node.type.test
     - taxonomy.vocabulary.tags
   module:
     - graphql
@@ -75,12 +75,8 @@ display:
           default_row_class: true
           uses_fields: false
       row:
-        type: fields
-        options:
-          inline: {  }
-          separator: ''
-          hide_empty: false
-          default_field_elements: true
+        type: graphql_entity
+        options: {  }
       fields:
         title:
           id: title

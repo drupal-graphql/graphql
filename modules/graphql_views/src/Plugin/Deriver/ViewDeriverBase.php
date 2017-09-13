@@ -148,18 +148,22 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   The name of the type or NULL if the type could not be derived.
    */
   protected function getRowResolveType(ViewEntityInterface $view, $displayId) {
-    if (!$entityType = $this->getEntityTypeByTable($view->get('base_table'))) {
-      // Skip for now, switch to different response type later when
-      // implementing fieldable views display support.
-      return NULL;
+    $style = $this->getViewStyle($view, $displayId);
+    if ($style->usesFields()) {
+      return StringHelper::camelCase([StringHelper::camelCase([$view->id(), $displayId, 'row'])]);
     }
 
-    $typeName = StringHelper::camelCase($entityType);
-    if ($this->interfaceExists($typeName)) {
-      return $typeName;
+    if ($entityType = $this->getEntityTypeByTable($view->get('base_table'))) {
+      $typeName = StringHelper::camelCase($entityType);
+      if ($this->interfaceExists($typeName)) {
+        return $typeName;
+      }
+
+      return 'Entity';
     }
 
-    return 'Entity';
+    // TODO: Add support for solr views.
+    return NULL;
   }
 
   /**
@@ -226,14 +230,14 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   protected function getArgumentsInfo(array $viewArguments) {
     $argumentsInfo = [];
 
-    $index = -1;
+    $index = 0;
     foreach ($viewArguments as $argumentId => $argument) {
-      $index++;
       $info = [
         'index' => $index,
         'entity_type' => NULL,
         'bundles' => [],
       ];
+
       if (isset($argument['entity_type']) && isset($argument['entity_field'])) {
         $entityType = $this->entityTypeManager->getDefinition($argument['entity_type']);
         if ($entityType) {
@@ -250,7 +254,9 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
           }
         }
       }
+
       $argumentsInfo[$argumentId] = $info;
+      $index++;
     }
 
     return $argumentsInfo;

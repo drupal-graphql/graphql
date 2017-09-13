@@ -1,22 +1,32 @@
 {
 
   default:graphqlTestSortedView {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
   asc:graphqlTestSortedView(sortBy: TITLE) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
   desc:graphqlTestSortedView(sortBy: TITLE, sortDirection: DESC) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
   asc_nid:graphqlTestSortedView(sortBy: NID, sortDirection: ASC) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
   desc_nid:graphqlTestSortedView(sortBy: NID, sortDirection: DESC) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 }

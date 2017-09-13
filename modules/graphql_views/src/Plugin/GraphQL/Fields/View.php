@@ -88,19 +88,13 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $executable->is_attachment = TRUE;
       $executable->exposed_raw_input = $input;
 
-      if ($definition['paged']) {
+      if (!empty($definition['paged'])) {
         // Set paging parameters.
         $executable->setItemsPerPage($args['pageSize']);
         $executable->setCurrentPage($args['page']);
-        $executable->execute();
-        yield $executable;
       }
-      else {
-        $executable->execute();
-        foreach ($executable->result as $row) {
-          yield $row->_entity;
-        }
-      }
+
+      yield $executable->render($definition['display']);
     }
   }
 
@@ -108,20 +102,15 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
    * {@inheritdoc}
    */
   protected function getCacheDependencies($result, $value, array $args) {
-    // If the view is not paged, it's simply a list of rows. Since these are
-    // entities, they should implement CacheableDependencyInterface anyways.
-    if (!$this->getPluginDefinition()['paged']) {
-      return parent::getCacheDependencies($result, $value, $args);
-    }
-
-    /** @var \Drupal\Views\ViewExecutable $executable */
-    $executable = reset($result);
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheTags($executable->getCacheTags());
-
-    return $metadata;
+    $result = reset($result);
+    return [$result['cache']];
   }
 
+  /**
+   * @param $value
+   * @param $args
+   * @return array
+   */
   protected function extractContextualFilters($value, $args) {
     $definition = $this->getPluginDefinition();
     $arguments = [];
@@ -146,6 +135,12 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
     return $arguments;
   }
 
+  /**
+   * @param $value
+   * @param $args
+   * @param $filters
+   * @return array
+   */
   protected function extractExposedInput($value, $args, $filters) {
     // Prepare arguments for use as exposed form input.
     $input = array_filter([
