@@ -88,20 +88,17 @@ install:
   - composer --working-dir=$DRUPAL_BUILD_DIR require youshido/graphql:~1.5
 
 script:
-  # Navigate into the drupal build directory.
-  - cd $DRUPAL_BUILD_DIR
-
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
+      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist --coverage-clover $TRAVIS_BUILD_DIR/coverage.xml $TRAVIS_BUILD_DIR;
     fi
 
   # Run the unit tests with standard php otherwise.
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
-      then vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
+      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist $TRAVIS_BUILD_DIR;
     fi
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then bash <(curl -s https://codecov.io/bash) -f modules/graphql/coverage.xml;
+      then bash <(curl -s https://codecov.io/bash);
     fi
