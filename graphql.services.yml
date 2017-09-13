@@ -115,7 +115,7 @@ services:
   graphql.extra_cache_metadata:
     class: Drupal\Core\Cache\CacheableMetadata
     calls:
-      - { method: addCacheContexts, arguments: [['gql']] }
+      - { method: addCacheContexts, arguments: [['gql', 'user']] }
       - { method: addCacheTags, arguments: [['graphql_response']] }
     tags:
       - { name: graphql_extra_cache_metadata }

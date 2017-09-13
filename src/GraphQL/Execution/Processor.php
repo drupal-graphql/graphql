@@ -45,6 +45,8 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    *   Indicate that this processor is executing trusted queries.
    */
   public function __construct(ContainerInterface $container, AbstractSchema $schema, $secure = FALSE) {
+    parent::__construct($schema);
+
     $this->container = $container;
     $this->metadata = new CacheableMetadata();
 
@@ -53,8 +55,6 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
       $this->metadata->addCacheableDependency($schema);
     }
 
-    parent::__construct($schema);
-
     $this->executionContext->getContainer()->set('secure', $secure);
   }
 
@@ -62,16 +62,16 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    * {@inheritdoc}
    */
   protected function doResolve(FieldInterface $field, AstFieldInterface $ast, $parentValue = NULL) {
-    // If not resolving in a trusted environment, check if the field is secure.
-    // Only check our own fields.
-    // TODO: Investigate if we also should check other fields.
-    if (!$this->executionContext->getContainer()->get('secure') && $field instanceof FieldPluginBase) {
-      if (!($field instanceof SecureFieldInterface && $field->isSecure())) {
+    if ($field instanceof SecureFieldInterface) {
+      $secure = $this->executionContext->getContainer()->get('secure');
+
+      // If not resolving in a trusted environment, check if the field is secure.
+      if (!$secure && !$field->isSecure()) {
         throw new \Exception(sprintf("Unable to resolve insecure field '%s' (%s).", $field->getName(), get_class($field)));
       }
     }
-    $value = $this->doResolveValue($field, $ast, $parentValue);
 
+    $value = $this->doResolveValue($field, $ast, $parentValue);
     if ($value instanceof CacheableDependencyInterface) {
       // If the current resolved value returns cache metadata, keep it.
       $this->metadata->addCacheableDependency($value);

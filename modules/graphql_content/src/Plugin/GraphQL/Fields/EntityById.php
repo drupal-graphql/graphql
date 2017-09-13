@@ -2,10 +2,12 @@
 
 namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\CacheableValue;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -69,16 +71,29 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveInfo $info) {
     $storage = $this->entityTypeManager->getStorage($this->pluginDefinition['entity_type']);
+    if ($entity = $storage->load($args['id'])) {
+      if ($entity->access('view')) {
+        if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
+          $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+        }
 
-    if (($entity = $storage->load($args['id'])) && $entity->access('view')) {
-      if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
-        $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+        return $entity;
       }
 
-      yield $entity;
+      // If the entity exists but we do not grant access to it, we still want
+      // to have it's cache metadata in the output because future changes to
+      // the entity might affect its visibility for the user.
+      return new CacheableValue(NULL, [$entity]);
     }
-  }
 
+    // If there is no entity with this id, add the list cache tags so that the
+    // cache entry is purged whenever a new entity of this type is saved.
+    $pluginDefinition = $this->getPluginDefinition();
+    $entityType = $this->entityTypeManager->getDefinition($pluginDefinition['entity_type']);
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheTags($entityType->getListCacheTags());
+    return new CacheableValue(NULL, [$metadata]);
+  }
 }

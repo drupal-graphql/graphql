@@ -5,6 +5,7 @@ namespace Drupal\graphql_core\GraphQL;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\SecureFieldInterface;
+use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql_core\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
@@ -129,7 +130,10 @@ abstract class FieldPluginBase extends AbstractField implements GraphQLPluginInt
    * @return \Generator
    *   The value generator.
    */
-  protected abstract function resolveValues($value, array $args, ResolveInfo $info);
+  protected function resolveValues($value, array $args, ResolveInfo $info) {
+    // Allow overriding this class without having to declare this method.
+    yield NULL;
+  }
 
   /**
    * {@inheritdoc}
