@@ -2,10 +2,13 @@
 
 namespace Drupal\graphql\Plugin\views\row;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
 use Drupal\views\Plugin\views\row\RowPluginBase;
+use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,7 +23,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class GraphQLEntityRow extends RowPluginBase {
 
-  use EntityTranslationRenderTrait;
+  use EntityTranslationRenderTrait {
+    getEntityTranslationRenderer as getEntityTranslationRendererBase;
+  }
 
   /**
    * {@inheritdoc}
@@ -80,15 +85,33 @@ class GraphQLEntityRow extends RowPluginBase {
    * {@inheritdoc}
    */
   public function render($row) {
-    // TODO: Add support for solr views.
-    return $this->getEntityTranslation($row->_entity, $row);
+    if ($entity = $this->getEntityFromRow($row)) {
+      return $this->view->getBaseEntityType() ? $this->getEntityTranslation($entity, $row) : $entity;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEntityTranslationRenderer() {
+    if ($this->view->getBaseEntityType()) {
+      return $this->getEntityTranslationRendererBase();
+    }
+
+    return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getEntityTypeId() {
-    return $this->view->getBaseEntityType()->id();
+    if ($entityType = $this->view->getBaseEntityType()) {
+      return $entityType->id();
+    }
+
+    return NULL;
   }
 
   /**
@@ -106,6 +129,27 @@ class GraphQLEntityRow extends RowPluginBase {
   }
 
   /**
+   * Retrieves the entity object from a result row.
+   *
+   * @param \Drupal\Views\ResultRow $row
+   *   The views result row object.
+   *
+   * @return null|\Drupal\Core\Entity\EntityInterface
+   *   The extracted entity object or NULL if it could not be retrieved.
+   */
+  protected function getEntityFromRow(ResultRow $row) {
+    if (isset($row->_entity) && $row->_entity instanceof EntityInterface) {
+      return $row->_entity;
+    }
+
+    if (isset($row->_object) && $row->_object instanceof EntityAdapter) {
+      return $row->_object->getValue();
+    }
+
+    return NULL;
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function getView() {
@@ -118,7 +162,9 @@ class GraphQLEntityRow extends RowPluginBase {
   public function query() {
     parent::query();
 
-    $this->getEntityTranslationRenderer()->query($this->view->getQuery());
+    if ($this->view->getBaseEntityType()) {
+      $this->getEntityTranslationRenderer()->query($this->view->getQuery());
+    }
   }
 
 }
