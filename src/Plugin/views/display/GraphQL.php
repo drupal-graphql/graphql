@@ -7,14 +7,13 @@
 
 namespace Drupal\graphql\Plugin\views\display;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a display plugin for GraphQL views.
- *
- * @ingroup views_display_plugins
  *
  * @ViewsDisplay(
  *   id = "graphql",
@@ -62,7 +61,7 @@ class GraphQL extends DisplayPluginBase {
    * {@inheritdoc}
    */
   public function usesFields() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -85,12 +84,14 @@ class GraphQL extends DisplayPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    // Set the default style plugin to 'graphql'.
+    // Set the default plugins to 'graphql'.
     $options['style']['contains']['type']['default'] = 'graphql';
     $options['exposed_form']['contains']['type']['default'] = 'graphql';
+    $options['row']['contains']['type']['default'] = 'graphql_entity';
 
     $options['defaults']['default']['style'] = FALSE;
     $options['defaults']['default']['exposed_form'] = FALSE;
+    $options['defaults']['default']['row'] = FALSE;
 
     // Remove css/exposed form settings, as they are not used for the data display.
     unset($options['exposed_block']);
@@ -122,13 +123,13 @@ class GraphQL extends DisplayPluginBase {
   public function optionsSummary(&$categories, &$options) {
     parent::optionsSummary($categories, $options);
 
-    unset($categories['format'], $categories['fields'], $categories['title']);
+    unset($categories['title']);
     unset($categories['pager'], $categories['exposed'], $categories['access']);
 
     unset($options['show_admin_links'], $options['analyze-theme'], $options['link_display']);
     unset($options['show_admin_links'], $options['analyze-theme'], $options['link_display']);
 
-    unset($options['style'], $options['row'], $options['title'], $options['access']);
+    unset($options['title'], $options['access']);
     unset($options['exposed_block'], $options['css_class']);
     unset($options['query'], $options['group_by']);
 
@@ -183,5 +184,22 @@ class GraphQL extends DisplayPluginBase {
    */
   public function execute() {
     return $this->view->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
+    $rows = (!empty($this->view->result) || $this->view->style_plugin->evenEmpty()) ? $this->view->style_plugin->render($this->view->result) : [];
+
+    // Apply the cache metadata from the display plugin. This comes back as a
+    // cache render array so we have to transform it back afterwards.
+    $this->applyDisplayCachablityMetadata($this->view->element);
+
+    return [
+      'view' => $this->view,
+      'rows' => $rows,
+      'cache' => CacheableMetadata::createFromRenderArray($this->view->element),
+    ];
   }
 }

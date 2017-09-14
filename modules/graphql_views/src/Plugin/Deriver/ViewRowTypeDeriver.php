@@ -6,9 +6,9 @@ use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Views;
 
 /**
- * Derive fields from configured views.
+ * Derive row types from configured fieldable views.
  */
-class ViewResultListDeriver extends ViewDeriverBase {
+class ViewRowTypeDeriver extends ViewDeriverBase {
 
   /**
    * {@inheritdoc}
@@ -19,23 +19,22 @@ class ViewResultListDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      if (!$type = $this->getRowResolveType($view, $displayId)) {
+      if (!$this->getRowResolveType($view, $displayId)) {
         continue;
       }
 
-      $id = implode('-', [$viewId, $displayId, 'result', 'list']);
       $style = $this->getViewStyle($view, $displayId);
+      // This deriver only supports style plugins that use fields.
+      if (!$style->usesFields()) {
+        continue;
+      }
+
+      $id = implode('-', [$viewId, $displayId, 'row']);
       $this->derivatives[$id] = [
         'id' => $id,
-        'type' => $type,
-        'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
-        'multi' => TRUE,
+        'name' => StringHelper::camelCase([$viewId, $displayId, 'row']),
         'view' => $viewId,
         'display' => $displayId,
-        'uses_fields' => $style->usesFields(),
-        'cache_tags' => $view->getCacheTags(),
-        'cache_contexts' => $view->getCacheContexts(),
-        'cache_max_age' => $view->getCacheMaxAge(),
       ] + $basePluginDefinition;
     }
 

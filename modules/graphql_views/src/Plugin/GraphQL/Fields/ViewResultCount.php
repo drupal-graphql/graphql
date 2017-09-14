@@ -24,8 +24,8 @@ class ViewResultCount extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ViewExecutable) {
-      yield intval($value->total_rows);
+    if (isset($value['view']) && $value['view'] instanceof ViewExecutable) {
+      yield intval($value['view']->total_rows);
     }
   }
 

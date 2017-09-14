@@ -12,6 +12,8 @@ use Prophecy\Argument;
 
 /**
  * Test disabled result cache.
+ *
+ * @group graphql
  */
 class DisabledResultCacheTest extends KernelTestBase {
   use QueryTrait;

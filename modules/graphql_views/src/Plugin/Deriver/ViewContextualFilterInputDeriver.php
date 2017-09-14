@@ -20,14 +20,11 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $display = $this->getViewDisplay($view, $displayId);
-
-      if (!$this->getEntityTypeByTable($view->get('base_table'))) {
-        // Skip for now, switch to different response type later when
-        // implementing fieldable views display support.
+      if (!$this->getRowResolveType($view, $displayId)) {
         continue;
       }
 
+      $display = $this->getViewDisplay($view, $displayId);
       $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
       if (!empty($argumentsInfo)) {
         $id = implode('_', [

@@ -8,6 +8,8 @@ use GuzzleHttp\Psr7\Response;
 
 /**
  * Test xml data from urls.
+ *
+ * @group graphql_xml
  */
 class XMLUrlTest extends GraphQLFileTestBase {
 

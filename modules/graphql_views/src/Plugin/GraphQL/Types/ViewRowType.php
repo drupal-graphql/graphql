@@ -6,13 +6,13 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 
 /**
- * Expose views as root fields.
+ * Expose types for fieldable views' rows.
  *
  * @GraphQLType(
- *   id = "view_result_type",
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewResultTypeDeriver"
+ *   id = "view_row_type",
+ *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewRowTypeDeriver"
  * )
  */
-class ViewResultType extends TypePluginBase {
+class ViewRowType extends TypePluginBase {
 
 }
