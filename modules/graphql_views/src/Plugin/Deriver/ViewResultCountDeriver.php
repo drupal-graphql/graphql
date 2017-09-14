@@ -24,8 +24,11 @@ class ViewResultCountDeriver extends ViewDeriverBase {
         continue;
       }
 
-      $id = implode('-', [$viewId, $displayId, 'result', 'count']);
+      if (!$this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
 
+      $id = implode('-', [$viewId, $displayId, 'result', 'count']);
       $this->derivatives[$id] = [
         'id' => $id,
         'type' => 'Int',

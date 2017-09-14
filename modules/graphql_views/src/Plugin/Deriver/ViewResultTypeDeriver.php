@@ -14,10 +14,16 @@ class ViewResultTypeDeriver extends ViewDeriverBase {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
+    $viewStorage = $this->entityTypeManager->getStorage('view');
+
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
-      $id = implode('-', [$viewId, $displayId, 'result']);
+      $view = $viewStorage->load($viewId);
+      if (!$this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
 
+      $id = implode('-', [$viewId, $displayId, 'result']);
       $this->derivatives[$id] = [
         'id' => $id,
         'name' => StringHelper::camelCase([$viewId, $displayId, 'result']),

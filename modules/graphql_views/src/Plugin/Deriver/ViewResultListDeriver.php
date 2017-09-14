@@ -19,10 +19,12 @@ class ViewResultListDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $id = implode('-', [$viewId, $displayId, 'result', 'list']);
-      $type = $this->getRowResolveType($view, $displayId);
-      $style = $this->getViewStyle($view, $displayId);
+      if (!$type = $this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
 
+      $id = implode('-', [$viewId, $displayId, 'result', 'list']);
+      $style = $this->getViewStyle($view, $displayId);
       $this->derivatives[$id] = [
         'id' => $id,
         'type' => $type,

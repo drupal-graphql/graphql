@@ -22,6 +22,10 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
+      if (!$this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
+
       /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
       $display = $this->getViewDisplay($view, $displayId);
 

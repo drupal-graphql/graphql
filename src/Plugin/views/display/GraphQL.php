@@ -84,12 +84,14 @@ class GraphQL extends DisplayPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    // Set the default style plugin to 'graphql'.
+    // Set the default plugins to 'graphql'.
     $options['style']['contains']['type']['default'] = 'graphql';
     $options['exposed_form']['contains']['type']['default'] = 'graphql';
+    $options['row']['contains']['type']['default'] = 'graphql_entity';
 
     $options['defaults']['default']['style'] = FALSE;
     $options['defaults']['default']['exposed_form'] = FALSE;
+    $options['defaults']['default']['row'] = FALSE;
 
     // Remove css/exposed form settings, as they are not used for the data display.
     unset($options['exposed_block']);

@@ -19,8 +19,11 @@ class ViewRowTypeDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
-      $style = $this->getViewStyle($view, $displayId);
+      if (!$this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
 
+      $style = $this->getViewStyle($view, $displayId);
       // This deriver only supports style plugins that use fields.
       if (!$style->usesFields()) {
         continue;

@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Plugin\views\row\GraphQLEntityRow;
+use Drupal\graphql\Plugin\views\row\GraphQLFieldRow;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginInterface;
 use Drupal\views\Plugin\views\style\StylePluginBase;
@@ -148,21 +150,26 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   The name of the type or NULL if the type could not be derived.
    */
   protected function getRowResolveType(ViewEntityInterface $view, $displayId) {
-    $style = $this->getViewStyle($view, $displayId);
-    if ($style->usesFields()) {
+    $display = $this->getViewDisplay($view, $displayId);
+    $rowPlugin = $display->getPlugin('row');
+
+    if ($rowPlugin instanceof GraphQLFieldRow) {
       return StringHelper::camelCase([StringHelper::camelCase([$view->id(), $displayId, 'row'])]);
     }
 
-    if ($entityType = $this->getEntityTypeByTable($view->get('base_table'))) {
-      $typeName = StringHelper::camelCase($entityType);
-      if ($this->interfaceExists($typeName)) {
-        return $typeName;
+    if ($rowPlugin instanceof GraphQLEntityRow) {
+      if ($entityType = $this->getEntityTypeByTable($view->get('base_table'))) {
+        $typeName = StringHelper::camelCase($entityType);
+        if ($this->interfaceExists($typeName)) {
+          return $typeName;
+        }
+
+        return 'Entity';
       }
 
-      return 'Entity';
+      // @TODO: Add support for solr views.
     }
 
-    // TODO: Add support for solr views.
     return NULL;
   }
 

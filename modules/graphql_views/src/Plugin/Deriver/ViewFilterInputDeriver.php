@@ -20,6 +20,10 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
+      if (!$this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
+
       $display = $this->getViewDisplay($view, $displayId);
       $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
