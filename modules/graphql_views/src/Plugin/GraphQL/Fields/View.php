@@ -107,9 +107,16 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
   }
 
   /**
+   * Retrieves the contextual filter argument from the parent value or args.
+   *
    * @param $value
+   *   The resolved parent value.
    * @param $args
+   *   The arguments provided to the field.
+   *
    * @return array
+   *   An array of arguments containing the contextual filter value from the
+   *   parent or provided args if any.
    */
   protected function extractContextualFilters($value, $args) {
     $definition = $this->getPluginDefinition();
@@ -136,10 +143,17 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
   }
 
   /**
+   * Retrieves sort and filter arguments from the provided field args.
+   *
    * @param $value
+   *   The resolved parent value.
    * @param $args
+   *   The array of arguments provided to the field.
    * @param $filters
+   *   The available filters for the configured view.
+   *
    * @return array
+   *   The array of sort and filter arguments to execute the view with.
    */
   protected function extractExposedInput($value, $args, $filters) {
     // Prepare arguments for use as exposed form input.
