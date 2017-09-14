@@ -11,7 +11,6 @@ use Drupal\graphql\Plugin\views\row\GraphQLEntityRow;
 use Drupal\graphql\Plugin\views\row\GraphQLFieldRow;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginInterface;
-use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\views\ViewEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -158,16 +157,14 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
     }
 
     if ($rowPlugin instanceof GraphQLEntityRow) {
-      if ($entityType = $this->getEntityTypeByTable($view->get('base_table'))) {
-        $typeName = StringHelper::camelCase($entityType);
+      if ($entityType = $view->getExecutable()->getBaseEntityType()) {
+        $typeName = StringHelper::camelCase($entityType->id());
         if ($this->interfaceExists($typeName)) {
           return $typeName;
         }
-
-        return 'Entity';
       }
 
-      // @TODO: Add support for solr views.
+      return 'Entity';
     }
 
     return NULL;
