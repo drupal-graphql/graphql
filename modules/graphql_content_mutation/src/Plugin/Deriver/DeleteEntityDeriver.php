@@ -4,9 +4,9 @@ namespace Drupal\graphql_content_mutation\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -59,7 +59,7 @@ class DeleteEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       $this->derivatives[$entityTypeId] = [
-        'name' => 'delete' . graphql_camelcase($entityTypeId),
+        'name' => 'delete' . StringHelper::camelCase($entityTypeId),
         'entity_type' => $entityTypeId,
       ] + $basePluginDefinition;
     }

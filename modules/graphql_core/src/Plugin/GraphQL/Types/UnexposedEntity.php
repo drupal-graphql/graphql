@@ -16,9 +16,17 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * @GraphQLType(
  *   id = "unexposed_entity",
  *   name = "UnexposedEntity",
+ *   weight = -10,
  *   interfaces = {"Entity"}
  * )
  */
 class UnexposedEntity extends TypePluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return TRUE;
+  }
 
 }

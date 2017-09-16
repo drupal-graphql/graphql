@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Disables any display variant on the explorer page.
@@ -177,7 +176,7 @@ class CacheSubscriber implements EventSubscriberInterface {
         $event->setResponse($response);
       }
     }
-   }
+  }
 
   /**
    * Stores a response in case of a cache miss if applicable.
@@ -234,6 +233,12 @@ class CacheSubscriber implements EventSubscriberInterface {
     $response->addCacheableDependency($this->metadata);
 
     $metadata = $response->getCacheableMetadata();
+
+    // A max age of 0 is supposed to disable caching entirely.
+    if ($metadata->getCacheMaxAge() === 0) {
+      return;
+    }
+
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 

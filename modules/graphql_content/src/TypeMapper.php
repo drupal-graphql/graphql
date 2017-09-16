@@ -4,6 +4,7 @@ namespace Drupal\graphql_content;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
+use Drupal\graphql\Utility\StringHelper;
 
 class TypeMapper {
 
@@ -37,7 +38,7 @@ class TypeMapper {
       $targetDefinition = $dataDefinition->getTargetDefinition();
       $entityType = $targetDefinition->getEntityTypeId();
 
-      return graphql_camelcase($entityType);
+      return StringHelper::camelCase($entityType);
     }
 
     foreach ($this->typeMap as $graphQlType => $typedDataTypes) {

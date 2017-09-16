@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_content\Plugin\GraphQL\Types;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql_core\GraphQL\TypePluginBase;
 
 /**
@@ -15,5 +16,12 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * )
  */
 class EntityBundle extends TypePluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies($value) {
+    return $value instanceof EntityInterface && $value->getEntityTypeId() == $this->getPluginDefinition()['entity_type'] && $value->bundle() == $this->getPluginDefinition()['bundle'];
+  }
 
 }

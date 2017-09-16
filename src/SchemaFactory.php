@@ -44,6 +44,13 @@ class SchemaFactory {
   protected $schemaCache;
 
   /**
+   * The cache metadata cache.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $metadataCache;
+
+  /**
    * The service configuration.
    *
    * @var array
@@ -75,6 +82,8 @@ class SchemaFactory {
    *   The schema provider service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $schemaCache
    *   The schema cache backend.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $metadataCache
+   *   The metadata cache backend.
    * @param array $config
    *   The configuration provided through the services.yml.
    */
@@ -83,6 +92,7 @@ class SchemaFactory {
     RequestStack $requestStack,
     SchemaProviderInterface $schemaProvider,
     CacheBackendInterface $schemaCache,
+    CacheBackendInterface $metadataCache,
     array $config
   ) {
     $this->config = $config;
@@ -95,6 +105,7 @@ class SchemaFactory {
     $this->schemaProvider = $schemaProvider;
     $this->contextsManager = $contextsManager;
     $this->schemaCache = $schemaCache;
+    $this->metadataCache = $metadataCache;
     $this->metadata = new CacheableMetadata();
     $this->requestStack = $requestStack;
   }
@@ -107,13 +118,19 @@ class SchemaFactory {
    */
   public function getSchema() {
     // The cache key is made up of all of the globally known cache contexts.
-    $cid = $this->getCacheIdentifier($this->metadata);
-    if ($this->config['schema_cache'] && ($schema = $this->schemaCache->get($cid)) && $schema->data instanceof AbstractSchema) {
-      return $schema->data;
+    $ccid = $this->getCacheIdentifier($this->metadata);
+    if ($this->config['schema_cache']) {
+      if ($contextCache = $this->metadataCache->get($ccid)) {
+        $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
+        if (($schema = $this->schemaCache->get($cid)) && $schema->data instanceof AbstractSchema) {
+          return $schema->data;
+        }
+      }
     }
 
     // If the schema is not cacheable, just return it directly.
     $schema = $this->schemaProvider->getSchema();
+
     if (!($schema instanceof CacheableDependencyInterface)) {
       return $schema;
     }
@@ -124,9 +141,16 @@ class SchemaFactory {
       $schema->addCacheableDependency($this->getCacheMetadataFromTypes($schema));
     }
 
-    if ($this->config['schema_cache']) {
+    if ($this->config['schema_cache'] && $schema->getCacheMaxAge() !== 0) {
+
       $tags = $schema->getCacheTags();
       $expire = $this->maxAgeToExpire($schema->getCacheMaxAge());
+      $metadata = CacheableMetadata::createFromObject($schema);
+
+      $cid = $this->getCacheIdentifier($metadata);
+
+      // Write the cache entry for the cache metadata.
+      $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
       // We use the cache key from the global cache metadata but the tags and
       // expiry time from the entire cache metadata.

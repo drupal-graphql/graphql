@@ -7,7 +7,7 @@ namespace Drupal\graphql_core\Annotation;
  *
  * @Annotation
  */
-class GraphQLField extends GraphQLAnnotationBase  {
+class GraphQLField extends GraphQLAnnotationBase {
 
   /**
    * {@inheritdoc}

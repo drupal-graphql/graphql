@@ -26,7 +26,7 @@ class MenuLinkLinks extends FieldPluginBase {
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof MenuLinkTreeElement) {
-      foreach (array_filter($value->subtree, function (MenuLinkTreeElement $item) {
+      foreach (array_filter($value->subtree, function(MenuLinkTreeElement $item) {
         if ($item->link instanceof MenuLinkInterface) {
           return $item->link->isEnabled();
         }

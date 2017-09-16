@@ -3,7 +3,6 @@
 namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\link\LinkItemInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\Core\Link;
 

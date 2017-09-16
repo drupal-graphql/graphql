@@ -24,7 +24,7 @@ class ViewsTest extends ViewsTestBase {
       ], [
         'entityLabel' => 'Node C',
       ],
-    ], $result['data']['graphqlTestSimpleView']);
+    ], $result['data']['graphqlTestSimpleView']['results']);
   }
 
   /**
@@ -71,29 +71,39 @@ class ViewsTest extends ViewsTestBase {
     $result = $this->executeQueryFile('sorted.gql');
     $this->assertEquals([
       'default' => [
-        ['entityLabel' => 'Node A'],
-        ['entityLabel' => 'Node B'],
-        ['entityLabel' => 'Node C'],
+        'results' => [
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node B'],
+          ['entityLabel' => 'Node C'],
+        ],
       ],
       'asc' => [
-        ['entityLabel' => 'Node A'],
-        ['entityLabel' => 'Node A'],
-        ['entityLabel' => 'Node A'],
+        'results' => [
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node A'],
+        ],
       ],
       'desc' => [
-        ['entityLabel' => 'Node C'],
-        ['entityLabel' => 'Node C'],
-        ['entityLabel' => 'Node C'],
+        'results' => [
+          ['entityLabel' => 'Node C'],
+          ['entityLabel' => 'Node C'],
+          ['entityLabel' => 'Node C'],
+        ],
       ],
       'asc_nid' => [
-        ['entityLabel' => 'Node A'],
-        ['entityLabel' => 'Node B'],
-        ['entityLabel' => 'Node C'],
+        'results' => [
+          ['entityLabel' => 'Node A'],
+          ['entityLabel' => 'Node B'],
+          ['entityLabel' => 'Node C'],
+        ],
       ],
       'desc_nid' => [
-        ['entityLabel' => 'Node C'],
-        ['entityLabel' => 'Node B'],
-        ['entityLabel' => 'Node A'],
+        'results' => [
+          ['entityLabel' => 'Node C'],
+          ['entityLabel' => 'Node B'],
+          ['entityLabel' => 'Node A'],
+        ],
       ],
     ], $result['data'], 'Sorting works as expected.');
   }
@@ -107,7 +117,7 @@ class ViewsTest extends ViewsTestBase {
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node A'],
-    ], $result['data']['default'], 'Filtering works as expected.');
+    ], $result['data']['default']['results'], 'Filtering works as expected.');
   }
 
   /**
@@ -122,7 +132,7 @@ class ViewsTest extends ViewsTestBase {
       ['entityLabel' => 'Node B'],
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node B'],
-    ], $result['data']['multi'], 'Filtering works as expected.');
+    ], $result['data']['multi']['results'], 'Filtering works as expected.');
   }
 
   /**
@@ -140,7 +150,7 @@ class ViewsTest extends ViewsTestBase {
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node B'],
       ['entityLabel' => 'Node C'],
-    ], $result['data']['complex'], 'Filtering works as expected.');
+    ], $result['data']['complex']['results'], 'Filtering works as expected.');
   }
 
 }

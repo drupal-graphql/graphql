@@ -54,13 +54,26 @@ abstract class TypePluginBase extends AbstractObjectType implements GraphQLPlugi
   protected function buildInterfaces(GraphQLSchemaManagerInterface $schemaManager) {
     $definition = $this->getPluginDefinition();
     if ($definition['interfaces']) {
-      return array_filter($schemaManager->find(function ($interface) use ($definition) {
+      return array_filter($schemaManager->find(function($interface) use ($definition) {
         return in_array($interface['name'], $definition['interfaces']);
-      }, [GRAPHQL_CORE_INTERFACE_PLUGIN]), function ($interface) {
+      }, [GRAPHQL_CORE_INTERFACE_PLUGIN]), function($interface) {
         return $interface instanceof AbstractInterfaceType;
       });
     }
     return [];
+  }
+
+  /**
+   * Check if a value conforms to this type.
+   *
+   * @param mixed $value
+   *   The current value.
+   *
+   * @return boolean
+   *   TRUE if the type applies, else false.
+   */
+  public function applies($value) {
+    return FALSE;
   }
 
 }

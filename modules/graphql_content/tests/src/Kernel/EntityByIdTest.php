@@ -17,6 +17,7 @@ use Drupal\user\Entity\Role;
 class EntityByIdTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
+  use RevisionsTestTrait;
 
   /**
    * {@inheritdoc}
@@ -96,6 +97,13 @@ class EntityByIdTest extends GraphQLFileTestBase {
     $node->save();
     $node->addTranslation($this->frenchLangcode, ['title' => 'French node'])->save();
     $node->addTranslation($this->chineseSimplifiedLangcode, ['title' => 'Chinese simplified node'])->save();
+
+    // Save a new draft.
+    $this
+      ->getNewDraft($node)
+      ->setPublished(FALSE)
+      ->setTitle('English node unpublished')
+      ->save();
 
     // Check English node.
     $result = $this->executeQueryFile('entity_by_id.gql', [

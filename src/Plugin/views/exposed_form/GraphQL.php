@@ -7,8 +7,6 @@ use Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase;
 /**
  * Exposed form plugin that prevents any rendering.
  *
- * @ingroup views_exposed_form_plugins
- *
  * @ViewsExposedForm(
  *   id = "graphql",
  *   title = @Translation("GraphQL"),
