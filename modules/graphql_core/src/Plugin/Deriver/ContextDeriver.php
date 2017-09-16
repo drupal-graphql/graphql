@@ -5,6 +5,7 @@ namespace Drupal\graphql_core\Plugin\Deriver;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -41,7 +42,7 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
         $dataType = $context->getContextDefinition()->getDataType();
 
         $this->derivatives[$id] = [
-          'name' => graphql_propcase($id) . 'Context',
+          'name' => StringHelper::propCase([$id, 'context']),
           'context_id' => $id,
           'nullable' => TRUE,
           'multi' => FALSE,

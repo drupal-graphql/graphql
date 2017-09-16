@@ -27,13 +27,13 @@ class GraphQLQueryMapForm extends EntityForm {
       ];
     }
 
-    $actions['delete'] = [
-      '#type' => 'link',
-      '#title' => $this->t('Back'),
-      '#url' => $this->entity->toUrl('collection'),
+    $form['actions'] = [
+      'delete' => [
+        '#type' => 'link',
+        '#title' => $this->t('Back'),
+        '#url' => $this->entity->toUrl('collection'),
+      ],
     ];
-
-    $form['actions'] = $actions;
 
     return $form;
   }

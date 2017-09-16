@@ -3,6 +3,7 @@
 namespace Drupal\graphql_content\Plugin\Deriver;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 
 /**
@@ -22,21 +23,23 @@ class RawValueFieldDeriver extends FieldFormatterDeriver {
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface|null $storage
    *   Field storage definition object.
    *
-   * @return array
+   * @return array|null
    *   Associative array of additional plugin definition values.
    */
   protected function getDefinition($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
-    return [
-      'types' => [
-        graphql_camelcase([$entityType, $bundle]),
-      ],
-      'name' => graphql_propcase($storage->getName()),
-      'virtual' => !$storage,
-      'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
-      'nullable' => TRUE,
-      'field' => $storage->getName(),
-      'type' => RawValueFieldType::getId($entityType, $storage->getName()),
-    ];
+    if (isset($storage)) {
+      return [
+        'types' => [StringHelper::camelCase([$entityType, $bundle])],
+        'name' => graphql_propcase($storage->getName()),
+        'virtual' => !$storage,
+        'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
+        'nullable' => TRUE,
+        'field' => $storage->getName(),
+        'type' => RawValueFieldType::getId($entityType, $storage->getName()),
+      ];
+    }
+
+    return NULL;
   }
 
 }

@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -56,7 +57,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => graphql_propcase($id) . 'Query',
+          'name' => StringHelper::propCase([$id, 'query']),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -68,11 +69,11 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
 
-        if ($queryableProperties) {
+        if (!empty($queryableProperties)) {
           $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,
-            'type' => graphql_camelcase([$id, 'query', 'filter', 'input']),
+            'type' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
           ];
         }
 

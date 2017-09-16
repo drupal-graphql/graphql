@@ -19,6 +19,7 @@ use Drupal\user\Entity\Role;
 class EntityRenderedFieldsTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
+  use RevisionsTestTrait;
 
   public static $modules = [
     'node',
@@ -99,6 +100,11 @@ class EntityRenderedFieldsTest extends GraphQLFileTestBase {
       'field_keywords' => ['a', 'b', 'c'],
       'status' => 1,
     ]);
+
+    $this
+      ->getNewDraft($node)
+      ->setTitle('Draft')
+      ->save();
 
     $result = $this->executeQueryFile('rendered_fields.gql', [
       'path' => '/node/' . $node->id(),

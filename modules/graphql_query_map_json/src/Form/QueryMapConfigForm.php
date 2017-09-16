@@ -65,9 +65,9 @@ class QueryMapConfigForm extends ConfigFormBase {
 
     $form['lookup_paths'] = [
       '#type' => 'textarea',
-      '#title' => t('Lookup paths'),
-      '#default_value' => implode($config->get('lookup_paths') ?: [], "\n"),
-      '#description' => t('The path patterns to use for the query map lookup.'),
+      '#title' => $this->t('Lookup paths'),
+      '#default_value' => implode("\n", $config->get('lookup_paths') ?: []),
+      '#description' => $this->t('The path patterns to use for the query map lookup.'),
     ];
 
     return parent::buildForm($form, $form_state);

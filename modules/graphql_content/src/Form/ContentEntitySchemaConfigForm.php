@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -113,7 +114,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
           '#default_value' => $config->get('exposed'),
           '#title' => '<strong>' . $type->getLabel() . '</strong>',
           '#description' => $this->t('Add the <strong>%interface</strong> interface to the schema.', [
-            '%interface' => graphql_camelcase($type->id()),
+            '%interface' => StringHelper::camelCase($type->id()),
           ]),
           '#wrapper_attributes' => ['colspan' => 2, 'class' => ['highlight']],
         ];
@@ -135,7 +136,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             ],
             '#title' => $info['label'],
             '#description' => $this->t('Add the <strong>%type</strong> type to the schema.', [
-              '%type' => graphql_camelcase([$type->id(), $bundle]),
+              '%type' => StringHelper::camelCase([$type->id(), $bundle]),
             ]),
           ];
 
