@@ -97,13 +97,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if the interface for nodes is created.
    */
   public function testNodeInterface() {
-	// @todo: fix config
-    $this->configFactory->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-        ],
-      ])->save();
+    $this->exposeEntity(TRUE, 'node');
 
     $schema = $this->executeQueryFile('schema.gql');
     $types = array_filter($schema['data']['__schema']['types'], function($type) {
@@ -116,17 +110,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if the node bundle types are created.
    */
   public function testNodeType() {
-    $this->configFactory->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])->save();
+    $this->exposeEntityBundle(TRUE, 'node', 'test', '');
 
     $schema = $this->executeQueryFile('schema.gql');
     $types = array_filter($schema['data']['__schema']['types'], function($type) {
@@ -139,18 +123,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if no fields are exposed.
    */
   public function testUnexposedFields() {
-    $this->configFactory->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => '__none__',
-            ],
-          ],
-        ],
-      ])->save();
+    $this->exposeEntityBundle(TRUE, 'node', 'test', '__none__');
 
     $schema = $this->executeQueryFile('introspect.gql');
     $result = $this->processIntrospection($schema['data']['__schema']);
@@ -161,18 +134,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if view mode fields are properly exposed.
    */
   public function testExposedFields() {
-    $this->configFactory->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-      ])->save();
+    $this->exposeEntityBundle(TRUE, 'node', 'test', 'node.graphql');
 
     $schema = $this->executeQueryFile('introspect.gql');
     $result = $this->processIntrospection($schema['data']['__schema']);
@@ -185,18 +147,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if unknown view modes fall back to default.
    */
   public function testFallback() {
-    $this->configFactory->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.idontexist',
-            ],
-          ],
-        ],
-      ])->save();
+    $this->exposeEntityBundle(TRUE, 'node', 'test', 'node.idontexist');
 
     $schema = $this->executeQueryFile('introspect.gql');
     $result = $this->processIntrospection($schema['data']['__schema']);

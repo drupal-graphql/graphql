@@ -10,13 +10,14 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 /**
  * Derive GraphQL fields for all fields exposed in graphql display modes.
  */
 class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use GraphQLEntityExposeTrait;
 
   /**
    * Entity type manager.
@@ -47,13 +48,6 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
   protected $bundleInfo;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
-   */
-  protected $schemaConfig;
-
-  /**
    * DisplayedFieldDeriver constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -66,14 +60,12 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityTypeBundleInfoInterface $bundleInfo,
-    EntityFieldManagerInterface $entityFieldManager,
-    ContentEntitySchemaConfig $schemaConfig
+    EntityFieldManagerInterface $entityFieldManager
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
     $this->bundleInfo = $bundleInfo;
     $this->displayStorage = $entityTypeManager->getStorage('entity_view_display');
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -83,9 +75,7 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_field.manager'),
-	  // @todo: fix config?
-      $container->get('graphql_content.schema_config')
+      $container->get('entity_field.manager')
     );
   }
 
@@ -129,7 +119,7 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
       $storages = $this->entityFieldManager->getFieldStorageDefinitions($typeId);
 
       foreach (array_keys($bundles[$typeId]) as $bundle) {
-        if ($viewMode = $this->schemaConfig->getExposedViewMode($typeId, $bundle)) {
+        if ($viewMode = $this->getExposedViewMode($typeId, $bundle)) {
           if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
             foreach (array_keys($display->getComponents()) as $field) {
               $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [

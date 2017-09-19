@@ -7,6 +7,9 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Trait to read and interpret graphql_content configuration.
+ *
+ * @deprecated
+ * use GraphQLEntityExposeTrait
  */
 class ContentEntitySchemaConfig {
 

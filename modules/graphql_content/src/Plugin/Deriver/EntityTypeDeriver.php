@@ -7,13 +7,14 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 /**
  * Derive GraphQL Interfaces from Drupal entity types.
  */
 class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use GraphQLEntityExposeTrait;
 
   /**
    * The entity type manager.
@@ -30,21 +31,11 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   protected $schemaManager;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
-   */
-  protected $schemaConfig;
-
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager'),
-	  // @todo: fix config?
-      $container->get('graphql_content.schema_config')
-    );
+    return new static($container->get('entity_type.manager'));
   }
 
   /**
@@ -52,12 +43,9 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Instance of an entity type manager.
-   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
-   *   The schema configuration service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, ContentEntitySchemaConfig $schemaConfig) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -66,7 +54,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if (!$this->schemaConfig->isEntityTypeExposed($typeId)) {
+      if (!$this->isEntityTypeExposed($typeId)) {
         continue;
       }
       if ($type instanceof ContentEntityTypeInterface) {

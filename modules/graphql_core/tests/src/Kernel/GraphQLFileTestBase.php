@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 use Drupal\user\Entity\Role;
 
 /**
@@ -11,6 +12,7 @@ use Drupal\user\Entity\Role;
  */
 abstract class GraphQLFileTestBase extends KernelTestBase {
   use GraphQLFileTestTrait;
+  use GraphQLEntityExposeTrait;
 
   /**
    * {@inheritdoc}

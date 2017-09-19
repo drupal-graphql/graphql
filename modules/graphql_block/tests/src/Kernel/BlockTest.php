@@ -59,19 +59,7 @@ class BlockTest extends GraphQLFileTestBase {
       'region' => 'sidebar_first',
     ]);
 
-	// @todo: fix config
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'block_content' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'basic' => [
-              'exposed' => TRUE,
-              'view_mode' => 'block_content.graphql',
-            ],
-          ],
-        ],
-      ])->save();
+    $this->exposeEntityBundle(TRUE, 'block_content', 'basic', 'block_content.graphql');
   }
 
   /**

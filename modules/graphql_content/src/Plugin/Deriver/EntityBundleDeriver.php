@@ -8,13 +8,14 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 /**
  * Derive GraphQL Interfaces from Drupal entity types.
  */
 class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use GraphQLEntityExposeTrait;
 
   /**
    * Entity type manager.
@@ -30,23 +31,13 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
    */
   protected $entityTypeBundleInfo;
 
-
-  /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
-   */
-  protected $schemaConfig;
-
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity_type.bundle.info'),
-	  // @todo: fix config?
-      $container->get('graphql_content.schema_config')
+      $container->get('entity_type.bundle.info')
     );
   }
 
@@ -57,17 +48,13 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
    *   Instance of an entity type manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   Instance of the entity bundle info service.
-   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
-   *   The schema configuration service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    EntityTypeBundleInfoInterface $entityTypeBundleInfo,
-    ContentEntitySchemaConfig $schemaConfig
+    EntityTypeBundleInfoInterface $entityTypeBundleInfo
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -79,7 +66,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
       if ($type instanceof ContentEntityTypeInterface && array_key_exists($typeId, $bundles)) {
         foreach (array_keys($bundles[$typeId]) as $bundle) {
-          if (!$this->schemaConfig->isEntityBundleExposed($typeId, $bundle)) {
+          if (!$this->isEntityBundleExposed($typeId, $bundle)) {
             continue;
           }
           $this->derivatives[$typeId . '-' . $bundle] = [

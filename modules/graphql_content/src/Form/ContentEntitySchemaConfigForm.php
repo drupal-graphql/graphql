@@ -12,11 +12,13 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 /**
  * Configuration form to define GraphQL schema content entity types and fields.
  */
 class ContentEntitySchemaConfigForm extends ConfigFormBase {
+  use GraphQLEntityExposeTrait;
 
   /**
    * The entity type manager.
@@ -183,21 +185,18 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     $types = $form_state->getValue('types');
 
     // Sanitize boolean values.
-    foreach (array_keys($types) as $type) {
-      $config_name = 'graphql.exposed.' . $type;
-      $config = \Drupal::configFactory()->getEditable($config_name);
-      $config->set('exposed', (bool) $types[$type]['exposed'])->save();
+    foreach (array_keys($types) as $entityType) {
+      $exposed = (bool) $types[$entityType]['exposed'];
+      $this->exposeEntity($exposed, $entityType);
 
-      if (array_key_exists('bundles', $types[$type])) {
-        foreach (array_keys($types[$type]['bundles']) as $bundle) {
-          $config_name = 'graphql.exposed.' . $type . '.' . $bundle;
-          $config = \Drupal::configFactory()->getEditable($config_name);
-          $bundle_config = $types[$type]['bundles'][$bundle];
+      if (!empty($types[$entityType]['bundles'])) {
+        $bundles = array_keys($types[$entityType]['bundles']);
+        foreach ($bundles as $bundle) {
+          $bundle_config = $types[$entityType]['bundles'][$bundle];
+          $exposed = (bool) $bundle_config['exposed'];
+          $view_mode = $bundle_config['view_mode'];
 
-          $config
-            ->set('exposed', (bool) $bundle_config['exposed'])
-            ->set('view_mode', $bundle_config['view_mode'])
-            ->save();
+          $this->exposeEntity($exposed, $entityType, $bundle, $view_mode);
         }
       }
     }

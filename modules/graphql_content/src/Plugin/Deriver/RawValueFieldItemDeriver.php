@@ -6,12 +6,13 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Drupal\graphql_content\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 class RawValueFieldItemDeriver extends FieldFormatterDeriver {
+  use GraphQLEntityExposeTrait;
 
   /**
    * The type mapper service.
@@ -32,8 +33,6 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
-   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $config
-   *   A schema configuration service.
    * @param \Drupal\graphql_content\TypeMapper $typeMapper
    *   The graphql type mapper service.
    * @param string $basePluginId
@@ -42,11 +41,10 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager,
-    ContentEntitySchemaConfig $config,
     TypeMapper $typeMapper,
     $basePluginId
   ) {
-    parent::__construct($entityTypeManager, $entityFieldManager, $config, $basePluginId);
+    parent::__construct($entityTypeManager, $entityFieldManager, $basePluginId);
     $this->typeMapper = $typeMapper;
   }
 
@@ -57,7 +55,6 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
-      $container->get('graphql_content.schema_config'),
       $container->get('graphql_content.type_mapper'),
       $basePluginId
     );

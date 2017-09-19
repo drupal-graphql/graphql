@@ -8,13 +8,14 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 /**
  * Generate GraphQLField plugins for certain field formatters.
  */
 class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use GraphQLEntityExposeTrait;
 
   /**
    * The entity type manager.
@@ -31,13 +32,6 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   protected $entityFieldManager;
 
   /**
-   * The content entity schema configuration service.
-   *
-   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
-   */
-  protected $config;
-
-  /**
    * The base plugin id.
    *
    * @var string
@@ -51,8 +45,6 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
-	  // @todo: fix config?
-      $container->get('graphql_content.schema_config'),
       $basePluginId);
   }
 
@@ -63,21 +55,17 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
-   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $config
-   *   A schema configuration service.
    * @param string $basePluginId
    *   The base plugin id.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager,
-    ContentEntitySchemaConfig $config,
     $basePluginId
   ) {
     $this->basePluginId = $basePluginId;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
-    $this->config = $config;
   }
 
   /**
@@ -148,7 +136,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $entityType = $display->getTargetEntityTypeId();
       $bundle = $display->getTargetBundle();
 
-      if ($this->config->getExposedViewMode($entityType, $bundle) !== $display->getMode()) {
+      if ($this->getExposedViewMode($entityType, $bundle) !== $display->getMode()) {
         continue;
       }
 

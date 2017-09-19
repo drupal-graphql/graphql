@@ -8,6 +8,7 @@ use Drupal\simpletest\NodeCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\Role;
+use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
 
 /**
  * Base class for test views support in GraphQL.
@@ -18,6 +19,7 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
   use EntityReferenceTestTrait;
+  use GraphQLEntityExposeTrait;
 
   /**
    * {@inheritdoc}
@@ -59,22 +61,8 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
       'vid' => 'tags',
     ])->save();
 
-	// @todo: fix config
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-            ],
-            'test2' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])
-      ->save();
+    $this->exposeEntityBundle(TRUE, 'node', 'test', '__none__');
+    $this->exposeEntityBundle(TRUE, 'node', 'test2', '__none__');
 
     Role::load('anonymous')
       ->grantPermission('access content')
