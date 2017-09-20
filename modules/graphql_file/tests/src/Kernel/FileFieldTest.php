@@ -76,8 +76,8 @@ class FileFieldTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('file', ['type' => 'graphql_file'])->save();
 
-    $this->exposeEntityBundle(TRUE, 'node', 'test', 'node.graphql');
-    $this->exposeEntityBundle(TRUE, 'file', 'file', '__none__');
+    $this->exposeEntityBundle('node', 'test', 'node.graphql');
+    $this->exposeEntityBundle('file', 'file');
   }
 
   /**

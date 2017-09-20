@@ -4,8 +4,6 @@ namespace Drupal\qraphql_content\Traits;
 
 /**
  * Provides methods to expose entities and entity bundles.
- *
- * This trait is meant to be used only by test classes.
  */
 trait GraphQLEntityExposeTrait {
 
@@ -29,35 +27,36 @@ trait GraphQLEntityExposeTrait {
   }
 
   /**
-   * Expose entity to graphQL schema.
+   * Configure exposed entity.
    *
-   * @param bool $exposed
-   *   Boolean value indicating if the entity should be exposed or hidden.
    * @param string $entityType
    *   The entity type id.
+   * @param bool $exposed
+   *   Boolean value indicating if the entity should be exposed or hidden.
    */
-  protected function exposeEntity(bool $exposed, $entityType) {
+  private function configureExposedEntity($entityType, bool $exposed) {
     $config_name = $this->getConfigName($entityType);
     $config = \Drupal::configFactory()->getEditable($config_name);
     $config->set('exposed', $exposed)->save();
   }
+
   /**
-   * Expose entity bundle to graphQL schema.
+   * Configure exposed entity bundle.
    *
-   * @param bool $exposed
-   *   Boolean value indicating if the bundle should be exposed or hidden.
    * @param string $entityType
    *   The entity type id.
    * @param string $bundle
    *   The bundle machine name.
+   * @param bool $exposed
+   *   Boolean value indicating if the bundle should be exposed or hidden.
    * @param string $view_mode
-   *   The view_mode machine name. (together with entity type, like node.graphql)
+   *   The view_mode machine name. (together with entity type, like "node.graphql")
    *   Use '__none__' in case the fields should not be exposed.
    */
-  protected function exposeEntityBundle(bool $exposed, $entityType, $bundle, $view_mode = '__none__') {
+  private function configureExposedEntityBundle($entityType, $bundle, bool $exposed, $view_mode = '__none__') {
     // Expose entity if not yet exposed.
     if ($exposed && !$this->isEntityTypeExposed($entityType)) {
-      $this->exposeEntity(TRUE, $entityType);
+      $this->exposeEntity($entityType);
     }
     $config_name = $this->getConfigName($entityType, $bundle);
     $config = \Drupal::configFactory()->getEditable($config_name);
@@ -66,6 +65,53 @@ trait GraphQLEntityExposeTrait {
       ->set('exposed', $exposed)
       ->set('view_mode', $view_mode)
       ->save();
+  }
+
+  /**
+   * Expose entity to graphQL schema.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   */
+  protected function exposeEntity($entityType) {
+    $this->configureExposedEntity($entityType, TRUE);
+  }
+
+  /**
+   * Unexpose (remove) entity from graphQL schema.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   */
+  protected function unexposeEntity($entityType) {
+    $this->configureExposedEntity($entityType, FALSE);
+  }
+
+  /**
+   * Expose entity bundle to graphQL schema.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   * @param string $bundle
+   *   The bundle machine name.
+   * @param string $view_mode
+   *   The view_mode machine name. (together with entity type, like node.graphql)
+   *   Use '__none__' in case the fields should not be exposed.
+   */
+  protected function exposeEntityBundle($entityType, $bundle, $view_mode = '__none__') {
+    $this->configureExposedEntityBundle($entityType, $bundle, TRUE, $view_mode);
+  }
+
+  /**
+   * Unexpose (remove) entity bundle from graphQL schema.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   * @param string $bundle
+   *   The bundle machine name.
+   */
+  protected function unexposeEntityBundle($entityType, $bundle) {
+    $this->configureExposedEntityBundle($entityType, $bundle, FALSE, '__none__');
   }
 
   /**

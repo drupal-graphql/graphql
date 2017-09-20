@@ -61,8 +61,8 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
       'vid' => 'tags',
     ])->save();
 
-    $this->exposeEntityBundle(TRUE, 'node', 'test', '__none__');
-    $this->exposeEntityBundle(TRUE, 'node', 'test2', '__none__');
+    $this->exposeEntityBundle('node', 'test');
+    $this->exposeEntityBundle('node', 'test2');
 
     Role::load('anonymous')
       ->grantPermission('access content')

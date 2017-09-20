@@ -79,7 +79,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('image', ['type' => 'graphql_image'])->save();
 
-    $this->exposeEntityBundle(TRUE, 'node', 'test', 'node.graphql');
+    $this->exposeEntityBundle('node', 'test', 'node.graphql');
   }
 
   /**

@@ -56,8 +56,8 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
     ]);
     $language->save();
 
-    $this->exposeEntityBundle(TRUE, 'node', 'test', '__none__');
-    $this->exposeEntityBundle(TRUE, 'user', 'user', '__none__');
+    $this->exposeEntityBundle('node', 'test');
+    $this->exposeEntityBundle('user', 'user');
   }
 
   /**

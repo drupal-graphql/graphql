@@ -105,8 +105,8 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       'uri' => 'public://example.png',
     ])->save();
 
-    $this->exposeEntityBundle(TRUE, 'node', 'test', 'node.graphql');
-    $this->exposeEntityBundle(TRUE, 'file', 'file', 'file.default');
+    $this->exposeEntityBundle('node', 'test', 'node.graphql');
+    $this->exposeEntityBundle('file', 'file', 'file.default');
   }
 
   /**

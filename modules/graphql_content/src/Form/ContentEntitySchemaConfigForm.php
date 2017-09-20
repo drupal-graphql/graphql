@@ -187,7 +187,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     // Sanitize boolean values.
     foreach (array_keys($types) as $entityType) {
       $exposed = (bool) $types[$entityType]['exposed'];
-      $this->exposeEntity($exposed, $entityType);
+      $exposed ? $this->exposeEntity($entityType) : $this->unexposeEntity($entityType);
 
       if (!empty($types[$entityType]['bundles'])) {
         $bundles = array_keys($types[$entityType]['bundles']);
@@ -196,7 +196,12 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
           $exposed = (bool) $bundle_config['exposed'];
           $view_mode = $bundle_config['view_mode'];
 
-          $this->exposeEntity($exposed, $entityType, $bundle, $view_mode);
+          if ($exposed) {
+            $this->exposeEntityBundle($entityType, $bundle, $view_mode);
+          }
+          else {
+            $this->unexposeEntityBundle($entityType, $bundle);
+          }
         }
       }
     }

@@ -71,7 +71,7 @@ class EntityRenderedFieldsTest extends GraphQLFileTestBase {
       ->grantPermission('access user profiles')
       ->save();
 
-    $this->exposeEntityBundle(TRUE, 'node', 'test', 'node.graphql');
+    $this->exposeEntityBundle('node', 'test', 'node.graphql');
   }
 
   /**
