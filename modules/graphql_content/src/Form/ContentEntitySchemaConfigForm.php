@@ -108,66 +108,71 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     foreach ($this->entityTypeManager->getDefinitions() as $type) {
       if ($type instanceof ContentEntityTypeInterface) {
 
-        $config_name = 'graphql.exposed.' . $type->id();
-        $config = \Drupal::configFactory()->getEditable($config_name);
+        $entityType = $type->id();
 
-        $form['types'][$type->id()]['exposed'] = [
+        $form['types'][$entityType]['exposed'] = [
           '#type' => 'checkbox',
-          '#default_value' => $config->get('exposed'),
+          '#default_value' => $this->isEntityTypeExposed($entityType),
           '#title' => '<strong>' . $type->getLabel() . '</strong>',
           '#description' => $this->t('Add the <strong>%interface</strong> interface to the schema.', [
-            '%interface' => StringHelper::camelCase($type->id()),
+            '%interface' => StringHelper::camelCase($entityType),
           ]),
           '#wrapper_attributes' => ['colspan' => 2, 'class' => ['highlight']],
         ];
 
-        foreach ($this->bundleInfo->getBundleInfo($type->id()) as $bundle => $info) {
-          $key = $type->id() . '__' . $bundle;
+        foreach ($this->bundleInfo->getBundleInfo($entityType) as $bundle => $info) {
+          $key = $entityType . '__' . $bundle;
 
-          $config_name = 'graphql.exposed.' . $type->id() . '.' . $bundle;
-          $config = \Drupal::configFactory()->getEditable($config_name);
-
+          $isEntityBundleExposed = $this->isEntityBundleExposed($entityType, $bundle);
           $form['types'][$key]['exposed'] = [
             '#type' => 'checkbox',
-            '#parents' => ['types', $type->id(), 'bundles', $bundle, 'exposed'],
-            '#default_value' => $config->get('exposed'),
+            '#parents' => ['types', $entityType, 'bundles', $bundle, 'exposed'],
+            '#default_value' => $isEntityBundleExposed,
             '#states' => [
               'enabled' => [
-                ':input[name="types[' . $type->id() . '][exposed]"]' => ['checked' => TRUE],
+                ':input[name="types[' . $entityType . '][exposed]"]' => ['checked' => TRUE],
               ],
             ],
             '#title' => $info['label'],
             '#description' => $this->t('Add the <strong>%type</strong> type to the schema.', [
-              '%type' => StringHelper::camelCase([$type->id(), $bundle]),
+              '%type' => StringHelper::camelCase([$entityType, $bundle]),
             ]),
           ];
 
           $options = [
             '__none__' => $this->t("Don't attach fields."),
-            $type->id() . '.default' => $this->t('Default'),
+            $entityType . '.default' => $this->t('Default'),
           ];
 
           foreach ($modes as $mode) {
             /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $display */
-            if ($mode->getTargetType() == $type->id()) {
+            if ($mode->getTargetType() == $entityType) {
               $options[$mode->id()] = $mode->label();
             }
           }
 
+          $defaultViewMode = $this->getExposedViewMode($entityType, $bundle);
+          if (!$isEntityBundleExposed && (empty($defaultViewMode)) || $defaultViewMode == '__none__') {
+            // Use graphql view mode as default.
+            $graphqlViewMode = $entityType . '.graphql';
+            if (isset($options[$graphqlViewMode])) {
+              $defaultViewMode = $graphqlViewMode;
+            }
+          }
           $form['types'][$key]['view_mode'] = [
             '#type' => 'select',
             '#parents' => [
-              'types', $type->id(), 'bundles', $bundle, 'view_mode',
+              'types', $entityType, 'bundles', $bundle, 'view_mode',
             ],
-            '#default_value' => $config->get('view_mode'),
+            '#default_value' => $defaultViewMode,
             '#options' => $options,
             '#attributes' => [
               'width' => '100%',
             ],
             '#states' => [
               'enabled' => [
-                ':input[name="types[' . $type->id() . '][exposed]"]' => ['checked' => TRUE],
-                ':input[name="types[' . $type->id() . '][bundles][' . $bundle . '][exposed]"]' => ['checked' => TRUE],
+                ':input[name="types[' . $entityType . '][exposed]"]' => ['checked' => TRUE],
+                ':input[name="types[' . $entityType . '][bundles][' . $bundle . '][exposed]"]' => ['checked' => TRUE],
               ],
             ],
           ];
