@@ -162,7 +162,7 @@ class RequestController implements ContainerInjectionInterface {
 
     // Gather all responses from all sub-requests.
     $content = array_map(function(Response $response) {
-      return json_decode($response->getContent());
+      return $response->getStatusCode() === 200 ? json_decode($response->getContent()) : NULL;
     }, $responses);
 
     $metadata = new CacheableMetadata();
