@@ -88,8 +88,9 @@ class ContentEntitySchemaConfig {
    *   Boolean value indicating if the entity should be exposed or hidden.
    */
   private function configureExposedEntity($entityType, bool $exposed) {
-    $config = $this->getEditableConfig($entityType);
-    $config->set('exposed', $exposed)->save();
+    $this->getEditableConfig($entityType)
+      ->set('exposed', $exposed)
+      ->save();
   }
 
   /**
@@ -110,9 +111,7 @@ class ContentEntitySchemaConfig {
     if ($exposed && !$this->isEntityTypeExposed($entityType)) {
       $this->exposeEntity($entityType);
     }
-    $config = $this->getEditableConfig($entityType, $bundle);
-
-    $config
+    $this->getEditableConfig($entityType, $bundle)
       ->set('exposed', $exposed)
       ->set('view_mode', $view_mode)
       ->save();

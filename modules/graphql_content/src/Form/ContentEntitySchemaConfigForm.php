@@ -165,7 +165,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             // Use graphql view mode as default.
             $graphqlViewMode = $entityType . '.graphql';
             if (isset($options[$graphqlViewMode])) {
-              $defaultViewMode = $graphqlViewMode;
+              $defaultViewMode = 'graphql';
             }
           }
           $form['types'][$key]['view_mode'] = [
@@ -173,7 +173,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             '#parents' => [
               'types', $entityType, 'bundles', $bundle, 'view_mode',
             ],
-            '#default_value' => $defaultViewMode,
+            '#default_value' => $entityType . '.' . $defaultViewMode,
             '#options' => $options,
             '#attributes' => [
               'width' => '100%',
