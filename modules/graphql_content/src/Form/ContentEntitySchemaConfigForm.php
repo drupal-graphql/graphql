@@ -12,7 +12,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\GraphQLSchemaConfig;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Configuration form to define GraphQL schema content entity types and fields.
@@ -43,7 +43,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
   /**
    * The schema configuration service.
    *
-   * @var \Drupal\qraphql_content\GraphQLSchemaConfig
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
   protected $schemaConfig;
 
@@ -55,7 +55,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     EntityTypeManagerInterface $entityTypeManager,
     EntityTypeBundleInfoInterface $bundleInfo,
     CacheTagsInvalidatorInterface $invalidator,
-    GraphQLSchemaConfig $schemaConfig
+    ContentEntitySchemaConfig $schemaConfig
   ) {
     parent::__construct($configFactory);
     $this->entityTypeManager = $entityTypeManager;

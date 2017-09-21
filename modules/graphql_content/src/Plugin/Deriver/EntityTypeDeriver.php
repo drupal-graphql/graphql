@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\ContentEntitySchemaConfig;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Derive GraphQL Interfaces from Drupal entity types.
@@ -25,7 +25,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   /**
    * The schema configuration service.
    *
-   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
   protected $schemaConfig;
 
@@ -34,7 +34,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Instance of an entity type manager.
-   * @param \Drupal\qraphql_content\ContentEntitySchemaConfig $schemaConfig
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
    *   The schema configuration service.
    */
   public function __construct(

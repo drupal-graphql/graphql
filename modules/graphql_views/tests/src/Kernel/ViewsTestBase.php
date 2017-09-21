@@ -8,7 +8,7 @@ use Drupal\simpletest\NodeCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\Role;
-use Drupal\qraphql_content\ContentEntitySchemaConfig;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Base class for test views support in GraphQL.
@@ -45,7 +45,7 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
   /**
    * The schema configuration service.
    *
-   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
   protected $schemaConfig;
 

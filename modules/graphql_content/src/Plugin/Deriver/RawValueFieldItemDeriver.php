@@ -9,7 +9,7 @@ use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Drupal\graphql_content\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\ContentEntitySchemaConfig;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 class RawValueFieldItemDeriver extends FieldFormatterDeriver {
 
@@ -28,7 +28,7 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   /**
    * The schema configuration service.
    *
-   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
   protected $schemaConfig;
 
@@ -39,7 +39,7 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
-   * @param \Drupal\qraphql_content\ContentEntitySchemaConfig $schemaConfig
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
    *   The schema configuration service.
    * @param \Drupal\graphql_content\TypeMapper $typeMapper
    *   The graphql type mapper service.

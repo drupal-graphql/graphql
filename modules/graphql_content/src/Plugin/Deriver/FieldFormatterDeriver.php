@@ -9,7 +9,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\ContentEntitySchemaConfig;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Generate GraphQLField plugins for certain field formatters.
@@ -40,7 +40,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   /**
    * The schema configuration service.
    *
-   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
   protected $schemaConfig;
 
@@ -51,7 +51,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
-   * @param \Drupal\qraphql_content\ContentEntitySchemaConfig $schemaConfig
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
    *   The schema configuration service.
    * @param string $basePluginId
    *   The base plugin id.

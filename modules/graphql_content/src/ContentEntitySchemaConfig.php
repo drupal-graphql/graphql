@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\qraphql_content;
+namespace Drupal\graphql_content;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 
