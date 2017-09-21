@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\QueryTrait;
 use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
 use Prophecy\Argument;
@@ -18,6 +19,7 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  */
 class ResultTest extends KernelTestBase {
   use QueryTrait;
+  use ByPassAccessTrait;
   use SchemaProphecyTrait;
 
   /**
