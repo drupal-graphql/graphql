@@ -40,9 +40,9 @@ class ContentEntitySchemaConfig {
    */
   private function getConfigName($entityType, $bundle = '') {
     if (empty($bundle)) {
-      return 'graphql.exposed.' . $entityType;
+      return 'graphql.exposed_entity.' . $entityType;
     }
-    return 'graphql.exposed.' . $entityType . '.' . $bundle;
+    return 'graphql.exposed_bundle.' . $entityType . '.' . $bundle;
   }
 
   /**

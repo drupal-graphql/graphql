@@ -1,0 +1,20 @@
+# Schema for the configuration files of the graphql_content module.
+
+graphql.exposed_entity.*:
+  type: config_object
+  label: 'Exposed content entity'
+  mapping:
+    exposed:
+      type: boolean
+      label: 'Expose the entity interface'
+
+graphql.exposed_bundle.*:
+  type: config_object
+  label: 'Exposed bundle'
+  mapping:
+    exposed:
+      type: boolean
+      label: 'Expose the bundle type'
+    view_mode:
+      type: string
+      label: 'Expose fields on view mode'
