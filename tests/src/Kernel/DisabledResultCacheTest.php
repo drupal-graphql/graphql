@@ -7,6 +7,8 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\QueryProcessor;
 use Drupal\graphql\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
+use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\QueryTrait;
 use Prophecy\Argument;
 
@@ -17,6 +19,8 @@ use Prophecy\Argument;
  */
 class DisabledResultCacheTest extends KernelTestBase {
   use QueryTrait;
+  use ByPassAccessTrait;
+  use EnableCliCacheTrait;
 
   /**
    * {@inheritdoc}
