@@ -8,13 +8,12 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
+use Drupal\qraphql_content\ContentEntitySchemaConfig;
 
 /**
  * Create GraphQL entityById fields based on available Drupal entity types.
  */
 class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
-  use GraphQLEntityExposeTrait;
 
   /**
    * The entity type manager service.
@@ -24,17 +23,31 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
   protected $entityTypeManager;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static($container->get('entity_type.manager'));
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    ContentEntitySchemaConfig $schemaConfig
+  ) {
+    $this->entityTypeManager = $entityTypeManager;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    $this->entityTypeManager = $entityTypeManager;
+  public static function create(ContainerInterface $container, $basePluginId) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('graphql_content.schema_config')
+    );
   }
 
   /**
@@ -42,7 +55,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      if (!$this->isEntityTypeExposed($id)) {
+      if (!$this->schemaConfig->isEntityTypeExposed($id)) {
         continue;
       }
       if ($type instanceof ContentEntityTypeInterface) {

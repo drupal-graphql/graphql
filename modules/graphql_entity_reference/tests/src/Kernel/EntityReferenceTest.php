@@ -65,7 +65,7 @@ class EntityReferenceTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->save();
 
-    $this->exposeEntityBundle('node', 'test', 'node.graphql');
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
   }
 
   /**

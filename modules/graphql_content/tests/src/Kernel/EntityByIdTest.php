@@ -70,7 +70,7 @@ class EntityByIdTest extends GraphQLFileTestBase {
     ]);
     $language->save();
 
-    $this->exposeEntityBundle('node', 'test', 'node.graphql');
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
   }
 
   /**

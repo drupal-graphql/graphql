@@ -9,10 +9,9 @@ use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\Plugin\GraphQL\Types\RawValueFieldType;
 use Drupal\graphql_content\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
+use Drupal\qraphql_content\ContentEntitySchemaConfig;
 
 class RawValueFieldItemDeriver extends FieldFormatterDeriver {
-  use GraphQLEntityExposeTrait;
 
   /**
    * The type mapper service.
@@ -27,12 +26,21 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   protected $entityBundleInfo;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * RawValueFieldItemDeriver constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
+   * @param \Drupal\qraphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    * @param \Drupal\graphql_content\TypeMapper $typeMapper
    *   The graphql type mapper service.
    * @param string $basePluginId
@@ -41,10 +49,11 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager,
+    ContentEntitySchemaConfig $schemaConfig,
     TypeMapper $typeMapper,
     $basePluginId
   ) {
-    parent::__construct($entityTypeManager, $entityFieldManager, $basePluginId);
+    parent::__construct($entityTypeManager, $entityFieldManager, $schemaConfig, $basePluginId);
     $this->typeMapper = $typeMapper;
   }
 
@@ -55,6 +64,7 @@ class RawValueFieldItemDeriver extends FieldFormatterDeriver {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
+      $container->get('graphql_content.schema_config'),
       $container->get('graphql_content.type_mapper'),
       $basePluginId
     );

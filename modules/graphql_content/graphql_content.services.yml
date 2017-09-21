@@ -7,3 +7,8 @@ parameters:
     Float:
       - float
     # All other types are considered strings.
+
+services:
+  graphql_content.schema_config:
+    class: Drupal\graphql_content\ContentEntitySchemaConfig
+    arguments: ['@config.factory']

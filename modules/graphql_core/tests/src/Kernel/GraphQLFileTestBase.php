@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
-use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
+use Drupal\qraphql_content\ContentEntitySchemaConfig;
 use Drupal\user\Entity\Role;
 
 /**
@@ -12,7 +12,6 @@ use Drupal\user\Entity\Role;
  */
 abstract class GraphQLFileTestBase extends KernelTestBase {
   use GraphQLFileTestTrait;
-  use GraphQLEntityExposeTrait;
 
   /**
    * {@inheritdoc}
@@ -26,6 +25,13 @@ abstract class GraphQLFileTestBase extends KernelTestBase {
   ];
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -34,6 +40,9 @@ abstract class GraphQLFileTestBase extends KernelTestBase {
     $this->installConfig('graphql');
     $this->installConfig('user');
     $this->installEntitySchema('user');
+
+    // @todo: is this the right way to do it?
+    $this->schemaConfig = new ContentEntitySchemaConfig(\Drupal::configFactory());
 
     Role::load('anonymous')
       ->grantPermission('execute graphql requests')

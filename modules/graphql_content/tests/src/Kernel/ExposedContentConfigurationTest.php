@@ -97,7 +97,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if the interface for nodes is created.
    */
   public function testNodeInterface() {
-    $this->exposeEntity('node');
+    $this->schemaConfig->exposeEntity('node');
 
     $schema = $this->executeQueryFile('schema.gql');
     $types = array_filter($schema['data']['__schema']['types'], function($type) {
@@ -110,7 +110,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if the node bundle types are created.
    */
   public function testNodeType() {
-    $this->exposeEntityBundle('node', 'test', '');
+    $this->schemaConfig->exposeEntityBundle('node', 'test', '');
 
     $schema = $this->executeQueryFile('schema.gql');
     $types = array_filter($schema['data']['__schema']['types'], function($type) {
@@ -123,7 +123,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if no fields are exposed.
    */
   public function testUnexposedFields() {
-    $this->exposeEntityBundle('node', 'test', '__none__');
+    $this->schemaConfig->exposeEntityBundle('node', 'test', '__none__');
 
     $schema = $this->executeQueryFile('introspect.gql');
     $result = $this->processIntrospection($schema['data']['__schema']);
@@ -134,7 +134,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if view mode fields are properly exposed.
    */
   public function testExposedFields() {
-    $this->exposeEntityBundle('node', 'test', 'node.graphql');
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
 
     $schema = $this->executeQueryFile('introspect.gql');
     $result = $this->processIntrospection($schema['data']['__schema']);
@@ -147,7 +147,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
    * Test if unknown view modes fall back to default.
    */
   public function testFallback() {
-    $this->exposeEntityBundle('node', 'test', 'node.idontexist');
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.idontexist');
 
     $schema = $this->executeQueryFile('introspect.gql');
     $result = $this->processIntrospection($schema['data']['__schema']);

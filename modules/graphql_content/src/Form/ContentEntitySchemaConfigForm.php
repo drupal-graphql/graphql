@@ -12,13 +12,12 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
+use Drupal\qraphql_content\GraphQLSchemaConfig;
 
 /**
  * Configuration form to define GraphQL schema content entity types and fields.
  */
 class ContentEntitySchemaConfigForm extends ConfigFormBase {
-  use GraphQLEntityExposeTrait;
 
   /**
    * The entity type manager.
@@ -42,18 +41,27 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
   protected $invalidator;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\qraphql_content\GraphQLSchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,
     EntityTypeManagerInterface $entityTypeManager,
     EntityTypeBundleInfoInterface $bundleInfo,
-    CacheTagsInvalidatorInterface $invalidator
+    CacheTagsInvalidatorInterface $invalidator,
+    GraphQLSchemaConfig $schemaConfig
   ) {
     parent::__construct($configFactory);
     $this->entityTypeManager = $entityTypeManager;
     $this->bundleInfo = $bundleInfo;
     $this->invalidator = $invalidator;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -64,7 +72,8 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('cache_tags.invalidator')
+      $container->get('cache_tags.invalidator'),
+      $container->get('graphql_content.schema_config')
     );
   }
 
@@ -112,7 +121,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
 
         $form['types'][$entityType]['exposed'] = [
           '#type' => 'checkbox',
-          '#default_value' => $this->isEntityTypeExposed($entityType),
+          '#default_value' => $this->schemaConfig->isEntityTypeExposed($entityType),
           '#title' => '<strong>' . $type->getLabel() . '</strong>',
           '#description' => $this->t('Add the <strong>%interface</strong> interface to the schema.', [
             '%interface' => StringHelper::camelCase($entityType),
@@ -123,7 +132,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
         foreach ($this->bundleInfo->getBundleInfo($entityType) as $bundle => $info) {
           $key = $entityType . '__' . $bundle;
 
-          $isEntityBundleExposed = $this->isEntityBundleExposed($entityType, $bundle);
+          $isEntityBundleExposed = $this->schemaConfig->isEntityBundleExposed($entityType, $bundle);
           $form['types'][$key]['exposed'] = [
             '#type' => 'checkbox',
             '#parents' => ['types', $entityType, 'bundles', $bundle, 'exposed'],
@@ -151,7 +160,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
             }
           }
 
-          $defaultViewMode = $this->getExposedViewMode($entityType, $bundle);
+          $defaultViewMode = $this->schemaConfig->getExposedViewMode($entityType, $bundle);
           if (!$isEntityBundleExposed && (empty($defaultViewMode)) || $defaultViewMode == '__none__') {
             // Use graphql view mode as default.
             $graphqlViewMode = $entityType . '.graphql';
@@ -192,7 +201,7 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
     // Sanitize boolean values.
     foreach (array_keys($types) as $entityType) {
       $exposed = (bool) $types[$entityType]['exposed'];
-      $exposed ? $this->exposeEntity($entityType) : $this->unexposeEntity($entityType);
+      $exposed ? $this->schemaConfig->exposeEntity($entityType) : $this->schemaConfig->unexposeEntity($entityType);
 
       if (!empty($types[$entityType]['bundles'])) {
         $bundles = array_keys($types[$entityType]['bundles']);
@@ -202,10 +211,10 @@ class ContentEntitySchemaConfigForm extends ConfigFormBase {
           $view_mode = $bundle_config['view_mode'];
 
           if ($exposed) {
-            $this->exposeEntityBundle($entityType, $bundle, $view_mode);
+            $this->schemaConfig->exposeEntityBundle($entityType, $bundle, $view_mode);
           }
           else {
-            $this->unexposeEntityBundle($entityType, $bundle);
+            $this->schemaConfig->unexposeEntityBundle($entityType, $bundle);
           }
         }
       }

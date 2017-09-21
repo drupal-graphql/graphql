@@ -9,13 +9,12 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\qraphql_content\Traits\GraphQLEntityExposeTrait;
+use Drupal\qraphql_content\ContentEntitySchemaConfig;
 
 /**
  * Generate GraphQLField plugins for certain field formatters.
  */
 class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInterface {
-  use GraphQLEntityExposeTrait;
 
   /**
    * The entity type manager.
@@ -39,14 +38,11 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   protected $basePluginId;
 
   /**
-   * {@inheritdoc}
+   * The schema configuration service.
+   *
+   * @var \Drupal\qraphql_content\ContentEntitySchemaConfig
    */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('entity_field.manager'),
-      $basePluginId);
-  }
+  protected $schemaConfig;
 
   /**
    * AbstractFieldFormatterDeriver constructor.
@@ -55,17 +51,33 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    *   An entity type manager instance.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   An entity field manager instance.
+   * @param \Drupal\qraphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    * @param string $basePluginId
    *   The base plugin id.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager,
+    ContentEntitySchemaConfig $schemaConfig,
     $basePluginId
   ) {
-    $this->basePluginId = $basePluginId;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
+    $this->schemaConfig = $schemaConfig;
+    $this->basePluginId = $basePluginId;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, $basePluginId) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager'),
+      $container->get('graphql_content.schema_config'),
+      $basePluginId
+    );
   }
 
   /**
@@ -136,7 +148,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $entityType = $display->getTargetEntityTypeId();
       $bundle = $display->getTargetBundle();
 
-      if ($this->getExposedViewMode($entityType, $bundle) !== $display->getMode()) {
+      if ($this->schemaConfig->getExposedViewMode($entityType, $bundle) !== $display->getMode()) {
         continue;
       }
 

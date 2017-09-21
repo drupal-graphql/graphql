@@ -59,7 +59,7 @@ class BlockTest extends GraphQLFileTestBase {
       'region' => 'sidebar_first',
     ]);
 
-    $this->exposeEntityBundle('block_content', 'basic', 'block_content.graphql');
+    $this->schemaConfig->exposeEntityBundle('block_content', 'basic', 'block_content.graphql');
   }
 
   /**
