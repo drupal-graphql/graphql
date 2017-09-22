@@ -74,7 +74,7 @@ class XMLFieldTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('xml', ['type' => 'graphql_xml'])->save();
 
-    $this->exposeEntityBundle('entity_test_with_bundle', 'graphql', 'entity_test_with_bundle.graphql');
+    $this->schemaConfig->exposeEntityBundle('entity_test_with_bundle', 'graphql', 'entity_test_with_bundle.graphql');
   }
 
   /**
