@@ -149,11 +149,12 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
    *   The name of the type or NULL if the type could not be derived.
    */
   protected function getRowResolveType(ViewEntityInterface $view, $displayId) {
+    /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
     $display = $this->getViewDisplay($view, $displayId);
     $rowPlugin = $display->getPlugin('row');
 
     if ($rowPlugin instanceof GraphQLFieldRow) {
-      return StringHelper::camelCase([StringHelper::camelCase([$view->id(), $displayId, 'row'])]);
+      return StringHelper::camelCase([$display->getGraphQLRowName()]);
     }
 
     if ($rowPlugin instanceof GraphQLEntityRow) {

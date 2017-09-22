@@ -108,12 +108,48 @@ class GraphQL extends DisplayPluginBase {
    * Query name.
    */
   public function getGraphQLQueryName() {
+    return $this->getGraphQLName();
+  }
+
+  /**
+   * Gets the result name based on user defined query name or the default one.
+   *
+   * @return string
+   *   Result name.
+   */
+  public function getGraphQLResultName() {
+    return $this->getGraphQLName('result');
+  }
+
+  /**
+   * Gets the row name based on user defined query name or the default one.
+   *
+   * @return string
+   *   Row name.
+   */
+  public function getGraphQLRowName() {
+    return $this->getGraphQLName('row');
+  }
+
+  /**
+   * Returns the id based on user-provided query name or the default one.
+   *
+   * @param string $suffix
+   *   Id suffix, eg. row, result.
+   *
+   * @return string
+   *   The id.
+   */
+  public function getGraphQLName($suffix = '') {
     $queryName = strip_tags($this->getOption('graphql_query_name'));
     if (empty($queryName)) {
       $viewId = $this->view->id();
       $displayId = $this->display['id'];
-      $queryName = StringHelper::camelCase([$viewId, $displayId, 'view']);
+      $queryName = StringHelper::camelCase([$viewId, $displayId, 'view', $suffix]);
+    } else {
+      $queryName .= ucfirst($suffix);
     }
+
     return lcfirst($queryName);
   }
 

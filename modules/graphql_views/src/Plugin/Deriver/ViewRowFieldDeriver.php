@@ -20,6 +20,7 @@ class ViewRowFieldDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
       $display = $this->getViewDisplay($view, $displayId);
       $rowPlugin = $display->getPlugin('row');
 
@@ -36,7 +37,7 @@ class ViewRowFieldDeriver extends ViewDeriverBase {
           'id' => $id,
           'name' => $alias,
           'type' => 'String',
-          'types' => [StringHelper::camelCase([$viewId, $displayId, 'row'])],
+          'types' => $display->getGraphQLRowName(),
           'view' => $viewId,
           'display' => $displayId,
           'field' => $alias,
