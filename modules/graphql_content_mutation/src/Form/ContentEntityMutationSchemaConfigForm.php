@@ -110,9 +110,6 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
       ],
     ];
 
-    // UI config to enable/disable mutation checkboxes on unexposed items.
-    $restrictMutations = empty(\Drupal::config('graphql_content_mutation.settings')->get('allow_all_mutations'));
-
     foreach ($this->entityTypeManager->getDefinitions() as $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $entityType = $type->id();
@@ -123,13 +120,12 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
           '#wrapper_attributes' => ['class' => ['highlight']],
         ];
 
-        $restrictEntityMutations = $restrictMutations && !$this->schemaConfig->isEntityTypeExposed($entityType);
         $form['types'][$entityType]['delete'] = [
           '#type' => 'checkbox',
           '#parents' => ['types', $entityType, 'delete'],
           '#default_value' => $this->schemaConfig->isDeleteExposed($entityType),
           '#title' => $this->t('Delete'),
-          '#disabled' => $restrictEntityMutations,
+          '#disabled' => $this->schemaConfig->isEntityMutationRestricted($entityType),
         ];
 
         foreach ($this->bundleInfo->getBundleInfo($entityType) as $bundle => $info) {
@@ -144,13 +140,13 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
             '#wrapper_attributes' => ['class' => ['form--inline']],
           ];
 
-          $restrictEntityBundleMutations = $restrictMutations && !$this->schemaConfig->isEntityBundleExposed($entityType, $bundle);
+          $isEntityBundleMutationRestricted = $this->schemaConfig->isEntityBundleMutationRestricted($entityType, $bundle);
           $form['types'][$key]['operations']['create'] = [
             '#type' => 'checkbox',
             '#parents' => ['types', $entityType, 'bundles', $bundle, 'create'],
             '#default_value' => $this->schemaConfig->isCreateExposed($entityType, $bundle),
             '#title' => $this->t('Create'),
-            '#disabled' => $restrictEntityBundleMutations,
+            '#disabled' => $isEntityBundleMutationRestricted,
           ];
 
           $form['types'][$key]['operations']['update'] = [
@@ -158,7 +154,7 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
             '#parents' => ['types', $entityType, 'bundles', $bundle, 'update'],
             '#default_value' => $this->schemaConfig->isUpdateExposed($entityType, $bundle),
             '#title' => $this->t('Update'),
-            '#disabled' => $restrictEntityBundleMutations,
+            '#disabled' => $isEntityBundleMutationRestricted,
           ];
         }
       }

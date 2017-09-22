@@ -3,11 +3,58 @@
 namespace Drupal\graphql_content_mutation;
 
 use Drupal\graphql_content\ContentEntitySchemaConfig;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Trait to read and interpret graphql_content_mutation configuration.
  */
 class ContentEntityMutationSchemaConfig extends ContentEntitySchemaConfig {
+
+  /**
+   * Restrict mutations to exposed items. By default mutations are allowed on exposed items only.
+   *
+   * @var bool
+   */
+  protected $restrictMutations;
+
+  /**
+   * ContentEntityMutationSchemaConfig constructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
+   */
+  public function __construct(ConfigFactoryInterface $configFactory) {
+    parent::__construct($configFactory);
+    $this->restrictMutations = empty(\Drupal::config('graphql_content_mutation.settings')->get('allow_all_mutations'));
+  }
+
+  /**
+   * Check if the entity type mutation is restricted.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   *
+   * @return bool
+   *   Boolean value indicating if the entity type mutation is restricted.
+   */
+  public function isEntityMutationRestricted($entityType) {
+    return $this->restrictMutations && !$this->isEntityTypeExposed($entityType);
+  }
+
+  /**
+   * Check if the entity bundle mutation is restricted.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   * @param string $bundle
+   *   The bundle machine name.
+   *
+   * @return bool
+   *   Boolean value indicating if the entity bundle mutation is restricted.
+   */
+  public function isEntityBundleMutationRestricted($entityType, $bundle) {
+    return $this->restrictMutations && !$this->isEntityBundleExposed($entityType, $bundle);
+  }
 
   /**
    * Get the list of exposed entity mutations.
@@ -19,7 +66,7 @@ class ContentEntityMutationSchemaConfig extends ContentEntitySchemaConfig {
    *   List of exposed mutations.
    */
   public function getExposedEntityMutations($entityType) {
-    if (!$this->isEntityTypeExposed($entityType)) {
+    if ($this->isEntityMutationRestricted($entityType)) {
       return [];
     }
 
@@ -44,7 +91,7 @@ class ContentEntityMutationSchemaConfig extends ContentEntitySchemaConfig {
    *   List of exposed mutations.
    */
   public function getExposedEntityBundleMutations($entityType, $bundle) {
-    if (!$this->isEntityBundleExposed($entityType, $bundle)) {
+    if ($this->isEntityBundleMutationRestricted($entityType, $bundle)) {
       return [];
     }
 
