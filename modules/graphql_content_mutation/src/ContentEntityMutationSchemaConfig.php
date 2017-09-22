@@ -147,7 +147,7 @@ class ContentEntityMutationSchemaConfig extends ContentEntitySchemaConfig {
    *   Boolean value indicating if any bundle exposes create or update.
    */
   public function isFieldMutationExposed($entityType) {
-    // @todo
+    // TODO: changing return to FALSE will produce a PHP fatal error. Is this function necessary?
     return TRUE;
     /*
     $bundles = NestedArray::getValue($this->types, [
