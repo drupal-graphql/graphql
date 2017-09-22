@@ -158,10 +158,29 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
     }
 
     if ($rowPlugin instanceof GraphQLEntityRow) {
-      if ($entityType = $view->getExecutable()->getBaseEntityType()) {
-        $typeName = StringHelper::camelCase($entityType->id());
-        if ($this->interfaceExists($typeName)) {
-          return $typeName;
+      $executable = $view->getExecutable();
+      $executable->setDisplay($displayId);
+
+      if ($entityType = $executable->getBaseEntityType()) {
+        $typeName = $entityType->id();
+        $typeNameCamel = StringHelper::camelCase($typeName);
+        if ($this->interfaceExists($typeNameCamel)) {
+          $filters = $executable->getDisplay()->getOption('filters');
+          $dataTable = $entityType->getDataTable();
+          $bundleKey = $entityType->getKey('bundle');
+
+          foreach ($filters as $filter) {
+            $isBundleFilter = $filter['table'] == $dataTable && $filter['field'] == $bundleKey;
+            $isSingleValued = is_array($filter['value']) && count($filter['value']) == 1;
+            $isExposed = isset($filter['exposed']) && $filter['exposed'];
+            if ($isBundleFilter && $isSingleValued && !$isExposed) {
+              $bundle = reset($filter['value']);
+              $typeName .= "_$bundle";
+              break;
+            }
+          }
+
+          return StringHelper::camelCase($typeName);
         }
       }
 
