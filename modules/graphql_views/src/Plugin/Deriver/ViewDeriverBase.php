@@ -169,9 +169,13 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
           $bundleKey = $entityType->getKey('bundle');
 
           foreach ($filters as $filter) {
-            if ($filter['table'] == $dataTable && $filter['field'] == $bundleKey && count($filter['value']) == 1) {
+            $isBundleFilter = $filter['table'] == $dataTable && $filter['field'] == $bundleKey;
+            $isSingleValued = is_array($filter['value']) && count($filter['value']) == 1;
+            $isExposed = isset($filter['exposed']) && $filter['exposed'];
+            if ($isBundleFilter && $isSingleValued && !$isExposed) {
               $bundle = reset($filter['value']);
               $typeName .= "_$bundle";
+              break;
             }
           }
 
