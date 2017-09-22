@@ -25,6 +25,7 @@ class EntityMutationTest extends GraphQLFileTestBase {
     'filter',
     'text',
     'taxonomy',
+    'graphql_content',
     'graphql_mutation',
     'graphql_content_mutation',
   ];
