@@ -6,6 +6,7 @@ use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
+use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 
 /**
  * Test entity deletion.
@@ -46,13 +47,9 @@ class DeleteEntityTest extends GraphQLFileTestBase {
       ->grantPermission('delete any test content')
       ->save();
 
-	// @todo: fix config
-    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
-      ->set('types', [
-        'node' => [
-          'delete' => TRUE,
-        ],
-      ])->save();
+    // TODO: is this the right way to do it?
+    $this->schemaConfig = new ContentEntityMutationSchemaConfig(\Drupal::configFactory());
+    $this->schemaConfig->exposeEntityMutations('node', ['delete']);
   }
 
   /**

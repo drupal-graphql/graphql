@@ -62,7 +62,7 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
     $this->createContentType(['type' => 'test']);
     $this->createEntityReferenceField('node', 'test', 'field_tags', 'Tags', 'taxonomy_term');
 
-    // @todo: is this the right way to do it?
+    // TODO: is this the right way to do it?
     $this->schemaConfig = new ContentEntitySchemaConfig(\Drupal::configFactory());
 
     Vocabulary::create([

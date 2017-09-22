@@ -8,6 +8,8 @@ use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
+use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
+
 
 /**
  * Test entity update.
@@ -60,32 +62,10 @@ class UpdateEntityTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('body', ['type' => 'graphql_raw_value'])->save();
 
-	// @todo: fix config
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-      ])
-      ->save();
-
-	// @todo: fix config
-    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
-      ->set('types', [
-        'node' => [
-          'bundles' => [
-            'test' => [
-              'update' => TRUE,
-            ],
-          ],
-        ],
-      ])->save();
+    // TODO: is this the right way to do it?
+    $this->schemaConfig = new ContentEntityMutationSchemaConfig(\Drupal::configFactory());
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
+    $this->schemaConfig->exposeEntityBundleMutations('node', 'test', ['update']);
   }
 
   /**

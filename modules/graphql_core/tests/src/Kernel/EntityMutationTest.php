@@ -5,6 +5,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\user\Entity\Role;
+use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 
 /**
  * Test entity mutation support in GraphQL.
@@ -38,17 +39,11 @@ class EntityMutationTest extends GraphQLFileTestBase {
     $this->installSchema('node', 'node_access');
     $this->createContentType(['type' => 'article']);
 
-	// @todo: fix config
-    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
-      ->set('types', [
-        'node' => [
-          'bundles' => [
-            'article' => [
-              'create' => TRUE,
-            ],
-          ],
-        ],
-      ])->save();
+    // TODO: is this the right way to do it?
+    $this->schemaConfig = new ContentEntityMutationSchemaConfig(\Drupal::configFactory());
+
+    // TODO: Is this really a graphql_core test?
+    $this->schemaConfig->exposeEntityBundleMutations('node', 'article', ['create']);
   }
 
   /**

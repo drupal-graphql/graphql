@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Implementing graphQL mutations on content entities.
+ */
+
+Use \Drupal\Core\Url;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function graphql_content_mutation_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.graphql_content_mutation':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The GraphQL Content Mutations module provides graphQL mutations for content entities.') . '</p>';
+      return $output;
+
+    case 'graphql_content_mutation.content_entity_mutation_schema':
+      $output = '';
+      $output .= '<p>';
+      $output .= t('This page provides the configuration to generate graphQL schema for content entity mutations.') . '<br />';
+      $output .= t('These settings are not meant for access restrictions. Use user permissions to restrict access on given operations.') . '<br />';
+      $output .= t('For example if article deletion should be allowed, but page deletion should be not, then the user permissions needs to be set accordingly.') . '<br />';
+
+      if (empty(\Drupal::config('graphql_content_mutation.settings')->get('allow_all_mutations'))) {
+        $output .= t('Mutations are not allowed for content entities and bundles which are not exposed. Content can be exposed on <a href=":exposed_content">Exposed content</a> page.',
+          [':exposed_content' => Url::fromRoute('graphql_content.content_entity_schema')->toString()]) . '<br />';
+      }
+      $output .= '<p>';
+      return $output;
+
+  }
+}
+

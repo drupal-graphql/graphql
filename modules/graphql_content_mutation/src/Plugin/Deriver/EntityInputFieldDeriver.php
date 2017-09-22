@@ -40,7 +40,6 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
     return new static(
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
-	  // @todo: fix config?
       $container->get('graphql_content_mutation.schema_config')
     );
   }
@@ -67,7 +66,8 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
         continue;
       }
 
-      if (!$this->schemaConfig->exposeAnyCreateOrUpdate($entityTypeId)) {
+      // TODO: is this the right name for this function?
+      if (!$this->schemaConfig->isFieldMutationExposed($entityTypeId)) {
         continue;
       }
 

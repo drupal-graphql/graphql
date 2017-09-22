@@ -49,7 +49,6 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
-	  // @todo: fix config
       $container->get('graphql_content_mutation.schema_config')
     );
   }
@@ -79,8 +78,8 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        $createExposed = $this->schemaConfig->exposeCreate($entityTypeId, $bundleName);
-        $updateExposed = $this->schemaConfig->exposeUpdate($entityTypeId, $bundleName);
+        $createExposed = $this->schemaConfig->isCreateExposed($entityTypeId, $bundleName);
+        $updateExposed = $this->schemaConfig->isUpdateExposed($entityTypeId, $bundleName);
 
         if (!$createExposed && !$updateExposed) {
           continue;

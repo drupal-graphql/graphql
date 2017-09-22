@@ -10,6 +10,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
+
 
 /**
  * Configuration form to define GraphQL schema content mutation.
@@ -38,18 +40,27 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
   protected $invalidator;
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,
     EntityTypeManagerInterface $entityTypeManager,
     EntityTypeBundleInfoInterface $bundleInfo,
-    CacheTagsInvalidatorInterface $invalidator
+    CacheTagsInvalidatorInterface $invalidator,
+    ContentEntityMutationSchemaConfig $schemaConfig
   ) {
     parent::__construct($configFactory);
     $this->entityTypeManager = $entityTypeManager;
     $this->bundleInfo = $bundleInfo;
     $this->invalidator = $invalidator;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -60,7 +71,8 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('cache_tags.invalidator')
+      $container->get('cache_tags.invalidator'),
+      $container->get('graphql_content_mutation.schema_config')
     );
   }
 
@@ -83,12 +95,6 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $defaults = [];
-	// @todo: fix config
-    $config = $this->config('graphql_content_mutation.schema');
-    if ($config) {
-      $defaults = $config->get('types');
-    }
 
     $form['description'] = [
       '#type' => 'html_tag',
@@ -104,24 +110,30 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
       ],
     ];
 
+    // UI config to enable/disable mutation checkboxes on unexposed items.
+    $restrictMutations = empty(\Drupal::config('graphql_content_mutation.settings')->get('allow_all_mutations'));
+
     foreach ($this->entityTypeManager->getDefinitions() as $type) {
       if ($type instanceof ContentEntityTypeInterface) {
-        $form['types'][$type->id()]['label'] = [
+        $entityType = $type->id();
+        $form['types'][$entityType]['label'] = [
           '#type' => 'html_tag',
           '#tag' => 'strong',
           '#value' => $type->getLabel(),
           '#wrapper_attributes' => ['class' => ['highlight']],
         ];
 
-        $form['types'][$type->id()]['delete'] = [
+        $restrictEntityMutations = $restrictMutations && !$this->schemaConfig->isEntityTypeExposed($entityType);
+        $form['types'][$entityType]['delete'] = [
           '#type' => 'checkbox',
-          '#parents' => ['types', $type->id(), 'delete'],
-          '#default_value' => isset($defaults[$type->id()]['delete']) ? $defaults[$type->id()]['delete'] : [],
+          '#parents' => ['types', $entityType, 'delete'],
+          '#default_value' => $this->schemaConfig->isDeleteExposed($entityType),
           '#title' => $this->t('Delete'),
+          '#disabled' => $restrictEntityMutations,
         ];
 
-        foreach ($this->bundleInfo->getBundleInfo($type->id()) as $bundle => $info) {
-          $key = $type->id() . '__' . $bundle;
+        foreach ($this->bundleInfo->getBundleInfo($entityType) as $bundle => $info) {
+          $key = $entityType . '__' . $bundle;
 
           $form['types'][$key]['exposed'] = [
             '#markup' => $info['label'],
@@ -132,18 +144,21 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
             '#wrapper_attributes' => ['class' => ['form--inline']],
           ];
 
+          $restrictEntityBundleMutations = $restrictMutations && !$this->schemaConfig->isEntityBundleExposed($entityType, $bundle);
           $form['types'][$key]['operations']['create'] = [
             '#type' => 'checkbox',
-            '#parents' => ['types', $type->id(), 'bundles', $bundle, 'create'],
-            '#default_value' => isset($defaults[$type->id()]['bundles'][$bundle]['create']) ? $defaults[$type->id()]['bundles'][$bundle]['create'] : [],
+            '#parents' => ['types', $entityType, 'bundles', $bundle, 'create'],
+            '#default_value' => $this->schemaConfig->isCreateExposed($entityType, $bundle),
             '#title' => $this->t('Create'),
+            '#disabled' => $restrictEntityBundleMutations,
           ];
 
           $form['types'][$key]['operations']['update'] = [
             '#type' => 'checkbox',
-            '#parents' => ['types', $type->id(), 'bundles', $bundle, 'update'],
-            '#default_value' => isset($defaults[$type->id()]['bundles'][$bundle]['update']) ? $defaults[$type->id()]['bundles'][$bundle]['update'] : [],
+            '#parents' => ['types', $entityType, 'bundles', $bundle, 'update'],
+            '#default_value' => $this->schemaConfig->isUpdateExposed($entityType, $bundle),
             '#title' => $this->t('Update'),
+            '#disabled' => $restrictEntityBundleMutations,
           ];
         }
       }
@@ -156,9 +171,30 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('graphql_content_mutation.schema')
-      ->set('types', $form_state->getValue('types'))
-      ->save();
+    $types = $form_state->getValue('types');
+
+    foreach (array_keys($types) as $entityType) {
+      $mutations = [];
+      if ($types[$entityType]['delete']) {
+        $mutations[] = 'delete';
+      }
+      $this->schemaConfig->exposeEntityMutations($entityType, $mutations);
+      if (!empty($types[$entityType]['bundles'])) {
+        $bundles = array_keys($types[$entityType]['bundles']);
+        foreach ($bundles as $bundle) {
+          $bundle_config = $types[$entityType]['bundles'][$bundle];
+          $mutations = [];
+          if ($bundle_config['create']) {
+            $mutations[] = 'create';
+          }
+          if ($bundle_config['update']) {
+            $mutations[] = 'update';
+          }
+
+          $this->schemaConfig->exposeEntityBundleMutations($entityType, $bundle, $mutations);
+        }
+      }
+    }
 
     $this->invalidator->invalidateTags(['graphql_schema', 'graphql_request']);
     parent::submitForm($form, $form_state);

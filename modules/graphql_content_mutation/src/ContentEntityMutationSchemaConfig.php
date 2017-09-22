@@ -2,27 +2,93 @@
 
 namespace Drupal\graphql_content_mutation;
 
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Trait to read and interpret graphql_content_mutation configuration.
  */
-class ContentEntityMutationSchemaConfig {
-
-  protected $types;
+class ContentEntityMutationSchemaConfig extends ContentEntitySchemaConfig {
 
   /**
-   * ContentEntityMutationSchemaConfig constructor.
+   * Get the list of exposed entity mutations.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
+   * @param string $entityType
+   *   The entity type id.
+   *
+   * @return array
+   *   List of exposed mutations.
    */
-  public function __construct(ConfigFactoryInterface $configFactory) {
-	// @todo: fix config
-    $config = $configFactory->get('graphql_content_mutation.schema');
-    $this->types = $config ? $config->get('types') : [];
-    $this->types = $this->types ?: [];
+  public function getExposedEntityMutations($entityType) {
+    if (!$this->isEntityTypeExposed($entityType)) {
+      return [];
+    }
+
+    $mutations = $this->getConfig($entityType)->get('mutations');
+    if (empty($mutations)) {
+      // Make sure we always return an array.
+      return [];
+    }
+
+    return $mutations;
+  }
+
+  /**
+   * Get the list of exposed bundle mutations.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   * @param string $bundle
+   *   The bundle machine name.
+   *
+   * @return array
+   *   List of exposed mutations.
+   */
+  public function getExposedEntityBundleMutations($entityType, $bundle) {
+    if (!$this->isEntityBundleExposed($entityType, $bundle)) {
+      return [];
+    }
+
+    $mutations = $this->getConfig($entityType, $bundle)->get('mutations');
+    if (empty($mutations)) {
+      // Make sure we always return an array.
+      return [];
+    }
+
+    return $mutations;
+  }
+
+  /**
+   * Expose entity mutations to graphQL schema.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   * @param array $mutations
+   *   The list of allowed mutations. Use empty array to unexpose mutations.
+   */
+  public function exposeEntityMutations($entityType, array $mutations) {
+    $options = ['mutations' => $mutations];
+    if (!empty($mutations)) {
+      $options['exposed'] = TRUE;
+    }
+    $this->configureExposedEntity($entityType, $options);
+  }
+
+  /**
+   * Expose entity bundle mutations to graphQL schema.
+   *
+   * @param string $entityType
+   *   The entity type id.
+   * @param string $bundle
+   *   The bundle machine name.
+   * @param array $mutations
+   *   The list of allowed mutations. Use empty array to unexpose mutations.
+   */
+  public function exposeEntityBundleMutations($entityType, $bundle, array $mutations) {
+    $options = ['mutations' => $mutations];
+    if (!empty($mutations)) {
+      $options['exposed'] = TRUE;
+    }
+    $this->configureExposedEntityBundle($entityType, $bundle, $options);
   }
 
   /**
@@ -36,10 +102,9 @@ class ContentEntityMutationSchemaConfig {
    * @return bool
    *   Boolean value indicating if entity creation is exposed.
    */
-  public function exposeCreate($entityType, $bundle) {
-    return ((bool) NestedArray::getValue($this->types, [
-      $entityType, 'bundles', $bundle, 'create',
-    ]));
+  public function isCreateExposed($entityType, $bundle) {
+    $exposedMutations = $this->getExposedEntityBundleMutations($entityType, $bundle);
+    return in_array('create', $exposedMutations);
   }
 
   /**
@@ -53,10 +118,9 @@ class ContentEntityMutationSchemaConfig {
    * @return bool
    *   Boolean value indicating if entity update is exposed.
    */
-  public function exposeUpdate($entityType, $bundle) {
-    return ((bool) NestedArray::getValue($this->types, [
-      $entityType, 'bundles', $bundle, 'update',
-    ]));
+  public function isUpdateExposed($entityType, $bundle) {
+    $exposedMutations = $this->getExposedEntityBundleMutations($entityType, $bundle);
+    return in_array('update', $exposedMutations);
   }
 
   /**
@@ -68,10 +132,9 @@ class ContentEntityMutationSchemaConfig {
    * @return bool
    *   Boolean value indicating if entity deletion is exposed.
    */
-  public function exposeDelete($entityType) {
-    return ((bool) NestedArray::getValue($this->types, [
-      $entityType, 'delete',
-    ]));
+  public function isDeleteExposed($entityType) {
+    $exposedMutations = $this->getExposedEntityMutations($entityType);
+    return in_array('delete', $exposedMutations);
   }
 
   /**
@@ -83,7 +146,10 @@ class ContentEntityMutationSchemaConfig {
    * @return bool
    *   Boolean value indicating if any bundle exposes create or update.
    */
-  public function exposeAnyCreateOrUpdate($entityType) {
+  public function isFieldMutationExposed($entityType) {
+    // @todo
+    return TRUE;
+    /*
     $bundles = NestedArray::getValue($this->types, [
       $entityType, 'bundles',
     ]);
@@ -97,6 +163,7 @@ class ContentEntityMutationSchemaConfig {
     }
 
     return FALSE;
+    */
   }
 
 }

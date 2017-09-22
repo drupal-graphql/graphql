@@ -38,7 +38,7 @@ class ContentEntitySchemaConfig {
    *   The name of the configuration object storing the information about expose.
    *
    */
-  private function getConfigName($entityType, $bundle = '') {
+  protected function getConfigName($entityType, $bundle = '') {
     if (empty($bundle)) {
       return 'graphql.exposed_entity.' . $entityType;
     }
@@ -57,7 +57,7 @@ class ContentEntitySchemaConfig {
    *   The configuration object.
    *
    */
-  private function getConfig($entityType, $bundle = '') {
+  protected function getConfig($entityType, $bundle = '') {
     $config_name = $this->getConfigName($entityType, $bundle);
     return $this->configFactory->get($config_name);
   }
@@ -74,7 +74,7 @@ class ContentEntitySchemaConfig {
    *   The configuration object.
    *
    */
-  private function getEditableConfig($entityType, $bundle = '') {
+  protected function getEditableConfig($entityType, $bundle = '') {
     $config_name = $this->getConfigName($entityType, $bundle);
     return $this->configFactory->getEditable($config_name);
   }
@@ -84,13 +84,17 @@ class ContentEntitySchemaConfig {
    *
    * @param string $entityType
    *   The entity type id.
-   * @param bool $exposed
-   *   Boolean value indicating if the entity should be exposed or hidden.
+   * @param array $options
+   *   An associative array of configuration options. It may contain the following elements.
+   *   - 'exposed': Boolean value indicating if the entity should be exposed or hidden.
+   *   - 'mutations': The list of allowed mutations.
    */
-  private function configureExposedEntity($entityType, bool $exposed) {
-    $this->getEditableConfig($entityType)
-      ->set('exposed', $exposed)
-      ->save();
+  protected function configureExposedEntity($entityType, array $options) {
+    $config = $this->getEditableConfig($entityType);
+    foreach ($options as $key => $value) {
+      $config->set($key, $value);
+    }
+    $config->save();
   }
 
   /**
@@ -100,21 +104,24 @@ class ContentEntitySchemaConfig {
    *   The entity type id.
    * @param string $bundle
    *   The bundle machine name.
-   * @param bool $exposed
-   *   Boolean value indicating if the bundle should be exposed or hidden.
-   * @param string $view_mode
-   *   The view_mode machine name. (together with entity type, like "node.graphql")
-   *   Use '__none__' in case the fields should not be exposed.
+   * @param array $options
+   *   An associative array of configuration options. It may contain the following elements.
+   *   - 'exposed': Boolean value indicating if the bundle should be exposed or hidden.
+   *   - '$view_mode': The view_mode machine name. (together with entity type, like "node.graphql")
+   *      Use '__none__' in case the fields should not be exposed.
+   *   - 'mutations': The list of allowed mutations.
    */
-  private function configureExposedEntityBundle($entityType, $bundle, bool $exposed, $view_mode = '__none__') {
+  protected function configureExposedEntityBundle($entityType, $bundle, array $options) {
     // Expose entity if not yet exposed.
+    $exposed = !empty($options['exposed']);
     if ($exposed && !$this->isEntityTypeExposed($entityType)) {
       $this->exposeEntity($entityType);
     }
-    $this->getEditableConfig($entityType, $bundle)
-      ->set('exposed', $exposed)
-      ->set('view_mode', $view_mode)
-      ->save();
+    $config = $this->getEditableConfig($entityType, $bundle);
+    foreach ($options as $key => $value) {
+      $config->set($key, $value);
+    }
+    $config->save();
   }
 
   /**
@@ -124,7 +131,7 @@ class ContentEntitySchemaConfig {
    *   The entity type id.
    */
   public function exposeEntity($entityType) {
-    $this->configureExposedEntity($entityType, TRUE);
+    $this->configureExposedEntity($entityType, ['exposed' => TRUE]);
   }
 
   /**
@@ -134,7 +141,7 @@ class ContentEntitySchemaConfig {
    *   The entity type id.
    */
   public function unexposeEntity($entityType) {
-    $this->configureExposedEntity($entityType, FALSE);
+    $this->configureExposedEntity($entityType, ['exposed' => FALSE]);
   }
 
   /**
@@ -149,7 +156,8 @@ class ContentEntitySchemaConfig {
    *   Use '__none__' in case the fields should not be exposed.
    */
   public function exposeEntityBundle($entityType, $bundle, $view_mode = '__none__') {
-    $this->configureExposedEntityBundle($entityType, $bundle, TRUE, $view_mode);
+    $options = ['exposed' => TRUE, 'view_mode' => $view_mode];
+    $this->configureExposedEntityBundle($entityType, $bundle, $options);
   }
 
   /**
@@ -161,7 +169,8 @@ class ContentEntitySchemaConfig {
    *   The bundle machine name.
    */
   public function unexposeEntityBundle($entityType, $bundle) {
-    $this->configureExposedEntityBundle($entityType, $bundle, FALSE, '__none__');
+    $options = ['exposed' => FALSE, 'view_mode' => '__none__'];
+    $this->configureExposedEntityBundle($entityType, $bundle, $options);
   }
 
   /**

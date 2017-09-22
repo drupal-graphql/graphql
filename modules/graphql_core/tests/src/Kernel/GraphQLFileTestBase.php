@@ -41,7 +41,7 @@ abstract class GraphQLFileTestBase extends KernelTestBase {
     $this->installConfig('user');
     $this->installEntitySchema('user');
 
-    // @todo: is this the right way to do it?
+    // TODO: is this the right way to do it?
     $this->schemaConfig = new ContentEntitySchemaConfig(\Drupal::configFactory());
 
     Role::load('anonymous')

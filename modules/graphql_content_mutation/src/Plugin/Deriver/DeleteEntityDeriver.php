@@ -31,7 +31,6 @@ class DeleteEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-	  // @todo: fix config?
       $container->get('graphql_content_mutation.schema_config')
     );
   }
@@ -51,7 +50,7 @@ class DeleteEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $type) {
-      if (!$this->schemaConfig->exposeDelete($entityTypeId)) {
+      if (!$this->schemaConfig->isDeleteExposed($entityTypeId)) {
         continue;
       }
 

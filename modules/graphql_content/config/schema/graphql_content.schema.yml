@@ -7,6 +7,12 @@ graphql.exposed_entity.*:
     exposed:
       type: boolean
       label: 'Expose the entity interface'
+    mutations:
+      type: sequence
+      label: 'Mutations'
+      sequence:
+        type: string
+        label: 'Mutation'
 
 graphql.exposed_bundle.*:
   type: config_object
@@ -18,3 +24,9 @@ graphql.exposed_bundle.*:
     view_mode:
       type: string
       label: 'Expose fields on view mode'
+    mutations:
+      type: sequence
+      label: 'Mutations'
+      sequence:
+        type: string
+        label: 'Mutation'

@@ -40,7 +40,6 @@ class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
     return new static(
       $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager'),
-	  // @todo: fix config?
       $container->get('graphql_content_mutation.schema_config')
     );
   }
@@ -68,7 +67,7 @@ class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        if (!$this->schemaConfig->exposeCreate($entityTypeId, $bundleName)) {
+        if (!$this->schemaConfig->isCreateExposed($entityTypeId, $bundleName)) {
           continue;
         }
 
