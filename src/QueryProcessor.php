@@ -73,7 +73,7 @@ class QueryProcessor {
    * @return \Drupal\graphql\QueryResult
    *   The GraphQL query result.
    */
-  public function processQuery($query, $variables = []) {
+  public function processQuery($query, array $variables = []) {
     $processor = new Processor($this->container, $this->schema, (
       $this->currentUser->hasPermission('bypass graphql field security')
       || $this->parameters['development']
