@@ -7,11 +7,10 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 use Drupal\user\Entity\Role;
 
 /**
@@ -19,9 +18,8 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_xml
  */
-class XMLFileTest extends KernelTestBase {
+class XMLFileTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
-  use GraphQLFileTestTrait;
 
   public static $modules = [
     'system',
@@ -87,27 +85,8 @@ class XMLFileTest extends KernelTestBase {
       ->setComponent('file', ['type' => 'graphql_file'])
       ->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'graphql' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-        'file' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'file' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])
-      ->save();
+    $this->schemaConfig->exposeEntityBundle('node', 'graphql', 'node.graphql');
+    $this->schemaConfig->exposeEntityBundle('file', 'file', '__none__');
   }
 
   /**
