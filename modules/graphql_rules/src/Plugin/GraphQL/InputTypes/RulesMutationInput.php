@@ -9,9 +9,9 @@ use Drupal\graphql_core\GraphQL\InputTypePluginBase;
  *
  * @GraphQLInputType(
  *   id = "rules_action_input",
- *   deriver = "\Drupal\graphql_rules\Plugin\Deriver\RulesActionInputDeriver"
+ *   deriver = "\Drupal\graphql_rules\Plugin\Deriver\RulesMutationInputDeriver"
  * )
  */
-class EntityInput extends InputTypePluginBase {
+class RulesMutationInput extends InputTypePluginBase {
 
 }

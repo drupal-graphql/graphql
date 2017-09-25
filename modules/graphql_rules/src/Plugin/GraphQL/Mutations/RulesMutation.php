@@ -20,28 +20,28 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLMutation(
  *   id = "rules_action",
  *   nullable = false,
- *   deriver = "\Drupal\graphql_rules\Plugin\Deriver\RulesActionDeriver"
+ *   deriver = "\Drupal\graphql_rules\Plugin\Deriver\RulesMutationDeriver"
  * )
  */
-class RulesAction extends MutationPluginBase implements ContainerFactoryPluginInterface {
+class RulesMutation extends MutationPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * Returns a camel case id for the input type associated with given action.
    *
-   * @param \Drupal\rules\Core\RulesActionInterface $action
+   * @param \Drupal\rules\Entity\RulesComponentConfig $rulesComponent
    *   The action plugin.
    *
    * @return string
    *   Camel case id.
    */
-  public static function getInputId($action) {
-    return static::getId($action, 'input');
+  public static function getInputId($rulesComponent) {
+    return static::getId($rulesComponent, 'input');
   }
 
   /**
    * Returns a camel case id for given rules action.
    *
-   * @param \Drupal\rules\Core\RulesActionInterface $action
+   * @param \Drupal\rules\Entity\RulesComponentConfig $rulesComponent
    *   The action plugin.
    * @param string $suffix
    *   Optional suffix for sub-ids.
@@ -49,8 +49,8 @@ class RulesAction extends MutationPluginBase implements ContainerFactoryPluginIn
    * @return string
    *   Camel case id.
    */
-  public static function getId($action, $suffix = '') {
-    return StringHelper::camelCase([$action->getPluginId(), $suffix]);
+  public static function getId($rulesComponent, $suffix = '') {
+    return StringHelper::camelCase([$rulesComponent->id(), $suffix]);
   }
 
   /**

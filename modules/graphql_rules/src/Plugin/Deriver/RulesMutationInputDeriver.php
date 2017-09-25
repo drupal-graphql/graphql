@@ -2,29 +2,29 @@
 
 namespace Drupal\graphql_rules\Plugin\Deriver;
 
-use Drupal\graphql_rules\Plugin\GraphQL\Mutations\RulesAction;
-use Drupal\rules\Core\RulesActionInterface;
+use Drupal\graphql_rules\Plugin\GraphQL\Mutations\RulesMutation;
+use Drupal\rules\Entity\RulesComponentConfig;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Derive fields from configured views.
  */
-class RulesActionInputDeriver extends RulesActionDeriverBase {
+class RulesMutationInputDeriver extends RulesMutationDeriverBase {
 
   /**
    * Returns plugin definition based on given action.
    *
-   * @param \Drupal\rules\Core\RulesActionInterface $action
-   *   The action plugin.
+   * @param \Drupal\rules\Entity\RulesComponentConfig $rulesComponent
+   *   The rules component.
    * @param array $basePluginDefinition
    *   Base definition.
    *
    * @return array
    */
-  protected function getDefinition(RulesActionInterface $action, $basePluginDefinition) {
+  protected function getDefinition(RulesComponentConfig $rulesComponent, $basePluginDefinition) {
     $inputFields = [];
 
-    foreach ($action->getContextDefinitions() as $contextName => $contextDefinition) {
+    foreach ($rulesComponent->getContextDefinitions() as $contextName => $contextDefinition) {
       $inputFields[$contextName] = [
         'nullable' => !$contextDefinition->isRequired() && $contextDefinition->isAllowedNull(),
         'multi' => $contextDefinition->isMultiple(),
@@ -32,10 +32,8 @@ class RulesActionInputDeriver extends RulesActionDeriverBase {
       ];
     }
 
-    // TODO There doesn't seems to be a generic way to get the result of action execution (a return value).
-
-    $this->derivatives[$action->getPluginId()] = [
-      'name' => RulesAction::getInputId($action),
+    $this->derivatives[$rulesComponent->id()] = [
+      'name' => RulesMutation::getInputId($rulesComponent),
       'fields' => $inputFields,
     ] + $basePluginDefinition;
   }
