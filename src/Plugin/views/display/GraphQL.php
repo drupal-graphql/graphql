@@ -105,7 +105,7 @@ class GraphQL extends DisplayPluginBase {
    * Get the user defined query name or the default one.
    *
    * @return string
-   * Query name.
+   *   Query name.
    */
   public function getGraphQLQueryName() {
     return $this->getGraphQLName();
@@ -118,7 +118,7 @@ class GraphQL extends DisplayPluginBase {
    *   Result name.
    */
   public function getGraphQLResultName() {
-    return $this->getGraphQLName('result');
+    return $this->getGraphQLName('result', TRUE);
   }
 
   /**
@@ -128,29 +128,33 @@ class GraphQL extends DisplayPluginBase {
    *   Row name.
    */
   public function getGraphQLRowName() {
-    return $this->getGraphQLName('row');
+    return $this->getGraphQLName('row', TRUE);
   }
 
   /**
    * Returns the id based on user-provided query name or the default one.
    *
-   * @param string $suffix
+   * @param string|null $suffix
    *   Id suffix, eg. row, result.
+   * @param bool $type
+   *   Whether to use camel- or snake case. Uses camel case if TRUE. Defaults to
+   *   FALSE.
    *
-   * @return string
+   * @return string The id.
    *   The id.
    */
-  public function getGraphQLName($suffix = '') {
+  public function getGraphQLName($suffix = NULL, $type = FALSE) {
     $queryName = strip_tags($this->getOption('graphql_query_name'));
+
     if (empty($queryName)) {
       $viewId = $this->view->id();
       $displayId = $this->display['id'];
-      $queryName = StringHelper::camelCase([$viewId, $displayId, 'view', $suffix]);
-    } else {
-      $queryName .= ucfirst($suffix);
+      $parts = [$viewId, $displayId, 'view', $suffix];
+      return $type ? StringHelper::camelCase($parts) : StringHelper::propCase($parts);
     }
 
-    return lcfirst($queryName);
+    $parts = array_filter([$queryName, $suffix]);
+    return $type ? StringHelper::camelCase($parts) : StringHelper::propCase($parts);
   }
 
   /**
