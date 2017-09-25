@@ -6,23 +6,23 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_core\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql_core\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql_core\GraphQL\Traits\PluginTrait;
 use Drupal\graphql_core\GraphQLPluginInterface;
 use Drupal\graphql_core\GraphQLSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Config\Object\InterfaceTypeConfig;
-use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
+use Youshido\GraphQL\Config\Object\UnionTypeConfig;
+use Youshido\GraphQL\Type\Object\AbstractObjectType;
+use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
+use Youshido\GraphQL\Type\Union\AbstractUnionType;
 
 /**
- * Base class for GraphQL interface plugins.
+ * Base class for GraphQL union type plugins.
  */
-abstract class InterfacePluginBase extends AbstractInterfaceType implements GraphQLPluginInterface, CacheableDependencyInterface, ContainerFactoryPluginInterface {
+abstract class UnionTypePluginBase extends AbstractUnionType implements GraphQLPluginInterface, CacheableDependencyInterface, ContainerFactoryPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;
-  use FieldablePluginTrait;
   use DependencySerializationTrait;
 
   /**
@@ -57,10 +57,12 @@ abstract class InterfacePluginBase extends AbstractInterfaceType implements Grap
    * {@inheritdoc}
    */
   public function buildConfig(GraphQLSchemaManagerInterface $schemaManager) {
-    $this->config = new InterfaceTypeConfig([
-      'name' => $this->buildName(),
+    $name = $this->buildName();
+
+    $this->config = new UnionTypeConfig([
+      'name' => $name,
       'description' => $this->buildDescription(),
-      'fields' => $this->buildFields($schemaManager),
+      'types' => $this->buildTypes($name),
     ]);
   }
 
@@ -69,6 +71,25 @@ abstract class InterfacePluginBase extends AbstractInterfaceType implements Grap
    */
   public function build($config) {
     // May be overridden, but not required any more.
+  }
+
+  /**
+   * @param $name
+   *   The name of this plugin.
+   *
+   * @return \Drupal\graphql_core\GraphQL\TypePluginBase[]
+   *   An array of types to add to this union type.
+   */
+  protected function buildTypes($name) {
+    /** @var \Drupal\graphql_core\GraphQL\TypePluginBase[] $types */
+    $types = $this->schemaManager->find(function ($type) use ($name) {
+      return in_array($name, $type['unions']);
+    }, [
+      GRAPHQL_CORE_TYPE_PLUGIN,
+    ]);
+
+    $types = array_merge($this->getPluginDefinition()['types'], $types);
+    return array_unique($types);
   }
 
   /**
@@ -84,14 +105,24 @@ abstract class InterfacePluginBase extends AbstractInterfaceType implements Grap
    *   The type object.
    */
   public function resolveType($object) {
-    $name = $this->getPluginDefinition()['name'];
-    $types = array_filter($this->schemaManager->find(function ($type) use ($name) {
-      return in_array($name, $type['interfaces']);
-    }, [GRAPHQL_CORE_TYPE_PLUGIN]), function (TypePluginBase $type) use ($object) {
-      return $type->applies($object);
-    });
+    /** @var \Drupal\graphql_core\GraphQL\TypePluginBase $type */
+    foreach ($this->getTypes() as $type) {
+      if ($type->applies($object)) {
+        return $type;
+      }
+    }
 
-    return array_shift($types);
+    return NULL;
+  }
+
+  /**
+   * Default implementation of "getTypes".
+   *
+   * @return \Drupal\graphql_core\GraphQL\TypePluginBase[]
+   *   The types contained within this union type.
+   */
+  public function getTypes() {
+    return $this->getConfig()->get('types', []);
   }
 
 }
