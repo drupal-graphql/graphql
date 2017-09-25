@@ -9,6 +9,8 @@ use GuzzleHttp\Psr7\Response;
 
 /**
  * Test json data spanning multiple urls.
+ *
+ * @group graphql_json
  */
 class JsonUrlTest extends GraphQLFileTestBase {
 

@@ -9,6 +9,8 @@ use GuzzleHttp\Psr7\Response;
 
 /**
  * Test json data retrieval.
+ *
+ * @group graphql_json
  */
 class JsonStructureTest extends GraphQLFileTestBase {
 

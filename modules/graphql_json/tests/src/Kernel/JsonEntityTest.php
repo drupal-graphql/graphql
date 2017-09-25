@@ -13,6 +13,8 @@ use GuzzleHttp\Psr7\Response;
 
 /**
  * Test loading entities from json.
+ *
+ * @group graphql_json
  */
 class JsonEntityTest extends GraphQLFileTestBase {
 
