@@ -37,7 +37,7 @@ class ViewRowFieldDeriver extends ViewDeriverBase {
           'id' => $id,
           'name' => $alias,
           'type' => 'String',
-          'types' => $display->getGraphQLRowName(),
+          'types' => [$display->getGraphQLRowName()],
           'view' => $viewId,
           'display' => $displayId,
           'field' => $alias,
