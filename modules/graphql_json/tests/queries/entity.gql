@@ -1,0 +1,13 @@
+query {
+  route(path: "http://graphql.drupal/json") {
+    request {
+      json {
+        ... on JsonObject {
+          node:pathToEntity(type: "node", steps: ["node"]) {
+            uuid:entityUuid
+          }
+        }
+      }
+    }
+  }
+}

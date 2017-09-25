@@ -1,0 +1,38 @@
+query {
+  string:route(path: "http://graphql.drupal/json/string") {
+    request {
+      json {
+        ... on JsonLeaf {
+          value
+        }
+      }
+    }
+  }
+  int:route(path: "http://graphql.drupal/json/int") {
+    request {
+      json {
+        ... on JsonLeaf {
+          value
+        }
+      }
+    }
+  }
+  float:route(path: "http://graphql.drupal/json/float") {
+    request {
+      json {
+        ... on JsonLeaf {
+          value
+        }
+      }
+    }
+  }
+  bool:route(path: "http://graphql.drupal/json/bool") {
+    request {
+      json {
+        ... on JsonLeaf {
+          value
+        }
+      }
+    }
+  }
+}
