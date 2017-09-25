@@ -41,6 +41,7 @@ trait FieldablePluginTrait {
         return $type instanceof FieldInterface;
       });
     }
+
     return [];
   }
 

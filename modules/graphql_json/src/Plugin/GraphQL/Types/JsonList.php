@@ -10,7 +10,7 @@ use Drupal\graphql_core\GraphQL\TypePluginBase;
  * @GraphQLType(
  *   id = "json_list",
  *   name = "JsonList",
- *   interfaces = {"JsonNode"}
+ *   unions = {"JsonNode"}
  * )
  */
 class JsonList extends TypePluginBase {
