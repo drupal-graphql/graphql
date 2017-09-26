@@ -1,0 +1,6 @@
+{#graphql-query
+query($input: String!) {
+  suggestion:echo(input: $input)
+}
+#}
+<em>{{ data.suggestion }}</em>

@@ -1,0 +1,12 @@
+{#graphql-query
+query {
+  my_garage:garage {
+    type
+    ... graphql_vehicle
+  }
+}
+#}
+Garage:
+{% for vehicle in data.my_garage %}
+{{ inject('graphql_vehicle__' ~ (vehicle.type | lower), vehicle) }}
+{% endfor %}
