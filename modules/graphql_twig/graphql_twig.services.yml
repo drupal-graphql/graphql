@@ -1,0 +1,6 @@
+services:
+  graphql_twig.twig.inject:
+    class: Drupal\graphql_twig\InjectTwigExtension
+    arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter']
+    tags:
+      - { name: twig.extension }

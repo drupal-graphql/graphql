@@ -168,7 +168,7 @@ class QueryAssembler {
   /**
    * Parse a single source string.
    */
-  protected function parse($source) {
+  public function parse($source) {
     return (new Parser())->parse($source);
   }
 

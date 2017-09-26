@@ -40,7 +40,7 @@ class QueryAssemblerTest extends UnitTestCase {
    */
   public function testNestedFragment() {
     $assembler = new QueryAssembler();
-    $query = 'query { ... a }';
+    $query = 'query { foo { ... a } }';
 
     $fragment_a = 'fragment a on Foo { ... b }';
     $fragment_b = 'fragment b on Foo { bar }';
@@ -58,14 +58,14 @@ class QueryAssemblerTest extends UnitTestCase {
    */
   public function testFragmentFallback() {
     $assembler = new QueryAssembler();
-    $query = 'query { ... a__b }';
+    $query = 'query { foo { ... a__b } }';
 
     $a = 'fragment a on Foo { bar }';
 
     $assembler->addFragment('a', $a);
 
     $this->assertEquals(implode("\n", [
-      'query { ... a__b }',
+      'query { foo { ... a__b } }',
       "fragment a__b on Foo { ... a }",
       "fragment a on Foo {...a__b, bar }",
     ]), $assembler->assemble($query));
@@ -76,7 +76,7 @@ class QueryAssemblerTest extends UnitTestCase {
    */
   public function testFragmentSuggestion() {
     $assembler = new QueryAssembler();
-    $query = 'query { ... a }';
+    $query = 'query { foo { ... a } }';
 
     $a = 'fragment a on Foo { bar }';
     $a__b = 'fragment a__b on Foo { bar }';
@@ -85,7 +85,7 @@ class QueryAssemblerTest extends UnitTestCase {
     $assembler->addFragment('a__b', $a__b);
 
     $this->assertEquals(implode("\n", [
-      'query { ... a }',
+      'query { foo { ... a } }',
       "fragment a on Foo {...a__b, bar }",
       "fragment a__b on Foo { bar }",
     ]), $assembler->assemble($query));
