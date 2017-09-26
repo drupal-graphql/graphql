@@ -1,0 +1,9 @@
+name: GraphQL Rules
+type: module
+description: 'Adds support for rules.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core
+  - graphql_mutation
+  - rules
