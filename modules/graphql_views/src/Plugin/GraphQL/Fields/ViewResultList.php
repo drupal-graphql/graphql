@@ -23,9 +23,9 @@ class ViewResultList extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ViewExecutable) {
-      foreach ($value->result as $row) {
-        yield $row->_entity;
+    if (isset($value['rows'])) {
+      foreach ($value['rows'] as $row) {
+        yield $row;
       }
     }
   }

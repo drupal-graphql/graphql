@@ -15,14 +15,4 @@ use Drupal\graphql_core\GraphQLSchemaManagerInterface;
  */
 class ViewResultType extends TypePluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function buildFields(GraphQLSchemaManagerInterface $schemaManager) {
-    // Attach the view_count field to all ViewResultType derivatives.
-    return array_merge(parent::buildFields($schemaManager), $schemaManager->find(function($definition) {
-      return $definition['id'] === 'view_count';
-    }, [GRAPHQL_CORE_FIELD_PLUGIN]));
-  }
-
 }

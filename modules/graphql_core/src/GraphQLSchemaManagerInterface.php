@@ -55,6 +55,7 @@ interface GraphQLSchemaManagerInterface {
    *   The matching type with the highest weight.
    */
   public function findByDataType($dataType, array $types = [
+    GRAPHQL_CORE_UNION_TYPE_PLUGIN,
     GRAPHQL_CORE_TYPE_PLUGIN,
     GRAPHQL_CORE_INTERFACE_PLUGIN,
     GRAPHQL_CORE_SCALAR_PLUGIN,

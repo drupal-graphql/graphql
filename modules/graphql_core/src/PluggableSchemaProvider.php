@@ -44,6 +44,7 @@ class PluggableSchemaProvider implements SchemaProviderInterface {
     $schema->getTypesList()->addTypes($this->pluginManager->find(function() {
       return TRUE;
     }, [
+      GRAPHQL_CORE_UNION_TYPE_PLUGIN,
       GRAPHQL_CORE_TYPE_PLUGIN,
       GRAPHQL_CORE_INPUT_TYPE_PLUGIN,
     ]));

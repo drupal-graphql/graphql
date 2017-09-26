@@ -233,6 +233,12 @@ class CacheSubscriber implements EventSubscriberInterface {
     $response->addCacheableDependency($this->metadata);
 
     $metadata = $response->getCacheableMetadata();
+
+    // A max age of 0 is supposed to disable caching entirely.
+    if ($metadata->getCacheMaxAge() === 0) {
+      return;
+    }
+
     $tags = $metadata->getCacheTags();
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 

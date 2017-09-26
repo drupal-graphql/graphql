@@ -10,7 +10,6 @@ env:
   global:
     - DRUPAL_BUILD_DIR=$TRAVIS_BUILD_DIR/../drupal
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
-    - SIMPLETEST_BASE_URL=http://localhost:8888
   matrix:
     - DRUPAL_CORE=8.2.x
     - DRUPAL_CORE=8.3.x
@@ -89,20 +88,14 @@ install:
   - composer --working-dir=$DRUPAL_BUILD_DIR require youshido/graphql:~1.5
 
 script:
-  # Navigate into the drupal build directory.
-  - cd $DRUPAL_BUILD_DIR
-
-  # Start a web server on port 8888, run in the background.
-  - php -S localhost:8888 &
-
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then phpdbg -qrr vendor/bin/phpunit --configuration core/phpunit.xml.dist --coverage-clover modules/graphql/coverage.xml modules/graphql;
+      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist --coverage-clover $TRAVIS_BUILD_DIR/coverage.xml $TRAVIS_BUILD_DIR;
     fi
 
-  # Run the unit tests with standdard php otherwise.
+  # Run the unit tests with standard php otherwise.
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
-      then vendor/bin/phpunit --configuration core/phpunit.xml.dist modules/graphql;
+      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist $TRAVIS_BUILD_DIR;
     fi
 
 after_success:

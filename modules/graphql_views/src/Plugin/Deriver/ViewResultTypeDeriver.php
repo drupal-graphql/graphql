@@ -19,23 +19,17 @@ class ViewResultTypeDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
+      if (!$this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
+
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
       $display = $this->getViewDisplay($view, $displayId);
-
-      if (!$this->isPaged($display)) {
-        // Skip if the display doesn't expose a pager.
-        continue;
-      }
-
-      if (!$this->getEntityTypeByTable($view->get('base_table'))) {
-        // Skip for now, switch to different response type later when
-        // implementing fieldable views display support.
-        continue;
-      }
 
       $id = implode('-', [$viewId, $displayId, 'result']);
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => StringHelper::camelCase([$viewId, $displayId, 'result']),
+        'name' => $display->getGraphQLResultName(),
         'view' => $viewId,
         'display' => $displayId,
       ] + $basePluginDefinition;

@@ -7,6 +7,9 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\graphql\Plugin\views\row\GraphQLEntityRow;
+use Drupal\graphql\Plugin\views\row\GraphQLFieldRow;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\views\Plugin\views\display\DisplayPluginInterface;
 use Drupal\views\ViewEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -135,6 +138,59 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   }
 
   /**
+   * Retrieves the type the view's rows resolve to.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   * @param $displayId
+   *   The id of the current display.
+   *
+   * @return null|string
+   *   The name of the type or NULL if the type could not be derived.
+   */
+  protected function getRowResolveType(ViewEntityInterface $view, $displayId) {
+    /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
+    $display = $this->getViewDisplay($view, $displayId);
+    $rowPlugin = $display->getPlugin('row');
+
+    if ($rowPlugin instanceof GraphQLFieldRow) {
+      return StringHelper::camelCase([$display->getGraphQLRowName()]);
+    }
+
+    if ($rowPlugin instanceof GraphQLEntityRow) {
+      $executable = $view->getExecutable();
+      $executable->setDisplay($displayId);
+
+      if ($entityType = $executable->getBaseEntityType()) {
+        $typeName = $entityType->id();
+        $typeNameCamel = StringHelper::camelCase($typeName);
+        if ($this->interfaceExists($typeNameCamel)) {
+          $filters = $executable->getDisplay()->getOption('filters');
+          $dataTable = $entityType->getDataTable();
+          $bundleKey = $entityType->getKey('bundle');
+
+          foreach ($filters as $filter) {
+            $isBundleFilter = $filter['table'] == $dataTable && $filter['field'] == $bundleKey;
+            $isSingleValued = is_array($filter['value']) && count($filter['value']) == 1;
+            $isExposed = isset($filter['exposed']) && $filter['exposed'];
+            if ($isBundleFilter && $isSingleValued && !$isExposed) {
+              $bundle = reset($filter['value']);
+              $typeName .= "_$bundle";
+              break;
+            }
+          }
+
+          return StringHelper::camelCase($typeName);
+        }
+      }
+
+      return 'Entity';
+    }
+
+    return NULL;
+  }
+
+  /**
    * Check if a certain interface exists.
    *
    * @param string $interface
@@ -167,6 +223,23 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   }
 
   /**
+   * Returns a view style object.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view object.
+   * @param string $displayId
+   *   The display ID to use.
+   *
+   * @return \Drupal\views\Plugin\views\style\StylePluginBase
+   *   The view style object.
+   */
+  protected function getViewStyle(ViewEntityInterface $view, $displayId) {
+    $viewExecutable = $view->getExecutable();
+    $viewExecutable->setDisplay($displayId);
+    return $viewExecutable->getStyle();
+  }
+
+  /**
    * Returns information about view arguments (contextual filters).
    *
    * @param array $viewArguments
@@ -181,14 +254,14 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   protected function getArgumentsInfo(array $viewArguments) {
     $argumentsInfo = [];
 
-    $index = -1;
+    $index = 0;
     foreach ($viewArguments as $argumentId => $argument) {
-      $index++;
       $info = [
         'index' => $index,
         'entity_type' => NULL,
         'bundles' => [],
       ];
+
       if (isset($argument['entity_type']) && isset($argument['entity_field'])) {
         $entityType = $this->entityTypeManager->getDefinition($argument['entity_type']);
         if ($entityType) {
@@ -205,10 +278,11 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
           }
         }
       }
+
       $argumentsInfo[$argumentId] = $info;
+      $index++;
     }
 
     return $argumentsInfo;
   }
-
 }

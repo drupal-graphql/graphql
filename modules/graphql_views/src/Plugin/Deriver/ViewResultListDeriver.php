@@ -19,32 +19,23 @@ class ViewResultListDeriver extends ViewDeriverBase {
     foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
       /** @var \Drupal\views\ViewEntityInterface $view */
       $view = $viewStorage->load($viewId);
+      if (!$type = $this->getRowResolveType($view, $displayId)) {
+        continue;
+      }
+
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
       $display = $this->getViewDisplay($view, $displayId);
 
-      if (!$this->isPaged($display)) {
-        // Skip if the display doesn't expose a pager.
-        continue;
-      }
-
-      if (!$type = $this->getEntityTypeByTable($view->get('base_table'))) {
-        // Skip for now, switch to different response type later when
-        // implementing fieldable views display support.
-        continue;
-      }
-
       $id = implode('-', [$viewId, $displayId, 'result', 'list']);
-      $typeName = StringHelper::camelCase($type);
-      if (!$this->interfaceExists($typeName)) {
-        $typeName = 'Entity';
-      }
-
+      $style = $this->getViewStyle($view, $displayId);
       $this->derivatives[$id] = [
         'id' => $id,
-        'type' => $typeName,
-        'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
+        'type' => $type,
+        'types' => [$display->getGraphQLResultName()],
         'multi' => TRUE,
         'view' => $viewId,
         'display' => $displayId,
+        'uses_fields' => $style->usesFields(),
         'cache_tags' => $view->getCacheTags(),
         'cache_contexts' => $view->getCacheContexts(),
         'cache_max_age' => $view->getCacheMaxAge(),

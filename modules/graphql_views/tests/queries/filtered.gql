@@ -1,15 +1,21 @@
 {
 
   default:graphqlTestFilteredView (filter: {title: "A"}) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
   multi:graphqlTestFilteredView (filter: {field_tags: ["1", "2"]}) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
   complex:graphqlTestFilteredView(filter: {node_type:{test:"test"}}) {
-    entityLabel
+    results {
+      entityLabel
+    }
   }
 
 }

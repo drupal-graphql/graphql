@@ -43,6 +43,7 @@ class ContextualViewsTest extends ViewsTestBase {
     $this->executeQueryFile('contextual.gql', [
       'test2NodeId' => $test2Node->id(),
     ]);
+
     $this->assertEquals(drupal_static('graphql_views_test:view:args'), [
       'graphql_test:contextual_title_arg' => [
         0 => [NULL],
