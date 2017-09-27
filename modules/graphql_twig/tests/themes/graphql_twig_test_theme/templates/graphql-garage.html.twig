@@ -8,5 +8,5 @@ query {
 #}
 Garage:
 {% for vehicle in data.my_garage %}
-{{ inject('graphql_vehicle__' ~ (vehicle.type | lower), vehicle) }}
+{{ embed(['graphql_vehicle', vehicle.type | lower], vehicle) }}
 {% endfor %}
