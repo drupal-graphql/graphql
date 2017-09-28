@@ -127,3 +127,16 @@ services:
       - '@graphql_core.schema_manager'
     tags:
       - { name: graphql_schema_provider }
+  graphql_core.type_mapper:
+      class: Drupal\graphql_core\TypeMapper
+      arguments: ['%graphql_core.type_map%']
+
+parameters:
+  graphql_core.type_map:
+    Int:
+      - integer
+      - boolean
+      - timestamp
+    Float:
+      - float
+    # All other types are considered strings.

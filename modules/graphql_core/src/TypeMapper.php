@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content;
+namespace Drupal\graphql_core;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
