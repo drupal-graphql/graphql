@@ -1,5 +1,7 @@
 name: GraphQL Twig test
 type: theme
+base theme: false
+engine: twigql
 description: 'Test theme for GraphQL Twig integration'
 package: GraphQL
 version: VERSION

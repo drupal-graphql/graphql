@@ -1,12 +1,12 @@
 {#graphql-query
 query {
-  my_garage:garage {
+  garage {
     type
     ... graphql_vehicle
   }
 }
 #}
 Garage:
-{% for vehicle in data.my_garage %}
+{% for vehicle in data.garage %}
 {{ embed(['graphql_vehicle', vehicle.type | lower], vehicle) }}
 {% endfor %}

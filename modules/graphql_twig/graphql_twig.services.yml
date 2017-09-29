@@ -1,6 +1,11 @@
 services:
-  graphql_twig.twig.inject:
+  graphql_twig.twig.embed:
     class: Drupal\graphql_twig\GraphQLTwigExtension
-    arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter']
+    arguments: ['@renderer']
     tags:
       - { name: twig.extension }
+  graphql_twig.query_registry:
+    class: Drupal\graphql_twig\QueryRegistry
+    arguments:
+    - '@theme.manager'
+    - '@graphql.query_processor'

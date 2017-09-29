@@ -128,26 +128,31 @@ class QueryAssembler {
     }
 
     if (!array_key_exists($name, $this->processedFragments)) {
-      /** @var Fragment $parsed */
+      /** @var Fragment[] $parsed */
       $parsed = array_filter((new Parser())->parse($this->fragments[$name])['fragments'], function (Fragment $fragment) use ($name) {
         return $fragment->getName() == $name;
-      })[0];
-      $model = $parsed->getModel();
-
-      $regex = "/fragment\s+$name\s+on\s+$model\s+{/";
-
-      $subs = array_filter(array_keys($this->fragments), function ($key) use ($name) {
-        $prefix = $name . '__';
-        $length = strlen($prefix);
-        return (substr($key, 0, $length) == $prefix) && !strpos(substr($key, $length), '__');
       });
+      if ($parsed) {
+        $model = $parsed[0]->getModel();
 
-      $subs = implode('', array_map(function ($sub) {
-        return "...$sub,";
-      }, $subs));
+        $regex = "/fragment\s+$name\s+on\s+$model\s+{/";
 
-      $replacement = 'fragment ' . $name . ' on ' . $model . ' {' . $subs;
-      $this->processedFragments[$name] = preg_replace($regex, $replacement, $this->fragments[$name]);
+        $subs = array_filter(array_keys($this->fragments), function ($key) use ($name) {
+          $prefix = $name . '__';
+          $length = strlen($prefix);
+          return (substr($key, 0, $length) == $prefix) && !strpos(substr($key, $length), '__');
+        });
+
+        $subs = implode('', array_map(function ($sub) {
+          return "...$sub,";
+        }, $subs));
+
+        $replacement = 'fragment ' . $name . ' on ' . $model . ' {' . $subs;
+        $this->processedFragments[$name] = preg_replace($regex, $replacement, $this->fragments[$name]);
+      }
+      else {
+        \Drupal::logger('graphql')->critical('Unknown GraphQL fragment %s.', [$name]);
+      }
     }
 
     return $this->processedFragments[$name];
@@ -158,11 +163,16 @@ class QueryAssembler {
    *
    * @param string $name
    *   The fragment name. Corresponding to the template name.
-   * @param string $fragment
+   * @param string $string
    *   The fragment string.
    */
-  public function addFragment($name, $fragment) {
-    $this->fragments[$name] = $fragment;
+  public function addFragment($name, $string) {
+    // TODO: properly handle multiple fragments.
+    $source = $this->parse($string);
+    foreach ($source['fragments'] as $fragment) {
+      /** @var \Youshido\GraphQL\Parser\Ast\Fragment $fragment */
+      $this->fragments[$fragment->getName()] = $string;
+    }
   }
 
   /**

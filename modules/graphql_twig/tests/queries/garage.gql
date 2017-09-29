@@ -1,0 +1,15 @@
+query {
+  garage {
+    type
+    ... graphql_vehicle
+  }
+}
+fragment graphql_vehicle on Vehicle {...graphql_vehicle__bike,
+  type
+  wheels
+}
+fragment graphql_vehicle__bike on Bike {
+  type
+  wheels
+  gears
+}

@@ -3,9 +3,21 @@
 namespace Drupal\graphql_twig;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Template\TwigExtension;
+use Drupal\Core\Render\RendererInterface;
 
-class GraphQLTwigExtension extends TwigExtension {
+class GraphQLTwigExtension extends \Twig_Extension {
+
+  /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  public function __construct(RendererInterface $renderer) {
+    $this->renderer = $renderer;
+  }
+
 
   public function getFunctions() {
     return [
@@ -18,7 +30,7 @@ class GraphQLTwigExtension extends TwigExtension {
     foreach ($data as $key => $value) {
       $arg['#' . $key] = $value instanceof EntityInterface ? $value->id() : (string) $value;
     }
-    return $this->renderVar($arg);
+    return $this->renderer->render($arg);
   }
 
 }
