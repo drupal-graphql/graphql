@@ -8,6 +8,13 @@ use Drupal\Core\Render\RendererInterface;
 class GraphQLTwigExtension extends \Twig_Extension {
 
   /**
+   * {@inheritdoc}
+   */
+  public function getName() {
+    return get_class($this);
+  }
+
+  /**
    * The renderer.
    *
    * @var \Drupal\Core\Render\RendererInterface
