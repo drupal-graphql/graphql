@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_twig;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -37,14 +38,27 @@ class QueryRegistry {
   protected $registry;
 
   /**
+   * The query registry cache.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $registryCache;
+
+  /**
    * QueryRegistry constructor.
    *
    * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
    */
-  public function __construct(ThemeManagerInterface $themeManager, QueryProcessor $processor) {
+  public function __construct(
+    ThemeManagerInterface $themeManager,
+    QueryProcessor $processor,
+    CacheBackendInterface $registryCache,
+    array $twigConfig
+  ) {
     $this->themeManager = $themeManager;
     $this->processor = $processor;
-    // TODO: load registry from cache.
+    $this->registryCache = $registryCache;
+    $this->enableCache = $twigConfig['cache'];
   }
 
   /**
@@ -73,7 +87,6 @@ class QueryRegistry {
       return $var instanceof EntityInterface ? $var->id() : $var;
     }, $vars);
 
-    // TODO: execute in render context.
     return $this->processor->processQuery($reg['query'], $vars)->getData();
   }
 
@@ -111,8 +124,11 @@ class QueryRegistry {
    *   The themes query registry.
    */
   protected function build(ActiveTheme $activeTheme) {
+    if ($this->enableCache && $data = $this->registryCache->get($activeTheme->getName())) {
+      return $data;
+    }
+
     $registry = [];
-    $fragments = [];
 
     $assembler = new QueryAssembler();
 
@@ -148,6 +164,7 @@ class QueryRegistry {
       $registry[$file]['query'] = $assembler->assemble($query['query']);
     }
 
+    $this->registryCache->set($activeTheme->getName(), $registry);
     return $registry;
   }
 
