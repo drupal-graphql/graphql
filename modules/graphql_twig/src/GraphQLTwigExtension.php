@@ -34,8 +34,10 @@ class GraphQLTwigExtension extends \Twig_Extension {
 
   public function embed($component, $data) {
     $arg = ['#theme' => is_array($component) ? implode('__', $component) : $component];
-    foreach ($data as $key => $value) {
-      $arg['#' . $key] = $value instanceof EntityInterface ? $value->id() : (string) $value;
+    if ($data) {
+      foreach ($data as $key => $value) {
+        $arg['#' . $key] = $value instanceof EntityInterface ? $value->id() : (string) $value;
+      }
     }
     return $this->renderer->render($arg);
   }

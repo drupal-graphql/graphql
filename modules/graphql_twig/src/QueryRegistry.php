@@ -58,7 +58,7 @@ class QueryRegistry {
     $this->themeManager = $themeManager;
     $this->processor = $processor;
     $this->registryCache = $registryCache;
-    $this->enableCache = $twigConfig['cache'];
+    $this->enableCache = isset($twigConfig['cache']) && $twigConfig['cache'];
   }
 
   /**
@@ -79,9 +79,12 @@ class QueryRegistry {
       return NULL;
     }
 
-    $vars = array_filter($variables, function ($key) use ($reg) {
-      return in_array($key, $reg['variables']);
-    }, ARRAY_FILTER_USE_KEY);
+    $vars = [];
+    foreach ($variables as $key => $value) {
+      if (in_array($key, $reg['variables'])) {
+        $vars[$key] = $value;
+      }
+    }
 
     $vars = array_map(function ($var) {
       return $var instanceof EntityInterface ? $var->id() : $var;
