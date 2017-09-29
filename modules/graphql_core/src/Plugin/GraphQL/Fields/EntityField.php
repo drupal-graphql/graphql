@@ -14,7 +14,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_field",
  *   secure = true,
  *   nullable = true,
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriver"
+ *   weight = -2,
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriver",
  * )
  */
 class EntityField extends FieldPluginBase {

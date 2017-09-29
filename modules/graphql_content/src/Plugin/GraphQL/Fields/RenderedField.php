@@ -21,7 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   type = "String",
  *   nullable = true,
- *   weight = 1,
+ *   weight = -1,
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\DisplayedFieldDeriver"
  * )
  */
