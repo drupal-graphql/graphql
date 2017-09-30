@@ -105,7 +105,8 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
     $bundleInfo = \Drupal::service('entity_type.bundle.info');
 
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
-      if (!$entityType instanceof FieldableEntityInterface) {
+      $interfaces = class_implements($entityType->getClass());
+      if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
         continue;
       }
 
