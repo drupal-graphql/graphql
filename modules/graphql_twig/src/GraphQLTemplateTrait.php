@@ -17,7 +17,7 @@ trait GraphQLTemplateTrait {
   }
 
   public function render(array $variables) {
-    if ($query = ($this->getGraphQLQuery())) {
+    if ($query = ($this->getGraphQLQuery()) && $this->processor) {
       $vars = [];
       $source = (new \Youshido\GraphQL\Parser\Parser())->parse($query);
 
