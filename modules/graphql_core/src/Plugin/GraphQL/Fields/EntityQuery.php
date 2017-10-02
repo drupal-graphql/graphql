@@ -30,6 +30,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *       "type" = "Int",
  *       "nullable" = true,
  *       "default" = 10
+ *     },
+ *     "sort" = {
+ *       "type" = "EntityQuerySortInput",
+ *       "nullable" = true,
+ *       "multi" = true
  *     }
  *   },
  *   deriver = "\Drupal\graphql_core\Plugin\Deriver\EntityQueryDeriver"
@@ -89,7 +94,12 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
 
     $query = $storage->getQuery();
     $query->range($args['offset'], $args['limit']);
-    $query->sort($type->getKey('id'));
+
+    if (!empty($args['sort'])) {
+      foreach ($args['sort'] as $sortArgs) {
+        $query->sort($sortArgs['field'], $sortArgs['order']);
+      }
+    }
 
     if (array_key_exists('filter', $args) && $args['filter']) {
       /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
