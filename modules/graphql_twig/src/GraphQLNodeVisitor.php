@@ -21,6 +21,10 @@ class GraphQLNodeVisitor extends \Twig_BaseNodeVisitor {
 
     if ($node instanceof \Twig_Node_Module) {
 
+      if (!$node->hasAttribute('source')) {
+        return $node;
+      }
+
       $this->query = '';
       $this->parent = '';
       $this->includes = [];
