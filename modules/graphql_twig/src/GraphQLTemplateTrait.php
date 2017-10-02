@@ -17,21 +17,23 @@ trait GraphQLTemplateTrait {
   }
 
   public function render(array $variables) {
-    if ($query = ($this->getGraphQLQuery()) && $this->processor) {
-      $vars = [];
-      $source = (new \Youshido\GraphQL\Parser\Parser())->parse($query);
+    if ($this->processor) {
+      if ($query = $this->getGraphQLQuery()) {
+        $vars = [];
+        $source = (new \Youshido\GraphQL\Parser\Parser())->parse($query);
 
-      foreach ($source['variables'] as $variable) {
-        /** @var \Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable $variable */
-        $arg = $variable->getName();
-        $vars[$arg] = isset($variables[$arg]) ? $variables[$arg] : NULL;
+        foreach ($source['variables'] as $variable) {
+          /** @var \Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable $variable */
+          $arg = $variable->getName();
+          $vars[$arg] = isset($variables[$arg]) ? $variables[$arg] : NULL;
+        }
+
+        $vars = array_map(function ($value) {
+          return $value instanceof EntityInterface ? $value->id() : $value;
+        }, $vars);
+
+        return parent::render($this->processor->processQuery($query, $vars)->getData());
       }
-
-      $vars = array_map(function ($value) {
-        return $value instanceof EntityInterface ? $value->id() : $value;
-      }, $vars);
-
-      return parent::render($this->processor->processQuery($query, $vars)->getData());
     }
     return parent::render($variables);
   }
