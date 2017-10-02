@@ -4,17 +4,3 @@ services:
     arguments: ['@renderer']
     tags:
       - { name: twig.extension }
-  graphql_twig.query_registry:
-    class: Drupal\graphql_twig\QueryRegistry
-    arguments:
-    - '@theme.manager'
-    - '@graphql.query_processor'
-    - '@cache.graphql_query_registry'
-    - '%twig.config%'
-
-  cache.graphql_query_registry:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory: cache_factory:get
-    arguments: [graphql_schema]

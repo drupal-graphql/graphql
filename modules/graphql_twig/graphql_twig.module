@@ -5,11 +5,12 @@
  * GraphQL Twig hook implementations.
  */
 
-use Drupal\graphql_twig\QueryAssembler;
-use Drupal\graphql_twig\QueryRegistry;
+use Drupal\graphql_twig\GraphQLNodeVisitor;
 
 /**
  * Implements hook_theme().
+ *
+ * Add theme entries for any GraphQL annotated template files.
  */
 function graphql_twig_theme($existing, $type, $theme, $path) {
   $themeRegistry = [];
@@ -40,10 +41,9 @@ function graphql_twig_theme($existing, $type, $theme, $path) {
 
       $content = file_get_contents($file->uri);
 
-      $assembler = new QueryAssembler();
-      preg_match(QueryRegistry::$GRAPHQL_TWIG_QUERY_REGEX, $content, $matches);
+      preg_match(GraphQLNodeVisitor::$GRAPHQL_TWIG_REGEX, $content, $matches);
       if (array_key_exists('query', $matches)) {
-        $source = $assembler->parse($matches['query']);
+        $source = (new \Youshido\GraphQL\Parser\Parser())->parse($matches['query']);
         $themeRegistry[$hook] = [
           'template' => $template,
           'path' => dirname($file->uri),
@@ -51,34 +51,14 @@ function graphql_twig_theme($existing, $type, $theme, $path) {
           'variables' => [],
         ];
 
-        foreach ($source['queries'] as $query) {
-          /** @var \Youshido\GraphQL\Parser\Ast\Query $query */
-          foreach ($query->getArguments() as $argument) {
-            $themeRegistry[$hook]['variables'][$argument->getName()] = null;
-          }
-        }
-      }
-
-      preg_match(QueryRegistry::$GRAPHQL_TWIG_FRAGMENT_REGEX, $content, $matches);
-      if (array_key_exists('fragment', $matches)) {
-        $source = $assembler->parse($matches['fragment']);
-
-        $themeRegistry[$hook] = [
-          'template' => $template,
-          'path' => dirname($file->uri),
-          'theme path' => $path,
-          'variables' => [],
-        ];
-
-        foreach ($source['fragments'] as $fragment) {
-          /** @var \Youshido\GraphQL\Parser\Ast\Fragment $fragment */
-          foreach ($fragment->getFields() as $field) {
-            $themeRegistry[$hook]['variables'][$field->getName()] = null;
-          }
+        foreach ($source['variables'] as $variable) {
+          /** @var \Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable $variable */
+          $themeRegistry[$hook]['variables'][$variable->getName()] = null;
         }
       }
     }
   }
+
   return $themeRegistry;
 }
 

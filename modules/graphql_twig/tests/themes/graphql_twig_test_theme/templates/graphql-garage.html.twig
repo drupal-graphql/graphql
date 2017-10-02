@@ -1,4 +1,4 @@
-{#graphql-query
+{#graphql
 query {
   garage {
     type
@@ -8,5 +8,5 @@ query {
 #}
 Garage:
 {% for vehicle in data.garage %}
-{{ embed(['graphql_vehicle', vehicle.type | lower], vehicle) }}
+  {% include 'graphql-vehicle.html.twig' with vehicle %}
 {% endfor %}

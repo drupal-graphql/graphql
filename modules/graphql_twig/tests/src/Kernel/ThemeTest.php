@@ -103,29 +103,4 @@ class ThemeTest extends KernelTestBase {
     $this->assertContains('<strong>' . $testString . '</strong>', $result);
   }
 
-  /**
-   * Test if a template suggestion is rendered with it's own query.
-   */
-  public function testTemplateSuggestion() {
-    $testString = 'This is a test.';
-    $this->processor
-      ->processQuery($this->getQuery('echo_suggestion.gql'), [
-        'input' => $testString,
-      ])
-      ->willReturn(new QueryResult([
-        'data' => [
-          'suggestion' => $testString,
-        ]
-      ], new CacheableMetadata()))
-      ->shouldBeCalled();
-
-    $element = [
-      '#theme' => 'graphql_echo__suggestion',
-      '#input' => 'This is a test.',
-    ];
-
-    $result = $this->render($element);
-    $this->assertContains('<em>' . $testString . '</em>', $result);
-  }
-
 }
