@@ -1,6 +1,5 @@
 services:
   graphql_twig.twig.embed:
     class: Drupal\graphql_twig\GraphQLTwigExtension
-    arguments: ['@renderer']
     tags:
       - { name: twig.extension }

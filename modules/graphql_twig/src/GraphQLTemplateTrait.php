@@ -2,45 +2,35 @@
 
 namespace Drupal\graphql_twig;
 
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\graphql\QueryProcessor;
-
+/**
+ * Trait that will be attached to all GraphQL enabled Twig templates.
+ */
 trait GraphQLTemplateTrait {
 
   /**
-   * @var QueryProcessor
+   * {@inheritdoc}
+   *
+   * Override of the original template render. If the context contains as
+   * `graphql_result` key, this will be passed into the template instead of
+   * the whole context.
    */
-  protected $processor;
-
-  public function setGraphQLProcessor(QueryProcessor $processor) {
-    $this->processor = $processor;
-  }
-
   public function render(array $variables) {
-    if ($this->processor) {
-      if ($query = $this->getGraphQLQuery()) {
-        $vars = [];
-        $source = (new \Youshido\GraphQL\Parser\Parser())->parse($query);
-
-        foreach ($source['variables'] as $variable) {
-          /** @var \Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable $variable */
-          $arg = $variable->getName();
-          $vars[$arg] = isset($variables[$arg]) ? $variables[$arg] : NULL;
-        }
-
-        $vars = array_map(function ($value) {
-          return $value instanceof EntityInterface ? $value->id() : $value;
-        }, $vars);
-
-        return parent::render($this->processor->processQuery($query, $vars)->getData());
-      }
+    if (array_key_exists('graphql_result', $variables)) {
+      return parent::render($variables['graphql_result']);
     }
     return parent::render($variables);
   }
 
+  /**
+   * Recursively build the GraphQL query.
+   *
+   * Builds the templates GraphQL query by iterating through all included or
+   * embedded templates recursively.
+   */
   public function getGraphQLQuery() {
 
-    $query = '';
+    $query = NULL;
+
     if ($this instanceof \Twig_Template) {
       if ($this->graphqlParent) {
         $query = $this->loadTemplate($this->graphqlParent)->getGraphQLQuery();
@@ -57,9 +47,16 @@ trait GraphQLTemplateTrait {
     if ($query) {
       array_unshift($includes, $query);
     }
+
     return implode("\n", $includes);
   }
 
+  /**
+   * Retrieve a list of all direct or indirect included templates.
+   *
+   * @return string[]
+   *   The list of included templates.
+   */
   public function getGraphQLIncludes() {
     $includes = $this->graphqlIncludes;
     foreach ($this->graphqlIncludes as $include) {

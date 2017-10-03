@@ -4,20 +4,28 @@ namespace Drupal\Tests\graphql_twig\Kernel;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\QueryResult;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;
 use Drupal\user\Entity\User;
 use Prophecy\Argument;
 
 /**
  * Tests that test GraphQL theme integration on module level.
  */
-class EntityRenderTest extends ThemeTest {
+class EntityRenderTest extends KernelTestBase {
+  use GraphQLFileTestTrait;
+  use ThemeTestTrait;
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
+    'system',
+    'graphql',
+    'graphql_twig',
     'datetime',
     'field',
     'text',
@@ -31,6 +39,7 @@ class EntityRenderTest extends ThemeTest {
    */
   protected function setUp() {
     parent::setUp();
+    $this->setupThemeTest();
     $this->installConfig(['system', 'user', 'node']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');

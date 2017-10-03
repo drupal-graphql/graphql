@@ -2,6 +2,9 @@
 
 namespace Drupal\graphql_twig;
 
+/**
+ * Simple Twig extension to integrate GraphQL.
+ */
 class GraphQLTwigExtension extends \Twig_Extension {
 
   /**
@@ -11,9 +14,11 @@ class GraphQLTwigExtension extends \Twig_Extension {
     return get_class($this);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getNodeVisitors() {
     return [new GraphQLNodeVisitor()];
   }
-
 
 }
