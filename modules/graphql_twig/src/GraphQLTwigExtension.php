@@ -14,6 +14,10 @@ class GraphQLTwigExtension extends \Twig_Extension {
     return get_class($this);
   }
 
+  public function getTokenParsers() {
+    return [new GraphQLTokenParser()];
+  }
+
   /**
    * {@inheritdoc}
    */

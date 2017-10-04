@@ -5,10 +5,10 @@
  * GraphQL Twig hook implementations.
  */
 
-use Drupal\graphql_twig\GraphQLNodeVisitor;
 use Youshido\GraphQL\Parser\Parser;
 use Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql_twig\GraphQLTwigEnvironment;
 
 /**
  * Implements hook_theme_registry_alter().
@@ -28,8 +28,13 @@ function graphql_twig_theme_registry_alter(&$theme_registry) {
 
 function graphql_twig_get_query($file) {
   if (file_exists($file)) {
-    preg_match(GraphQLNodeVisitor::$GRAPHQL_TWIG_REGEX, file_get_contents($file), $matches);
 
+    $graphqlFile = str_replace('.html.twig', '.gql', $file);
+    if (file_exists($graphqlFile)) {
+      return file_get_contents($graphqlFile);
+    }
+
+    preg_match(GraphQLTwigEnvironment::$GRAPHQL_ANNOTATION_REGEX, file_get_contents($file), $matches);
     if (array_key_exists('query', $matches)) {
       $source = (new Parser())->parse($matches['query']);
       if ($source['queries']) {

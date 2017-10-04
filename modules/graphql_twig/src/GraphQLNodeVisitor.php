@@ -7,7 +7,6 @@ use Twig_Node;
 
 class GraphQLNodeVisitor extends \Twig_BaseNodeVisitor {
 
-  public static $GRAPHQL_TWIG_REGEX = '/.*\{#graphql\s+(?<query>.*)\s+#\}.*/s';
 
   protected $query = '';
   protected $parent = '';
@@ -20,21 +19,6 @@ class GraphQLNodeVisitor extends \Twig_BaseNodeVisitor {
   protected function doEnterNode(Twig_Node $node, Twig_Environment $env) {
 
     if ($node instanceof \Twig_Node_Module) {
-
-      if (!$node->hasAttribute('source')) {
-        return $node;
-      }
-
-      $this->query = '';
-      $this->parent = '';
-      $this->includes = [];
-
-      $source = $node->getAttribute('source');
-      preg_match(static::$GRAPHQL_TWIG_REGEX, $source, $matches);
-
-      if (array_key_exists('query', $matches)) {
-        $this->query = $matches['query'];
-      }
 
       if ($node->hasNode('parent')) {
         $parent = $node->getNode('parent');
@@ -55,12 +39,19 @@ class GraphQLNodeVisitor extends \Twig_BaseNodeVisitor {
       }
     }
 
+    if ($node instanceof GraphQLFragmentNode) {
+      $this->query .= $node->getFragment();
+    }
+
     return $node;
   }
 
   protected function doLeaveNode(Twig_Node $node, Twig_Environment $env) {
     if ($node instanceof \Twig_Node_Module) {
       $node->setNode('class_end', new GraphQLNode($this->query, $this->parent, $this->includes));
+      $this->query = '';
+      $this->parent = '';
+      $this->includes = [];
     }
     return $node;
   }
