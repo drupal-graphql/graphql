@@ -9,7 +9,7 @@ query ($path: String!, $responsive_style: String!) {
         width
         height
         url
-        responsive(style: $responsive_style)
+        responsive(style_id: $responsive_style)
         thumbnailImage: derivative(style: thumbnail) {
           width
           height

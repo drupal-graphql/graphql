@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql_image\Kernel;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
@@ -125,7 +126,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
     $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
     $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
     $this->assertEquals($a->image->entity->url(), $image['url'], 'Retrieve correct image url.');
-    $this->assertContains();
+    $this->assertNotEmpty(trim($image['responsive']), 'Responsive image returned.');
   }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_image\Plugin\GraphQL\Fields;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
@@ -28,6 +29,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * )
  */
 class ImageResponsive extends FieldPluginBase implements ContainerFactoryPluginInterface {
+  use DependencySerializationTrait;
 
   /**
    * Renderer instance to render fields.
