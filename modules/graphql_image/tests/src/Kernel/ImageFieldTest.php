@@ -2,10 +2,12 @@
 
 namespace Drupal\Tests\graphql_image\Kernel;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
@@ -30,6 +32,8 @@ class ImageFieldTest extends GraphQLFileTestBase {
     'filter',
     'file',
     'image',
+    'breakpoint',
+    'responsive_image',
     'graphql_content',
     'graphql_file',
     'graphql_image',
@@ -92,6 +96,17 @@ class ImageFieldTest extends GraphQLFileTestBase {
         ],
       ])
       ->save();
+
+    $responsiveImgStyle = ResponsiveImageStyle::create(array(
+      'id' => 'style_one',
+      'label' => 'Style One',
+      'breakpoint_group' => 'graphql_image',
+    ));
+    $responsiveImgStyle->addImageStyleMapping('graphql_image.mobile', '1x', array(
+      'image_mapping_type' => 'image_style',
+      'image_mapping' => 'thumbnail',
+    ));
+    $responsiveImgStyle->save();
   }
 
   /**
@@ -113,6 +128,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
     $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
     $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
     $this->assertEquals($a->image->entity->url(), $image['url'], 'Retrieve correct image url.');
+    $this->assertNotEmpty(trim($image['responsive']), 'Responsive image returned.');
   }
 
 }
