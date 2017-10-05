@@ -1,4 +1,4 @@
-query ($path: String!, $responsive_style: String!) {
+query ($path: String!, $responsiveStyle: String!) {
   route:route(path: $path) {
     node:entity {
       image {
@@ -9,7 +9,7 @@ query ($path: String!, $responsive_style: String!) {
         width
         height
         url
-        responsive(style_id: $responsive_style)
+        responsive(styleId: $responsiveStyle)
         thumbnailImage: derivative(style: thumbnail) {
           width
           height

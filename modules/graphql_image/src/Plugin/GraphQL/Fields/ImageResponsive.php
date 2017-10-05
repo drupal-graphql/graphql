@@ -21,7 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   nullable = true,
  *   types = {"Image"},
  *   arguments = {
- *     "style_id" = {
+ *     "styleId" = {
  *       "type" = "String",
  *       "multi" = false,
  *     }
@@ -39,12 +39,16 @@ class ImageResponsive extends FieldPluginBase implements ContainerFactoryPluginI
   protected $renderer;
 
   /**
-   * ImageResponsive constructor.
+   * Constructs an ImageResponsive object.
    *
    * @param array $configuration
+   *   Plugin configuration.
    * @param string $pluginId
+   *   Id of the plugin.
    * @param array $pluginDefinition
+   *   Plugin definition array.
    * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, RendererInterface $renderer) {
     $this->renderer = $renderer;
@@ -70,7 +74,7 @@ class ImageResponsive extends FieldPluginBase implements ContainerFactoryPluginI
     if ($value instanceof ImageItem && $value->entity->access('view')) {
       $variables = [
         '#theme' => 'responsive_image',
-        '#responsive_image_style_id' => $args['style_id'],
+        '#responsive_image_style_id' => $args['styleId'],
         '#uri' => $value->uri,
       ];
 
