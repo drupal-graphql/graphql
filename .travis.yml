@@ -74,7 +74,7 @@ install:
   - git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git $DRUPAL_BUILD_DIR
 
   # Reference the module in the build site.
-  - cp -R $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
+  - ln -s $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
 
   # When running with phpdbg we need to replace all code occurrences that check
   # for 'cli' with 'phpdbg'. Some files might be write protected, hence the
