@@ -73,7 +73,7 @@ class ImageResponsive extends FieldPluginBase implements ContainerFactoryPluginI
       $variables = [
         '#theme' => 'responsive_image',
         '#responsive_image_style_id' => $args['style'],
-        '#uri' => $value->uri,
+        '#uri' => $value->entity->getFileUri(),
       ];
 
       yield $this->renderer->renderRoot($variables);
