@@ -23,6 +23,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   arguments = {
  *     "style" = "ResponsiveImageStyleId"
  *   },
+ *   deriver = "Drupal\graphql_image\Plugin\Deriver\ImageResponsiveDeriver"
  * )
  */
 class ImageResponsive extends FieldPluginBase implements ContainerFactoryPluginInterface {
