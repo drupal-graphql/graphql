@@ -21,10 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   nullable = true,
  *   types = {"Image"},
  *   arguments = {
- *     "styleId" = {
- *       "type" = "String",
- *       "multi" = false,
- *     }
+ *     "style" = "ResponsiveImageStyleId"
  *   },
  * )
  */
@@ -74,7 +71,7 @@ class ImageResponsive extends FieldPluginBase implements ContainerFactoryPluginI
     if ($value instanceof ImageItem && $value->entity->access('view')) {
       $variables = [
         '#theme' => 'responsive_image',
-        '#responsive_image_style_id' => $args['styleId'],
+        '#responsive_image_style_id' => $args['style'],
         '#uri' => $value->uri,
       ];
 

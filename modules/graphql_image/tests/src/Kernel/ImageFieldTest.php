@@ -32,6 +32,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
     'filter',
     'file',
     'image',
+    'breakpoint',
     'responsive_image',
     'graphql_content',
     'graphql_file',
@@ -105,6 +106,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
       'image_mapping_type' => 'image_style',
       'image_mapping' => 'thumbnail',
     ));
+    $responsiveImgStyle->save();
   }
 
   /**
@@ -120,7 +122,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
 
     $a->save();
 
-    $result = $this->executeQueryFile('image.gql', ['path' => '/node/' . $a->id(), 'responsiveStyle' => 'style_one']);
+    $result = $this->executeQueryFile('image.gql', ['path' => '/node/' . $a->id()]);
     $image = $result['data']['route']['node']['image'];
 
     $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
