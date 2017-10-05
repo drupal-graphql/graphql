@@ -128,7 +128,13 @@ class ImageFieldTest extends GraphQLFileTestBase {
     $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
     $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
     $this->assertEquals($a->image->entity->url(), $image['url'], 'Retrieve correct image url.');
-    $this->assertNotEmpty(trim($image['responsive']), 'Responsive image returned.');
+
+    /**
+     * Responsive image output should contain the name of the file.
+     *
+     * @see \Drupal\image\Plugin\Field\FieldType\ImageItem::generateSampleValue()
+     */
+    $this->assertContains('generateImage', $image['responsive'], 'Proper responsive image returned.');
   }
 
 }
