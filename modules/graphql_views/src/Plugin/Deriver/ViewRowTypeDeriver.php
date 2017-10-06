@@ -29,10 +29,13 @@ class ViewRowTypeDeriver extends ViewDeriverBase {
         continue;
       }
 
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
+      $display = $this->getViewDisplay($view, $displayId);
+
       $id = implode('-', [$viewId, $displayId, 'row']);
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => StringHelper::camelCase([$viewId, $displayId, 'row']),
+        'name' => $display->getGraphQLRowName(),
         'view' => $viewId,
         'display' => $displayId,
       ] + $basePluginDefinition;

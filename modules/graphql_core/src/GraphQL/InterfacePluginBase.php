@@ -90,6 +90,7 @@ abstract class InterfacePluginBase extends AbstractInterfaceType implements Grap
     }, [GRAPHQL_CORE_TYPE_PLUGIN]), function (TypePluginBase $type) use ($object) {
       return $type->applies($object);
     });
+
     return array_shift($types);
   }
 

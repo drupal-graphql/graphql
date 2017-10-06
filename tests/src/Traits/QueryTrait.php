@@ -20,7 +20,7 @@ trait QueryTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function query($query, $variables = []) {
+  protected function query($query, array $variables = []) {
     return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
       'query' => $query,
       'variables' => $variables,
@@ -40,7 +40,7 @@ trait QueryTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function persistedQuery($id, $version, $variables = []) {
+  protected function persistedQuery($id, $version, array $variables = []) {
     return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
       'id' => $id,
       'version' => $version,

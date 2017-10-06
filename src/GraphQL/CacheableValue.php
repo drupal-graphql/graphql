@@ -27,7 +27,7 @@ class CacheableValue extends CacheableMetadata implements ValueWrapperInterface 
    * @param array $dependencies
    *   An array of dependencies, in the order they should be applied.
    */
-  public function __construct($value, $dependencies = []) {
+  public function __construct($value, array $dependencies = []) {
     $this->setValue($value);
     foreach ($dependencies as $dependency) {
       if ($dependency instanceof CacheableDependencyInterface) {

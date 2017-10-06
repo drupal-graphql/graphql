@@ -184,7 +184,7 @@ class GraphQLFieldRow extends RowPluginBase {
    * @return array
    *   A regular one dimensional array of values.
    */
-  protected static function extractFromOptionsArray($key, $options) {
+  protected static function extractFromOptionsArray($key, array $options) {
     return array_map(function($item) use ($key) {
       return isset($item[$key]) ? $item[$key] : NULL;
     }, $options);

@@ -41,7 +41,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
       $this->derivatives[$id] = [
         'id' => $id,
         'name' => $display->getGraphQLQueryName(),
-        'type' => StringHelper::camelCase([$viewId, $displayId, 'result']),
+        'type' => $display->getGraphQLResultName(),
         'types' => $types,
         'multi' => FALSE,
         'arguments' => $arguments,

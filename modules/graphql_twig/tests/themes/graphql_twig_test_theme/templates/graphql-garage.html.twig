@@ -1,0 +1,12 @@
+{#graphql
+query {
+  garage {
+    type
+    ... graphql_vehicle
+  }
+}
+#}
+Garage:
+{% for vehicle in data.garage %}
+  {% include '@graphql_twig_test_theme/graphql-vehicle.html.twig' with vehicle %}
+{% endfor %}
