@@ -5,6 +5,7 @@ namespace Drupal\graphql_image\Plugin\Deriver;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -42,8 +43,17 @@ class ImageResponsiveDeriver extends DeriverBase implements ContainerDeriverInte
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
+    /**
+     * Add the 'responsive' field only if responsive image module is enabled
+     * and there is at least one style defined in the system.
+     *
+     * @see \Drupal\graphql_image\Plugin\GraphQL\Enums\ResponsiveImageStyleId
+     */
     if ($this->moduleHandler->moduleExists('responsive_image')) {
-      $this->derivatives['responsive_image'] = $basePluginDefinition;
+      $imageStyles = ResponsiveImageStyle::loadMultiple();
+      if (!empty($imageStyles)) {
+        $this->derivatives['responsive_image'] = $basePluginDefinition;
+      }
     }
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
