@@ -4,13 +4,10 @@ namespace Drupal\Tests\graphql_twig\Kernel;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\Cache\Context\ContextCacheKeys;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;
-use Prophecy\Argument;
 
 /**
  * Tests that test GraphQL theme integration on module level.
@@ -56,9 +53,37 @@ class ThemeTest extends KernelTestBase {
   }
 
   /**
-   * Test query assembly.
+   * Test query caching.
    */
-  public function testRenderCache() {
+  public function testCacheableQuery() {
+
+    $metadata = new CacheableMetadata();
+
+    $process = $this->processor
+      ->processQuery($this->getQuery('garage.gql'), [])
+      ->willReturn(new QueryResult([], $metadata));
+
+    $element = [
+      '#theme' => 'graphql_garage',
+      '#cache' => [
+        'keys' => ['garage'],
+      ],
+    ];
+
+    $renderer = $this->container->get('renderer');
+    $element_1 = $element;
+    $element_2 = $element;
+
+    $renderer->renderRoot($element_1);
+    $renderer->renderRoot($element_2);
+
+    $process->shouldHaveBeenCalledTimes(1);
+  }
+
+  /**
+   * Test query caching.
+   */
+  public function testUncacheableQuery() {
 
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
@@ -69,12 +94,17 @@ class ThemeTest extends KernelTestBase {
 
     $element = [
       '#theme' => 'graphql_garage',
+      '#cache' => [
+        'keys' => ['garage'],
+      ],
     ];
 
     $renderer = $this->container->get('renderer');
+    $element_1 = $element;
+    $element_2 = $element;
 
-    $renderer->renderRoot($element);
-    $renderer->renderRoot($element);
+    $renderer->renderRoot($element_1);
+    $renderer->renderRoot($element_2);
 
     $process->shouldHaveBeenCalledTimes(2);
   }

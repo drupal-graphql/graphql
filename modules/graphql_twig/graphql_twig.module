@@ -12,6 +12,9 @@ use Drupal\graphql_twig\GraphQLTwigEnvironment;
 
 /**
  * Implements hook_theme_registry_alter().
+ *
+ * Search for GraphQL enhanced templates in the theme registry and append
+ * the GraphQL preprocessor.
  */
 function graphql_twig_theme_registry_alter(&$theme_registry) {
   /** @var \Drupal\Core\Template\TwigEnvironment $twig */
@@ -26,6 +29,18 @@ function graphql_twig_theme_registry_alter(&$theme_registry) {
   }
 }
 
+/**
+ * Get the query string for a given template file.
+ *
+ * Checks for an annotation, a `*.gql` sibling file or returns NULL if nothing
+ * is found.
+ *
+ * @param string $file
+ *   The template file path.
+ *
+ * @return string|null
+ *   The GraphQL query string or NULL.
+ */
 function graphql_twig_get_query($file) {
   if (file_exists($file)) {
 
@@ -46,6 +61,15 @@ function graphql_twig_get_query($file) {
   return NULL;
 }
 
+/**
+ * Get the declared variables in a GraphQL query string.
+ *
+ * @param $query
+ *   The query string.
+ *
+ * @return array
+ *   A list of variable names.
+ */
 function graphql_twig_get_query_variables($query) {
   $source = (new Parser())->parse($query);
   return array_map(function (Variable $var) {
@@ -53,6 +77,12 @@ function graphql_twig_get_query_variables($query) {
   }, $source['variables']);
 }
 
+/**
+ * Implements hook_preprocess().
+ *
+ * Execute the GraphQL query if the theme hook is GraphQL enhanced and add
+ * the query result as well as cache metadata.
+ */
 function graphql_twig_process_query(&$variables, $hook, $info) {
   if (isset($info['graphql_enabled']) && $info['graphql_enabled']) {
     /** @var \Drupal\graphql\QueryProcessor $processor */
@@ -133,8 +163,12 @@ function graphql_twig_theme($existing, $type, $theme, $path) {
 
 /**
  * Implements hook_module_implements_alter().
+ *
+ * Make sure graphql_twig_theme runs last to not accidentially override existing
+ * theme hooks.
  */
 function graphql_twig_module_implements_alter(&$implementations, $hook) {
+
   if ($hook == 'theme') {
     unset($implementations['graphql_twig']);
     $implementations['graphql_twig'] = FALSE;

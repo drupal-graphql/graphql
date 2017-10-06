@@ -24,8 +24,8 @@ trait ThemeTestTrait {
       $currentUser = $this->prophesize(AccountProxy::class);
       $currentUser->isAuthenticated()->willReturn(TRUE);
       $currentUser->hasPermission(Argument::any())->willReturn(TRUE);
-      $currentUser->id()->willReturn(0);
-      $currentUser->getRoles()->willReturn(['anonymous']);
+      $currentUser->id()->willReturn(1);
+      $currentUser->getRoles()->willReturn(['administrator']);
       $this->container->set('current_user', $currentUser->reveal());
 
       // Prepare a mock graphql processor.

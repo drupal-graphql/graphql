@@ -29,26 +29,27 @@ trait GraphQLTemplateTrait {
    */
   public function getGraphQLQuery() {
 
-    $query = NULL;
+    $query = '';
+    $includes = [];
 
     if ($this instanceof \Twig_Template) {
-      if ($this->graphqlParent) {
-        $query = $this->loadTemplate($this->graphqlParent)->getGraphQLQuery();
-      }
+      // If there is no query for this template, try to get one from the
+      // parent template.
       if ($this->graphqlQuery) {
         $query = $this->graphqlQuery;
       }
+      elseif ($this->graphqlParent) {
+        $query = $this->loadTemplate($this->graphqlParent)->getGraphQLQuery();
+      }
+
+      // Recursively collect all included fragments.
+      $includes = array_map(function ($template) {
+        return $this->loadTemplate($template)->getGraphQLQuery();
+      }, $this->getGraphQLIncludes());
     }
 
-    $includes = array_map(function ($template) {
-      return $this->loadTemplate($template)->getGraphQLQuery();
-    }, $this->getGraphQLIncludes());
 
-    if ($query) {
-      array_unshift($includes, $query);
-    }
-
-    return implode("\n", $includes);
+    return implode("\n", [-1 => $query] + $includes);
   }
 
   /**

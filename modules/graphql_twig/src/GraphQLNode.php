@@ -5,7 +5,11 @@ namespace Drupal\graphql_twig;
 use Twig_Compiler;
 
 /**
- * A Twig node wrapping modules and adding graphql metadata to them.
+ * GraphQL meta information Twig node.
+ *
+ * A Twig node that will be attached to templates `class_end` to output the
+ * collected graphql query and inheritance metadata. Not parsed directly but
+ * injected by the `GraphQLNodeVisitor`.
  */
 class GraphQLNode extends \Twig_Node {
 
@@ -33,8 +37,11 @@ class GraphQLNode extends \Twig_Node {
    * GraphQLNode constructor.
    *
    * @param string $query
+   *   The query string.
    * @param string $parent
+   *   The parent template identifier.
    * @param array $includes
+   *   Identifiers for any included/referenced templates.
    */
   public function __construct($query, $parent, $includes) {
     $this->query = $query;

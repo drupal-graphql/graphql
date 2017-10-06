@@ -5,6 +5,11 @@ namespace Drupal\graphql_twig;
 use Twig_Error_Syntax;
 use Twig_Token;
 
+/**
+ * Parse the `graphql` twig tag.
+ *
+ * Parses the `{% graphql %}` twig tag. Only allowed on template root level.
+ */
 class GraphQLTokenParser extends \Twig_TokenParser {
 
   public function parse(Twig_Token $token) {

@@ -2,10 +2,8 @@
 
 namespace Drupal\graphql_twig;
 
-use Twig_Compiler;
-
 /**
- * A Twig node wrapping modules and adding graphql metadata to them.
+ * A Twig node for collecting GraphQL query fragments in twig templates.
  */
 class GraphQLFragmentNode extends \Twig_Node {
 
@@ -19,15 +17,20 @@ class GraphQLFragmentNode extends \Twig_Node {
   /**
    * GraphQLFragmentNode constructor.
    *
-   * @param string $query
-   * @param string $parent
-   * @param array $includes
+   * @param string $fragment
+   *   The query fragment.
    */
   public function __construct($fragment) {
     $this->fragment = $fragment;
     parent::__construct();
   }
 
+  /**
+   * Retrieve the stored query fragment.
+   *
+   * @return string
+   *   The query fragment.
+   */
   public function getFragment() {
     return $this->fragment;
   }
