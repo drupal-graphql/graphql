@@ -26,9 +26,6 @@ function graphql_twig_theme_registry_alter(&$theme_registry) {
       $theme_registry[$hook]['graphql_variables'] = graphql_twig_get_query_variables($query);
       $theme_registry[$hook]['preprocess functions'][] = 'graphql_twig_process_query';
     }
-    else {
-      print "\n===\nNO QUERY: $file\n===\n";
-    }
   }
 }
 
