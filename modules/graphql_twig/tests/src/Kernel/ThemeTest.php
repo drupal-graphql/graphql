@@ -3,18 +3,24 @@
 namespace Drupal\Tests\graphql_twig\Kernel;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Session\AccountProxy;
-use Drupal\graphql\QueryProcessor;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
-use Prophecy\Argument;
+use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;
 
 /**
  * Tests that test GraphQL theme integration on module level.
+ *
  */
 class ThemeTest extends KernelTestBase {
   use GraphQLFileTestTrait;
+  use ThemeTestTrait;
+
+  /**
+   * @var CacheContextsManager
+   */
+  protected $contextManager;
 
   /**
    * {@inheritdoc}
@@ -26,42 +32,17 @@ class ThemeTest extends KernelTestBase {
   ];
 
   /**
-   * A query processor prophecy.
-   * @var \Prophecy\Prophecy\ObjectProphecy
-   */
-  protected $processor;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp() {
-    $this->markTestSkipped('Skip graphql_twig tests for now.');
     parent::setUp();
-
-    // Mock a user that is allowed to do everything.
-    $currentUser = $this->prophesize(AccountProxy::class);
-    $currentUser->isAuthenticated()->willReturn(TRUE);
-    $currentUser->hasPermission(Argument::any())->willReturn(TRUE);
-    $currentUser->id()->willReturn(0);
-    $currentUser->getRoles()->willReturn(['anonymous']);
-    $this->container->set('current_user', $currentUser->reveal());
-
-    // Prepare a mock graphql processor.
-    $this->processor = $this->prophesize(QueryProcessor::class);
-    $this->container->set('graphql.query_processor', $this->processor->reveal());
-
-    $themeName = 'graphql_twig_test_theme';
-
-    /** @var \Drupal\Core\Extension\ThemeHandler $themeHandler */
-    $themeHandler = $this->container->get('theme_handler');
-    /** @var \Drupal\Core\Theme\ThemeInitialization $themeInitialization */
-    $themeInitialization = $this->container->get('theme.initialization');
-    /** @var \Drupal\Core\Theme\ThemeManager $themeManager */
-    $themeManager = $this->container->get('theme.manager');
-
-    $themeHandler->install([$themeName]);
-    $theme = $themeInitialization->initTheme($themeName);
-    $themeManager->setActiveTheme($theme);
+    // Skip these tests in travis for now, since they break there for an unknown
+    // reason.
+    // TODO: re-enable tests on travis
+    if (getenv('TRAVIS')) {
+      $this->markTestSkipped();
+    }
+    $this->setupThemeTest();
   }
 
   /**
@@ -76,6 +57,63 @@ class ThemeTest extends KernelTestBase {
 
     $element = ['#theme' => 'graphql_garage'];
     $this->render($element);
+  }
+
+  /**
+   * Test query caching.
+   */
+  public function testCacheableQuery() {
+
+    $metadata = new CacheableMetadata();
+
+    $process = $this->processor
+      ->processQuery($this->getQuery('garage.gql'), [])
+      ->willReturn(new QueryResult([], $metadata));
+
+    $element = [
+      '#theme' => 'graphql_garage',
+      '#cache' => [
+        'keys' => ['garage'],
+      ],
+    ];
+
+    $renderer = $this->container->get('renderer');
+    $element_1 = $element;
+    $element_2 = $element;
+
+    $renderer->renderRoot($element_1);
+    $renderer->renderRoot($element_2);
+
+    $process->shouldHaveBeenCalledTimes(1);
+  }
+
+  /**
+   * Test query caching.
+   */
+  public function testUncacheableQuery() {
+
+    $metadata = new CacheableMetadata();
+    $metadata->setCacheMaxAge(0);
+
+    $process = $this->processor
+      ->processQuery($this->getQuery('garage.gql'), [])
+      ->willReturn(new QueryResult([], $metadata));
+
+    $element = [
+      '#theme' => 'graphql_garage',
+      '#cache' => [
+        'keys' => ['garage'],
+      ],
+    ];
+
+    $renderer = $this->container->get('renderer');
+    $element_1 = $element;
+    $element_2 = $element;
+
+    $renderer->renderRoot($element_1);
+    $renderer->renderRoot($element_2);
+
+    $process->shouldHaveBeenCalledTimes(2);
   }
 
   /**

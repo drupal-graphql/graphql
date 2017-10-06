@@ -15,19 +15,19 @@ class GraphQLTwigExtensionTest extends UnitTestCase {
   protected $twig;
 
   function setUp() {
-    $this->markTestSkipped();
     $this->twig = new \Twig_Environment(new\Twig_Loader_Array([
-      'simple' => '{#graphql a #}',
+      'query' => '{% graphql %}query ($arg: String!) { foo(id: [1, 2, 3], search: "test") { bar } }{% endgraphql %}',
+      'simple' => '{% graphql %}a{% endgraphql %}',
       'extend' => '{% extends "simple" %}',
       'dynamic_extend' => '{% extends simple %}',
-      'override_extend' => '{#graphql b #}{% extends "simple" %}',
-      'include' => '{#graphql a #}{% include "sub_fragment" with { foo: "bar" } %}',
+      'override_extend' => '{% graphql %}b{% endgraphql %}{% extends "simple" %}',
+      'include' => '{% graphql %}a{% endgraphql %}{% include "sub_fragment" with { foo: "bar" } %}',
       'embed' => '{% embed "embeddable" %}{% block test %} Override {% endblock %}{% endembed %}',
-      'embeddable' => '{#graphql a #}{% block test %} Test {% endblock %}',
-      'nested_include' => '{#graphql a #}{% include "fragment" with { foo: "bar" } %}',
-      'dynamic_include' => '{#graphql a #}{% include sub_fragment with { foo: "bar" } %}',
-      'fragment' => '{#graphql b #}{% include "sub_fragment" %}',
-      'sub_fragment' => '{#graphql c #}',
+      'embeddable' => '{% graphql %}a{% endgraphql %}{% block test %} Test {% endblock %}',
+      'nested_include' => '{% graphql %}a{% endgraphql %}{% include "fragment" with { foo: "bar" } %}',
+      'dynamic_include' => '{% graphql %}a{% endgraphql %}{% include sub_fragment with { foo: "bar" } %}',
+      'fragment' => '{% graphql %}b{% endgraphql %}{% include "sub_fragment" %}',
+      'sub_fragment' => '{% graphql %}c{% endgraphql %}',
     ]));
     $this->twig->addExtension(new GraphQLTwigExtension());
   }
@@ -38,8 +38,8 @@ class GraphQLTwigExtensionTest extends UnitTestCase {
     $this->assertEquals($query, $template->getGraphQLQuery());
   }
 
-  function testSimple() {
-    $this->assertGraphQLQuery('simple', 'a');
+  function testQuery() {
+    $this->assertGraphQLQuery('query', 'query ($arg: String!) { foo(id: [1, 2, 3], search: "test") { bar } }');
   }
 
   function testExtend() {

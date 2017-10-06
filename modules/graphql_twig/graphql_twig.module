@@ -5,7 +5,112 @@
  * GraphQL Twig hook implementations.
  */
 
-use Drupal\graphql_twig\GraphQLNodeVisitor;
+use Youshido\GraphQL\Parser\Parser;
+use Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql_twig\GraphQLTwigEnvironment;
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * Search for GraphQL enhanced templates in the theme registry and append
+ * the GraphQL preprocessor.
+ */
+function graphql_twig_theme_registry_alter(&$theme_registry) {
+  /** @var \Drupal\Core\Template\TwigEnvironment $twig */
+  $twig = Drupal::service('twig');
+  foreach ($theme_registry as $hook => $info) {
+    $file = $info['path'] . '/' . $info['template'] . '.html.twig';
+    if ($query = graphql_twig_get_query($file)) {
+      $theme_registry[$hook]['graphql_enabled'] = TRUE;
+      $theme_registry[$hook]['graphql_variables'] = graphql_twig_get_query_variables($query);
+      $theme_registry[$hook]['preprocess functions'][] = 'graphql_twig_process_query';
+    }
+  }
+}
+
+/**
+ * Get the query string for a given template file.
+ *
+ * Checks for an annotation, a `*.gql` sibling file or returns NULL if nothing
+ * is found.
+ *
+ * @param string $file
+ *   The template file path.
+ *
+ * @return string|null
+ *   The GraphQL query string or NULL.
+ */
+function graphql_twig_get_query($file) {
+  if (file_exists($file)) {
+
+    $graphqlFile = str_replace('.html.twig', '.gql', $file);
+    if (file_exists($graphqlFile)) {
+      return file_get_contents($graphqlFile);
+    }
+
+    preg_match(GraphQLTwigEnvironment::$GRAPHQL_ANNOTATION_REGEX, file_get_contents($file), $matches);
+    if (array_key_exists('query', $matches)) {
+      $source = (new Parser())->parse($matches['query']);
+      if ($source['queries']) {
+        return $matches['query'];
+      }
+    }
+  }
+
+  return NULL;
+}
+
+/**
+ * Get the declared variables in a GraphQL query string.
+ *
+ * @param $query
+ *   The query string.
+ *
+ * @return array
+ *   A list of variable names.
+ */
+function graphql_twig_get_query_variables($query) {
+  $source = (new Parser())->parse($query);
+  return array_map(function (Variable $var) {
+    return $var->getName();
+  }, $source['variables']);
+}
+
+/**
+ * Implements hook_preprocess().
+ *
+ * Execute the GraphQL query if the theme hook is GraphQL enhanced and add
+ * the query result as well as cache metadata.
+ */
+function graphql_twig_process_query(&$variables, $hook, $info) {
+  if (isset($info['graphql_enabled']) && $info['graphql_enabled']) {
+    /** @var \Drupal\graphql\QueryProcessor $processor */
+    $processor = Drupal::service('graphql.query_processor');
+
+    /** @var \Drupal\Core\Template\TwigEnvironment $twig */
+    $twig = Drupal::service('twig');
+
+    $file = $info['path'] . '/' . $info['template'] . '.html.twig';
+
+    $query = $twig->loadTemplate($file)->getGraphQLQuery();
+
+    $arguments = [];
+    foreach ($info['graphql_variables'] as $var) {
+      if (isset($variables[$var])) {
+        $arguments[$var] = $variables[$var] instanceof EntityInterface ? $variables[$var]->id() : $variables[$var];
+      }
+    }
+
+    $queryResult = $processor->processQuery($query, $arguments);
+
+    $variables['graphql_result'] = $queryResult->getData();
+
+    $variables['#cache']['contexts'] = $queryResult->getCacheContexts();
+    $variables['#cache']['tags'] = $queryResult->getCacheTags();
+    $variables['#cache']['max-age'] = $queryResult->getCacheMaxAge();
+  }
+}
 
 /**
  * Implements hook_theme().
@@ -39,21 +144,15 @@ function graphql_twig_theme($existing, $type, $theme, $path) {
         continue;
       }
 
-      $content = file_get_contents($file->uri);
-
-      preg_match(GraphQLNodeVisitor::$GRAPHQL_TWIG_REGEX, $content, $matches);
-      if (array_key_exists('query', $matches)) {
-        $source = (new \Youshido\GraphQL\Parser\Parser())->parse($matches['query']);
+      if ($query = graphql_twig_get_query($file->uri)) {
         $themeRegistry[$hook] = [
           'template' => $template,
           'path' => dirname($file->uri),
           'theme path' => $path,
           'variables' => [],
         ];
-
-        foreach ($source['variables'] as $variable) {
-          /** @var \Youshido\GraphQL\Parser\Ast\ArgumentValue\Variable $variable */
-          $themeRegistry[$hook]['variables'][$variable->getName()] = null;
+        foreach (graphql_twig_get_query_variables($query) as $var) {
+          $themeRegistry[$hook]['variables'][$var] = NULL;
         }
       }
     }
@@ -64,8 +163,12 @@ function graphql_twig_theme($existing, $type, $theme, $path) {
 
 /**
  * Implements hook_module_implements_alter().
+ *
+ * Make sure graphql_twig_theme runs last to not accidentially override existing
+ * theme hooks.
  */
 function graphql_twig_module_implements_alter(&$implementations, $hook) {
+
   if ($hook == 'theme') {
     unset($implementations['graphql_twig']);
     $implementations['graphql_twig'] = FALSE;

@@ -4,14 +4,21 @@ namespace Drupal\graphql_twig;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
-use Symfony\Component\DependencyInjection\Reference;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
+use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 
-class GraphQLTwigServiceProvider implements ServiceModifierInterface {
+/**
+ * Service provider to inject a custom derivation of `TwigEnvironment`.
+ */
+class GraphQLTwigServiceProvider extends ServiceProviderBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function alter(ContainerBuilder $container) {
-    $definition = $container->getDefinition('twig');
-    $definition->setClass('Drupal\graphql_twig\GraphQLTwigEnvironment');
-    $definition->addArgument(new Reference('graphql.query_processor'));
+    // Replace the twig environment with the GraphQL enhanced one.
+    $container->getDefinition('twig')
+      ->setClass(GraphQLTwigEnvironment::class);
   }
 
 }
