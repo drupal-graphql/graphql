@@ -19,19 +19,29 @@ trait GraphQLTemplateTrait {
     $includes = [];
 
     if ($this instanceof \Twig_Template) {
+      /** @var \Twig_Template $parent */
+      $parent = $this->graphqlParent ? $this->loadTemplate($this->graphqlParent) : NULL;
+
       // If there is no query for this template, try to get one from the
       // parent template.
       if ($this->graphqlQuery) {
         $query = $this->graphqlQuery;
       }
-      elseif ($this->graphqlParent) {
-        $query = $this->loadTemplate($this->graphqlParent)->getGraphQLQuery();
+      elseif ($parent) {
+        $query = $parent->getGraphQLQuery();
       }
 
       // Recursively collect all included fragments.
       $includes = array_map(function ($template) {
         return $this->loadTemplate($template)->getGraphQLQuery();
       }, $this->getGraphQLIncludes());
+
+      // Always add includes from parent templates.
+      if ($parent) {
+        $includes += array_map(function ($template) {
+          return $this->loadTemplate($template)->getGraphQLQuery();
+        }, $parent->getGraphQLIncludes());
+      }
     }
 
 
