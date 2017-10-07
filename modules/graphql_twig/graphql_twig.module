@@ -104,7 +104,7 @@ function graphql_twig_process_query(&$variables, $hook, $info) {
 
     $queryResult = $processor->processQuery($query, $arguments);
 
-    $variables['graphql_result'] = $queryResult->getData();
+    $variables['graphql'] = $queryResult->getData();
 
     $variables['#cache']['contexts'] = $queryResult->getCacheContexts();
     $variables['#cache']['tags'] = $queryResult->getCacheTags();

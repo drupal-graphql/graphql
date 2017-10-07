@@ -8,20 +8,6 @@ namespace Drupal\graphql_twig;
 trait GraphQLTemplateTrait {
 
   /**
-   * {@inheritdoc}
-   *
-   * Override of the original template render. If the context contains as
-   * `graphql_result` key, this will be passed into the template instead of
-   * the whole context.
-   */
-  public function render(array $variables) {
-    if (array_key_exists('graphql_result', $variables)) {
-      return parent::render($variables['graphql_result']);
-    }
-    return parent::render($variables);
-  }
-
-  /**
    * Recursively build the GraphQL query.
    *
    * Builds the templates GraphQL query by iterating through all included or
