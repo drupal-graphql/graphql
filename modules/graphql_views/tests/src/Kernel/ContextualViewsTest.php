@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\graphql_views\Kernel;
 
-use Drupal\graphql\GraphQL\TypeCollector;
+use Drupal\graphql\GraphQL\Utility\TypeCollector;
 
 /**
  * Test contextual views support in GraphQL.

@@ -3,8 +3,8 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\GraphQL\TypePluginBase;
 
 /**
  * Plugin for GraphQL types derived from Drupal entity bundles.

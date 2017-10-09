@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_twig\Kernel;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\graphql\QueryResult;
+use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;

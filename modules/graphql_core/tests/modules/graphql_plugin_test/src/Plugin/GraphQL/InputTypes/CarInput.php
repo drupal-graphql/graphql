@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_plugin_test\Plugin\GraphQL\InputTypes;
 
-use Drupal\graphql_core\GraphQL\InputTypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 
 /**
  * Car input type.

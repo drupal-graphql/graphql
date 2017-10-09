@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql_twig\Kernel;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\QueryResult;
+use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;

@@ -4,7 +4,7 @@ namespace Drupal\graphql_cache_test\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_cache_test\Counter;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

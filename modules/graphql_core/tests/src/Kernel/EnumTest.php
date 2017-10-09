@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\graphql_core\Kernel;
 
-use Drupal\graphql\GraphQL\TypeCollector;
+use Drupal\graphql\GraphQL\Utility\TypeCollector;
 use Youshido\GraphQL\Type\Enum\EnumType;
 
 /**

@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_link\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\link\LinkItemInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

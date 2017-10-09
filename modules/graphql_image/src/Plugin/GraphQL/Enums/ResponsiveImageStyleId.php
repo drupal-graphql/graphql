@@ -2,8 +2,8 @@
 
 namespace Drupal\graphql_image\Plugin\GraphQL\Enums;
 
-use Drupal\graphql_core\GraphQL\EnumPluginBase;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 
 /**
@@ -14,7 +14,7 @@ use Drupal\responsive_image\Entity\ResponsiveImageStyle;
  */
 class ResponsiveImageStyleId extends EnumPluginBase {
 
-  public function buildValues(GraphQLSchemaManagerInterface $schemaManager) {
+  public function buildValues(PluggableSchemaManagerInterface $schemaManager) {
     $items = [];
     foreach (ResponsiveImageStyle::loadMultiple() as $responsiveImageStyle) {
       $items[$responsiveImageStyle->id()] = [

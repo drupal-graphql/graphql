@@ -4,9 +4,9 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
-use Drupal\graphql_core\BatchedFieldResolver;
-use Drupal\graphql_core\GraphQL\SubrequestField;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
+use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -22,10 +22,10 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   types = {"Url", "Root"},
  *   nullable = true,
- *   deriver = "\Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\ContextDeriver"
  * )
  */
-class Context extends SubrequestField {
+class Context extends SubrequestFieldBase {
 
   /**
    * The context repository.
@@ -44,8 +44,8 @@ class Context extends SubrequestField {
       $pluginDefinition,
       $container->get('http_kernel'),
       $container->get('request_stack'),
-      $container->get('graphql_core.batched_resolver'),
-      $container->get('graphql_core.context_repository')
+      $container->get('graphql.batched_resolver'),
+      $container->get('graphql.context_repository')
     );
   }
 
@@ -68,11 +68,11 @@ class Context extends SubrequestField {
   /**
    * {@inheritdoc}
    */
-  protected function buildType(GraphQLSchemaManagerInterface $schemaManager) {
+  protected function buildType(PluggableSchemaManagerInterface $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {
-        return $schemaManager->findByDataType($definition['data_type']) ?: $schemaManager->findByName('String', [GRAPHQL_CORE_SCALAR_PLUGIN]);
+        return $schemaManager->findByDataType($definition['data_type']) ?: $schemaManager->findByName('String', [GRAPHQL_SCALAR_PLUGIN]);
       }
     }
 

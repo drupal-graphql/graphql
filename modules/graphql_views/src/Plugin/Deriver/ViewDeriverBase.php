@@ -45,7 +45,7 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('graphql_core.interface_manager')
+      $container->get('plugin.manager.graphql.interface')
     );
   }
 
