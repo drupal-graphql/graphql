@@ -22,7 +22,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_xml
  */
-class JsonFieldTest extends KernelTestBase {
+class JsonFieldTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use GraphQLFileTestTrait;
 
@@ -104,27 +104,8 @@ class JsonFieldTest extends KernelTestBase {
       ->setComponent('file', ['type' => 'graphql_file'])
       ->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'graphql' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-        'file' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'file' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])
-      ->save();
+    $this->schemaConfig->exposeEntityBundle('node', 'graphql', 'node.graphql');
+    $this->schemaConfig->exposeEntityBundle('file', 'file');
   }
 
   /**
