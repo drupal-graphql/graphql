@@ -2,7 +2,7 @@
 namespace Drupal\graphql_json\Plugin\GraphQL\Types;
 
 
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**
  * GraphQL type for json object nodes.

@@ -3,8 +3,7 @@
 namespace Drupal\graphql_voyager\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql\Introspection;
+use Drupal\graphql\GraphQL\Utility\Introspection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -14,14 +13,14 @@ class VoyagerController implements ContainerInjectionInterface {
   /**
    * The introspection service.
    *
-   * @var \Drupal\graphql\Introspection
+   * @var \Drupal\graphql\GraphQL\Utility\Introspection
    */
   protected $introspection;
 
   /**
    * Constructs a VoyagerController object.
    *
-   * @param \Drupal\graphql\Introspection $introspection
+   * @param \Drupal\graphql\GraphQL\Utility\Introspection $introspection
    *   The GraphQL introspection service.
    */
   public function __construct(Introspection $introspection) {

@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Interfaces;
 
-use Drupal\graphql_core\GraphQL\InterfacePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
 
 /**
  * GraphQL interface for Urls.

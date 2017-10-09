@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   field_formatter = "text_default",
  *   type = "String",
- *   deriver = "\Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
+ *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
  * )
  */
 class CapsLockField extends RenderedField {

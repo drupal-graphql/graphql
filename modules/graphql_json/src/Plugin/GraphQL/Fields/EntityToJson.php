@@ -4,8 +4,8 @@ namespace Drupal\graphql_json\Plugin\GraphQL\Fields;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\Annotation\GraphQLField;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Annotation\GraphQLField;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;

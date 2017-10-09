@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class for identifying language for api calls.
  *
+ * TODO: Can we remove this?
+ *
  * @LanguageNegotiation(
  *   id = \Drupal\graphql_core\Plugin\LanguageNegotiation\LanguageNegotiationGraphQL::METHOD_ID,
  *   weight = -10,

@@ -2,8 +2,8 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
 use Drupal\user\EntityOwnerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -22,12 +22,12 @@ class EntityOwner extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function buildType(GraphQLSchemaManagerInterface $schemaManager) {
+  protected function buildType(PluggableSchemaManagerInterface $schemaManager) {
     try {
-      return $schemaManager->findByName('User', [GRAPHQL_CORE_INTERFACE_PLUGIN]);
+      return $schemaManager->findByName('User', [GRAPHQL_INTERFACE_PLUGIN]);
     }
     catch (\Exception $exc) {
-      return $schemaManager->findByName('Entity', [GRAPHQL_CORE_INTERFACE_PLUGIN]);
+      return $schemaManager->findByName('Entity', [GRAPHQL_INTERFACE_PLUGIN]);
     }
   }
 

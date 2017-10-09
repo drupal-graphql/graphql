@@ -4,8 +4,8 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Enums;
 
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQL\EnumPluginBase;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -49,7 +49,7 @@ class AvailableLanguages extends EnumPluginBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function buildValues(GraphQLSchemaManagerInterface $schemaManager) {
+  public function buildValues(PluggableSchemaManagerInterface $schemaManager) {
     $values = [];
 
     foreach ($this->languageManager->getLanguages() as $language) {

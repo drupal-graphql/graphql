@@ -9,7 +9,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_image\Plugin\GraphQL\Types;
 
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 
 /**

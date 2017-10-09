@@ -7,8 +7,8 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\CacheableValue;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -25,7 +25,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   arguments = {
  *     "id" = "String"
  *   },
- *   deriver = "\Drupal\graphql_content\Plugin\Deriver\EntityByIdDeriver"
+ *   deriver = "Drupal\graphql_content\Plugin\Deriver\EntityByIdDeriver"
  * )
  */
 class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterface {

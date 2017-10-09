@@ -12,7 +12,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
-use Drupal\graphql\QueryProcessor;
+use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -55,7 +55,7 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * The query processor.
    *
-   * @var \Drupal\graphql\QueryProcessor
+   * @var \Drupal\graphql\GraphQL\Execution\QueryProcessor
    */
   protected $queryProcessor;
 
@@ -70,7 +70,7 @@ class RequestController implements ContainerInjectionInterface {
    *   The request stack service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\graphql\QueryProcessor $queryProcessor
+   * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $queryProcessor
    *   The query processor.
    */
   public function __construct(
@@ -198,7 +198,7 @@ class RequestController implements ContainerInjectionInterface {
   public function handleRequest(Request $request, $query = '', array $variables = []) {
     $context = new RenderContext();
 
-    /** @var \Drupal\graphql\QueryResult $result */
+    /** @var \Drupal\graphql\GraphQL\Execution\QueryResult $result */
     $result = NULL;
 
     // Evaluating the GraphQL request can potentially invoke rendering. We allow

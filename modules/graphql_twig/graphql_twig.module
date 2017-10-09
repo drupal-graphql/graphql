@@ -85,7 +85,7 @@ function graphql_twig_get_query_variables($query) {
  */
 function graphql_twig_process_query(&$variables, $hook, $info) {
   if (isset($info['graphql_enabled']) && $info['graphql_enabled']) {
-    /** @var \Drupal\graphql\QueryProcessor $processor */
+    /** @var \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor */
     $processor = Drupal::service('graphql.query_processor');
 
     /** @var \Drupal\Core\Template\TwigEnvironment $twig */

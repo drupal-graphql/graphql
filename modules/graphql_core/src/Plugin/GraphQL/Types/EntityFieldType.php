@@ -3,7 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 // TODO Add cache tags.
 

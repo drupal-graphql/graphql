@@ -4,8 +4,8 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\CacheableValue;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\SecureFieldInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Exception\ResolveException;

@@ -4,8 +4,8 @@ namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Breadcrumb\BreadcrumbManager;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\graphql_core\BatchedFieldResolver;
-use Drupal\graphql_core\GraphQL\SubrequestField;
+use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
+use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -25,7 +25,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   types = {"Url"},
  * )
  */
-class Breadcrumbs extends SubrequestField {
+class Breadcrumbs extends SubrequestFieldBase {
 
   /**
    * The breadcrumb manager.
@@ -66,7 +66,7 @@ class Breadcrumbs extends SubrequestField {
       $pluginDefinition,
       $container->get('http_kernel'),
       $container->get('request_stack'),
-      $container->get('graphql_core.batched_resolver'),
+      $container->get('graphql.batched_resolver'),
       $container->get('breadcrumb'),
       $container->get('current_route_match')
     );

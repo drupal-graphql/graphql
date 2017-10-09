@@ -6,6 +6,15 @@
  */
 use Drupal\graphql\Utility\StringHelper;
 
+define('GRAPHQL_SCALAR_PLUGIN', 'scalar');
+define('GRAPHQL_FIELD_PLUGIN', 'field');
+define('GRAPHQL_MUTATION_PLUGIN', 'mutation');
+define('GRAPHQL_INTERFACE_PLUGIN', 'interface');
+define('GRAPHQL_UNION_TYPE_PLUGIN', 'union');
+define('GRAPHQL_INPUT_TYPE_PLUGIN', 'input');
+define('GRAPHQL_TYPE_PLUGIN', 'type');
+define('GRAPHQL_ENUM_PLUGIN', 'enum');
+
 /**
  * Implements hook_help().
  */
@@ -48,4 +57,74 @@ function graphql_camelcase($components) {
  */
 function graphql_propcase($components) {
   return StringHelper::propCase($components);
+}
+
+/**
+ * Implements hook_graphql_interfaces_alter().
+ *
+ * Flatten the interface inheritance tree.
+ */
+function graphql_graphql_interfaces_alter(&$definitions) {
+  $interfaces = array_map(function($definition) use ($definitions) {
+    return graphql_list_interfaces($definitions, $definition);
+  }, $definitions);
+
+  foreach ($interfaces as $index => $list) {
+    $definition['interfaces'] = $list;
+  }
+}
+
+/**
+ * Implements hook_graphql_types_alter().
+ *
+ * Flatten the interface inheritance tree.
+ */
+function graphql_graphql_types_alter(&$definitions) {
+  $interfaceDefinitions = \Drupal::service('plugin.manager.graphql.interface')->getDefinitions();
+
+  $interfaces = array_map(function($definition) use ($interfaceDefinitions) {
+    return graphql_list_interfaces($interfaceDefinitions, $definition);
+  }, $definitions);
+
+  foreach ($interfaces as $index => $list) {
+    $definitions[$index]['interfaces'] = $list;
+  }
+}
+
+/**
+ * Get a flattened list of a plugins interface inheritance tree.
+ *
+ * @param array $definitions
+ *   The list of interface definitions.
+ * @param mixed $definition
+ *   A plugin definition.
+ *
+ * @return string[]
+ *   A list of interface names.
+ */
+function graphql_list_interfaces(array &$definitions, $definition) {
+  $parents = array_filter($definitions, function($parent) use ($definition) {
+    return in_array($parent['name'], $definition['interfaces']);
+  });
+
+  $interfaces = array_reduce(array_map(function($parent) use ($definitions) {
+    return graphql_list_interfaces($definitions, $parent);
+  }, $parents), 'array_merge', $definition['interfaces']);
+
+  return $interfaces;
+}
+
+/**
+ * Alter the subrequest payload and add contextual data.
+ */
+function graphql_graphql_subrequest_alter(&$data, $requirements) {
+  /** @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface $repository */
+  $repository = \Drupal::service('graphql.context_repository');
+  $requiredContexts = array_intersect(array_keys($repository->getAvailableContexts()), $requirements);
+  $runtimeContexts = $repository->getRuntimeContexts($requiredContexts);
+  foreach ($requiredContexts as $contextId) {
+    if (array_key_exists($contextId, $runtimeContexts)) {
+      $data[$contextId] = $runtimeContexts[$contextId]->getContextValue();
+    }
+  }
 }

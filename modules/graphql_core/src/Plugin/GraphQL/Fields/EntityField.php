@@ -3,8 +3,8 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

@@ -8,8 +8,8 @@ use Drupal\Core\Condition\ConditionInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\graphql_core\BatchedFieldResolver;
-use Drupal\graphql_core\GraphQL\SubrequestField;
+use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
+use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -32,7 +32,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   }
  * )
  */
-class BlocksByRegion extends SubrequestField {
+class BlocksByRegion extends SubrequestFieldBase {
   /**
    * The theme manager.
    *
@@ -69,7 +69,7 @@ class BlocksByRegion extends SubrequestField {
       $pluginDefinition,
       $container->get('http_kernel'),
       $container->get('request_stack'),
-      $container->get('graphql_core.batched_resolver'),
+      $container->get('graphql.batched_resolver'),
       $container->get('theme.manager'),
       $container->get('entity_type.manager'),
       $container->get('entity.repository')

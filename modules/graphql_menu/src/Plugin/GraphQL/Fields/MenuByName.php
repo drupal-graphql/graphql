@@ -5,7 +5,7 @@ namespace Drupal\graphql_menu\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;

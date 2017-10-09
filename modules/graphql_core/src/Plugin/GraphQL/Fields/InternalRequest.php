@@ -2,8 +2,8 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\Annotation\GraphQLField;
-use Drupal\graphql_core\GraphQL\SubrequestField;
+use Drupal\graphql\Annotation\GraphQLField;
+use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -18,7 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   types = {"InternalUrl"}
  * )
  */
-class InternalRequest extends SubrequestField {
+class InternalRequest extends SubrequestFieldBase {
 
   /**
    * {@inheritdoc}

@@ -4,9 +4,9 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxy;
+use Drupal\graphql\GraphQL\Execution\QueryProcessor;
+use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
-use Drupal\graphql\QueryProcessor;
-use Drupal\graphql\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\QueryTrait;
 use Prophecy\Argument;

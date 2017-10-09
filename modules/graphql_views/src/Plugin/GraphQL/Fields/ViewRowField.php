@@ -2,14 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
-use Drupal\views\ViewExecutable;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

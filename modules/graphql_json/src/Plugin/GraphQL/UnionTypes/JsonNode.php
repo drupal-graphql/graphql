@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_json\Plugin\GraphQL\UnionTypes;
 
-use Drupal\graphql_core\GraphQL\UnionTypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 
 /**
  * GraphQL interface for JSON objects.
