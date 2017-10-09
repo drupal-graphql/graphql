@@ -1,0 +1,15 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    entity {
+      file {
+        json {
+          path(steps:["test"]) {
+            ... on JsonLeaf {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+}

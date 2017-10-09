@@ -30,4 +30,11 @@ class GraphQLType extends GraphQLAnnotationBase {
    */
   public $interfaces = [];
 
+  /**
+   * The list of union types containing this type.
+   *
+   * @var array
+   */
+  public $unions = [];
+
 }

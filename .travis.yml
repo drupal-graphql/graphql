@@ -10,6 +10,7 @@ env:
   global:
     - DRUPAL_BUILD_DIR=$TRAVIS_BUILD_DIR/../drupal
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
+    - TRAVIS=true
   matrix:
     - DRUPAL_CORE=8.2.x
     - DRUPAL_CORE=8.3.x

@@ -9,6 +9,7 @@ query ($path: String!) {
         width
         height
         url
+        responsive(style: style_one)
         thumbnailImage: derivative(style: thumbnail) {
           width
           height

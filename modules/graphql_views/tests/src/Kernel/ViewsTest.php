@@ -138,7 +138,7 @@ class ViewsTest extends ViewsTestBase {
   /**
    * Test complex filters.
    */
-  public function testComplextFilteredView() {
+  public function testComplexFilteredView() {
     $result = $this->executeQueryFile('filtered.gql');
     $this->assertEquals([
       ['entityLabel' => 'Node A'],
@@ -151,6 +151,14 @@ class ViewsTest extends ViewsTestBase {
       ['entityLabel' => 'Node B'],
       ['entityLabel' => 'Node C'],
     ], $result['data']['complex']['results'], 'Filtering works as expected.');
+  }
+
+  /**
+   * Test the result type for views with (and without) a single-value bundle filter.
+   */
+  public function testSingleValueBundleFilterView() {
+    $result = $this->executeQueryFile('single_bundle_filter.gql');
+    $this->assertEquals('NodeTest', $result['data']['withSingleBundleFilter']['results'][0]['__typename'], 'View result types work as expected.');
   }
 
 }

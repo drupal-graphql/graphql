@@ -23,12 +23,15 @@ class ViewResultListDeriver extends ViewDeriverBase {
         continue;
       }
 
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
+      $display = $this->getViewDisplay($view, $displayId);
+
       $id = implode('-', [$viewId, $displayId, 'result', 'list']);
       $style = $this->getViewStyle($view, $displayId);
       $this->derivatives[$id] = [
         'id' => $id,
         'type' => $type,
-        'types' => [StringHelper::camelCase([$viewId, $displayId, 'result'])],
+        'types' => [$display->getGraphQLResultName()],
         'multi' => TRUE,
         'view' => $viewId,
         'display' => $displayId,

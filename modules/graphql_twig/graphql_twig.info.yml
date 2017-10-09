@@ -1,0 +1,7 @@
+name: GraphQL Twig
+type: module
+description: 'Render twig templates with graphql data.'
+package: GraphQL
+core: 8.x
+dependencies:
+  - graphql_core

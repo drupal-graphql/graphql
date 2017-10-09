@@ -2,6 +2,19 @@ services:
   logger.channel.graphql_core:
     parent: logger.channel_base
     arguments: ['graphql_core']
+  graphql_core.union_type_manager:
+    class: Drupal\graphql_core\GraphQLPluginManager
+    tags:
+      - { name: graphql_plugin_manager }
+    arguments:
+      - 'Plugin/GraphQL/UnionTypes'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '\Drupal\graphql_core\GraphQL\UnionTypePluginBase'
+      - '\Drupal\graphql_core\Annotation\GraphQLUnionType'
+      - '@graphql_core.schema_manager'
+      - 'graphql_union_types'
+      - '@logger.channel.graphql_core'
   graphql_core.interface_manager:
     class: Drupal\graphql_core\GraphQLPluginManager
     tags:
