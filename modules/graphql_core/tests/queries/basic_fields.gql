@@ -25,6 +25,9 @@ query ($nid: Int!) {
       entityPublished
       entityCreated
       entityChanged
+      viewAccess:entityAccess(operation: "view")
+      updateAccess:entityAccess(operation: "update")
+      deleteAccess:entityAccess(operation: "delete")
     }
   }
 }

@@ -23,10 +23,13 @@ class ViewResultTypeDeriver extends ViewDeriverBase {
         continue;
       }
 
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
+      $display = $this->getViewDisplay($view, $displayId);
+
       $id = implode('-', [$viewId, $displayId, 'result']);
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => StringHelper::camelCase([$viewId, $displayId, 'result']),
+        'name' => $display->getGraphQLResultName(),
         'view' => $viewId,
         'display' => $displayId,
       ] + $basePluginDefinition;

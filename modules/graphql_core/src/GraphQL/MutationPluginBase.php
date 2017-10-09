@@ -61,13 +61,4 @@ abstract class MutationPluginBase extends AbstractField implements GraphQLPlugin
     // May be overridden, but not required any more.
   }
 
-  /**
-   * {@inheritdoc}
-   *
-   * Disable cache because mutations should never cache.
-   */
-  public function getCacheMaxAge() {
-    return 0;
-  }
-
 }

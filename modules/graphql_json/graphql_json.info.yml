@@ -1,0 +1,8 @@
+name: GraphQL JSON
+type: module
+description: 'Extract data from various JSON sources.'
+package: GraphQL
+core: 8.x
+dependencies:
+- graphql_core
+- graphql_content

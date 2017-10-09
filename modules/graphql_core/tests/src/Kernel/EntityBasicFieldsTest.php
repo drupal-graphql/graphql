@@ -46,6 +46,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
 
     Role::load('anonymous')
       ->grantPermission('access content')
+      ->grantPermission('edit any test content')
       ->grantPermission('access user profiles')
       ->save();
 
@@ -60,6 +61,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
    */
   public function testBasicFields() {
     $user = $this->createUser();
+
     $node = $this->createNode([
       'title' => 'Node in default language',
       'type' => 'test',
@@ -104,6 +106,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'entityPublished' => version_compare(\Drupal::VERSION, '8.3', '<') ? FALSE : TRUE,
       'entityCreated' => $created,
       'entityChanged' => $changed,
+      'viewAccess' => TRUE,
+      'updateAccess' => TRUE,
+      'deleteAccess' => FALSE,
     ];
 
     $this->assertEquals($values, $result['data']['node']['entities'][0], 'Content type Interface resolves basic entity fields.');
