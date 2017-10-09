@@ -131,7 +131,7 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
         if ($viewMode = $this->schemaConfig->getExposedViewMode($typeId, $bundle)) {
           if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
             foreach ($display->getComponents() as $field => $component) {
-              if ($component['type'] == 'graphql_raw_value') {
+              if (isset($component['type']) && $component['type'] == 'graphql_raw_value') {
                 // Raw values formatter is obsolete.
                 continue;
               }
