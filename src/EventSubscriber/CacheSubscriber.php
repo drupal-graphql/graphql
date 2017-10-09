@@ -11,6 +11,9 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
+use Drupal\graphql\GraphQL\Schema\SchemaLoader;
+use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -85,11 +88,11 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $contextsManager;
 
   /**
-   * Extra cache metadata to add to every query.
+   * The schema loader service.
    *
-   * @var \Drupal\Core\Cache\CacheableMetadata
+   * @var \Drupal\graphql\GraphQL\Schema\SchemaLoader
    */
-  protected $metadata;
+  protected $schemaLoader;
 
   /**
    * The service configuration.
@@ -115,6 +118,8 @@ class CacheSubscriber implements EventSubscriberInterface {
    *   The cache backend for caching query cache contexts.
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
+   * @param \Drupal\graphql\GraphQL\Schema\SchemaLoader $schemaLoader
+   *   The schema loader service.
    * @param array $config
    *   The service configuration.
    */
@@ -126,6 +131,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     CacheBackendInterface $responseCache,
     CacheBackendInterface $metadataCache,
     CacheContextsManager $contextsManager,
+    SchemaLoader $schemaLoader,
     array $config
   ) {
     $this->config = $config;
@@ -137,7 +143,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     $this->requestStack = $requestStack;
     $this->requestPolicyResults = new \SplObjectStorage();
     $this->contextsManager = $contextsManager;
-    $this->metadata = new CacheableMetadata();
+    $this->schemaLoader = $schemaLoader;
   }
 
   /**
@@ -153,8 +159,7 @@ class CacheSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
     $routeMatch = $this->routeMatch->getRouteMatchFromRequest($request);
-
-    if ($routeMatch->getRouteName() !== 'graphql.request') {
+    if (strpos($routeMatch->getRouteName(), 'graphql.query.') !== 0) {
       return;
     }
 
@@ -167,9 +172,21 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $ccid = $this->getCacheIdentifier($this->metadata);
-    if ($contextCache = $this->metadataCache->get($ccid)) {
-      $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
+    // If the schema is not cacheable, the response isn't cacheable either.
+    $schema = $routeMatch->getRouteObject()->getDefault('schema');
+    $schema = $this->schemaLoader->getSchema($schema);
+    if (!$schema instanceof SchemaPluginInterface) {
+      return;
+    }
+
+    $responseMetadata = $schema->getResponseCacheMetadata();
+    if ($responseMetadata->getCacheMaxAge() === 0) {
+      return;
+    }
+
+    $ccid = $this->getCacheIdentifier($responseMetadata);
+    if ($metadataCache = $this->metadataCache->get($ccid)) {
+      $cid = $metadataCache->data ? $this->getCacheIdentifier($metadataCache->data) : $ccid;
 
       if (($responseCache = $this->responseCache->get($cid)) && ($response = $responseCache->data) instanceof Response) {
         $response->headers->set(self::HEADER, 'HIT');
@@ -191,8 +208,7 @@ class CacheSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
     $routeMatch = $this->routeMatch->getRouteMatchFromRequest($request);
-
-    if ($routeMatch->getRouteName() !== 'graphql.request') {
+    if (strpos($routeMatch->getRouteName(), 'graphql.query.') !== 0) {
       return;
     }
 
@@ -229,11 +245,14 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    // Merge the global cache metadata with the response cache metadata.
-    $response->addCacheableDependency($this->metadata);
+    // If the schema is not cacheable, the response isn't cacheable either.
+    $schema = $routeMatch->getRouteObject()->getDefault('schema');
+    $schema = $this->schemaLoader->getSchema($schema);
+    if (!$schema instanceof SchemaPluginInterface) {
+      return;
+    }
 
     $metadata = $response->getCacheableMetadata();
-
     // A max age of 0 is supposed to disable caching entirely.
     if ($metadata->getCacheMaxAge() === 0) {
       return;
@@ -243,7 +262,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
     // Write the cache entry for the cache metadata.
-    $ccid = $this->getCacheIdentifier($this->metadata);
+    $ccid = $this->getCacheIdentifier($schema->getResponseCacheMetadata());
     $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
     // Write the cache entry for the response object.
@@ -283,16 +302,6 @@ class CacheSubscriber implements EventSubscriberInterface {
     $tokens = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($tokens)->getKeys();
     return implode(':', array_merge(['graphql'], array_values($keys)));
-  }
-
-  /**
-   * Adds extra (global) cache metadata for every query.
-   *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
-   *   Extra cache metadata to merge with the cache metadata of each query.
-   */
-  public function addExtraCacheMetadata(CacheableDependencyInterface $metadata) {
-    $this->metadata->addCacheableDependency($metadata);
   }
 
   /**

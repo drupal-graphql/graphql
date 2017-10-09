@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\GraphQL\Schema;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\graphql\GraphQL\Utility\TypeCollector;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -10,7 +9,8 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\GraphQL\Validator\TypeValidationRule;
-use Drupal\graphql\SchemaProvider\SchemaProviderInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\InputObject\AbstractInputObjectType;
@@ -21,7 +21,7 @@ use Youshido\GraphQL\Validator\ConfigValidator\ConfigValidator;
 /**
  * Loads and caches a generated GraphQL schema.
  */
-class SchemaFactory {
+class SchemaLoader {
   /**
    * The cache contexts manager service.
    *
@@ -30,11 +30,11 @@ class SchemaFactory {
   protected $contextsManager;
 
   /**
-   * The schema provider service.
+   * The schema plugin manager service.
    *
-   * @var \Drupal\graphql\SchemaProvider\SchemaProviderInterface
+   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
    */
-  protected $schemaProvider;
+  protected $schemaManager;
 
   /**
    * The schema cache backend.
@@ -58,13 +58,6 @@ class SchemaFactory {
   protected $config;
 
   /**
-   * Extra cache metadata to add to every schema.
-   *
-   * @var \Drupal\Core\Cache\CacheableMetadata
-   */
-  protected $metadata;
-
-  /**
    * The request stack service.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack
@@ -78,8 +71,8 @@ class SchemaFactory {
    *   The cache contexts manager service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack service.
-   * @param \Drupal\graphql\SchemaProvider\SchemaProviderInterface $schemaProvider
-   *   The schema provider service.
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
+   *   The schema plugin manager service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $schemaCache
    *   The schema cache backend.
    * @param \Drupal\Core\Cache\CacheBackendInterface $metadataCache
@@ -90,7 +83,7 @@ class SchemaFactory {
   public function __construct(
     CacheContextsManager $contextsManager,
     RequestStack $requestStack,
-    SchemaProviderInterface $schemaProvider,
+    SchemaPluginManager $schemaManager,
     CacheBackendInterface $schemaCache,
     CacheBackendInterface $metadataCache,
     array $config
@@ -102,91 +95,58 @@ class SchemaFactory {
     $validator = ConfigValidator::getInstance();
     $validator->addRule('type', new TypeValidationRule($validator));
 
-    $this->schemaProvider = $schemaProvider;
+    $this->schemaManager = $schemaManager;
     $this->contextsManager = $contextsManager;
     $this->schemaCache = $schemaCache;
     $this->metadataCache = $metadataCache;
-    $this->metadata = new CacheableMetadata();
     $this->requestStack = $requestStack;
   }
 
   /**
    * Loads and caches the generated schema.
    *
-   * @return \Youshido\GraphQL\Schema\AbstractSchema
+   * @param string $name
+   *   The name of the schema to load.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface
    *   The generated GraphQL schema.
    */
-  public function getSchema() {
+  public function getSchema($name) {
     // The cache key is made up of all of the globally known cache contexts.
-    $ccid = $this->getCacheIdentifier($this->metadata);
-    if ($this->config['schema_cache']) {
-      if ($contextCache = $this->metadataCache->get($ccid)) {
-        $cid = $contextCache->data ? $this->getCacheIdentifier($contextCache->data) : $ccid;
-        if (($schema = $this->schemaCache->get($cid)) && $schema->data instanceof AbstractSchema) {
+    if (!empty($this->config['schema_cache'])) {
+      if (($contextCache = $this->metadataCache->get($name)) && $contextCache->data) {
+        $cid = $this->getCacheIdentifier($name, $contextCache->data);
+
+        if (($schema = $this->schemaCache->get($cid)) && $schema->data instanceof SchemaPluginInterface) {
           return $schema->data;
         }
       }
     }
 
+    $schema = $this->schemaManager->createInstance($name);
     // If the schema is not cacheable, just return it directly.
-    $schema = $this->schemaProvider->getSchema();
-
-    if (!($schema instanceof CacheableDependencyInterface)) {
+    if (!$schema instanceof SchemaPluginInterface || empty($this->config['schema_cache'])) {
       return $schema;
     }
 
-    // Add global and field/type cache metadata to the schema.
-    if ($schema instanceof RefinableCacheableDependencyInterface) {
-      $schema->addCacheableDependency($this->metadata);
-      $schema->addCacheableDependency($this->getCacheMetadataFromTypes($schema));
+    // Compute the cache identifier, tag and expiry time.
+    $metadata = $schema->getSchemaCacheMetadata();
+    if ($metadata->getCacheMaxAge() === 0) {
+      return $schema;
     }
 
-    if ($this->config['schema_cache'] && $schema->getCacheMaxAge() !== 0) {
+    $tags = $metadata->getCacheTags();
+    $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
+    $cid = $this->getCacheIdentifier($name, $metadata);
 
-      $tags = $schema->getCacheTags();
-      $expire = $this->maxAgeToExpire($schema->getCacheMaxAge());
-      $metadata = CacheableMetadata::createFromObject($schema);
+    // Write the cache entry for the cache metadata.
+    $this->metadataCache->set($name, $metadata, $expire, $tags);
 
-      $cid = $this->getCacheIdentifier($metadata);
-
-      // Write the cache entry for the cache metadata.
-      $this->metadataCache->set($ccid, $metadata, $expire, $tags);
-
-      // We use the cache key from the global cache metadata but the tags and
-      // expiry time from the entire cache metadata.
-      $this->schemaCache->set($cid, $schema, $expire, $tags);
-    }
+    // We use the cache key from the global cache metadata but the tags and
+    // expiry time from the entire cache metadata.
+    $this->schemaCache->set($cid, $schema, $expire, $tags);
 
     return $schema;
-  }
-
-  /**
-   * Collects cache metadata from all types registered with a schema.
-   *
-   * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
-   *   The schema to collect the metadata for.
-   *
-   * @return \Drupal\Core\Cache\CacheableMetadata
-   *   The cache metadata collected from the schema's types.
-   */
-  protected function getCacheMetadataFromTypes(AbstractSchema $schema) {
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheMaxAge(Cache::PERMANENT);
-
-    foreach (TypeCollector::collectTypes($schema) as $type) {
-      if ($type instanceof CacheableDependencyInterface) {
-        $metadata->addCacheableDependency($type);
-      }
-      if ($type instanceof AbstractObjectType || $type instanceof AbstractInputObjectType || $type instanceof AbstractInterfaceType) {
-        foreach ($type->getFields() as $field) {
-          if ($field instanceof CacheableDependencyInterface) {
-            $metadata->addCacheableDependency($field);
-          }
-        }
-      }
-    }
-
-    return $metadata;
   }
 
   /**
@@ -207,25 +167,18 @@ class SchemaFactory {
   /**
    * Generates a cache identifier for the passed cache contexts.
    *
+   * @param string $name
+   *   The name of the schema.
    * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
    *   Optional array of cache context tokens.
    *
    * @return string The generated cache identifier.
    *   The generated cache identifier.
    */
-  protected function getCacheIdentifier(CacheableDependencyInterface $metadata) {
+  protected function getCacheIdentifier($name, CacheableDependencyInterface $metadata) {
     $tokens = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($tokens)->getKeys();
-    return implode(':', array_merge(['graphql'], array_values($keys)));
+    return implode(':', array_merge(['graphql', $name], array_values($keys)));
   }
 
-  /**
-   * Adds extra (global) cache metadata for every query.
-   *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
-   *   Extra cache metadata to merge with the cache metadata of each query.
-   */
-  public function addExtraCacheMetadata(CacheableDependencyInterface $metadata) {
-    $this->metadata->addCacheableDependency($metadata);
-  }
 }

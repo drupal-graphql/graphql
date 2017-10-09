@@ -6,9 +6,19 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 
 /**
- * Interface for GraphQL plugins.
+ * Interface for type plugins of all sorts.
  */
 interface TypeSystemPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
+
+  /**
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   */
+  public function getSchemaCacheMetadata();
+
+  /**
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   */
+  public function getResponseCacheMetadata();
 
   /**
    * Plugin config builder method.

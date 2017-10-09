@@ -17,7 +17,7 @@ class ExplorerPageDisplayVariantSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event) {
-    if ($event->getRouteMatch()->getRouteName() === 'graphql_graphiql.explorer') {
+    if (strpos($event->getRouteMatch()->getRouteName(), 'graphql_graphiql.explorer') === 0) {
       $event->setPluginId(NULL)->stopPropagation();
     }
   }

@@ -8,10 +8,12 @@ use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;
+use Prophecy\Argument;
 
 /**
  * Tests that test GraphQL theme integration on module level.
  *
+ * @group graphql_twig
  */
 class ThemeTest extends KernelTestBase {
   use GraphQLFileTestTrait;
@@ -50,8 +52,8 @@ class ThemeTest extends KernelTestBase {
    */
   public function testQueryAssembly() {
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $this->processor
-      ->processQuery($this->getQuery('garage.gql'), [])
+    $this->processor
+      ->processQuery(Argument::any(), $this->getQuery('garage.gql'), [])
       ->willReturn(new QueryResult([], new CacheableMetadata()))
       ->shouldBeCalled();
 
@@ -67,7 +69,7 @@ class ThemeTest extends KernelTestBase {
     $metadata = new CacheableMetadata();
 
     $process = $this->processor
-      ->processQuery($this->getQuery('garage.gql'), [])
+      ->processQuery(Argument::any(), $this->getQuery('garage.gql'), [])
       ->willReturn(new QueryResult([], $metadata));
 
     $element = [
@@ -96,7 +98,7 @@ class ThemeTest extends KernelTestBase {
     $metadata->setCacheMaxAge(0);
 
     $process = $this->processor
-      ->processQuery($this->getQuery('garage.gql'), [])
+      ->processQuery(Argument::any(), $this->getQuery('garage.gql'), [])
       ->willReturn(new QueryResult([], $metadata));
 
     $element = [
@@ -122,7 +124,7 @@ class ThemeTest extends KernelTestBase {
   public function testAutoThemeHook() {
     $testString = 'This is a test.';
     $this->processor
-      ->processQuery($this->getQuery('echo.gql'), [
+      ->processQuery(Argument::any(), $this->getQuery('echo.gql'), [
         'input' => $testString,
       ])
       ->willReturn(new QueryResult([

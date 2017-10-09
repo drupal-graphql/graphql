@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Traversable;
 
 /**
- * Base class for GraphQL Plugin managers.
+ * Base class for type system plugin managers or all sorts.
  */
 class TypeSystemPluginManager extends DefaultPluginManager {
 
@@ -93,15 +93,17 @@ class TypeSystemPluginManager extends DefaultPluginManager {
       // We deliberately ignore that $configuration could be different, because
       // GraphQL plugins don't contain user defined configuration.
       $this->instances[$pluginId] = parent::createInstance($pluginId);
-      if ($this->instances[$pluginId] instanceof TypeSystemPluginInterface) {
-        try {
-          $this->instances[$pluginId]->buildConfig($this->schemaManager);
-        }
-        catch (\Exception $exception) {
-          $this->logger->warning('Plugin ' . $pluginId . ' could not be added to the GraphQL schema: ' . $exception->getMessage());
-          $this->instances[$pluginId]->buildConfig($this->schemaManager);
-          $this->instances[$pluginId] = NULL;
-        }
+      if (!$this->instances[$pluginId] instanceof TypeSystemPluginInterface) {
+        throw new \LogicException(sprintf('Plugin %s does not implement \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface.', $pluginId));
+      }
+
+      try {
+        $this->instances[$pluginId]->buildConfig($this->schemaManager);
+      }
+      catch (\Exception $exception) {
+        $this->logger->warning(sprintf('Plugin %s could not be added to the GraphQL schema: %s', $pluginId, $exception->getMessage()));
+        $this->instances[$pluginId]->buildConfig($this->schemaManager);
+        $this->instances[$pluginId] = NULL;
       }
     }
     return $this->instances[$pluginId];

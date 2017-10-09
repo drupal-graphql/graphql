@@ -21,13 +21,6 @@ parameters:
     # @default false
     development: false
 
-    # GraphQL schema class to be used:
-    #
-    # By default, this uses the GraphQL schema provided by the module.
-    #
-    # @default \Drupal\graphql\GraphQL\Schema\Schema
-    schema_class: Drupal\graphql\GraphQL\Schema\Schema
-
 services:
   # Logger channel for graphql related log entries.
   logger.channel.graphql:
@@ -80,44 +73,22 @@ services:
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
-    - '@service_container'
-    - '@graphql.schema'
-    - '@graphql.reducer_manager'
-    - '@current_user'
-    - '%graphql.config%'
-  graphql.schema:
-    class: Drupal\graphql\GraphQL\Schema\Schema
-    factory: ['@graphql.schema_factory', getSchema]
-    tags:
-      - { name: graphql_extra_cache_metadata }
-  graphql.schema_factory:
-    class: Drupal\graphql\GraphQL\Schema\SchemaFactory
+      - '@service_container'
+      - '@graphql.reducer_manager'
+      - '@graphql.schema_loader'
+      - '@current_user'
+      - '%graphql.config%'
+  graphql.schema_loader:
+    class: Drupal\graphql\GraphQL\Schema\SchemaLoader
     arguments:
-    - '@cache_contexts_manager'
-    - '@request_stack'
-    - '@graphql.schema_provider'
-    - '@cache.graphql_schema'
-    - '@cache.graphql_schema_metadata'
-    - '%graphql.config%'
-    tags:
-      - { name: service_collector, tag: graphql_extra_schema_cache_metadata, call: addExtraCacheMetadata }
+      - '@cache_contexts_manager'
+      - '@request_stack'
+      - '@plugin.manager.graphql.schema'
+      - '@cache.graphql_schema'
+      - '@cache.graphql_schema_metadata'
+      - '%graphql.config%'
 
-  # Global cache metadata to add to every graphql schema.
-  # TODO: This needs to be refactored.
-  graphql.extra_schema_cache_metadata:
-    class: Drupal\Core\Cache\CacheableMetadata
-    calls:
-      - { method: addCacheContexts, arguments: [['languages:language_interface']] }
-      - { method: addCacheTags, arguments: [['graphql_schema']] }
-    tags:
-      - { name: graphql_extra_schema_cache_metadata }
-
-  # Composite service for gathering schemas.
-  graphql.schema_provider:
-    class: Drupal\graphql\SchemaProvider\SchemaProvider
-    arguments: ['%graphql.config%']
-    tags:
-        - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
+  # Query map provider using the composite pattern.
   graphql.query_map_provider:
     class: Drupal\graphql\QueryMapProvider\QueryMapProvider
     tags:
@@ -131,20 +102,24 @@ services:
   # Service for graphql request caching.
   graphql.cache_subscriber:
     class: Drupal\graphql\EventSubscriber\CacheSubscriber
-    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager', '%graphql.config%']
+    arguments:
+      - '@graphql.request_policy'
+      - '@graphql.response_policy'
+      - '@current_route_match'
+      - '@request_stack'
+      - '@cache.graphql_response'
+      - '@cache.graphql_response_metadata'
+      - '@cache_contexts_manager'
+      - '@graphql.schema_loader'
+      - '%graphql.config%'
     tags:
-      - { name: service_collector, tag: graphql_extra_cache_metadata, call: addExtraCacheMetadata }
       - { name: event_subscriber }
 
-  # Global cache metadata to add to every graphql request.
-  # TODO: This needs to be refactored.
-  graphql.extra_cache_metadata:
-    class: Drupal\Core\Cache\CacheableMetadata
-    calls:
-      - { method: addCacheContexts, arguments: [['gql', 'user']] }
-      - { method: addCacheTags, arguments: [['graphql_response']] }
+  graphql.query_routes:
+    class: Drupal\graphql\Routing\QueryRoutes
+    arguments: ['@plugin.manager.graphql.schema']
     tags:
-      - { name: graphql_extra_cache_metadata }
+      - { name: 'event_subscriber' }
 
   # Cache request and response policies for graphql requests.
   graphql.request_policy:
@@ -181,7 +156,7 @@ services:
   # Schema introspection service.
   graphql.introspection:
     class: Drupal\graphql\GraphQL\Utility\Introspection
-    arguments: ['@service_container', '@graphql.reducer_manager', '@graphql.schema']
+    arguments: ['@graphql.query_processor']
 
   # Support for subrequests.
   graphql.subrequest_subscriber:
@@ -197,19 +172,22 @@ services:
   graphql.batched_resolver:
     class: Drupal\graphql\GraphQL\Batching\BatchedFieldResolver
 
-  # Schema provider based on plugin system.
-  graphql.schema_provider.pluggable:
-    class: Drupal\graphql\SchemaProvider\PluggableSchemaProvider
-    arguments:
-      - '@graphql.pluggable_schema_manager'
-    tags:
-      - { name: graphql_schema_provider }
-
   # Plugin system based schema manager.
   graphql.pluggable_schema_manager:
     class: Drupal\graphql\Plugin\GraphQL\PluggableSchemaManager
     tags:
       - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
+
+  # Plugin manager for schemas
+  plugin.manager.graphql.schema:
+    class: Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Schemas'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLSchema'
+      - 'graphql_schemas'
 
   # Plugin manager implementations for schema types.
   plugin.manager.graphql.union_type:

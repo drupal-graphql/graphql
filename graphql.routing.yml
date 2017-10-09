@@ -1,16 +1,15 @@
-graphql.request:
-  path: '/graphql'
-  defaults:
-    _graphql:
-      single: '\Drupal\graphql\Controller\RequestController::handleRequest'
-      multiple: '\Drupal\graphql\Controller\RequestController::handleBatchRequest'
-  requirements:
-    _graphql_query_access: 'TRUE'
-
 graphql.config_page:
   path: '/admin/config/graphql'
   defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'GraphQL'
+  requirements:
+    _permission: 'administer site configuration'
+
+graphql.schema_overview:
+  path: '/admin/config/graphql/schemas'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\SchemaOverviewController::listSchemas'
+    _title: 'Schemas'
   requirements:
     _permission: 'administer site configuration'

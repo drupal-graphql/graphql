@@ -17,7 +17,7 @@ use Youshido\GraphQL\Type\Union\AbstractUnionType;
 /**
  * Base class for GraphQL union type plugins.
  */
-abstract class UnionTypePluginBase extends AbstractUnionType implements TypeSystemPluginInterface, CacheableDependencyInterface, ContainerFactoryPluginInterface {
+abstract class UnionTypePluginBase extends AbstractUnionType implements TypeSystemPluginInterface, ContainerFactoryPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;

@@ -3,3 +3,8 @@ services:
     class: Drupal\graphql_graphiql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
     tags:
       - { name: event_subscriber }
+  graphql_graphiql.explorer_routes:
+    class: Drupal\graphql_graphiql\Routing\ExplorerRoutes
+    arguments: ['@plugin.manager.graphql.schema']
+    tags:
+      - { name: 'event_subscriber' }

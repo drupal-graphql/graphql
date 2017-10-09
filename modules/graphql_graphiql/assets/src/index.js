@@ -16,7 +16,7 @@ Drupal.behaviors.graphQLRenderExplorer = {
     }
 
     // Defines a GraphQL fetcher using the fetch API.
-    const graphQLFetcher = (graphQLParams) => fetch(settings.graphQLRequestUrl, {
+    const graphQLFetcher = (graphQLParams) => fetch(settings.graphqlRequestUrl, {
       method: 'post',
       credentials: 'same-origin',
       body: JSON.stringify(graphQLParams),

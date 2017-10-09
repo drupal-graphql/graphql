@@ -11,7 +11,7 @@ class Counter {
    *
    * @var int
    */
-  private $count = 0;
+  protected $count = 0;
 
   /**
    * Increase the counter and return it.
