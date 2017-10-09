@@ -43,8 +43,7 @@ query ($path: String!) {
         fieldFile {
           targetId
           entity {
-            mimeType
-            fileSize
+            entityLabel
           }
           display
           description
@@ -52,8 +51,7 @@ query ($path: String!) {
         fieldImage {
           targetId
           entity {
-            mimeType
-            fileSize
+            entityLabel
           }
           alt
           title

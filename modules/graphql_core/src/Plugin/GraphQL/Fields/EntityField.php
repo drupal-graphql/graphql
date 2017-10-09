@@ -1,24 +1,36 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Generic field plugin for rendering entity fields to string values.
+ * Generic field plugin for rendering entity fields.
  *
  * @GraphQLField(
- *   id = "raw_field",
+ *   id = "entity_field",
  *   secure = true,
  *   nullable = true,
- *   type = "String",
- *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFieldDeriver",
- *   field_formatter = "graphql_raw_value"
+ *   weight = -2,
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriver",
  * )
  */
-class RawValueField extends FieldPluginBase {
+class EntityField extends FieldPluginBase {
+
+  /**
+   * Returns a string if for the plugin.
+   *
+   * @param string $fieldName
+   *   Field id.
+   *
+   * @return string
+   */
+  public static function getId($fieldName) {
+    return StringHelper::propCase($fieldName);
+  }
 
   /**
    * {@inheritdoc}

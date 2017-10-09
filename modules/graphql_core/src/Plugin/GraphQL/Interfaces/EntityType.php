@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Interfaces;
+namespace Drupal\graphql_core\Plugin\GraphQL\Interfaces;
 
 use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity;
 
@@ -12,7 +12,7 @@ use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity;
  *   weight = -1,
  *   cache_tags = {"entity_types"},
  *   interfaces = {"Entity"},
- *   deriver = "Drupal\graphql_content\Plugin\Deriver\EntityTypeDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\EntityTypeDeriver"
  * )
  */
 class EntityType extends Entity {

@@ -1,18 +1,5 @@
-parameters:
-  graphql_content.type_map:
-    Int:
-      - integer
-      - boolean
-      - timestamp
-    Float:
-      - float
-    # All other types are considered strings.
-
 services:
   graphql_content.schema_config:
     class: Drupal\graphql_content\ContentEntitySchemaConfig
     arguments:
       - '@config.factory'
-  graphql_content.type_mapper:
-    class: Drupal\graphql_content\TypeMapper
-    arguments: ['%graphql_content.type_map%']

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_content\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -15,9 +15,9 @@ use Drupal\user\Entity\Role;
 /**
  * Test basic entity fields.
  *
- * @group graphql_content
+ * @group graphql_core
  */
-class RawFieldValueTest extends GraphQLFileTestBase {
+class EntityFieldValueTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 
@@ -29,8 +29,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     'field',
     'filter',
     'text',
-    'graphql_content',
-    'graphql_file',
+    'graphql_core',
     'link',
     'datetime',
     'image',
@@ -73,26 +72,6 @@ class RawFieldValueTest extends GraphQLFileTestBase {
       ->grantPermission('access user profiles')
       ->save();
 
-    $options = ['type' => 'graphql_raw_value'];
-    EntityViewMode::create(['id' => 'node.graphql', 'targetEntityType' => 'node'])->save();
-
-    entity_get_display('node', 'test', 'graphql')
-      ->setComponent('body', $options)
-      ->setComponent('field_text', $options)
-      ->setComponent('field_boolean', $options)
-      ->setComponent('field_link', $options)
-      ->setComponent('field_integer', $options)
-      ->setComponent('field_float', $options)
-      ->setComponent('field_decimal', $options)
-      ->setComponent('field_datetime', $options)
-      ->setComponent('field_timestamp', $options)
-      ->setComponent('field_email', $options)
-      ->setComponent('field_string', $options)
-      ->setComponent('field_reference', $options)
-      ->setComponent('field_file', $options)
-      ->setComponent('field_image', $options)
-      ->save();
-
     // File 1
     file_put_contents('public://example.txt', $this->randomMachineName());
     File::create([
@@ -104,28 +83,6 @@ class RawFieldValueTest extends GraphQLFileTestBase {
     File::create([
       'uri' => 'public://example.png',
     ])->save();
-
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-        'file' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'file' => [
-              'exposed' => TRUE,
-              'view_mode' => 'file.default',
-            ],
-          ],
-        ],
-      ])->save();
   }
 
   /**
@@ -261,8 +218,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'display' => 0,
           'description' => 'description test 1',
           'entity' => [
-            'mimeType' => 'text/plain',
-            'fileSize' => 8,
+            'entityLabel' => 'example.txt',
           ]
         ],
         [
@@ -270,8 +226,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'display' => 1,
           'description' => 'description test 2',
           'entity' => [
-            'mimeType' => 'image/png',
-            'fileSize' => 8,
+            'entityLabel' => 'example.png',
           ]
         ],
       ],
@@ -283,8 +238,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'width' => 100,
           'height' => 50,
           'entity' => [
-            'mimeType' => 'text/plain',
-            'fileSize' => 8,
+            'entityLabel' => 'example.txt',
           ]
         ],
         [
@@ -294,8 +248,7 @@ class RawFieldValueTest extends GraphQLFileTestBase {
           'width' => 200,
           'height' => 100,
           'entity' => [
-            'mimeType' => 'image/png',
-            'fileSize' => 8,
+            'entityLabel' => 'example.png',
           ]
         ],
       ],

@@ -48,32 +48,6 @@ class UpdateEntityTest extends GraphQLFileTestBase {
       ->grantPermission('edit any test content')
       ->save();
 
-    EntityViewMode::create([
-      'targetEntityType' => 'node',
-      'id' => "node.graphql",
-    ])->save();
-
-    EntityViewDisplay::create([
-      'targetEntityType' => 'node',
-      'bundle' => 'test',
-      'mode' => 'graphql',
-      'status' => TRUE,
-    ])->setComponent('body', ['type' => 'graphql_raw_value'])->save();
-
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-      ])
-      ->save();
-
     $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
       ->set('types', [
         'node' => [

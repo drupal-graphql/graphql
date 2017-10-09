@@ -1,24 +1,23 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\graphql_core\GraphQL\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Generic field plugin for rendering entity fields to string values.
+ * Generic field plugin for rendering entity field properties.
  *
  * @GraphQLField(
- *   id = "raw_field_item",
+ *   id = "entity_field_item",
  *   secure = true,
  *   nullable = true,
  *   weight = -1,
- *   deriver = "Drupal\graphql_content\Plugin\Deriver\RawValueFieldItemDeriver",
- *   field_formatter = "graphql_raw_value"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\EntityFieldItemDeriver",
  * )
  */
-class RawValueFieldItem extends FieldPluginBase {
+class EntityFieldItem extends FieldPluginBase {
 
   /**
    * {@inheritdoc}

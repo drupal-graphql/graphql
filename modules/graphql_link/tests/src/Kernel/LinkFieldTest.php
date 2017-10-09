@@ -110,6 +110,8 @@ class LinkFieldTest extends GraphQLFileTestBase {
 
     $result = $this->executeQueryFile('link.gql', ['path' => '/node/' . $a->id()]);
 
+    // TODO Failed asserting that two arrays are equal.
+
     $this->assertEquals([
       'links' => [
         [

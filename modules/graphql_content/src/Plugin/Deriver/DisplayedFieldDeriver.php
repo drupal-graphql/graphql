@@ -130,7 +130,12 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
       foreach (array_keys($bundles[$typeId]) as $bundle) {
         if ($viewMode = $this->schemaConfig->getExposedViewMode($typeId, $bundle)) {
           if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
-            foreach (array_keys($display->getComponents()) as $field) {
+            foreach ($display->getComponents() as $field => $component) {
+              if (isset($component['type']) && $component['type'] == 'graphql_raw_value') {
+                // Raw values formatter is obsolete.
+                continue;
+              }
+
               $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
                 'name' => StringHelper::propCase($field),
                 'types' => [StringHelper::camelCase([$typeId, $bundle])],
