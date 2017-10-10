@@ -222,6 +222,8 @@ class RequestController implements ContainerInjectionInterface {
       $response->addCacheableDependency($context->pop());
     }
 
+    print_r($response->getCacheableMetadata()->getCacheTags());
+
     return $response;
   }
 }

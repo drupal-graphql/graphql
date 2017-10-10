@@ -3,7 +3,6 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 
 /**
  * A single graphql query result.
