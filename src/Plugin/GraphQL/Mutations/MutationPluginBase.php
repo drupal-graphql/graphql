@@ -15,7 +15,7 @@ use Youshido\GraphQL\Field\AbstractField;
 /**
  * Base class for graphql mutation plugins.
  */
-abstract class MutationPluginBase extends AbstractField implements TypeSystemPluginInterface, CacheableDependencyInterface {
+abstract class MutationPluginBase extends AbstractField implements TypeSystemPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;

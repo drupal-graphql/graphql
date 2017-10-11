@@ -1,5 +1,5 @@
 graphql_voyager.voyager:
   title: 'Voyager'
   description: 'Explore your schema with the GraphQL voyager.'
-  parent: 'graphql.config_page'
-  route_name: graphql_voyager.voyager
+  parent: 'graphql.schema_overview'
+  deriver: \Drupal\graphql_voyager\Plugin\Deriver\VoyagerMenuLinkDeriver

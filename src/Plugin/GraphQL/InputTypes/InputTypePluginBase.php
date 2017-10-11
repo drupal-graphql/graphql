@@ -18,7 +18,7 @@ use Youshido\GraphQL\Type\TypeInterface;
 /**
  * Base class for GraphQL interface plugins.
  */
-abstract class InputTypePluginBase extends AbstractInputObjectType implements TypeSystemPluginInterface, CacheableDependencyInterface {
+abstract class InputTypePluginBase extends AbstractInputObjectType implements TypeSystemPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;

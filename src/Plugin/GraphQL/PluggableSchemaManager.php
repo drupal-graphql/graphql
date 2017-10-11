@@ -110,7 +110,6 @@ class PluggableSchemaManager implements PluggableSchemaManagerInterface {
       }
 
       array_pop($chain);
-
     }
 
     return NULL;

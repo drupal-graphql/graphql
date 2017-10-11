@@ -66,7 +66,6 @@ class JsonPathToEntity extends JsonPath implements ContainerFactoryPluginInterfa
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
-
   /**
    * {@inheritdoc}
    */

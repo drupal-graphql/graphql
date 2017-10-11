@@ -13,7 +13,7 @@ use Youshido\GraphQL\Type\Enum\AbstractEnumType;
 /**
  * Base class for graphql field plugins.
  */
-abstract class EnumPluginBase extends AbstractEnumType implements TypeSystemPluginInterface, CacheableDependencyInterface {
+abstract class EnumPluginBase extends AbstractEnumType implements TypeSystemPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
 

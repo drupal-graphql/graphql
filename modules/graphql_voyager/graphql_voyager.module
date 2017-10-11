@@ -1,4 +1,5 @@
 <?php
+use Drupal\Core\Url;
 
 /**
  * Implements hook_theme().
@@ -10,4 +11,21 @@ function graphql_voyager_theme() {
       'base hook' => 'block',
     ],
   ];
+}
+
+/**
+ * Implements hook_graphql_schema_operations().
+ */
+function graphql_voyager_graphql_schema_operations($pluginId, array $pluginDefinition) {
+  $operations = [];
+
+  if (\Drupal::currentUser()->hasPermission('use graphql voyager')) {
+    $operations['voyager'] = [
+      'title' => 'Voyager',
+      'weight' => 10,
+      'url' => Url::fromRoute("graphql_voyager.voyager.$pluginId"),
+    ];
+  }
+
+  return $operations;
 }

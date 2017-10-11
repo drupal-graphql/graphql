@@ -3,8 +3,10 @@
 namespace Drupal\graphql_voyager\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Drupal\graphql\GraphQL\Utility\Introspection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller for the GraphQL Voyager visualisation API.
@@ -31,19 +33,20 @@ class VoyagerController implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('graphql.introspection')
-    );
+    return new static($container->get('graphql.introspection'));
   }
 
   /**
    * Display for the GraphQL Voyager visualization API.
    *
-   * @return array
-   *   The render array.
+   * @param string $schema
+   *   The name of the schema to use.
+   *
+   * @return array The render array.
+   * The render array.
    */
-  public function viewExplorer() {
-    $introspectionData = $this->introspection->introspect();
+  public function viewVoyager($schema) {
+    $introspectionData = $this->introspection->introspect($schema);
 
     return [
       '#type' => 'page',

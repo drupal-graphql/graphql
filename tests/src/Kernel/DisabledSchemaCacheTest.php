@@ -32,7 +32,7 @@ class DisabledSchemaCacheTest extends KernelTestBase {
     $config = $container->getParameter('graphql.config');
     $config['schema_cache'] = FALSE;
     $container->setParameter('graphql.config', $config);
-    $this->injectSchemaProviderProphecy($container);
+    $this->injectSchemaManager($container);
     parent::register($container);
   }
 
@@ -40,23 +40,20 @@ class DisabledSchemaCacheTest extends KernelTestBase {
    * Test basic schema caching.
    */
   public function testDisabledCache() {
-    $schema = new Schema();
-
     // Prophesize a field with permanent cache.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(Cache::PERMANENT);
     $root = $this->prophesizeField('root', new StringType(), $metadata);
     $root->resolve(Argument::any())->willReturn('test');
 
-    $schema->addQueryField($root->reveal());
-
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
+    $schema = $this->createSchema($root->reveal());
     $getSchema = $this->injectSchema($schema);
 
-    $this->container->get('graphql.schema_factory')->getSchema();
+    $this->container->get('graphql.schema_loader')->getSchema('default');
     $getSchema->shouldHaveBeenCalledTimes(1);
 
-    $this->container->get('graphql.schema_factory')->getSchema();
+    $this->container->get('graphql.schema_loader')->getSchema('default');
     $getSchema->shouldHaveBeenCalledTimes(2);
   }
 

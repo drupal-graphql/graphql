@@ -1,0 +1,10 @@
+services:
+  graphql_voyager.page_display_variant_subscriber:
+    class: Drupal\graphql_graphiql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }
+  graphql_voyager.voyager_routes:
+    class: Drupal\graphql_voyager\Routing\VoyagerRoutes
+    arguments: ['@plugin.manager.graphql.schema']
+    tags:
+      - { name: 'event_subscriber' }

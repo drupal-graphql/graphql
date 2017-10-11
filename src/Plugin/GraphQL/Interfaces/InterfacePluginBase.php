@@ -19,7 +19,7 @@ use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 /**
  * Base class for GraphQL interface plugins.
  */
-abstract class InterfacePluginBase extends AbstractInterfaceType implements TypeSystemPluginInterface, CacheableDependencyInterface, ContainerFactoryPluginInterface {
+abstract class InterfacePluginBase extends AbstractInterfaceType implements TypeSystemPluginInterface, ContainerFactoryPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;

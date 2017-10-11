@@ -14,6 +14,8 @@ use Prophecy\Argument;
 
 /**
  * Tests that test GraphQL theme integration on module level.
+ *
+ * @group graphql_twig
  */
 class EntityRenderTest extends KernelTestBase {
   use GraphQLFileTestTrait;
@@ -25,6 +27,7 @@ class EntityRenderTest extends KernelTestBase {
   public static $modules = [
     'system',
     'graphql',
+    'graphql_core',
     'graphql_twig',
     'datetime',
     'field',
@@ -60,7 +63,7 @@ class EntityRenderTest extends KernelTestBase {
     ]);
     $node->save();
 
-    $this->processor->processQuery(Argument::any(), ['node' => '1'])
+    $this->processor->processQuery(Argument::any(), Argument::any(), ['node' => '1'])
       ->willReturn(new QueryResult([
         'data' => [
           'node' => [
@@ -85,7 +88,7 @@ class EntityRenderTest extends KernelTestBase {
     ]);
     $node->save();
 
-    $process = $this->processor->processQuery(Argument::any(), ['node' => '1'])
+    $process = $this->processor->processQuery(Argument::any(), Argument::any(), ['node' => '1'])
       ->willReturn(new QueryResult([
         'data' => [
           'node' => [
@@ -118,7 +121,7 @@ class EntityRenderTest extends KernelTestBase {
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
 
-    $process = $this->processor->processQuery(Argument::any(), ['node' => '1'])
+    $process = $this->processor->processQuery(Argument::any(), Argument::any(), ['node' => '1'])
       ->willReturn(new QueryResult([
         'data' => [
           'node' => [
