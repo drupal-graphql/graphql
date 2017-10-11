@@ -43,7 +43,7 @@ class EntityToJsonDeriver extends DeriverBase implements ContainerDeriverInterfa
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    if ($this->moduleHandler->moduleExists('serializer')) {
+    if ($this->moduleHandler->moduleExists('serialization')) {
       $this->derivatives['entity_to_json'] = $basePluginDefinition;
     }
 
