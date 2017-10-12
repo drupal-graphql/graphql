@@ -102,7 +102,6 @@ class TypeSystemPluginManager extends DefaultPluginManager {
       }
       catch (\Exception $exception) {
         $this->logger->warning(sprintf('Plugin %s could not be added to the GraphQL schema: %s', $pluginId, $exception->getMessage()));
-        $this->instances[$pluginId]->buildConfig($this->schemaManager);
         $this->instances[$pluginId] = NULL;
       }
     }
