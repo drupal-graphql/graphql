@@ -12,7 +12,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
-use Drupal\graphql\QueryProcessor;
+use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -55,9 +55,16 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * The query processor.
    *
-   * @var \Drupal\graphql\QueryProcessor
+   * @var \Drupal\graphql\GraphQL\Execution\QueryProcessor
    */
   protected $queryProcessor;
+
+  /**
+   * The schema loader.
+   *
+   * @var \Drupal\graphql\GraphQL\Schema\SchemaLoader
+   */
+  protected $schemaLoader;
 
   /**
    * Constructs a RequestController object.
@@ -70,7 +77,7 @@ class RequestController implements ContainerInjectionInterface {
    *   The request stack service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\graphql\QueryProcessor $queryProcessor
+   * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $queryProcessor
    *   The query processor.
    */
   public function __construct(
@@ -185,36 +192,35 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * Handles GraphQL requests.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
+   * @param string $schema
+   *   The name of the graphql schema.
    * @param string $query
    *   The query string.
    * @param array $variables
    *   The variables to process the query string with.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   The JSON formatted response.
    */
-  public function handleRequest(Request $request, $query = '', array $variables = []) {
-    $context = new RenderContext();
-
-    /** @var \Drupal\graphql\QueryResult $result */
+  public function handleRequest($schema, $query = '', array $variables = []) {
+    /** @var \Drupal\graphql\GraphQL\Execution\QueryResult $result */
     $result = NULL;
+    $context = new RenderContext();
 
     // Evaluating the GraphQL request can potentially invoke rendering. We allow
     // those to "leak" and collect them here in a render context.
-    $this->renderer->executeInRenderContext($context, function() use ($query, $variables, &$result) {
-      $result = $this->queryProcessor->processQuery($query, $variables);
+    $this->renderer->executeInRenderContext($context, function() use ($schema, $query, $variables, &$result) {
+      $result = $this->queryProcessor->processQuery($schema, $query, $variables);
     });
 
     $response = new CacheableJsonResponse($result->getData());
+    // Apply the metadata to the response object.
+    $response->addCacheableDependency($result);
 
+    // Apply rendere context cache metadata to the response.
     if (!$context->isEmpty()) {
       $response->addCacheableDependency($context->pop());
     }
-
-    // Apply the metadata to the response object.
-    $response->addCacheableDependency($result);
 
     return $response;
   }

@@ -3,7 +3,7 @@
 namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

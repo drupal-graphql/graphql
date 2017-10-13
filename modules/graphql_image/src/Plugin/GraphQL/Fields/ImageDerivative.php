@@ -5,7 +5,7 @@ namespace Drupal\graphql_image\Plugin\GraphQL\Fields;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;

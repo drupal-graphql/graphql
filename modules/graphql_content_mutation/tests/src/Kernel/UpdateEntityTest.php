@@ -50,21 +50,9 @@ class UpdateEntityTest extends GraphQLFileTestBase {
       ->grantPermission('edit any test content')
       ->save();
 
-    EntityViewMode::create([
-      'targetEntityType' => 'node',
-      'id' => "node.graphql",
-    ])->save();
-
-    EntityViewDisplay::create([
-      'targetEntityType' => 'node',
-      'bundle' => 'test',
-      'mode' => 'graphql',
-      'status' => TRUE,
-    ])->setComponent('body', ['type' => 'graphql_raw_value'])->save();
 
     // TODO: is this the right way to do it?
     $this->schemaConfig = new ContentEntityMutationSchemaConfig(\Drupal::configFactory());
-    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
     $this->schemaConfig->exposeEntityBundleMutations('node', 'test', ['update']);
   }
 

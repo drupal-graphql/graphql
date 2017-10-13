@@ -11,8 +11,8 @@ namespace Drupal\graphql_cache_test\Plugin\GraphQL\Fields;
  *   name = "c",
  *   type = "Int",
  *   types = {"Root"},
- *   cache_tags = {"c"},
- *   cache_contexts = {"graphql_test_root_field"}
+ *   response_cache_tags = {"c"},
+ *   response_cache_contexts = {"graphql_test_root_field"}
  * )
  */
 class C extends A {

@@ -4,7 +4,7 @@ namespace Drupal\graphql;
 
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\graphql\Reducers\ReducerPass;
+use Drupal\graphql\GraphQL\Reducers\ReducerPass;
 
 class GraphqlServiceProvider implements ServiceProviderInterface {
 

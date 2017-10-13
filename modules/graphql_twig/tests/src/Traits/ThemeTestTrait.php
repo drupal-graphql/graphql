@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql_twig\Traits;
 
 use Drupal\Core\Session\AccountProxy;
-use Drupal\graphql\QueryProcessor;
+use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Drupal\KernelTests\KernelTestBase;
 use Prophecy\Argument;
 

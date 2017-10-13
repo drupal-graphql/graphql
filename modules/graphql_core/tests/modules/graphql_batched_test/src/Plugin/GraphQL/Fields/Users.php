@@ -4,9 +4,9 @@ namespace Drupal\graphql_batched_test\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql_batched_test\UserDataBaseInterface;
-use Drupal\graphql_core\BatchedFieldResolver;
-use Drupal\graphql_core\GraphQL\BatchedFieldInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
+use Drupal\graphql\GraphQL\Batching\BatchedFieldInterface;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -39,7 +39,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
   /**
    * The batched field resolver.
    *
-   * @var \Drupal\graphql_core\BatchedFieldResolver
+   * @var \Drupal\graphql\GraphQL\Batching\BatchedFieldResolver
    */
   protected $batchedFieldResolver;
 
@@ -111,7 +111,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
       $pluginId,
       $pluginDefinition,
       $container->get('graphql_batched_test.user_database'),
-      $container->get('graphql_core.batched_resolver')
+      $container->get('graphql.batched_resolver')
     );
   }
 

@@ -2,8 +2,7 @@
 
 namespace Drupal\graphql_views\Plugin\GraphQL\Types;
 
-use Drupal\graphql_core\GraphQL\TypePluginBase;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**
  * Expose types for fieldable views' rows.

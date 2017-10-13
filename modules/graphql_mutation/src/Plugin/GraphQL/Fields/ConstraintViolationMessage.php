@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_mutation\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

@@ -3,7 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 
 use Drupal\Core\Url;
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**
  * GraphQL type for Drupal routes.

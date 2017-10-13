@@ -3,7 +3,7 @@
 namespace Drupal\graphql_menu\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Menu\MenuLinkTreeElement;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

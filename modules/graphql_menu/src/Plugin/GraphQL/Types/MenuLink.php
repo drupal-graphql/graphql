@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_menu\Plugin\GraphQL\Types;
 
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**
  * GraphQL type representing Drupal menu links.

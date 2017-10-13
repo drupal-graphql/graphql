@@ -132,6 +132,7 @@ class XMLFieldTest extends GraphQLFileTestBase {
     $result = $this->executeQueryFile('content.gql', [
       'path' => '/entity_test_with_bundle/' . $entity->id(),
     ]);
+
     $this->assertEquals('<p>A</p><p>B</p>', $result['data']['route']['entity']['xml']['content']);
   }
 
@@ -149,6 +150,7 @@ class XMLFieldTest extends GraphQLFileTestBase {
     $result = $this->executeQueryFile('attribute.gql', [
       'path' => '/entity_test_with_bundle/' . $entity->id(),
     ]);
+
     $this->assertEquals([
       ['class' => 'a'],
       ['class' => 'b'],

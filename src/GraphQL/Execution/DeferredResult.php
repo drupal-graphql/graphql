@@ -4,7 +4,7 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\CacheableValue;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Youshido\GraphQL\Execution\DeferredResolverInterface;
 use Youshido\GraphQL\Execution\DeferredResult as OriginalDeferredResult;
 

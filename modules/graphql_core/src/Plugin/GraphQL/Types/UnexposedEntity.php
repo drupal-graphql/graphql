@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**
  * Entity type to resolve to if the values type is not exposed to the schema.
