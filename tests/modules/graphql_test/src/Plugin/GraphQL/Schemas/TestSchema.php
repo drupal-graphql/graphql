@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_test\Plugin\GraphQL\Schemas;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
@@ -27,6 +28,15 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
    * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
    */
   protected $schemaManager;
+
+  public function __construct($configuration, $pluginId, $pluginDefinition) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheContexts(['gql', 'user']);
+    $metadata->addCacheTags(['graphql_response']);
+    $this->responseMetadata->addCacheableDependency($metadata);
+  }
+
 
   /**
    * {@inheritdoc}
