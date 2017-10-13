@@ -1,3 +1,5 @@
+# TODO: Move only breadcrumbs field to graphql_core.
+# Consolidate link functionality with the one from graphql_link.
 name: GraphQL Breadcrumbs
 type: module
 description: Expose a route's breadcrumbs to GraphQL

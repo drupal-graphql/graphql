@@ -1,3 +1,4 @@
+# TODO: Move module to graphql_core.
 name: GraphQL Block
 type: module
 description: 'Query Drupal blocks with GraphQL.'

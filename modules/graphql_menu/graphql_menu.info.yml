@@ -1,3 +1,4 @@
+# TODO: Move to core.
 name: GraphQL Menu
 type: module
 description: 'Query Drupal menu trees with GraphQL.'

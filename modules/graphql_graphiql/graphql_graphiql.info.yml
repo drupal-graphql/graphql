@@ -1,3 +1,4 @@
+# TODO: Move to graphql base.
 name: GraphQL Explorer
 type: module
 description: 'Adds a page with the GraphiQL explorer (https://github.com/graphql/graphiql/).'

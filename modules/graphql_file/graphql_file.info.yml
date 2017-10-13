@@ -1,3 +1,4 @@
+# TODO: Add FileUrl to raw data field type in core. Keep for BC and deprecate.
 name: GraphQL File
 type: module
 description: 'Retrieve detailed file field information with GraphQL.'
