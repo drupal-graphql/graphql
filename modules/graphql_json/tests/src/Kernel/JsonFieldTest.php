@@ -4,17 +4,13 @@ namespace Drupal\Tests\graphql_json\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\entity_test\Entity\EntityTestBundle;
-use Drupal\entity_test\Entity\EntityTestWithBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -24,7 +20,6 @@ use Drupal\user\Entity\Role;
  */
 class JsonFieldTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
-  use GraphQLFileTestTrait;
 
   public static $modules = [
     'system',
