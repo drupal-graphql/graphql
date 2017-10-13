@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Languages;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;

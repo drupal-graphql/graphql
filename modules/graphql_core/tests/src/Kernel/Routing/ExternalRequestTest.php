@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use GuzzleHttp\ClientInterface;
