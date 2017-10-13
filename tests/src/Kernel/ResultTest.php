@@ -25,17 +25,17 @@ class ResultTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql'];
+  public static $modules = ['graphql', 'graphql_core'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    $schema = new Schema();
     $root = $this->prophesizeField('root', new StringType());
     $root->resolve(Argument::cetera())->willReturn('test');
-    $schema->addQueryField($root->reveal());
+
+    $schema = $this->createSchema($root->reveal());
     $this->injectSchema($schema);
   }
 

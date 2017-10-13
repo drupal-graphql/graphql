@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\graphql_views\Kernel;
 
-use Drupal\graphql\GraphQL\TypeCollector;
+use Drupal\graphql\GraphQL\Utility\TypeCollector;
 
 /**
  * Test contextual views support in GraphQL.
@@ -31,7 +31,7 @@ class ContextualViewsTest extends ViewsTestBase {
   protected function setUp() {
     parent::setUp();
     $this->createContentType(['type' => 'test2']);
-    $this->schema = \Drupal::service('graphql.schema');
+    $this->schema = \Drupal::service('plugin.manager.graphql.schema')->createInstance('default');
     $this->types = TypeCollector::collectTypes($this->schema);
   }
 

@@ -2,8 +2,8 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Types;
 
-use Drupal\graphql_core\Annotation\GraphQLType;
-use Drupal\graphql_core\GraphQL\TypePluginBase;
+use Drupal\graphql\Annotation\GraphQLType;
+use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**
  * GraphQL type for external http responses.

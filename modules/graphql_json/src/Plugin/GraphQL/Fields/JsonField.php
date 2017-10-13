@@ -3,7 +3,7 @@
 namespace Drupal\graphql_json\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\text\Plugin\Field\FieldType\TextItemBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

@@ -3,8 +3,8 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 
-use Drupal\graphql_core\Annotation\GraphQLField;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Annotation\GraphQLField;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Youshido\GraphQL\Execution\ResolveInfo;

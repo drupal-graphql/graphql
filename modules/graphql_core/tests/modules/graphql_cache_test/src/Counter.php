@@ -11,7 +11,7 @@ class Counter {
    *
    * @var int
    */
-  private $count = 0;
+  protected static $count = 0;
 
   /**
    * Increase the counter and return it.
@@ -23,8 +23,8 @@ class Counter {
    *   The current count value.
    */
   public function count($amount = 1) {
-    $this->count += $amount;
-    return $this->count;
+    static::$count += $amount;
+    return static::$count;
   }
 
 }

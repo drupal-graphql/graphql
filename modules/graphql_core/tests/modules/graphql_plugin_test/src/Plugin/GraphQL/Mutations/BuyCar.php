@@ -4,8 +4,8 @@ namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Mutations;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_core\GraphQLSchemaManagerInterface;
-use Drupal\graphql_core\GraphQL\MutationPluginBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql_plugin_test\GarageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -29,14 +29,14 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
   /**
    * The plugin manager.
    *
-   * @var \Drupal\graphql_core\GraphQLSchemaManagerInterface
+   * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
    */
   protected $pluginManager;
 
   /**
    * The schema manager.
    *
-   * @var \Drupal\graphql_core\GraphQLSchemaManagerInterface
+   * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
    */
   protected $schemaManager;
 
@@ -58,13 +58,13 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql_core.schema_manager'), $container->get('graphql_test.garage'));
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql.pluggable_schema_manager'), $container->get('graphql_test.garage'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, GraphQLSchemaManagerInterface $schemaManager, GarageInterface $garage) {
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, PluggableSchemaManagerInterface $schemaManager, GarageInterface $garage) {
     $this->schemaManager = $schemaManager;
     $this->garage = $garage;
     parent::__construct($configuration, $pluginId, $pluginDefinition);

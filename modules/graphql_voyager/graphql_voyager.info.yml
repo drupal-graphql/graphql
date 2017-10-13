@@ -1,7 +1,0 @@
-name: GraphQL Voyager
-type: module
-description: 'Adds a page with GraphQL Voyager (https://apis.guru/graphql-voyager/).'
-package: GraphQL
-core: 8.x
-dependencies:
-  - graphql

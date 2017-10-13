@@ -4,7 +4,7 @@ namespace Drupal\graphql_entity_reference\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
-use Drupal\graphql_core\GraphQL\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

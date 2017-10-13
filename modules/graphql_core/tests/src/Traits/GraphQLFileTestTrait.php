@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql_core\Traits;
 
-use Drupal\graphql\GraphQL\Execution\Processor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -62,12 +61,15 @@ trait GraphQLFileTestTrait {
    *   The GraphQL result object.
    */
   public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE, $bypassSecurity = FALSE) {
-    $processor = new Processor($this->container, \Drupal::service('graphql.schema'), $bypassSecurity);
-    $result = $processor->processPayload($this->getQuery($queryFile), $variables);
-    $data = $result->getResponseData();
+    /** @var \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor */
+    $processor = \Drupal::service('graphql.query_processor');
+    $result = $processor->processQuery('default', $this->getQuery($queryFile), $variables, $bypassSecurity);
+    $data = $result->getData();
+
     if ($assertNoErrors) {
       $this->assertNoErrors($data);
     }
+
     return $data;
   }
 
@@ -89,13 +91,16 @@ trait GraphQLFileTestTrait {
       'query' => $this->getQuery($queryFile),
       'variables' => $variables,
     ];
+
     /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel */
     $httpKernel = \Drupal::service('http_kernel');
     $response = $httpKernel->handle(Request::create('/graphql', 'POST', [], [], [], [], json_encode($content)));
     $data = json_decode($response->getContent(), TRUE);
+
     if ($assertNoErrors) {
       $this->assertNoErrors($data);
     }
+
     return $data;
   }
 

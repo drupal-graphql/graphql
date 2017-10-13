@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Generate a FieldFormatter plugin applicable to all available field types.
+ *
+ * @deprecated Will be removed before the first stable release.
+ *   Raw values all returned by default for all fields user has access to.
  */
 class RawValueFormatterDeriver extends DeriverBase implements ContainerDeriverInterface {
 
