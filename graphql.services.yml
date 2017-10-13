@@ -5,14 +5,14 @@ parameters:
     # By default, the GraphQL results get cached. This can be disabled during development.
     #
     # @default true
-    result_cache: true
+    result_cache: false
 
     # GraphQL schema cache:
     #
     # By default, the GraphQL schema gets cached. This can be disabled during development.
     #
     # @default true
-    schema_cache: true
+    schema_cache: false
 
     # Development mode:
     #
@@ -93,6 +93,16 @@ services:
     class: Drupal\graphql\QueryMapProvider\QueryMapProvider
     tags:
         - { name: service_collector, tag: graphql_query_map_provider, call: addQueryMapProvider }
+  graphql.query_map_provider.entity:
+    class: Drupal\graphql\QueryMapProvider\EntityQueryMapProvider
+    arguments: ['@entity_type.manager']
+    tags:
+        - { name: graphql_query_map_provider }
+  graphql.query_map_provider.json:
+    class: Drupal\graphql\QueryMapProvider\JsonQueryMapProvider
+    arguments: ['@cache.default', '@config.factory']
+    tags:
+        - { name: graphql_query_map_provider }
 
   # Manager for schema reducers. Uses a compiler pass to gather reducers.
   graphql.reducer_manager:
@@ -302,3 +312,25 @@ services:
       - '\Drupal\graphql\Annotation\GraphQLEnum'
       - 'graphql_enums'
       - '@logger.channel.graphql'
+
+  # Voyager.
+  graphql.voyager.page_display_variant_subscriber:
+    class: Drupal\graphql\EventSubscriber\VoyagerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }
+  graphql.voyager.routes:
+    class: Drupal\graphql\Routing\VoyagerRoutes
+    arguments: ['@plugin.manager.graphql.schema']
+    tags:
+      - { name: 'event_subscriber' }
+
+  # Explorer.
+  graphql.graphiql.page_display_variant_subscriber:
+    class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }
+  graphql.graphiql.explorer_routes:
+    class: Drupal\graphql\Routing\ExplorerRoutes
+    arguments: ['@plugin.manager.graphql.schema']
+    tags:
+      - { name: 'event_subscriber' }

@@ -1,0 +1,12 @@
+graphql.graphql_query_map.*:
+  type: config_entity
+  label: 'GraphQL Query Map'
+  mapping:
+    version:
+      type: string
+      label: 'Version'
+    query_map:
+      type: sequence
+      label: 'QueryMap'
+      sequence:
+        type: graphql.graphql_query_map.[%key]
