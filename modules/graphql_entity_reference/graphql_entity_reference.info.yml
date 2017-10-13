@@ -1,3 +1,4 @@
+# TODO: Keep for BC and deprecate.
 name: GraphQL Entity Reference
 type: module
 description: 'Traverse entity references in GraphQL queries.'

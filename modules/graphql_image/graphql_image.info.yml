@@ -1,3 +1,5 @@
+# TODO: Move image derivative functionality to core.
+# Attach it to legacy Image type by alter hook. Deprecate module.
 name: GraphQL Image
 type: module
 description: 'Request specific image styles in GraphQL queries.'

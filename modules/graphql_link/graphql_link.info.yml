@@ -1,3 +1,4 @@
+# TODO: Add Url field to link field raw data type. Deprecate module.
 name: GraphQL Link
 type: module
 description: 'Retrieve distinct properties from link fields.'

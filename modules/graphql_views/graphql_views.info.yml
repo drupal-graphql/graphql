@@ -1,3 +1,4 @@
+# TODO: Move to graphql core.
 name: GraphQL Views
 type: module
 description: 'Adds support for views.'

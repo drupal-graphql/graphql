@@ -1,3 +1,4 @@
+#TODO: Move everything to graphql_core.
 name: GraphQL Content Mutations
 type: module
 description: 'Automatically create GraphQL mutations for Drupal content entities.'

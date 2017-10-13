@@ -1,3 +1,4 @@
+# TODO: Move to graphql base.
 name: GraphQL Query Map Entity
 type: module
 description: 'Store query maps as config entities.'

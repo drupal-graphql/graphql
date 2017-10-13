@@ -1,3 +1,4 @@
+# TODO: move to graphql base.
 name: GraphQL Query Map JSON
 type: module
 description: 'Store query maps in JSON files on your local file system.'

@@ -1,3 +1,5 @@
+# TODO: Move EntityById to core and use EntityTypeDeriver.
+# Increase weights of rendered and displayed fields for BC.
 name: GraphQL Content
 type: module
 description: 'Automatically create GraphQL types and fields from Drupal content entities.'
