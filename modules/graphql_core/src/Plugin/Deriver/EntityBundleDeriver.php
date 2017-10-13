@@ -45,13 +45,17 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
    *   Instance of an entity type manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   Instance of the entity bundle info service.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    EntityTypeBundleInfoInterface $entityTypeBundleInfo
+    EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    ContentEntitySchemaConfig $schemaConfig
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**

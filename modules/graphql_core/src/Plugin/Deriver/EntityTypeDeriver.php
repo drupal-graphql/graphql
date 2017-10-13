@@ -35,12 +35,15 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Instance of an entity type manager.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     ContentEntitySchemaConfig $schemaConfig
   ) {
     $this->entityTypeManager = $entityTypeManager;
+    $this->schemaConfig = $schemaConfig;
   }
 
   /**
