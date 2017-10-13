@@ -24,7 +24,7 @@ use Drupal\user\Entity\Role;
  */
 class JsonFieldTest extends KernelTestBase {
   use NodeCreationTrait;
-  use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
+  use GraphQLFileTestTrait;
 
   public static $modules = [
     'system',

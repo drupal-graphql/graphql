@@ -18,7 +18,7 @@ use Prophecy\Argument;
  * @group graphql_twig
  */
 class EntityRenderTest extends KernelTestBase {
-  use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
+  use GraphQLFileTestTrait;
   use ThemeTestTrait;
 
   /**

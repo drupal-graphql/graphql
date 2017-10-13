@@ -18,7 +18,7 @@ use Drupal\user\Entity\Role;
  * @group graphql_xml
  */
 class XMLFieldTest extends KernelTestBase {
-  use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
+  use GraphQLFileTestTrait;
 
   public static $modules = [
     'system',
