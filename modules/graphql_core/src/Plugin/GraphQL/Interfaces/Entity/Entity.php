@@ -1,0 +1,18 @@
+<?php
+
+namespace Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity;
+
+use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
+
+/**
+ * Plugin for GraphQL interfaces derived from Drupal entity types.
+ *
+ * @GraphQLInterface(
+ *   id = "entity",
+ *   name = "Entity",
+ *   data_type = "entity"
+ * )
+ */
+class Entity extends InterfacePluginBase {
+
+}

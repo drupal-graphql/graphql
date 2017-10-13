@@ -9,7 +9,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -17,7 +17,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_core
  */
-class EntityFieldValueTest extends GraphQLFileTestBase {
+class EntityFieldValueTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 
@@ -25,6 +25,7 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'graphql_core',
     'node',
     'field',
     'filter',

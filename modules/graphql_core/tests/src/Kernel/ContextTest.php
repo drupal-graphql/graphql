@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 
 /**
  * Test plugin based schema generation.
@@ -15,6 +16,7 @@ class ContextTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
 
   public static $modules = [
+    'graphql_core',
     'graphql_context_test',
   ];
 

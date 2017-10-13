@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\graphql_core\Kernel;
 
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+
 /**
  * Test internal requests.
  *
@@ -12,7 +14,7 @@ class InternalRequestTest extends GraphQLFileTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql_requests_test'];
+  public static $modules = ['graphql_requests_test', 'graphql_core'];
 
   /**
    * Test internal requests.

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql_core\Kernel;
 
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
@@ -11,6 +12,11 @@ use GuzzleHttp\Psr7\Response;
  * @group graphql_core
  */
 class ExternalRequestTest extends GraphQLFileTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['graphql_core'];
 
   /**
    * Test external requests.

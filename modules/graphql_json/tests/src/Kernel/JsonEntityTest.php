@@ -6,7 +6,7 @@ namespace Drupal\Tests\graphql_json\Kernel;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;

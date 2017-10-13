@@ -9,7 +9,7 @@ use Drupal\entity_test\Entity\EntityTestWithBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 use Drupal\user\Entity\Role;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\user\Entity\Role;
  * @group graphql_xml
  */
 class XMLFieldTest extends KernelTestBase {
-  use GraphQLFileTestTrait;
+  use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 
   public static $modules = [
     'system',

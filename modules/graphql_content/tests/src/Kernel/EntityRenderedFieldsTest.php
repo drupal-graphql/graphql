@@ -8,7 +8,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content
  */
-class EntityRenderedFieldsTest extends GraphQLFileTestBase {
+class EntityRenderedFieldsTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
   use RevisionsTestTrait;

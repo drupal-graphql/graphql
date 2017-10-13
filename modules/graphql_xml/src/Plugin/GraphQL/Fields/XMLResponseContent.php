@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_xml\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\Plugin\GraphQL\Fields\ResponseContent;
+use Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\ResponseContent;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -16,7 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   types = {"InternalResponse", "ExternalResponse"}
  * )
  */
-class XMLResponseContent extends ResponseContent {
+class XMLResponseContent extends \Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\ResponseContent {
 
   /**
    * {@inheritdoc}

@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_menu\Kernel;
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

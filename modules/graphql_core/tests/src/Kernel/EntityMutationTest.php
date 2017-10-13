@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -19,6 +20,7 @@ class EntityMutationTest extends GraphQLFileTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'graphql_core',
     'node',
     'field',
     'filter',

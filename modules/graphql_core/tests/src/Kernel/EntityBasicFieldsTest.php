@@ -5,6 +5,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\simpletest\UserCreationTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 use DateTime;
 
@@ -19,6 +20,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
   use UserCreationTrait;
 
   public static $modules = [
+    'graphql_core',
     'node',
     'field',
     'filter',

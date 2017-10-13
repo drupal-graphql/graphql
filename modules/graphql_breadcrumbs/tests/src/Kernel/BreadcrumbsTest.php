@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Prophecy\Argument;
 
 /**
@@ -17,7 +17,7 @@ use Prophecy\Argument;
  *
  * @group graphql_breadcrumbs
  */
-class BreadcrumbsTest extends GraphQLFileTestBase {
+class BreadcrumbsTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
 

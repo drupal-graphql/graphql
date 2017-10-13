@@ -11,7 +11,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 use Drupal\user\Entity\Role;
 
 /**
@@ -21,7 +21,7 @@ use Drupal\user\Entity\Role;
  */
 class XMLFileTest extends KernelTestBase {
   use NodeCreationTrait;
-  use GraphQLFileTestTrait;
+  use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 
   public static $modules = [
     'system',

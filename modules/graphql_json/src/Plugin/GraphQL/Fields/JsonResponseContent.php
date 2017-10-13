@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_json\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\Plugin\GraphQL\Fields\ResponseContent;
+use Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\ResponseContent;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

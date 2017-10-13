@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql_json\Kernel;
 
 
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
@@ -12,7 +12,7 @@ use GuzzleHttp\Psr7\Response;
  *
  * @group graphql_json
  */
-class JsonStructureTest extends GraphQLFileTestBase {
+class JsonStructureTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
 
   /**
    * {@inheritdoc}

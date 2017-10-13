@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;
 use Prophecy\Argument;
 
@@ -16,7 +16,7 @@ use Prophecy\Argument;
  * @group graphql_twig
  */
 class ThemeTest extends KernelTestBase {
-  use GraphQLFileTestTrait;
+  use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
   use ThemeTestTrait;
 
   /**

@@ -22,7 +22,7 @@ class PermissionsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql', 'graphql_core'];
+  public static $modules = ['graphql', 'graphql_test'];
 
   /**
    * The account prophecy.

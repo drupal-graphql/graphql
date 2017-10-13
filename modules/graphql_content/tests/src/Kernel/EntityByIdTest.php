@@ -6,7 +6,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\NodeInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -14,7 +14,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content
  */
-class EntityByIdTest extends GraphQLFileTestBase {
+class EntityByIdTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
   use RevisionsTestTrait;

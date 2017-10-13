@@ -6,7 +6,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -14,7 +14,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content_mutation
  */
-class UpdateEntityTest extends GraphQLFileTestBase {
+class UpdateEntityTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

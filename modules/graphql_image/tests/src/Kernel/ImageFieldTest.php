@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_image
  */
-class ImageFieldTest extends GraphQLFileTestBase {
+class ImageFieldTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
 
