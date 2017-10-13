@@ -1,0 +1,5 @@
+entity.graphql_query_map.import_form:
+  route_name: 'entity.graphql_query_map.import_form'
+  title: 'Import query map'
+  appears_on:
+    - entity.graphql_query_map.collection

@@ -1,5 +1,0 @@
-graphql_graphiql.explorer:
-  title: 'Explorer'
-  description: 'Explore your schema with the GraphiQL explorer.'
-  parent: 'graphql.schema_overview'
-  deriver: \Drupal\graphql_graphiql\Plugin\Deriver\ExplorerMenuLinkDeriver

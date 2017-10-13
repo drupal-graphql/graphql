@@ -4,7 +4,9 @@
  * @file
  * The GraphQL module.
  */
+
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\Core\Url;
 
 define('GRAPHQL_SCALAR_PLUGIN', 'scalar');
 define('GRAPHQL_FIELD_PLUGIN', 'field');
@@ -40,23 +42,19 @@ EOT;
 }
 
 /**
- * Turn a list of machine names into a camel-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
- *   Use \Drupal\graphql\Utility\StringHelper::camelCase() instead.
+ * Implements hook_theme().
  */
-function graphql_camelcase($components) {
-  return StringHelper::camelCase($components);
-}
-
-/**
- * Turn a list of machine names into a property-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
- *   Use \Drupal\graphql\Utility\StringHelper::propCase() instead.
- */
-function graphql_propcase($components) {
-  return StringHelper::propCase($components);
+function graphql_theme() {
+  return [
+    'page__graphql_explorer' => [
+      'render element' => 'elements',
+      'base hook' => 'block',
+    ],
+    'page__graphql_voyager' => [
+      'render element' => 'elements',
+      'base hook' => 'block',
+    ],
+  ];
 }
 
 /**
@@ -127,4 +125,49 @@ function graphql_graphql_subrequest_alter(&$data, $requirements) {
       $data[$contextId] = $runtimeContexts[$contextId]->getContextValue();
     }
   }
+}
+
+/**
+ * Implements hook_graphql_schema_operations().
+ */
+function graphql_graphql_schema_operations($pluginId, array $pluginDefinition) {
+  $operations = [];
+
+  if (\Drupal::currentUser()->hasPermission('use graphql explorer')) {
+    $operations['explorer'] = [
+      'title' => 'Explorer',
+      'weight' => 10,
+      'url' => Url::fromRoute("graphql.explorer.$pluginId"),
+    ];
+  }
+
+  if (\Drupal::currentUser()->hasPermission('use graphql voyager')) {
+    $operations['voyager'] = [
+      'title' => 'Voyager',
+      'weight' => 10,
+      'url' => Url::fromRoute("graphql.voyager.$pluginId"),
+    ];
+  }
+
+  return $operations;
+}
+
+/**
+ * Turn a list of machine names into a camel-cased string.
+ *
+ * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
+ *   Use \Drupal\graphql\Utility\StringHelper::camelCase() instead.
+ */
+function graphql_camelcase($components) {
+  return StringHelper::camelCase($components);
+}
+
+/**
+ * Turn a list of machine names into a property-cased string.
+ *
+ * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
+ *   Use \Drupal\graphql\Utility\StringHelper::propCase() instead.
+ */
+function graphql_propcase($components) {
+  return StringHelper::propCase($components);
 }

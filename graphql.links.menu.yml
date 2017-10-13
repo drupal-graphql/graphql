@@ -9,3 +9,33 @@ graphq.schema_overview:
   description: 'Birds-eye overview of your available schemas.'
   parent: graphql.config_page
   route_name: graphql.schema_overview
+
+graphql.explorer:
+  title: 'Explorer'
+  description: 'Explore your schema with the GraphiQL explorer.'
+  parent: graphql.schema_overview
+  deriver: \Drupal\graphql\Plugin\MenuLink\Deriver\ExplorerMenuLinkDeriver
+
+graphql.voyager:
+  title: 'Voyager'
+  description: 'Explore your schema with the GraphQL voyager.'
+  parent: graphql.schema_overview
+  deriver: \Drupal\graphql\Plugin\MenuLink\Deriver\VoyagerMenuLinkDeriver
+
+graphql.query_maps:
+  title: 'Query maps'
+  description: 'Query map configuration.'
+  parent: graphql.config_page
+  route_name: graphql.query_maps
+
+graphql.query_map_json_config:
+  title: 'File system discovery'
+  description: 'Manage configuration for query maps stored on the local filesystem.'
+  parent: graphql.query_maps
+  route_name: graphql.query_map_json_config
+
+entity.graphql_query_map.collection:
+  title: 'Imported query maps'
+  description: 'Save and manage query maps in config.'
+  parent: graphql.query_maps
+  route_name: entity.graphql_query_map.collection
