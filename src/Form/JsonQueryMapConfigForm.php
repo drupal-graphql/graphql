@@ -54,14 +54,14 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['graphql_query_map_json.config'];
+    return ['graphql.query_map_json.config'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('graphql_query_map_json.config');
+    $config = $this->config('graphql.query_map_json.config');
 
     $form['lookup_paths'] = [
       '#type' => 'textarea',
@@ -80,7 +80,7 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
     $this->cacheBackend->delete('graphql_query_map_json_versions');
 
     $paths = array_map('trim', explode("\n", $form_state->getValue('lookup_paths', '')));
-    $this->config('graphql_query_map_json.config')
+    $this->config('graphql.query_map_json.config')
       ->set('lookup_paths', $paths)
       ->save();
 

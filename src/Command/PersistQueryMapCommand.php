@@ -9,13 +9,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Drupal\Console\Core\Style\DrupalStyle;
-use Drupal\Console\Annotations\DrupalCommand;
 
 /**
  * @package Drupal\graphql
  *
  * @DrupalCommand (
- *   extension="graphql_query_map_entity",
+ *   extension="graphql",
  *   extensionType="module"
  * )
  */
