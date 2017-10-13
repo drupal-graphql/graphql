@@ -5,14 +5,14 @@ parameters:
     # By default, the GraphQL results get cached. This can be disabled during development.
     #
     # @default true
-    result_cache: false
+    result_cache: true
 
     # GraphQL schema cache:
     #
     # By default, the GraphQL schema gets cached. This can be disabled during development.
     #
     # @default true
-    schema_cache: false
+    schema_cache: true
 
     # Development mode:
     #
