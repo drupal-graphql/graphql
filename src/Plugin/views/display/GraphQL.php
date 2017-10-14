@@ -132,6 +132,16 @@ class GraphQL extends DisplayPluginBase {
   }
 
   /**
+   * Gets the filter input name based on user defined query name or the default one.
+   *
+   * @return string
+   *   Result name.
+   */
+  public function getGraphQLFilterInputName() {
+    return $this->getGraphQLName('filter_input', TRUE);
+  }
+
+  /**
    * Returns the id based on user-provided query name or the default one.
    *
    * @param string|null $suffix
