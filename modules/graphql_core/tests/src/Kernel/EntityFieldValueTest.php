@@ -167,6 +167,9 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
       'body' => [
         'value' => 'test',
         'summary' => 'test summary',
+        'summaryProcessed' => "<p>test summary</p>\n",
+        'processed' => "<p>test</p>\n",
+        'format' => null,
       ],
       'fieldText' => [
         ['value' => 'a'],
@@ -217,17 +220,11 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
           'targetId' => 1,
           'display' => 0,
           'description' => 'description test 1',
-          'entity' => [
-            'entityLabel' => 'example.txt',
-          ]
         ],
         [
           'targetId' => 2,
           'display' => 1,
           'description' => 'description test 2',
-          'entity' => [
-            'entityLabel' => 'example.png',
-          ]
         ],
       ],
       'fieldImage' => [
@@ -237,9 +234,6 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
           'title' => 'title test 1',
           'width' => 100,
           'height' => 50,
-          'entity' => [
-            'entityLabel' => 'example.txt',
-          ]
         ],
         [
           'targetId' => 2,
@@ -247,10 +241,34 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
           'title' => 'title test 2',
           'width' => 200,
           'height' => 100,
-          'entity' => [
-            'entityLabel' => 'example.png',
-          ]
         ],
+      ],
+      'nid' => [
+        'value' => 1,
+      ],
+      'vid' => [
+        'value' => 1,
+      ],
+      'langcode' => [
+        'value' => 'en',
+      ],
+      'type' => [
+        'targetId' => 'test',
+      ],
+      'title' => [
+        'value' => 'Test',
+      ],
+      'status' => [
+        'value' => 1,
+      ],
+      'promote' => [
+        'value' => 1,
+      ],
+      'sticky' => [
+        'value' => 0,
+      ],
+      'revisionTranslationAffected' => [
+        'value' => 1,
       ],
     ];
 
