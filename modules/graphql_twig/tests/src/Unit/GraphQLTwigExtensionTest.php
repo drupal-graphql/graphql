@@ -1,10 +1,13 @@
 <?php
 
-namespace Drupal\Tests\graphql_twig;
+namespace Drupal\Tests\graphql_twig\Unit;
 
 use Drupal\graphql_twig\GraphQLTwigExtension;
 use Drupal\Tests\UnitTestCase;
 
+/**
+ * @group graphql_twig
+ */
 class GraphQLTwigExtensionTest extends UnitTestCase {
 
   /**

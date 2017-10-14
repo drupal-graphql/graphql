@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 use Drupal\Tests\language\Kernel\LanguageTestBase;
 
@@ -13,6 +14,7 @@ use Drupal\Tests\language\Kernel\LanguageTestBase;
  */
 class LanguageTest extends LanguageTestBase {
   use GraphQLFileTestTrait;
+  use ByPassAccessTrait;
 
   /**
    * {@inheritdoc}

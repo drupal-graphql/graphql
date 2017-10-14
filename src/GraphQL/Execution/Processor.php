@@ -19,7 +19,7 @@ use Youshido\GraphQL\Parser\Ast\Query as AstQuery;
 use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\TypeService;
 
-class Processor extends BaseProcessor implements CacheableDependencyInterface {
+class Processor extends BaseProcessor {
   /**
    * The dependency injection container.
    *
@@ -32,7 +32,7 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    *
    * @var \Drupal\Core\Cache\CacheableMetadata
    */
-  protected $metadata;
+  protected $queryMetadata;
 
   /**
    * Constructs a Processor object.
@@ -46,16 +46,27 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    */
   public function __construct(ContainerInterface $container, AbstractSchema $schema, $secure = FALSE) {
     parent::__construct($schema);
-
     $this->container = $container;
-    $this->metadata = new CacheableMetadata();
+    $this->executionContext->getContainer()->set('secure', $secure);
+    $this->queryMetadata = new CacheableMetadata();
+  }
 
-    // Add cache metadata from the active schema.
-    if ($schema instanceof CacheableDependencyInterface) {
-      $this->metadata->addCacheableDependency($schema);
+  /**
+   * Return the collected cache metadata from the query.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   *   The collected cache metadata from the query.
+   */
+  public function getQueryCacheMetadata() {
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheableDependency($this->queryMetadata);
+
+    // Prevent caching if this is a mutation query.
+    if (($request = $this->executionContext->getRequest()) && $request->hasMutations()) {
+      $metadata->setCacheMaxAge(0);
     }
 
-    $this->executionContext->getContainer()->set('secure', $secure);
+    return $metadata;
   }
 
   /**
@@ -74,7 +85,7 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     $value = $this->doResolveValue($field, $ast, $parentValue);
     if ($value instanceof CacheableDependencyInterface) {
       // If the current resolved value returns cache metadata, keep it.
-      $this->metadata->addCacheableDependency($value);
+      $this->queryMetadata->addCacheableDependency($value);
     }
 
     // If it's a GraphQL cacheable value wrapper, extract the real value to return.
@@ -92,7 +103,7 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
    */
   protected function deferredResolve($resolvedValue, callable $callback) {
     if ($resolvedValue instanceof DeferredResolverInterface) {
-      $deferredResult = new DeferredResult($this->metadata, $resolvedValue, $callback);
+      $deferredResult = new DeferredResult($this->queryMetadata, $resolvedValue, $callback);
       // Whenever we stumble upon a deferred resolver, append it to the
       // queue to be resolved later.
       $this->deferredResults[] = $deferredResult;
@@ -161,31 +172,5 @@ class Processor extends BaseProcessor implements CacheableDependencyInterface {
     }
 
     return $resolveFunction;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts() {
-    return $this->metadata->getCacheContexts();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    return $this->metadata->getCacheTags();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge() {
-    // Prevent caching if this is a mutation query.
-    if (($request = $this->executionContext->getRequest()) && $request->hasMutations()) {
-      return 0;
-    }
-
-    return $this->metadata->getCacheMaxAge();
   }
 }

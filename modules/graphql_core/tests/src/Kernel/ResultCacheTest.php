@@ -14,6 +14,7 @@ class ResultCacheTest extends GraphQLFileTestBase {
    */
   public static $modules = [
     'graphql_cache_test',
+    'graphql_core',
   ];
 
   /**

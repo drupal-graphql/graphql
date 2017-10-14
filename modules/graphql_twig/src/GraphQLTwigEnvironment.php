@@ -21,7 +21,7 @@ class GraphQLTwigEnvironment extends TwigEnvironment {
    *
    * @var string
    */
-  public static $GRAPHQL_ANNOTATION_REGEX = '/{#graphql\s+(?<query>.*)\s+#\}/s';
+  public static $GRAPHQL_ANNOTATION_REGEX = '/{#graphql\s+(?<query>.*?)\s+#\}/s';
 
   public function compileSource($source, $name = NULL) {
     if ($source instanceof \Twig_Source) {

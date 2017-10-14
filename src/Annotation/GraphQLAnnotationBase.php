@@ -4,6 +4,7 @@ namespace Drupal\graphql\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Drupal\Component\Annotation\Plugin;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * Annotation for GraphQL input type plugins.
@@ -50,5 +51,47 @@ abstract class GraphQLAnnotationBase extends Plugin {
    * @var int
    */
   public $weight = 0;
+
+  /**
+   * The cache contexts for caching the type system definition in the schema.
+   *
+   * @var array
+   */
+  public $schema_cache_contexts = ['languages:language_interface'];
+
+  /**
+   * The cache tags for caching the type system definition in the schema.
+   *
+   * @var array
+   */
+  public $schema_cache_tags = ['graphql_schema'];
+
+  /**
+   * The cache max age for caching the type system definition in the schema.
+   *
+   * @var array
+   */
+  public $schema_cache_max_age = CacheBackendInterface::CACHE_PERMANENT;
+
+  /**
+   * The cache contexts for caching the response.
+   *
+   * @var array
+   */
+  public $response_cache_contexts = ['gql', 'user'];
+
+  /**
+   * The cache tags for caching theresponse.
+   *
+   * @var array
+   */
+  public $response_cache_tags = ['graphql_response'];
+
+  /**
+   * The cache max age for caching the response.
+   *
+   * @var array
+   */
+  public $response_cache_max_age = CacheBackendInterface::CACHE_PERMANENT;
 
 }

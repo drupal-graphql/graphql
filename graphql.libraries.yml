@@ -1,0 +1,25 @@
+explorer:
+  version: VERSION
+  js:
+    assets/explorer/dist/bundle.min.js: {preprocess: false}
+  css:
+    component:
+      assets/explorer/dist/graphiql.css: {preprocess: false}
+      assets/explorer/dist/explorer.css: {preprocess: false}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
+
+voyager:
+  version: VERSION
+  js:
+    assets/voyager/dist/voyager.worker.js: {preprocess: false}
+    assets/voyager/dist/bundle.min.js: {preprocess: false}
+  css:
+    component:
+      assets/voyager/dist/voyager.css: {preprocess: true}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

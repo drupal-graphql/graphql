@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Fields;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\Batching\BatchedFieldInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\SecureFieldInterface;
@@ -20,7 +19,7 @@ use Youshido\GraphQL\Field\AbstractField;
 /**
  * Base class for graphql field plugins.
  */
-abstract class FieldPluginBase extends AbstractField implements TypeSystemPluginInterface, CacheableDependencyInterface, SecureFieldInterface {
+abstract class FieldPluginBase extends AbstractField implements TypeSystemPluginInterface, SecureFieldInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;
@@ -111,7 +110,7 @@ abstract class FieldPluginBase extends AbstractField implements TypeSystemPlugin
    */
   protected function getCacheDependencies($result, $parent, array $args) {
     // Default implementation just returns the value itself.
-    return $result;
+    return [$result];
   }
 
   /**

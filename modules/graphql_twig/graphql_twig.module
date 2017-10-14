@@ -87,6 +87,8 @@ function graphql_twig_process_query(&$variables, $hook, $info) {
   if (isset($info['graphql_enabled']) && $info['graphql_enabled']) {
     /** @var \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor */
     $processor = Drupal::service('graphql.query_processor');
+    /** @var \Drupal\graphql\GraphQL\Schema\SchemaLoader $loader */
+    $loader = Drupal::service('graphql.schema_loader');
 
     /** @var \Drupal\Core\Template\TwigEnvironment $twig */
     $twig = Drupal::service('twig');
@@ -102,7 +104,8 @@ function graphql_twig_process_query(&$variables, $hook, $info) {
       }
     }
 
-    $queryResult = $processor->processQuery($query, $arguments);
+    // TODO: This needs to be configurable.
+    $queryResult = $processor->processQuery('default', $query, $arguments);
 
     $variables['graphql'] = $queryResult->getData();
 

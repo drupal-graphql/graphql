@@ -25,7 +25,7 @@ class DisabledResultCacheTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql'];
+  public static $modules = ['graphql', 'graphql_core'];
 
   /**
    * {@inheritdoc}
@@ -45,7 +45,7 @@ class DisabledResultCacheTest extends KernelTestBase {
     $processor = $this->prophesize(QueryProcessor::class);
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery('cached', Argument::cetera())
+    $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
       ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
 
     $this->container->set('graphql.query_processor', $processor->reveal());

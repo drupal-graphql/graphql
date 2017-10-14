@@ -16,7 +16,7 @@ use Youshido\GraphQL\Type\Object\AbstractObjectType;
 /**
  * Base class for GraphQL type plugins.
  */
-abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPluginInterface, CacheableDependencyInterface {
+abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPluginInterface {
   use PluginTrait;
   use CacheablePluginTrait;
   use NamedPluginTrait;
@@ -39,8 +39,6 @@ abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPl
       'interfaces' => $this->buildInterfaces($schemaManager),
       'fields' => $this->buildFields($schemaManager),
     ]);
-
-    $this->build($this->config);
   }
 
   /**

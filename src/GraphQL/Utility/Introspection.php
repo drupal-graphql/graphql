@@ -3,6 +3,7 @@
 namespace Drupal\graphql\GraphQL\Utility;
 
 use Drupal\graphql\GraphQL\Execution\Processor;
+use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Drupal\graphql\GraphQL\Reducers\ReducerManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Schema\AbstractSchema;
@@ -103,53 +104,32 @@ class Introspection {
 TEXT;
 
   /**
-   * The GraphQL schema.
-   *
-   * @var \Youshido\GraphQL\Schema\AbstractSchema
+   * @var \Drupal\graphql\GraphQL\Execution\QueryProcessor
    */
-  protected $schema;
-
-  /**
-   * The dependency injection container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
-
-  /**
-   * The reducer manager service.
-   *
-   * @var \Drupal\graphql\GraphQL\Reducers\ReducerManager
-   */
-  protected $reducerManager;
+  protected $queryProcessor;
 
   /**
    * Constructs an Introspection object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The dependency injection container.
-   * @param \Drupal\graphql\GraphQL\Reducers\ReducerManager $reducerManager
-   *   The reducer manager service.
-   * @param \Youshido\GraphQL\Schema\AbstractSchema $schema
-   *   The graphql schema.
+   * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $queryProcessor
+   *   The query processor srevice.
    */
-  public function __construct(ContainerInterface $container, ReducerManager $reducerManager, AbstractSchema $schema) {
-    $this->schema = $schema;
-    $this->container = $container;
-    $this->reducerManager = $reducerManager;
+  public function __construct(QueryProcessor $queryProcessor) {
+    $this->queryProcessor = $queryProcessor;
   }
 
   /**
    * Perform an introspection query and return result.
    *
-   * @return array
+   * @param string $schema
+   *   The name of the graphql schema to introspect.
+   *
+   * @return array The introspection result as an array.
    *   The introspection result as an array.
    */
-  public function introspect() {
-    $processor = new Processor($this->container, $this->schema);
-    $processor->processPayload($this->introspectionQuery, [], $this->reducerManager->getAllServices());
-
-    return $processor->getResponseData();
+  public function introspect($schema) {
+    $result = $this->queryProcessor->processQuery($schema, $this->introspectionQuery);
+    return $result->getData();
   }
 
 }
