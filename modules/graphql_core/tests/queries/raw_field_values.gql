@@ -2,33 +2,19 @@ query ($path: String!) {
   route:route(path: $path) {
     entity {
       ... on NodeTest {
-        nid {
-          value
-        }
-        vid {
-          value
-        }
+        nid
+        vid
         langcode {
           value
         }
         type {
           targetId
         }
-        title {
-          value
-        }
-        status {
-          value
-        }
-        promote {
-          value
-        }
-        sticky {
-          value
-        }
-        revisionTranslationAffected {
-          value
-        }
+        title
+        status
+        promote
+        sticky
+        revisionTranslationAffected
         body {
           summaryProcessed
           summary
