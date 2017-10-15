@@ -1,0 +1,5 @@
+services:
+  graphql_metatag.event_listener:
+    class: Drupal\graphql_metatag\EventListener
+    tags:
+      - { name: event_subscriber }
