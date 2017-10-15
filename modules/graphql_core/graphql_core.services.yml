@@ -1,7 +1,7 @@
 services:
   graphql_core.type_mapper:
       class: Drupal\graphql_core\TypeMapper
-      arguments: ['%graphql_core.type_map%']
+      arguments: ['@entity_type.manager', '%graphql_core.type_map%']
 
 parameters:
   graphql_core.type_map:

@@ -2,11 +2,15 @@
 
 namespace Drupal\graphql_core\Plugin\Deriver;
 
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriverBase;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityField;
 use Drupal\graphql_core\Plugin\GraphQL\Types\EntityFieldType;
+
+// TODO Reduce single-property fields to scalars.
+
+// TODO Convert timestamps to strings?
 
 /**
  * Deriver for RawValue fields.
@@ -14,14 +18,22 @@ use Drupal\graphql_core\Plugin\GraphQL\Types\EntityFieldType;
 class EntityFieldDeriver extends EntityFieldDeriverBase {
 
   /**
-   * Provide plugin definition values from config field storage.
-   *
-   * @param string $entityTypeId
-   *   The host entity type.
-   * @param string $bundleId
-   *   The host entity bundle.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage
-   *   Field storage definition object.
+   * {@inheritdoc}
+   */
+  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {
+    $fieldName = $baseFieldDefinition->getName();
+
+    $this->derivatives["$entityTypeId-$fieldName"] = [
+      'types' => [StringHelper::camelCase([$entityTypeId])],
+      'name' => EntityField::getId($fieldName),
+      'multi' => $baseFieldDefinition->isMultiple(),
+      'field' => $fieldName,
+      'type' => EntityFieldType::getId($entityTypeId, $fieldName),
+    ] + $basePluginDefinition;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {
     $fieldName = $storage->getName();

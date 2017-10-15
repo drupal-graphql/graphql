@@ -6,11 +6,10 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,7 +18,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * Provide plugin definition values from config field storage.
+   * Provides plugin definition values from base fields.
+   *
+   * @param string $entityTypeId
+   *   The host entity type.
+   * @param \Drupal\Core\Field\BaseFieldDefinition $baseFieldDefinition
+   *   Base field definition object.
+   * @param array $basePluginDefinition
+   *   Base definition array.
+   */
+  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {}
+
+  /**
+   * Provides plugin definition values from config field storage.
    *
    * @param string $entityTypeId
    *   The host entity type.
@@ -30,7 +41,7 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
    * @param array $basePluginDefinition
    *   Base definition array.
    */
-  protected abstract function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition);
+  protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {}
 
   /**
    * The entity type manager.
@@ -68,18 +79,19 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
       $container->get('entity_type.bundle.info'),
-      $basePluginId);
+      $basePluginId
+    );
   }
 
   /**
-   * AbstractFieldFormatterDeriver constructor.
+   * RawValueFieldItemDeriver constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
-   *   The entity bundle info service.
+   *   The bundle info service.
    * @param string $basePluginId
    *   The base plugin id.
    */
@@ -110,7 +122,9 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
         continue;
       }
 
-      // TODO Add base fields.
+      foreach ($this->entityFieldManager->getBaseFieldDefinitions($entityTypeId) as $baseFieldDefinition) {
+        $this->getBaseFieldDefinition($entityTypeId, $baseFieldDefinition, $basePluginDefinition);
+      }
 
       foreach ($bundleInfo->getBundleInfo($entityTypeId) as $bundleId => $bundle) {
         foreach ($this->entityFieldManager->getFieldDefinitions($entityTypeId, $bundleId) as $fieldDefinition) {
