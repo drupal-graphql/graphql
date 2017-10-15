@@ -40,4 +40,18 @@ query {
       uuid:entityUuid
     }
   }
+
+  sort:nodeQuery(sort: [{field: "title", order: "DESC"}]) {
+    count
+    entities {
+      uuid:entityUuid
+    }
+  }
+
+  sort_multiple:nodeQuery(sort: [{field: "type"}, {field: "title", order: DESC}]) {
+    count
+    entities {
+      uuid:entityUuid
+    }
+  }
 }

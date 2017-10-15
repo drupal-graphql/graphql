@@ -115,6 +115,24 @@ class EntityQueryTest extends GraphQLFileTestBase {
     ], $result['data']['all_nodes']['entities'], 'All entities queried.');
 
     $this->assertEquals(4, $result['data']['all_nodes']['count'], 'Correct count is returned');
+
+    $this->assertEquals([
+      ['uuid' => $d->uuid()],
+      ['uuid' => $c->uuid()],
+      ['uuid' => $b->uuid()],
+      ['uuid' => $a->uuid()],
+    ], $result['data']['sort']['entities'], 'Sort works as expected.');
+
+    $this->assertEquals(4, $result['data']['sort']['count'], 'Correct count is returned');
+
+    $this->assertEquals([
+      ['uuid' => $c->uuid()],
+      ['uuid' => $b->uuid()],
+      ['uuid' => $a->uuid()],
+      ['uuid' => $d->uuid()],
+    ], $result['data']['sort_multiple']['entities'], 'Multisort works as expected.');
+
+    $this->assertEquals(4, $result['data']['sort_multiple']['count'], 'Correct count is returned');
   }
 
 }

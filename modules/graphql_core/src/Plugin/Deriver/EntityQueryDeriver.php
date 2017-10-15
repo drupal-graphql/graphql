@@ -75,6 +75,11 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
             'nullable' => TRUE,
             'type' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
           ];
+          $derivative['arguments']['sort'] = [
+            'multi' => TRUE,
+            'nullable' => TRUE,
+            'type' => 'EntityQuerySortInput',
+          ];
         }
 
         $this->derivatives[$id] = $derivative;
