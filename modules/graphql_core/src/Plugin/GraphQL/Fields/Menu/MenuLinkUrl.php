@@ -1,30 +1,30 @@
 <?php
 
-namespace Drupal\graphql_menu\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
 
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Check if the menu link is expanded.
+ * Retrieve a menu links route object.
  *
  * @GraphQLField(
- *   id = "menu_link_expanded",
+ *   id = "menu_link_url",
  *   secure = true,
- *   name = "expanded",
- *   type = "Boolean",
+ *   name = "url",
+ *   type = "Url",
  *   types = {"MenuLink"}
  * )
  */
-class MenuLinkExpanded extends FieldPluginBase {
+class MenuLinkUrl extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof MenuLinkTreeElement) {
-      yield $value->link->isExpanded();
+      yield $value->link->getUrlObject();
     }
   }
 

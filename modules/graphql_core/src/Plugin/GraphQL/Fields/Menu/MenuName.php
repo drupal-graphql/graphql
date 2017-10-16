@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_menu\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\system\MenuInterface;

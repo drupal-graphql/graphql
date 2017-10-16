@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_menu\Plugin\GraphQL\Types;
+namespace Drupal\graphql_core\Plugin\GraphQL\Types\Menu;
 
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 

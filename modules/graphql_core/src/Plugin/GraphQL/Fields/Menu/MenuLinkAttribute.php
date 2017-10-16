@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_menu\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Menu\MenuLinkTreeElement;
