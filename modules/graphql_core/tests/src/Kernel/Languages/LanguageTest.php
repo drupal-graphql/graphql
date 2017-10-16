@@ -104,4 +104,49 @@ class LanguageTest extends GraphQLCoreTestBase {
     ], $metadata);
   }
 
+  /**
+   * Test language switch links.
+   */
+  public function testLanguageSwitchLinks() {
+    $result = $this->executeQueryFile('languages.gql');
+
+    $english = [
+      'langcode' => 'en',
+      'url' => [
+        'asString' => '/en',
+      ],
+      'title' => 'English',
+      'isActive' => true,
+    ];
+
+    $french = [
+      'langcode' => 'fr',
+      'url' => [
+        'asString' => '/fr',
+      ],
+      'title' => NULL,
+      'isActive' => false,
+    ];
+
+    $spanish = [
+      'langcode' => 'es',
+      'url' => [
+        'asString' => '/es',
+      ],
+      'title' => NULL,
+      'isActive' => false,
+    ];
+
+    $brazil = [
+      'langcode' => 'pt-br',
+      'url' => [
+        'asString' => '/',
+      ],
+      'title' => NULL,
+      'isActive' => false,
+    ];
+
+    $this->assertEquals([$english, $french, $spanish, $brazil], $result['data']['frontpage']['languageSwitchLinks']);
+  }
+
 }
