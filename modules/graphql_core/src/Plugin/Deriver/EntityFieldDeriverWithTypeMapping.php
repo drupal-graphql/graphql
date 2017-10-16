@@ -24,7 +24,7 @@ abstract class EntityFieldDeriverWithTypeMapping extends EntityFieldDeriverBase 
    * @param null|string $bundleId
    *   Bundle id.
    */
-  protected abstract function getDerivativesFromPropertyDefinitions($entityTypeId, FieldStorageDefinitionInterface $definition, array $basePluginDefinition, $bundleId = NULL);
+  abstract protected function getDerivativesFromPropertyDefinitions($entityTypeId, FieldStorageDefinitionInterface $definition, array $basePluginDefinition, $bundleId = NULL);
 
   /**
    * The type mapper service.

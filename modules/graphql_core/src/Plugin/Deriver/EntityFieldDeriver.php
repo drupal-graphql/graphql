@@ -46,12 +46,7 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
       $derivative['type'] = EntityFieldType::getId($entityTypeId, $fieldName);
     }
 
-    if (is_null($bundleId)) {
-      $key = "$entityTypeId-$bundleId-$fieldName";
-    }
-    else {
-      $key = "$entityTypeId-$fieldName";
-    }
+    $key = is_null($bundleId) ? "$entityTypeId-$fieldName" : "$entityTypeId-$bundleId-$fieldName";
 
     $this->derivatives[$key] = $derivative + $basePluginDefinition;
   }
