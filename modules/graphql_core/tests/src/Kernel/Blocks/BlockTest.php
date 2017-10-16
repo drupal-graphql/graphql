@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_block\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Blocks;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\simpletest\BlockCreationTrait;
@@ -26,8 +26,6 @@ class BlockTest extends GraphQLFileTestBase {
     'editor',
     'ckeditor',
     'graphql_core',
-    'graphql_content',
-    'graphql_block',
     'graphql_block_test',
   ];
 
@@ -59,19 +57,6 @@ class BlockTest extends GraphQLFileTestBase {
     $this->placeBlock('block_content:' . $customBlock->uuid(), [
       'region' => 'sidebar_first',
     ]);
-
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'block_content' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'basic' => [
-              'exposed' => TRUE,
-              'view_mode' => 'block_content.graphql',
-            ],
-          ],
-        ],
-      ])->save();
   }
 
   /**
@@ -89,7 +74,7 @@ class BlockTest extends GraphQLFileTestBase {
   public function testContentBlock() {
     $result = $this->executeQueryFile('blocks.gql');
     $this->assertEquals(1, count($result['data']['route']['sidebar']), 'One content block in sidebar region.');
-    $this->assertEquals('<p>This is a test block content.</p>', $result['data']['route']['sidebar'][0]['body'], 'Content block body contains expected text.');
+    $this->assertEquals('<p>This is a test block content.</p>', $result['data']['route']['sidebar'][0]['body']['value'], 'Content block body contains expected text.');
   }
 
 }

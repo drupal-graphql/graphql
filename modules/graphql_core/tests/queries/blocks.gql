@@ -10,7 +10,9 @@ query {
     sidebar:blocksByRegion(region: "sidebar_first") {
       ... on BlockContentBasic {
         __typename
-        body
+        body {
+          value
+        }
       }
     }
   }

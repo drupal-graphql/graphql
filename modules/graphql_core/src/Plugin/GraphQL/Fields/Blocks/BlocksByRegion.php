@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_block\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Blocks;
 
 use Drupal\block\Entity\Block;
 use Drupal\block_content\Plugin\Block\BlockContentBlock;
