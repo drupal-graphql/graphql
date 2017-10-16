@@ -8,4 +8,14 @@ query {
     weight
     argument
   }
+  frontpage:route(path: "/") {
+    languageSwitchLinks {
+      langcode
+      title
+      isActive
+      url {
+        asString
+      }
+    }
+  }
 }
