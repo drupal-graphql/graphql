@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\Mutations;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -11,7 +11,7 @@ use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
+class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The entity type manager service.
    *
@@ -27,20 +27,12 @@ class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
   protected $entityTypeBundleInfo;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
-   */
-  protected $schemaConfig;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_type.manager'),
-      $container->get('graphql_content_mutation.schema_config')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -49,12 +41,10 @@ class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
    */
   public function __construct(
     EntityTypeBundleInfoInterface $entityTypeBundleInfo,
-    EntityTypeManagerInterface $entityTypeManager,
-    ContentEntityMutationSchemaConfig $schemaConfig
+    EntityTypeManagerInterface $entityTypeManager
   ) {
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityTypeManager = $entityTypeManager;
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -67,20 +57,11 @@ class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        if (!$this->schemaConfig->exposeUpdate($entityTypeId, $bundleName)) {
-          continue;
-        }
-
         $this->derivatives["$entityTypeId:$bundleName"] = [
-          'name' => 'update' . StringHelper::camelCase([$entityTypeId, $bundleName]),
+          'name' => StringHelper::propCase(['create', $entityTypeId, $bundleName]),
           'arguments' => [
-            'id' => [
-              'type' => 'String',
-              'nullable' => FALSE,
-              'multi' => FALSE,
-            ],
             'input' => [
-              'type' => StringHelper::camelCase([$entityTypeId, $bundleName, 'update', 'input']),
+              'type' => StringHelper::camelCase([$entityTypeId, $bundleName, 'create', 'input']),
               'nullable' => FALSE,
               'multi' => FALSE,
             ],

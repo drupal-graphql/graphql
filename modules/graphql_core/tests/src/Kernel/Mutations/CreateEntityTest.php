@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_content_mutation\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Mutations;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -25,9 +25,6 @@ class CreateEntityTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'graphql_core',
-    'graphql_content',
-    'graphql_mutation',
-    'graphql_content_mutation',
   ];
 
   /**
@@ -45,17 +42,6 @@ class CreateEntityTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->grantPermission('create test content')
       ->save();
-
-    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
-      ->set('types', [
-        'node' => [
-          'bundles' => [
-            'test' => [
-              'create' => TRUE,
-            ],
-          ],
-        ],
-      ])->save();
   }
 
   /**

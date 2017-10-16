@@ -1,12 +1,13 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Mutations;
+namespace Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
+use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\EntityMutationInputTrait;
+use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -20,7 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   nullable = false,
  *   cache_tags = {"entity_types", "entity_bundles"},
- *   deriver = "Drupal\graphql_content_mutation\Plugin\Deriver\CreateEntityDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Mutations\CreateEntityDeriver"
  * )
  */
 class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
@@ -70,7 +71,7 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
     $inputArgs = $args['input'];
     /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $type */
     $type = $this->config->getArgument('input')->getType();
-    /** @var \Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInput $inputType */
+    /** @var \Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInput $inputType */
     $inputType = $type->getNamedType();
     $input = $this->extractEntityInput($inputArgs, $inputType);
 

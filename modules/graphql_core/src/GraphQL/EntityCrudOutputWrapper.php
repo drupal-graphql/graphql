@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\GraphQL;
+namespace Drupal\graphql_core\GraphQL;
 
 use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;

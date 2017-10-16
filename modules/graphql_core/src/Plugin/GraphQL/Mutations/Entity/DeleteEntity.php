@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Mutations;
+namespace Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\EntityCrudOutputWrapper;
+use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -24,7 +24,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   },
  *   nullable = false,
  *   cache_tags = {"entity_types"},
- *   deriver = "Drupal\graphql_content_mutation\Plugin\Deriver\DeleteEntityDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Mutations\DeleteEntityDeriver"
  * )
  */
 class DeleteEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {

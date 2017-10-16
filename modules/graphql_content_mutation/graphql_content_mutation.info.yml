@@ -3,5 +3,6 @@ type: module
 description: 'Automatically create GraphQL mutations for Drupal content entities.'
 package: GraphQL
 core: 8.x
+hidden: true
 dependencies:
   - graphql_mutation

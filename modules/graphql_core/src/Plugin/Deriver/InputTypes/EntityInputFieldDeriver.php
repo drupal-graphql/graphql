@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\InputTypes;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -27,20 +27,12 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
   protected $entityFieldManager;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
-   */
-  protected $schemaConfig;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity_field.manager'),
-      $container->get('graphql_content_mutation.schema_config')
+      $container->get('entity_field.manager')
     );
   }
 
@@ -49,12 +41,10 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    EntityFieldManagerInterface $entityFieldManager,
-    ContentEntityMutationSchemaConfig $schemaConfig
+    EntityFieldManagerInterface $entityFieldManager
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -63,10 +53,6 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $type) {
       if (!($type instanceof ContentEntityTypeInterface)) {
-        continue;
-      }
-
-      if (!$this->schemaConfig->exposeAnyCreateOrUpdate($entityTypeId)) {
         continue;
       }
 

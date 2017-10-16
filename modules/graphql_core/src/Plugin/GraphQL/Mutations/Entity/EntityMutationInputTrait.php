@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\GraphQL\Mutations;
+namespace Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity;
 
-use Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInput;
-use Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInputField;
+use Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInput;
+use Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInputField;
 use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
 
 trait EntityMutationInputTrait {
@@ -15,8 +15,9 @@ trait EntityMutationInputTrait {
    *
    * @param array $inputValue
    *   The entity values provided through the resolver args.
-   * @param \Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInput $inputType
+   * @param \Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInput $inputType
    *   The input type.
+   *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
@@ -52,8 +53,9 @@ trait EntityMutationInputTrait {
    *
    * @param array $fieldValue
    *   The field values keyed by property name.
-   * @param \Drupal\graphql_content_mutation\Plugin\GraphQL\InputTypes\EntityInputField $fieldType
+   * @param \Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInputField $fieldType
    *   The field type.
+   *
    * @return array
    *   The extracted field values with their proper, internal property names.
    */

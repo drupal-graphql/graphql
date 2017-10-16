@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\Mutations;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -19,19 +19,11 @@ class DeleteEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
   protected $entityTypeManager;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
-   */
-  protected $schemaConfig;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
-      $container->get('entity_type.manager'),
-      $container->get('graphql_content_mutation.schema_config')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -39,20 +31,15 @@ class DeleteEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
    * {@inheritdoc}
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
-    ContentEntityMutationSchemaConfig $schemaConfig
+    EntityTypeManagerInterface $entityTypeManager
   ) {
     $this->entityTypeManager = $entityTypeManager;
-    $this->schemaConfig = $schemaConfig;
   }
   /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $type) {
-      if (!$this->schemaConfig->exposeDelete($entityTypeId)) {
-        continue;
-      }
 
       if (!($type instanceof ContentEntityTypeInterface)) {
         continue;

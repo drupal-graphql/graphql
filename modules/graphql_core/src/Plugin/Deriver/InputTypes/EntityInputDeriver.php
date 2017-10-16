@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content_mutation\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\InputTypes;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -35,21 +35,13 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
   protected $entityFieldManager;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
-   */
-  protected $schemaConfig;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
       $container->get('entity_type.bundle.info'),
       $container->get('entity_type.manager'),
-      $container->get('entity_field.manager'),
-      $container->get('graphql_content_mutation.schema_config')
+      $container->get('entity_field.manager')
     );
   }
 
@@ -59,13 +51,11 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
   public function __construct(
     EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     EntityTypeManagerInterface $entityTypeManager,
-    EntityFieldManagerInterface $entityFieldManager,
-    ContentEntityMutationSchemaConfig $schemaConfig
+    EntityFieldManagerInterface $entityFieldManager
   ) {
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityFieldManager = $entityFieldManager;
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -78,12 +68,6 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        $createExposed = $this->schemaConfig->exposeCreate($entityTypeId, $bundleName);
-        $updateExposed = $this->schemaConfig->exposeUpdate($entityTypeId, $bundleName);
-
-        if (!$createExposed && !$updateExposed) {
-          continue;
-        }
 
         $createFields = [];
         $updateFields = [];
@@ -117,25 +101,21 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
           ];
         }
 
-        if ($createExposed) {
-          $this->derivatives["$entityTypeId:$bundleName:create"] = [
-            'name' => StringHelper::camelCase([$entityTypeId, $bundleName, 'create', 'input']),
-            'fields' => $createFields,
-            'entity_type' => $entityTypeId,
-            'entity_bundle' => $bundleName,
-            'data_type' => implode(':', ['entity', $entityTypeId, $bundleName]),
-          ] + $basePluginDefinition;
-        }
+        $this->derivatives["$entityTypeId:$bundleName:create"] = [
+          'name' => StringHelper::camelCase([$entityTypeId, $bundleName, 'create', 'input']),
+          'fields' => $createFields,
+          'entity_type' => $entityTypeId,
+          'entity_bundle' => $bundleName,
+          'data_type' => implode(':', ['entity', $entityTypeId, $bundleName]),
+        ] + $basePluginDefinition;
 
-        if ($updateExposed) {
-          $this->derivatives["$entityTypeId:$bundleName:update"] = [
-            'name' => StringHelper::camelCase([$entityTypeId, $bundleName, 'update', 'input']),
-            'fields' => $updateFields,
-            'entity_type' => $entityTypeId,
-            'entity_bundle' => $bundleName,
-            'data_type' => implode(':', ['entity', $entityTypeId, $bundleName]),
-          ] + $basePluginDefinition;
-        }
+        $this->derivatives["$entityTypeId:$bundleName:update"] = [
+          'name' => StringHelper::camelCase([$entityTypeId, $bundleName, 'update', 'input']),
+          'fields' => $updateFields,
+          'entity_type' => $entityTypeId,
+          'entity_bundle' => $bundleName,
+          'data_type' => implode(':', ['entity', $entityTypeId, $bundleName]),
+        ] + $basePluginDefinition;
       }
     }
 

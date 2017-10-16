@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_content_mutation\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Mutations;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
@@ -25,9 +25,6 @@ class DeleteEntityTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'graphql_core',
-    'graphql_content',
-    'graphql_mutation',
-    'graphql_content_mutation',
   ];
 
   /**
@@ -45,13 +42,6 @@ class DeleteEntityTest extends GraphQLFileTestBase {
       ->grantPermission('access content')
       ->grantPermission('delete any test content')
       ->save();
-
-    $this->container->get('config.factory')->getEditable('graphql_content_mutation.schema')
-      ->set('types', [
-        'node' => [
-          'delete' => TRUE,
-        ],
-      ])->save();
   }
 
   /**
