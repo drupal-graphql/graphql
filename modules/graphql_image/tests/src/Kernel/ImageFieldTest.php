@@ -18,7 +18,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_image
  */
-class ImageFieldTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class ImageFieldTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
 
@@ -34,6 +34,7 @@ class ImageFieldTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
     'image',
     'breakpoint',
     'responsive_image',
+    'graphql_core',
     'graphql_content',
     'graphql_file',
     'graphql_image',

@@ -17,7 +17,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_core
  */
-class EntityFieldValueTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class EntityFieldValueTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

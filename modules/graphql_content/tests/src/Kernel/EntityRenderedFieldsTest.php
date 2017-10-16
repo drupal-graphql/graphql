@@ -16,7 +16,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content
  */
-class EntityRenderedFieldsTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class EntityRenderedFieldsTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
   use RevisionsTestTrait;
@@ -26,6 +26,7 @@ class EntityRenderedFieldsTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileT
     'field',
     'filter',
     'text',
+    'graphql_core',
     'graphql_content',
     'graphql_content_test',
   ];

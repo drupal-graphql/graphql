@@ -26,6 +26,7 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
     'text',
     'language',
     'content_translation',
+    'graphql_core',
     'graphql_content',
   ];
 
@@ -55,26 +56,6 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'id' => 'fr',
     ]);
     $language->save();
-
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-        'user' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'user' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])->save();
   }
 
   /**

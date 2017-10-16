@@ -29,6 +29,7 @@ class XMLFieldTest extends KernelTestBase {
     'user',
     'graphql',
     'graphql_core',
+    'graphql_test',
     'graphql_content',
     'graphql_xml',
   ];

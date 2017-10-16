@@ -17,6 +17,7 @@ class XMLUrlTest extends GraphQLFileTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'graphql_core',
     'graphql_content',
     'graphql_xml',
   ];

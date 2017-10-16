@@ -63,7 +63,7 @@ trait GraphQLFileTestTrait {
   public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE, $bypassSecurity = FALSE) {
     /** @var \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor */
     $processor = \Drupal::service('graphql.query_processor');
-    $result = $processor->processQuery('default', $this->getQuery($queryFile), $variables, $bypassSecurity);
+    $result = $processor->processQuery('test', $this->getQuery($queryFile), $variables, $bypassSecurity);
     $data = $result->getData();
 
     if ($assertNoErrors) {

@@ -50,7 +50,7 @@ class EnumTest extends GraphQLFileTestBase {
    */
   public function testEnumTypeNames() {
     /** @var \Youshido\GraphQL\Schema\AbstractSchema $schema */
-    $schema = \Drupal::service('plugin.manager.graphql.schema')->createInstance('default');
+    $schema = \Drupal::service('plugin.manager.graphql.schema')->createInstance('test');
     $types = TypeCollector::collectTypes($schema);
     foreach ($types as $type) {
       if ($type instanceof EnumType && $type->getName() === NULL) {

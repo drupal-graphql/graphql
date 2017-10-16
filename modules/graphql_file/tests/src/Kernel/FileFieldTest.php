@@ -16,7 +16,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_file
  */
-class FileFieldTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class FileFieldTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
 
@@ -29,6 +29,7 @@ class FileFieldTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
     'text',
     'filter',
     'file',
+    'graphql_core',
     'graphql_content',
     'graphql_file',
   ];

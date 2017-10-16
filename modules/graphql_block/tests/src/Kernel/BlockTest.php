@@ -11,7 +11,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
  *
  * @group graphql_block
  */
-class BlockTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class BlockTest extends GraphQLFileTestBase {
   use BlockCreationTrait;
   /**
    * {@inheritdoc}
@@ -25,6 +25,7 @@ class BlockTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
     'filter',
     'editor',
     'ckeditor',
+    'graphql_core',
     'graphql_content',
     'graphql_block',
     'graphql_block_test',

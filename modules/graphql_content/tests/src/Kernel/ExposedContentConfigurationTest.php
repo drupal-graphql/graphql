@@ -31,6 +31,7 @@ class ExposedContentConfigurationTest extends GraphQLFileTestBase {
     'field',
     'filter',
     'text',
+    'graphql_core',
     'graphql_content',
     'graphql_content_test',
   ];

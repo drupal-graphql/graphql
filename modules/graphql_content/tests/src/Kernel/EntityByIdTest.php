@@ -14,7 +14,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content
  */
-class EntityByIdTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class EntityByIdTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
   use RevisionsTestTrait;
@@ -29,6 +29,8 @@ class EntityByIdTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
     'language',
     'content_translation',
     'text',
+    'graphql_test',
+    'graphql_core',
     'graphql_content',
   ];
 

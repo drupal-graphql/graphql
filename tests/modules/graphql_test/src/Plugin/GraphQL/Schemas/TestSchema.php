@@ -15,7 +15,7 @@ use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
  * Default generated schema.
  *
  * @GraphQLSchema(
- *   id = "default",
+ *   id = "test",
  *   name = "Default",
  *   path = "/graphql"
  * )

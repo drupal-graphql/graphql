@@ -15,7 +15,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_entity_reference
  */
-class EntityReferenceTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class EntityReferenceTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
   use EntityReferenceTestTrait;
@@ -29,6 +29,7 @@ class EntityReferenceTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBa
     'text',
     'filter',
     'entity_reference',
+    'graphql_core',
     'graphql_content',
     'graphql_entity_reference',
   ];

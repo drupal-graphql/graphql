@@ -32,6 +32,7 @@ class LinkFieldTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'link',
+    'graphql_core',
     'graphql_content',
     'graphql_link',
   ];

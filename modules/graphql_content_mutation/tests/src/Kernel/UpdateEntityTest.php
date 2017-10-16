@@ -14,7 +14,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content_mutation
  */
-class UpdateEntityTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class UpdateEntityTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

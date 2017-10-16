@@ -37,6 +37,7 @@ class JsonFieldTest extends KernelTestBase {
     'node',
     'user',
     'graphql',
+    'graphql_test',
     'graphql_core',
     'graphql_content',
     'graphql_file',

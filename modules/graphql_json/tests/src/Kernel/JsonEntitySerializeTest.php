@@ -16,7 +16,7 @@ use GuzzleHttp\Psr7\Response;
  *
  * @group graphql_json
  */
-class JsonEntitySerializeTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class JsonEntitySerializeTest extends GraphQLFileTestBase {
 
   /**
    * {@inheritdoc}
@@ -24,6 +24,7 @@ class JsonEntitySerializeTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTe
   public static $modules = [
     'node',
     'serialization',
+    'graphql_core',
     'graphql_content',
     'graphql_json',
   ];

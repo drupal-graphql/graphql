@@ -9,7 +9,7 @@ if (version_compare(\Drupal::VERSION, '8.4', '<')) {
     use \Drupal\taxonomy\Tests\TaxonomyTestTrait;
   }
 } else {
-  abstract class ViewsTestBaseDeprecationFix extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+  abstract class ViewsTestBaseDeprecationFix extends GraphQLFileTestBase {
     use \Drupal\Tests\taxonomy\Functional\TaxonomyTestTrait;
   }
 }

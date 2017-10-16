@@ -12,12 +12,13 @@ use GuzzleHttp\Psr7\Response;
  *
  * @group graphql_json
  */
-class JsonStructureTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class JsonStructureTest extends GraphQLFileTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
+    'graphql_core',
     'graphql_content',
     'graphql_json',
   ];

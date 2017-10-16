@@ -22,6 +22,7 @@ class MenuTest extends GraphQLFileTestBase {
     'menu_link_content',
     'link',
     'graphql_menu',
+    'graphql_core',
     'graphql_test_menu',
   ];
 

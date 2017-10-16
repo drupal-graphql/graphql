@@ -23,6 +23,7 @@ class JsonEntityTest extends GraphQLFileTestBase {
    */
   public static $modules = [
     'node',
+    'graphql_core',
     'graphql_content',
     'graphql_json',
   ];

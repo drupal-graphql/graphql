@@ -12,7 +12,7 @@ use Drupal\user\Entity\Role;
  *
  * @group graphql_content_mutation
  */
-class DeleteEntityTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class DeleteEntityTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
 

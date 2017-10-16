@@ -17,7 +17,7 @@ use Prophecy\Argument;
  *
  * @group graphql_breadcrumbs
  */
-class BreadcrumbsTest extends \Drupal\Tests\graphql\Kernel\GraphQLFileTestBase {
+class BreadcrumbsTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
   use ContentTypeCreationTrait;
 

@@ -22,6 +22,7 @@ class LanguageTest extends LanguageTestBase {
   public static $modules = [
     'graphql',
     'graphql_core',
+    'graphql_test',
     'graphql_context_test',
   ];
 
