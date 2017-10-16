@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_menu\Kernel;
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,6 +22,7 @@ class MenuTest extends GraphQLFileTestBase {
     'menu_link_content',
     'link',
     'graphql_menu',
+    'graphql_core',
     'graphql_test_menu',
   ];
 

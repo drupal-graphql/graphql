@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldDeriverBase;
 use Drupal\graphql_core\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

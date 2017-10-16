@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Prophecy\Argument;
 
 /**

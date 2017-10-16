@@ -7,7 +7,7 @@ use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 use Drupal\Tests\graphql_twig\Traits\ThemeTestTrait;
 use Drupal\user\Entity\User;
 use Prophecy\Argument;

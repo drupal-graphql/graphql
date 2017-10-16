@@ -19,7 +19,7 @@ class EntityFieldBase extends FieldPluginBase {
       $definition = $this->getPluginDefinition();
       $property = $definition['property'];
       $type = $definition['type'];
-      $result = $item->get($property);
+      $result = $item->$property;
 
       if ($type === 'Int') {
         $result = (int) $result;

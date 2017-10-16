@@ -25,7 +25,7 @@ class DisabledResultCacheTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql', 'graphql_core'];
+  public static $modules = ['graphql', 'graphql_test'];
 
   /**
    * {@inheritdoc}

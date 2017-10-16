@@ -1,0 +1,8 @@
+type: module
+name: GraphQL Plugin Test
+description: Test plugin based graphql schema.
+package: Testing
+core: 8.x
+hidden: TRUE
+dependencies:
+- graphql_test

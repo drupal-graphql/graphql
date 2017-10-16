@@ -6,7 +6,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\NodeInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -29,6 +29,8 @@ class EntityByIdTest extends GraphQLFileTestBase {
     'language',
     'content_translation',
     'text',
+    'graphql_test',
+    'graphql_core',
     'graphql_content',
   ];
 

@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_xml\Plugin\GraphQL\Fields;
 
-use Drupal\graphql_core\Plugin\GraphQL\Fields\Route;
+use Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Route;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

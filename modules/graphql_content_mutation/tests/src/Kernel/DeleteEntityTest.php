@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_content_mutation\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**

@@ -14,7 +14,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
+use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
 use Drupal\user\Entity\Role;
 
 /**
@@ -37,6 +37,7 @@ class JsonFieldTest extends KernelTestBase {
     'node',
     'user',
     'graphql',
+    'graphql_test',
     'graphql_core',
     'graphql_content',
     'graphql_file',
