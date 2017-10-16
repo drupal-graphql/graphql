@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Breadcrumbs;
 
 use Drupal\Core\Breadcrumb\BreadcrumbManager;
 use Drupal\Core\Routing\RouteMatchInterface;

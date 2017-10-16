@@ -1,30 +1,30 @@
 <?php
 
-namespace Drupal\graphql_breadcrumbs\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Drupal\Core\Link;
 
 /**
- * Retrieve a link's route object.
+ * Retrieve a link text.
  *
  * @GraphQLField(
- *   id = "link_url",
+ *   id = "link_label",
  *   secure = true,
- *   name = "url",
- *   type = "Url",
+ *   name = "text",
+ *   type = "String",
  *   types = {"Link"}
  * )
  */
-class Url extends FieldPluginBase {
+class LinkLabel extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Link) {
-      yield $value->getUrl();
+      yield $value->getText();
     }
   }
 

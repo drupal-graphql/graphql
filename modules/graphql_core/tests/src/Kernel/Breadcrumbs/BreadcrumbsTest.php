@@ -1,12 +1,11 @@
 <?php
 
-namespace Drupal\Tests\graphql_breadcrumbs\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Breadcrumbs;
 
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Link;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Url;
-use Drupal\node\NodeInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
@@ -26,7 +25,6 @@ class BreadcrumbsTest extends GraphQLFileTestBase {
    */
   public static $modules = [
     'graphql_core',
-    'graphql_breadcrumbs',
     'graphql_breadcrumbs_test',
   ];
 
@@ -54,11 +52,11 @@ class BreadcrumbsTest extends GraphQLFileTestBase {
   /**
    * Test that the breadcrumb query returns breadcrumbs for given path.
    */
-  public function testBreadcrumbsIsolated() {
+  public function testBreadcrumbs() {
     $expected = [
       ['text' => 'Test breadcrumb']
     ];
-    $result = $this->executeQueryFile('isolated.graphql', ['path' => '/breadcrumbs-test']);
+    $result = $this->executeQueryFile('breadcrumbs.gql', ['path' => '/breadcrumbs-test']);
     $this->assertEquals($expected, $result['data']['route']['breadcrumb']);
   }
 
