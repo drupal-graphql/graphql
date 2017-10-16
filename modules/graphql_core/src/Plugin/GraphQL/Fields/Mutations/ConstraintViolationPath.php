@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_mutation\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Mutations;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;

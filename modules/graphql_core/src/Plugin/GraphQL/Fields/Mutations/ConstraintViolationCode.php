@@ -1,31 +1,31 @@
 <?php
 
-namespace Drupal\graphql_mutation\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Mutations;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve the message of an entity constraint violation.
+ * Retrieve the error code of an entity constraint violation.
  *
  * @GraphQLField(
- *   id = "constraint_violation_message",
+ *   id = "constraint_violation_code",
  *   secure = true,
- *   name = "message",
+ *   name = "code",
  *   type = "String",
  *   types = {"ConstraintViolation"},
  *   nullable = true
  * )
  */
-class ConstraintViolationMessage extends FieldPluginBase {
+class ConstraintViolationCode extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ConstraintViolationInterface){
-      yield $value->getMessage();
+    if ($value instanceof ConstraintViolationInterface) {
+      yield $value->getCode();
     }
   }
 

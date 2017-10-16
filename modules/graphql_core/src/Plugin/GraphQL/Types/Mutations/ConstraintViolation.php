@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_mutation\Plugin\GraphQL\Types;
+namespace Drupal\graphql_core\Plugin\GraphQL\Types\Mutations;
 
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
