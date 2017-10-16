@@ -3,8 +3,10 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\Plugin\DataType\FieldItem;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -18,7 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldDeriver",
  * )
  */
-class EntityField extends FieldPluginBase {
+class EntityField extends EntityFieldBase {
 
   /**
    * Returns a string if for the plugin.
@@ -39,8 +41,15 @@ class EntityField extends FieldPluginBase {
     if ($value instanceof FieldableEntityInterface) {
       $fieldName = $this->getPluginDefinition()['field'];
       if ($value->hasField($fieldName)) {
+        /** @var \Drupal\Core\Field\FieldItemBase $item */
         foreach ($value->get($fieldName) as $item) {
-          yield $item;
+          $properties = $item->getProperties(TRUE);
+          if (count($properties) === 1) {
+            yield $this->resolveItem($item);
+          }
+          else {
+            yield $item;
+          }
         }
       }
     }

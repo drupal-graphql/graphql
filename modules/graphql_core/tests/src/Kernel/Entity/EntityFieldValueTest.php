@@ -165,6 +165,19 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
     ];
 
     $expected = [
+      'nid' => 1,
+      'vid' => 1,
+      'langcode' => [
+        'value' => 'en',
+      ],
+      'type' => [
+        'targetId' => 'test',
+      ],
+      'title' => 'Test',
+      'status' => 1,
+      'promote' => 1,
+      'sticky' => 0,
+      'revisionTranslationAffected' => 1,
       'body' => [
         'value' => 'test',
         'summary' => 'test summary',
@@ -178,39 +191,37 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
         ['value' => 'c'],
       ],
       'fieldBoolean' => [
-        ['value' => TRUE],
-        ['value' => FALSE],
+        TRUE,
+        FALSE,
       ],
       'fieldLink' => [
         ['title' => 'Internal link', 'uri' => 'internal:/node/1'],
         ['title' => 'External link', 'uri' => 'http://drupal.org'],
       ],
       'fieldInteger' => [
-        ['value' => 10],
-        ['value' => -5],
+        10,
+        -5,
       ],
       'fieldFloat' => [
-        ['value' => 3.14145],
-        ['value' => -8.8],
+        3.14145,
+        -8.8,
       ],
       'fieldDecimal' => [
-        ['value' => 10.5],
-        ['value' => -17.22],
+        10.5,
+        -17.22,
       ],
       'fieldDatetime' => [
         ['value' => '2017-01-01'],
         ['value' => '1900-01-01'],
       ],
       'fieldTimestamp' => [
-        ['value' => 0],
-        ['value' => 300],
+        0,
+        300,
       ],
-      'fieldEmail' => [
-        ['value' => 'test@test.com'],
-      ],
+      'fieldEmail' => ['test@test.com'],
       'fieldString' => [
-        ['value' => 'test'],
-        ['value' => '123'],
+        'test',
+        '123',
       ],
       'fieldReference' => [
         ['targetId' => 1],
@@ -243,33 +254,6 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
           'width' => 200,
           'height' => 100,
         ],
-      ],
-      'nid' => [
-        'value' => 1,
-      ],
-      'vid' => [
-        'value' => 1,
-      ],
-      'langcode' => [
-        'value' => 'en',
-      ],
-      'type' => [
-        'targetId' => 'test',
-      ],
-      'title' => [
-        'value' => 'Test',
-      ],
-      'status' => [
-        'value' => 1,
-      ],
-      'promote' => [
-        'value' => 1,
-      ],
-      'sticky' => [
-        'value' => 0,
-      ],
-      'revisionTranslationAffected' => [
-        'value' => 1,
       ],
     ];
 

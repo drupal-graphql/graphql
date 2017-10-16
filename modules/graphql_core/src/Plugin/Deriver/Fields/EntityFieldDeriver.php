@@ -2,49 +2,52 @@
 
 namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriverWithTypeMapping;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\EntityField;
 use Drupal\graphql_core\Plugin\GraphQL\Types\Entity\EntityFieldType;
 
-// TODO Reduce single-property fields to scalars.
+// TODO Write tests for entity reference graph traversal.
+
+// TODO Should we expose config entities?
 
 // TODO Convert timestamps to strings?
 
 /**
  * Deriver for RawValue fields.
  */
-class EntityFieldDeriver extends EntityFieldDeriverBase {
+class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
 
   /**
    * {@inheritdoc}
    */
-  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {
-    $fieldName = $baseFieldDefinition->getName();
+  protected function getDerivativesFromPropertyDefinitions($entityTypeId, FieldStorageDefinitionInterface $definition, array $basePluginDefinition, $bundleId = NULL) {
+    $fieldName = $definition->getName();
 
-    $this->derivatives["$entityTypeId-$fieldName"] = [
+    $derivative = [
       'types' => [StringHelper::camelCase([$entityTypeId])],
       'name' => EntityField::getId($fieldName),
-      'multi' => $baseFieldDefinition->isMultiple(),
+      'multi' => $definition->isMultiple(),
       'field' => $fieldName,
-      'type' => EntityFieldType::getId($entityTypeId, $fieldName),
-    ] + $basePluginDefinition;
+    ];
+
+    $properties = $definition->getPropertyDefinitions();
+    if (count($properties) === 1) {
+      // Flatten the structure for single-property fields.
+      /** @var \Drupal\Core\TypedData\DataDefinitionInterface $property */
+      $property = reset($properties);
+      $keys = array_keys($properties);
+
+      $derivative['type'] = $this->typeMapper->typedDataToGraphQLFieldType($property);
+      $derivative['property'] = reset($keys);
+    }
+    else {
+      $derivative['type'] = EntityFieldType::getId($entityTypeId, $fieldName);
+    }
+
+    $key = is_null($bundleId) ? "$entityTypeId-$fieldName" : "$entityTypeId-$bundleId-$fieldName";
+
+    $this->derivatives[$key] = $derivative + $basePluginDefinition;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {
-    $fieldName = $storage->getName();
-
-    $this->derivatives["$entityTypeId-$bundleId-$fieldName"] = [
-      'types' => [StringHelper::camelCase([$entityTypeId, $bundleId])],
-      'name' => EntityField::getId($fieldName),
-      'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
-      'field' => $fieldName,
-      'type' => EntityFieldType::getId($entityTypeId, $fieldName),
-    ] + $basePluginDefinition;
-  }
-
 }

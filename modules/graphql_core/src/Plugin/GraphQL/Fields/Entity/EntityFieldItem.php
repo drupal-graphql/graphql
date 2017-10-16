@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -17,27 +18,13 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldItemDeriver",
  * )
  */
-class EntityFieldItem extends FieldPluginBase {
+class EntityFieldItem extends EntityFieldBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof FieldItemBase) {
-      $definition = $this->getPluginDefinition();
-      $property = $definition['property'];
-      $type = $definition['type'];
-      $result = $value->$property;
-
-      if ($type == 'Int') {
-        $result = (int) $result;
-      }
-      elseif ($type == 'Float') {
-        $result = (float) $result;
-      }
-
-      yield $result;
-    }
+    yield $this->resolveItem($value);
   }
 
 }
