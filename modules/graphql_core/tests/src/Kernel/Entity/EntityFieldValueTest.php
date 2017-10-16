@@ -131,7 +131,6 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
       'field_string' => ['test', '123'],
       'field_reference' => [
         ['target_id' => 1],
-        ['target_id' => 1],
       ],
       'field_file' => [
         [
@@ -172,6 +171,10 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
       'type' => [
         'targetId' => 'test',
       ],
+      'uid' => [
+        'targetId' => 0,
+        'entity' => NULL,
+      ],
       'title' => 'Test',
       'status' => 1,
       'promote' => 1,
@@ -182,7 +185,7 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => null,
+        'format' => NULL,
       ],
       'fieldText' => [
         ['value' => 'a'],
@@ -223,19 +226,37 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
         '123',
       ],
       'fieldReference' => [
-        ['targetId' => 1],
-        ['targetId' => 1],
+        [
+          'targetId' => 1,
+          'entity' => [
+            'title' => 'Test',
+            'fieldReference' => [
+              [
+                'targetId' => 1,
+                'entity' => [
+                  'title' => 'Test',
+                ],
+              ],
+            ],
+          ],
+        ],
       ],
       'fieldFile' => [
         [
           'targetId' => 1,
           'display' => 0,
           'description' => 'description test 1',
+          'entity' => [
+            'uri' => 'public://example.txt'
+          ],
         ],
         [
           'targetId' => 2,
           'display' => 1,
           'description' => 'description test 2',
+          'entity' => [
+            'uri' => 'public://example.png'
+          ],
         ],
       ],
       'fieldImage' => [
@@ -245,6 +266,9 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
           'title' => 'title test 1',
           'width' => 100,
           'height' => 50,
+          'entity' => [
+            'uri' => 'public://example.txt'
+          ],
         ],
         [
           'targetId' => 2,
@@ -252,6 +276,9 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
           'title' => 'title test 2',
           'width' => 200,
           'height' => 100,
+          'entity' => [
+            'uri' => 'public://example.png'
+          ],
         ],
       ],
     ];

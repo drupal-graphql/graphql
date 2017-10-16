@@ -10,6 +10,12 @@ query ($path: String!) {
         type {
           targetId
         }
+        uid {
+          targetId
+          entity {
+            name
+          }
+        }
         title
         status
         promote
@@ -55,11 +61,23 @@ query ($path: String!) {
         }
         fieldReference {
           targetId
+          entity {
+            title
+            fieldReference {
+              targetId
+              entity {
+                title
+              }
+            }
+          }
         }
         fieldFile {
           targetId
           display
           description
+          entity {
+            uri
+          }
         }
         fieldImage {
           targetId
@@ -67,6 +85,9 @@ query ($path: String!) {
           title
           width
           height
+          entity {
+            uri
+          }
         }
       }
     }
