@@ -67,7 +67,7 @@ class UpdateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        if (!$this->schemaConfig->exposeUpdate($entityTypeId, $bundleName)) {
+        if (!$this->schemaConfig->isUpdateExposed($entityTypeId, $bundleName)) {
           continue;
         }
 

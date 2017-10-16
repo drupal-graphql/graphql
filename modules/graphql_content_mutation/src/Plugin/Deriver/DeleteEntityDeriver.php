@@ -50,7 +50,7 @@ class DeleteEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $type) {
-      if (!$this->schemaConfig->exposeDelete($entityTypeId)) {
+      if (!$this->schemaConfig->isDeleteExposed($entityTypeId)) {
         continue;
       }
 

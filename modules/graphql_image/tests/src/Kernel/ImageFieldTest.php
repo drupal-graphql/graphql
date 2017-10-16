@@ -83,19 +83,7 @@ class ImageFieldTest extends GraphQLFileTestBase {
       'status' => TRUE,
     ])->setComponent('image', ['type' => 'graphql_image'])->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-      ])
-      ->save();
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
 
     $responsiveImgStyle = ResponsiveImageStyle::create(array(
       'id' => 'style_one',

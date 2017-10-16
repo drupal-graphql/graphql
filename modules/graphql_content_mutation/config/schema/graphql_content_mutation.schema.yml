@@ -1,0 +1,9 @@
+# Schema for the configuration files of the graphql_content_mutation module.
+
+graphql_content_mutation.settings:
+  type: config_object
+  label: 'Content Mutations settings'
+  mapping:
+    allow_all_mutations:
+      type: boolean
+      label: 'Allow mutations even on unexposed entities and bundles'

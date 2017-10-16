@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\graphql_content\Kernel;
 
-use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\node\NodeInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
@@ -72,18 +70,7 @@ class EntityByIdTest extends GraphQLFileTestBase {
     ]);
     $language->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-              'view_mode' => 'node.graphql',
-            ],
-          ],
-        ],
-      ])->save();
+    $this->schemaConfig->exposeEntityBundle('node', 'test', 'node.graphql');
   }
 
   /**

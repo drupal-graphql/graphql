@@ -66,7 +66,8 @@ class EntityInputFieldDeriver extends DeriverBase implements ContainerDeriverInt
         continue;
       }
 
-      if (!$this->schemaConfig->exposeAnyCreateOrUpdate($entityTypeId)) {
+      // TODO: is this the right name for this function?
+      if (!$this->schemaConfig->isFieldMutationExposed($entityTypeId)) {
         continue;
       }
 

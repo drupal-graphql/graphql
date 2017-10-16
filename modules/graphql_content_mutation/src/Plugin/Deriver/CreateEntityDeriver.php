@@ -67,7 +67,7 @@ class CreateEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        if (!$this->schemaConfig->exposeCreate($entityTypeId, $bundleName)) {
+        if (!$this->schemaConfig->isCreateExposed($entityTypeId, $bundleName)) {
           continue;
         }
 

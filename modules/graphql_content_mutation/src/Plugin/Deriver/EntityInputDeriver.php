@@ -78,8 +78,8 @@ class EntityInputDeriver extends DeriverBase implements ContainerDeriverInterfac
       }
 
       foreach ($this->entityTypeBundleInfo->getBundleInfo($entityTypeId) as $bundleName => $bundle) {
-        $createExposed = $this->schemaConfig->exposeCreate($entityTypeId, $bundleName);
-        $updateExposed = $this->schemaConfig->exposeUpdate($entityTypeId, $bundleName);
+        $createExposed = $this->schemaConfig->isCreateExposed($entityTypeId, $bundleName);
+        $updateExposed = $this->schemaConfig->isUpdateExposed($entityTypeId, $bundleName);
 
         if (!$createExposed && !$updateExposed) {
           continue;

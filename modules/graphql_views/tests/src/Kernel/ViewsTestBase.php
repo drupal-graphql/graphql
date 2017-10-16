@@ -8,6 +8,7 @@ use Drupal\simpletest\NodeCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\Role;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Base class for test views support in GraphQL.
@@ -42,6 +43,13 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
   protected $letters = ['A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C'];
 
   /**
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
+   */
+  protected $schemaConfig;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -54,26 +62,16 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
     $this->createContentType(['type' => 'test']);
     $this->createEntityReferenceField('node', 'test', 'field_tags', 'Tags', 'taxonomy_term');
 
+    // TODO: is this the right way to do it?
+    $this->schemaConfig = new ContentEntitySchemaConfig(\Drupal::configFactory());
+
     Vocabulary::create([
       'name' => 'Tags',
       'vid' => 'tags',
     ])->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-            ],
-            'test2' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])
-      ->save();
+    $this->schemaConfig->exposeEntityBundle('node', 'test');
+    $this->schemaConfig->exposeEntityBundle('node', 'test2');
 
     Role::load('anonymous')
       ->grantPermission('access content')

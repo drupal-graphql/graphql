@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_core\Plugin\GraphQL\Types\EntityBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Derive GraphQL Interfaces from Drupal entity types.
@@ -31,14 +32,11 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
   protected $entityTypeBundleInfo;
 
   /**
-   * {@inheritdoc}
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('entity_type.bundle.info')
-    );
-  }
+  protected $schemaConfig;
 
   /**
    * EntityBundleDeriver constructor.
@@ -47,14 +45,30 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
    *   Instance of an entity type manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   Instance of the entity bundle info service.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    EntityTypeBundleInfoInterface $entityTypeBundleInfo
+    EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    ContentEntitySchemaConfig $schemaConfig
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
+    $this->schemaConfig = $schemaConfig;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, $basePluginId) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('graphql_content.schema_config')
+    );
+  }
+
 
   /**
    * {@inheritdoc}

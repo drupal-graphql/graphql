@@ -1,5 +1,4 @@
 services:
   graphql_content_mutation.schema_config:
     class: Drupal\graphql_content_mutation\ContentEntityMutationSchemaConfig
-    arguments:
-      - '@config.factory'
+    arguments: ['@config.factory']

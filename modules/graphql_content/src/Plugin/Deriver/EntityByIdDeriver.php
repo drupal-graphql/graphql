@@ -7,8 +7,8 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Create GraphQL entityById fields based on available Drupal entity types.
@@ -32,22 +32,22 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('graphql_content.schema_config')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     ContentEntitySchemaConfig $schemaConfig
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->schemaConfig = $schemaConfig;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, $basePluginId) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('graphql_content.schema_config')
+    );
   }
 
   /**

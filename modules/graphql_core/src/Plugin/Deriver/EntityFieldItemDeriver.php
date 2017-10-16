@@ -11,6 +11,7 @@ use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_core\Plugin\GraphQL\Types\EntityFieldType;
 use Drupal\graphql_core\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 class EntityFieldItemDeriver extends EntityFieldDeriverBase {
 
@@ -29,6 +30,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
       $container->get('entity_type.bundle.info'),
+      $container->get('graphql_content.schema_config'),
       $container->get('graphql_core.type_mapper'),
       $basePluginId
     );
@@ -43,6 +45,8 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The bundle info service.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    * @param \Drupal\graphql_core\TypeMapper $typeMapper
    *   The graphql type mapper service.
    * @param string $basePluginId
@@ -52,6 +56,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
     EntityTypeManagerInterface $entityTypeManager,
     EntityFieldManagerInterface $entityFieldManager,
     EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    ContentEntitySchemaConfig $schemaConfig,
     TypeMapper $typeMapper,
     $basePluginId
   ) {

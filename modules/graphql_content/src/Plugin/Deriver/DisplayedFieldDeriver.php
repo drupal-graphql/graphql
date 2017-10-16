@@ -10,8 +10,8 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Derive GraphQL fields for all fields exposed in graphql display modes.
@@ -62,6 +62,8 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
    *   Bundle info provider.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   Entity field manager instance.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,

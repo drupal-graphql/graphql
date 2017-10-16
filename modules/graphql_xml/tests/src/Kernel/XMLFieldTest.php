@@ -8,17 +8,15 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql_core\Traits\GraphQLFileTestTrait;
 use Drupal\user\Entity\Role;
+use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
 
 /**
  * Test boolean graphql fields.
  *
  * @group graphql_xml
  */
-class XMLFieldTest extends KernelTestBase {
-  use GraphQLFileTestTrait;
+class XMLFieldTest extends GraphQLFileTestBase {
 
   public static $modules = [
     'system',
@@ -76,19 +74,7 @@ class XMLFieldTest extends KernelTestBase {
       'status' => TRUE,
     ])->setComponent('xml', ['type' => 'graphql_xml'])->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'entity_test_with_bundle' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'graphql' => [
-              'exposed' => TRUE,
-              'view_mode' => 'entity_test_with_bundle.graphql',
-            ],
-          ],
-        ],
-      ])
-      ->save();
+    $this->schemaConfig->exposeEntityBundle('entity_test_with_bundle', 'graphql', 'entity_test_with_bundle.graphql');
   }
 
   /**

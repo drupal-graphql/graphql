@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_content\ContentEntitySchemaConfig;
 
 /**
  * Derive GraphQL Interfaces from Drupal entity types.
@@ -22,22 +23,37 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   protected $entityTypeManager;
 
   /**
-   * {@inheritdoc}
+   * The schema configuration service.
+   *
+   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
    */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager')
-    );
-  }
+  protected $schemaConfig;
+
 
   /**
    * EntityTypeDeriver constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Instance of an entity type manager.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema configuration service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    ContentEntitySchemaConfig $schemaConfig
+  ) {
     $this->entityTypeManager = $entityTypeManager;
+    $this->schemaConfig = $schemaConfig;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, $basePluginId) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('graphql_content.schema_config')
+    );
   }
 
   /**

@@ -56,25 +56,8 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
     ]);
     $language->save();
 
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-        'user' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'user' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])->save();
+    $this->schemaConfig->exposeEntityBundle('node', 'test');
+    $this->schemaConfig->exposeEntityBundle('user', 'user');
   }
 
   /**
