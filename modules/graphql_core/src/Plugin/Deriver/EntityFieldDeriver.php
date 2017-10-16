@@ -33,7 +33,7 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
     ];
 
     $properties = $definition->getPropertyDefinitions();
-    if (count($properties) == 1) {
+    if (count($properties) === 1) {
       // Flatten the structure for single-property fields.
       /** @var \Drupal\Core\TypedData\DataDefinitionInterface $property */
       $property = reset($properties);
@@ -41,13 +41,15 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
 
       $derivative['type'] = $this->typeMapper->typedDataToGraphQLFieldType($property);
       $derivative['property'] = reset($keys);
-    }else {
+    }
+    else {
       $derivative['type'] = EntityFieldType::getId($entityTypeId, $fieldName);
     }
 
-    if ($bundleId) {
+    if (is_null($bundleId)) {
       $key = "$entityTypeId-$bundleId-$fieldName";
-    } else {
+    }
+    else {
       $key = "$entityTypeId-$fieldName";
     }
 

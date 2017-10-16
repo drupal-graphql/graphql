@@ -43,9 +43,10 @@ class EntityField extends EntityFieldBase {
         /** @var \Drupal\Core\Field\FieldItemBase $item */
         foreach ($value->get($fieldName) as $item) {
           $properties = $item->getProperties(TRUE);
-          if (count($properties) == 1) {
+          if (count($properties) === 1) {
             yield $this->resolveItem($item);
-          }else {
+          }
+          else {
             yield $item;
           }
         }

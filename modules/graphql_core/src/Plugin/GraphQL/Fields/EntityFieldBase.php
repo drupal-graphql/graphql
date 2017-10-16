@@ -21,10 +21,10 @@ class EntityFieldBase extends FieldPluginBase {
       $type = $definition['type'];
       $result = $item->$property;
 
-      if ($type == 'Int') {
+      if ($type === 'Int') {
         $result = (int) $result;
       }
-      elseif ($type == 'Float') {
+      elseif ($type === 'Float') {
         $result = (float) $result;
       }
 
