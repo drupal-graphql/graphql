@@ -29,7 +29,8 @@ class EntityFieldType extends TypePluginBase {
    *   The GraphQL type name.
    */
   public static function getId($entityTypeId, $fieldName) {
-    return StringHelper::camelCase([$entityTypeId, $fieldName, 'field']);
+    $result = StringHelper::camelCase(['type', $entityTypeId, $fieldName]);
+    return $result;
   }
 
 }

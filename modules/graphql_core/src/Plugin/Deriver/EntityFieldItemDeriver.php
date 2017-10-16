@@ -5,11 +5,11 @@ namespace Drupal\graphql_core\Plugin\Deriver;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriverBase;
-use Drupal\graphql_core\TypeMapper;
 use Drupal\graphql_core\Plugin\GraphQL\Types\EntityFieldType;
+use Drupal\graphql_core\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityFieldItemDeriver extends EntityFieldDeriverBase {
@@ -59,15 +59,35 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
     $this->typeMapper = $typeMapper;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {
+    $this->getDerivativesFromPropertyDefinitions($entityTypeId, $baseFieldDefinition, $basePluginDefinition);
+  }
 
   /**
    * {@inheritdoc}
    */
   protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {
-    $fieldName = $storage->getName();
+    $this->getDerivativesFromPropertyDefinitions($entityTypeId, $storage, $basePluginDefinition);
+  }
+
+  /**
+   * Provide plugin definition values from base fields.
+   *
+   * @param string $entityTypeId
+   *   The host entity type.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+   *   Field definition object.
+   * @param array $basePluginDefinition
+   *   Base plugin definition array.
+   */
+  protected function getDerivativesFromPropertyDefinitions($entityTypeId, FieldStorageDefinitionInterface $definition, array $basePluginDefinition) {
+    $fieldName = $definition->getName();
     $dataType = EntityFieldType::getId($entityTypeId, $fieldName);
 
-    foreach ($storage->getPropertyDefinitions() as $property => $definition) {
+    foreach ($definition->getPropertyDefinitions() as $property => $definition) {
       if ($definition->getDataType() == 'map') {
         // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
         continue;
