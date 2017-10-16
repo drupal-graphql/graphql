@@ -43,6 +43,13 @@ abstract class GraphQLAnnotationBase extends Plugin {
   public $name;
 
   /**
+   * The component description.
+   *
+   * @var string
+   */
+  public $description = '';
+
+  /**
    * Weight for precedence calculations.
    *
    * If multiple components with the same name are available, the highest

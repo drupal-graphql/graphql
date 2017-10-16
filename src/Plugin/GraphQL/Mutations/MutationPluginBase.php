@@ -34,6 +34,7 @@ abstract class MutationPluginBase extends AbstractField implements TypeSystemPlu
   public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
     $this->config = new FieldConfig([
       'name' => $this->buildName(),
+      'description' => $this->buildDescription(),
       'type' => $this->buildType($schemaManager),
       'args' => $this->buildArguments($schemaManager),
     ]);
