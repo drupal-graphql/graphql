@@ -24,6 +24,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
         continue;
       }
 
+      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
       $display = $this->getViewDisplay($view, $displayId);
       $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
@@ -55,7 +56,7 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
 
       $this->derivatives[$id] = [
         'id' => $id,
-        'name' => StringHelper::camelCase($id),
+        'name' => $display->getGraphQLFilterInputName(),
         'fields' => $fields,
         'view' => $viewId,
         'display' => $displayId,

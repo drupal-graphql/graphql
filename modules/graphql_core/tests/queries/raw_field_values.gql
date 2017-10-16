@@ -2,9 +2,39 @@ query ($path: String!) {
   route:route(path: $path) {
     entity {
       ... on NodeTest {
-        body {
+        nid {
           value
+        }
+        vid {
+          value
+        }
+        langcode {
+          value
+        }
+        type {
+          targetId
+        }
+        title {
+          value
+        }
+        status {
+          value
+        }
+        promote {
+          value
+        }
+        sticky {
+          value
+        }
+        revisionTranslationAffected {
+          value
+        }
+        body {
+          summaryProcessed
           summary
+          processed
+          format
+          value
         }
         fieldText {
           value
@@ -42,17 +72,11 @@ query ($path: String!) {
         }
         fieldFile {
           targetId
-          entity {
-            entityLabel
-          }
           display
           description
         }
         fieldImage {
           targetId
-          entity {
-            entityLabel
-          }
           alt
           title
           width
