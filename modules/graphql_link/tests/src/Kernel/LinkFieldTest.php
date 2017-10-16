@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -32,6 +32,7 @@ class LinkFieldTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'link',
+    'graphql_core',
     'graphql_content',
     'graphql_link',
   ];

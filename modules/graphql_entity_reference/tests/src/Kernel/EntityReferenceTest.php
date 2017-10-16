@@ -7,7 +7,7 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -29,6 +29,7 @@ class EntityReferenceTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'entity_reference',
+    'graphql_core',
     'graphql_content',
     'graphql_entity_reference',
   ];

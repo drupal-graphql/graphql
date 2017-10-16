@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_block\Kernel;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\simpletest\BlockCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 
 /**
  * Test block retrieval via GraphQL.
@@ -25,6 +25,7 @@ class BlockTest extends GraphQLFileTestBase {
     'filter',
     'editor',
     'ckeditor',
+    'graphql_core',
     'graphql_content',
     'graphql_block',
     'graphql_block_test',

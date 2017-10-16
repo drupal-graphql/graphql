@@ -29,6 +29,7 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
     'text',
     'views',
     'taxonomy',
+    'graphql_core',
     'graphql_content',
     'graphql_views',
     'graphql_views_test',

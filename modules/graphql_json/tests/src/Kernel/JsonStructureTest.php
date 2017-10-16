@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql_json\Kernel;
 
 
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 
@@ -18,6 +18,7 @@ class JsonStructureTest extends GraphQLFileTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'graphql_core',
     'graphql_content',
     'graphql_json',
   ];

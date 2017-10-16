@@ -3,7 +3,7 @@
 namespace Drupal\graphql_json\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\graphql_core\Plugin\GraphQL\Fields\Route;
+use Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Route;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

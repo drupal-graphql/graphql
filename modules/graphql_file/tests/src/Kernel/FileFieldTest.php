@@ -8,7 +8,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql_core\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
 
 /**
@@ -29,6 +29,7 @@ class FileFieldTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'file',
+    'graphql_core',
     'graphql_content',
     'graphql_file',
   ];

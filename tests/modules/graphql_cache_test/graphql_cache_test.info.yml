@@ -1,0 +1,8 @@
+type: module
+name: GraphQL Cache Test
+description: Test result caching in graphql schema.
+package: Testing
+core: 8.x
+hidden: TRUE
+dependencies:
+- graphql_test
