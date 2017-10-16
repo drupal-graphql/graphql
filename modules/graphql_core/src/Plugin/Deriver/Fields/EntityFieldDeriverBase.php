@@ -139,4 +139,17 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
     return $this->derivatives;
   }
 
+  /**
+   * Tells if given field has just a single property.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+   *   Field definition.
+   *
+   * @return bool
+   */
+  protected function isSinglePropertyField(FieldStorageDefinitionInterface $definition) {
+    $properties = $definition->getPropertyDefinitions();
+    return count($properties) === 1;
+  }
+
 }
