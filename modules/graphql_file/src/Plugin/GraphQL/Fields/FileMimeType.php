@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "mimeType",
  *   type = "String",
- *   types = {"File"}
+ *   parents = {"File"}
  * )
  */
 class FileMimeType extends FieldPluginBase {

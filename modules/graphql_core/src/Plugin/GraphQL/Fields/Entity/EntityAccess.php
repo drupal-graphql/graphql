@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entityAccess",
  *   type = "Boolean",
- *   types = {"Entity"},
+ *   parents = {"Entity"},
  *   arguments = {
  *     "operation" = "String"
  *   }

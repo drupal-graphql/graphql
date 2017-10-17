@@ -18,7 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   nullable = true,
  *   multi = true,
- *   types = {"Root"},
+ *   parents = {"Root"},
  *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewDeriver"
  * )
  */

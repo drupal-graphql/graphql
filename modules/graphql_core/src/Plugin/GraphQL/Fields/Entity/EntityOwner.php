@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_owner",
  *   secure = true,
  *   name = "entityOwner",
- *   types = {"Entity"}
+ *   parents = {"Entity"}
  * )
  */
 class EntityOwner extends FieldPluginBase {

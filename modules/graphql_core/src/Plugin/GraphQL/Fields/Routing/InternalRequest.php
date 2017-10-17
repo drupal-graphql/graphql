@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "request",
  *   type = "InternalResponse",
- *   types = {"InternalUrl"}
+ *   parents = {"InternalUrl"}
  * )
  */
 class InternalRequest extends SubrequestFieldBase {

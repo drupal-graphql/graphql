@@ -14,7 +14,7 @@ use Drupal\Core\Link;
  *   secure = true,
  *   name = "url",
  *   type = "Url",
- *   types = {"Link"}
+ *   parents = {"Link"}
  * )
  */
 class Url extends FieldPluginBase {

@@ -42,7 +42,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         'id' => $id,
         'name' => $display->getGraphQLQueryName(),
         'type' => $display->getGraphQLResultName(),
-        'types' => $types,
+        'parents' => $types,
         'multi' => FALSE,
         'arguments' => $arguments,
         'view' => $viewId,

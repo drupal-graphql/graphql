@@ -17,7 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "header",
  *   type = "String",
- *   types = {"InternalResponse", "ExternalResponse"},
+ *   parents = {"InternalResponse", "ExternalResponse"},
  *   arguments={
  *     "key" = "String"
  *   }

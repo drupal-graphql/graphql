@@ -146,7 +146,7 @@ class PluggableSchemaManager implements PluggableSchemaManagerInterface {
     // Retrieve the list of fields that are not attached in any way or
     // explicitly attached to the artificial "Root" type.
     return $this->find(function($def) use ($attachedFields) {
-      return (!in_array($def['name'], $attachedFields) && empty($def['types'])) || in_array('Root', $def['types']);
+      return (!in_array($def['name'], $attachedFields) && empty($def['parents'])) || in_array('Root', $def['parents']);
     }, [GRAPHQL_FIELD_PLUGIN]);
   }
 

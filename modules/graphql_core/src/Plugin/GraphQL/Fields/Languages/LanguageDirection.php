@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "direction",
  *   type = "String",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageDirection extends FieldPluginBase {

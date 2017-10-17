@@ -22,7 +22,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "breadcrumb",
  *   type = "Link",
  *   multi = true,
- *   types = {"Url"},
+ *   parents = {"Url"},
  * )
  */
 class Breadcrumbs extends SubrequestFieldBase {

@@ -14,7 +14,7 @@ use Drupal\Core\Link;
  *   secure = true,
  *   name = "text",
  *   type = "String",
- *   types = {"Link"}
+ *   parents = {"Link"}
  * )
  */
 class Label extends FieldPluginBase {

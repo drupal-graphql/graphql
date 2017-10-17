@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "mimeType",
  *   type = "String",
  *   nullable = true,
- *   types = {"Image"}
+ *   parents = {"Image"}
  * )
  */
 class ImageMimeType extends FieldPluginBase {

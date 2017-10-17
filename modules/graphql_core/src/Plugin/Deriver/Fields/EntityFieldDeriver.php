@@ -26,7 +26,7 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
     $fieldName = $definition->getName();
 
     $derivative = [
-      'types' => isset($bundleId) ? [StringHelper::camelCase([$entityTypeId, $bundleId])] : [StringHelper::camelCase([$entityTypeId])],
+      'parents' => isset($bundleId) ? [StringHelper::camelCase([$entityTypeId, $bundleId])] : [StringHelper::camelCase([$entityTypeId])],
       'name' => EntityField::getId($fieldName),
       'multi' => $definition->isMultiple(),
       'field' => $fieldName,

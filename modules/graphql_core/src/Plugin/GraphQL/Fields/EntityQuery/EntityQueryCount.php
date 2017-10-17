@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "count",
  *   type = "Int",
- *   types = {"EntityQueryResult"},
+ *   parents = {"EntityQueryResult"},
  *   nullable = true
  * )
  */

@@ -28,7 +28,7 @@ class GraphQLField extends GraphQLAnnotationBase {
    *
    * @var string[]
    */
-  public $types = [];
+  public $parents = [];
 
   /**
    * The field type.

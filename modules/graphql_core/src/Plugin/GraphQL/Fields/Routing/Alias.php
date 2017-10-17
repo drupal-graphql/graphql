@@ -20,7 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "alias",
  *   type = "String",
- *   types = {"Url"}
+ *   parents = {"Url"}
  * )
  */
 class Alias extends Path implements ContainerFactoryPluginInterface {

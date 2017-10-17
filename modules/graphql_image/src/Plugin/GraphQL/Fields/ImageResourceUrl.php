@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "url",
  *   type = "String",
  *   nullable = true,
- *   types = {"ImageResource"}
+ *   parents = {"ImageResource"}
  * )
  */
 class ImageResourceUrl extends FieldPluginBase {
