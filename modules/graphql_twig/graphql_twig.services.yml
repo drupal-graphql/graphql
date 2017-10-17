@@ -1,5 +1,0 @@
-services:
-  graphql_twig.twig.embed:
-    class: Drupal\graphql_twig\GraphQLTwigExtension
-    tags:
-      - { name: twig.extension }

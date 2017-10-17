@@ -23,7 +23,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 class EntityField extends EntityFieldBase {
 
   /**
-   * Returns a string if for the plugin.
+   * Returns a string id for the plugin.
    *
    * @param string $fieldName
    *   Field id.

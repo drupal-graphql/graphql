@@ -22,7 +22,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "EntityCrudOutput",
  *   secure = true,
  *   nullable = false,
- *   cache_tags = {"entity_types", "entity_bundles"},
+ *   schema_cache_tags = {"entity_types", "entity_bundles"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Mutations\UpdateEntityDeriver"
  * )
  */

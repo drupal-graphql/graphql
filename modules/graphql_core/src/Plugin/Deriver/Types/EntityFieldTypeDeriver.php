@@ -20,11 +20,14 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
   protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {
     $fieldName = $baseFieldDefinition->getName();
 
+    if ($this->isSinglePropertyField($baseFieldDefinition)) {
+      return;
+    }
+
     $this->derivatives["$entityTypeId-$fieldName"] = [
       'name' => EntityFieldType::getId($entityTypeId, $fieldName),
       'entity_type' => $entityTypeId,
       'data_type' => "entity:$entityTypeId:$fieldName",
-      'interfaces' => [EntityType::getId($entityTypeId)],
     ] + $basePluginDefinition;
   }
 
@@ -34,11 +37,14 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
   protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {
     $fieldName = $storage->getName();
 
+    if ($this->isSinglePropertyField($storage)) {
+      return;
+    }
+
     $this->derivatives["$entityTypeId-$bundleId-$fieldName"] = [
       'name' => EntityFieldType::getId($entityTypeId, $fieldName),
       'entity_type' => $entityTypeId,
       'data_type' => "entity:$entityTypeId:$bundleId:$fieldName",
-      'interfaces' => [EntityBundle::getId($entityTypeId, $bundleId)],
       'bundle' => $bundleId,
     ] + $basePluginDefinition;
   }

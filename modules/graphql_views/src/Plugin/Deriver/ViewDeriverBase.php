@@ -240,6 +240,23 @@ abstract class ViewDeriverBase extends DeriverBase implements ContainerDeriverIn
   }
 
   /**
+   * Returns cache metadata plugin definitions.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view object.
+   *
+   * @return array
+   *   The cache metadata definitions for the plugin definition.
+   */
+  protected function getCacheMetadataDefinition(ViewEntityInterface $view) {
+    return [
+      'schema_cache_tags' => $view->getCacheTags(),
+      'schema_cache_contexts' => $view->getCacheContexts(),
+      'schema_cache_max_age' => $view->getCacheMaxAge(),
+    ];
+  }
+
+  /**
    * Returns information about view arguments (contextual filters).
    *
    * @param array $viewArguments

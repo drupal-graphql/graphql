@@ -23,7 +23,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *     "id" = "String"
  *   },
  *   nullable = false,
- *   cache_tags = {"entity_types"},
+ *   schema_cache_tags = {"entity_types"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Mutations\DeleteEntityDeriver"
  * )
  */

@@ -26,10 +26,13 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
     $fieldName = $definition->getName();
 
     $derivative = [
-      'types' => [StringHelper::camelCase([$entityTypeId])],
+      'types' => isset($bundleId) ? [StringHelper::camelCase([$entityTypeId, $bundleId])] : [StringHelper::camelCase([$entityTypeId])],
       'name' => EntityField::getId($fieldName),
       'multi' => $definition->isMultiple(),
       'field' => $fieldName,
+      'schema_cache_tags' => array_merge($definition->getCacheTags(), ['entity_field_info']),
+      'schema_cache_contexts' => $definition->getCacheContexts(),
+      'schema_cache_max_age' => $definition->getCacheMaxAge(),
     ];
 
     $properties = $definition->getPropertyDefinitions();
@@ -46,8 +49,7 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
       $derivative['type'] = EntityFieldType::getId($entityTypeId, $fieldName);
     }
 
-    $key = is_null($bundleId) ? "$entityTypeId-$fieldName" : "$entityTypeId-$bundleId-$fieldName";
-
+    $key = !isset($bundleId) ? "$entityTypeId-$fieldName" : "$entityTypeId-$bundleId-$fieldName";
     $this->derivatives[$key] = $derivative + $basePluginDefinition;
   }
 }
