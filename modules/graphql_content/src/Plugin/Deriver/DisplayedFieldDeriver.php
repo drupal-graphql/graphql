@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_content\ContentEntitySchemaConfig;
@@ -62,6 +63,8 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
    *   Bundle info provider.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   Entity field manager instance.
+   * @param \Drupal\graphql_content\ContentEntitySchemaConfig $schemaConfig
+   *   The schema config service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
@@ -125,14 +128,20 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
         continue;
       }
 
-      $storages = $this->entityFieldManager->getFieldStorageDefinitions($typeId);
-
+      $storageDefinitions = $this->entityFieldManager->getFieldStorageDefinitions($typeId);
       foreach (array_keys($bundles[$typeId]) as $bundle) {
         if ($viewMode = $this->schemaConfig->getExposedViewMode($typeId, $bundle)) {
           if ($display = $this->getDisplay($typeId, $bundle, $viewMode)) {
             foreach ($display->getComponents() as $field => $component) {
-              if (isset($component['type']) && $component['type'] == 'graphql_raw_value') {
+              if (isset($component['type']) && $component['type'] === 'graphql_raw_value') {
                 // Raw values formatter is obsolete.
+                continue;
+              }
+
+              $storageDefinition = isset($storageDefinitions[$field]) ? $storageDefinitions[$field] : NULL;
+              if (isset($storageDefinition) && $storageDefinition instanceof BaseFieldDefinition) {
+                // Skip base fields. We generate them globally across all
+                // bundles.
                 continue;
               }
 
@@ -142,8 +151,8 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
                 'entity_type' => $typeId,
                 'bundle' => $bundle,
                 'field' => $field,
-                'virtual' => !array_key_exists($field, $storages),
-                'multi' => array_key_exists($field, $storages) ? $storages[$field]->getCardinality() != 1 : FALSE,
+                'virtual' => !isset($storageDefinition),
+                'multi' => isset($storageDefinition) ? $storageDefinition->getCardinality() != 1 : FALSE,
                 'cache_tags' => $display->getCacheTags(),
                 'cache_contexts' => $display->getCacheContexts(),
                 'cache_max_age' => $display->getCacheMaxAge(),
