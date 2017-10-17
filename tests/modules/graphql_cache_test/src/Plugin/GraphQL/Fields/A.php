@@ -16,7 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "a",
  *   secure = true,
  *   type = "Int",
- *   types = {"Root", "Object"},
+ *   parents = {"Root", "Object"},
  *   response_cache_tags = {"a", "graphql_response"},
  *   response_cache_contexts = {"graphql_test", "gql", "user"}
  * )

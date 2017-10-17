@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entityLanguage",
  *   type = "Language",
- *   types = {"Entity"}
+ *   parents = {"Entity"}
  * )
  */
 class EntityLanguage extends FieldPluginBase {

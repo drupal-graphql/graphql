@@ -23,7 +23,7 @@ use Drupal\image\Entity\ImageStyle;
  *   arguments = {
  *     "style" = "ImageStyleId"
  *   },
- *   types = {
+ *   parents = {
  *     "Image"
  *   }
  * )

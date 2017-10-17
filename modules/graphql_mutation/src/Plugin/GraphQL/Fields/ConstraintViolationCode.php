@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "code",
  *   type = "String",
- *   types = {"ConstraintViolation"},
+ *   parents = {"ConstraintViolation"},
  *   nullable = true
  * )
  */

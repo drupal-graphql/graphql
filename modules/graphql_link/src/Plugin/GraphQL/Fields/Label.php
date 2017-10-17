@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "label",
  *   type = "String",
- *   types = {"LinkItem"}
+ *   parents = {"LinkItem"}
  * )
  */
 class Label extends FieldPluginBase {

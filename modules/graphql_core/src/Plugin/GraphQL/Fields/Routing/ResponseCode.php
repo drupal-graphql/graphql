@@ -17,7 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "code",
  *   type = "Int",
- *   types = {"InternalResponse", "ExternalResponse"}
+ *   parents = {"InternalResponse", "ExternalResponse"}
  * )
  */
 class ResponseCode extends FieldPluginBase {

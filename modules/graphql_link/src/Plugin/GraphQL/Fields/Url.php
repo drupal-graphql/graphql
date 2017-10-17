@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "url",
  *   type = "Url",
- *   types = {"LinkItem"}
+ *   parents = {"LinkItem"}
  * )
  */
 class Url extends FieldPluginBase {

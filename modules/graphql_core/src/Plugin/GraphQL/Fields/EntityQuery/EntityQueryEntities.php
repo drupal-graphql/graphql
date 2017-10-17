@@ -19,7 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entities",
  *   type = "Entity",
- *   types = {"EntityQueryResult"},
+ *   parents = {"EntityQueryResult"},
  *   multi = true,
  *   nullable = true
  * )

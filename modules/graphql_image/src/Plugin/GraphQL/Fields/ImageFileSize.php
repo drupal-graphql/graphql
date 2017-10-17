@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "fileSize",
  *   type = "Int",
  *   nullable = true,
- *   types = {"Image"}
+ *   parents = {"Image"}
  * )
  */
 class ImageFileSize extends FieldPluginBase {

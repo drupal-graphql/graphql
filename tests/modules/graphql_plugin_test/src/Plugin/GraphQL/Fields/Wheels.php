@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "wheels",
  *   type = "Int",
- *   types = {"Vehicle"}
+ *   parents = {"Vehicle"}
  * )
  */
 class Wheels extends FieldPluginBase {

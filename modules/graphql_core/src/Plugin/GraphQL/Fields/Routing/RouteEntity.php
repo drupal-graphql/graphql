@@ -22,7 +22,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "route_entity",
  *   secure = true,
  *   name = "entity",
- *   types = {"Url"},
+ *   parents = {"Url"},
  *   type = "Entity"
  * )
  */

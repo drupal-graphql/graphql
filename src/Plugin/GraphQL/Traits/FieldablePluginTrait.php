@@ -29,7 +29,7 @@ trait FieldablePluginTrait {
 
         // Fields that are attached by annotating the type on the field.
         $implicitFields = $schemaManager->find(function ($field) use ($types) {
-          return array_intersect($types, $field['types']);
+          return array_intersect($types, $field['parents']);
         }, [GRAPHQL_FIELD_PLUGIN]);
 
         // Implicit fields have higher precedence than explicit ones.

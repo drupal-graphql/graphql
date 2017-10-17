@@ -18,7 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "external_request",
  *   name = "request",
  *   type = "ExternalResponse",
- *   types = {"ExternalUrl"}
+ *   parents = {"ExternalUrl"}
  * )
  */
 class ExternalRequest extends FieldPluginBase implements ContainerFactoryPluginInterface {

@@ -31,7 +31,7 @@ class ViewResultListDeriver extends ViewDeriverBase {
       $this->derivatives[$id] = [
         'id' => $id,
         'type' => $type,
-        'types' => [$display->getGraphQLResultName()],
+        'parents' => [$display->getGraphQLResultName()],
         'multi' => TRUE,
         'view' => $viewId,
         'display' => $displayId,

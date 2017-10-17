@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "wheels",
  *   type = "Int",
- *   types = {"Bike"},
+ *   parents = {"Bike"},
  *   weight = 1
  * )
  */

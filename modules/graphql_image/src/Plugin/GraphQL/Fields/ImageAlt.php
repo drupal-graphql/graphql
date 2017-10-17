@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "alt",
  *   type = "String",
  *   nullable = true,
- *   types = {"Image"}
+ *   parents = {"Image"}
  * )
  */
 class ImageAlt extends FieldPluginBase {
