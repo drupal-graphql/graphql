@@ -36,10 +36,7 @@ class ViewResultListDeriver extends ViewDeriverBase {
         'view' => $viewId,
         'display' => $displayId,
         'uses_fields' => $style->usesFields(),
-        'cache_tags' => $view->getCacheTags(),
-        'cache_contexts' => $view->getCacheContexts(),
-        'cache_max_age' => $view->getCacheMaxAge(),
-      ] + $basePluginDefinition;
+      ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);

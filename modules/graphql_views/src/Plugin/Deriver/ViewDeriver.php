@@ -49,10 +49,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         'display' => $displayId,
         'paged' => $this->isPaged($display),
         'arguments_info' => $info,
-        'cache_tags' => $view->getCacheTags(),
-        'cache_contexts' => $view->getCacheContexts(),
-        'cache_max_age' => $view->getCacheMaxAge(),
-      ] + $basePluginDefinition;
+      ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);

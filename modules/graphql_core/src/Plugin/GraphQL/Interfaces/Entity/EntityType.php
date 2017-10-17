@@ -10,7 +10,7 @@ use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity\Entity;
  * @GraphQLInterface(
  *   id = "entity_type",
  *   weight = -1,
- *   cache_tags = {"entity_types"},
+ *   schema_cache_tags = {"entity_types"},
  *   interfaces = {"Entity"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Interfaces\EntityTypeDeriver"
  * )

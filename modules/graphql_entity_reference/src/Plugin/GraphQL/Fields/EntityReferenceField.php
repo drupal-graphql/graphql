@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_reference",
  *   secure = true,
  *   field_formatter = "graphql_entity_reference",
- *   cache_tags = {"entity_field_info"},
+ *   schema_cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_entity_reference\Plugin\Deriver\EntityReferenceFields"
  * )
  */
