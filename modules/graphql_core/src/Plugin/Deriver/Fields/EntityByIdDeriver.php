@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -23,19 +23,11 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
   protected $entityTypeManager;
 
   /**
-   * The schema configuration service.
-   *
-   * @var \Drupal\graphql_content\ContentEntitySchemaConfig
-   */
-  protected $schemaConfig;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
     return new static(
-      $container->get('entity_type.manager'),
-      $container->get('graphql_content.schema_config')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -43,11 +35,9 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
-    ContentEntitySchemaConfig $schemaConfig
+    EntityTypeManagerInterface $entityTypeManager
   ) {
     $this->entityTypeManager = $entityTypeManager;
-    $this->schemaConfig = $schemaConfig;
   }
 
   /**
@@ -55,9 +45,6 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      if (!$this->schemaConfig->isEntityTypeExposed($id)) {
-        continue;
-      }
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
           'name' => StringHelper::propCase([$id, 'by', 'id']),

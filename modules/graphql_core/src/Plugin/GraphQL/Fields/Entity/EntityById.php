@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_content\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -25,7 +25,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   arguments = {
  *     "id" = "String"
  *   },
- *   deriver = "Drupal\graphql_content\Plugin\Deriver\EntityByIdDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityByIdDeriver"
  * )
  */
 class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterface {
