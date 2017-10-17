@@ -12,7 +12,7 @@ use Drupal\graphql\Utility\StringHelper;
  * @GraphQLType(
  *   id = "entity_bundle",
  *   weight = -1,
- *   cache_tags = {"entity_types", "entity_bundles"},
+ *   schema_cache_tags = {"entity_types", "entity_bundles"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Types\EntityBundleDeriver"
  * )
  */

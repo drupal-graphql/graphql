@@ -43,7 +43,7 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
           ]),
           'view' => $viewId,
           'display' => $displayId,
-        ] + $basePluginDefinition;
+        ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
       }
     }
 

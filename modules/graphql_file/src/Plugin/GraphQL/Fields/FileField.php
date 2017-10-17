@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   field_formatter = "graphql_file",
  *   type = "File",
- *   cache_tags = {"entity_field_info"},
+ *   schema_cache_tags = {"entity_field_info"},
  *   deriver = "Drupal\graphql_content\Plugin\Deriver\FieldFormatterDeriver"
  * )
  */
