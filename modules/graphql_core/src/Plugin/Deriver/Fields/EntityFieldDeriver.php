@@ -30,6 +30,9 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
       'name' => EntityField::getId($fieldName),
       'multi' => $definition->isMultiple(),
       'field' => $fieldName,
+      'schema_cache_tags' => array_merge($definition->getCacheTags(), ['entity_field_info']),
+      'schema_cache_contexts' => $definition->getCacheContexts(),
+      'schema_cache_max_age' => $definition->getCacheMaxAge(),
     ];
 
     $properties = $definition->getPropertyDefinitions();

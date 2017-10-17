@@ -16,10 +16,9 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
     $fieldName = $definition->getName();
     $dataType = EntityFieldType::getId($entityTypeId, $fieldName);
 
-    $definitions = $definition->getPropertyDefinitions();
-
-    foreach ($definitions as $property => $definition) {
-      if ($definition->getDataType() == 'map') {
+    $propertyDefinitions = $definition->getPropertyDefinitions();
+    foreach ($propertyDefinitions as $property => $propertyDefinition) {
+      if ($propertyDefinition->getDataType() == 'map') {
         // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
         continue;
       }
@@ -28,8 +27,11 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
         'name' => StringHelper::propCase($property),
         'property' => $property,
         'multi' => FALSE,
-        'type' => $this->typeMapper->typedDataToGraphQLFieldType($definition),
+        'type' => $this->typeMapper->typedDataToGraphQLFieldType($propertyDefinition),
         'types' => [$dataType],
+        'schema_cache_tags' => array_merge($definition->getCacheTags(), ['entity_field_info']),
+        'schema_cache_contexts' => $definition->getCacheContexts(),
+        'schema_cache_max_age' => $definition->getCacheMaxAge(),
       ] + $basePluginDefinition;
     }
   }

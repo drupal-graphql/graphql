@@ -3,6 +3,7 @@
 namespace Drupal\graphql_content\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -145,6 +146,11 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
                 continue;
               }
 
+              $metadata = CacheableMetadata::createFromObject($display);
+              if (isset($storageDefinition)) {
+                $metadata->addCacheableDependency($storageDefinition);
+              }
+
               $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
                 'name' => StringHelper::propCase($field),
                 'types' => [StringHelper::camelCase([$typeId, $bundle])],
@@ -152,10 +158,10 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
                 'bundle' => $bundle,
                 'field' => $field,
                 'virtual' => !isset($storageDefinition),
-                'multi' => isset($storageDefinition) ? $storageDefinition->getCardinality() != 1 : FALSE,
-                'cache_tags' => $display->getCacheTags(),
-                'cache_contexts' => $display->getCacheContexts(),
-                'cache_max_age' => $display->getCacheMaxAge(),
+                'multi' => isset($storageDefinition) ? $storageDefinition->getCardinality() !== 1 : FALSE,
+                'schema_cache_tags' => $metadata->getCacheTags(),
+                'schema_cache_contexts' => $metadata->getCacheContexts(),
+                'schema_cache_max_age' => $metadata->getCacheMaxAge(),
               ] + $basePluginDefinition;
             }
           }
