@@ -1,8 +1,8 @@
 # GraphQL for Drupal
 
-[![Build Status](https://img.shields.io/travis/fubhy/graphql-drupal.svg)](https://travis-ci.org/fubhy/graphql-drupal)
-[![Code Coverage](https://img.shields.io/codecov/c/github/fubhy/graphql-drupal.svg)](https://codecov.io/gh/fubhy/graphql-drupal)
-[![Code Quality](https://img.shields.io/scrutinizer/g/fubhy/graphql-drupal.svg)](https://scrutinizer-ci.com/g/fubhy/graphql-drupal/?branch=8.x-3.x)
+[![Build Status](https://img.shields.io/travis/drupal-graphql/graphql-drupal.svg)](https://travis-ci.org/drupal-graphql/graphql)
+[![Code Coverage](https://img.shields.io/codecov/c/github/drupal-graphql/graphql.svg)](https://codecov.io/gh/drupal-graphql/graphql)
+[![Code Quality](https://img.shields.io/scrutinizer/g/drupal-graphql/graphql.svg)](https://scrutinizer-ci.com/g/drupal-graphql/graphql/?branch=8.x-3.x)
 
 This module lets you craft and expose a [GraphQL] schema for [Drupal 8].
 
@@ -31,7 +31,7 @@ Please refer to `modules/README.md` for more information.
 
 ## Example implementation
 
-Check out https://github.com/fubhy/drupal-decoupled-app for a complete example
+Check out https://github.com/drupal-graphql/drupal-decoupled-app for a complete example
 of a fully decoupled React and GraphQL application. Feel free to use that
 repository as a starting point for your own decoupled application.
 
@@ -54,5 +54,5 @@ module works and how you can configure, adjust and extend it:
 ## Resources
  
 * Project homepage: https://www.drupal.org/project/graphql
-* Contributing: https://github.com/fubhy/graphql-drupal
+* Contributing: https://github.com/drupal-graphql/graphql
 
