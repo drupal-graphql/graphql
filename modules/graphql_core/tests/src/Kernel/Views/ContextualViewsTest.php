@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\Tests\graphql_views\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Views;
 
 use Drupal\graphql\GraphQL\Utility\TypeCollector;
+use Drupal\Tests\graphql_core\Kernel\Views\ViewsTestBase;
 
 /**
  * Test contextual views support in GraphQL.
@@ -40,7 +41,7 @@ class ContextualViewsTest extends ViewsTestBase {
    */
   public function testContextualViewArgs() {
     $test2Node = $this->createNode(['type' => 'test2']);
-    $this->executeQueryFile('contextual.gql', [
+    $this->executeQueryFile('Views/contextual.gql', [
       'test2NodeId' => $test2Node->id(),
     ]);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Views;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
@@ -19,7 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   nullable = true,
  *   multi = true,
  *   types = {"Root"},
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ViewDeriver"
  * )
  */
 class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
@@ -70,7 +70,7 @@ class View extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $executable->setDisplay($definition['display']);
 
       // Set view contextual filters.
-      /* @see \Drupal\graphql_views\Plugin\Deriver\ViewDeriverBase::getArgumentsInfo() */
+      /* @see \Drupal\graphql_core\Plugin\Deriver\ViewDeriverBase::getArgumentsInfo() */
       if (!empty($definition['arguments_info'])) {
         $arguments = $this->extractContextualFilters($value, $args);
         $executable->setArguments($arguments);

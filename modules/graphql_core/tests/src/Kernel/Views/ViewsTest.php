@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\Tests\graphql_views\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Views;
+
+use Drupal\Tests\graphql_core\Kernel\Views\ViewsTestBase;
 
 /**
  * Test views support in GraphQL.
@@ -14,7 +16,7 @@ class ViewsTest extends ViewsTestBase {
    */
   public function testSimpleView() {
 
-    $result = $this->executeQueryFile('simple.gql');
+    $result = $this->executeQueryFile('Views/simple.gql');
 
     $this->assertEquals([
       [
@@ -31,7 +33,7 @@ class ViewsTest extends ViewsTestBase {
    * Test paging support.
    */
   public function testPagedView() {
-    $result = $this->executeQueryFile('paged.gql');
+    $result = $this->executeQueryFile('Views/paged.gql');
     $this->assertEquals([
       'page_one' => [
         'count' => count($this->letters),
@@ -68,7 +70,7 @@ class ViewsTest extends ViewsTestBase {
    * Test sorting behavior.
    */
   public function testSortedView() {
-    $result = $this->executeQueryFile('sorted.gql');
+    $result = $this->executeQueryFile('Views/sorted.gql');
     $this->assertEquals([
       'default' => [
         'results' => [
@@ -112,7 +114,7 @@ class ViewsTest extends ViewsTestBase {
    * Test filter behavior.
    */
   public function testFilteredView() {
-    $result = $this->executeQueryFile('filtered.gql');
+    $result = $this->executeQueryFile('Views/filtered.gql');
     $this->assertEquals([
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node A'],
@@ -124,7 +126,7 @@ class ViewsTest extends ViewsTestBase {
    * Test filter behavior.
    */
   public function testMultiValueFilteredView() {
-    $result = $this->executeQueryFile('filtered.gql');
+    $result = $this->executeQueryFile('Views/filtered.gql');
     $this->assertEquals([
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node B'],
@@ -139,7 +141,7 @@ class ViewsTest extends ViewsTestBase {
    * Test complex filters.
    */
   public function testComplexFilteredView() {
-    $result = $this->executeQueryFile('filtered.gql');
+    $result = $this->executeQueryFile('Views/filtered.gql');
     $this->assertEquals([
       ['entityLabel' => 'Node A'],
       ['entityLabel' => 'Node B'],
@@ -157,7 +159,7 @@ class ViewsTest extends ViewsTestBase {
    * Test the result type for views with (and without) a single-value bundle filter.
    */
   public function testSingleValueBundleFilterView() {
-    $result = $this->executeQueryFile('single_bundle_filter.gql');
+    $result = $this->executeQueryFile('Views/single_bundle_filter.gql');
     $this->assertEquals('NodeTest', $result['data']['withSingleBundleFilter']['results'][0]['__typename'], 'View result types work as expected.');
   }
 

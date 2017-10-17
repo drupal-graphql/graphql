@@ -63,7 +63,7 @@ class BlockTest extends GraphQLFileTestBase {
    * Test if two static blocks are in the content area.
    */
   public function testStaticBlocks() {
-    $result = $this->executeQueryFile('blocks.gql');
+    $result = $this->executeQueryFile('Blocks/blocks.gql');
     $this->assertEquals(1, count($result['data']['content']), 'Blocks can be retrieved on root level.');
     $this->assertEquals(1, count($result['data']['route']['content']), 'Block listing respects visibility settings.');
   }
@@ -72,7 +72,7 @@ class BlockTest extends GraphQLFileTestBase {
    * Test placement of a content block.
    */
   public function testContentBlock() {
-    $result = $this->executeQueryFile('blocks.gql');
+    $result = $this->executeQueryFile('Blocks/blocks.gql');
     $this->assertEquals(1, count($result['data']['route']['sidebar']), 'One content block in sidebar region.');
     $this->assertEquals('<p>This is a test block content.</p>', $result['data']['route']['sidebar'][0]['body']['value'], 'Content block body contains expected text.');
   }

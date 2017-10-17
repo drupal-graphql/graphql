@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\GraphQL\Types;
+namespace Drupal\graphql_core\Plugin\GraphQL\Types\Views;
 
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
@@ -9,7 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  *
  * @GraphQLType(
  *   id = "view_result_type",
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewResultTypeDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Types\ViewResultTypeDeriver"
  * )
  */
 class ViewResultType extends TypePluginBase {

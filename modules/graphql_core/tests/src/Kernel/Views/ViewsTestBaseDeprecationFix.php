@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_views\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Views;
 
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\ViewDeriverBase;
 use Drupal\views\Plugin\views\display\DisplayPluginInterface;
-use Drupal\views\ViewEntityInterface;
 use Drupal\views\Views;
 
 /**

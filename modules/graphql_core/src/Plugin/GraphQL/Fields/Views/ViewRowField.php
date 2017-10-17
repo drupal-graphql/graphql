@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Views;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "view_row_field",
  *   secure = true,
  *   nullable = true,
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewRowFieldDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ViewRowFieldDeriver"
  * )
  */
 class ViewRowField extends FieldPluginBase {

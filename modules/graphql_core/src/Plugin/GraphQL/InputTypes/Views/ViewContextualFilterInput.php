@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\GraphQL\InputTypes;
+namespace Drupal\graphql_core\Plugin\GraphQL\InputTypes\Views;
 
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 
@@ -9,7 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
  *
  * @GraphQLInputType(
  *   id = "view_contextual_filter_input",
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewContextualFilterInputDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\InputTypes\ViewContextualFilterInputDeriver"
  * )
  */
 class ViewContextualFilterInput extends InputTypePluginBase {

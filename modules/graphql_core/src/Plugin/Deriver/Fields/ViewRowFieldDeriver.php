@@ -1,9 +1,10 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
 use Drupal\graphql\Plugin\views\row\GraphQLFieldRow;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\ViewDeriverBase;
 use Drupal\views\Views;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Views;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\views\ViewExecutable;
@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   nullable = false,
  *   type = "Int",
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewResultCountDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ViewResultCountDeriver"
  * )
  */
 class ViewResultCount extends FieldPluginBase {

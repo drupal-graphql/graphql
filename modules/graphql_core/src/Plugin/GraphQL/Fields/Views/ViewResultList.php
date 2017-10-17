@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\GraphQL\Fields;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Views;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "results",
  *   secure = true,
  *   multi = true,
- *   deriver = "Drupal\graphql_views\Plugin\Deriver\ViewResultListDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ViewResultListDeriver"
  * )
  */
 class ViewResultList extends FieldPluginBase {

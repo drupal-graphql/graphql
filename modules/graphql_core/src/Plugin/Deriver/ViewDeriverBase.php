@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_views\Plugin\Deriver;
+namespace Drupal\graphql_core\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Component\Plugin\PluginManagerInterface;

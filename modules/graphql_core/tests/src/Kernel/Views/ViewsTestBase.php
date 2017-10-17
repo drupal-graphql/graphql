@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_views\Kernel;
+namespace Drupal\Tests\graphql_core\Kernel\Views;
 
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
@@ -30,7 +30,6 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
     'views',
     'taxonomy',
     'graphql_core',
-    'graphql_content',
     'graphql_views',
     'graphql_views_test',
   ];
@@ -59,22 +58,6 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
       'name' => 'Tags',
       'vid' => 'tags',
     ])->save();
-
-    $this->container->get('config.factory')->getEditable('graphql_content.schema')
-      ->set('types', [
-        'node' => [
-          'exposed' => TRUE,
-          'bundles' => [
-            'test' => [
-              'exposed' => TRUE,
-            ],
-            'test2' => [
-              'exposed' => TRUE,
-            ],
-          ],
-        ],
-      ])
-      ->save();
 
     Role::load('anonymous')
       ->grantPermission('access content')
