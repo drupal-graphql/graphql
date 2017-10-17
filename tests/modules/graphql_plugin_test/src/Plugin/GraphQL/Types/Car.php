@@ -10,7 +10,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  * @GraphQLType(
  *   id = "car",
  *   name = "Car",
- *   interfaces = {"Vehicle"},
+ *   interfaces = {"MotorizedVehicle"},
  * )
  */
 class Car extends TypePluginBase {
