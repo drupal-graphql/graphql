@@ -1,5 +1,0 @@
-query($node: String!) {
-  node:nodeById(id: $node) {
-    title:entityLabel
-  }
-}
