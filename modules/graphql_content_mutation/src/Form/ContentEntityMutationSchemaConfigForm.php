@@ -82,6 +82,7 @@ class ContentEntityMutationSchemaConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    drupal_set_message($this->t('This form is deprecated and configuration. Settings will not be respected by the schema any more.', 'error'));
     $form = parent::buildForm($form, $form_state);
     $defaults = [];
     $config = $this->config('graphql_content_mutation.schema');

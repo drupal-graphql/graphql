@@ -76,6 +76,7 @@ query ($path: String!) {
           display
           description
           entity {
+            url
             uri
           }
         }
@@ -86,6 +87,7 @@ query ($path: String!) {
           width
           height
           entity {
+            url
             uri
           }
         }

@@ -21,6 +21,16 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
   use NodeCreationTrait;
 
   /**
+   * @var File
+   */
+  protected $testFile;
+
+  /**
+   * @var File
+   */
+  protected $testImage;
+
+  /**
    * {@inheritdoc}
    */
   public static $modules = [
@@ -74,15 +84,17 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
 
     // File 1
     file_put_contents('public://example.txt', $this->randomMachineName());
-    File::create([
+    $this->testFile = File::create([
       'uri' => 'public://example.txt',
-    ])->save();
+    ]);
+    $this->testFile->save();
 
     // File 2
     file_put_contents('public://example.png', $this->randomMachineName());
-    File::create([
+    $this->testImage = File::create([
       'uri' => 'public://example.png',
-    ])->save();
+    ]);
+    $this->testImage->save();
   }
 
   /**
@@ -101,6 +113,12 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
       'path' => '/node/' . $node->id(),
     ]);
     $resultNode = NestedArray::getValue($result, ['data', 'route', 'entity']);
+
+    // Workaround for public file urls.
+    $expectedFieldValues['fieldFile'][0]['entity']['url'] = file_create_url($this->testFile->getFileUri());
+    $expectedFieldValues['fieldFile'][1]['entity']['url'] = file_create_url($this->testImage->getFileUri());
+    $expectedFieldValues['fieldImage'][0]['entity']['url'] = file_create_url($this->testFile->getFileUri());
+    $expectedFieldValues['fieldImage'][1]['entity']['url'] = file_create_url($this->testImage->getFileUri());
 
     $this->assertEquals($expectedFieldValues, $resultNode, 'Correct raw node values are returned.');
   }
