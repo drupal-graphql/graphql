@@ -5,27 +5,10 @@ namespace Drupal\graphql_core\Plugin\Deriver;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldDeriverBase;
 use Drupal\graphql_core\TypeMapper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class EntityFieldDeriverWithTypeMapping extends EntityFieldDeriverBase {
-
-  /**
-   * Provide plugin definition values from both base and config fields.
-   *
-   * @param string $entityTypeId
-   *   The host entity type.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
-   *   Field definition object.
-   * @param array $basePluginDefinition
-   *   Base plugin definition array.
-   * @param null|string $bundleId
-   *   Bundle id.
-   */
-  abstract protected function getDerivativesFromPropertyDefinitions($entityTypeId, FieldStorageDefinitionInterface $definition, array $basePluginDefinition, $bundleId = NULL);
 
   /**
    * The type mapper service.
@@ -70,20 +53,6 @@ abstract class EntityFieldDeriverWithTypeMapping extends EntityFieldDeriverBase 
   ) {
     parent::__construct($entityTypeManager, $entityFieldManager, $entityTypeBundleInfo, $basePluginId);
     $this->typeMapper = $typeMapper;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {
-    $this->getDerivativesFromPropertyDefinitions($entityTypeId, $baseFieldDefinition, $basePluginDefinition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {
-    $this->getDerivativesFromPropertyDefinitions($entityTypeId, $storage, $basePluginDefinition, $bundleId);
   }
 
 }

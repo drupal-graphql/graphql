@@ -1,12 +1,11 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver\Fields;
+namespace Drupal\graphql_core\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -18,30 +17,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * Provides plugin definition values from base fields.
+   * Provides plugin definition values from fields.
    *
    * @param string $entityTypeId
    *   The host entity type.
-   * @param \Drupal\Core\Field\BaseFieldDefinition $baseFieldDefinition
-   *   Base field definition object.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $fieldDefinition
+   *   Field definition object.
    * @param array $basePluginDefinition
    *   Base definition array.
    */
-  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {}
-
-  /**
-   * Provides plugin definition values from config field storage.
-   *
-   * @param string $entityTypeId
-   *   The host entity type.
-   * @param string $bundleId
-   *   The host entity bundle.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage
-   *   Field storage definition object.
-   * @param array $basePluginDefinition
-   *   Base definition array.
-   */
-  protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {}
+  abstract protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition);
 
   /**
    * The entity type manager.
@@ -113,26 +98,14 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
   public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
 
-    /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInfo */
-    $bundleInfo = \Drupal::service('entity_type.bundle.info');
-
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
       $interfaces = class_implements($entityType->getClass());
       if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
         continue;
       }
 
-      foreach ($this->entityFieldManager->getBaseFieldDefinitions($entityTypeId) as $baseFieldDefinition) {
-        $this->getBaseFieldDefinition($entityTypeId, $baseFieldDefinition, $basePluginDefinition);
-      }
-
-      foreach ($bundleInfo->getBundleInfo($entityTypeId) as $bundleId => $bundle) {
-        foreach ($this->entityFieldManager->getFieldDefinitions($entityTypeId, $bundleId) as $fieldDefinition) {
-          $storage = $fieldDefinition->getFieldStorageDefinition();
-          if (!$storage->isBaseField()) {
-            $this->getConfigFieldDefinition($entityTypeId, $bundleId, $storage, $basePluginDefinition);
-          }
-        }
+      foreach ($this->entityFieldManager->getFieldStorageDefinitions($entityTypeId) as $fieldStorageDefinition) {
+        $this->derivatives = array_merge($this->derivatives, $this->getDerivativeDefinitionsFromFieldDefinition($entityTypeId, $fieldStorageDefinition, $basePluginDefinition));
       }
     }
 
