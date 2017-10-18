@@ -3,7 +3,8 @@
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
@@ -32,13 +33,21 @@ abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPl
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
+  public function buildConfig(SchemaBuilder $schemaManager) {
+    $interfaces = $this->buildInterfaces($schemaManager);
+
     $this->config = new ObjectTypeConfig([
       'name' => $this->buildName(),
       'description' => $this->buildDescription(),
-      'interfaces' => $this->buildInterfaces($schemaManager),
+      'interfaces' => $interfaces,
       'fields' => $this->buildFields($schemaManager),
     ]);
+
+    foreach ($interfaces as $interface) {
+      if ($interface instanceof InterfacePluginBase) {
+        $interface->addType($this);
+      }
+    }
   }
 
   /**
@@ -51,13 +60,13 @@ abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPl
   /**
    * Build the list of interfaces.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Type\AbstractInterfaceTypeInterface[]
    *   The list of interfaces.
    */
-  protected function buildInterfaces(PluggableSchemaManagerInterface $schemaManager) {
+  protected function buildInterfaces(SchemaBuilder $schemaManager) {
     $definition = $this->getPluginDefinition();
     if ($definition['interfaces']) {
       return array_filter($schemaManager->find(function($interface) use ($definition) {
@@ -66,6 +75,7 @@ abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPl
         return $interface instanceof AbstractInterfaceType;
       });
     }
+
     return [];
   }
 

@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Youshido\GraphQL\Type\Enum\EnumType;
 use Youshido\GraphQL\Type\ListType\ListType;
 use Youshido\GraphQL\Type\NonNullType;
@@ -68,13 +68,13 @@ trait TypedPluginTrait {
   /**
    * Build the plugin type.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Type\TypeInterface
    *   The type object.
    */
-  protected function buildType(PluggableSchemaManagerInterface $schemaManager) {
+  protected function buildType(SchemaBuilder $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
 

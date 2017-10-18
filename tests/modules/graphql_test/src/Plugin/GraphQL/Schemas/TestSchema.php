@@ -25,7 +25,7 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
   /**
    * The pluggable schema manager service.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
+   * @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilder
    */
   protected $schemaManager;
 
@@ -37,12 +37,11 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
     $this->responseMetadata->addCacheableDependency($metadata);
   }
 
-
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    /** @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager */
+    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager */
     $schemaManager = $container->get('graphql.pluggable_schema_manager');
 
     $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);

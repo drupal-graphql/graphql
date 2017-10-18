@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
@@ -24,7 +24,7 @@ class GraphQLId extends IdType implements TypeSystemPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
+  public function buildConfig(SchemaBuilder $schemaManager) {
     // Nothing to do here.
   }
 }

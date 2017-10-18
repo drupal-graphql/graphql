@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,11 +18,13 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
   /**
    * The pluggable schema manager service.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
+   * @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilder
    */
   protected $schemaManager;
 
   /**
+   * Mocked plugin configuration.
+   *
    * @return array
    */
   public static function configuration() {
@@ -38,16 +39,22 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, AbstractField $field = NULL) {
-    /** @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager */
-    $schemaManager = $container->get('graphql.pluggable_schema_manager');
-
-    $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
-    $query->addFields($schemaManager->getRootFields());
+    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilderFactory $schemaBuilderFactory */
+    $schemaBuilderFactory = $container->get('graphql.schema_builder_factory');
+    $schemaBuilder = $schemaBuilderFactory->getSchemaBuilder();
 
     $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
-    $mutation->addFields($schemaManager->getMutations());
+    $mutation->addFields($schemaBuilder->getMutations());
 
-    $types = $schemaManager->find(function() {
+    $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
+    $query->addFields($schemaBuilder->getRootFields());
+
+    // Allow injection of an additional field.
+    if (!empty($field)) {
+      $query->addField($field);
+    }
+
+    $types = $schemaBuilder->find(function() {
       return TRUE;
     }, [
       GRAPHQL_UNION_TYPE_PLUGIN,
@@ -55,15 +62,19 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
       GRAPHQL_INPUT_TYPE_PLUGIN,
     ]);
 
-    // Allow a custom field to be passed in.
-    if (isset($field)) {
-      $query->addField($field);
-    }
-
-    return new static(['schema' => [
+    $schema = [
       'query' => $query,
       'mutation' => $mutation,
       'types' => $types,
-    ]], 'graphq:test', static::configuration());
+    ];
+
+    return new static(['schema' => $schema], 'graphql:test', static::configuration());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function constructSchema($configuration, $pluginId, $pluginDefinition) {
+    $this->config = new SchemaConfig($configuration['schema']);
   }
 }

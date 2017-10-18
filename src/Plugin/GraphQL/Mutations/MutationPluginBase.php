@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
@@ -31,7 +31,7 @@ abstract class MutationPluginBase extends AbstractField implements TypeSystemPlu
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
+  public function buildConfig(SchemaBuilder $schemaManager) {
     $this->config = new FieldConfig([
       'name' => $this->buildName(),
       'description' => $this->buildDescription(),
