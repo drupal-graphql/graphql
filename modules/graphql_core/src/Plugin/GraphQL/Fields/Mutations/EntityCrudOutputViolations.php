@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "violations",
  *   type = "ConstraintViolation",
- *   types = {"EntityCrudOutput"},
+ *   parents = {"EntityCrudOutput"},
  *   multi = true,
  *   nullable = false
  * )

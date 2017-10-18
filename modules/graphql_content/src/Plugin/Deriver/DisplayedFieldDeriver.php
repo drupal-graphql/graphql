@@ -153,7 +153,7 @@ class DisplayedFieldDeriver extends DeriverBase implements ContainerDeriverInter
 
               $this->derivatives[$typeId . '-' . $bundle . '-' . $field] = [
                 'name' => StringHelper::propCase($field),
-                'types' => [StringHelper::camelCase([$typeId, $bundle])],
+                'parents' => [StringHelper::camelCase([$typeId, $bundle])],
                 'entity_type' => $typeId,
                 'bundle' => $bundle,
                 'field' => $field,

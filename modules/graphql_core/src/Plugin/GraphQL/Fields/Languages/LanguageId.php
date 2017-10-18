@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "id",
  *   type = "String",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageId extends FieldPluginBase {

@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "isDefault",
  *   type = "Boolean",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageIsDefault extends FieldPluginBase {

@@ -21,7 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   multi = false,
  *   weight = -1,
  *   type = "Entity",
- *   types = {"Entity"},
+ *   parents = {"Entity"},
  *   arguments = {
  *     "language" = "AvailableLanguages"
  *   }

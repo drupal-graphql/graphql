@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "isLocked",
  *   type = "Boolean",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageIsLocked extends FieldPluginBase {

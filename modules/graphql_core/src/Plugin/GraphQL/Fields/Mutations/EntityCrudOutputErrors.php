@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "errors",
  *   type = "String",
- *   types = {"EntityCrudOutput"},
+ *   parents = {"EntityCrudOutput"},
  *   multi = true,
  *   nullable = false
  * )

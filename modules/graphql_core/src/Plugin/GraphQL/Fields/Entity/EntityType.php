@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entityType",
  *   type = "String",
- *   types = {"Entity"}
+ *   parents = {"Entity"}
  * )
  */
 class EntityType extends FieldPluginBase {

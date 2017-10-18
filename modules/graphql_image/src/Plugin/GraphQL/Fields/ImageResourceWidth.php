@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "width",
  *   type = "Int",
  *   nullable = true,
- *   types = {"ImageResource"}
+ *   parents = {"ImageResource"}
  * )
  */
 class ImageResourceWidth extends FieldPluginBase {

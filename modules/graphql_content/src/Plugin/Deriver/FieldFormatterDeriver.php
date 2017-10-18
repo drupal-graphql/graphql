@@ -97,7 +97,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
   protected function getDefinition($entityType, $bundle, array $displayOptions, FieldStorageDefinitionInterface $storage = NULL) {
     if (isset($storage)) {
       return [
-        'types' => [StringHelper::camelCase([$entityType, $bundle])],
+        'parents' => [StringHelper::camelCase([$entityType, $bundle])],
         'name' => graphql_propcase($storage->getName()),
         'virtual' => !$storage,
         'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,

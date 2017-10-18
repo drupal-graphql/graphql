@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "attribute",
  *   type = "String",
- *   types = {"MenuLink"},
+ *   parents = {"MenuLink"},
  *   nullable = true,
  *   arguments = {
  *     "key" = "String"

@@ -19,7 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "responsive",
  *   type = "String",
  *   nullable = true,
- *   types = {"Image"},
+ *   parents = {"Image"},
  *   arguments = {
  *     "style" = "ResponsiveImageStyleId"
  *   },

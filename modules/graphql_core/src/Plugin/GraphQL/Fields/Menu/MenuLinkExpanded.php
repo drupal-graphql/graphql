@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "expanded",
  *   type = "Boolean",
- *   types = {"MenuLink"}
+ *   parents = {"MenuLink"}
  * )
  */
 class MenuLinkExpanded extends FieldPluginBase {

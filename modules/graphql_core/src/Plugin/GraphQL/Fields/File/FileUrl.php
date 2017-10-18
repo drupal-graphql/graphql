@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "url",
  *   type = "String",
- *   types = {"File"}
+ *   parents = {"File"}
  * )
  */
 class FileUrl extends FieldPluginBase {

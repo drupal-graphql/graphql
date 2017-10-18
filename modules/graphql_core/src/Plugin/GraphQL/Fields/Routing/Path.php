@@ -21,7 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *        "default" = false,
  *      }
  *   },
- *   types = {"Url"}
+ *   parents = {"Url"}
  * )
  */
 class Path extends FieldPluginBase {

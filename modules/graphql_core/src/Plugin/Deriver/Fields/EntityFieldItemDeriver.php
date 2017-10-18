@@ -28,7 +28,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
         'property' => $property,
         'multi' => FALSE,
         'type' => $this->typeMapper->typedDataToGraphQLFieldType($propertyDefinition),
-        'types' => [$dataType],
+        'parents' => [$dataType],
         'schema_cache_tags' => array_merge($definition->getCacheTags(), ['entity_field_info']),
         'schema_cache_contexts' => $definition->getCacheContexts(),
         'schema_cache_max_age' => $definition->getCacheMaxAge(),

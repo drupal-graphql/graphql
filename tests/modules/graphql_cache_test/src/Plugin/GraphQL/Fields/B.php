@@ -10,7 +10,7 @@ namespace Drupal\graphql_cache_test\Plugin\GraphQL\Fields;
  *   secure = true,
  *   name = "b",
  *   type = "Int",
- *   types = {"Root", "Object"},
+ *   parents = {"Root", "Object"},
  *   response_cache_tags = {"b", "graphql_response"},
  *   response_cache_contexts = {"graphql_test", "gql", "user"}
  * )

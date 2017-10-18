@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "title",
  *   type = "String",
  *   nullable = true,
- *   types = {"Image"}
+ *   parents = {"Image"}
  * )
  */
 class ImageTitle extends FieldPluginBase {

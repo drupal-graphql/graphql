@@ -86,7 +86,7 @@ abstract class UnionTypePluginBase extends AbstractUnionType implements TypeSyst
       GRAPHQL_TYPE_PLUGIN,
     ]);
 
-    $types = array_merge($this->getPluginDefinition()['types'], $types);
+    $types = array_merge($this->getPluginDefinition()['parents'], $types);
     return array_unique($types);
   }
 

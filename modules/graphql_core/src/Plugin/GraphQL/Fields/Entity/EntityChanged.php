@@ -15,7 +15,7 @@ use DateTime;
  *   secure = true,
  *   name = "entityChanged",
  *   type = "String",
- *   types = {"Entity"}
+ *   parents = {"Entity"}
  * )
  */
 class EntityChanged extends FieldPluginBase {

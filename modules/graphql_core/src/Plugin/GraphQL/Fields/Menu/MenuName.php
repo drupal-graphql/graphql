@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "name",
  *   type = "String",
- *   types = {"Menu"}
+ *   parents = {"Menu"}
  * )
  */
 class MenuName extends FieldPluginBase {

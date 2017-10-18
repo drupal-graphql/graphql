@@ -17,7 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "content",
  *   type = "String",
- *   types = {"InternalResponse", "ExternalResponse"}
+ *   parents = {"InternalResponse", "ExternalResponse"}
  * )
  */
 class ResponseContent extends FieldPluginBase {

@@ -20,7 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "context",
  *   secure = true,
- *   types = {"Url", "Root"},
+ *   parents = {"Url", "Root"},
  *   nullable = true,
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ContextDeriver"
  * )

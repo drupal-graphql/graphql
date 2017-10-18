@@ -16,7 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "links",
  *   type = "MenuLink",
  *   multi = true,
- *   types = {"MenuLink"}
+ *   parents = {"MenuLink"}
  * )
  */
 class MenuLinkLinks extends FieldPluginBase {

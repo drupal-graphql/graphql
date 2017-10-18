@@ -21,7 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "links",
  *   type = "MenuLink",
- *   types = {"Menu"},
+ *   parents = {"Menu"},
  *   multi = true
  * )
  */

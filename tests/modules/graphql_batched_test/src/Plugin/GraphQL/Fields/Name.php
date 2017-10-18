@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "name",
  *   secure = true,
  *   name = "name",
- *   types = {"User"},
+ *   parents = {"User"},
  *   type = "String"
  * )
  */

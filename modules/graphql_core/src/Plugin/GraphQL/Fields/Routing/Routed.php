@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "routed",
  *   type = "Boolean",
- *   types = {"Url"}
+ *   parents = {"Url"}
  * )
  */
 class Routed extends FieldPluginBase {
