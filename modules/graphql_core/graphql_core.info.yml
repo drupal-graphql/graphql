@@ -1,6 +1,6 @@
 name: GraphQL Core
 type: module
-description: 'Plugin based schema generation. To be merged into graphql module eventually.'
+description: 'Provides type system plugins and derivers on behalf of core modules.'
 package: GraphQL
 core: 8.x
 dependencies:
