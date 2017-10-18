@@ -4,5 +4,6 @@ description: 'Automatically create GraphQL types and fields from Drupal content 
 package: GraphQL
 configure: graphql_content.content_entity_schema
 core: 8.x
+hidden: true
 dependencies:
   - graphql_core
