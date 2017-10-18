@@ -12,28 +12,31 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
   /**
    * {@inheritdoc}
    */
-  protected function getDerivativesFromPropertyDefinitions($entityTypeId, FieldStorageDefinitionInterface $definition, array $basePluginDefinition, $bundleId = NULL) {
-    $fieldName = $definition->getName();
-    $dataType = EntityFieldType::getId($entityTypeId, $fieldName);
+  protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition, $bundleId = NULL) {
+    $derivatives = [];
+    $fieldName = $fieldDefinition->getName();
+    $commonDefinition = [
+      'parents' => [EntityFieldType::getId($entityTypeId, $fieldName)],
+      'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
+      'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
+      'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
+    ];
 
-    $propertyDefinitions = $definition->getPropertyDefinitions();
-    foreach ($propertyDefinitions as $property => $propertyDefinition) {
+    foreach ($fieldDefinition->getPropertyDefinitions() as $property => $propertyDefinition) {
       if ($propertyDefinition->getDataType() == 'map') {
         // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
         continue;
       }
 
-      $this->derivatives["$entityTypeId-$fieldName-$property"] = [
+      $derivatives["$entityTypeId-$fieldName-$property"] = [
         'name' => StringHelper::propCase($property),
         'property' => $property,
         'multi' => FALSE,
         'type' => $this->typeMapper->typedDataToGraphQLFieldType($propertyDefinition),
-        'parents' => [$dataType],
-        'schema_cache_tags' => array_merge($definition->getCacheTags(), ['entity_field_info']),
-        'schema_cache_contexts' => $definition->getCacheContexts(),
-        'schema_cache_max_age' => $definition->getCacheMaxAge(),
-      ] + $basePluginDefinition;
+      ] + $commonDefinition + $basePluginDefinition;
     }
+
+    return $derivatives;
   }
 
 }
