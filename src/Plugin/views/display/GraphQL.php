@@ -112,7 +112,7 @@ class GraphQL extends DisplayPluginBase {
   }
 
   /**
-   * Gets the result name based on user defined query name or the default one.
+   * Gets the result name.
    *
    * @return string
    *   Result name.
@@ -122,7 +122,7 @@ class GraphQL extends DisplayPluginBase {
   }
 
   /**
-   * Gets the row name based on user defined query name or the default one.
+   * Gets the row name.
    *
    * @return string
    *   Row name.
@@ -132,7 +132,7 @@ class GraphQL extends DisplayPluginBase {
   }
 
   /**
-   * Gets the filter input name based on user defined query name or the default one.
+   * Gets the filter input name..
    *
    * @return string
    *   Result name.
@@ -142,7 +142,17 @@ class GraphQL extends DisplayPluginBase {
   }
 
   /**
-   * Returns the id based on user-provided query name or the default one.
+   * Gets the contextual filter input name.
+   *
+   * @return string
+   *   Result name.
+   */
+  public function getGraphQLContextualFilterInputName() {
+    return $this->getGraphQLName('contextual_filter_input', TRUE);
+  }
+
+  /**
+   * Returns the formatted name.
    *
    * @param string|null $suffix
    *   Id suffix, eg. row, result.

@@ -33,12 +33,12 @@ class ViewResultCountDeriver extends ViewDeriverBase {
 
         $id = implode('-', [$viewId, $displayId, 'result', 'count']);
         $this->derivatives[$id] = [
-            'id' => $id,
-            'type' => 'Int',
-            'parents' => [$display->getGraphQLResultName()],
-            'view' => $viewId,
-            'display' => $displayId,
-          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+          'id' => $id,
+          'type' => 'Int',
+          'parents' => [$display->getGraphQLResultName()],
+          'view' => $viewId,
+          'display' => $displayId,
+        ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
       }
     }
 

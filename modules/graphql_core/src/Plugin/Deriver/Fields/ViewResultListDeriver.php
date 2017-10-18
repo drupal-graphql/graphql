@@ -31,14 +31,14 @@ class ViewResultListDeriver extends ViewDeriverBase {
         $id = implode('-', [$viewId, $displayId, 'result', 'list']);
         $style = $this->getViewStyle($view, $displayId);
         $this->derivatives[$id] = [
-            'id' => $id,
-            'type' => $type,
-            'parents' => [$display->getGraphQLResultName()],
-            'multi' => TRUE,
-            'view' => $viewId,
-            'display' => $displayId,
-            'uses_fields' => $style->usesFields(),
-          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+          'id' => $id,
+          'type' => $type,
+          'parents' => [$display->getGraphQLResultName()],
+          'multi' => TRUE,
+          'view' => $viewId,
+          'display' => $displayId,
+          'uses_fields' => $style->usesFields(),
+        ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
       }
     }
 

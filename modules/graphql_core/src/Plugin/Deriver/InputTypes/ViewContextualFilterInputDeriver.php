@@ -26,6 +26,7 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
           continue;
         }
 
+        /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
         $display = $this->getViewDisplay($view, $displayId);
         $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
         if (!empty($argumentsInfo)) {
@@ -34,18 +35,18 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
           ]);
 
           $this->derivatives[$id] = [
-              'id' => $id,
-              'name' => StringHelper::camelCase([$viewId, $displayId, 'view', 'contextual', 'filter', 'input']),
-              'fields' => array_fill_keys(array_keys($argumentsInfo), [
-                'type' => 'String',
-                // Always expose contextual filters as nullable. Let views module
-                // decide what to do if value is missing.
-                'nullable' => TRUE,
-                'multi' => FALSE,
-              ]),
-              'view' => $viewId,
-              'display' => $displayId,
-            ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+            'id' => $id,
+            'name' => $display->getGraphQLContextualFilterInputName(),
+            'fields' => array_fill_keys(array_keys($argumentsInfo), [
+              'type' => 'String',
+              // Always expose contextual filters as nullable. Let views module
+              // decide what to do if value is missing.
+              'nullable' => TRUE,
+              'multi' => FALSE,
+            ]),
+            'view' => $viewId,
+            'display' => $displayId,
+          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
         }
       }
     }

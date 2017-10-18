@@ -35,8 +35,8 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
           return array_key_exists('exposed', $filter) && $filter['exposed'];
         }), function($carry, $current) {
           return $carry + [
-              $current['expose']['identifier'] => $current,
-            ];
+            $current['expose']['identifier'] => $current,
+          ];
         }, []);
 
         // If there are no exposed filters, don't create the derivative.
@@ -57,12 +57,12 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
         }, $filters);
 
         $this->derivatives[$id] = [
-            'id' => $id,
-            'name' => $display->getGraphQLFilterInputName(),
-            'fields' => $fields,
-            'view' => $viewId,
-            'display' => $displayId,
-          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+          'id' => $id,
+          'name' => $display->getGraphQLFilterInputName(),
+          'fields' => $fields,
+          'view' => $viewId,
+          'display' => $displayId,
+        ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
       }
 
     }

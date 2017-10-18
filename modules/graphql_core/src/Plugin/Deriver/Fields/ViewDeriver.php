@@ -33,24 +33,24 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
         $id = implode('-', [$viewId, $displayId, 'view']);
         $info = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
         $arguments = [];
-        $arguments += $this->getContextualArguments($info, $id);
+        $arguments += $this->getContextualArguments($display, $info, $id);
         $arguments += $this->getPagerArguments($display);
         $arguments += $this->getSortArguments($display, $id);
         $arguments += $this->getFilterArguments($display, $id);
         $types = $this->getTypes($info);
 
         $this->derivatives[$id] = [
-            'id' => $id,
-            'name' => $display->getGraphQLQueryName(),
-            'type' => $display->getGraphQLResultName(),
-            'parents' => $types,
-            'multi' => FALSE,
-            'arguments' => $arguments,
-            'view' => $viewId,
-            'display' => $displayId,
-            'paged' => $this->isPaged($display),
-            'arguments_info' => $info,
-          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+          'id' => $id,
+          'name' => $display->getGraphQLQueryName(),
+          'type' => $display->getGraphQLResultName(),
+          'parents' => $types,
+          'multi' => FALSE,
+          'arguments' => $arguments,
+          'view' => $viewId,
+          'display' => $displayId,
+          'paged' => $this->isPaged($display),
+          'arguments_info' => $info,
+        ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
       }
     }
 
@@ -60,6 +60,8 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
   /**
    * Helper function to return the contextual filter argument if any exist.
    *
+   * @param \Drupal\views\Plugin\views\display\DisplayPluginInterface $display
+   *   The display plugin.
    * @param array $arguments
    *   The array of available arguments.
    * @param $id
@@ -67,12 +69,15 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
    *
    * @return array
    *   The contextual filter argument if applicable.
+   *
+   * The contextual filter argument if applicable.
    */
-  protected function getContextualArguments(array $arguments, $id) {
+  protected function getContextualArguments(DisplayPluginInterface $display, array $arguments, $id) {
+    /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
     if (!empty($arguments)) {
       return [
         'contextualFilter' => [
-          'type' => StringHelper::camelCase([$id, 'contextual', 'filter', 'input']),
+          'type' => $display->getGraphQLContextualFilterInputName(),
           'multi' => FALSE,
           'nullable' => TRUE,
         ],
@@ -94,6 +99,7 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
    *   The sort arguments if any exposed sorts are available.
    */
   protected function getSortArguments(DisplayPluginInterface $display, $id) {
+    /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
     $sorts = array_filter($display->getOption('sorts') ?: [], function($sort) {
       return $sort['exposed'];
     });
@@ -129,13 +135,14 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
    *   The filter argument if any exposed filters are available.
    */
   protected function getFilterArguments(DisplayPluginInterface $display, $id) {
+    /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
     $filters = array_filter($display->getOption('filters') ?: [], function($filter) {
       return array_key_exists('exposed', $filter) && $filter['exposed'];
     });
 
     return !empty($filters) ? [
       'filter' => [
-        'type' => StringHelper::camelCase([$id, 'filter', 'input']),
+        'type' => $display->getGraphQLFilterInputName(),
         'multi' => FALSE,
         'nullable' => TRUE,
       ],

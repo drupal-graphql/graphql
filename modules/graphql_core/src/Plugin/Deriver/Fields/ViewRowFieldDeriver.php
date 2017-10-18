@@ -36,14 +36,14 @@ class ViewRowFieldDeriver extends ViewDeriverBase {
           $alias = $rowPlugin->getFieldKeyAlias($name);
 
           $this->derivatives[$id] = [
-              'id' => $id,
-              'name' => $alias,
-              'type' => 'String',
-              'parents' => [$display->getGraphQLRowName()],
-              'view' => $viewId,
-              'display' => $displayId,
-              'field' => $alias,
-            ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+            'id' => $id,
+            'name' => $alias,
+            'type' => 'String',
+            'parents' => [$display->getGraphQLRowName()],
+            'view' => $viewId,
+            'display' => $displayId,
+            'field' => $alias,
+          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
         }
       }
     }
