@@ -37,6 +37,16 @@ query ($path: String!) {
         fieldLink {
           title
           uri
+          target:attribute(key: "_target")
+          url {
+            ... on InternalUrl {
+              internal:path
+            }
+            ... on ExternalUrl {
+              external:path
+            }
+          }
+
         }
         fieldInteger {
           value

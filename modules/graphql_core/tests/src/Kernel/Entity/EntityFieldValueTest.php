@@ -137,8 +137,15 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
       'field_text' => ['a', 'b', 'c'],
       'field_boolean' => [TRUE, FALSE],
       'field_link' => [
-        ['title' => 'Internal link', 'uri' => 'internal:/node/1'],
-        ['title' => 'External link', 'uri' => 'http://drupal.org'],
+        [
+          'title' => 'Internal link',
+          'uri' => 'internal:/node/1',
+          'options' => ['attributes' => ['_target' => 'blank']],
+        ], [
+          'title' => 'External link',
+          'uri' => 'http://drupal.org',
+          'options' => ['attributes' => ['_target' => 'blank']],
+        ],
       ],
       'field_integer' => [10, -5],
       'field_float' => [3.14145, -8.8],
@@ -215,8 +222,8 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
         FALSE,
       ],
       'fieldLink' => [
-        ['title' => 'Internal link', 'uri' => 'internal:/node/1'],
-        ['title' => 'External link', 'uri' => 'http://drupal.org'],
+        ['title' => 'Internal link', 'uri' => 'internal:/node/1', 'target' => 'blank', 'url' => ['internal' => '/node/1']],
+        ['title' => 'External link', 'uri' => 'http://drupal.org', 'target' => 'blank', 'url' => ['external' => 'http://drupal.org']],
       ],
       'fieldInteger' => [
         10,
