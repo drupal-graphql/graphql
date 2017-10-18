@@ -16,54 +16,56 @@ class ViewFilterInputDeriver extends ViewDeriverBase implements ContainerDeriver
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $viewStorage = $this->entityTypeManager->getStorage('view');
+    if ($this->entityTypeManager->hasDefinition('view')) {
+      $viewStorage = $this->entityTypeManager->getStorage('view');
 
-    foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
-      /** @var \Drupal\views\ViewEntityInterface $view */
-      $view = $viewStorage->load($viewId);
-      if (!$this->getRowResolveType($view, $displayId)) {
-        continue;
-      }
-
-      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
-      $display = $this->getViewDisplay($view, $displayId);
-      $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
-
-      // Re-key filters by filter identifier.
-      $filters = array_reduce(array_filter($display->getOption('filters') ?: [], function($filter) {
-        return array_key_exists('exposed', $filter) && $filter['exposed'];
-      }), function($carry, $current) {
-        return $carry + [
-          $current['expose']['identifier'] => $current,
-        ];
-      }, []);
-
-      // If there are no exposed filters, don't create the derivative.
-      if (empty($filters)) {
-        continue;
-      }
-
-      $fields = array_map(function($filter) use ($basePluginDefinition) {
-        if ($this->isGenericInputFilter($filter)) {
-          return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
+      foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
+        /** @var \Drupal\views\ViewEntityInterface $view */
+        $view = $viewStorage->load($viewId);
+        if (!$this->getRowResolveType($view, $displayId)) {
+          continue;
         }
 
-        return [
-          'type' => 'String',
-          'nullable' => TRUE,
-          'multi' => $filter['expose']['multiple'],
-        ];
-      }, $filters);
+        /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
+        $display = $this->getViewDisplay($view, $displayId);
+        $id = implode('_', [$viewId, $displayId, 'view', 'filter', 'input']);
 
-      $this->derivatives[$id] = [
-        'id' => $id,
-        'name' => $display->getGraphQLFilterInputName(),
-        'fields' => $fields,
-        'view' => $viewId,
-        'display' => $displayId,
-      ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+        // Re-key filters by filter identifier.
+        $filters = array_reduce(array_filter($display->getOption('filters') ?: [], function($filter) {
+          return array_key_exists('exposed', $filter) && $filter['exposed'];
+        }), function($carry, $current) {
+          return $carry + [
+              $current['expose']['identifier'] => $current,
+            ];
+        }, []);
+
+        // If there are no exposed filters, don't create the derivative.
+        if (empty($filters)) {
+          continue;
+        }
+
+        $fields = array_map(function($filter) use ($basePluginDefinition) {
+          if ($this->isGenericInputFilter($filter)) {
+            return $this->createGenericInputFilterDefinition($filter, $basePluginDefinition);
+          }
+
+          return [
+            'type' => 'String',
+            'nullable' => TRUE,
+            'multi' => $filter['expose']['multiple'],
+          ];
+        }, $filters);
+
+        $this->derivatives[$id] = [
+            'id' => $id,
+            'name' => $display->getGraphQLFilterInputName(),
+            'fields' => $fields,
+            'view' => $viewId,
+            'display' => $displayId,
+          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+      }
+
     }
-
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 

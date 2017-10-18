@@ -16,35 +16,37 @@ class ViewContextualFilterInputDeriver extends ViewDeriverBase implements Contai
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $viewStorage = $this->entityTypeManager->getStorage('view');
+    if ($this->entityTypeManager->hasDefinition('view')) {
+      $viewStorage = $this->entityTypeManager->getStorage('view');
 
-    foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
-      /** @var \Drupal\views\ViewEntityInterface $view */
-      $view = $viewStorage->load($viewId);
-      if (!$this->getRowResolveType($view, $displayId)) {
-        continue;
-      }
+      foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
+        /** @var \Drupal\views\ViewEntityInterface $view */
+        $view = $viewStorage->load($viewId);
+        if (!$this->getRowResolveType($view, $displayId)) {
+          continue;
+        }
 
-      $display = $this->getViewDisplay($view, $displayId);
-      $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
-      if (!empty($argumentsInfo)) {
-        $id = implode('_', [
-          $viewId, $displayId, 'view', 'contextual', 'filter', 'input'
-        ]);
+        $display = $this->getViewDisplay($view, $displayId);
+        $argumentsInfo = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
+        if (!empty($argumentsInfo)) {
+          $id = implode('_', [
+            $viewId, $displayId, 'view', 'contextual', 'filter', 'input'
+          ]);
 
-        $this->derivatives[$id] = [
-          'id' => $id,
-          'name' => StringHelper::camelCase([$viewId, $displayId, 'view', 'contextual', 'filter', 'input']),
-          'fields' => array_fill_keys(array_keys($argumentsInfo), [
-            'type' => 'String',
-            // Always expose contextual filters as nullable. Let views module
-            // decide what to do if value is missing.
-            'nullable' => TRUE,
-            'multi' => FALSE,
-          ]),
-          'view' => $viewId,
-          'display' => $displayId,
-        ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+          $this->derivatives[$id] = [
+              'id' => $id,
+              'name' => StringHelper::camelCase([$viewId, $displayId, 'view', 'contextual', 'filter', 'input']),
+              'fields' => array_fill_keys(array_keys($argumentsInfo), [
+                'type' => 'String',
+                // Always expose contextual filters as nullable. Let views module
+                // decide what to do if value is missing.
+                'nullable' => TRUE,
+                'multi' => FALSE,
+              ]),
+              'view' => $viewId,
+              'display' => $displayId,
+            ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
+        }
       }
     }
 

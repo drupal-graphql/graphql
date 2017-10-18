@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "results",
  *   secure = true,
  *   multi = true,
+ *   provider = "views",
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ViewResultListDeriver"
  * )
  */

@@ -17,39 +17,41 @@ class ViewDeriver extends ViewDeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $viewStorage = $this->entityTypeManager->getStorage('view');
+    if ($this->entityTypeManager->hasDefinition('view')) {
+      $viewStorage = $this->entityTypeManager->getStorage('view');
 
-    foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
-      /** @var \Drupal\views\ViewEntityInterface $view */
-      $view = $viewStorage->load($viewId);
-      if (!$this->getRowResolveType($view, $displayId)) {
-        continue;
+      foreach (Views::getApplicableViews('graphql_display') as list($viewId, $displayId)) {
+        /** @var \Drupal\views\ViewEntityInterface $view */
+        $view = $viewStorage->load($viewId);
+        if (!$this->getRowResolveType($view, $displayId)) {
+          continue;
+        }
+
+        /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
+        $display = $this->getViewDisplay($view, $displayId);
+
+        $id = implode('-', [$viewId, $displayId, 'view']);
+        $info = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
+        $arguments = [];
+        $arguments += $this->getContextualArguments($info, $id);
+        $arguments += $this->getPagerArguments($display);
+        $arguments += $this->getSortArguments($display, $id);
+        $arguments += $this->getFilterArguments($display, $id);
+        $types = $this->getTypes($info);
+
+        $this->derivatives[$id] = [
+            'id' => $id,
+            'name' => $display->getGraphQLQueryName(),
+            'type' => $display->getGraphQLResultName(),
+            'types' => $types,
+            'multi' => FALSE,
+            'arguments' => $arguments,
+            'view' => $viewId,
+            'display' => $displayId,
+            'paged' => $this->isPaged($display),
+            'arguments_info' => $info,
+          ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
       }
-
-      /** @var \Drupal\graphql\Plugin\views\display\GraphQL $display */
-      $display = $this->getViewDisplay($view, $displayId);
-
-      $id = implode('-', [$viewId, $displayId, 'view']);
-      $info = $this->getArgumentsInfo($display->getOption('arguments') ?: []);
-      $arguments = [];
-      $arguments += $this->getContextualArguments($info, $id);
-      $arguments += $this->getPagerArguments($display);
-      $arguments += $this->getSortArguments($display, $id);
-      $arguments += $this->getFilterArguments($display, $id);
-      $types = $this->getTypes($info);
-
-      $this->derivatives[$id] = [
-        'id' => $id,
-        'name' => $display->getGraphQLQueryName(),
-        'type' => $display->getGraphQLResultName(),
-        'types' => $types,
-        'multi' => FALSE,
-        'arguments' => $arguments,
-        'view' => $viewId,
-        'display' => $displayId,
-        'paged' => $this->isPaged($display),
-        'arguments_info' => $info,
-      ] + $this->getCacheMetadataDefinition($view) + $basePluginDefinition;
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);

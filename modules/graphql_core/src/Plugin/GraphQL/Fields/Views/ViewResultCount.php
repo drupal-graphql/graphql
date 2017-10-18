@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   nullable = false,
  *   type = "Int",
+ *   provider = "views",
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ViewResultCountDeriver"
  * )
  */
