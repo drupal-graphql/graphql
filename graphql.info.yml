@@ -1,6 +1,6 @@
 name: GraphQL
 type: module
-description: 'Exposes your Drupal data model through a GraphQL schema.'
+description: 'Base module for integrating GraphQL with Drupal.'
 package: GraphQL
 configure: graphql.config_page
 core: 8.x
