@@ -84,7 +84,7 @@ class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriver
     }
 
     $this->derivatives[$basePluginDefinition['id']] = [
-      'parents' => $parents,
+      'parents' => array_merge($parents, $basePluginDefinition['parents']),
     ] + $basePluginDefinition;
 
     return $this->derivatives;

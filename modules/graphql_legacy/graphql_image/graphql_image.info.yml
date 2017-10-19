@@ -3,6 +3,7 @@ type: module
 description: 'Request specific image styles in GraphQL queries.'
 package: GraphQL
 core: 8.x
+hidden: true
 dependencies:
   - image
   - graphql_file
