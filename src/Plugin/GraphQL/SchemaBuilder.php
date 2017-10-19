@@ -66,7 +66,18 @@ class SchemaBuilder {
   }
 
   /**
-   * {@inheritdoc}
+   * Search for a specific plugin.
+   *
+   * @param callable $selector
+   *   A selector callable that will be used to array_filter the list of
+   *   plugin definitions.
+   * @param integer[] $types
+   *   A list of type constants.
+   * @param bool $invert
+   *   Invert the selector result.
+   *
+   * @return object[]
+   *   The list of matching plugin instances, keyed by name.
    */
   public function find(callable $selector, array $types, $invert = FALSE) {
     $instances = [];
@@ -87,7 +98,15 @@ class SchemaBuilder {
   }
 
   /**
-   * {@inheritdoc}
+   * Search for a specific plugin.
+   *
+   * @param string $name
+   *   The specific plugin name.
+   * @param integer[] $types
+   *   A list of type constants.
+   *
+   * @return object
+   *   The highest weighted plugin with a specific name.
    */
   public function findByName($name, array $types) {
     $result = $this->find(function($definition) use ($name) {
@@ -102,7 +121,19 @@ class SchemaBuilder {
   }
 
   /**
-   * {@inheritdoc}
+   * Find the matching GraphQL data type for a Drupal type data identifier.
+   *
+   * Respects type chains. `entity:node:article` should return the
+   * `NodeArticle` type if it is exposed or fall back to either `Node` or even
+   * `Entity` otherwise.
+   *
+   * @param string $dataType
+   *   The typed data identifier. E.g. `string` or `entity:node:article`.
+   * @param string[] $types
+   *   A list of type constants.
+   *
+   * @return object
+   *   The matching type with the highest weight.
    */
   public function findByDataType($dataType, array $types = [
     GRAPHQL_UNION_TYPE_PLUGIN,
@@ -130,7 +161,10 @@ class SchemaBuilder {
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieve all mutations.
+   *
+   * @return object[]
+   *   The list of mutation plugins.
    */
   public function getMutations() {
     return $this->find(function() {
@@ -139,7 +173,10 @@ class SchemaBuilder {
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieve all fields that are not associated with a specific type.
+   *
+   * @return object[]
+   *   The list root field plugins.
    */
   public function getRootFields() {
     // Retrieve the list of fields that are explicitly attached to a type.
@@ -154,6 +191,19 @@ class SchemaBuilder {
     }, [GRAPHQL_FIELD_PLUGIN]);
   }
 
+  /**
+   * Creates a type system plugin instance for a given plugin manager.
+   *
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   *   The plugin manager responsible for creation of the plugin instance.
+   * @param $pluginType
+   *   The plugin type.
+   * @param $pluginId
+   *   The plugin id.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface
+   *   The created plugin instance.
+   */
   protected function getInstance(PluginManagerInterface $manager, $pluginType, $pluginId) {
     if (!isset($this->instances[$pluginType][$pluginId])) {
       // Initialize the static cache array if necessary.
