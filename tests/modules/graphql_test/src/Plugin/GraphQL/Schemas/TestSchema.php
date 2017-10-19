@@ -44,16 +44,17 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager */
-    $schemaManager = $container->get('graphql.pluggable_schema_manager');
+    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilderFactory $schemaBuilderFactory */
+    $schemaBuilderFactory = $container->get('graphql.schema_builder_factory');
+    $schemaBuilder = $schemaBuilderFactory->getSchemaBuilder();
 
     $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
-    $query->addFields($schemaManager->getRootFields());
+    $query->addFields($schemaBuilder->getRootFields());
 
     $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
-    $mutation->addFields($schemaManager->getMutations());
+    $mutation->addFields($schemaBuilder->getMutations());
 
-    $types = $schemaManager->find(function() {
+    $types = $schemaBuilder->find(function() {
       return TRUE;
     }, [
       GRAPHQL_UNION_TYPE_PLUGIN,
