@@ -2,9 +2,8 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
@@ -33,7 +32,7 @@ abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPl
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilder $schemaManager) {
+  public function buildConfig(SchemaBuilderInterface $schemaManager) {
     $interfaces = $this->buildInterfaces($schemaManager);
 
     $this->config = new ObjectTypeConfig([
@@ -60,13 +59,13 @@ abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPl
   /**
    * Build the list of interfaces.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Type\AbstractInterfaceTypeInterface[]
    *   The list of interfaces.
    */
-  protected function buildInterfaces(SchemaBuilder $schemaManager) {
+  protected function buildInterfaces(SchemaBuilderInterface $schemaManager) {
     $definition = $this->getPluginDefinition();
     if ($definition['interfaces']) {
       return array_filter($schemaManager->find(function($interface) use ($definition) {

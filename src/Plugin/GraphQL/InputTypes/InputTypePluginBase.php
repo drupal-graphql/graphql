@@ -3,8 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\InputTypes;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
@@ -34,7 +33,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Ty
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilder $schemaManager) {
+  public function buildConfig(SchemaBuilderInterface $schemaManager) {
     $this->config = new InputObjectTypeConfig([
       'name' => $this->buildName(),
       'description' => $this->buildDescription(),
@@ -52,13 +51,13 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Ty
   /**
    * Build the field list.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Field\FieldInterface[]
    *   The list of fields.
    */
-  protected function buildFields(SchemaBuilder $schemaManager) {
+  protected function buildFields(SchemaBuilderInterface $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       if (!$definition['fields']) {
@@ -92,7 +91,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Ty
   /**
    * Build the field type.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    * @param array|string $field
    *   The field definition array or type name.
@@ -100,7 +99,7 @@ abstract class InputTypePluginBase extends AbstractInputObjectType implements Ty
    * @return \Youshido\GraphQL\Type\TypeInterface
    *   The type object.
    */
-  protected function buildFieldType(SchemaBuilder $schemaManager, $field) {
+  protected function buildFieldType(SchemaBuilderInterface $schemaManager, $field) {
     if (is_array($field) && array_key_exists('data_type', $field) && $field['data_type']) {
       $types = $schemaManager->find(function($definition) use ($field) {
         return array_key_exists('data_type', $definition) && $definition['data_type'] === $field['data_type'];

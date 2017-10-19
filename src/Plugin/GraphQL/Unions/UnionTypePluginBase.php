@@ -2,15 +2,11 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Unions;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Config\Object\UnionTypeConfig;
 use Youshido\GraphQL\Type\Union\AbstractUnionType;
 
@@ -32,7 +28,7 @@ abstract class UnionTypePluginBase extends AbstractUnionType implements TypeSyst
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilder $schemaManager) {
+  public function buildConfig(SchemaBuilderInterface $schemaManager) {
     $name = $this->buildName();
 
     $this->config = new UnionTypeConfig([
@@ -52,7 +48,7 @@ abstract class UnionTypePluginBase extends AbstractUnionType implements TypeSyst
   /**
    * Builds the list of types that are contained within this union type.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
    *   The schema manager.
    * @param $name
    *   The name of this plugin.
@@ -60,7 +56,7 @@ abstract class UnionTypePluginBase extends AbstractUnionType implements TypeSyst
    * @return \Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase[]
    *   An array of types to add to this union type.
    */
-  protected function buildTypes(SchemaBuilder $schemaManager, $name) {
+  protected function buildTypes(SchemaBuilderInterface $schemaManager, $name) {
     /** @var \Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase[] $types */
     $types = $schemaManager->find(function ($type) use ($name) {
       return in_array($name, $type['unions']);

@@ -29,12 +29,9 @@ interface TypeSystemPluginInterface extends PluginInspectionInterface, Derivativ
   /**
    * Plugin config builder method.
    *
-   * During the build step, dependencies to other GraphQL plugins are supposed
-   * to be resolved.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
-   *   The schema manager to resolve other plugins.
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaBuilder
+   *   The schema builder.
    */
-  public function buildConfig(SchemaBuilder $schemaManager);
+  public function buildConfig(SchemaBuilderInterface $schemaBuilder);
 
 }

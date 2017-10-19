@@ -5,7 +5,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Fields;
 use Drupal\graphql\GraphQL\Batching\BatchedFieldInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\SecureFieldInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
@@ -137,7 +137,7 @@ abstract class FieldPluginBase extends AbstractField implements TypeSystemPlugin
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilder $schemaManager) {
+  public function buildConfig(SchemaBuilderInterface $schemaManager) {
     $this->config = new FieldConfig([
       'name' => $this->buildName(),
       'type' => $this->buildType($schemaManager),

@@ -9,6 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Config\Field\FieldConfig;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Schema\AbstractSchema;
@@ -40,11 +41,14 @@ trait SchemaProphecyTrait {
 
   /**
    * Create an empty default schema.
-   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param \Youshido\GraphQL\Field\AbstractField $field
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface The empty schema plugin.
    *   The empty schema plugin.
    */
-  protected function createSchema(AbstractField $field = NULL) {
-    return TestSchema::create($this->container, $field);
+  protected function createSchema(ContainerInterface $container, AbstractField $field = NULL) {
+    return TestSchema::create($container, $field);
   }
 
   /**
@@ -75,7 +79,7 @@ trait SchemaProphecyTrait {
    *   The container builder.
    */
   protected function injectSchemaManager(ContainerBuilder $container) {
-    $defaultSchemaDefinition = TestSchema::configuration();
+    $defaultSchemaDefinition = TestSchema::pluginDefinition();
 
     $this->schemaManager = $this->prophesize(SchemaPluginManager::class);
     $this->schemaManager->getDefinitions()->willReturn([

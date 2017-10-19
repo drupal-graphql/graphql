@@ -4,6 +4,7 @@ namespace Drupal\graphql_test\Plugin\GraphQL\Schemas;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,62 +18,22 @@ use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
  * @GraphQLSchema(
  *   id = "test",
  *   name = "Default",
- *   path = "/graphql"
+ *   path = "/graphql",
+ *   builder = "\Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder"
  * )
  */
-class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface {
-
-  /**
-   * The pluggable schema manager service.
-   *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilder
-   */
-  protected $schemaManager;
+class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function __construct($configuration, $pluginId, $pluginDefinition) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  protected function constructCacheMetadata(SchemaBuilderInterface $schemaBuilder) {
+    parent::constructCacheMetadata($schemaBuilder);
+
     $metadata = new CacheableMetadata();
     $metadata->addCacheContexts(['gql', 'user']);
     $metadata->addCacheTags(['graphql_response']);
+
     $this->responseMetadata->addCacheableDependency($metadata);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilderFactory $schemaBuilderFactory */
-    $schemaBuilderFactory = $container->get('graphql.schema_builder_factory');
-    $schemaBuilder = $schemaBuilderFactory->getSchemaBuilder();
-
-    $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
-    $query->addFields($schemaBuilder->getRootFields());
-
-    $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
-    $mutation->addFields($schemaBuilder->getMutations());
-
-    $types = $schemaBuilder->find(function() {
-      return TRUE;
-    }, [
-      GRAPHQL_UNION_TYPE_PLUGIN,
-      GRAPHQL_TYPE_PLUGIN,
-      GRAPHQL_INPUT_TYPE_PLUGIN,
-    ]);
-
-    return new static($configuration + ['schema' => [
-      'query' => $query,
-      'mutation' => $mutation,
-      'types' => $types,
-    ]], $plugin_id, $plugin_definition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function constructSchema($configuration, $pluginId, $pluginDefinition) {
-    $this->config = new SchemaConfig($configuration['schema']);
   }
 }

@@ -5,6 +5,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Utility\TypeCollector;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
@@ -37,33 +38,33 @@ abstract class SchemaPluginBase extends AbstractSchema implements SchemaPluginIn
    */
   public function __construct($configuration, $pluginId, $pluginDefinition) {
     $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-    $this->constructSchema($configuration, $pluginId, $pluginDefinition);
-    $this->constructCacheMetadata($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfig(SchemaBuilderInterface $schemaBuilder) {
+    $this->constructSchema($schemaBuilder);
+    $this->constructCacheMetadata($schemaBuilder);
   }
 
   /**
    * Constructs the schema configuration.
    *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param array $pluginDefinition
-   *   The plugin definition array.
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaBuilder
+   *   The schema builder.
    */
-  abstract protected function constructSchema($configuration, $pluginId, $pluginDefinition);
+  protected function constructSchema(SchemaBuilderInterface $schemaBuilder) {
+    $this->config = $schemaBuilder->getSchemaConfig();
+  }
 
   /**
    * Constructs the schema cache metadata.
    *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param array $pluginDefinition
-   *   The plugin definition array.
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaBuilder
+   *   The schema builder.
    */
-  protected function constructCacheMetadata($configuration, $pluginId, $pluginDefinition) {
+  protected function constructCacheMetadata(SchemaBuilderInterface $schemaBuilder) {
     // Build the schema and response metadata objects based on the provided
     // schema config and all included types/fields/etc.
     $this->responseMetadata = new CacheableMetadata();
@@ -123,5 +124,4 @@ abstract class SchemaPluginBase extends AbstractSchema implements SchemaPluginIn
   public function build(SchemaConfig $config) {
     // Not needed anymore.
   }
-
 }

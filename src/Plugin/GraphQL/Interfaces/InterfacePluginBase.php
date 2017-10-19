@@ -2,17 +2,13 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Interfaces;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Config\Object\InterfaceTypeConfig;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
@@ -42,7 +38,7 @@ abstract class InterfacePluginBase extends AbstractInterfaceType implements Type
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilder $schemaManager) {
+  public function buildConfig(SchemaBuilderInterface $schemaManager) {
     $this->config = new InterfaceTypeConfig([
       'name' => $this->buildName(),
       'description' => $this->buildDescription(),

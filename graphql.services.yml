@@ -193,10 +193,11 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
       - 'graphql_schemas'
+      - '@service_container'
 
   # Schema builder service. Collects all registered type system plugin managers.
-  graphql.schema_builder_factory:
-    class: Drupal\graphql\Plugin\GraphQL\SchemaBuilderFactory
+  graphql.plugin_manager_aggregator:
+    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator
     tags:
       - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
 
