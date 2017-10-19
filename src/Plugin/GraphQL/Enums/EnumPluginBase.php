@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Enums;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
@@ -29,7 +29,7 @@ abstract class EnumPluginBase extends AbstractEnumType implements TypeSystemPlug
   /**
    * {@inheritdoc}
    */
-  abstract public function buildValues(PluggableSchemaManagerInterface $schemaManager);
+  abstract public function buildValues(SchemaBuilder $schemaManager);
 
   /**
    * {@inheritdoc}
@@ -41,7 +41,7 @@ abstract class EnumPluginBase extends AbstractEnumType implements TypeSystemPlug
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
+  public function buildConfig(SchemaBuilder $schemaManager) {
     $this->config = new EnumTypeConfig([
       'name' => $this->buildName(),
       'description' => $this->buildDescription(),

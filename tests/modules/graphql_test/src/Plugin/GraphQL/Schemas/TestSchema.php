@@ -25,10 +25,13 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
   /**
    * The pluggable schema manager service.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
+   * @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilder
    */
   protected $schemaManager;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct($configuration, $pluginId, $pluginDefinition) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $metadata = new CacheableMetadata();
@@ -37,21 +40,21 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
     $this->responseMetadata->addCacheableDependency($metadata);
   }
 
-
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    /** @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager */
-    $schemaManager = $container->get('graphql.pluggable_schema_manager');
+    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaBuilderFactory $schemaBuilderFactory */
+    $schemaBuilderFactory = $container->get('graphql.schema_builder_factory');
+    $schemaBuilder = $schemaBuilderFactory->getSchemaBuilder();
 
     $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
-    $query->addFields($schemaManager->getRootFields());
+    $query->addFields($schemaBuilder->getRootFields());
 
     $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
-    $mutation->addFields($schemaManager->getMutations());
+    $mutation->addFields($schemaBuilder->getMutations());
 
-    $types = $schemaManager->find(function() {
+    $types = $schemaBuilder->find(function() {
       return TRUE;
     }, [
       GRAPHQL_UNION_TYPE_PLUGIN,
@@ -64,5 +67,12 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
       'mutation' => $mutation,
       'types' => $types,
     ]], $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function constructSchema($configuration, $pluginId, $pluginDefinition) {
+    $this->config = new SchemaConfig($configuration['schema']);
   }
 }

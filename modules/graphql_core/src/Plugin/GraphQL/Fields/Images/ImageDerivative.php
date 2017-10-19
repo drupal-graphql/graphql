@@ -26,6 +26,7 @@ use Drupal\image\Entity\ImageStyle;
  *   field_types = {
  *     "image"
  *   },
+ *   provider = "image",
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
  * )
  */

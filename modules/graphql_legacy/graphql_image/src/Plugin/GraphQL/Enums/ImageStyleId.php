@@ -3,7 +3,7 @@
 namespace Drupal\graphql_image\Plugin\GraphQL\Enums;
 
 use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Drupal\image\Entity\ImageStyle as ImageStyleConfig;
 use Youshido\GraphQL\Type\Enum\AbstractEnumType;
 
@@ -15,7 +15,7 @@ use Youshido\GraphQL\Type\Enum\AbstractEnumType;
  */
 class ImageStyleId extends EnumPluginBase {
 
-  public function buildValues(PluggableSchemaManagerInterface $schemaManager) {
+  public function buildValues(SchemaBuilder $schemaManager) {
     $items = [];
     foreach (ImageStyleConfig::loadMultiple() as $imageStyle) {
       $items[$imageStyle->id()] = [

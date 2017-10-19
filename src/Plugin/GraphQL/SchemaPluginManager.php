@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Traversable;
@@ -25,9 +24,9 @@ class SchemaPluginManager extends DefaultPluginManager {
     ModuleHandlerInterface $moduleHandler,
     $pluginInterface,
     $pluginAnnotationName,
-    $alterInfo
+    $pluginType
   ) {
-    $this->alterInfo($alterInfo);
+    $this->alterInfo($pluginType);
 
     parent::__construct(
       $pluginSubdirectory,

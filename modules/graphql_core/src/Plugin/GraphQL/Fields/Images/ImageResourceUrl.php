@@ -17,6 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   nullable = true,
  *   parents = {"ImageResource"},
  *   field_types = {"image"},
+ *   provider = "image",
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
  * )
  */

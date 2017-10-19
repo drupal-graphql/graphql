@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Youshido\GraphQL\Field\FieldInterface;
 
 /**
@@ -14,13 +14,13 @@ trait FieldablePluginTrait {
   /**
    * Build the list of implicit and explicit fields attached to the object type.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Field\FieldInterface[]
    *   The type object.
    */
-  protected function buildFields(PluggableSchemaManagerInterface $schemaManager) {
+  protected function buildFields(SchemaBuilder $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
 

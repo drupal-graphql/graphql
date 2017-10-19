@@ -6,7 +6,7 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
 use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -68,7 +68,7 @@ class Context extends SubrequestFieldBase {
   /**
    * {@inheritdoc}
    */
-  protected function buildType(PluggableSchemaManagerInterface $schemaManager) {
+  protected function buildType(SchemaBuilder $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {

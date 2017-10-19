@@ -15,6 +15,7 @@ use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 use Youshido\GraphQL\Type\Object\AbstractObjectType;
 
 abstract class SchemaPluginBase extends AbstractSchema implements SchemaPluginInterface {
+
   use PluginTrait;
 
   /**
@@ -34,19 +35,35 @@ abstract class SchemaPluginBase extends AbstractSchema implements SchemaPluginIn
   /**
    * {@inheritdoc}
    */
-  public function build(SchemaConfig $config) {
-    // May be overridden, but not required any more.
+  public function __construct($configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+    $this->constructSchema($configuration, $pluginId, $pluginDefinition);
+    $this->constructCacheMetadata($configuration, $pluginId, $pluginDefinition);
   }
 
   /**
-   * {@inheritdoc}
+   * Constructs the schema configuration.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param array $pluginDefinition
+   *   The plugin definition array.
    */
-  public function __construct($configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  abstract protected function constructSchema($configuration, $pluginId, $pluginDefinition);
 
-    // Link the schema configuration object.
-    $this->config = new SchemaConfig($configuration['schema'], $this);
-
+  /**
+   * Constructs the schema cache metadata.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param array $pluginDefinition
+   *   The plugin definition array.
+   */
+  protected function constructCacheMetadata($configuration, $pluginId, $pluginDefinition) {
     // Build the schema and response metadata objects based on the provided
     // schema config and all included types/fields/etc.
     $this->responseMetadata = new CacheableMetadata();
@@ -99,4 +116,12 @@ abstract class SchemaPluginBase extends AbstractSchema implements SchemaPluginIn
   public function getResponseCacheMetadata() {
     return $this->responseMetadata;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(SchemaConfig $config) {
+    // Not needed anymore.
+  }
+
 }

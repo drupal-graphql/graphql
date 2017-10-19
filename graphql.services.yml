@@ -78,6 +78,7 @@ services:
       - '@graphql.schema_loader'
       - '@current_user'
       - '%graphql.config%'
+
   graphql.schema_loader:
     class: Drupal\graphql\GraphQL\Schema\SchemaLoader
     arguments:
@@ -182,12 +183,6 @@ services:
   graphql.batched_resolver:
     class: Drupal\graphql\GraphQL\Batching\BatchedFieldResolver
 
-  # Plugin system based schema manager.
-  graphql.pluggable_schema_manager:
-    class: Drupal\graphql\Plugin\GraphQL\PluggableSchemaManager
-    tags:
-      - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
-
   # Plugin manager for schemas
   plugin.manager.graphql.schema:
     class: Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
@@ -199,13 +194,17 @@ services:
       - '\Drupal\graphql\Annotation\GraphQLSchema'
       - 'graphql_schemas'
 
+  # Schema builder service. Collects all registered type system plugin managers.
+  graphql.schema_builder_factory:
+    class: Drupal\graphql\Plugin\GraphQL\SchemaBuilderFactory
+    tags:
+      - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
+
   # Plugin manager implementations for schema types.
   plugin.manager.graphql.union_type:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/UnionTypes'
       - '@container.namespaces'
@@ -218,8 +217,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/Interfaces'
       - '@container.namespaces'
@@ -232,8 +229,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/Types'
       - '@container.namespaces'
@@ -246,8 +241,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/InputTypes'
       - '@container.namespaces'
@@ -260,8 +253,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/Fields'
       - '@container.namespaces'
@@ -274,8 +265,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/Mutations'
       - '@container.namespaces'
@@ -288,8 +277,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/Scalars'
       - '@container.namespaces'
@@ -302,8 +289,6 @@ services:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
-    calls:
-      - [setSchemaManager, ['@graphql.pluggable_schema_manager']]
     arguments:
       - 'Plugin/GraphQL/Enums'
       - '@container.namespaces'
