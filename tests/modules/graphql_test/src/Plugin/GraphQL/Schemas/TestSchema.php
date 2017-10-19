@@ -29,6 +29,9 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
    */
   protected $schemaManager;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct($configuration, $pluginId, $pluginDefinition) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $metadata = new CacheableMetadata();
@@ -63,5 +66,12 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface, Cont
       'mutation' => $mutation,
       'types' => $types,
     ]], $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function constructSchema($configuration, $pluginId, $pluginDefinition) {
+    $this->config = new SchemaConfig($configuration['schema']);
   }
 }
