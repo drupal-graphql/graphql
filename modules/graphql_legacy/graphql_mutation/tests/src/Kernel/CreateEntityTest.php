@@ -1,9 +1,7 @@
 <?php
 
-namespace Drupal\Tests\graphql_core\Kernel\Mutations;
+namespace Drupal\Tests\graphql_mutation\Kernel;
 
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Drupal\user\Entity\Role;
@@ -11,7 +9,7 @@ use Drupal\user\Entity\Role;
 /**
  * Test entity creation.
  *
- * @group graphql_content_mutation
+ * @group graphql_mutation
  */
 class CreateEntityTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
@@ -25,6 +23,7 @@ class CreateEntityTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'graphql_core',
+    'graphql_mutation',
   ];
 
   /**

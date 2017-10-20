@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations;
+namespace Drupal\graphql_mutation\Plugin\GraphQL\InputTypes;
 
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 
@@ -9,7 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
  *
  * @GraphQLInputType(
  *   id = "entity_input",
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\InputTypes\EntityInputDeriver"
+ *   deriver = "Drupal\graphql_mutation\Plugin\Deriver\InputTypes\EntityInputDeriver"
  * )
  */
 class EntityInput extends InputTypePluginBase {
