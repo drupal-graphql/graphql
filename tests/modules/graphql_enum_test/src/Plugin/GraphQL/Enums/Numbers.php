@@ -3,7 +3,7 @@
 namespace Drupal\graphql_enum_test\Plugin\GraphQL\Enums;
 
 use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 
 /**
  * Generates an enumeration of numbers.
@@ -36,7 +36,7 @@ class Numbers extends EnumPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildValues(SchemaBuilder $schemaManager) {
+  public function buildValues(SchemaBuilderInterface $schemaManager) {
     $values = [];
     foreach (static::$NUMBERS as $num => $word) {
       $values[] = [

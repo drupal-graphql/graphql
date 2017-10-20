@@ -4,7 +4,6 @@ namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Mutations;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql_plugin_test\GarageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

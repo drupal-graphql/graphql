@@ -36,7 +36,7 @@ class UserPermissionsContextTest extends KernelTestBase {
     $root = $this->prophesizeField('root', new StringType());
     $root->resolve(Argument::cetera())->willReturn('test');
 
-    $schema = $this->createSchema($root->reveal());
+    $schema = $this->createSchema($this->container, $root->reveal());
     $this->injectSchema($schema);
   }
 

@@ -23,4 +23,12 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
    */
   public function getResponseCacheMetadata();
 
+  /**
+   * Plugin config builder method.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaBuilder
+   *   The schema builder.
+   */
+  public function buildConfig(SchemaBuilderInterface $schemaBuilder);
+
 }

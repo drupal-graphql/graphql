@@ -36,7 +36,7 @@ class SchemaCacheTest extends KernelTestBase {
     $root->resolve(Argument::any())->willReturn('test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($root->reveal());
+    $schema = $this->createSchema($this->container, $root->reveal());
     $getSchema = $this->injectSchema($schema);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
@@ -57,7 +57,7 @@ class SchemaCacheTest extends KernelTestBase {
     $root->resolve(Argument::any())->willReturn('test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($root->reveal());
+    $schema = $this->createSchema($this->container, $root->reveal());
     $getSchema = $this->injectSchema($schema);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
@@ -100,7 +100,7 @@ class SchemaCacheTest extends KernelTestBase {
     $root->resolve(Argument::any())->willReturn('test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($root->reveal());
+    $schema = $this->createSchema($this->container, $root->reveal());
     $getSchema = $this->injectSchema($schema);
 
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
@@ -123,7 +123,7 @@ class SchemaCacheTest extends KernelTestBase {
     $root->resolve(Argument::any())->willReturn('test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($root->reveal());
+    $schema = $this->createSchema($this->container, $root->reveal());
     $getSchema = $this->injectSchema($schema);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');

@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilder;
+use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Youshido\GraphQL\Field\InputField;
 use Youshido\GraphQL\Type\TypeInterface;
 
@@ -16,13 +16,13 @@ trait ArgumentAwarePluginTrait {
   /**
    * Build the arguments list.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Field\InputFieldInterface[]
    *   The list of arguments.
    */
-  protected function buildArguments(SchemaBuilder $schemaManager) {
+  protected function buildArguments(SchemaBuilderInterface $schemaManager) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       if (!$definition['arguments']) {
@@ -56,7 +56,7 @@ trait ArgumentAwarePluginTrait {
   /**
    * Build the argument type.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilder $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
    *   Instance of the schema manager to resolve dependencies.
    * @param array|string $argument
    *   The argument definition array or type name.
@@ -64,7 +64,7 @@ trait ArgumentAwarePluginTrait {
    * @return \Youshido\GraphQL\Type\TypeInterface
    *   The type object.
    */
-  protected function buildArgumentType(SchemaBuilder $schemaManager, $argument) {
+  protected function buildArgumentType(SchemaBuilderInterface $schemaManager, $argument) {
     if (is_array($argument) && array_key_exists('data_type', $argument) && $argument['data_type']) {
       $type = $schemaManager->findByDataType($argument['data_type'], [
         GRAPHQL_INPUT_TYPE_PLUGIN,

@@ -4,8 +4,12 @@ namespace Drupal\graphql\Plugin\GraphQL;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Config\Schema\SchemaConfig;
+use Youshido\GraphQL\Schema\InternalSchemaMutationObject;
+use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
 
-class SchemaBuilder {
+class PluggableSchemaBuilder implements SchemaBuilderInterface {
 
   /**
    * Static cache of type system plugin instances.
@@ -24,18 +28,52 @@ class SchemaBuilder {
   /**
    * List of registered type system plugin managers.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface[]
+   * @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator
    */
   protected $pluginManagers;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, $pluginId, array $pluginDefinition) {
+    return new static(
+      $container->get('graphql.plugin_manager_aggregator')
+    );
+  }
+
+  /**
    * SchemaBuilder constructor.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface[] $pluginManagers
+   * @param \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator $pluginManagers
    *   List of type system plugin managers.
    */
-  public function __construct(array $pluginManagers) {
+  public function __construct(TypeSystemPluginManagerAggregator $pluginManagers) {
     $this->pluginManagers = $pluginManagers;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSchemaConfig() {
+    $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
+    $mutation->addFields($this->getMutations());
+
+    $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
+    $query->addFields($this->getRootFields());
+
+    $types = $this->find(function() {
+      return TRUE;
+    }, [
+      GRAPHQL_UNION_TYPE_PLUGIN,
+      GRAPHQL_TYPE_PLUGIN,
+      GRAPHQL_INPUT_TYPE_PLUGIN,
+    ]);
+
+    return new SchemaConfig([
+      'query' => $query,
+      'mutation' => $mutation,
+      'types' => $types,
+    ]);
   }
 
   /**
@@ -44,8 +82,10 @@ class SchemaBuilder {
    * @return array
    *   The list of sorted plugin definitions.
    */
-  protected function getDefinitions() {
-    if ($this->definitions == NULL) {
+  public function getDefinitions() {
+    if (!isset($this->definitions)) {
+      $this->definitions = [];
+
       foreach ($this->pluginManagers as $manager) {
         foreach ($manager->getDefinitions() as $pluginId => $definition) {
           $this->definitions[] = [
@@ -76,8 +116,10 @@ class SchemaBuilder {
    * @param bool $invert
    *   Invert the selector result.
    *
-   * @return object[]
+   * @return \object[] The list of matching plugin instances, keyed by name.
    *   The list of matching plugin instances, keyed by name.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   public function find(callable $selector, array $types, $invert = FALSE) {
     $instances = [];
@@ -105,8 +147,10 @@ class SchemaBuilder {
    * @param integer[] $types
    *   A list of type constants.
    *
-   * @return object
+   * @return object The highest weighted plugin with a specific name.
    *   The highest weighted plugin with a specific name.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   public function findByName($name, array $types) {
     $result = $this->find(function($definition) use ($name) {
