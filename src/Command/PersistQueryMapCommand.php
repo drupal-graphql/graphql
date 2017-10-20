@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Command;
 
-use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\Console\Input\InputArgument;
