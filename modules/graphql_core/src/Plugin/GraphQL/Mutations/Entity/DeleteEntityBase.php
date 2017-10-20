@@ -12,22 +12,7 @@ use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
-/**
- * Delete an entity.
- *
- * @GraphQLMutation(
- *   id = "delete_entity",
- *   type = "EntityCrudOutput",
- *   secure = true,
- *   arguments = {
- *     "id" = "String"
- *   },
- *   nullable = false,
- *   schema_cache_tags = {"entity_types"},
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\Mutations\DeleteEntityDeriver"
- * )
- */
-class DeleteEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
+abstract class DeleteEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
   use StringTranslationTrait;
 

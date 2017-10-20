@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql_core\Kernel\Mutations;
+namespace Drupal\Tests\graphql_mutation\Kernel;
 
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
@@ -10,7 +10,7 @@ use Drupal\user\Entity\Role;
 /**
  * Test entity deletion.
  *
- * @group graphql_content_mutation
+ * @group graphql_mutation
  */
 class DeleteEntityTest extends GraphQLFileTestBase {
   use ContentTypeCreationTrait;
@@ -25,6 +25,7 @@ class DeleteEntityTest extends GraphQLFileTestBase {
     'text',
     'filter',
     'graphql_core',
+    'graphql_mutation',
   ];
 
   /**

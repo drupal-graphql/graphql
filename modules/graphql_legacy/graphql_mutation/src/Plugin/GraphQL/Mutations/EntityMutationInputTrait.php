@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity;
+namespace Drupal\graphql_mutation\Plugin\GraphQL\Mutations;
 
-use Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInput;
-use Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInputField;
+use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
+use Drupal\graphql_mutation\Plugin\GraphQL\InputTypes\EntityInputField;
 use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
 
 trait EntityMutationInputTrait {
@@ -13,20 +13,20 @@ trait EntityMutationInputTrait {
    *
    * Loops over all input values and assigns them to their original field names.
    *
-   * @param array $inputValue
+   * @param array $inputArgs
    *   The entity values provided through the resolver args.
-   * @param \Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInput $inputType
+   * @param \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $inputType
    *   The input type.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  protected function extractEntityInput(array $inputValue, EntityInput $inputType) {
+  protected function extractEntityInput(array $inputArgs, InputTypePluginBase $inputType) {
     $fields = $inputType->getPluginDefinition()['fields'];
-    return array_reduce(array_keys($inputValue), function($carry, $current) use ($fields, $inputValue, $inputType) {
+    return array_reduce(array_keys($inputArgs), function($carry, $current) use ($fields, $inputArgs, $inputType) {
       $isMulti = $fields[$current]['multi'];
       $fieldName = $fields[$current]['field_name'];
-      $fieldValue = $inputValue[$current];
+      $fieldValue = $inputArgs[$current];
       $fieldType = $inputType->getField($current)->getType()->getNamedType();
 
       if ($fieldType instanceof AbstractScalarType) {
@@ -53,13 +53,13 @@ trait EntityMutationInputTrait {
    *
    * @param array $fieldValue
    *   The field values keyed by property name.
-   * @param \Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInputField $fieldType
+   * @param \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $fieldType
    *   The field type.
    *
    * @return array
    *   The extracted field values with their proper, internal property names.
    */
-  protected function extractEntityFieldInput(array $fieldValue, EntityInputField $fieldType) {
+  protected function extractEntityFieldInput(array $fieldValue, InputTypePluginBase $fieldType) {
     $properties = $fieldType->getPluginDefinition()['fields'];
     return array_reduce(array_keys($fieldValue), function($carry, $current) use ($properties, $fieldValue) {
       $key = $properties[$current]['property_name'];

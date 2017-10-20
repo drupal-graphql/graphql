@@ -6,28 +6,15 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\EntityMutationInputTrait;
+use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
-/**
- * Create an entity.
- *
- * @GraphQLMutation(
- *   id = "create_entity",
- *   type = "EntityCrudOutput",
- *   secure = true,
- *   nullable = false,
- *   schema_cache_tags = {"entity_types", "entity_bundles"},
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\Mutations\CreateEntityDeriver"
- * )
- */
-class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginInterface {
+abstract class UpdateEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
   use StringTranslationTrait;
-  use EntityMutationInputTrait;
 
   /**
    * The entity type manager.
@@ -62,8 +49,26 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
   public function resolve($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $bundleName = $this->pluginDefinition['entity_bundle'];
-    $bundleKey = $this->entityTypeManager->getDefinition($entityTypeId)->getKey('bundle');
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
+
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    if (!$entity = $storage->load($args['id'])) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('The requested @bundle could not be loaded.', ['@bundle' => $bundleName]),
+      ]);
+    }
+
+    if (!$entity->bundle() === $bundleName) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('The requested entity is not of the expected type @bundle.', ['@bundle' => $bundleName]),
+      ]);
+    }
+
+    if (!$entity->access('update')) {
+      return new EntityCrudOutputWrapper(NULL, NULL, [
+        $this->t('You do not have the necessary permissions to update this @bundle.', ['@bundle' => $bundleName]),
+      ]);
+    }
 
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
@@ -71,18 +76,18 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
     $inputArgs = $args['input'];
     /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $type */
     $type = $this->config->getArgument('input')->getType();
-    /** @var \Drupal\graphql_core\Plugin\GraphQL\InputTypes\Mutations\EntityInput $inputType */
+    /** @var \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $inputType */
     $inputType = $type->getNamedType();
     $input = $this->extractEntityInput($inputArgs, $inputType);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create($input + [
-      $bundleKey => $bundleName,
-    ]);
-
-    if (!$entity->access('create')) {
+    try {
+      foreach ($input as $key => $value) {
+        $entity->get($key)->setValue($value);
+      }
+    }
+    catch (\InvalidArgumentException $exception) {
       return new EntityCrudOutputWrapper(NULL, NULL, [
-        $this->t('You do not have the necessary permissions to create entities of this type.'),
+        $this->t('The entity update failed with exception: @exception.', ['@exception' => $exception->getMessage()]),
       ]);
     }
 
@@ -90,11 +95,26 @@ class CreateEntity extends MutationPluginBase implements ContainerFactoryPluginI
       return new EntityCrudOutputWrapper(NULL, $violations);
     }
 
-    if (($status = $entity->save()) && $status === SAVED_NEW) {
+    if (($status = $entity->save()) && $status === SAVED_UPDATED) {
       return new EntityCrudOutputWrapper($entity);
     }
 
     return NULL;
   }
+
+  /**
+   * Extract entity values from the resolver args.
+   *
+   * Loops over all input values and assigns them to their original field names.
+   *
+   * @param array $inputArgs
+   *   The entity values provided through the resolver args.
+   * @param \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $inputType
+   *   The input type.
+   *
+   * @return array
+   *   The extracted entity values with their proper, internal field names.
+   */
+  abstract protected function extractEntityInput(array $inputArgs, InputTypePluginBase $inputType);
 
 }
