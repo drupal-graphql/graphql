@@ -30,7 +30,6 @@ class DefaultSchema extends SchemaPluginBase implements ContainerFactoryPluginIn
     $schemaBuilder = $schemaBuilderFactory->getSchemaBuilder();
 
     $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
-    $mutation->addFields($schemaBuilder->getMutations());
 
     $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
     $query->addFields($schemaBuilder->getRootFields());

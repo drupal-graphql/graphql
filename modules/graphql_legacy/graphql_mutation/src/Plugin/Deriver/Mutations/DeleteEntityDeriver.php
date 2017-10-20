@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver\Mutations;
+namespace Drupal\graphql_mutation\Plugin\Deriver\Mutations;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver\InputTypes;
+namespace Drupal\graphql_mutation\Plugin\Deriver\InputTypes;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
