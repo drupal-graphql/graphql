@@ -3,12 +3,11 @@
 namespace Drupal\Tests\graphql_core\Kernel\Views;
 
 use Drupal\graphql\GraphQL\Utility\TypeCollector;
-use Drupal\Tests\graphql_core\Kernel\Views\ViewsTestBase;
 
 /**
  * Test contextual views support in GraphQL.
  *
- * @group graphql_views
+ * @group graphql_core
  */
 class ContextualViewsTest extends ViewsTestBase {
 

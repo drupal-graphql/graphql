@@ -1,8 +1,0 @@
-name: GraphQL Link
-type: module
-description: 'Retrieve distinct properties from link fields.'
-package: GraphQL
-core: 8.x
-hidden: true
-dependencies:
-  - graphql_content

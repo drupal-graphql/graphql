@@ -3,7 +3,6 @@ description: 'Test configurations for GraphQL views integration.'
 type: module
 core: 8.x
 dependencies:
-  - graphql_views
   - graphql_content_test
   - node
   - taxonomy

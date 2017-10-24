@@ -2,12 +2,10 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Views;
 
-use Drupal\Tests\graphql_core\Kernel\Views\ViewsTestBase;
-
 /**
  * Test views support in GraphQL.
  *
- * @group graphql_views
+ * @group graphql_core
  */
 class ViewsTest extends ViewsTestBase {
 

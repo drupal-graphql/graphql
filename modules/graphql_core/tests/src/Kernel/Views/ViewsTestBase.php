@@ -12,7 +12,7 @@ use Drupal\user\Entity\Role;
 /**
  * Base class for test views support in GraphQL.
  *
- * @group graphql_views
+ * @group graphql_core
  */
 abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
   use NodeCreationTrait;
@@ -30,7 +30,6 @@ abstract class ViewsTestBase extends ViewsTestBaseDeprecationFix {
     'views',
     'taxonomy',
     'graphql_core',
-    'graphql_views',
     'graphql_views_test',
   ];
 
