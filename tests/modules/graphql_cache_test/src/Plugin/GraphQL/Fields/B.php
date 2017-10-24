@@ -12,7 +12,7 @@ namespace Drupal\graphql_cache_test\Plugin\GraphQL\Fields;
  *   type = "Int",
  *   parents = {"Root", "Object"},
  *   response_cache_tags = {"b", "graphql_response"},
- *   response_cache_contexts = {"graphql_test", "gql", "user"}
+ *   response_cache_contexts = {"graphql_test", "user"}
  * )
  */
 class B extends A {

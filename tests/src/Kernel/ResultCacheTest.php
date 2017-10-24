@@ -266,38 +266,4 @@ class ResultCacheTest extends KernelTestBase {
     $processB->shouldHaveBeenCalledTimes(2);
   }
 
-  /**
-   * Test batched persisted queries.
-   */
-  public function testBatchedPersistedQueries() {
-    $queryMap = $this->prophesize(QueryMapProviderInterface::class);
-    $this->container->set('graphql.query_map_provider', $queryMap->reveal());
-
-    $queryMap->getQuery('a', 'query')->willReturn('A');
-    $queryMap->getQuery('b', 'query')->willReturn('B');
-
-    $processor = $this->prophesize(QueryProcessor::class);
-    $this->container->set('graphql.query_processor', $processor->reveal());
-
-    /** @var \Prophecy\Prophecy\MethodProphecy $processA */
-    $processA = $processor->processQuery(Argument::any(), 'A', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
-    /** @var \Prophecy\Prophecy\MethodProphecy $processB */
-    $processB = $processor->processQuery(Argument::any(), 'B', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
-
-    $this->batchedQueries([
-      ['id' => 'query', 'version' => 'a'] ,
-    ]);
-    $processA->shouldHaveBeenCalledTimes(1);
-    $processB->shouldNotHaveBeenCalled();
-
-    $this->batchedQueries([
-      ['id' => 'query', 'version' => 'b'] ,
-    ]);
-    $processA->shouldHaveBeenCalledTimes(1);
-    $processB->shouldHaveBeenCalledTimes(1);
-
-  }
-
 }

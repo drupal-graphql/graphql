@@ -31,8 +31,7 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
     parent::constructCacheMetadata($schemaBuilder);
 
     $metadata = new CacheableMetadata();
-    $metadata->addCacheContexts(['gql', 'user']);
-    $metadata->addCacheTags(['graphql_response']);
+    $metadata->addCacheContexts(['user']);
 
     $this->responseMetadata->addCacheableDependency($metadata);
   }
