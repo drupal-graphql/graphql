@@ -151,23 +151,3 @@ function graphql_graphql_schema_operations($pluginId, array $pluginDefinition) {
 
   return $operations;
 }
-
-/**
- * Turn a list of machine names into a camel-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
- *   Use \Drupal\graphql\Utility\StringHelper::camelCase() instead.
- */
-function graphql_camelcase($components) {
-  return StringHelper::camelCase($components);
-}
-
-/**
- * Turn a list of machine names into a property-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
- *   Use \Drupal\graphql\Utility\StringHelper::propCase() instead.
- */
-function graphql_propcase($components) {
-  return StringHelper::propCase($components);
-}
