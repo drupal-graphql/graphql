@@ -36,8 +36,8 @@ class StringFormattingTest extends UnitTestCase {
 
   public function providerTestStringFormatting() {
     return [
-      ['simple-name', 'SimpleName'],
-      ['123-name-with*^&!@some-SPECIAL-chars', 'NameWithSomeSPECIALChars'],
+      [['simple-name'], 'SimpleName'],
+      [['123-name-with*^&!@some-SPECIAL-chars'], 'NameWithSomeSPECIALChars'],
       [['simple', 'name-of-string', 'components'], 'SimpleNameOfStringComponents'],
       [['123', 'array', '%^!@&#*', 'of', 'STRING', '(*&', 'components', 'with', 'SPEcial', 'chars'], 'ArrayOfSTRINGComponentsWithSPEcialChars']
     ];
