@@ -23,7 +23,7 @@ class EntityCanonicalUrl extends TypePluginBase {
   public function applies($value) {
     if ($value instanceof Url && $value->isRouted()) {
       $parts = explode('.', $value->getRouteName());
-      if (count($parts) != 3) {
+      if (count($parts) !== 3) {
         return FALSE;
       }
 
