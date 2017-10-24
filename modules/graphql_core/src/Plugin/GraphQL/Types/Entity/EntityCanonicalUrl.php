@@ -11,7 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  * @GraphQLType(
  *   id = "entity_canonical_url",
  *   name = "EntityCanonicalUrl",
- *   interfaces={"Url"},
+ *   interfaces = {"Url"},
  *   weight = 1
  * )
  */
