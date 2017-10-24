@@ -34,7 +34,8 @@ class StringHelper {
    *   A camel-cased concatenation of the input components.
    */
   public static function propCase() {
-    return lcfirst(forward_static_call_array('camelCase', func_get_args()));
+    $result = call_user_func_array([static::class, 'camelCase'], func_get_args());
+    return ctype_upper($result) ? strtolower($result) : lcfirst($result);
   }
 
 }
