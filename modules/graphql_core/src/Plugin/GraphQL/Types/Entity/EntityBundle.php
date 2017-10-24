@@ -29,7 +29,7 @@ class EntityBundle extends TypePluginBase {
    * @return string
    */
   public static function getId($entityTypeId, $bundleId) {
-    return StringHelper::camelCase([$entityTypeId, $bundleId]);
+    return StringHelper::camelCase($entityTypeId, $bundleId);
   }
 
   /**

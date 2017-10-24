@@ -57,7 +57,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
+          'name' => StringHelper::camelCase($id, 'query', 'filter', 'input'),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 

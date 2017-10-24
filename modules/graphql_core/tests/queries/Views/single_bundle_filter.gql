@@ -1,7 +1,0 @@
-{
-  withSingleBundleFilter: graphqlBundleTestGraphql1View {
-    results {
-      __typename
-    }
-  }
-}

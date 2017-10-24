@@ -25,7 +25,7 @@ class Entity extends InterfacePluginBase {
    * @return string
    */
   public static function getId($entityTypeId) {
-    return StringHelper::camelCase([$entityTypeId]);
+    return StringHelper::camelCase($entityTypeId);
   }
 
 }

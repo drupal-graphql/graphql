@@ -1,9 +1,0 @@
-name: GraphQL Views
-type: module
-description: 'Adds support for views.'
-package: GraphQL
-hidden: true
-core: 8.x
-dependencies:
-  - graphql_core
-  - views
