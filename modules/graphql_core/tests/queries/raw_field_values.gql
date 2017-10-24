@@ -1,104 +1,106 @@
 query ($path: String!) {
   route:route(path: $path) {
-    entity {
-      ... on NodeTest {
-        nid
-        vid
-        langcode {
-          value
-        }
-        type {
-          targetId
-        }
-        uid {
-          targetId
-          entity {
-            name
+    ... on EntityCanonicalUrl {
+      entity {
+        ... on NodeTest {
+          nid
+          vid
+          langcode {
+            value
           }
-        }
-        title
-        status
-        promote
-        sticky
-        revisionTranslationAffected
-        body {
-          summaryProcessed
-          summary
-          processed
-          format
-          value
-        }
-        fieldText {
-          value
-        }
-        fieldBoolean {
-          value
-        }
-        fieldLink {
+          type {
+            targetId
+          }
+          uid {
+            targetId
+            entity {
+              name
+            }
+          }
           title
-          uri
-          target:attribute(key: "_target")
-          url {
-            ... on InternalUrl {
-              internal:path
-            }
-            ... on ExternalUrl {
-              external:path
-            }
+          status
+          promote
+          sticky
+          revisionTranslationAffected
+          body {
+            summaryProcessed
+            summary
+            processed
+            format
+            value
           }
-
-        }
-        fieldInteger {
-          value
-        }
-        fieldFloat {
-          value
-        }
-        fieldDecimal {
-          value
-        }
-        fieldDatetime {
-          value
-        }
-        fieldTimestamp {
-          value
-        }
-        fieldEmail {
-          value
-        }
-        fieldString {
-          value
-        }
-        fieldReference {
-          targetId
-          entity {
+          fieldText {
+            value
+          }
+          fieldBoolean {
+            value
+          }
+          fieldLink {
             title
-            fieldReference {
-              targetId
-              entity {
-                title
+            uri
+            target:attribute(key: "_target")
+            url {
+              ... on EntityCanonicalUrl {
+                internal:path
+              }
+              ... on ExternalUrl {
+                external:path
+              }
+            }
+
+          }
+          fieldInteger {
+            value
+          }
+          fieldFloat {
+            value
+          }
+          fieldDecimal {
+            value
+          }
+          fieldDatetime {
+            value
+          }
+          fieldTimestamp {
+            value
+          }
+          fieldEmail {
+            value
+          }
+          fieldString {
+            value
+          }
+          fieldReference {
+            targetId
+            entity {
+              title
+              fieldReference {
+                targetId
+                entity {
+                  title
+                }
               }
             }
           }
-        }
-        fieldFile {
-          targetId
-          display
-          description
-          entity {
-            url
-            uri
+          fieldFile {
+            targetId
+            display
+            description
+            entity {
+              url
+              uri
+            }
           }
-        }
-        fieldImage {
-          targetId
-          alt
-          title
-          width
-          height
-          entity {
-            url
-            uri
+          fieldImage {
+            targetId
+            alt
+            title
+            width
+            height
+            entity {
+              url
+              uri
+            }
           }
         }
       }
