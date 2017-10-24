@@ -85,7 +85,7 @@ abstract class GraphQLAnnotationBase extends Plugin {
    *
    * @var array
    */
-  public $response_cache_contexts = ['gql', 'user'];
+  public $response_cache_contexts = ['user'];
 
   /**
    * The cache tags for caching theresponse.

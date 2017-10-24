@@ -69,8 +69,12 @@ abstract class SchemaPluginBase extends AbstractSchema implements SchemaPluginIn
     // schema config and all included types/fields/etc.
     $this->responseMetadata = new CacheableMetadata();
     $this->responseMetadata->setCacheMaxAge(Cache::PERMANENT);
+    $this->responseMetadata->addCacheTags(['graphql_response', "graphql_response:{$this->getPluginId()}"]);
+    $this->responseMetadata->addCacheContexts(['gql']);
+
     $this->schemaMetadata = new CacheableMetadata();
     $this->schemaMetadata->setCacheMaxAge(Cache::PERMANENT);
+    $this->schemaMetadata->addCacheTags(['graphql_schema', "graphql_schema:{$this->getPluginId()}"]);
 
     foreach (TypeCollector::collectTypes($this) as $type) {
       if ($type instanceof TypeSystemPluginInterface) {
