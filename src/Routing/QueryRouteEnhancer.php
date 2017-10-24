@@ -140,6 +140,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $content = $request->getContent();
 
     $values = !empty($content) ? json_decode($content, TRUE) : $request->query->all();
+    $values = !empty($values) ? $values : [];
 
     // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
     $keys = array_filter(array_keys($values), $filter);
