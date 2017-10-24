@@ -43,7 +43,7 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
         $dataType = $context->getContextDefinition()->getDataType();
 
         $this->derivatives[$id] = [
-          'name' => StringHelper::propCase([$id, 'context']),
+          'name' => StringHelper::propCase($id, 'context'),
           'context_id' => $id,
           'nullable' => TRUE,
           'multi' => FALSE,

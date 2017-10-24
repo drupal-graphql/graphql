@@ -31,7 +31,7 @@ class EntityField extends EntityFieldBase {
    * @return string
    */
   public static function getId($fieldName) {
-    return StringHelper::propCase([$fieldName]);
+    return StringHelper::propCase($fieldName);
   }
 
   /**

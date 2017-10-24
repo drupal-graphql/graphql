@@ -57,7 +57,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => StringHelper::propCase([$id, 'query']),
+          'name' => StringHelper::propCase($id, 'query'),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -73,7 +73,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           $derivative['arguments']['filter'] = [
             'multi' => FALSE,
             'nullable' => TRUE,
-            'type' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
+            'type' => StringHelper::camelCase($id, 'query', 'filter', 'input'),
           ];
         }
 

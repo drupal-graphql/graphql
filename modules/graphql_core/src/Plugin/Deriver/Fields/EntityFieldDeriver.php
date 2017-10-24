@@ -66,12 +66,12 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
    */
   protected function getParentsForField($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition) {
     if ($fieldDefinition->isBaseField()) {
-      return [StringHelper::camelCase([$entityTypeId])];
+      return [StringHelper::camelCase($entityTypeId)];
     }
 
     if ($fieldDefinition instanceof FieldStorageConfigInterface) {
       return array_values(array_map(function ($bundleId) use ($entityTypeId) {
-        return StringHelper::camelCase([$entityTypeId, $bundleId]);
+        return StringHelper::camelCase($entityTypeId, $bundleId);
       }, $fieldDefinition->getBundles()));
     }
 

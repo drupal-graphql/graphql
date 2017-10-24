@@ -7,9 +7,6 @@ class StringHelper {
   /**
    * Turn a list of machine names into a camel-cased string.
    *
-   * @param string[]|string $components
-   *   Name components to be concatenated.
-   *
    * @return string
    *   A camel-cased concatenation of the input components.
    *
@@ -17,7 +14,8 @@ class StringHelper {
    *   If the provided input does can't be converted to a specification compliant
    *   string representation for field or type names.
    */
-  public static function camelCase($components) {
+  public static function camelCase() {
+    $components = func_get_args();
     $string = is_array($components) ? implode('_', $components) : $components;
     $filtered = preg_replace('/^[^_a-zA-Z]+/', '', $string);
     $components = array_filter(preg_split('/[^a-zA-Z0-9]/', $filtered));
@@ -32,14 +30,11 @@ class StringHelper {
   /**
    * Turn a list of machine names into a property-cased string.
    *
-   * @param string[]|string $components
-   *   Name components to be concatenated.
-   *
    * @return string
    *   A camel-cased concatenation of the input components.
    */
-  public static function propCase($components) {
-    return lcfirst(static::camelCase($components));
+  public static function propCase() {
+    return lcfirst(forward_static_call_array('camelCase', func_get_args()));
   }
 
 }

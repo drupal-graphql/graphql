@@ -47,7 +47,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => StringHelper::propCase([$id, 'by', 'id']),
+          'name' => StringHelper::propCase($id, 'by', 'id'),
           'type' => StringHelper::camelCase($id),
           'entity_type' => $id,
         ] + $basePluginDefinition;
