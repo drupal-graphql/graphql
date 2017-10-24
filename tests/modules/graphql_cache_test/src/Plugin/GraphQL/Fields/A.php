@@ -18,7 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "Int",
  *   parents = {"Root", "Object"},
  *   response_cache_tags = {"a", "graphql_response"},
- *   response_cache_contexts = {"graphql_test", "gql", "user"}
+ *   response_cache_contexts = {"graphql_test", "user"}
  * )
  */
 class A extends FieldPluginBase implements ContainerFactoryPluginInterface {

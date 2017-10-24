@@ -42,7 +42,7 @@ trait CacheablePluginTrait {
   public function getResponseCacheMetadata() {
     $definition = $this->getPluginDefinition();
     $metadata = new CacheableMetadata();
-    $metadata->addCacheContexts(isset($definition['response_cache_contexts']) ? $definition['response_cache_contexts'] : ['gql', 'user']);
+    $metadata->addCacheContexts(isset($definition['response_cache_contexts']) ? $definition['response_cache_contexts'] : ['user']);
     $metadata->addCacheTags(isset($definition['response_cache_tags']) ? $definition['response_cache_tags'] : []);
     $metadata->setCacheMaxAge(isset($definition['response_cache_max_age']) ? $definition['response_cache_max_age'] : CacheBackendInterface::CACHE_PERMANENT);
     return $metadata;
