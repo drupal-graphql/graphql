@@ -20,6 +20,15 @@ class GraphQLDateTime extends DateTimeType implements TypeSystemPluginInterface 
   use PluginTrait;
   use CacheablePluginTrait;
 
+  protected $format = 'Y-m-d H:i:s';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
   /**
    * {@inheritdoc}
    */
