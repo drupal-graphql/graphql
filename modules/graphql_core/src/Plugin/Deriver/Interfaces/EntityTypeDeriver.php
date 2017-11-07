@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -13,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Derive GraphQL Interfaces from Drupal entity types.
  */
 class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use StringTranslationTrait;
 
   /**
    * The entity type manager.
@@ -49,6 +51,9 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
       if ($type instanceof ContentEntityTypeInterface) {
         $this->derivatives[$typeId] = [
           'name' => StringHelper::camelCase($typeId),
+          'description' => $this->t("The '@type' entity type.", [
+            '@type' => $type->getLabel(),
+          ]),
           'data_type' => 'entity:' . $typeId,
           'entity_type' => $typeId,
         ] + $basePluginDefinition;

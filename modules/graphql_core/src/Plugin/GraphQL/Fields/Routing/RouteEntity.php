@@ -22,6 +22,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "route_entity",
  *   secure = true,
  *   name = "entity",
+ *   description = @Translation("The entity belonging to the current url."),
  *   parents = {"EntityCanonicalUrl"},
  *   type = "Entity"
  * )

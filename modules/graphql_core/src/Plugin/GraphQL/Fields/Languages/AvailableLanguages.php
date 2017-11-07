@@ -15,6 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "available_languages_field",
  *   secure = true,
  *   name = "availableLanguages",
+ *   description = @Translation("Loads the list of available languages."),
  *   type = "Language",
  *   multi = true
  * )

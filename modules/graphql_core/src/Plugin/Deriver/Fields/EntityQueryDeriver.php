@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Create GraphQL entityQuery fields based on available Drupal entity types.
  */
 class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use StringTranslationTrait;
+
   /**
    * The entity type manager service.
    *
@@ -58,6 +61,7 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
           'name' => StringHelper::propCase($id, 'query'),
+          'description' => $this->t("Loads '@type' entities.", ['@type' => $type->getLabel()]),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 

@@ -60,19 +60,14 @@ class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriver
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $this->derivatives = [];
-
     $parents = [];
-
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
       $interfaces = class_implements($entityType->getClass());
       if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
         continue;
       }
 
-      $fieldDefinitions = $this->entityFieldManager
-        ->getFieldStorageDefinitions($entityTypeId);
-
+      $fieldDefinitions = $this->entityFieldManager->getFieldStorageDefinitions($entityTypeId);
       foreach ($fieldDefinitions as $fieldDefinition) {
         $fieldName = $fieldDefinition->getName();
         $fieldType = $fieldDefinition->getType();
@@ -83,9 +78,11 @@ class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriver
       }
     }
 
-    $this->derivatives[$basePluginDefinition['id']] = [
-      'parents' => array_merge($parents, $basePluginDefinition['parents']),
-    ] + $basePluginDefinition;
+    if (!empty($parents)) {
+      $this->derivatives[$basePluginDefinition['id']] = [
+        'parents' => array_merge($parents, $basePluginDefinition['parents']),
+      ] + $basePluginDefinition;
+    }
 
     return $this->derivatives;
   }

@@ -6,14 +6,16 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_content\ContentEntitySchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Create GraphQL entityById fields based on available Drupal entity types.
  */
 class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The entity type manager service.
@@ -49,11 +51,15 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
         $derivative = [
           'name' => StringHelper::propCase($id, 'by', 'id'),
           'type' => StringHelper::camelCase($id),
+          'description' => $this->t("Loads '@type' entities by their id.", ['@type' => $type->getLabel()]),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
         if ($type->isTranslatable()) {
-          $derivative['arguments']['language'] = 'AvailableLanguages';
+          $derivative['arguments']['language'] = [
+            'type' => 'AvailableLanguages',
+            'nullable' => TRUE,
+          ];
         }
 
         $this->derivatives["entity:$id"] = $derivative;

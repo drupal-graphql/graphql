@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "url_path",
  *   secure = true,
  *   name = "path",
+ *   description = @Translation("The route's canonical path."),
  *   type = "String",
  *   arguments = {
  *     "internal" = {

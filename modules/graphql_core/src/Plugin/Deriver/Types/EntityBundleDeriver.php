@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_core\Plugin\GraphQL\Types\Entity\EntityBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Derive GraphQL Interfaces from Drupal entity types.
  */
 class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use StringTranslationTrait;
 
   /**
    * Entity type manager.
@@ -64,9 +66,13 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
     $bundles = $this->entityTypeBundleInfo->getAllBundleInfo();
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
       if ($type instanceof ContentEntityTypeInterface && array_key_exists($typeId, $bundles)) {
-        foreach (array_keys($bundles[$typeId]) as $bundle) {
+        foreach ($bundles[$typeId] as $bundle => $bundleDefinition) {
           $this->derivatives[$typeId . '-' . $bundle] = [
             'name' => EntityBundle::getId($typeId, $bundle),
+            'description' => $this->t("The '@bundle' bundle of the '@type' entity type.", [
+              '@bundle' => $bundleDefinition['label'],
+              '@type' => $type->getLabel(),
+            ]),
             'entity_type' => $typeId,
             'data_type' => 'entity:' . $typeId . ':' . $bundle,
             'interfaces' => [StringHelper::camelCase($typeId)],

@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "language_id",
  *   secure = true,
  *   name = "id",
+ *   description = @Translation("The language id."),
  *   type = "String",
  *   parents = {"Language"}
  * )

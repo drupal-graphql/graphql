@@ -11,6 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  * @GraphQLType(
  *   id = "entity_canonical_url",
  *   name = "EntityCanonicalUrl",
+ *   description = @Translation("The canonical entity url."),
  *   interfaces = {"Url"},
  *   weight = 1
  * )

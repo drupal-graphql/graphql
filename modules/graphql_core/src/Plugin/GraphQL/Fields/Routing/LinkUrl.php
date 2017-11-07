@@ -13,6 +13,7 @@ use Drupal\Core\Link;
  *   id = "link_url",
  *   secure = true,
  *   name = "url",
+ *   description = @Translation("The url of a link."),
  *   type = "Url",
  *   parents = {"Link"}
  * )

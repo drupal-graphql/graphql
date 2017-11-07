@@ -17,6 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "menu_by_name",
  *   secure = true,
  *   name = "menuByName",
+ *   description = @Translation("Loads a menu by its machine-readable name."),
  *   type = "Menu",
  *   arguments = {
  *     "name" = "String"

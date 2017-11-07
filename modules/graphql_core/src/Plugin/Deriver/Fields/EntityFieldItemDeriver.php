@@ -30,6 +30,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
 
       $derivatives["$entityTypeId-$fieldName-$property"] = [
         'name' => StringHelper::propCase($property),
+        'description' => $propertyDefinition->getDescription(),
         'property' => $property,
         'multi' => FALSE,
         'type' => $this->typeMapper->typedDataToGraphQLFieldType($propertyDefinition),

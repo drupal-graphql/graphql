@@ -13,6 +13,7 @@ use Drupal\Core\Link;
  *   id = "link_label",
  *   secure = true,
  *   name = "text",
+ *   description = @Translation("The label of a link."),
  *   type = "String",
  *   parents = {"Link"}
  * )

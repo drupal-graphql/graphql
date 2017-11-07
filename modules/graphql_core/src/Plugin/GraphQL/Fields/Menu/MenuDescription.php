@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "menu_description",
  *   secure = true,
  *   name = "description",
+ *   description = @Translation("The menu's description."),
  *   type = "String",
  *   parents = {"Menu"}
  * )

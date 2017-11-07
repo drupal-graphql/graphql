@@ -11,6 +11,7 @@ use Drupal\graphql\Utility\StringHelper;
  * @GraphQLInterface(
  *   id = "entity",
  *   name = "Entity",
+ *   description = @Translation("Common entity interface containing generic entity properties."),
  *   data_type = "entity"
  * )
  */

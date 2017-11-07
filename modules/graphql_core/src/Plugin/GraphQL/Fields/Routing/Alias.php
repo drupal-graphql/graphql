@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a routes canonical path.
+ * Retrieve a routes aliased path.
  *
  * TODO: Move this to `InternalUrl` (breaking change).
  *
@@ -19,6 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "url_alias",
  *   secure = true,
  *   name = "alias",
+ *   description = @Translation("The route's path alias or canonical url if no alias is defined."),
  *   type = "String",
  *   parents = {"Url"}
  * )

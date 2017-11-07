@@ -16,6 +16,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  * @GraphQLType(
  *   id = "unexposed_entity",
  *   name = "UnexposedEntity",
+ *   description = @Translation("Fallback type for otherwise unexposed entities."),
  *   weight = -10,
  *   interfaces = {"Entity"}
  * )

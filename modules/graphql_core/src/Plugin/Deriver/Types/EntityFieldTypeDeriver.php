@@ -21,13 +21,12 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
 
     $fieldName = $fieldDefinition->getName();
 
-    return [
-      "$entityTypeId-$fieldName" => [
-        'name' => EntityFieldType::getId($entityTypeId, $fieldName),
-        'entity_type' => $entityTypeId,
-        'field_name' => $fieldName,
-      ] + $basePluginDefinition,
-    ];
+    return ["$entityTypeId-$fieldName" => [
+      'name' => EntityFieldType::getId($entityTypeId, $fieldName),
+      'description' => $fieldDefinition->getDescription(),
+      'entity_type' => $entityTypeId,
+      'field_name' => $fieldName,
+    ] + $basePluginDefinition];
   }
 
 }

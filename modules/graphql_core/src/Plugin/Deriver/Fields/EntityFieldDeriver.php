@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
-use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\graphql\Utility\StringHelper;
@@ -33,6 +32,7 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
     $derivative = [
       'parents' => $parents,
       'name' => EntityField::getId($fieldName),
+      'description' => $fieldDefinition->getDescription(),
       'multi' => $fieldDefinition->isMultiple(),
       'field' => $fieldName,
       'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),

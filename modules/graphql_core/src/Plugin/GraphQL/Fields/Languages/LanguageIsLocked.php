@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "language_is_locked",
  *   secure = true,
  *   name = "isLocked",
+ *   description = @Translation("Boolean indicating if this language is locked."),
  *   type = "Boolean",
  *   parents = {"Language"}
  * )

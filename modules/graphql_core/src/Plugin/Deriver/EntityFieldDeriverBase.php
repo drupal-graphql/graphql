@@ -96,8 +96,6 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $this->derivatives = [];
-
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
       $interfaces = class_implements($entityType->getClass());
       if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {

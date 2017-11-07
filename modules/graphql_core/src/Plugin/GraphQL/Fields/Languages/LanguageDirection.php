@@ -13,6 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "language_direction",
  *   secure = true,
  *   name = "direction",
+ *   description = @Translation("The language direction (rtl or ltr)."),
  *   type = "String",
  *   parents = {"Language"}
  * )
