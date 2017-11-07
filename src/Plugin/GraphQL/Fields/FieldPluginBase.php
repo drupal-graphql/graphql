@@ -66,6 +66,7 @@ abstract class FieldPluginBase extends AbstractField implements TypeSystemPlugin
         return $this->cacheable($result, $value, $args);
       });
     }
+
     $result = iterator_to_array($this->resolveValues($value, $args, $info));
     return $this->cacheable($result, $value, $args);
   }

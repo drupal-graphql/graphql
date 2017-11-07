@@ -79,7 +79,7 @@ class QueryProcessor {
    * @param bool $bypassSecurity
    *   Bypass field security
    *
-   * @return \Drupal\graphql\GraphQL\Execution\QueryResult The GraphQL query result.
+   * @return \Drupal\graphql\GraphQL\Execution\QueryResult.
    *   The GraphQL query result.
    */
   public function processQuery($schemaId, $query, array $variables = [], $bypassSecurity = FALSE) {
@@ -92,11 +92,23 @@ class QueryProcessor {
     $processor = new Processor($this->container, $schema, $secure);
     $processor->processPayload($query, $variables);
 
-    // Fetch the result data and collected cache metadata from the processor.
+    // Add collected cache metadata from the query processor.
     $metadata = new CacheableMetadata();
-    $metadata->addCacheableDependency($processor->getQueryCacheMetadata());
+    $context = $processor->getExecutionContext();
+    $container = $context->getContainer();
+    if ($container->has('metadata')) {
+      $metadata->addCacheableDependency($container->get('metadata'));
+    }
+
+    // Add cache metadata from the schema in use.
     /** @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface $schema */
     $metadata->addCacheableDependency($schema->getResponseCacheMetadata());
+
+    // Prevent caching if this is a mutation query.
+    $request = $context->getRequest();
+    if (!empty($request) && $request->hasMutations()) {
+      $metadata->setCacheMaxAge(0);
+    }
 
     return new QueryResult($processor->getResponseData(), $metadata);
   }
