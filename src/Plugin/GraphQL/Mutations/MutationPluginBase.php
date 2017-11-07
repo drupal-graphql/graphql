@@ -31,11 +31,15 @@ abstract class MutationPluginBase extends AbstractField implements TypeSystemPlu
    * {@inheritdoc}
    */
   public function buildConfig(SchemaBuilderInterface $schemaManager) {
+    $definition = $this->getPluginDefinition();
+
     $this->config = new FieldConfig([
       'name' => $this->buildName(),
       'description' => $this->buildDescription(),
       'type' => $this->buildType($schemaManager),
       'args' => $this->buildArguments($schemaManager),
+      'isDeprecated' => !empty($definition['deprecated']),
+      'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
     ]);
   }
 
