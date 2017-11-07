@@ -79,4 +79,11 @@ class GraphQLField extends GraphQLAnnotationBase {
    */
   public $enum_type_name = NULL;
 
+  /**
+   * The deprecation reason or FALSE if the field is not deprecated.
+   *
+   * @var string|boolean
+   */
+  public $deprecated = FALSE;
+
 }
