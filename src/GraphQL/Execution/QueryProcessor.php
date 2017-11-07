@@ -23,13 +23,6 @@ class QueryProcessor {
   protected $container;
 
   /**
-   * The reducer manager service.
-   *
-   * @var \Drupal\graphql\GraphQL\Reducers\ReducerManager
-   */
-  protected $reducerManager;
-
-  /**
    * The current user account.
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
@@ -55,8 +48,6 @@ class QueryProcessor {
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The dependency injection container.
-   * @param \Drupal\graphql\GraphQL\Reducers\ReducerManager $reducerManager
-   *   The schema reducer manager service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
    * @param \Drupal\graphql\GraphQL\Schema\SchemaLoader $schemaLoader
@@ -66,7 +57,6 @@ class QueryProcessor {
    */
   public function __construct(
     ContainerInterface $container,
-    ReducerManager $reducerManager,
     SchemaLoader $schemaLoader,
     AccountProxyInterface $currentUser,
     array $parameters
@@ -74,7 +64,6 @@ class QueryProcessor {
     $this->container = $container;
     $this->currentUser = $currentUser;
     $this->parameters = $parameters;
-    $this->reducerManager = $reducerManager;
     $this->schemaLoader = $schemaLoader;
   }
 
@@ -90,7 +79,7 @@ class QueryProcessor {
    * @param bool $bypassSecurity
    *   Bypass field security
    *
-   * @return \Drupal\graphql\GraphQL\Execution\QueryResult The GraphQL query result.
+   * @return \Drupal\graphql\GraphQL\Execution\QueryResult.
    *   The GraphQL query result.
    */
   public function processQuery($schemaId, $query, array $variables = [], $bypassSecurity = FALSE) {
@@ -101,13 +90,25 @@ class QueryProcessor {
     /** @var \Youshido\GraphQL\Schema\AbstractSchema $schema */
     $secure = !!($bypassSecurity || $this->currentUser->hasPermission('bypass graphql field security') || $this->parameters['development']);
     $processor = new Processor($this->container, $schema, $secure);
-    $processor->processPayload($query, $variables, $this->reducerManager->getAllServices());
+    $processor->processPayload($query, $variables);
 
-    // Fetch the result data and collected cache metadata from the processor.
+    // Add collected cache metadata from the query processor.
     $metadata = new CacheableMetadata();
-    $metadata->addCacheableDependency($processor->getQueryCacheMetadata());
+    $context = $processor->getExecutionContext();
+    $container = $context->getContainer();
+    if ($container->has('metadata')) {
+      $metadata->addCacheableDependency($container->get('metadata'));
+    }
+
+    // Add cache metadata from the schema in use.
     /** @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface $schema */
     $metadata->addCacheableDependency($schema->getResponseCacheMetadata());
+
+    // Prevent caching if this is a mutation query.
+    $request = $context->getRequest();
+    if (!empty($request) && $request->hasMutations()) {
+      $metadata->setCacheMaxAge(0);
+    }
 
     return new QueryResult($processor->getResponseData(), $metadata);
   }
