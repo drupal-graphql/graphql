@@ -74,7 +74,6 @@ services:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
       - '@service_container'
-      - '@graphql.reducer_manager'
       - '@graphql.schema_loader'
       - '@current_user'
       - '%graphql.config%'
@@ -104,11 +103,6 @@ services:
     arguments: ['@cache.default', '@config.factory']
     tags:
         - { name: graphql_query_map_provider }
-
-  # Manager for schema reducers. Uses a compiler pass to gather reducers.
-  graphql.reducer_manager:
-    class: Drupal\graphql\GraphQL\Reducers\ReducerManager
-    arguments: ['@service_container', '%graphql.reducers%']
 
   # Service for graphql request caching.
   graphql.cache_subscriber:
