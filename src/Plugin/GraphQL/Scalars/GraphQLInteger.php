@@ -24,6 +24,13 @@ class GraphQLInteger extends IntType implements TypeSystemPluginInterface {
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(SchemaBuilderInterface $schemaManager) {
     // Nothing to do here.
   }
