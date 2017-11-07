@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Drupal from 'drupal';
 import jQuery from 'jquery';
 import GraphiQL from 'graphiql';
+import { buildClientSchema } from 'graphql';
 
 /**
  * Behavior for rendering the GraphiQL interface.
@@ -14,6 +15,9 @@ Drupal.behaviors.graphQLRenderExplorer = {
     if (typeof container === 'undefined') {
       return;
     }
+
+    // Build a schema from the passed introspection data.
+    const graphQLSchema = buildClientSchema(settings.graphqlIntrospectionData.data);
 
     // Defines a GraphQL fetcher using the fetch API.
     const graphQLFetcher = (graphQLParams) => fetch(settings.graphqlRequestUrl, {
@@ -29,6 +33,7 @@ Drupal.behaviors.graphQLRenderExplorer = {
     ReactDOM.render(
       React.createElement(GraphiQL, {
         fetcher: graphQLFetcher,
+        schema: graphQLSchema,
       }), container
     );
   },

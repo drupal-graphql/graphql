@@ -5,7 +5,7 @@ explorer:
   css:
     component:
       assets/explorer/dist/graphiql.css: {preprocess: false}
-      assets/explorer/dist/explorer.css: {preprocess: false}
+      assets/explorer/dist/container.css: {preprocess: false}
   dependencies:
     - core/drupal
     - core/jquery
@@ -18,7 +18,8 @@ voyager:
     assets/voyager/dist/bundle.min.js: {preprocess: false}
   css:
     component:
-      assets/voyager/dist/voyager.css: {preprocess: true}
+      assets/voyager/dist/voyager.css: {preprocess: false}
+      assets/voyager/dist/container.css: {preprocess: false}
   dependencies:
     - core/drupal
     - core/jquery
