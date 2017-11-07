@@ -23,6 +23,13 @@ class GraphQLDateTimeTz extends DateTimeTzType implements TypeSystemPluginInterf
   /**
    * {@inheritdoc}
    */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
+    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfig(SchemaBuilderInterface $schemaManager) {
     // Nothing to do here.
   }
