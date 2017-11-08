@@ -47,6 +47,7 @@ class QueryRoutes extends RouteSubscriberBase {
         ],
       ], [
         '_graphql_query_access' => 'TRUE',
+        '_method' => 'POST|GET',
       ]));
     }
 
