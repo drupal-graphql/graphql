@@ -40,6 +40,8 @@ class DisabledSchemaCacheTest extends KernelTestBase {
    * Test basic schema caching.
    */
   public function testDisabledCache() {
+    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
+
     // Prophesize a field with permanent cache.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(Cache::PERMANENT);
