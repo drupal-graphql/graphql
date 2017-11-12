@@ -69,14 +69,14 @@ class SchemaLoader {
    *
    * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface[]
    */
-  protected $schemas;
+  protected $schemas = [];
 
   /**
    * Static cache of loaded cache metadata.
    *
    * @var \Drupal\Core\Cache\CacheableDependencyInterface[]
    */
-  protected $metadata;
+  protected $metadata = [];
 
   /**
    * Constructs a SchemaLoader object.
