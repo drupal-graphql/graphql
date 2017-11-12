@@ -100,10 +100,6 @@ class QueryProcessor {
       $metadata->addCacheableDependency($container->get('metadata'));
     }
 
-    // Add cache metadata from the schema in use.
-    /** @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface $schema */
-    $metadata->addCacheableDependency($schema->getResponseCacheMetadata());
-
     // Prevent caching if this is a mutation query.
     $request = $context->getRequest();
     if (!empty($request) && $request->hasMutations()) {

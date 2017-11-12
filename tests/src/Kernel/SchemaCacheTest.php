@@ -29,6 +29,8 @@ class SchemaCacheTest extends KernelTestBase {
    * Test basic schema caching.
    */
   public function testCacheableSchema() {
+    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
+
     // Prophesize a field with permanent cache.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(Cache::PERMANENT);
@@ -42,6 +44,7 @@ class SchemaCacheTest extends KernelTestBase {
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $getSchema->shouldHaveBeenCalledTimes(1);
 
+
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $getSchema->shouldHaveBeenCalledTimes(1);
   }
@@ -50,6 +53,8 @@ class SchemaCacheTest extends KernelTestBase {
    * Test an uncacheable schema.
    */
   public function testUncacheableSchema() {
+    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
+
     // Prophesize an uncacheable field.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
@@ -71,6 +76,8 @@ class SchemaCacheTest extends KernelTestBase {
    * Test context based schema invalidation.
    */
   public function testContext() {
+    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
+
     // Prepare a prophesied context manager.
     $contextManager = $this->prophesize(CacheContextsManager::class);
     $this->container->set('cache_contexts_manager', $contextManager->reveal());
@@ -116,6 +123,8 @@ class SchemaCacheTest extends KernelTestBase {
    * Test tag based schema invalidation.
    */
   public function testTags() {
+    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
+
     // Prophesize an uncacheable field.
     $metadata = new CacheableMetadata();
     $metadata->setCacheTags(['a', 'b']);
