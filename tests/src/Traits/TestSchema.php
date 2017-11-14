@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,22 +28,26 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, AbstractField $field = NULL) {
-    $schema = new static(['field' => $field], 'graphql:test', static::pluginDefinition());
-    $schema->buildConfig(new PluggableSchemaBuilder($container->get('graphql.plugin_manager_aggregator')));
-    return $schema;
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition, AbstractField $field = NULL) {
+    return new static(['field' => $field], 'graphql:test', static::pluginDefinition(), $container->get('graphql.plugin_manager_aggregator'));
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function constructSchema(SchemaBuilderInterface $schemaBuilder) {
-    parent::constructSchema($schemaBuilder);
+  public function getSchema() {
+    if (!isset($this->schema)) {
+      $schema = parent::getSchema();
 
-    // Allow injection of an additional field.
-    if (!empty($this->configuration['field'])) {
-      $this->getQueryType()->addField($this->configuration['field']);
+      // Allow injection of an additional field.
+      if (!empty($this->configuration['field'])) {
+        $schema->getQueryType()->addField($this->configuration['field']);
+      }
+
+      $this->schema = $schema;
     }
+
+    return $this->schema;
   }
 
 }

@@ -4,7 +4,7 @@ namespace Drupal\graphql_test\Plugin\GraphQL\Schemas;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,7 +19,7 @@ use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
  *   id = "test",
  *   name = "Default",
  *   path = "/graphql",
- *   builder = "\Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder"
+ *   builder = "\Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface"
  * )
  */
 class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
@@ -27,7 +27,7 @@ class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
   /**
    * {@inheritdoc}
    */
-  protected function constructCacheMetadata(SchemaBuilderInterface $schemaBuilder) {
+  protected function constructCacheMetadata(PluggableSchemaBuilderInterface $schemaBuilder) {
     parent::constructCacheMetadata($schemaBuilder);
 
     $metadata = new CacheableMetadata();

@@ -30,6 +30,7 @@ class ImageResourceUrl extends FieldPluginBase {
     if ($value instanceof ImageItem && $value->entity->access('view')) {
       yield file_create_url($value->entity->getFileUri());
     }
+
     if (is_array($value) && array_key_exists('url', $value)) {
       yield $value['url'];
     }

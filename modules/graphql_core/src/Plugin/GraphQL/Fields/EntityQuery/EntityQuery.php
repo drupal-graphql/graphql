@@ -6,7 +6,9 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Schema\Schema;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -80,9 +82,33 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   }
 
   /**
+   * Retrieves the schema builder from the resolve info.
+   *
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface|null
+   *   The corresponding plugin instance for this edge.
+   */
+  protected function getSchemaBuilder(ResolveInfo $info) {
+    $schema = isset($info) ? $info->getExecutionContext()->getSchema() : NULL;
+    if (!$schema instanceof Schema) {
+      return NULL;
+    }
+
+    $schemaPlugin = $schema->getSchemaPlugin();
+    if (!$schemaPlugin instanceof PluggableSchemaPluginInterface) {
+      return NULL;
+    }
+
+    return $schemaPlugin->getSchemaBuilder();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
+    $schemaBuilder = $this->getSchemaBuilder($info);
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
     $type = $this->entityTypeManager->getDefinition($entityTypeId);
@@ -93,10 +119,10 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
 
     if (array_key_exists('filter', $args) && $args['filter']) {
       /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
-      $filter = $this->config->getArgument('filter')->getType();
-      /** @var \Drupal\graphql_core\Plugin\GraphQL\InputTypes\EntityQuery\EntityQueryFilterInput $filterType */
+      $filter = $info->getField()->getArgument('filter')->getType();
+      /** @var \Drupal\graphql\GraphQL\Type\InputObjectType $filterType */
       $filterType = $filter->getNamedType();
-      $filterFields = $filterType->getPluginDefinition()['fields'];
+      $filterFields = $filterType->getPlugin($schemaBuilder)->getPluginDefinition()['fields'];
 
       foreach ($args['filter'] as $key => $arg) {
         $query->condition($filterFields[$key]['field_name'], $arg);

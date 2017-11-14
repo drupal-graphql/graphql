@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Type\Enum\EnumType;
 use Youshido\GraphQL\Type\ListType\ListType;
 use Youshido\GraphQL\Type\NonNullType;
@@ -59,6 +59,7 @@ trait TypedPluginTrait {
         'description' => $description,
       ];
     }
+
     return new EnumType([
       'name' => $typeName,
       'values' => $values,
@@ -68,33 +69,34 @@ trait TypedPluginTrait {
   /**
    * Build the plugin type.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Type\TypeInterface
    *   The type object.
    */
-  protected function buildType(SchemaBuilderInterface $schemaManager) {
+  protected function buildType(PluggableSchemaBuilderInterface $schemaBuilder) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
 
       if (array_key_exists('data_type', $definition) && $definition['data_type']) {
-        $type = $schemaManager->findByDataType($definition['data_type']);
+        $type = $schemaBuilder->findByDataType($definition['data_type'])->getDefinition($schemaBuilder);
       }
       else if (array_key_exists('type', $definition) && $definition['type']) {
-        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type'], $definition['enum_type_name']) : $schemaManager->findByName($definition['type'], [
+        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type'], $definition['enum_type_name']) : $schemaBuilder->findByName($definition['type'], [
           GRAPHQL_SCALAR_PLUGIN,
           GRAPHQL_UNION_TYPE_PLUGIN,
           GRAPHQL_TYPE_PLUGIN,
           GRAPHQL_INTERFACE_PLUGIN,
           GRAPHQL_ENUM_PLUGIN,
-        ]);
+        ])->getDefinition($schemaBuilder);
       }
 
       if (isset($type) && $type instanceof TypeInterface) {
         return $this->decorateType($type, $definition['nullable'], $definition['multi']);
       }
     }
+
     return NULL;
   }
 

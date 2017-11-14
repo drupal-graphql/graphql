@@ -10,10 +10,10 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 trait NamedPluginTrait {
 
   /**
-   * Build the fields name.
+   * Build the plugin's name.
    *
    * @return string
-   *   The field name string.
+   *   The plugin name string.
    */
   protected function buildName() {
     if ($this instanceof PluginInspectionInterface) {
@@ -22,14 +22,15 @@ trait NamedPluginTrait {
         return $definition['name'];
       }
     }
+
     return NULL;
   }
 
   /**
-   * Build the fields description.
+   * Build the plugin's description.
    *
    * @return string
-   *   The field description string.
+   *   The plugin description string.
    */
   protected function buildDescription() {
     if ($this instanceof PluginInspectionInterface) {
@@ -38,6 +39,7 @@ trait NamedPluginTrait {
         return $definition['description'];
       }
     }
+
     return NULL;
   }
 

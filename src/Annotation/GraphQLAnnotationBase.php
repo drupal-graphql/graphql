@@ -71,7 +71,7 @@ abstract class GraphQLAnnotationBase extends Plugin {
    *
    * @var array
    */
-  public $schema_cache_tags = ['graphql_schema'];
+  public $schema_cache_tags = [];
 
   /**
    * The cache max age for caching the type system definition in the schema.
@@ -92,7 +92,7 @@ abstract class GraphQLAnnotationBase extends Plugin {
    *
    * @var array
    */
-  public $response_cache_tags = ['graphql_response'];
+  public $response_cache_tags = [];
 
   /**
    * The cache max age for caching the response.

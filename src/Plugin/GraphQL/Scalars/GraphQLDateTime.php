@@ -2,10 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Type\Scalar\DateTimeType;
 
 /**
@@ -16,23 +13,16 @@ use Youshido\GraphQL\Type\Scalar\DateTimeType;
  *   name = "DateTime"
  * )
  */
-class GraphQLDateTime extends DateTimeType implements TypeSystemPluginInterface {
-  use PluginTrait;
-  use CacheablePluginTrait;
-
-  protected $format = 'Y-m-d H:i:s';
+class GraphQLDateTime extends ScalarPluginBase {
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-  }
+  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
+    if (!isset($this->definition)) {
+      $this->definition = new DateTimeType();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfig(SchemaBuilderInterface $schemaManager) {
-    // Nothing to do here.
+    return $this->definition;
   }
 }

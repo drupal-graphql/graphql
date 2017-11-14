@@ -2,28 +2,68 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Fields;
 
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\GraphQL\Batching\BatchedFieldInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Field\BatchedField;
+use Drupal\graphql\GraphQL\Field\Field;
 use Drupal\graphql\GraphQL\SecureFieldInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Config\Field\FieldConfig;
 use Youshido\GraphQL\Execution\DeferredResolver;
 use Youshido\GraphQL\Execution\ResolveInfo;
-use Youshido\GraphQL\Field\AbstractField;
 
 /**
- * Base class for graphql field plugins.
+ * Base class for field plugins.
  */
-abstract class FieldPluginBase extends AbstractField implements TypeSystemPluginInterface, SecureFieldInterface {
-  use PluginTrait;
+abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInterface, SecureFieldInterface {
   use CacheablePluginTrait;
   use NamedPluginTrait;
   use ArgumentAwarePluginTrait;
+
+  /**
+   * The field instance.
+   *
+   * @var \Drupal\graphql\GraphQL\Field\Field
+   */
+  protected $definition;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
+    if (!isset($this->definition)) {
+      $definition = $this->getPluginDefinition();
+
+      $config = [
+        'name' => $this->buildName(),
+        'description' => $this->buildDescription(),
+        'type' => $this->buildType($schemaBuilder),
+        'args' => $this->buildArguments($schemaBuilder),
+        'isDeprecated' => !empty($definition['deprecated']),
+        'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
+      ];
+
+      if ($this instanceof BatchedFieldInterface) {
+        $this->definition = new Field($this, $this->isSecure(), $config);
+      }
+      else {
+        $this->definition = new BatchedField($this, $this->isSecure(), $config);
+      }
+    }
+
+    return $this->definition;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isSecure() {
+    return isset($this->getPluginDefinition()['secure']) && $this->getPluginDefinition()['secure'];
+  }
 
   /**
    * Dummy implementation for `getBatchId` in `BatchedFieldInterface`.
@@ -51,16 +91,9 @@ abstract class FieldPluginBase extends AbstractField implements TypeSystemPlugin
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function resolve($value, array $args, ResolveInfo $info) {
     if ($this instanceof BatchedFieldInterface) {
-      $result = $this->getBatchedFieldResolver()->add($this, $value, $args, $info);
+      $result = $this->getBatchedFieldResolver($value, $args, $info)->add($this, $value, $args, $info);
       return new DeferredResolver(function() use ($result, $args, $info, $value) {
         $result = iterator_to_array($this->resolveValues($result(), $args, $info));
         return $this->cacheable($result, $value, $args);
@@ -133,50 +166,6 @@ abstract class FieldPluginBase extends AbstractField implements TypeSystemPlugin
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     // Allow overriding this class without having to declare this method.
     yield NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfig(SchemaBuilderInterface $schemaManager) {
-    $definition = $this->getPluginDefinition();
-
-    $this->config = new FieldConfig([
-      'name' => $this->buildName(),
-      'description' => $this->buildDescription(),
-      'type' => $this->buildType($schemaManager),
-      'args' => $this->buildArguments($schemaManager),
-      'isDeprecated' => !empty($definition['deprecated']),
-      'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-    ]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getType() {
-    return $this->config->getType();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->buildName();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function build(FieldConfig $config) {
-    // May be overridden, but not required any more.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isSecure() {
-    return isset($this->getPluginDefinition()['secure']) && $this->getPluginDefinition()['secure'];
   }
 
 }

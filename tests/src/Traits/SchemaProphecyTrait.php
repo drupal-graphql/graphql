@@ -2,17 +2,15 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\graphql\GraphQL\CacheableEdgeInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Config\Field\FieldConfig;
 use Youshido\GraphQL\Field\AbstractField;
-use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\TypeInterface;
 
 trait SchemaProphecyTrait {
@@ -48,7 +46,7 @@ trait SchemaProphecyTrait {
    *   The empty schema plugin.
    */
   protected function createSchema(ContainerInterface $container, AbstractField $field = NULL) {
-    return TestSchema::create($container, $field);
+    return TestSchema::create($container, [], '', [], $field);
   }
 
   /**
@@ -118,7 +116,7 @@ trait SchemaProphecyTrait {
     }
 
     $root = $this->prophesize(AbstractField::class)
-      ->willImplement(TypeSystemPluginInterface::class);
+      ->willImplement(CacheableEdgeInterface::class);
 
     $root->getName()->willReturn($name);
     $root->getType()->willReturn($type);
@@ -127,8 +125,8 @@ trait SchemaProphecyTrait {
       'type' => $type,
     ]));
 
-    $root->getSchemaCacheMetadata()->willReturn($schemaMetadata);
-    $root->getResponseCacheMetadata()->willReturn($responseMetadata);
+    $root->getSchemaCacheMetadata(Argument::any())->willReturn($schemaMetadata);
+    $root->getResponseCacheMetadata(Argument::any())->willReturn($responseMetadata);
     $root->getArguments()->willReturn([]);
 
     return $root;

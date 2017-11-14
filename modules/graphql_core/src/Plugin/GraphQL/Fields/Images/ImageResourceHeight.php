@@ -30,6 +30,7 @@ class ImageResourceHeight extends FieldPluginBase {
     if ($value instanceof ImageItem && $value->entity->access('view')) {
       yield (int) $value->height;
     }
+
     if (is_array($value) && array_key_exists('height', $value)) {
       yield (int) $value['height'];
     }

@@ -9,7 +9,7 @@ use Traversable;
 /**
  * Base class for type system plugin managers or all sorts.
  */
-class TypeSystemPluginManager extends DefaultPluginManager {
+class TypeSystemPluginManager extends DefaultPluginManager implements TypeSystemPluginManagerInterface {
 
   /**
    * {@inheritdoc}
@@ -32,6 +32,16 @@ class TypeSystemPluginManager extends DefaultPluginManager {
       $pluginInterface,
       $pluginAnnotationName
     );
+  }
+
+  /**
+   * Returns the type of plugin handled by this plugin manager.
+   *
+   * @return string
+   *   The plugin type handled by this manager.
+   */
+  public function getPluginType() {
+    return $this->alterHook;
   }
 
 }

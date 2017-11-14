@@ -196,7 +196,7 @@ services:
       - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
 
   # Plugin manager implementations for schema types.
-  plugin.manager.graphql.union_type:
+  plugin.manager.graphql.union:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
@@ -232,7 +232,7 @@ services:
       - '\Drupal\graphql\Annotation\GraphQLType'
       - 'graphql_types'
       - '@logger.channel.graphql'
-  plugin.manager.graphql.input_type:
+  plugin.manager.graphql.input:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
       - { name: graphql_plugin_manager }
@@ -276,7 +276,7 @@ services:
       - 'Plugin/GraphQL/Scalars'
       - '@container.namespaces'
       - '@module_handler'
-      - '\Youshido\GraphQL\Type\TypeInterface'
+      - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
       - 'graphql_scalars'
       - '@logger.channel.graphql'
