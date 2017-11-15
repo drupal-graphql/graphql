@@ -26,6 +26,13 @@ class UnionType extends AbstractUnionType implements TypeSystemPluginReferenceIn
   /**
    * {@inheritdoc}
    */
+  protected function getConfigValue($key, $default = NULL) {
+    return !empty($this->config) ? $this->config->get($key, $default) : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function resolveType($object, ResolveInfo $info = NULL) {
     /** @var \Drupal\graphql\GraphQL\Type\ObjectType $type */
     foreach ($this->getTypes() as $type) {

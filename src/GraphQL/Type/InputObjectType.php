@@ -25,6 +25,13 @@ class InputObjectType extends AbstractInputObjectType implements TypeSystemPlugi
   /**
    * {@inheritdoc}
    */
+  protected function getConfigValue($key, $default = NULL) {
+    return !empty($this->config) ? $this->config->get($key, $default) : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build($config) {
     // Nothing to do here.
   }

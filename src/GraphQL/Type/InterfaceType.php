@@ -31,6 +31,13 @@ class InterfaceType extends AbstractInterfaceType implements TypeSystemPluginRef
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function getConfigValue($key, $default = NULL) {
+    return !empty($this->config) ? $this->config->get($key, $default) : $default;
+  }
+
+  /**
    * Registers a type that implements this interface.
    *
    * @param \Drupal\graphql\GraphQL\Type\ObjectType $type

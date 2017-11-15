@@ -26,6 +26,13 @@ class ObjectType extends AbstractObjectType implements TypeSystemPluginReference
   /**
    * {@inheritdoc}
    */
+  protected function getConfigValue($key, $default = NULL) {
+    return !empty($this->config) ? $this->config->get($key, $default) : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getName() {
     return $this->getConfigValue('name');
   }

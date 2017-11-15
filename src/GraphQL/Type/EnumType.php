@@ -25,6 +25,13 @@ class EnumType extends AbstractEnumType implements TypeSystemPluginReferenceInte
   /**
    * {@inheritdoc}
    */
+  protected function getConfigValue($key, $default = NULL) {
+    return !empty($this->config) ? $this->config->get($key, $default) : $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getValues() {
     return $this->getConfigValue('values', []);
   }
