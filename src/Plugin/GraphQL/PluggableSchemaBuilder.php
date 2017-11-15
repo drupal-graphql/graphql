@@ -77,21 +77,35 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
    * {@inheritdoc}
    */
   public function find(callable $selector, array $types, $invert = FALSE) {
-    $instances = [];
-    foreach ($this->getDefinitions() as $index => $definition) {
-      $name = $definition['definition']['name'];
-      if (empty($name)) {
-        throw new InvalidPluginDefinitionException('Invalid GraphQL plugin definition. No name defined.');
+    $items = [];
+
+    /** @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface $manager */
+    foreach ($this->pluginManagers as $type => $manager) {
+      if (!in_array($type, $types)) {
+        continue;
       }
 
-      if (!array_key_exists($name, $instances) && in_array($definition['definition']['pluginType'], $types)) {
-        if ((($invert && !$selector($definition['definition'])) || $selector($definition['definition']))) {
-          $instances[$name] = $this->getInstance($definition['type'], $definition['id']);
+      foreach ($manager->getDefinitions() as $id => $definition) {
+        $name = $definition['name'];
+        if (empty($name)) {
+          throw new InvalidPluginDefinitionException('Invalid GraphQL plugin definition. No name defined.');
+        }
+
+        if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
+          if ((($invert && !$selector($definition)) || $selector($definition))) {
+            $items[$name] = [
+              'weight' => $definition['weight'],
+              'id' => $id,
+              'type' => $type,
+            ];
+          }
         }
       }
     }
 
-    return $instances;
+    return array_map(function (array $item) {
+      return $this->getInstance($item['type'], $item['id']);
+    }, $items);
   }
 
   /**
@@ -135,34 +149,6 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
     }
 
     return NULL;
-  }
-
-  /**
-   * Collects and aggregates all plugin definitions.
-   *
-   *
-   * @return array
-   *   The plugin definitions array.
-   */
-  protected function getDefinitions() {
-    $this->definitions = [];
-
-    /** @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface $manager */
-    foreach ($this->pluginManagers as $manager) {
-      foreach ($manager->getDefinitions() as $pluginId => $definition) {
-        $this->definitions[] = [
-          'id' => $pluginId,
-          'type' => $definition['pluginType'],
-          'weight' => $definition['weight'],
-          'definition' => $definition,
-        ];
-      }
-    }
-
-    uasort($this->definitions, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
-    $this->definitions = array_reverse($this->definitions);
-
-    return $this->definitions;
   }
 
   /**
