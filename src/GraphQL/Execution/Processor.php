@@ -17,6 +17,7 @@ use Youshido\GraphQL\Parser\Ast\Query as AstQuery;
 use Youshido\GraphQL\Schema\AbstractSchema;
 
 class Processor extends BaseProcessor {
+
   /**
    * The dependency injection container.
    *

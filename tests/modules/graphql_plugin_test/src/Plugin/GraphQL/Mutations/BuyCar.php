@@ -15,8 +15,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLMutation(
  *   id = "buy_car",
  *   secure = true,
- *   name="buyCar",
- *   type="Car",
+ *   name = "buyCar",
+ *   type = "Car",
  *   arguments = {
  *     "car" = "CarInput"
  *   }

@@ -2,66 +2,47 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\GraphQL\Field\Field;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Config\Field\FieldConfig;
-use Youshido\GraphQL\Field\AbstractField;
 
 /**
  * Base class for graphql mutation plugins.
  */
-abstract class MutationPluginBase extends AbstractField implements TypeSystemPluginInterface {
-  use PluginTrait;
+abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;
   use NamedPluginTrait;
   use ArgumentAwarePluginTrait;
 
   /**
-   * {@inheritdoc}
+   * The field instance.
+   *
+   * @var \Drupal\graphql\GraphQL\Field\Field
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-  }
+  protected $definition;
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilderInterface $schemaManager) {
-    $definition = $this->getPluginDefinition();
+  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
+    if (!isset($this->definition)) {
+      $definition = $this->getPluginDefinition();
 
-    $this->config = new FieldConfig([
-      'name' => $this->buildName(),
-      'description' => $this->buildDescription(),
-      'type' => $this->buildType($schemaManager),
-      'args' => $this->buildArguments($schemaManager),
-      'isDeprecated' => !empty($definition['deprecated']),
-      'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-    ]);
-  }
+      $this->definition = new Field($this, TRUE, [
+        'name' => $this->buildName(),
+        'description' => $this->buildDescription(),
+        'type' => $this->buildType($schemaBuilder),
+        'args' => $this->buildArguments($schemaBuilder),
+        'isDeprecated' => !empty($definition['deprecated']),
+        'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
+      ]);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function build(FieldConfig $config) {
-    // May be overridden, but not required any more.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getType() {
-    return $this->config->getType();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->buildName();
+    return $this->definition;
   }
 
 }

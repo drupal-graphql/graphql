@@ -2,92 +2,90 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\GraphQL\Type\InterfaceType;
+use Drupal\graphql\GraphQL\Type\ObjectType;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
-use Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Config\Object\ObjectTypeConfig;
-use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
-use Youshido\GraphQL\Type\Object\AbstractObjectType;
 
 /**
  * Base class for GraphQL type plugins.
  */
-abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPluginInterface {
-  use PluginTrait;
+abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;
   use NamedPluginTrait;
   use FieldablePluginTrait;
 
   /**
-   * {@inheritdoc}
+   * The type instance.
+   *
+   * @var \Drupal\graphql\GraphQL\Type\ObjectType
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-  }
+  protected $definition;
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(SchemaBuilderInterface $schemaManager) {
-    $interfaces = $this->buildInterfaces($schemaManager);
+  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
+    if (!isset($this->definition)) {
+      $interfaces = $this->buildInterfaces($schemaBuilder);
 
-    $this->config = new ObjectTypeConfig([
-      'name' => $this->buildName(),
-      'description' => $this->buildDescription(),
-      'interfaces' => $interfaces,
-      'fields' => $this->buildFields($schemaManager),
-    ]);
+      $this->definition = new ObjectType($this, [
+        'name' => $this->buildName(),
+        'description' => $this->buildDescription(),
+        'interfaces' => $interfaces,
+      ]);
 
-    foreach ($interfaces as $interface) {
-      if ($interface instanceof InterfacePluginBase) {
-        $interface->addType($this);
+      $this->definition->addFields($this->buildFields($schemaBuilder));
+
+      foreach ($interfaces as $interface) {
+        if ($interface instanceof InterfaceType) {
+          $interface->registerType($this->definition);
+        }
       }
     }
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function build($config) {
-    // May be overridden, but not required any more.
+    return $this->definition;
   }
 
   /**
    * Build the list of interfaces.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface $schemaManager
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
    *   Instance of the schema manager to resolve dependencies.
    *
    * @return \Youshido\GraphQL\Type\AbstractInterfaceTypeInterface[]
    *   The list of interfaces.
    */
-  protected function buildInterfaces(SchemaBuilderInterface $schemaManager) {
+  protected function buildInterfaces(PluggableSchemaBuilderInterface $schemaBuilder) {
     $definition = $this->getPluginDefinition();
     if ($definition['interfaces']) {
-      return array_filter($schemaManager->find(function($interface) use ($definition) {
+      return array_map(function (TypeSystemPluginInterface $interface) use ($schemaBuilder) {
+        return $interface->getDefinition($schemaBuilder);
+      }, array_filter($schemaBuilder->find(function ($interface) use ($definition) {
         return in_array($interface['name'], $definition['interfaces']);
-      }, [GRAPHQL_INTERFACE_PLUGIN]), function($interface) {
-        return $interface instanceof AbstractInterfaceType;
-      });
+      }, [GRAPHQL_INTERFACE_PLUGIN]), function ($interface) {
+        return $interface instanceof InterfacePluginBase;
+      }));
     }
 
     return [];
   }
 
   /**
-   * Check if a value conforms to this type.
+   * Checks whether this type applies to a given object.
    *
-   * @param mixed $value
-   *   The current value.
+   * @param mixed $object
+   *   The object to check against.
    *
-   * @return boolean
-   *   TRUE if the type applies, else false.
+   * @return bool
+   *   TRUE if this type applies to the given object, FALSE otherwise.
    */
-  public function applies($value) {
+  public function applies($object) {
     return FALSE;
   }
 

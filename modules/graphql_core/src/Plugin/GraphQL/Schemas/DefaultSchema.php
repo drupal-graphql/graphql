@@ -11,7 +11,6 @@ use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
  *   id = "default",
  *   name = "Default",
  *   path = "/graphql",
- *   builder = "\Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder"
  * )
  */
 class DefaultSchema extends SchemaPluginBase {

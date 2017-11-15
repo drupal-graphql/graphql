@@ -44,7 +44,6 @@ class SchemaCacheTest extends KernelTestBase {
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $getSchema->shouldHaveBeenCalledTimes(1);
 
-
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $getSchema->shouldHaveBeenCalledTimes(1);
   }

@@ -43,6 +43,13 @@ abstract class SubrequestFieldBase extends FieldPluginBase implements ContainerF
   protected $batchedFieldResolver;
 
   /**
+   * The result of this specific subrequest.
+   *
+   * @var mixed
+   */
+  protected $subrequestResult;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
@@ -74,22 +81,16 @@ abstract class SubrequestFieldBase extends FieldPluginBase implements ContainerF
     if ($parent instanceof Url) {
       return $parent->toString();
     }
+
     return parent::getBatchId($parent, $arguments, $info);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getBatchedFieldResolver() {
+  public function getBatchedFieldResolver($value, array $args, ResolveInfo $info) {
     return $this->batchedFieldResolver;
   }
-
-  /**
-   * The result of this specific subrequest.
-   *
-   * @var mixed
-   */
-  protected $subrequestResult;
 
   /**
    * @param $value
@@ -99,7 +100,7 @@ abstract class SubrequestFieldBase extends FieldPluginBase implements ContainerF
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
    *   GraphQL resolve info
    */
-  public function doResolveSubrequest($value, $args, ResolveInfo $info) {
+  public function doResolveSubrequest($value, array $args, ResolveInfo $info) {
     $this->subrequestResult = $this->resolveSubrequest($value, $args, $info);
   }
 

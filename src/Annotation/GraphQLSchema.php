@@ -43,13 +43,6 @@ class GraphQLSchema extends Plugin {
   public $path;
 
   /**
-   * Whether the schema uses the type plugin system.
-   *
-   * @var string
-   */
-  public $builder = '\Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder';
-
-  /**
    * Weight for precedence calculations.
    *
    * If multiple components with the same name are available, the highest

@@ -39,6 +39,7 @@ class BatchedFieldResolver {
       $method = $reflection->getMethod('resolveBatch');
       $this->implementationMap[$class] = $method->class;
     }
+
     return $this->implementationMap[$class];
   }
 
@@ -59,12 +60,14 @@ class BatchedFieldResolver {
    */
   public function add(BatchedFieldInterface $batchedField, $value, array $args, ResolveInfo $info) {
     $buffer = $this->getImplementingClass($batchedField) . ':' . $batchedField->getBatchId($value, $args, $info);
+
     $this->buffers[$buffer][] = [
       'parent' => $value,
       'arguments' => $args,
       'info' => $info,
       'field' => $batchedField,
     ];
+
     return new BatchedFieldResult($this, $buffer, max(array_keys($this->buffers[$buffer])));
   }
 

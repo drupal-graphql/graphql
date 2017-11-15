@@ -57,37 +57,9 @@ class SchemaPluginManager extends DefaultPluginManager {
       if (!$this->instances[$pluginId] instanceof SchemaPluginInterface) {
         throw new \LogicException(sprintf('Plugin %s does not implement \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface.', $pluginId));
       }
-
-      $schemaBuilder = $this->getSchemaBuilder($pluginId);
-      $this->instances[$pluginId]->buildConfig($schemaBuilder);
     }
 
     return $this->instances[$pluginId];
-  }
-
-  /**
-   * Retrieves a schema builder instance.
-   *
-   * @param string $pluginId
-   *   The plugin id.
-   *
-   * @return \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface|NULL The schema builder.
-   *   The schema builder.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   */
-  public function getSchemaBuilder($pluginId) {
-    $pluginDefinition = $this->getDefinition($pluginId);
-    if (empty($pluginDefinition['builder'])) {
-      return NULL;
-    }
-
-    $class = $pluginDefinition['builder'];
-    if (!is_subclass_of($class, '\Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface')) {
-      throw new InvalidPluginDefinitionException(sprintf('The schema builder for plugin %s does not implement \Drupal\graphql\Plugin\GraphQL\SchemaBuilderInterface.', $schema->getPluginId()));
-    }
-
-    return $class::createInstance($this->container, $pluginId, $pluginDefinition);
   }
 
 }

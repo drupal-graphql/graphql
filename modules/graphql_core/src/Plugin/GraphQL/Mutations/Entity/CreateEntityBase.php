@@ -57,7 +57,7 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
     // the schema.
     $inputArgs = $args['input'];
     /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $type */
-    $type = $this->config->getArgument('input')->getType();
+    $type = $info->getField()->getArgument('input')->getType();
     /** @var \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $inputType */
     $inputType = $type->getNamedType();
     $input = $this->extractEntityInput($inputArgs, $inputType);

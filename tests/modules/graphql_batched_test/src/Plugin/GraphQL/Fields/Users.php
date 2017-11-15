@@ -46,7 +46,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
   /**
    * {@inheritdoc}
    */
-  public function getBatchedFieldResolver() {
+  public function getBatchedFieldResolver($parent, array $arguments, ResolveInfo $info) {
     return $this->batchedFieldResolver;
   }
 
