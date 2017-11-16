@@ -11,6 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Base class for GraphQL type plugins.
@@ -81,11 +82,13 @@ abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInte
    *
    * @param mixed $object
    *   The object to check against.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo|null $info
+   *   The resolve info object.
    *
    * @return bool
    *   TRUE if this type applies to the given object, FALSE otherwise.
    */
-  public function applies($object) {
+  public function applies($object, ResolveInfo $info = NULL) {
     return FALSE;
   }
 

@@ -25,13 +25,6 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   protected $instances = [];
 
   /**
-   * Static cache of plugin definitions.
-   *
-   * @var array
-   */
-  protected $definitions;
-
-  /**
    * PluggableSchemaBuilderInterface constructor.
    *
    * @param \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator $pluginManagers

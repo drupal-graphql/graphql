@@ -50,7 +50,7 @@ class ObjectType extends AbstractObjectType implements TypeSystemPluginReference
    */
   public function applies($object, ResolveInfo $info = NULL) {
     if (($plugin = $this->getPluginFromResolveInfo($info)) && $plugin instanceof TypePluginBase) {
-      return $plugin->applies($object);
+      return $plugin->applies($object, $info);
     }
 
     return FALSE;
