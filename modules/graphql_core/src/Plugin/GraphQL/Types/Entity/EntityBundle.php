@@ -5,6 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Types\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Utility\StringHelper;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Plugin for GraphQL types derived from Drupal entity bundles.
@@ -35,7 +36,7 @@ class EntityBundle extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($value) {
+  public function applies($value, ResolveInfo $info) {
     return $value instanceof EntityInterface
       && $value->getEntityTypeId() == $this->getPluginDefinition()['entity_type']
       && $value->bundle() == $this->getPluginDefinition()['bundle'];
