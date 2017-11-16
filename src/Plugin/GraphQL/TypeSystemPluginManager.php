@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Traversable;
@@ -10,6 +11,7 @@ use Traversable;
  * Base class for type system plugin managers or all sorts.
  */
 class TypeSystemPluginManager extends DefaultPluginManager implements TypeSystemPluginManagerInterface {
+  use DependencySerializationTrait;
 
   /**
    * {@inheritdoc}
