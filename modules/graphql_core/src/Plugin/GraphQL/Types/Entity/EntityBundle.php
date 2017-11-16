@@ -36,10 +36,10 @@ class EntityBundle extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($value, ResolveInfo $info) {
-    return $value instanceof EntityInterface
-      && $value->getEntityTypeId() == $this->getPluginDefinition()['entity_type']
-      && $value->bundle() == $this->getPluginDefinition()['bundle'];
+  public function applies($object, ResolveInfo $info) {
+    return $object instanceof EntityInterface
+      && $object->getEntityTypeId() == $this->getPluginDefinition()['entity_type']
+      && $object->bundle() == $this->getPluginDefinition()['bundle'];
   }
 
 }
