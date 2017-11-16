@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Types\Entity;
 
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Entity type to resolve to if the values type is not exposed to the schema.
@@ -26,7 +27,7 @@ class UnexposedEntity extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($value) {
+  public function applies($value, ResolveInfo $info = NULL) {
     return TRUE;
   }
 

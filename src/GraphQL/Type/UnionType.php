@@ -48,7 +48,7 @@ class UnionType extends AbstractUnionType implements TypeSystemPluginReferenceIn
    * {@inheritdoc}
    */
   public function getTypes() {
-    return $this->getConfigValue('types', []);
+    return $this->config->get('types', []);
   }
 
 }
