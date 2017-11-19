@@ -18,21 +18,9 @@ use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
  * @GraphQLSchema(
  *   id = "test",
  *   name = "Default",
- *   path = "/graphql",
- *   builder = "\Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface"
+ *   path = "/graphql"
  * )
  */
 class TestSchema extends SchemaPluginBase implements SchemaPluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function constructCacheMetadata(PluggableSchemaBuilderInterface $schemaBuilder) {
-    parent::constructCacheMetadata($schemaBuilder);
-
-    $metadata = new CacheableMetadata();
-    $metadata->addCacheContexts(['user']);
-
-    $this->responseMetadata->addCacheableDependency($metadata);
-  }
 }
