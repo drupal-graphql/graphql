@@ -6,6 +6,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql\GraphQL\Type\InputObjectType;
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
@@ -58,9 +59,9 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
     $inputArgs = $args['input'];
     /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $type */
     $type = $info->getField()->getArgument('input')->getType();
-    /** @var \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $inputType */
+    /** @var \Drupal\graphql\GraphQL\Type\InputObjectType $inputType */
     $inputType = $type->getNamedType();
-    $input = $this->extractEntityInput($inputArgs, $inputType);
+    $input = $this->extractEntityInput($inputArgs, $inputType, $info);
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $storage->create($input + [
@@ -91,12 +92,14 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    *
    * @param array $inputArgs
    *   The entity values provided through the resolver args.
-   * @param \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $inputType
+   * @param \Drupal\graphql\GraphQL\Type\InputObjectType $inputType
    *   The input type.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   the resolve info object.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  abstract protected function extractEntityInput(array $inputArgs, InputTypePluginBase $inputType);
+  abstract protected function extractEntityInput(array $inputArgs, InputObjectType $inputType, ResolveInfo $info);
 
 }
