@@ -42,9 +42,22 @@ class InterfaceType extends AbstractInterfaceType implements TypeSystemPluginRef
    *
    * @param \Drupal\graphql\GraphQL\Type\ObjectType $type
    *   The type to register on this interface.
+   * @param int $weight
+   *   The weight of the type.
    */
-  public function registerType(ObjectType $type) {
-    $this->types[$type->getName()] = $type;
+  public function registerType(ObjectType $type, $weight = 0) {
+    $this->types[$type->getName()] = [
+      'weight' => $weight,
+      'type' => $type,
+    ];
+
+    uasort($this->types, function (array $a, array $b) {
+      if ($a['weight'] === $b['weight']) {
+        return 0;
+      }
+
+      return ($a['weight'] < $b['weight']) ? 1 : -1;
+    });
   }
 
   /**
@@ -52,7 +65,8 @@ class InterfaceType extends AbstractInterfaceType implements TypeSystemPluginRef
    */
   public function resolveType($object, ResolveInfo $info = NULL) {
     /** @var \Drupal\graphql\GraphQL\Type\ObjectType $type */
-    foreach ($this->types as $type) {
+    foreach ($this->types as $item) {
+      $type = $item['type'];
       if ($type->applies($object, $info)) {
         return $type;
       }

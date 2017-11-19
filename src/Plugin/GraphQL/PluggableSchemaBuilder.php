@@ -96,6 +96,15 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       }
     }
 
+    // Sort the plugins so that the ones with higher weight come first.
+    usort($items, function (array $a, array $b) {
+      if ($a['weight'] === $b['weight']) {
+        return 0;
+      }
+
+      return ($a['weight'] < $b['weight']) ? 1 : -1;
+    });
+
     return array_map(function (array $item) {
       return $this->getInstance($item['type'], $item['id']);
     }, $items);

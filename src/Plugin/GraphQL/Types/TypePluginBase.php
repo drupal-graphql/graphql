@@ -45,7 +45,7 @@ abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInte
 
       foreach ($interfaces as $interface) {
         if ($interface instanceof InterfaceType) {
-          $interface->registerType($this->definition);
+          $interface->registerType($this->definition, $this->getPluginDefinition()['weight']);
         }
       }
     }
