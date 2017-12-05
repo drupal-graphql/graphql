@@ -85,4 +85,15 @@ trait TypeSystemPluginReferenceTrait {
     return array_keys(get_object_vars($this));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isValidValue($value) {
+    // TODO: Don't rely on a pre-initialized plugin.
+    if ($this->plugin instanceof TypeValidationInterface) {
+      return $this->plugin->isValidValue($value);
+    }
+    return parent::isValidValue($value);
+  }
+
 }
