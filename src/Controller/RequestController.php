@@ -130,8 +130,10 @@ class RequestController implements ContainerInjectionInterface {
     $requestContentKeys = array_filter($requestContent, $filterNumeric);
     $requestContent = array_intersect_key($requestContent, array_flip($requestContentKeys));
 
+    $session = $request->getSession();
+
     // Walk over all queries and issue a sub-request for each.
-    $responses = array_map(function($query) use ($request, $requestParameters, $requestContent) {
+    $responses = array_map(function($query) use ($request, $requestParameters, $requestContent, $session) {
       $method = $request->getMethod();
 
       // Make sure we remove the 'queries' parameter, otherwise the subsequent
@@ -151,7 +153,7 @@ class RequestController implements ContainerInjectionInterface {
         $content
       );
 
-      if ($session = $request->getSession()) {
+      if ($session) {
         $subRequest->setSession($session);
       }
 
