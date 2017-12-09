@@ -7,7 +7,7 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Drupal\graphql\GraphQL\Execution\QueryResult;
-use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
+use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
@@ -237,11 +237,18 @@ class ResultCacheTest extends KernelTestBase {
    * query.
    */
   public function testPersistedQuery() {
-    $queryMap = $this->prophesize(QueryMapProviderInterface::class);
-    $this->container->set('graphql.query_map_provider', $queryMap->reveal());
+    $queryProvider = $this->prophesize(QueryProviderInterface::class);
+    $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
-    $queryMap->getQuery('a', 'query')->willReturn('A');
-    $queryMap->getQuery('b', 'query')->willReturn('B');
+    $queryProvider->getQuery(Argument::allOf(
+      Argument::withEntry('version', 'a'),
+      Argument::withEntry('id', 'query')
+    ))->willReturn('A');
+
+    $queryProvider->getQuery(Argument::allOf(
+      Argument::withEntry('version', 'b'),
+      Argument::withEntry('id', 'query')
+    ))->willReturn('B');
 
     $processor = $this->prophesize(QueryProcessor::class);
     $this->container->set('graphql.query_processor', $processor->reveal());
