@@ -89,7 +89,7 @@ class Processor extends BaseProcessor {
           $result = $result->getValue();
         }
 
-        return call_user_func($callback, $result);
+        return $this->deferredResolve($result, $callback);
       });
 
       // Whenever we stumble upon a deferred resolver, append it to the

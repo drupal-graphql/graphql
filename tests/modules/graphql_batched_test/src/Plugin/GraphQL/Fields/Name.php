@@ -22,7 +22,11 @@ class Name extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    yield $value['name'];
+    return function () use ($value) {
+      return function () use ($value) {
+        yield $value['name'];
+      };
+    };
   }
 
 }
