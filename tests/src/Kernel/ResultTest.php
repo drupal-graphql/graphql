@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
+use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\QueryTrait;
@@ -58,10 +58,13 @@ class ResultTest extends KernelTestBase {
    * Test a persisted query result.
    */
   public function testPersistedQuery() {
-    $queryMap = $this->prophesize(QueryMapProviderInterface::class);
-    $this->container->set('graphql.query_map_provider', $queryMap->reveal());
+    $queryProvider = $this->prophesize(QueryProviderInterface::class);
+    $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
-    $queryMap->getQuery('b', 'a')->willReturn('query { root }');
+    $queryProvider->getQuery(Argument::allOf(
+      Argument::withEntry('version', 'b'),
+      Argument::withEntry('id', 'a')
+    ))->willReturn('query { root }');
 
     $result = $this->persistedQuery('a', 'b');
     $this->assertSame(200, $result->getStatusCode());
@@ -76,10 +79,14 @@ class ResultTest extends KernelTestBase {
    * Test a batched query result.
    */
   public function testBatchedQueries() {
-    $queryMap = $this->prophesize(QueryMapProviderInterface::class);
-    $this->container->set('graphql.query_map_provider', $queryMap->reveal());
+    $queryProvider = $this->prophesize(QueryProviderInterface::class);
+    $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
-    $queryMap->getQuery('b', 'a')->willReturn('query { root }');
+    $queryProvider->getQuery(Argument::any())->willReturn(NULL);
+    $queryProvider->getQuery(Argument::allOf(
+      Argument::withEntry('version', 'b'),
+      Argument::withEntry('id', 'a')
+    ))->willReturn('query { root }');
 
     $result = $this->batchedQueries([
       ['query' => 'query { root } '],
