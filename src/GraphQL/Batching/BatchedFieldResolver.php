@@ -6,6 +6,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Queueing service for deferred field resolution.
+ *
+ * @deprecated To be removed with 1.0. Replace with a buffered fields.
  */
 class BatchedFieldResolver {
 

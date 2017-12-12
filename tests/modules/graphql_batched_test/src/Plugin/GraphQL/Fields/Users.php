@@ -3,9 +3,7 @@
 namespace Drupal\graphql_batched_test\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql_batched_test\UserDataBaseInterface;
-use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
-use Drupal\graphql\GraphQL\Batching\BatchedFieldInterface;
+use Drupal\graphql_batched_test\UserDatabaseBuffer;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -27,53 +25,26 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   }
  * )
  */
-class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, BatchedFieldInterface {
+class Users extends FieldPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The user database.
    *
-   * @var \Drupal\graphql_batched_test\UserDataBaseInterface
+   * @var \Drupal\graphql_batched_test\UserDatabaseBuffer
    */
-  protected $userDatabase;
-
-  /**
-   * The batched field resolver.
-   *
-   * @var \Drupal\graphql\GraphQL\Batching\BatchedFieldResolver
-   */
-  protected $batchedFieldResolver;
+  protected $userDatabaseBuffer;
 
   /**
    * {@inheritdoc}
    */
-  public function getBatchedFieldResolver($parent, array $arguments, ResolveInfo $info) {
-    return $this->batchedFieldResolver;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resolveBatch(array $batch) {
-    // Turn the list of method arguments into a list of user requirements.
-    $resultMap = array_map(function($item) {
-      return $this->getRequirementsFromArgs($item['parent'], $item['arguments']);
-    }, $batch);
-
-    // Reduce this list into one list of users to fetch.
-    $uids = array_unique(array_reduce($resultMap, 'array_merge', []));
-
-    // Sort them so we can predict the input argument.
-    sort($uids);
-
-    // Actually fetch the users.
-    $users = $this->userDatabase->fetchUsers($uids);
-
-    // Map the fetched users back into the result map.
-    return array_map(function($item) use ($users) {
-      return array_map(function($uid) use ($users) {
-        return $users[$uid];
-      }, $item);
-    }, $resultMap);
+  protected function resolveValues($value, array $args, ResolveInfo $info) {
+    $uids = $this->getRequirementsFromArgs($value, $args);
+    $deferred = $this->userDatabaseBuffer->add($uids);
+    return function () use ($deferred) {
+      foreach ($deferred() as $row) {
+        yield $row;
+      }
+    };
   }
 
   /**
@@ -110,8 +81,7 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('graphql_batched_test.user_database'),
-      $container->get('graphql.batched_resolver')
+      $container->get('graphql_batched_test.user_database_buffer')
     );
   }
 
@@ -122,21 +92,11 @@ class Users extends FieldPluginBase implements ContainerFactoryPluginInterface, 
     array $configuration,
     $pluginId,
     $pluginDefinition,
-    UserDataBaseInterface $userDataBase,
-    BatchedFieldResolver $batchedFieldResolver
+    UserDataBaseBuffer $userDataBaseBuffer
   ) {
-    $this->batchedFieldResolver = $batchedFieldResolver;
-    $this->userDatabase = $userDataBase;
+    $this->userDatabaseBuffer = $userDataBaseBuffer;
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
-    foreach ($value as $user) {
-      yield $user;
-    }
-  }
 
 }

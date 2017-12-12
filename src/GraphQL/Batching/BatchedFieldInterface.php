@@ -6,6 +6,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Interface for fields that can be evaluated in optimized batches.
+ *
+ * @deprecated To be removed with 1.0. Replace with a buffered fields.
  */
 interface BatchedFieldInterface {
 
