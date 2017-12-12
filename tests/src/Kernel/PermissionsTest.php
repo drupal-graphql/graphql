@@ -48,7 +48,12 @@ class PermissionsTest extends KernelTestBase {
 
     // Set up a query map provider.
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
-    $queryProvider->getQuery(Argument::any())->willReturn('persisted');
+    $queryProvider->getQuery(Argument::any())->willReturn(NULL);
+    $queryProvider->getQuery(Argument::allOf(
+        Argument::withEntry('id', 'persisted'),
+        Argument::withEntry('version', 'a')
+    ))->willReturn('persisted');
+
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
   }
 

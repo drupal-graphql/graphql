@@ -82,6 +82,7 @@ class ResultTest extends KernelTestBase {
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
+    $queryProvider->getQuery(Argument::any())->willReturn(NULL);
     $queryProvider->getQuery(Argument::allOf(
       Argument::withEntry('version', 'b'),
       Argument::withEntry('id', 'a')
