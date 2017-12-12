@@ -4,6 +4,8 @@ namespace Drupal\graphql\GraphQL\Batching;
 
 /**
  * A callable lazy result token.
+ *
+ * @deprecated To be removed with 1.0. Replace with a buffered fields.
  */
 class BatchedFieldResult {
 

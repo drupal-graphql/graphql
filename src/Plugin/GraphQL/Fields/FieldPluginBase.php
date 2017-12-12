@@ -99,9 +99,20 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         return $this->cacheable($result, $value, $args);
       });
     }
+    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
+  }
 
-    $result = iterator_to_array($this->resolveValues($value, $args, $info));
-    return $this->cacheable($result, $value, $args);
+  /**
+   * {@inheritdoc}
+   */
+  public function resolveDeferred(callable $callback, $value, array $args, ResolveInfo $info) {
+    $result = $callback($value, $args, $info);
+    if (is_callable($result)) {
+      return new DeferredResolver(function () use ($result, $args, $info, $value) {
+        return $this->resolveDeferred($result, $value, $args, $info);
+      });
+    }
+    return $this->cacheable(iterator_to_array($result), $value, $args);
   }
 
   /**
