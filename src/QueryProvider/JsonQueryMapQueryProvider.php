@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\graphql\QueryMapProvider;
+namespace Drupal\graphql\QueryProvider;
 
 use Drupal\Component\FileSystem\RegexDirectoryIterator;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
-class JsonQueryMapProvider implements QueryMapProviderInterface {
+class JsonQueryMapQueryProvider implements QueryProviderInterface {
   /**
    * The cache backend for storing query map file paths.
    *
@@ -22,7 +22,7 @@ class JsonQueryMapProvider implements QueryMapProviderInterface {
   protected $lookupPaths;
 
   /**
-   * Constructs a QueryMapProvider object.
+   * Constructs a QueryProvider object.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for storing query map file paths.
@@ -37,10 +37,17 @@ class JsonQueryMapProvider implements QueryMapProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getQuery($version, $id) {
+  public function getQuery(array $params) {
+    if (empty($params['version']) || empty($params['id'])) {
+      return NULL;
+    }
+
     if (!(($cache = $this->cacheBackend->get('graphql_query_map_json_versions')) && ($versions = $cache->data) !== NULL)) {
       $this->cacheBackend->set('graphql_query_map_json_versions', $versions = $this->discoverQueryMaps());
     }
+
+    $version = $params['version'];
+    $id = $params['id'];
 
     if (isset($versions[$version]) && file_exists($versions[$version])) {
       $contents = json_decode(file_get_contents($versions[$version]), TRUE);

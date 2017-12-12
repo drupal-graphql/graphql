@@ -3,28 +3,32 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
-use Drupal\graphql\QueryMapProvider\QueryMapProviderInterface;
+use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 class QueryRouteEnhancer implements RouteEnhancerInterface {
 
-  /**
-   * The query map provider service.
-   *
-   * @var \Drupal\graphql\QueryMapProvider\QueryMapProviderInterface
-   */
-  protected $queryMapProvider;
+  const SINGLE = 'single';
+  const BATCH = 'batch';
 
   /**
-   * Creates a new QueryRouteEnhancer instance.
+   * The query provider service.
    *
-   * @param \Drupal\graphql\QueryMapProvider\QueryMapProviderInterface $queryMapProvider
-   *   The query map provider service.
+   * @var \Drupal\graphql\QueryProvider\QueryProviderInterface
    */
-  public function __construct(QueryMapProviderInterface $queryMapProvider) {
-    $this->queryMapProvider = $queryMapProvider;
+  protected $queryProvider;
+
+  /**
+   * QueryRouteEnhancer constructor.
+   *
+   * @param \Drupal\graphql\QueryProvider\QueryProviderInterface $queryProvider
+   *   The query provider service.
+   */
+  public function __construct(QueryProviderInterface $queryProvider) {
+    $this->queryProvider = $queryProvider;
   }
+
 
   /**
    * {@inheritdoc}
@@ -41,11 +45,12 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       return $defaults;
     }
 
-    if ($enhanced = $this->enhanceSingle($defaults, $request)) {
+    $params = $this->extractParams($request);
+    if ($enhanced = $this->enhanceSingle($defaults, $params, $request)) {
       return $enhanced;
     }
 
-    if ($enhanced = $this->enhanceBatch($defaults, $request)) {
+    if ($enhanced = $this->enhanceBatch($defaults, $params, $request)) {
       return $enhanced;
     }
 
@@ -62,17 +67,21 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *
    * @param array $defaults
    *   The controller defaults.
+   * @param array $params
+   *   The query parameters.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
-   * @return array|boolean
+   * @return array|bool
    *   The enhanced controller defaults.
    */
-  protected function enhanceBatch(array $defaults, Request $request) {
-    $queries = $this->filterRequestValues($request, function($index) {
+  protected function enhanceBatch(array $defaults, array $params, Request $request) {
+    // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
+    $keys = array_filter(array_keys($params), function($index) {
       return is_numeric($index);
     });
 
+    $queries = array_intersect_key($params, array_flip($keys));
     if (!isset($queries[0])) {
       return FALSE;
     }
@@ -85,7 +94,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     return $defaults + [
       '_controller' => $defaults['_graphql']['multiple'],
       'queries' => $queries,
-      'type' => 'batch',
+      'type' => static::BATCH,
     ];
   }
 
@@ -94,93 +103,56 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *
    * @param array $defaults
    *   The controller defaults.
+   * @param array $params
+   *   The query parameters.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
    * @return array|boolean
    *   The enhanced controller defaults.
    */
-  protected function enhanceSingle(array $defaults, Request $request) {
-    $values = $this->filterRequestValues($request, function($index) {
-      return in_array($index, ['query', 'variables', 'id', 'version']);
-    }) + [
-      'query' => '',
+  protected function enhanceSingle(array $defaults, array $params, Request $request) {
+    $values = $params + [
+      'query' => empty($params['query']) ? $this->queryProvider->getQuery($params) : $params['query'],
       'variables' => [],
-      'id' => NULL,
-      'version' => NULL,
     ];
 
-    if (!$query = $this->getQuery($values['query'], $values['id'], $values['version'])) {
+    if (empty($values['query'])) {
       return FALSE;
     }
 
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
-      'query' => is_string($query) ? $query : '',
-      'variables' => is_array($values['variables']) ? $values['variables'] : [],
-      // If the 'query' parameter was empty and we reached this point, this is
-      // a persisted query.
-      'persisted' => empty($values['query']),
-      'type' => 'single',
+      'query' => $values['query'] ?: '',
+      'variables' => $values['variables'] ?: [],
+      'persisted' => empty($params['query']),
+      'type' => static::SINGLE,
     ];
   }
 
   /**
-   * Filters the request body or query parameters using a filter callback.
+   * Extract an associative array of query parameters from the request.
+   *
+   * If the given request does not have any POST body content it uses the GET
+   * query parameters instead.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
-   * @param callable $filter
-   *   The filter callback.
    *
    * @return array
-   *   The filtered request parameters.
+   *   An associative array of query parameters.
    */
-  protected function filterRequestValues(Request $request, callable $filter) {
-    $content = $request->getContent();
+  protected function extractParams(Request $request) {
+    $values = ($content = $request->getContent()) ? json_decode($content, TRUE) : $request->query->all();
 
-    $values = !empty($content) ? json_decode($content, TRUE) : $request->query->all();
-    $values = !empty($values) ? $values : [];
-
-    // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
-    $keys = array_filter(array_keys($values), $filter);
-    $values = array_intersect_key($values, array_flip($keys));
-
-    $values = array_map(function($value) {
+    return array_map(function($value) {
       if (!is_string($value)) {
         return $value;
       }
 
       $decoded = json_decode($value, TRUE);
       return ($decoded != $value) && $decoded ? $decoded : $value;
-    }, $values);
-
-    return $values;
-  }
-
-  /**
-   * Resolves a query string.
-   *
-   * @param $query
-   *   The query string. If this is set, it will be returned immediately.
-   * @param $id
-   *   The id of a query from the query map.
-   * @param $version
-   *   The version of the query map to load the query from.
-   *
-   * @return string|null
-   *   The resolved query string.
-   */
-  protected function getQuery($query, $id, $version) {
-    if (!empty($query)) {
-      return $query;
-    }
-
-    if (!empty($id) && !empty($version)) {
-      return $this->queryMapProvider->getQuery($version, $id);
-    }
-
-    return NULL;
+    }, $values ?: []);
   }
 
 }
