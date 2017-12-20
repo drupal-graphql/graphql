@@ -134,7 +134,8 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
     }
 
     if ($result) {
-      return new CacheableValue(reset($result), $this->getCacheDependencies($result, $value, $args));
+      $result = reset($result);
+      return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
     }
 
     return new CacheableValue(NULL, $this->getCacheDependencies($result, $value, $args));
