@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -101,6 +103,22 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       }
 
     }
+  }
+
+  /**
+   * Intermediate solution. Shouldn't the entity (stored in result) have it's
+   * cache tag? Right now thats not the case.
+   */
+  protected function getCacheDependencies($result, $parent, array $args) {
+    $dependencies = parent::getCacheDependencies($result, $parent, $args);
+    foreach ($result as $item) {
+      if ($item instanceof EntityInterface) {
+        $metadata = new CacheableMetadata();
+        $metadata->addCacheTags(['node:' . $item->id()]);
+        $dependencies[] = $metadata;
+      }
+    }
+    return $dependencies;
   }
 
 }
