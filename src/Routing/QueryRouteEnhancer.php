@@ -133,8 +133,10 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
   /**
    * Extract an associative array of query parameters from the request.
    *
-   * If the given request does not have any POST body content it uses the GET
-   * query parameters instead.
+   * If the given request does not have any POST body content check for a POST 
+   * query parameter otherwise use the GET query parameters instead. The additional
+   * check for the ParametersBag query is necessary when sending FormData such as 
+   * needed when sending files along with the query from the client.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
@@ -143,7 +145,13 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *   An associative array of query parameters.
    */
   protected function extractParams(Request $request) {
-    $values = ($content = $request->getContent()) ? json_decode($content, TRUE) : $request->query->all();
+
+    if ($request->getContent() !== "" ){
+      $values = ($content = $request->getContent()) ? json_decode($content, TRUE) : $request->query->all();
+    }else{
+      $values = isset($request->request) ? json_decode($request->request->get('query'), TRUE): $request->query->all();
+      return $values;
+    }
 
     return array_map(function($value) {
       if (!is_string($value)) {
