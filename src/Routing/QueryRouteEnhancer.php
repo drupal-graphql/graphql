@@ -131,11 +131,30 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
   }
 
   /**
+   * Extract the query from the parameter bag
+   *
+   * Search the parameter bag array for a query
+   *
+   * @param array $parameters
+   *   The parameter bag array.
+   *
+   * @return string
+   *   The query
+   */
+  protected function extractQueryFromParameterBag(array $parameters){
+    foreach ($parameters as $key => $value){
+      if (strpos($value, 'query')){
+        return $value;
+      }
+    }
+  }
+
+  /**
    * Extract an associative array of query parameters from the request.
    *
-   * If the given request does not have any POST body content check for a POST 
+   * If the given request does not have any POST body content check for a POST
    * query parameter otherwise use the GET query parameters instead. The additional
-   * check for the ParametersBag query is necessary when sending FormData such as 
+   * check for the ParametersBag query is necessary when sending FormData such as
    * needed when sending files along with the query from the client.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -146,11 +165,10 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    */
   protected function extractParams(Request $request) {
 
-    if ($request->getContent() !== "" ){
-      $values = ($content = $request->getContent()) ? json_decode($content, TRUE) : $request->query->all();
-    }else{
-      $values = isset($request->request) ? json_decode($request->request->get('query'), TRUE): $request->query->all();
-      return $values;
+    $values = ($content = $request->getContent()) ? json_decode($content, TRUE) : $request->query->all();
+    $parameters = $request->request->all();
+    if (count($parameters) > 0){
+      $values = isset($request->request) ? json_decode($this->extractQueryFromParameterBag($request->request->all()), TRUE): $request->query->all();
     }
 
     return array_map(function($value) {
