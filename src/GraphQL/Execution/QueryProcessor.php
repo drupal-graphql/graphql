@@ -102,7 +102,7 @@ class QueryProcessor {
 
     // Prevent caching if this is a mutation query or an error occurs.
     $request = $context->getRequest();
-    if (!empty($request) && $request->hasMutations() || $context->hasErrors()) {
+    if ((!empty($request) && $request->hasMutations()) || $context->hasErrors()) {
       $metadata->setCacheMaxAge(0);
     }
 
