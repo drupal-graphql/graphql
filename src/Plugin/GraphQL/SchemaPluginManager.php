@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;

@@ -81,7 +81,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       foreach ($manager->getDefinitions() as $id => $definition) {
         $name = $definition['name'];
         if (empty($name)) {
-          throw new InvalidPluginDefinitionException('Invalid GraphQL plugin definition. No name defined.');
+          throw new InvalidPluginDefinitionException($id, 'Invalid GraphQL plugin definition. No name defined.');
         }
 
         if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
@@ -119,7 +119,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
     }, $types);
 
     if (empty($result)) {
-      throw new InvalidPluginDefinitionException(sprintf('GraphQL plugin with name %s could not be found.', $name));
+      throw new InvalidPluginDefinitionException(null, sprintf('GraphQL plugin with name %s could not be found.', $name));
     }
 
     return array_pop($result);
