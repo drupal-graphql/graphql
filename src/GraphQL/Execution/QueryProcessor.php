@@ -100,9 +100,9 @@ class QueryProcessor {
       $metadata->addCacheableDependency($container->get('metadata'));
     }
 
-    // Prevent caching if this is a mutation query.
+    // Prevent caching if this is a mutation query or an error occurs.
     $request = $context->getRequest();
-    if (!empty($request) && $request->hasMutations()) {
+    if ((!empty($request) && $request->hasMutations()) || $context->hasErrors()) {
       $metadata->setCacheMaxAge(0);
     }
 
