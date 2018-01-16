@@ -6,7 +6,7 @@ use Drupal\block\Entity\Block;
 use Drupal\block_content\Plugin\Block\BlockContentBlock;
 use Drupal\Core\Condition\ConditionInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
 use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
@@ -87,7 +87,7 @@ class BlocksByRegion extends SubrequestFieldBase {
     RequestStack $requestStack,
     BatchedFieldResolver $batchedFieldResolver,
     ThemeManagerInterface $themeManager,
-    EntityTypeManager $entityTypeManager,
+    EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository
   ) {
     $this->themeManager = $themeManager;
