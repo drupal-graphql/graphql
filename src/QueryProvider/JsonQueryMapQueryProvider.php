@@ -30,7 +30,7 @@ class JsonQueryMapQueryProvider implements QueryProviderInterface {
    *   The config factory.
    */
   public function __construct(CacheBackendInterface $cacheBackend, ConfigFactoryInterface $configFactory) {
-    $this->lookupPaths = $configFactory->get('graphql.query_map_json.config')->get('lookup_paths');
+    $this->lookupPaths = $configFactory->get('graphql.query_map_json.config')->get('lookup_paths') ?: [];
     $this->cacheBackend = $cacheBackend;
   }
 
