@@ -51,7 +51,7 @@ abstract class SchemaPluginBase extends PluginBase implements PluggableSchemaPlu
    */
   public function __construct($configuration, $pluginId, $pluginDefinition, TypeSystemPluginManagerAggregator $pluginManagers) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->schemaBuilder = new PluggableSchemaBuilder($pluginManagers);
+    $this->schemaBuilder = new PluggableSchemaBuilder($this, $pluginManagers);
   }
 
   /**
@@ -73,7 +73,7 @@ abstract class SchemaPluginBase extends PluginBase implements PluggableSchemaPlu
 
     $types = $this->extractDefinitions($this->getTypes());
 
-    return new Schema($this, [
+    return new Schema($this->getSchemaBuilder(), [
       'query' => $query,
       'mutation' => $mutation,
       'types' => $types,

@@ -4,16 +4,20 @@ namespace Drupal\graphql\GraphQL\Type;
 
 use Drupal\graphql\GraphQL\CacheableEdgeInterface;
 use Drupal\graphql\GraphQL\CacheableEdgeTrait;
+use Drupal\graphql\GraphQL\PluginReferenceInterface;
+use Drupal\graphql\GraphQL\PluginReferenceTrait;
+use Drupal\graphql\GraphQL\TypeValidationInterface;
+use Drupal\graphql\GraphQL\TypeValidationTrait;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginReferenceInterface;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginReferenceTrait;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Config\Object\InterfaceTypeConfig;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
-class InterfaceType extends AbstractInterfaceType implements TypeSystemPluginReferenceInterface, CacheableEdgeInterface {
-  use TypeSystemPluginReferenceTrait;
+class InterfaceType extends AbstractInterfaceType implements PluginReferenceInterface, TypeValidationInterface, CacheableEdgeInterface {
+  use PluginReferenceTrait;
   use CacheableEdgeTrait;
+  use TypeValidationTrait;
 
   /**
    * List of types implementing this interface.
@@ -25,8 +29,9 @@ class InterfaceType extends AbstractInterfaceType implements TypeSystemPluginRef
   /**
    * {@inheritdoc}
    */
-  public function __construct(InterfacePluginBase $plugin, array $config = []) {
+  public function __construct(InterfacePluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;
+    $this->builder = $builder;
     $this->config = new InterfaceTypeConfig($config, $this, TRUE);
   }
 

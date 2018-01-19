@@ -10,8 +10,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginReferenceInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Youshido\GraphQL\Schema\AbstractSchema;
 use Youshido\GraphQL\Type\InputObject\AbstractInputObjectType;

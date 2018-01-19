@@ -11,8 +11,8 @@ class BatchedField extends Field implements BatchedFieldInterface {
    * {@inheritdoc}
    */
   public function getBatchedFieldResolver($parent, array $arguments, ResolveInfo $info) {
-    if (($plugin = $this->getPluginFromResolveInfo($info)) && $plugin instanceof BatchedFieldInterface) {
-      return $plugin->getBatchedFieldResolver($parent, $arguments, $info);
+    if ($this->plugin instanceof BatchedFieldInterface) {
+      return $this->plugin->getBatchedFieldResolver($parent, $arguments, $info);
     }
 
     return NULL;
@@ -22,8 +22,8 @@ class BatchedField extends Field implements BatchedFieldInterface {
    * {@inheritdoc}
    */
   public function getBatchId($parent, array $arguments, ResolveInfo $info) {
-    if (($plugin = $this->getPluginFromResolveInfo($info)) && $plugin instanceof BatchedFieldInterface) {
-      return $plugin->getBatchId($parent, $arguments, $info);
+    if ($this->plugin instanceof BatchedFieldInterface) {
+      return $this->plugin->getBatchId($parent, $arguments, $info);
     }
 
     return NULL;
@@ -33,8 +33,8 @@ class BatchedField extends Field implements BatchedFieldInterface {
    * {@inheritdoc}
    */
   public function resolveBatch(array $batch) {
-    if (($plugin = $this->getPluginFromResolveInfo($batch['info'])) && $plugin instanceof BatchedFieldInterface) {
-      return $plugin->resolveBatch($batch);
+    if ($this->plugin instanceof BatchedFieldInterface) {
+      return $this->plugin->resolveBatch($batch);
     }
 
     return NULL;

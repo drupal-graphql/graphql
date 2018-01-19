@@ -30,7 +30,7 @@ abstract class UnionTypePluginBase extends PluginBase implements TypeSystemPlugi
     if (!isset($this->definition)) {
       $name = $this->buildName();
 
-      $this->definition = new UnionType($this, [
+      $this->definition = new UnionType($this, $schemaBuilder, [
         'name' => $name,
         'description' => $this->buildDescription(),
         'types' => $this->buildTypes($schemaBuilder, $name),
