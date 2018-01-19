@@ -4,22 +4,27 @@ namespace Drupal\graphql\GraphQL\Type;
 
 use Drupal\graphql\GraphQL\CacheableEdgeInterface;
 use Drupal\graphql\GraphQL\CacheableEdgeTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginReferenceInterface;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginReferenceTrait;
+use Drupal\graphql\GraphQL\PluginReferenceInterface;
+use Drupal\graphql\GraphQL\PluginReferenceTrait;
+use Drupal\graphql\GraphQL\TypeValidationInterface;
+use Drupal\graphql\GraphQL\TypeValidationTrait;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 use Youshido\GraphQL\Config\Object\UnionTypeConfig;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\Union\AbstractUnionType;
 
-class UnionType extends AbstractUnionType implements TypeSystemPluginReferenceInterface, CacheableEdgeInterface  {
-  use TypeSystemPluginReferenceTrait;
+class UnionType extends AbstractUnionType implements PluginReferenceInterface, TypeValidationInterface, CacheableEdgeInterface  {
+  use PluginReferenceTrait;
   use CacheableEdgeTrait;
+  use TypeValidationTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(UnionTypePluginBase $plugin, array $config = []) {
+  public function __construct(UnionTypePluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;
+    $this->builder = $builder;
     $this->config = new UnionTypeConfig($config, $this, TRUE);
   }
 

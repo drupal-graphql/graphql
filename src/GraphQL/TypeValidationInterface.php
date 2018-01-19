@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL;
+namespace Drupal\graphql\GraphQL;
 
 /**
  * Interface for type plugins that intend to employ their own validation rules.
@@ -17,4 +17,5 @@ interface TypeValidationInterface {
    *   A boolean value indicating if the value conforms to this type.
    */
   public function isValidValue($value);
+
 }

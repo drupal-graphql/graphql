@@ -28,7 +28,7 @@ abstract class EnumPluginBase extends PluginBase implements TypeSystemPluginInte
    */
   public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
     if (!isset($this->definition)) {
-      $this->definition = new EnumType($this, [
+      $this->definition = new EnumType($this, $schemaBuilder, [
         'name' => $this->buildName(),
         'description' => $this->buildDescription(),
         'values' => $this->buildValues($schemaBuilder),
