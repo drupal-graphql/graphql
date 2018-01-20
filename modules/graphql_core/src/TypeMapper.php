@@ -54,13 +54,12 @@ class TypeMapper {
     if ($dataDefinition instanceof DataReferenceDefinitionInterface) {
       $targetDefinition = $dataDefinition->getTargetDefinition();
       if ($targetDefinition instanceof EntityDataDefinition) {
-        $entityType = $targetDefinition->getEntityTypeId();
-
-        if ($this->entityTypeManager->getDefinition($entityType) instanceof ContentEntityType) {
+        if (($entityType = $targetDefinition->getEntityTypeId()) === NULL) {
+          return 'Entity';
+        }
+        else if ($this->entityTypeManager->getDefinition($entityType) instanceof ContentEntityType) {
           return StringHelper::camelCase($entityType);
         }
-
-        // TODO Handle config entity references.
       }
     }
 
