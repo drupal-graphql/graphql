@@ -25,14 +25,12 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   protected $instances = [];
 
   /**
-   * PluggableSchemaBuilderconstructor.
+   * PluggableSchemaBuilder constructor.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaPluginInterface $schemaPlugin
-   *   The schema plugin.
    * @param \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator $pluginManagers
    *   Type system plugin manager aggregator service.
    */
-  public function __construct(PluggableSchemaPluginInterface $schemaPlugin, TypeSystemPluginManagerAggregator $pluginManagers) {
+  public function __construct(TypeSystemPluginManagerAggregator $pluginManagers) {
     $this->pluginManagers = $pluginManagers;
   }
 
@@ -40,10 +38,8 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
    * {@inheritdoc}
    */
   public function getInstance($pluginType, $pluginId, array $pluginConfiguration = []) {
-    asort($pluginConfiguration);
-    $configCid = md5(json_encode($pluginConfiguration));
-
-    if (!isset($this->instances[$pluginType][$pluginId][$configCid])) {
+    $cid = $this->getCacheIdentifier($pluginType, $pluginId, $pluginConfiguration);
+    if (!isset($this->instances[$cid])) {
       $manager = $this->pluginManagers->getPluginManager($pluginType);
       if (empty($manager)) {
         throw new \LogicException(sprintf('Could not find %s plugin manager for plugin %s.', $pluginType, $pluginId));
@@ -52,20 +48,13 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       // We do not allow plugin configuration for now.
       $instance = $manager->createInstance($pluginId, $pluginConfiguration);
       if (empty($instance)) {
-        throw new \LogicException(sprintf('Could not instantiate plugin %s of type %s.', $pluginId, $pluginType));
+        throw new \LogicException(sprintf('Failed to instantiate plugin %s of type %s.', $pluginId, $pluginType));
       }
 
-      if (!$instance instanceof TypeSystemPluginInterface) {
-        throw new \LogicException(sprintf('Plugin %s of type %s does not implement \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface.', $pluginId, $pluginType));
-      }
-
-      // Initialize the static cache array if necessary.
-      $this->instances[$pluginType] = isset($this->instances[$pluginType]) ? $this->instances[$pluginType] : [];
-      $this->instances[$pluginType][$pluginId] = isset($this->instances[$pluginType][$pluginId]) ? $this->instances[$pluginType][$pluginId] : [];
-      $this->instances[$pluginType][$pluginId][$configCid] = $instance;
+      $this->instances[$cid] = $instance;
     }
 
-    return $this->instances[$pluginType][$pluginId][$configCid];
+    return $this->instances[$cid];
   }
 
   /**
@@ -83,7 +72,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       foreach ($manager->getDefinitions() as $id => $definition) {
         $name = $definition['name'];
         if (empty($name)) {
-          throw new InvalidPluginDefinitionException($id, 'Invalid GraphQL plugin definition. No name defined.');
+          throw new InvalidPluginDefinitionException($id, 'Invalid plugin definition. No name defined.');
         }
 
         if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
@@ -107,6 +96,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       return ($a['weight'] < $b['weight']) ? 1 : -1;
     });
 
+    // @TODO: Add support configurable plugins.
     return array_map(function (array $item) {
       return $this->getInstance($item['type'], $item['id']);
     }, $items);
@@ -121,7 +111,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
     }, $types);
 
     if (empty($result)) {
-      throw new InvalidPluginDefinitionException(null, sprintf('GraphQL plugin with name %s could not be found.', $name));
+      throw new InvalidPluginDefinitionException(null, sprintf('Plugin with name %s could not be found.', $name));
     }
 
     return array_pop($result);
@@ -156,10 +146,54 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   }
 
   /**
+   * Creates a plugin instance cache identifier.
+   *
+   * @param string $pluginType
+   *   The plugin type.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param array $pluginConfiguration
+   *   The plugin configuration.
+   *
+   * @return string
+   */
+  protected function getCacheIdentifier($pluginType, $pluginId, array $pluginConfiguration) {
+    if (empty($pluginConfiguration)) {
+      return "$pluginType:::$pluginId";
+    }
+
+    $configCid = md5(serialize($this->sortRecursive($pluginConfiguration)));
+    return "$pluginType:::$pluginId:::$configCid";
+  }
+
+  /**
+   * Recursively sorts an array.
+   *
+   * Useful for generating a cache identifiers.
+   *
+   * @param array $subject
+   *   The array to sort.
+   *
+   * @return array
+   *   The sorted array.
+   */
+  protected function sortRecursive(array $subject) {
+    asort($subject);
+    foreach ($subject as $key => $item) {
+      if (is_array($item)) {
+        $subject[$key] = $this->sortRecursive($item);
+      }
+    }
+
+    return $subject;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function __sleep() {
     // Don't write the plugin instances into the cache.
     return array_diff($this->sleepDependencies(), ['instances']);
   }
+
 }
