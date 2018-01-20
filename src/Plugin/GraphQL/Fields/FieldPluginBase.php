@@ -48,10 +48,10 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
       ];
 
       if ($this instanceof BatchedFieldInterface) {
-        $this->definition = new BatchedField($this, $this->isSecure(), $config);
+        $this->definition = new BatchedField($this, $schemaBuilder, $config);
       }
       else {
-        $this->definition = new Field($this, $this->isSecure(), $config);
+        $this->definition = new Field($this, $schemaBuilder, $config);
       }
     }
 

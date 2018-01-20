@@ -30,7 +30,7 @@ abstract class InterfacePluginBase extends PluginBase implements TypeSystemPlugi
    */
   public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
     if (!isset($this->definition)) {
-      $this->definition = new InterfaceType($this, [
+      $this->definition = new InterfaceType($this, $schemaBuilder, [
         'name' => $this->buildName(),
         'description' => $this->buildDescription(),
       ]);

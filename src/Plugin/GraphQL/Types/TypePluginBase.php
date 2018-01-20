@@ -35,7 +35,7 @@ abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInte
     if (!isset($this->definition)) {
       $interfaces = $this->buildInterfaces($schemaBuilder);
 
-      $this->definition = new ObjectType($this, [
+      $this->definition = new ObjectType($this, $schemaBuilder, [
         'name' => $this->buildName(),
         'description' => $this->buildDescription(),
         'interfaces' => $interfaces,
