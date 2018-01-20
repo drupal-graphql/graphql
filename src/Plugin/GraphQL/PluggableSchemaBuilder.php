@@ -27,12 +27,10 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   /**
    * PluggableSchemaBuilderconstructor.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaPluginInterface $schemaPlugin
-   *   The schema plugin.
    * @param \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator $pluginManagers
    *   Type system plugin manager aggregator service.
    */
-  public function __construct(PluggableSchemaPluginInterface $schemaPlugin, TypeSystemPluginManagerAggregator $pluginManagers) {
+  public function __construct(TypeSystemPluginManagerAggregator $pluginManagers) {
     $this->pluginManagers = $pluginManagers;
   }
 
