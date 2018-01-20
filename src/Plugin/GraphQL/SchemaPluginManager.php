@@ -10,20 +10,6 @@ use Traversable;
 class SchemaPluginManager extends DefaultPluginManager {
 
   /**
-   * Static cache for plugin instances.
-   *
-   * @var object[]
-   */
-  protected $instances = [];
-
-  /**
-   * The dependency injection container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
-
-  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -32,10 +18,8 @@ class SchemaPluginManager extends DefaultPluginManager {
     ModuleHandlerInterface $moduleHandler,
     $pluginInterface,
     $pluginAnnotationName,
-    $pluginType,
-    ContainerInterface $container
+    $pluginType
   ) {
-    $this->container = $container;
     $this->alterInfo($pluginType);
 
     parent::__construct(
@@ -45,20 +29,6 @@ class SchemaPluginManager extends DefaultPluginManager {
       $pluginInterface,
       $pluginAnnotationName
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createInstance($pluginId, array $configuration = []) {
-    if (!array_key_exists($pluginId, $this->instances)) {
-      $this->instances[$pluginId] = parent::createInstance($pluginId);
-      if (!$this->instances[$pluginId] instanceof SchemaPluginInterface) {
-        throw new \LogicException(sprintf('Plugin %s does not implement \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface.', $pluginId));
-      }
-    }
-
-    return $this->instances[$pluginId];
   }
 
 }

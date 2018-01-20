@@ -22,11 +22,6 @@ parameters:
     development: false
 
 services:
-  # Logger channel for graphql related log entries.
-  logger.channel.graphql:
-    parent: logger.channel_base
-    arguments: ['graphql']
-
   # Check access for executing graphql queries.
   access_check.graphql.query:
     class: Drupal\graphql\Access\QueryAccessCheck
@@ -187,7 +182,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
       - 'graphql_schemas'
-      - '@service_container'
 
   # Schema builder service. Collects all registered type system plugin managers.
   graphql.plugin_manager_aggregator:
@@ -207,7 +201,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLUnionType'
       - 'graphql_union_types'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.interface:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -219,7 +212,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInterface'
       - 'graphql_interfaces'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.type:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -231,7 +223,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLType'
       - 'graphql_types'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.input:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -243,7 +234,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInputType'
       - 'graphql_input_types'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.field:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -255,7 +245,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLField'
       - 'graphql_fields'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.mutation:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -267,7 +256,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
       - 'graphql_mutations'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.scalar:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -279,7 +267,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
       - 'graphql_scalars'
-      - '@logger.channel.graphql'
   plugin.manager.graphql.enum:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
     tags:
@@ -291,7 +278,6 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLEnum'
       - 'graphql_enums'
-      - '@logger.channel.graphql'
 
   # Voyager.
   graphql.voyager.page_display_variant_subscriber:
