@@ -162,7 +162,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
    * @return array
    *   A list of cacheable dependencies.
    */
-  protected function getCacheDependencies(array $result, $parent, array $args, ResolveInfo $info) {
+  protected function getCacheDependencies($result, $parent, array $args, ResolveInfo $info) {
     // Default implementation just returns the value itself.
     return $result;
   }
