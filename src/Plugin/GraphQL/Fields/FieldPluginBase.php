@@ -15,6 +15,7 @@ use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Youshido\GraphQL\Execution\DeferredResolver;
 use Youshido\GraphQL\Execution\ResolveInfo;
+use Youshido\GraphQL\Type\ListType\ListType;
 
 /**
  * Base class for field plugins.
@@ -96,9 +97,10 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
       $result = $this->getBatchedFieldResolver($value, $args, $info)->add($this, $value, $args, $info);
       return new DeferredResolver(function() use ($result, $args, $info, $value) {
         $result = iterator_to_array($this->resolveValues($result(), $args, $info));
-        return $this->cacheable($result, $value, $args);
+        return $this->cacheable($result, $value, $args, $info);
       });
     }
+
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
   }
 
@@ -112,51 +114,58 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         return $this->resolveDeferred($result, $value, $args, $info);
       });
     }
-    return $this->cacheable(iterator_to_array($result), $value, $args);
+
+    return $this->cacheable(iterator_to_array($result), $value, $args, $info);
   }
 
   /**
    * Wrap the result in a CacheableValue.
    *
-   * @param mixed $result
+   * @param array $result
    *   The field result.
    * @param mixed $value
    *   The parent value.
    * @param array $args
    *   The field arguments.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
    *
-   * @return CacheableValue
+   * @return \Drupal\graphql\GraphQL\Cache\CacheableValue
    *   The cacheable value.
    */
-  protected function cacheable($result, $value, array $args) {
-    if ($this->getPluginDefinition()['multi']) {
-      return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
+  protected function cacheable(array $result, $value, array $args, ResolveInfo $info) {
+    $dependencies = $this->getCacheDependencies($result, $value, $args, $info);
+    // The field resolver may yield cache value wrappers. Unwrap them.
+    $result = array_map(function ($item) {
+      return $item instanceof CacheableValue ? $item->getValue() : $item;
+    }, $result);
+
+    if ($info->getReturnType()->getNullableType() instanceof ListType) {
+      return new CacheableValue($result, $dependencies);
     }
 
-    if ($result) {
-      $result = reset($result);
-      return new CacheableValue($result, $this->getCacheDependencies($result, $value, $args));
-    }
-
-    return new CacheableValue(NULL, $this->getCacheDependencies($result, $value, $args));
+    $result = !empty($result) ? reset($result) : NULL;
+    return new CacheableValue($result, $dependencies);
   }
 
   /**
    * Retrieve the list of cache dependencies for a given value and arguments.
    *
-   * @param mixed $result
+   * @param array $result
    *   The result of the field.
    * @param mixed $parent
    *   The parent value.
    * @param array $args
    *   The arguments passed to the field.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
    *
    * @return array
    *   A list of cacheable dependencies.
    */
-  protected function getCacheDependencies($result, $parent, array $args) {
+  protected function getCacheDependencies(array $result, $parent, array $args, ResolveInfo $info) {
     // Default implementation just returns the value itself.
-    return [$result];
+    return $result;
   }
 
   /**
