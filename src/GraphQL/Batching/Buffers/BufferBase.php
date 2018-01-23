@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\GraphQL\Batching;
+namespace Drupal\graphql\GraphQL\Batching\Buffers;
 
 /**
  * Base class for field buffering services.
