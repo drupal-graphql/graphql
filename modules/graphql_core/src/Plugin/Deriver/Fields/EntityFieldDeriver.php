@@ -46,8 +46,9 @@ class EntityFieldDeriver extends EntityFieldDeriverWithTypeMapping {
       /** @var \Drupal\Core\TypedData\DataDefinitionInterface $property */
       $property = reset($properties);
       $keys = array_keys($properties);
+      $type = $this->typeMapper->getTypeFromDataDefinition($property) ?: 'String';
 
-      $derivative['type'] = $this->typeMapper->typedDataToGraphQLFieldType($property);
+      $derivative['type'] = $type;
       $derivative['property'] = reset($keys);
     }
     else {

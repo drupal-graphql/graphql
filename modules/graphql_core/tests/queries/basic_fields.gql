@@ -5,7 +5,9 @@ query ($nid: Int!) {
       entityUuid,
       entityLabel,
       entityType,
-      entityBundle,
+      entityBundle {
+        entityId
+      }
       entityLanguage {
         id,
         name,

@@ -2,20 +2,16 @@
 
 namespace Drupal\graphql_core;
 
-use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\graphql\Utility\StringHelper;
 
-/**
- * GraphQL type mapper service.
- */
 class TypeMapper {
 
   /**
-   * Mapping of graphql types to drupal types.
+   * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
@@ -42,34 +38,35 @@ class TypeMapper {
   }
 
   /**
-   * Maps drupal data type to graphql type.
+   * Maps a drupal data type to a graphql type.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $dataDefinition
    *   The property definition.
    *
-   * @return string
+   * @return string|null
+   *   The name of the determined type.
    */
-  public function typedDataToGraphQLFieldType(DataDefinitionInterface $dataDefinition) {
-    $dataType = $dataDefinition->getDataType();
+  public function getTypeFromDataDefinition(DataDefinitionInterface $dataDefinition) {
     if ($dataDefinition instanceof DataReferenceDefinitionInterface) {
       $targetDefinition = $dataDefinition->getTargetDefinition();
       if ($targetDefinition instanceof EntityDataDefinition) {
-        if (($entityType = $targetDefinition->getEntityTypeId()) === NULL) {
-          return 'Entity';
-        }
-        else if ($this->entityTypeManager->getDefinition($entityType) instanceof ContentEntityType) {
+        $entityType = $targetDefinition->getEntityTypeId();
+        if ($entityType !== NULL && $this->entityTypeManager->hasDefinition($entityType)) {
           return StringHelper::camelCase($entityType);
         }
+
+        return 'Entity';
       }
     }
 
-    foreach ($this->typeMap as $graphQlType => $typedDataTypes) {
+    $dataType = $dataDefinition->getDataType();
+    foreach ($this->typeMap as $type => $typedDataTypes) {
       if (in_array($dataType, $typedDataTypes)) {
-        return $graphQlType;
+        return $type;
       }
     }
 
-    return 'String';
+    return NULL;
   }
 
 }

@@ -63,24 +63,24 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
+
     $bundles = $this->entityTypeBundleInfo->getAllBundleInfo();
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if ($type instanceof ContentEntityTypeInterface && array_key_exists($typeId, $bundles)) {
-        foreach ($bundles[$typeId] as $bundle => $bundleDefinition) {
-          $this->derivatives[$typeId . '-' . $bundle] = [
-            'name' => EntityBundle::getId($typeId, $bundle),
-            'description' => $this->t("The '@bundle' bundle of the '@type' entity type.", [
-              '@bundle' => $bundleDefinition['label'],
-              '@type' => $type->getLabel(),
-            ]),
-            'entity_type' => $typeId,
-            'data_type' => 'entity:' . $typeId . ':' . $bundle,
-            'interfaces' => [StringHelper::camelCase($typeId)],
-            'bundle' => $bundle,
-          ] + $basePluginDefinition;
-        }
+      foreach ($bundles[$typeId] as $bundle => $bundleDefinition) {
+        $this->derivatives[$typeId . '-' . $bundle] = [
+          'name' => EntityBundle::getId($typeId, $bundle),
+          'description' => $this->t("The '@bundle' bundle of the '@type' entity type.", [
+            '@bundle' => $bundleDefinition['label'],
+            '@type' => $type->getLabel(),
+          ]),
+          'entity_type' => $typeId,
+          'data_type' => 'entity:' . $typeId . ':' . $bundle,
+          'interfaces' => [StringHelper::camelCase($typeId)],
+          'bundle' => $bundle,
+        ] + $basePluginDefinition;
       }
     }
+
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 

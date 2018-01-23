@@ -23,9 +23,13 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
     ];
 
     foreach ($fieldDefinition->getPropertyDefinitions() as $property => $propertyDefinition) {
-      if ($propertyDefinition->getDataType() == 'map') {
-        // TODO Is it possible to get the keys of a map (eg. the options array for link field) here?
-        continue;
+      if (($type = $this->typeMapper->getTypeFromDataDefinition($propertyDefinition)) === NULL) {
+        if ($propertyDefinition->getDataType() === 'map') {
+          continue;
+        }
+
+        // Default to 'String' for unknown types.
+        $type = 'String';
       }
 
       $derivatives["$entityTypeId-$fieldName-$property"] = [
@@ -33,7 +37,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverWithTypeMapping {
         'description' => $propertyDefinition->getDescription(),
         'property' => $property,
         'multi' => FALSE,
-        'type' => $this->typeMapper->typedDataToGraphQLFieldType($propertyDefinition),
+        'type' => $type,
       ] + $commonDefinition + $basePluginDefinition;
     }
 

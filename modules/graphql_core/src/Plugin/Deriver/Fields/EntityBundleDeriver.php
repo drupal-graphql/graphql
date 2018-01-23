@@ -3,18 +3,13 @@
 namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Create GraphQL entityById fields based on available Drupal entity types.
- */
-class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
-
+class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
@@ -36,9 +31,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(
-    EntityTypeManagerInterface $entityTypeManager
-  ) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
   }
 
@@ -46,20 +39,14 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      $derivative = [
-        'name' => StringHelper::propCase($id, 'by', 'id'),
-        'type' => StringHelper::camelCase($id),
-        'description' => $this->t("Loads '@type' entities by their id.", ['@type' => $type->getLabel()]),
-        'entity_type' => $id,
-      ] + $basePluginDefinition;
+    foreach ($this->entityTypeManager->getDefinitions() as $id => $entityType) {
+      $bundleEntityType = $entityType->getBundleEntityType();
 
-      if ($type->isTranslatable()) {
-        $derivative['arguments']['language'] = [
-          'type' => 'AvailableLanguages',
-          'nullable' => TRUE,
-        ];
-      }
+      $derivative = [
+        'type' => $bundleEntityType === NULL ? 'String' : StringHelper::camelCase($bundleEntityType),
+        'description' => $this->t('Retrieves the bundle or bundle name of the entity.'),
+        'parents' => [StringHelper::camelCase($id)],
+      ] + $basePluginDefinition;
 
       $this->derivatives["entity:$id"] = $derivative;
     }
