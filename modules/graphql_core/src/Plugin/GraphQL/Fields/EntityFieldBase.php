@@ -2,9 +2,8 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
-use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Base class for entity field plugins.
@@ -15,10 +14,11 @@ class EntityFieldBase extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveItem($item) {
-    if ($item instanceof FieldItemBase) {
+    if ($item instanceof FieldItemInterface) {
       $definition = $this->getPluginDefinition();
       $property = $definition['property'];
       $type = $definition['type'];
+      // @TODO Add smarter resolving (e.g. buffering for entity references).
       $result = $item->get($property)->getValue();
 
       if ($type === 'Int') {
