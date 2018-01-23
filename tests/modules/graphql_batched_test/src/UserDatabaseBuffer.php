@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_batched_test;
 
-use Drupal\graphql\GraphQL\Batching\BufferBase;
+use Drupal\graphql\GraphQL\Batching\Buffers\BufferBase;
 use Zend\Stdlib\ArrayObject;
 
 class UserDatabaseBuffer extends BufferBase {
