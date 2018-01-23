@@ -134,21 +134,17 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
    */
   protected function cacheable(array $result, $value, array $args, ResolveInfo $info) {
     $dependencies = $this->getCacheDependencies($result, $value, $args, $info);
-    $output = new CacheableValue(NULL, $dependencies);
-
-    // Unwrap the result items.
+    // The field resolver may yield cache value wrappers. Unwrap them.
     $result = array_map(function ($item) {
       return $item instanceof CacheableValue ? $item->getValue() : $item;
     }, $result);
 
     if ($info->getReturnType()->getNullableType() instanceof ListType) {
-      $output->setValue($result);
-    }
-    else if (!empty($result)) {
-      $output->setValue(reset($result));
+      return new CacheableValue($result, $dependencies);
     }
 
-    return $output;
+    $result = !empty($result) ? reset($result) : NULL;
+    return new CacheableValue($result, $dependencies);
   }
 
   /**
