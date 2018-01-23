@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -84,12 +85,12 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
-    $storage = $this->entityTypeManager->getStorage($entityTypeId);
-    $type = $this->entityTypeManager->getDefinition($entityTypeId);
+    $entityStorage = $this->entityTypeManager->getStorage($entityTypeId);
+    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
 
-    $query = $storage->getQuery();
+    $query = $entityStorage->getQuery();
     $query->range($args['offset'], $args['limit']);
-    $query->sort($type->getKey('id'));
+    $query->sort($entityType->getKey('id'));
 
     if (array_key_exists('filter', $args) && $args['filter']) {
       /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
@@ -103,7 +104,10 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       }
     }
 
-    yield $query;
+    // Add the entity type's list cache tag to the response.
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheTags($entityType->getListCacheTags());
+    yield new CacheableValue($query, [$metadata]);
   }
 
 }
