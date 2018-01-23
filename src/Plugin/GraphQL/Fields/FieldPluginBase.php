@@ -100,6 +100,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         return $this->cacheable($result, $value, $args, $info);
       });
     }
+
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
   }
 
@@ -150,7 +151,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
   /**
    * Retrieve the list of cache dependencies for a given value and arguments.
    *
-   * @param mixed $result
+   * @param array $result
    *   The result of the field.
    * @param mixed $parent
    *   The parent value.
@@ -162,7 +163,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
    * @return array
    *   A list of cacheable dependencies.
    */
-  protected function getCacheDependencies($result, $parent, array $args, ResolveInfo $info) {
+  protected function getCacheDependencies(array $result, $parent, array $args, ResolveInfo $info) {
     // Default implementation just returns the value itself.
     return $result;
   }

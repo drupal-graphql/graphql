@@ -68,7 +68,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  protected function getCacheDependencies($result, $value, array $args) {
+  protected function getCacheDependencies(array $result, $value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $type = $this->entityTypeManager->getDefinition($entityTypeId);
 
