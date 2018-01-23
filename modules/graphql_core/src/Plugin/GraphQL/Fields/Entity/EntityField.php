@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Plugin\DataType\FieldItem;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
@@ -41,13 +42,17 @@ class EntityField extends EntityFieldBase {
     if ($value instanceof FieldableEntityInterface) {
       $fieldName = $this->getPluginDefinition()['field'];
       if ($value->hasField($fieldName)) {
-        /** @var \Drupal\Core\Field\FieldItemBase $item */
-        foreach ($value->get($fieldName) as $item) {
-          if (!empty($this->getPluginDefinition()['property'])) {
-            yield $this->resolveItem($item);
-          }
-          else {
-            yield $item;
+        /** @var \Drupal\Core\Field\FieldItemListInterface $items */
+        $items = $value->get($fieldName);
+
+        if (($access = $items->access('view', NULL, TRUE)) && $access->isAllowed()) {
+          foreach ($items as $item) {
+            if (!empty($this->getPluginDefinition()['property'])) {
+              yield new CacheableValue($this->resolveItem($item), [$access]);
+            }
+            else {
+              yield new CacheableValue($item, [$access]);
+            }
           }
         }
       }

@@ -300,3 +300,8 @@ services:
     arguments: ['@plugin.manager.graphql.schema']
     tags:
       - { name: 'event_subscriber' }
+
+  # Buffers.
+  graphql.buffer.entity:
+      class: Drupal\graphql\GraphQL\Batching\Buffers\EntityBuffer
+      arguments: ['@entity_type.manager']
