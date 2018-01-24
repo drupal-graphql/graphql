@@ -5,7 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Batching\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,7 +30,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
   /**
    * The entity buffer service.
    *
-   * @var \Drupal\graphql\GraphQL\Batching\Buffers\EntityBuffer
+   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
    */
   protected $entityBuffer;
 

@@ -3,10 +3,9 @@
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
+use Drupal\graphql\GraphQL\Buffers\SubRequestResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Extract arbitrary information from subrequests.
@@ -38,13 +37,9 @@ class SubrequestExtractionController extends ControllerBase {
    * Process the subrequest batch.
    */
   public function extract() {
-    $batch = $this
-      ->requestStack->getCurrentRequest()
-      ->attributes->get('graphql_subrequest');
-
-    SubrequestFieldBase::processSubrequestBatch($batch);
-
-    return Response::create();
+    $request = $this->requestStack->getCurrentRequest();
+    $callback = $request->attributes->get('_graphql_subrequest');
+    return new SubRequestResponse($callback());
   }
 
 }

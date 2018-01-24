@@ -7,32 +7,31 @@ use Drupal\block_content\Plugin\Block\BlockContentBlock;
 use Drupal\Core\Condition\ConditionInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\graphql\GraphQL\Batching\BatchedFieldResolver;
-use Drupal\graphql\Plugin\GraphQL\Fields\SubrequestFieldBase;
+use Drupal\Core\Url;
+use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * List all blocks within a theme region.
- *
- * TODO: Move this to `InternalUrl` (breaking change).
  *
  * @GraphQLField(
  *   id = "blocks_by_region",
  *   secure = true,
  *   name = "blocksByRegion",
  *   type = "Entity",
- *   parents = {"Url", "Root"},
+ *   parents = {"InternalUrl"},
  *   multi = true,
  *   arguments = {
  *     "region" = "String"
  *   }
  * )
  */
-class BlocksByRegion extends SubrequestFieldBase {
+class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginInterface {
+
   /**
    * The theme manager.
    *
@@ -55,6 +54,13 @@ class BlocksByRegion extends SubrequestFieldBase {
   protected $entityRepository;
 
   /**
+   * The subrequest buffer service.
+   *
+   * @var \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
+   */
+  protected $subRequestBuffer;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(
@@ -67,9 +73,7 @@ class BlocksByRegion extends SubrequestFieldBase {
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('http_kernel'),
-      $container->get('request_stack'),
-      $container->get('graphql.batched_resolver'),
+      $container->get('graphql.buffer.subrequest'),
       $container->get('theme.manager'),
       $container->get('entity_type.manager'),
       $container->get('entity.repository')
@@ -83,59 +87,57 @@ class BlocksByRegion extends SubrequestFieldBase {
     array $configuration,
     $pluginId,
     $pluginDefinition,
-    HttpKernelInterface $httpKernel,
-    RequestStack $requestStack,
-    BatchedFieldResolver $batchedFieldResolver,
+    SubRequestBuffer $subRequestBuffer,
     ThemeManagerInterface $themeManager,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository
   ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->subRequestBuffer = $subRequestBuffer;
     $this->themeManager = $themeManager;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityRepository = $entityRepository;
-    parent::__construct(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $httpKernel,
-      $requestStack,
-      $batchedFieldResolver
-    );
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function resolveSubrequest($value, array $args, ResolveInfo $info) {
-    $region = $args['region'];
+  protected function resolveValues($value, array $args, ResolveInfo $info) {
+    if ($value instanceof Url) {
+      $activeTheme = $this->themeManager->getActiveTheme();
+      $blockStorage = $this->entityTypeManager->getStorage('block');
+      $blocks = $blockStorage->loadByProperties([
+        'theme' => $activeTheme->getName(),
+        'region' => $args['region'],
+      ]);
 
-    $activeTheme = $this->themeManager->getActiveTheme();
-    $blockStorage = $this->entityTypeManager->getStorage('block');
-    $blocks = $blockStorage->loadByProperties([
-      'theme' => $activeTheme->getName(),
-      'region' => $region,
-    ]);
+      $resolve = $this->subRequestBuffer->add($value, function () use ($blocks) {
+        $blocks = array_filter($blocks, function (Block $block) {
+          return array_reduce(iterator_to_array($block->getVisibilityConditions()), function($value, ConditionInterface $condition) {
+            return $value && (!$condition->isNegated() == $condition->evaluate());
+          }, TRUE);
+        });
 
-    $blocks = array_filter($blocks, function(Block $block) {
-      return array_reduce(iterator_to_array($block->getVisibilityConditions()), function($value, ConditionInterface $condition) {
-        return $value && (!$condition->isNegated() == $condition->evaluate());
-      }, TRUE);
-    });
+        uasort($blocks, '\Drupal\Block\Entity\Block::sort');
 
-    uasort($blocks, '\Drupal\Block\Entity\Block::sort');
+        return $blocks;
+      });
 
-    $result = array_map(function(Block $block) {
-      $plugin = $block->getPlugin();
-      if ($plugin instanceof BlockContentBlock) {
-        return $this->entityRepository->loadEntityByUuid('block_content', $plugin->getDerivativeId());
-      }
-      else {
-        return $block;
-      }
-    }, $blocks);
+      return function ($value, array $args, ResolveInfo $info) use ($resolve) {
+        $blocks = array_map(function(Block $block) {
+          $plugin = $block->getPlugin();
+          if ($plugin instanceof BlockContentBlock) {
+            return $this->entityRepository->loadEntityByUuid('block_content', $plugin->getDerivativeId());
+          }
+          else {
+            return $block;
+          }
+        }, $resolve());
 
-    return $result;
-
+        foreach ($blocks as $block) {
+          yield $block;
+        }
+      };
+    }
   }
-
 }

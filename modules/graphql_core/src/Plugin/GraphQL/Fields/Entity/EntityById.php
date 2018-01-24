@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Batching\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,7 +35,7 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * The entity buffer service.
    *
-   * @var \Drupal\graphql\GraphQL\Batching\Buffers\EntityBuffer
+   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
    */
   protected $entityBuffer;
 
