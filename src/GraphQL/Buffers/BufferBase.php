@@ -1,12 +1,11 @@
 <?php
 
-namespace Drupal\graphql\GraphQL\Batching\Buffers;
+namespace Drupal\graphql\GraphQL\Buffers;
 
 /**
  * Base class for field buffering services.
  */
 abstract class BufferBase {
-
 
   /**
    * The the array of buffers.

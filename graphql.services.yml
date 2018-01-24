@@ -303,5 +303,8 @@ services:
 
   # Buffers.
   graphql.buffer.entity:
-      class: Drupal\graphql\GraphQL\Batching\Buffers\EntityBuffer
+      class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
       arguments: ['@entity_type.manager']
+  graphql.buffer.subrequest:
+      class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
+      arguments: ['@http_kernel', '@request_stack']

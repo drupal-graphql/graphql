@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\GraphQL\Batching\Buffers;
+namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -25,8 +25,6 @@ class EntityBuffer extends BufferBase {
 
   /**
    * Add an item to the buffer.
-   *
-   * The results are ordered in the same way as the given publications.
    *
    * @param string $type
    *   The entity type of the given entity ids.

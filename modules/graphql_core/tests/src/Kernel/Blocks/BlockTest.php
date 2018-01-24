@@ -64,7 +64,6 @@ class BlockTest extends GraphQLFileTestBase {
    */
   public function testStaticBlocks() {
     $result = $this->executeQueryFile('Blocks/blocks.gql');
-    $this->assertEquals(1, count($result['data']['content']), 'Blocks can be retrieved on root level.');
     $this->assertEquals(1, count($result['data']['route']['content']), 'Block listing respects visibility settings.');
   }
 
