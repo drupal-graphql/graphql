@@ -29,8 +29,7 @@ class ResponseCode extends FieldPluginBase {
     if ($value instanceof Response) {
       yield $value->getStatusCode();
     }
-
-    if ($value instanceof ResponseInterface) {
+    else if ($value instanceof ResponseInterface) {
       yield $value->getStatusCode();
     }
   }
