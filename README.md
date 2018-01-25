@@ -11,7 +11,7 @@ the full official GraphQL specification with all its features.
 
 You can use this module as a foundation for building your own schema through
 custom code or you can use and extend the generated schema using the plugin
-architecture of the contained sub-modules.
+architecture and the provided plugin implementations form the sub-module.
 
 For ease of development, it includes the [GraphiQL] interface at
 /graphql/explorer. Make sure to __enable__ the GraphiQL module.
@@ -19,15 +19,6 @@ For ease of development, it includes the [GraphiQL] interface at
 [Drupal 8]: https://www.drupal.org/8
 [GraphQL]: http://graphql.org/
 [GraphiQL]: https://github.com/graphql/graphiql/
-
-## Built-in generated schema
-
-The `modules` directory contains a set of modules that help to automatically
-create a schema from Drupal data structures and components. By enabling these
-sub-modules you can expose much of the Drupal data graph without writing a
-single line of code.
-
-Please refer to `modules/README.md` for more information.
 
 ## Example implementation
 
@@ -50,6 +41,8 @@ module works and how you can configure, adjust and extend it:
 * https://www.amazeelabs.com/en/blog/drupal-graphql-batteries-included
 * https://www.amazeelabs.com/en/blog/extending-graphql-part1-fields
 * https://www.amazeelabs.com/en/blog/extending-graphql-part-2
+* https://www.amazeelabs.com/en/blog/graphql-for-drupalers-fields
+* https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations
 
 ## Resources
  
