@@ -131,20 +131,17 @@ services:
     tags:
       - { name: service_collector, tag: graphql_response_policy, call: addPolicy }
     lazy: true
-  graphql.request_policy.allow_no_session_open:
-    class: Drupal\Core\PageCache\RequestPolicy\NoSessionOpen
-    arguments: ['@session_configuration']
-    tags:
-      - { name: graphql_request_policy }
   graphql.request_policy.deny_command_line:
     class: Drupal\graphql\Cache\RequestPolicy\DenyCommandLine
     tags:
       - { name: graphql_request_policy }
-  graphql.request_policy.deny_unsafe_method_unless_query:
-    class: Drupal\graphql\Cache\RequestPolicy\DenyUnsafeMethodUnlessQuery
-    arguments: ['@path_processor_manager']
+
+  # Deny caching in the dynamic page cache / page cache.
+  graphql.request_policy.deny_query:
+    class: Drupal\graphql\Cache\RequestPolicy\DenyQuery
     tags:
-      - { name: graphql_request_policy }
+      - { name: dynamic_page_cache_request_policy }
+      - { name: page_cache_request_policy }
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
