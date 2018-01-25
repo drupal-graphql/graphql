@@ -16,7 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "context",
  *   secure = true,
- *   parents = {"InternalUrl"},
+ *   parents = {"InternalUrl", "EntityCanonicalUrl"},
  *   nullable = true,
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ContextDeriver"
  * )
