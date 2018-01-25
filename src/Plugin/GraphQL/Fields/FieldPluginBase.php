@@ -3,9 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Batching\BatchedFieldInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
-use Drupal\graphql\GraphQL\Field\BatchedField;
 use Drupal\graphql\GraphQL\Field\Field;
 use Drupal\graphql\GraphQL\SecureFieldInterface;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
@@ -48,12 +46,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
       ];
 
-      if ($this instanceof BatchedFieldInterface) {
-        $this->definition = new BatchedField($this, $schemaBuilder, $config);
-      }
-      else {
-        $this->definition = new Field($this, $schemaBuilder, $config);
-      }
+      $this->definition = new Field($this, $schemaBuilder, $config);
     }
 
     return $this->definition;
@@ -67,40 +60,9 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
   }
 
   /**
-   * Dummy implementation for `getBatchId` in `BatchedFieldInterface`.
-   *
-   * This provides an empty implementation of `getBatchId` in case the subclass
-   * implements `BatchedFieldInterface`. In may cases this will suffice since
-   * the batches are already grouped by the class implementing `resolveBatch`.
-   * `getBatchId` is only necessary for cases where batch grouping depends on
-   * runtime arguments.
-   *
-   * @param mixed $parent
-   *   The parent value in the result tree.
-   * @param array $arguments
-   *   The list of arguments.
-   * @param ResolveInfo $info
-   *   The graphql resolve info object.
-   *
-   * @return string
-   *   The batch key.
-   */
-  public function getBatchId($parent, array $arguments, ResolveInfo $info) {
-    return '';
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveInfo $info) {
-    if ($this instanceof BatchedFieldInterface) {
-      $result = $this->getBatchedFieldResolver($value, $args, $info)->add($this, $value, $args, $info);
-      return new DeferredResolver(function() use ($result, $args, $info, $value) {
-        $result = iterator_to_array($this->resolveValues($result(), $args, $info));
-        return $this->cacheable($result, $value, $args, $info);
-      });
-    }
-
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
   }
 
