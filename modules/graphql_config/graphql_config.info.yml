@@ -1,0 +1,8 @@
+name: GraphQL Config
+type: module
+description: 'Automatically create GraphQL types and fields from Drupal config entities.'
+package: GraphQL
+configure: graphql_config.config_entity_schema
+core: 8.x
+dependencies:
+  - graphql_core

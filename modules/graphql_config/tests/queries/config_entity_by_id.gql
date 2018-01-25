@@ -1,0 +1,5 @@
+query($id: String) {
+  nodeTypeById(id: $id) {
+    entityId
+  }
+}
