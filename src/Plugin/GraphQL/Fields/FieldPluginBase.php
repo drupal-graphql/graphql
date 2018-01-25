@@ -100,7 +100,6 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         return $this->cacheable($result, $value, $args, $info);
       });
     }
-
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
   }
 
@@ -114,7 +113,6 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         return $this->resolveDeferred($result, $value, $args, $info);
       });
     }
-
     return $this->cacheable(iterator_to_array($result), $value, $args, $info);
   }
 

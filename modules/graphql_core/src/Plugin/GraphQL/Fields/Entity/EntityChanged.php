@@ -15,7 +15,10 @@ use DateTime;
  *   secure = true,
  *   name = "entityChanged",
  *   type = "String",
- *   parents = {"Entity"}
+ *   parents = {"Entity"},
+ *   arguments = {
+ *     "format" = "String"
+ *   }
  * )
  */
 class EntityChanged extends FieldPluginBase {
@@ -27,7 +30,12 @@ class EntityChanged extends FieldPluginBase {
     if ($value instanceof EntityChangedInterface) {
       $datetime = new DateTime();
       $datetime->setTimestamp($value->getChangedTime());
-      yield $datetime->format(DateTime::ISO8601);
+      if (!isset($args['format'])) {
+        yield $datetime->format(DateTime::ISO8601);
+      }
+      else {
+        yield $datetime->format($args['format']);
+      }
     }
   }
 

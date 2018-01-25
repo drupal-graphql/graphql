@@ -14,7 +14,10 @@ use DateTime;
  *   secure = true,
  *   name = "entityCreated",
  *   type = "String",
- *   parents = {"Entity"}
+ *   parents = {"Entity"},
+ *   arguments = {
+ *     "format" = "String"
+ *   }
  * )
  */
 class EntityCreated extends FieldPluginBase {
@@ -28,7 +31,12 @@ class EntityCreated extends FieldPluginBase {
     if (method_exists($value, 'getCreatedTime')) {
       $datetime = new DateTime();
       $datetime->setTimestamp($value->getCreatedTime());
-      yield $datetime->format(DateTime::ISO8601);
+      if (!isset($args['format'])) {
+        yield $datetime->format(DateTime::ISO8601);
+      }
+      else {
+        yield $datetime->format($args['format']);
+      }
     }
   }
 
