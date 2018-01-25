@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
+use Drupal\Core\Render\Element\Date;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use DateTime;
 
@@ -14,7 +16,13 @@ use DateTime;
  *   secure = true,
  *   name = "entityCreated",
  *   type = "String",
- *   parents = {"Entity"}
+ *   parents = {"Entity"},
+ *   arguments = {
+ *     "format" = {
+ *       "type" = "String",
+ *       "nullable" = "true"
+ *     }
+ *   }
  * )
  */
 class EntityCreated extends FieldPluginBase {
@@ -28,7 +36,8 @@ class EntityCreated extends FieldPluginBase {
     if (method_exists($value, 'getCreatedTime')) {
       $datetime = new DateTime();
       $datetime->setTimestamp($value->getCreatedTime());
-      yield $datetime->format(DateTime::ISO8601);
+      $format = isset($args['format']) ? $args['format'] : DateTime::ISO8601;
+      yield $datetime->format($format);
     }
   }
 
