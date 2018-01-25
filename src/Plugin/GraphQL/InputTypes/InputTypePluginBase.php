@@ -34,7 +34,7 @@ abstract class InputTypePluginBase extends PluginBase implements TypeSystemPlugi
    */
   public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
     if (!isset($this->definition)) {
-      $this->definition = new InputObjectType($this, [
+      $this->definition = new InputObjectType($this, $schemaBuilder, [
         'name' => $this->buildName(),
         'description' => $this->buildDescription(),
         'fields' => $this->buildFields($schemaBuilder),

@@ -29,8 +29,7 @@ class ResponseContent extends FieldPluginBase {
     if ($value instanceof Response) {
       yield $value->getContent();
     }
-
-    if ($value instanceof ResponseInterface) {
+    else if ($value instanceof ResponseInterface) {
       yield (string) $value->getBody();
     }
   }

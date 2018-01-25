@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLType(
  *   id = "internal_url",
  *   name = "InternalUrl",
- *   interfaces={"Url"}
+ *   interfaces = {"Url"}
  * )
  */
 class InternalUrl extends TypePluginBase {

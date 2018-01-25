@@ -7,14 +7,14 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Schema\Schema;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Schema\InternalSchemaMutationObject;
 use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
 
-abstract class SchemaPluginBase extends PluginBase implements PluggableSchemaPluginInterface, ContainerFactoryPluginInterface {
+abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface {
 
   use DependencySerializationTrait;
 
@@ -57,13 +57,6 @@ abstract class SchemaPluginBase extends PluginBase implements PluggableSchemaPlu
   /**
    * {@inheritdoc}
    */
-  public function getSchemaBuilder() {
-    return $this->schemaBuilder;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getSchema() {
     $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
     $mutation->addFields($this->extractDefinitions(($this->getMutations())));
@@ -73,7 +66,7 @@ abstract class SchemaPluginBase extends PluginBase implements PluggableSchemaPlu
 
     $types = $this->extractDefinitions($this->getTypes());
 
-    return new Schema($this, [
+    return new Schema([
       'query' => $query,
       'mutation' => $mutation,
       'types' => $types,

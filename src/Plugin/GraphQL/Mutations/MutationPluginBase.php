@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\GraphQL\Field\Field;
+use Drupal\graphql\GraphQL\SecureFieldInterface;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
@@ -13,7 +14,7 @@ use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 /**
  * Base class for graphql mutation plugins.
  */
-abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface, SecureFieldInterface {
   use CacheablePluginTrait;
   use NamedPluginTrait;
   use ArgumentAwarePluginTrait;
@@ -32,7 +33,7 @@ abstract class MutationPluginBase extends PluginBase implements TypeSystemPlugin
     if (!isset($this->definition)) {
       $definition = $this->getPluginDefinition();
 
-      $this->definition = new Field($this, TRUE, [
+      $this->definition = new Field($this, $schemaBuilder, [
         'name' => $this->buildName(),
         'description' => $this->buildDescription(),
         'type' => $this->buildType($schemaBuilder),
@@ -43,6 +44,13 @@ abstract class MutationPluginBase extends PluginBase implements TypeSystemPlugin
     }
 
     return $this->definition;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isSecure() {
+    return TRUE;
   }
 
 }

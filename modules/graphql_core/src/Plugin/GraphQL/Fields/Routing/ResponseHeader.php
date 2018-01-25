@@ -32,8 +32,7 @@ class ResponseHeader extends FieldPluginBase {
     if ($value instanceof Response) {
       yield $value->headers->get($args['key']);
     }
-
-    if ($value instanceof ResponseInterface) {
+    else if ($value instanceof ResponseInterface) {
       yield implode(";", $value->getHeader($args['key']));
     }
   }
