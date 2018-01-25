@@ -165,10 +165,6 @@ services:
     tags:
       - { name: service_collector, tag: context_provider, call: addContextProvider }
 
-  # Support for deferred / batched field resolvers.
-  graphql.batched_resolver:
-    class: Drupal\graphql\GraphQL\Batching\BatchedFieldResolver
-
   # Plugin manager for schemas
   plugin.manager.graphql.schema:
     class: Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
