@@ -16,7 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "context",
  *   secure = true,
- *   parents = {"InternalUrl", "EntityCanonicalUrl"},
+ *   parents = {"Root", "InternalUrl", "EntityCanonicalUrl"},
  *   nullable = true,
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\ContextDeriver"
  * )
@@ -69,17 +69,19 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof Url) {
-      $resolve = $this->subRequestBuffer->add($value, function () {
-        $id = $this->getPluginDefinition()['context_id'];
-        $contexts = $this->contextRepository->getRuntimeContexts([$id]);
-        return isset($contexts[$id]) ? $contexts[$id]->getContextValue() : NULL;
-      });
-
-      return function ($value, array $args, ResolveInfo $info) use ($resolve) {
-        yield $resolve();
-      };
+    if (!($value instanceof Url)) {
+      $value = Url::fromRoute('<front>');
     }
+
+    $resolve = $this->subRequestBuffer->add($value, function () {
+      $id = $this->getPluginDefinition()['context_id'];
+      $contexts = $this->contextRepository->getRuntimeContexts([$id]);
+      return isset($contexts[$id]) ? $contexts[$id]->getContextValue() : NULL;
+    });
+
+    return function ($value, array $args, ResolveInfo $info) use ($resolve) {
+      yield $resolve();
+    };
   }
 
 }
