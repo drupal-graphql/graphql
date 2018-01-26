@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Generate GraphQLField plugins for config fields.
  */
 abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDeriverInterface {
+  use DependencySerializationTrait;
 
   /**
    * Provides plugin definition values from fields.
@@ -103,7 +105,9 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
       }
 
       foreach ($this->entityFieldManager->getFieldStorageDefinitions($entityTypeId) as $fieldStorageDefinition) {
-        $this->derivatives = array_merge($this->derivatives, $this->getDerivativeDefinitionsFromFieldDefinition($entityTypeId, $fieldStorageDefinition, $basePluginDefinition));
+        if ($derivatives = $this->getDerivativeDefinitionsFromFieldDefinition($entityTypeId, $fieldStorageDefinition, $basePluginDefinition)) {
+          $this->derivatives = array_merge($this->derivatives, $derivatives);
+        }
       }
     }
 
