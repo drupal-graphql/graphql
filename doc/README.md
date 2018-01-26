@@ -10,7 +10,7 @@ custom code or you can use and extend the generated schema using the plugin
 architecture and the provided plugin implementations form the sub-module.
 
 For ease of development, it includes the [GraphiQL] interface at
-/graphql/explorer. Make sure to __enable__ the GraphiQL module.
+/graphql/explorer.
 
 [Drupal 8]: https://www.drupal.org/8
 [GraphQL]: http://graphql.org/
