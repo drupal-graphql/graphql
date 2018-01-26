@@ -141,7 +141,6 @@ services:
     class: Drupal\graphql\Cache\RequestPolicy\DenyQuery
     tags:
       - { name: dynamic_page_cache_request_policy }
-      - { name: page_cache_request_policy }
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
