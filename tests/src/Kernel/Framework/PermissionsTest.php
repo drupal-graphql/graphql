@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql\Kernel;
+namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxy;

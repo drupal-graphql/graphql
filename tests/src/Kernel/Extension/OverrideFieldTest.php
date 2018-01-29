@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\graphql\Kernel;
+namespace Drupal\Tests\graphql\Kernel\Extension;
 
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 
@@ -9,18 +9,19 @@ use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
  *
  * @group graphql
  */
-class FieldTest extends GraphQLFileTestBase {
+class OverrideFieldTest extends GraphQLFileTestBase {
   public static $modules = [
     'graphql_plugin_test',
+    'graphql_override_test',
   ];
 
   /**
    * Test if the schema is created properly.
    */
-  public function testRootField() {
+  public function testEcho() {
     $string = 'Hello Echo!';
     $values = $this->executeQueryFile('echo.gql', ['input' => $string]);
-    $this->assertEquals($values['data']['echo'], $string);
+    $this->assertEquals($values['data']['echo'], strtoupper($string));
   }
 
 }

@@ -1,10 +1,11 @@
 <?php
 
-namespace Drupal\Tests\graphql\Kernel;
+namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql_batched_test\UserDataBaseInterface;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 
 /**
  * Test batched field resolving.
