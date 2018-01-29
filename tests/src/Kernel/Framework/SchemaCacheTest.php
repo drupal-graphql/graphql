@@ -7,7 +7,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
+use Drupal\Tests\graphql\Traits\LegacySchemaProphecyTrait;
 use Prophecy\Argument;
 use Youshido\GraphQL\Type\Scalar\StringType;
 
@@ -18,7 +18,7 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  * @group cache
  */
 class SchemaCacheTest extends KernelTestBase {
-  use SchemaProphecyTrait;
+  use LegacySchemaProphecyTrait;
 
   /**
    * {@inheritdoc}

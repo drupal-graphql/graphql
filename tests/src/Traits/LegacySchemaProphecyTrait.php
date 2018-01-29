@@ -13,7 +13,7 @@ use Youshido\GraphQL\Config\Field\FieldConfig;
 use Youshido\GraphQL\Field\AbstractField;
 use Youshido\GraphQL\Type\TypeInterface;
 
-trait SchemaProphecyTrait {
+trait LegacySchemaProphecyTrait {
 
   /**
    * A schema provider prophecy.
