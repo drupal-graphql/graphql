@@ -24,6 +24,7 @@ trait ByPassAccessTrait {
       ->willReturn(AccessResult::allowed());
     $user->id()->willReturn(0);
     $user->isAnonymous()->willReturn(TRUE);
+    $user->isAuthenticated()->willReturn(FALSE);
     $this->container->set('current_user', $user->reveal());
   }
 }
