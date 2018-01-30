@@ -5,6 +5,8 @@ namespace Drupal\Tests\graphql\Traits;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\graphql\Annotation\GraphQLField;
+use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface;
@@ -14,7 +16,7 @@ use Prophecy\Argument;
 trait MockTypeSystemTrait {
 
   /**
-   * @var
+   * @var \Prophecy\Prophecy\ObjectProphecy[]
    */
   protected $typeSystemPluginManagerProphecies = [];
 
@@ -77,12 +79,43 @@ trait MockTypeSystemTrait {
     }
   }
 
-  public function addPlugin(TypeSystemPluginInterface $plugin) {
+  public function getTypeSystemPluginDefaults($annotationClass, $definition) {
+    return (new $annotationClass($definition))->get();
+  }
+
+  public function addTypeSystemPlugin(TypeSystemPluginInterface $plugin) {
     foreach ($this->typeSystemClassMap as $id => $class) {
       if ($plugin instanceof $class) {
         $this->typeSystemPlugins[$id][$plugin->getPluginId()] = $plugin;
       }
     }
+  }
+
+  public function mockField($id, $definition, $resolver) {
+    $definition = $this->getTypeSystemPluginDefaults(GraphQLField::class, $definition + ['id' => $id]);
+
+    $field = $this->getMockBuilder(FieldPluginBase::class)
+      ->setConstructorArgs([[], 'root', $definition])
+      ->setMethods([
+        'resolveValues',
+      ])->getMock();
+
+    if (isset($resolver)) {
+      $resolve = $field
+        ->expects(static::any())
+        ->method('resolveValues')
+        ->with($this->anything(), $this->anything(), $this->anything());
+      if (is_callable($resolver)) {
+        $resolve->will($this->returnCallback($resolver));
+      }
+      else {
+        $resolve->will($this->returnCallback(function () use ($resolver) {
+          yield $resolver;
+        }));
+      }
+    }
+
+    return $field;
   }
 
 }
