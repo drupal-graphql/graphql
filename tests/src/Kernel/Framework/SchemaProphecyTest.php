@@ -7,18 +7,18 @@ use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Scalars\GraphQLString;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
+use Drupal\Tests\graphql\Traits\MockTypeSystemTrait;
 use Drupal\Tests\graphql\Traits\QueryTrait;
-use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
+use Drupal\Tests\graphql\Traits\MockSchemaTrait;
 
 class SchemaProphecyTest extends KernelTestBase {
   use QueryTrait;
   use ByPassAccessTrait;
-  use SchemaProphecyTrait;
+  use MockSchemaTrait;
+  use MockTypeSystemTrait;
 
   public static $modules = [
     'system',
-    'path',
-    'user',
     'graphql',
   ];
 
@@ -39,14 +39,10 @@ class SchemaProphecyTest extends KernelTestBase {
   }
 
   protected function setUp() {
-
     parent::setUp();
     $this->byPassAccess();
-
     $this->installConfig('system');
     $this->installConfig('graphql');
-    $this->installConfig('user');
-    $this->installEntitySchema('user');
   }
 
   public function testSchemaProphecy() {

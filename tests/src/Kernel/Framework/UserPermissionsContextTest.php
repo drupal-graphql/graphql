@@ -5,7 +5,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\QueryTrait;
-use Drupal\Tests\graphql\Traits\LegacySchemaProphecyTrait;
+use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
 use Prophecy\Argument;
 use Youshido\GraphQL\Schema\Schema;
 use Youshido\GraphQL\Type\Scalar\StringType;
@@ -21,7 +21,7 @@ use Youshido\GraphQL\Type\Scalar\StringType;
 class UserPermissionsContextTest extends KernelTestBase {
   use QueryTrait;
   use ByPassAccessTrait;
-  use LegacySchemaProphecyTrait;
+  use SchemaProphecyTrait;
 
   /**
    * {@inheritdoc}

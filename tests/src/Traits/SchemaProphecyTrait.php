@@ -2,126 +2,136 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\graphql\GraphQL\CacheableEdgeInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
-use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface;
-use Drupal\KernelTests\KernelTestBase;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Config\Field\FieldConfig;
+use Youshido\GraphQL\Field\AbstractField;
+use Youshido\GraphQL\Type\TypeInterface;
 
+/**
+ * @deprecated Use `MockSchemaTrait` and `MockTypeSystemTrait` instead.
+ */
 trait SchemaProphecyTrait {
 
-  abstract function getSchemaDefinitions();
-
   /**
+   * A schema provider prophecy.
+   *
    * @var \Prophecy\Prophecy\ObjectProphecy
    */
-  protected $schemaManagerProphecy;
+  protected $schemaManager;
 
   /**
-   * @var
+   * Factory method that will return the prophesized schema provider service.
    */
-  protected $typeSystemPluginManagerProphecies = [];
+  public function schemaManagerProphecyFactory() {
+    return $this->schemaManager->reveal();
+  }
 
   /**
-   * @var \Drupal\Component\Plugin\PluginInspectionInterface[][]
+   * {@inheritdoc}
    */
-  protected $typeSystemPlugins = [];
+  public function register(ContainerBuilder $container) {
+    $this->injectSchemaManager($container);
+    parent::register($container);
+  }
 
   /**
-   * @var string[]
+   * Create an empty default schema.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param \Youshido\GraphQL\Field\AbstractField $field
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface The empty schema plugin.
+   *   The empty schema plugin.
    */
-  protected $typeSystemClassMap = [];
-
-
-  public function schemaManagerFactory() {
-    return $this->schemaManagerProphecy->reveal();
+  protected function createSchema(ContainerInterface $container, AbstractField $field = NULL) {
+    return TestSchema::create($container, [], '', [], $field);
   }
 
-  public function typeSystemPluginManagerFactory($id) {
-    return $this->typeSystemPluginManagerProphecies[$id]->reveal();
-  }
-
-  protected function registerSchemaPluginManager(ContainerBuilder $container) {
-    if ($this instanceof KernelTestBase) {
-      $this->schemaManagerProphecy = $this->prophesize(SchemaPluginManager::class);
-
-      $that = $this;
-
-      $this->schemaManagerProphecy->getDefinitions()->will(function () use ($that) {
-        return $that->getSchemaDefinitions();
-      });
-
-      $this->schemaManagerProphecy->getDefinition(Argument::type('string'))->will(function ($args) use ($that) {
-        return $that->getSchemaDefinitions()[$args[0]];
-      });
-
-      $this->schemaManagerProphecy->createInstance(Argument::type('string'), Argument::cetera())->will(function ($args) use ($that) {
-        return $that->getMockForAbstractClass(SchemaPluginBase::class, [
-          [],
-          'default',
-          $that->getSchemaDefinitions()[$args[0]],
-          $that->container->get('graphql.plugin_manager_aggregator'),
-        ]);
-      });
-
-      $definition = $container->getDefinition('plugin.manager.graphql.schema');
-      $definition->setClass(get_class($this->schemaManagerProphecy->reveal()));
-      $definition->setFactory([$this, 'schemaManagerFactory']);
+  /**
+   * Set the mock schema that will be injected into tests.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface $schema
+   *   The schema to inject.
+   *
+   * @return \Prophecy\Prophecy\ObjectProphecy
+   *   The prophesized schema manager service.
+   *
+   * @throws \Exception
+   */
+  protected function injectSchema(SchemaPluginInterface $schema) {
+    if (!isset($this->schemaManager)) {
+      throw new \Exception('No schema provider prophecy available. Please invoke `injectSchemaManagerProphecy()` in `KernelTestBase::register()`');
     }
+
+    return $this->schemaManager->createInstance('default')->willReturn($schema);
   }
 
-  protected function registerTypeSystemPluginManagers(ContainerBuilder $container) {
-    if ($this instanceof KernelTestBase) {
-      $that = $this;
+  /**
+   * Inject a schema manager prophecy to mock GraphQL fields.
+   *
+   * To be called in `KernelTestBase::register()`.
+   *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container builder.
+   */
+  protected function injectSchemaManager(ContainerBuilder $container) {
+    $defaultSchemaDefinition = TestSchema::pluginDefinition();
 
-      foreach (array_keys($container->findTaggedServiceIds('graphql_plugin_manager')) as $id) {
-        $definition = $container->getDefinition($id);
-        $this->typeSystemClassMap[$id] = $definition->getArguments()[3];
-        $this->typeSystemPlugins[$id] = [];
+    $this->schemaManager = $this->prophesize(SchemaPluginManager::class);
+    $this->schemaManager->getDefinitions()->willReturn([
+      'default' => $defaultSchemaDefinition,
+    ]);
 
-        $manager = $this->prophesize(TypeSystemPluginManagerInterface::class);
+    $this->schemaManager->getDefinition('default')->willReturn($defaultSchemaDefinition);
 
-        $manager->getDefinitions()->will(function () use ($that, $id) {
-          return array_map(function (PluginInspectionInterface $plugin) {
-            return $plugin->getPluginDefinition();
-          }, $that->typeSystemPlugins[$id]);
-        });
+    $container->register('plugin.manager.graphql.schema')
+      ->setFactory([$this, 'schemaManagerProphecyFactory'])
+      ->setClass(get_class($this->prophesize(SchemaPluginManager::class)->reveal()));
+  }
 
-        $manager->getDefinition(Argument::type('string'))->will(function ($args) use ($that, $id) {
-          if (!isset($that->typeSystemPlugins[$id][$args[0]])) {
-            throw new PluginNotFoundException($args[0]);
-          }
-          return $that->typeSystemPlugins[$id][$args[0]]->getPluginDefinition();
-        });
-
-        $manager->createInstance(Argument::type('string'), Argument::cetera())->will(function ($args) use ($that, $id) {
-          if (!isset($that->typeSystemPlugins[$id][$args[0]])) {
-            throw new PluginNotFoundException($args[0]);
-          }
-          return $that->typeSystemPlugins[$id][$args[0]];
-        });
-
-        $this->typeSystemPluginManagerProphecies[$id] = $manager;
-
-        $new = $container->register('test.' . $id, TypeSystemPluginManager::class);
-        $new->addTag('graphql_plugin_manager');
-        $new->setFactory([$this, 'typeSystemPluginManagerFactory']);
-        $new->addArgument($id);
-      }
+  /**
+   * Prophesize a field.
+   *
+   * @param $name
+   *   The field name in the schema.
+   * @param \Youshido\GraphQL\Type\TypeInterface $type
+   *   The fields return type.
+   * @param \Drupal\Core\Cache\CacheableMetadata $schemaMetadata
+   *   The cacheable schema metadata.
+   * @param \Drupal\Core\Cache\CacheableMetadata $responseMetadata
+   *   The cacheable response metadata.
+   *
+   * @return \Prophecy\Prophecy\ObjectProphecy
+   *   The field prophecy.
+   */
+  protected function prophesizeField($name, TypeInterface $type, CacheableMetadata $schemaMetadata = NULL, CacheableMetadata $responseMetadata = NULL) {
+    if (!$schemaMetadata) {
+      $schemaMetadata = new CacheableMetadata();
     }
-  }
 
-  public function addPlugin(TypeSystemPluginInterface $plugin) {
-    foreach ($this->typeSystemClassMap as $id => $class) {
-      if ($plugin instanceof $class) {
-        $this->typeSystemPlugins[$id][$plugin->getPluginId()] = $plugin;
-      }
+    if (!$responseMetadata) {
+      $responseMetadata = new CacheableMetadata();
     }
-  }
 
+    $root = $this->prophesize(AbstractField::class)
+      ->willImplement(CacheableEdgeInterface::class);
+
+    $root->getName()->willReturn($name);
+    $root->getType()->willReturn($type);
+    $root->getConfig()->willReturn(new FieldConfig([
+      'name' => $name,
+      'type' => $type,
+    ]));
+
+    $root->getSchemaCacheMetadata(Argument::any())->willReturn($schemaMetadata);
+    $root->getResponseCacheMetadata(Argument::any())->willReturn($responseMetadata);
+    $root->getArguments()->willReturn([]);
+
+    return $root;
+  }
 }
