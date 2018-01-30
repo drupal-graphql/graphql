@@ -49,6 +49,10 @@ trait MockTypeSystemTrait {
           }, $that->typeSystemPlugins[$id]);
         });
 
+        $manager->hasDefinition(Argument::type('string'))->will(function ($args) use ($that, $id) {
+          return isset($that->typeSystemPlugins[$id][$args[0]]);
+        });
+
         $manager->getDefinition(Argument::type('string'))->will(function ($args) use ($that, $id) {
           if (!isset($that->typeSystemPlugins[$id][$args[0]])) {
             throw new PluginNotFoundException($args[0]);

@@ -7,7 +7,7 @@ class TypeSystemPluginManagerAggregator implements \IteratorAggregate {
   /**
    * List of registered plugin managers.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface[]
+   * @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface[][]
    */
   protected $pluginManagers = [];
 
@@ -23,7 +23,7 @@ class TypeSystemPluginManagerAggregator implements \IteratorAggregate {
     $pieces = explode('.', $id);
     $key = end($pieces);
 
-    $this->pluginManagers[$key] = $pluginManager;
+    $this->pluginManagers[$key][] = $pluginManager;
   }
 
   /**
@@ -32,15 +32,14 @@ class TypeSystemPluginManagerAggregator implements \IteratorAggregate {
    * @param string $type
    *   The plugin type.
    *
-   * @return \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface|null
-   *   The plugin manager for the given plugin type or NULL.
+   * @return \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface[]
+   *   The plugin managers for the given plugin type.
    */
-  public function getPluginManager($type) {
+  public function getPluginManagers($type) {
     if (isset($this->pluginManagers[$type])) {
       return $this->pluginManagers[$type];
     }
-
-    return NULL;
+    return [];
   }
 
   /**

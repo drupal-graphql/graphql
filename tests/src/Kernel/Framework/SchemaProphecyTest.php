@@ -69,13 +69,6 @@ class SchemaProphecyTest extends KernelTestBase {
       ->method('resolveValues')
       ->willreturn(new \ArrayIterator(['test']));
 
-    $this->addPlugin(new GraphQLString([], 'graphql_string', [
-      'id' => 'string',
-      'name' => 'String',
-      'data_type' => 'string',
-      'weight' => 0,
-      'pluginType' => GRAPHQL_SCALAR_PLUGIN,
-    ]));
     $this->addPlugin($field);
 
     $result = $this->query('{ root }');

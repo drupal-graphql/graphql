@@ -43,7 +43,7 @@ class TypeSystemPluginManager extends DefaultPluginManager implements TypeSystem
    *   The plugin type handled by this manager.
    */
   public function getPluginType() {
-    return $this->alterHook;
+    return substr(strlen('grapqhl_'), $this->alterHook);
   }
 
 }
