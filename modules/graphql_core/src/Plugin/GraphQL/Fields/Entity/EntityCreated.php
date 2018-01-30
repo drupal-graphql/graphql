@@ -2,9 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
-use Drupal\Core\Render\Element\Date;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use DateTime;
 
@@ -18,10 +16,7 @@ use DateTime;
  *   type = "String",
  *   parents = {"Entity"},
  *   arguments = {
- *     "format" = {
- *       "type" = "String",
- *       "nullable" = "true"
- *     }
+ *     "format" = "String"
  *   }
  * )
  */

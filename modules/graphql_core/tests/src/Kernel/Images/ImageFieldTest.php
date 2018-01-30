@@ -2,13 +2,10 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Images;
 
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\image\Entity\ImageStyle;
-use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;

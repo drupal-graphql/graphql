@@ -50,7 +50,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
           'name' => StringHelper::propCase($id, 'by', 'id'),
-          'type' => StringHelper::camelCase($id),
+          'type' => "entity:$id",
           'description' => $this->t("Loads '@type' entities by their id.", ['@type' => $type->getLabel()]),
           'entity_type' => $id,
         ] + $basePluginDefinition;
@@ -58,7 +58,6 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
         if ($type->isTranslatable()) {
           $derivative['arguments']['language'] = [
             'type' => 'AvailableLanguages',
-            'nullable' => TRUE,
           ];
         }
 

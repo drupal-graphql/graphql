@@ -6,9 +6,8 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Drupal\graphql_core\Plugin\GraphQL\Types\Entity\EntityFieldType;
+use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -73,7 +72,7 @@ class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriver
         $fieldType = $fieldDefinition->getType();
 
         if (isset($basePluginDefinition['field_types']) && in_array($fieldType, $basePluginDefinition['field_types'])) {
-          $parents[] = EntityFieldType::getId($entityTypeId, $fieldName);
+          $parents[] = StringHelper::camelCase('field', $entityTypeId, $fieldName);
         }
       }
     }

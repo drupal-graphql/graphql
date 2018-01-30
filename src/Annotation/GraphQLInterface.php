@@ -15,13 +15,6 @@ class GraphQLInterface extends GraphQLAnnotationBase {
   public $pluginType = GRAPHQL_INTERFACE_PLUGIN;
 
   /**
-   * The Drupal (TypedData) type of a given interface.
-   *
-   * @var string
-   */
-  public $data_type;
-
-  /**
    * The list of parent interfaces this interface extends.
    *
    * Fields attached to interfaces will be inherited.
@@ -29,5 +22,12 @@ class GraphQLInterface extends GraphQLAnnotationBase {
    * @var string[]
    */
   public $interfaces = [];
+
+  /**
+   * The typed data type of this type.
+   *
+   * @var string|null
+   */
+  public $type = NULL;
 
 }

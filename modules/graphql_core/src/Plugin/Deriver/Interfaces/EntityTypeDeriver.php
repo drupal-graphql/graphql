@@ -54,8 +54,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
           'description' => $this->t("The '@type' entity type.", [
             '@type' => $type->getLabel(),
           ]),
-          'data_type' => 'entity:' . $typeId,
-          'entity_type' => $typeId,
+          'type' => "entity:$typeId",
         ] + $basePluginDefinition;
       }
     }

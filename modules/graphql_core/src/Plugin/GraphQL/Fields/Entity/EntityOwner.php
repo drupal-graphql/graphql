@@ -3,7 +3,6 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\user\EntityOwnerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -14,22 +13,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_owner",
  *   secure = true,
  *   name = "entityOwner",
+ *   type = "entity:user",
  *   parents = {"Entity"}
  * )
  */
 class EntityOwner extends FieldPluginBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function buildType(PluggableSchemaBuilderInterface $schemaBuilder) {
-    try {
-      return $schemaBuilder->findByName('User', [GRAPHQL_INTERFACE_PLUGIN])->getDefinition($schemaBuilder);
-    }
-    catch (\Exception $exc) {
-      return $schemaBuilder->findByName('Entity', [GRAPHQL_INTERFACE_PLUGIN])->getDefinition($schemaBuilder);
-    }
-  }
 
   /**
    * {@inheritdoc}

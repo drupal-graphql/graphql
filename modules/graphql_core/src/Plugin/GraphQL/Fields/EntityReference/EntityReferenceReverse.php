@@ -10,18 +10,15 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "entity_reference_reverse",
  *   secure = true,
- *   nullable = true,
  *   weight = -1,
  *   type = "EntityQueryResult",
  *   arguments = {
  *     "offset" = {
  *       "type" = "Int",
- *       "nullable" = true,
  *       "default" = 0
  *     },
  *     "limit" = {
  *       "type" = "Int",
- *       "nullable" = true,
  *       "default" = 10
  *     }
  *   },

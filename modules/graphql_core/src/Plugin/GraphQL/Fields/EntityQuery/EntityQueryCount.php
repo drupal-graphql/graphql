@@ -14,8 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "count",
  *   type = "Int",
- *   parents = {"EntityQueryResult"},
- *   nullable = true
+ *   parents = {"EntityQueryResult"}
  * )
  */
 class EntityQueryCount extends FieldPluginBase {

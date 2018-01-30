@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-
 /**
  * Test caching of query results.
  *

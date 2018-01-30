@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
@@ -60,7 +59,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function find(callable $selector, array $types, $invert = FALSE) {
+  public function find(callable $selector, array $types) {
     $items = [];
 
     /** @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface $manager */
@@ -71,12 +70,9 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
 
       foreach ($manager->getDefinitions() as $id => $definition) {
         $name = $definition['name'];
-        if (empty($name)) {
-          throw new InvalidPluginDefinitionException($id, 'Invalid plugin definition. No name defined.');
-        }
 
         if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
-          if ((($invert && !$selector($definition)) || $selector($definition))) {
+          if ($selector($definition)) {
             $items[$name] = [
               'weight' => $definition['weight'],
               'id' => $id,
@@ -96,7 +92,6 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       return ($a['weight'] < $b['weight']) ? 1 : -1;
     });
 
-    // @TODO: Add support configurable plugins.
     return array_map(function (array $item) {
       return $this->getInstance($item['type'], $item['id']);
     }, $items);
@@ -105,14 +100,31 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   /**
    * {@inheritdoc}
    */
+  public function findByDataType($type, array $types) {
+    $parts = explode(':', $type);
+    $chain = array_reverse(array_reduce($parts, function ($carry, $current) {
+      return $carry + [implode(':', array_filter([end($carry), $current]))];
+    }, []), TRUE);
+
+    $result = $this->find(function($definition) use ($chain) {
+      if (!empty($definition['type'])) {
+        foreach ($chain as $priority => $part) {
+          if ($definition['type'] === $part) {
+            return TRUE;
+          }
+        }
+      }
+
+      return FALSE;
+    }, $types);
+
+    return array_pop($result);
+  }
+
   public function findByName($name, array $types) {
     $result = $this->find(function($definition) use ($name) {
       return $definition['name'] === $name;
     }, $types);
-
-    if (empty($result)) {
-      throw new InvalidPluginDefinitionException(null, sprintf('Plugin with name %s could not be found.', $name));
-    }
 
     return array_pop($result);
   }
@@ -120,29 +132,16 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function findByDataType($dataType, array $types = [
-    GRAPHQL_UNION_TYPE_PLUGIN,
-    GRAPHQL_TYPE_PLUGIN,
-    GRAPHQL_INTERFACE_PLUGIN,
-    GRAPHQL_SCALAR_PLUGIN,
-  ]) {
-    $chain = explode(':', $dataType);
-
-    while ($chain) {
-      $dataType = implode(':', $chain);
-
-      $types = $this->find(function($definition) use ($dataType) {
-        return isset($definition['data_type']) && $definition['data_type'] == $dataType;
-      }, $types);
-
-      if (!empty($types)) {
-        return array_pop($types);
-      }
-
-      array_pop($chain);
+  public function findByDataTypeOrName($input, array $types) {
+    if ($type = $this->findByDataType($input, $types)) {
+      return $type;
     }
 
-    return NULL;
+    if ($type = $this->findByName($input, $types)) {
+      return $type;
+    }
+
+    return $this->getInstance('scalar', 'undefined');
   }
 
   /**

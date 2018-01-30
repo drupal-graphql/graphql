@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "number",
  *   type = "Numbers",
  *   arguments = {
- *     "number" = "Numbers"
+ *     "number" = "Numbers!"
  *   }
  * )
  */

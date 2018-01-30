@@ -13,10 +13,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_crud_output_violations",
  *   secure = true,
  *   name = "violations",
- *   type = "ConstraintViolation",
- *   parents = {"EntityCrudOutput"},
- *   multi = true,
- *   nullable = false
+ *   type = "[ConstraintViolation]",
+ *   parents = {"EntityCrudOutput"}
  * )
  */
 class EntityCrudOutputViolations extends FieldPluginBase {

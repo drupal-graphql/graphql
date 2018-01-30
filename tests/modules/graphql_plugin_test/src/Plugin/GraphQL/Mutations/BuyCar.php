@@ -18,7 +18,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "buyCar",
  *   type = "Car",
  *   arguments = {
- *     "car" = "CarInput"
+ *     "car" = "CarInput!"
  *   }
  * )
  */

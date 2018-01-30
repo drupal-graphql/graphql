@@ -13,10 +13,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_crud_output_errors",
  *   secure = true,
  *   name = "errors",
- *   type = "String",
- *   parents = {"EntityCrudOutput"},
- *   multi = true,
- *   nullable = false
+ *   type = "[String]",
+ *   parents = {"EntityCrudOutput"}
  * )
  */
 class EntityCrudOutputErrors extends FieldPluginBase {

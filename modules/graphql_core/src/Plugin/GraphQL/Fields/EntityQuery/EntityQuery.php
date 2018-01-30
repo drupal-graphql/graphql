@@ -6,7 +6,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -24,12 +23,10 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   arguments = {
  *     "offset" = {
  *       "type" = "Int",
- *       "nullable" = true,
  *       "default" = 0
  *     },
  *     "limit" = {
  *       "type" = "Int",
- *       "nullable" = true,
  *       "default" = 10
  *     }
  *   },

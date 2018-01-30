@@ -10,8 +10,7 @@ namespace Drupal\graphql_batched_test\Plugin\GraphQL\Fields;
  *   secure = true,
  *   name = "friends",
  *   parents = {"User"},
- *   type = "User",
- *   multi = true
+ *   type = "[User]"
  * )
  */
 class Friends extends Users {

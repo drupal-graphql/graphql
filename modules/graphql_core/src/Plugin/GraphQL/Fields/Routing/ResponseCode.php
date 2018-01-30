@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
-
-use Drupal\graphql\Annotation\GraphQLField;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;

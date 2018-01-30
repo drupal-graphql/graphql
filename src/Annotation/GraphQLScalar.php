@@ -15,10 +15,10 @@ class GraphQLScalar extends GraphQLAnnotationBase {
   public $pluginType = GRAPHQL_SCALAR_PLUGIN;
 
   /**
-   * The Drupal (TypedData) type of a given scalar.
+   * The typed data type of this type.
    *
-   * @var string
+   * @var string|null
    */
-  public $data_type;
+  public $type = NULL;
 
 }
