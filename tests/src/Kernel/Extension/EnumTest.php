@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
 use Drupal\graphql\GraphQL\Utility\TypeCollector;
+use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Youshido\GraphQL\Type\Enum\EnumType;
 
 /**
