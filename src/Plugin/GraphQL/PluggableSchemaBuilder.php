@@ -103,7 +103,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   public function findByDataType($type, array $types) {
     $parts = explode(':', $type);
     $chain = array_reverse(array_reduce($parts, function ($carry, $current) {
-      return $carry + [implode(':', array_filter([end($carry), $current]))];
+      return array_merge($carry, [implode(':', array_filter([end($carry), $current]))]);
     }, []), TRUE);
 
     $result = $this->find(function($definition) use ($chain) {
