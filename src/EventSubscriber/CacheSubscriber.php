@@ -12,8 +12,6 @@ use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;

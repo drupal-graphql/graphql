@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-
 /**
  * Test plugin based schema generation.
  *

@@ -10,8 +10,7 @@ use Youshido\GraphQL\Type\Scalar\IdType;
  *
  * @GraphQLScalar(
  *   id = "id",
- *   name = "ID",
- *   data_type = "id"
+ *   name = "ID"
  * )
  */
 class GraphQLId extends ScalarPluginBase {

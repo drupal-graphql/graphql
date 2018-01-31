@@ -89,6 +89,55 @@ function graphql_graphql_types_alter(&$definitions) {
 }
 
 /**
+ * Helper function to decorate legacy definitions.
+ *
+ * @param array $definitions
+ *   A plugin definitions array.
+ */
+function _graphql_decorate_deprecated_type(array &$definitions) {
+  foreach ($definitions as &$definition) {
+    if (!empty($definition['type'])) {
+      if (!empty($definition['multi'])) {
+        $definition['type'] = "[{$definition['type']}]";
+      }
+
+      if (isset($definition['nullable']) && empty($definition['nullable'])) {
+        $definition['type'] = "{$definition['type']}!";
+      }
+    }
+
+    if (!empty($definition['fields'])) {
+      _graphql_decorate_deprecated_type($definition['fields']);
+    }
+
+    if (!empty($definition['arguments'])) {
+      _graphql_decorate_deprecated_type($definition['arguments']);
+    }
+  }
+}
+
+/**
+ * Implements hook_graphql_fields_alter().
+ */
+function graphql_graphql_fields_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
+ * Implements hook_graphql_mutations_alter().
+ */
+function graphql_graphql_mutations_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
+ * Implements hook_graphql_input_types_alter().
+ */
+function graphql_graphql_input_types_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
  * Get a flattened list of a plugins interface inheritance tree.
  *
  * @param array $definitions

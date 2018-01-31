@@ -16,8 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "garage",
  *   secure = true,
  *   name = "garage",
- *   type = "Vehicle",
- *   multi = true
+ *   type = "[Vehicle]"
  * )
  */
 class Garage extends FieldPluginBase implements ContainerFactoryPluginInterface {

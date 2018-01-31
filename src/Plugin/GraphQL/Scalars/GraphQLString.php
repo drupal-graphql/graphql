@@ -11,7 +11,7 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  * @GraphQLScalar(
  *   id = "string",
  *   name = "String",
- *   data_type = "string"
+ *   type = "string"
  * )
  */
 class GraphQLString extends ScalarPluginBase {

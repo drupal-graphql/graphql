@@ -4,9 +4,6 @@ namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 
-/**
- * Methods for named plugins.
- */
 trait NamedPluginTrait {
 
   /**

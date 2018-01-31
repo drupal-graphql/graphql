@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "String",
  *   parents = {"Root"},
  *   arguments = {
- *     "input" = "String"
+ *     "input" = "String!"
  *   }
  * )
  */

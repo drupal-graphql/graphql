@@ -20,9 +20,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "menu_links",
  *   secure = true,
  *   name = "links",
- *   type = "MenuLink",
- *   parents = {"Menu"},
- *   multi = true
+ *   type = "[MenuLink]",
+ *   parents = {"Menu"}
  * )
  */
 class MenuLinks extends FieldPluginBase implements ContainerFactoryPluginInterface {

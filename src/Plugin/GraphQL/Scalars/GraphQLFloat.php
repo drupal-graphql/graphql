@@ -11,7 +11,7 @@ use Youshido\GraphQL\Type\Scalar\FloatType;
  * @GraphQLScalar(
  *   id = "float",
  *   name = "Float",
- *   data_type = "float"
+ *   type = "float"
  * )
  */
 class GraphQLFloat extends ScalarPluginBase {

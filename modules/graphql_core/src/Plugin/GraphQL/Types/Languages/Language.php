@@ -10,7 +10,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  * @GraphQLType(
  *   id = "language",
  *   name = "Language",
- *   data_type = "language"
+ *   type = "language"
  * )
  */
 class Language extends TypePluginBase {

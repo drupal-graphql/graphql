@@ -123,8 +123,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
-      'query' => $values['query'] ?: '',
-      'variables' => $values['variables'] ?: [],
+      'query' => is_string($values['query']) ? $values['query'] : '',
+      'variables' => is_array($values['variables']) ? $values['variables'] : [],
       'persisted' => empty($params['query']),
       'type' => static::SINGLE,
     ];

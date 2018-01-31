@@ -68,6 +68,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
+        /** @var \Drupal\Core\Field\BaseFieldDefinition[] $queryableProperties */
         $queryableProperties = array_filter($properties, function($property) {
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
@@ -92,10 +93,8 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
           }
 
           $derivative['fields'][$fieldName] = [
-            'multi' => FALSE,
-            'nullable' => TRUE,
             'field_name' => $key,
-            'data_type' => $mainPropertyDefinition->getDataType(),
+            'type' => $mainPropertyDefinition->getDataType(),
           ];
         }
 

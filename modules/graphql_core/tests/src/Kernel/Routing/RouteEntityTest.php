@@ -3,9 +3,6 @@
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\image\Entity\ImageStyle;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;

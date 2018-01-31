@@ -7,7 +7,6 @@ use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\QueryTrait;
 use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
 use Prophecy\Argument;
-use Youshido\GraphQL\Schema\Schema;
 use Youshido\GraphQL\Type\Scalar\StringType;
 
 /**

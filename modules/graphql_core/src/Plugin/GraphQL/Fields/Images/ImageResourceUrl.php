@@ -14,7 +14,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "url",
  *   type = "String",
- *   nullable = true,
  *   parents = {"ImageResource"},
  *   field_types = {"image"},
  *   provider = "image",

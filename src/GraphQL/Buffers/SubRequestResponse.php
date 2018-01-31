@@ -9,14 +9,14 @@ class SubRequestResponse extends Response {
   /**
    * The request result.
    *
-   * @var mixed
+   * @var array
    */
   protected $result;
 
   /**
    * SubrequestResponse constructor.
    *
-   * @param mixed $result
+   * @param array $result
    *   The request result.
    * @param int $status
    *   The response status code.
@@ -31,7 +31,7 @@ class SubRequestResponse extends Response {
   /**
    * Gets the request result.
    *
-   * @return mixed
+   * @return array
    *   The request result.
    */
   public function getResult() {
