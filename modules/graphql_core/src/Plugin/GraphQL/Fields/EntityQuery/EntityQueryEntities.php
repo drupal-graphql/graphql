@@ -18,10 +18,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_query_entities",
  *   secure = true,
  *   name = "entities",
- *   type = "Entity",
- *   parents = {"EntityQueryResult"},
- *   multi = true,
- *   nullable = true
+ *   type = "[Entity]",
+ *   parents = {"EntityQueryResult"}
  * )
  */
 class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPluginInterface {

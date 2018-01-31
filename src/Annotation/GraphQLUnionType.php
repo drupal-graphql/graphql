@@ -21,4 +21,11 @@ class GraphQLUnionType extends GraphQLAnnotationBase {
    */
   public $types = [];
 
+  /**
+   * The typed data type of this type.
+   *
+   * @var string|null
+   */
+  public $type = NULL;
+
 }

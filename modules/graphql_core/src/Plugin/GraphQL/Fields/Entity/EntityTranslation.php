@@ -17,13 +17,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_translation",
  *   secure = true,
  *   name = "entityTranslation",
- *   nullable = true,
- *   multi = false,
  *   weight = -1,
  *   type = "Entity",
  *   parents = {"Entity"},
  *   arguments = {
- *     "language" = "AvailableLanguages"
+ *     "language" = "AvailableLanguages!"
  *   }
  * )
  */

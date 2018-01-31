@@ -57,7 +57,7 @@ trait GraphQLFileTestTrait {
    * @param bool $bypassSecurity
    *   Bypass field security for this query.
    *
-   * @return string
+   * @return array
    *   The GraphQL result object.
    */
   public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE, $bypassSecurity = FALSE) {

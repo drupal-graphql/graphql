@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "echo",
  *   type = "String",
  *   arguments = {
- *     "input" = "String"
+ *     "input" = "String!"
  *   },
  *   weight = 1
  * )

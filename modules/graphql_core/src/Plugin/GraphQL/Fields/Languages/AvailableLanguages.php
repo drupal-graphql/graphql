@@ -16,8 +16,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "availableLanguages",
  *   description = @Translation("Loads the list of available languages."),
- *   type = "Language",
- *   multi = true
+ *   type = "[Language]"
  * )
  */
 class AvailableLanguages extends FieldPluginBase implements ContainerFactoryPluginInterface {

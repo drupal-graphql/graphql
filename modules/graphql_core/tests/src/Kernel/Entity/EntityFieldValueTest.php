@@ -39,7 +39,6 @@ class EntityFieldValueTest extends GraphQLFileTestBase {
     'field',
     'filter',
     'text',
-    'graphql_core',
     'link',
     'datetime',
     'image',

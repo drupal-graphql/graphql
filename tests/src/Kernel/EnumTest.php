@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Utility\TypeCollector;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 use Youshido\GraphQL\Type\Enum\EnumType;
 
 /**
@@ -29,20 +28,6 @@ class EnumTest extends GraphQLFileTestBase {
         'ONE', 'TWO', 'THREE',
       ],
     ], $result['data'], 'Enum plugins accept and return properly.');
-  }
-
-  /**
-   * Test enumerations generated from annotations.
-   */
-  public function testEnumAnnotations() {
-    $result = $this->executeQueryFile('enums.gql');
-
-    $this->assertArraySubset([
-      'character' => 'A',
-      'characters' => [
-        'A', 'B', 'C',
-      ],
-    ], $result['data'], 'Annotated enums accept and return properly.');
   }
 
   /**

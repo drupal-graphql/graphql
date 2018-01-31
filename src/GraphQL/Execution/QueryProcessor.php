@@ -2,13 +2,10 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\graphql\GraphQL\Reducers\ReducerManager;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Schema\AbstractSchema;
 
 /**
  * Drupal service for executing GraphQL queries.

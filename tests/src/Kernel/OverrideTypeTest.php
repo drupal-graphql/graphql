@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql_plugin_test\GarageInterface;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
 
 /**
  * Test plugin based schema generation.

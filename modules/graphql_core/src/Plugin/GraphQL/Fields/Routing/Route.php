@@ -18,9 +18,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "route",
  *   description = @Translation("Loads a route by its path."),
  *   type = "Url",
- *   nullable = true,
  *   arguments = {
- *     "path" = "String"
+ *     "path" = "String!"
  *   }
  * )
  */

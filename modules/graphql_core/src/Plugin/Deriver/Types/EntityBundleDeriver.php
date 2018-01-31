@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\Plugin\GraphQL\Types\Entity\EntityBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -68,19 +67,20 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
       if ($type instanceof ContentEntityTypeInterface && array_key_exists($typeId, $bundles)) {
         foreach ($bundles[$typeId] as $bundle => $bundleDefinition) {
           $this->derivatives[$typeId . '-' . $bundle] = [
-            'name' => EntityBundle::getId($typeId, $bundle),
+            'name' => StringHelper::camelCase($typeId, $bundle),
             'description' => $this->t("The '@bundle' bundle of the '@type' entity type.", [
               '@bundle' => $bundleDefinition['label'],
               '@type' => $type->getLabel(),
             ]),
-            'entity_type' => $typeId,
-            'data_type' => 'entity:' . $typeId . ':' . $bundle,
             'interfaces' => [StringHelper::camelCase($typeId)],
-            'bundle' => $bundle,
+            'type' => "entity:$typeId:$bundle",
+            'entity_type' => $typeId,
+            'entity_bundle' => $bundle,
           ] + $basePluginDefinition;
         }
       }
     }
+
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 

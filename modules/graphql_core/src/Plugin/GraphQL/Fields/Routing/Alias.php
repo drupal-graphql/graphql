@@ -6,7 +6,6 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
-use Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Path;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 

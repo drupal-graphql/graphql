@@ -14,8 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entity",
  *   type = "Entity",
- *   parents = {"EntityCrudOutput"},
- *   nullable = true
+ *   parents = {"EntityCrudOutput"}
  * )
  */
 class EntityCrudOutputEntity extends FieldPluginBase {

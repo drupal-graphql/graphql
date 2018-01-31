@@ -11,7 +11,7 @@ use Youshido\GraphQL\Type\Scalar\BooleanType;
  * @GraphQLScalar(
  *   id = "boolean",
  *   name = "Boolean",
- *   data_type = "boolean"
+ *   type = "boolean"
  * )
  */
 class GraphQLBoolean extends ScalarPluginBase {
