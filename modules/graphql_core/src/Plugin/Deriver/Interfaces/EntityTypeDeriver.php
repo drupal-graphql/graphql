@@ -26,9 +26,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager')
-    );
+    return new static($container->get('entity_type.manager'));
   }
 
   /**
@@ -52,8 +50,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
         'description' => $this->t("The '@type' entity type.", [
           '@type' => $type->getLabel(),
         ]),
-        'data_type' => 'entity:' . $typeId,
-        'entity_type' => $typeId,
+        'type' => "entity:$typeId",
       ] + $basePluginDefinition;
     }
 

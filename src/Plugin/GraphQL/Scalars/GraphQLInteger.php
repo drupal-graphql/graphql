@@ -11,7 +11,7 @@ use Youshido\GraphQL\Type\Scalar\IntType;
  * @GraphQLScalar(
  *   id = "int",
  *   name = "Int",
- *   data_type = "integer"
+ *   type = "integer"
  * )
  */
 class GraphQLInteger extends ScalarPluginBase {

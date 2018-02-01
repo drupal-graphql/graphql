@@ -4,67 +4,11 @@ namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Youshido\GraphQL\Type\Enum\EnumType;
 use Youshido\GraphQL\Type\ListType\ListType;
 use Youshido\GraphQL\Type\NonNullType;
 use Youshido\GraphQL\Type\TypeInterface;
 
-/**
- * Methods for GraphQL plugins that have a type.
- */
 trait TypedPluginTrait {
-
-  /**
-   * Add information about cardinality and nullability.
-   *
-   * @param \Youshido\GraphQL\Type\TypeInterface $type
-   *   The initial type object.
-   * @param bool $nullable
-   *   Indicates if the type can be null.
-   * @param bool $multi
-   *   Indicates if the type is a list.
-   *
-   * @return \Youshido\GraphQL\Type\TypeInterface
-   *   The decorated type
-   */
-  public function decorateType(TypeInterface $type, $nullable, $multi) {
-    if ($type) {
-      if ($multi) {
-        $type = new ListType($type);
-      }
-      if (!$nullable) {
-        $type = new NonNullType($type);
-      }
-    }
-    return $type;
-  }
-
-  /**
-   * Turn a list of options into an EnumType.
-   *
-   * @param string[] $options
-   *   A list of options.
-   * @param string $typeName
-   *   The name for the enum type.
-   *
-   * @return EnumType
-   *   The enumeration type.
-   */
-  protected function buildEnumConfig(array $options, $typeName) {
-    $values = [];
-    foreach ($options as $value => $description) {
-      $values[] = [
-        'value' => $value,
-        'name' => strtoupper($value),
-        'description' => $description,
-      ];
-    }
-
-    return new EnumType([
-      'name' => $typeName,
-      'values' => $values,
-    ]);
-  }
 
   /**
    * Build the plugin type.
@@ -78,26 +22,84 @@ trait TypedPluginTrait {
   protected function buildType(PluggableSchemaBuilderInterface $schemaBuilder) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
-
-      if (array_key_exists('data_type', $definition) && $definition['data_type']) {
-        $type = $schemaBuilder->findByDataType($definition['data_type'])->getDefinition($schemaBuilder);
-      }
-      else if (array_key_exists('type', $definition) && $definition['type']) {
-        $type = is_array($definition['type']) ? $this->buildEnumConfig($definition['type'], $definition['enum_type_name']) : $schemaBuilder->findByName($definition['type'], [
+      return $this->parseType($definition['type'], function ($type) use ($schemaBuilder) {
+        return $schemaBuilder->findByDataTypeOrName($type, [
           GRAPHQL_SCALAR_PLUGIN,
           GRAPHQL_UNION_TYPE_PLUGIN,
           GRAPHQL_TYPE_PLUGIN,
           GRAPHQL_INTERFACE_PLUGIN,
           GRAPHQL_ENUM_PLUGIN,
         ])->getDefinition($schemaBuilder);
-      }
-
-      if (isset($type) && $type instanceof TypeInterface) {
-        return $this->decorateType($type, $definition['nullable'], $definition['multi']);
-      }
+      });
     }
 
     return NULL;
+  }
+
+  /**
+   * Parses a type definition from a string and properly decorates it.
+   *
+   * Converts type strings (e.g. [Foo!]) to their object representations.
+   *
+   * @param string $type
+   *   The type string to parse.
+   * @param callable $callback
+   *   A callback for retrieving the concrete type object from the extracted
+   *   type name.
+   *
+   * @return \Youshido\GraphQL\Type\TypeInterface
+   *   The extracted type with the type decorators applied.
+   */
+  protected function parseType($type, callable $callback) {
+    $decorators = [];
+    $unwrapped = $type;
+    $matches = NULL;
+
+    while (preg_match('/[\[\]!]/', $unwrapped) && preg_match_all('/^(\[?)(.*?)(\]?)(!*?)$/', $unwrapped, $matches)) {
+      if ($unwrapped === $matches[2][0] || empty($matches[1][0]) !== empty($matches[3][0])) {
+        throw new \InvalidArgumentException(sprintf("Invalid type declaration '%s'.", $type));
+      }
+
+      if (!empty($matches[4][0])) {
+        array_push($decorators, [$this, 'nonNullType']);
+      }
+
+      if (!empty($matches[1][0]) && !empty($matches[3][0])) {
+        array_push($decorators, [$this, 'listType']);
+      }
+
+      $unwrapped = $matches[2][0];
+    }
+
+    return array_reduce($decorators, function ($carry, $current) {
+      return $current($carry);
+    }, $callback($unwrapped));
+  }
+
+  /**
+   * Declares a type as non-nullable.
+   *
+   * @param \Youshido\GraphQL\Type\TypeInterface $type
+   *   The type to wrap.
+   *
+   * @return \Youshido\GraphQL\Type\NonNullType
+   *   The wrapped type.
+   */
+  protected function nonNullType(TypeInterface $type) {
+    return new NonNullType($type);
+  }
+
+  /**
+   * Declares a type as a list.
+   *
+   * @param \Youshido\GraphQL\Type\TypeInterface $type
+   *   The type to wrap.
+   *
+   * @return \Youshido\GraphQL\Type\ListType\ListType
+   *   The wrapped type.
+   */
+  protected function listType(TypeInterface $type) {
+    return new ListType($type);
   }
 
 }

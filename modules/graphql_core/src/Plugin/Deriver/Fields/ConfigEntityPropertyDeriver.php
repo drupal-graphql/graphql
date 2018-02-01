@@ -86,7 +86,7 @@ class ConfigEntityPropertyDeriver extends DeriverBase implements ContainerDerive
         $this->derivatives["$entityTypeId:$propertyName"] = [
           'name' => StringHelper::propCase($propertyName),
           'type' => $this->getType($propertyDefinition),
-          'parents' => [EntityType::getId($entityTypeId)],
+          'parents' => [StringHelper::camelCase($entityTypeId)],
           'property' => $propertyName,
         ] + $basePluginDefinition;
       }

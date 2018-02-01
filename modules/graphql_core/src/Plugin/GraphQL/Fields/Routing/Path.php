@@ -17,10 +17,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   type = "String",
  *   arguments = {
  *     "internal" = {
- *        "type"= "Boolean",
- *        "nullable" = true,
- *        "default" = false,
- *      }
+ *       "type"= "Boolean",
+ *       "default" = false
+ *     }
  *   },
  *   parents = {"Url"}
  * )

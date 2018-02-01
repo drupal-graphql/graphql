@@ -3,7 +3,6 @@
 namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -28,17 +27,13 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager')
-    );
+    return new static($container->get('entity_type.manager'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(
-    EntityTypeManagerInterface $entityTypeManager
-  ) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
   }
 
@@ -49,7 +44,7 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       $derivative = [
         'name' => StringHelper::propCase($id, 'by', 'id'),
-        'type' => StringHelper::camelCase($id),
+        'type' => "entity:$id",
         'description' => $this->t("Loads '@type' entities by their id.", ['@type' => $type->getLabel()]),
         'entity_type' => $id,
       ] + $basePluginDefinition;
@@ -57,7 +52,6 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
       if ($type->isTranslatable()) {
         $derivative['arguments']['language'] = [
           'type' => 'AvailableLanguages',
-          'nullable' => TRUE,
         ];
       }
 

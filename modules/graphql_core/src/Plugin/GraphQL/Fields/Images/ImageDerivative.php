@@ -19,13 +19,10 @@ use Drupal\image\Entity\ImageStyle;
  *   secure = true,
  *   name = "derivative",
  *   type = "ImageResource",
- *   nullable = true,
  *   arguments = {
- *     "style" = "ImageStyleId"
+ *     "style" = "ImageStyleId!"
  *   },
- *   field_types = {
- *     "image"
- *   },
+ *   field_types = {"image"},
  *   provider = "image",
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
  * )

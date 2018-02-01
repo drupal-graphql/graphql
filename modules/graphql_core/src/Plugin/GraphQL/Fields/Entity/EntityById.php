@@ -20,11 +20,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_by_id",
  *   secure = true,
  *   name = "entityById",
- *   nullable = true,
- *   multi = false,
  *   weight = -1,
  *   arguments = {
- *     "id" = "String"
+ *     "id" = "String!"
  *   },
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityByIdDeriver"
  * )

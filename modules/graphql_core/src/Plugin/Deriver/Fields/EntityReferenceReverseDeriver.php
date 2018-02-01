@@ -11,7 +11,6 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity\Entity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -86,7 +85,7 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
 
         $fieldName = $fieldDefinition->getName();
         $derivative = [
-          'parents' => [Entity::getId($targetTypeId)],
+          'parents' => [StringHelper::camelCase($targetTypeId)],
           'name' => StringHelper::propCase('reverse', $fieldName, $entityTypeId),
           'description' => $this->t('Reverse reference: @description', [
             '@description' => $fieldDefinition->getDescription(),
@@ -107,8 +106,6 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
 
         if (!empty($queryableProperties)) {
           $derivative['arguments']['filter'] = [
-            'multi' => FALSE,
-            'nullable' => TRUE,
             'type' => StringHelper::camelCase($targetTypeId, 'query', 'filter', 'input'),
           ];
         }

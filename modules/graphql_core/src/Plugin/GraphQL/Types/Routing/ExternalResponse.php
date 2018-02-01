@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Types\Routing;
 
-use Drupal\graphql\Annotation\GraphQLType;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 
 /**

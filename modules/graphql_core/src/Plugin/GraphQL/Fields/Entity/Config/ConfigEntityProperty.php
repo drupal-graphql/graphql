@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Config;
 
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
+use Youshido\GraphQL\Type\Scalar\AbstractScalarType;
 
 /**
  * @GraphQLField(
@@ -22,7 +23,12 @@ class ConfigEntityProperty extends EntityFieldBase {
   public function resolveValues($value, array $args, ResolveInfo $info) {
     $definition = $this->getPluginDefinition();
     $property = $definition['property'];
-    yield $value->get($property);
+    $result = $value->get($property);
+    if (($type = $info->getReturnType()->getNamedType()) && $type instanceof AbstractScalarType) {
+      $result = $type->serialize($result);
+    }
+
+    yield $result;
   }
 
 }

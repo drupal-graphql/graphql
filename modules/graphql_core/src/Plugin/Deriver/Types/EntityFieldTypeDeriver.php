@@ -3,8 +3,8 @@
 namespace Drupal\graphql_core\Plugin\Deriver\Types;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\graphql\Utility\StringHelper;
 use Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriverBase;
-use Drupal\graphql_core\Plugin\GraphQL\Types\Entity\EntityFieldType;
 
 /**
  * Derive GraphQL types for raw values of drupal fields.
@@ -22,7 +22,7 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
     $fieldName = $fieldDefinition->getName();
 
     return ["$entityTypeId-$fieldName" => [
-      'name' => EntityFieldType::getId($entityTypeId, $fieldName),
+      'name' => StringHelper::camelCase('field', $entityTypeId, $fieldName),
       'description' => $fieldDefinition->getDescription(),
       'entity_type' => $entityTypeId,
       'field_name' => $fieldName,

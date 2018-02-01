@@ -12,13 +12,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "numbers",
  *   secure = true,
  *   name = "numbers",
- *   type = "Numbers",
- *   multi = true,
+ *   type = "[Numbers]",
  *   arguments = {
- *     "numbers" = {
- *       "type" = "Numbers",
- *       "multi" = true,
- *     }
+ *     "numbers" = "[Numbers]"
  *   }
  * )
  */

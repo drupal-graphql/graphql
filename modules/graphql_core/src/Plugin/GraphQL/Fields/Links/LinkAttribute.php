@@ -15,12 +15,11 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "attribute",
  *   type = "String",
- *   nullable = true,
  *   arguments = {
- *     "key" = "String"
+ *     "key" = "String!"
  *   },
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver",
- *   field_types = {"link"}
+ *   field_types = {"link"},
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
  * )
  */
 class LinkAttribute extends FieldPluginBase {

@@ -75,8 +75,6 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
 
         if (!empty($queryableProperties)) {
           $derivative['arguments']['filter'] = [
-            'multi' => FALSE,
-            'nullable' => TRUE,
             'type' => StringHelper::camelCase($id, 'query', 'filter', 'input'),
           ];
         }

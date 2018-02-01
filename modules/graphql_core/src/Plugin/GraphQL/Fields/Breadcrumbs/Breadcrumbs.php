@@ -20,8 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "breadcrumb",
  *   secure = true,
  *   name = "breadcrumb",
- *   type = "Link",
- *   multi = true,
+ *   type = "[Link]",
  *   parents = {"Url"},
  * )
  */

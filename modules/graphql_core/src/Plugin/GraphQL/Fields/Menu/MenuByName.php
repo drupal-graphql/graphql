@@ -20,7 +20,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   description = @Translation("Loads a menu by its machine-readable name."),
  *   type = "Menu",
  *   arguments = {
- *     "name" = "String"
+ *     "name" = "String!"
  *   }
  * )
  */

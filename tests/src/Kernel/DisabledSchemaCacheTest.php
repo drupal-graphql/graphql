@@ -8,7 +8,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
 use Prophecy\Argument;
-use Youshido\GraphQL\Schema\Schema;
 use Youshido\GraphQL\Type\Scalar\StringType;
 
 /**

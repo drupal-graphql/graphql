@@ -15,13 +15,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "users",
  *   secure = true,
  *   name = "users",
- *   type = "User",
- *   multi = true,
+ *   type = "[User]",
  *   arguments = {
- *     "uids" = {
- *       "type" = "String",
- *       "multi" = true
- *     }
+ *     "uids" = "[String!]!",
  *   }
  * )
  */
