@@ -174,8 +174,7 @@ class MockingFrameworkTest extends KernelTestBase {
 
     $this->mockField('root', [
       'name' => 'root',
-      'type' => 'Token',
-      'multi' => TRUE,
+      'type' => '[Token]',
     ], function () {
       yield ['value' => 42];
       yield ['value' => 'GraphQL'];
@@ -230,8 +229,7 @@ class MockingFrameworkTest extends KernelTestBase {
 
     $this->mockField('root', [
       'name' => 'root',
-      'type' => 'Token',
-      'multi' => TRUE,
+      'type' => '[Token]',
     ], function () {
       yield ['value' => 42];
       yield ['value' => 'GraphQL'];
