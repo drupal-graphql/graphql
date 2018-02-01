@@ -17,8 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_query",
  *   secure = true,
  *   name = "entityQuery",
- *   type = "EntityQueryResult",
- *   nullable = false,
+ *   type = "EntityQueryResult!",
  *   weight = -1,
  *   arguments = {
  *     "offset" = {

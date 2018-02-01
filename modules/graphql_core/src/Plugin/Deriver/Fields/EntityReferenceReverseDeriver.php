@@ -95,7 +95,7 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
           'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
           'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
           'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
-        ];
+        ] + $basePluginDefinition;
 
         /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition */
         $definition = $this->typedDataManager->createDataDefinition("entity:$targetTypeId");
@@ -110,7 +110,7 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
           ];
         }
 
-        $this->derivatives["$entityTypeId-$fieldName"] = $derivative + $basePluginDefinition;
+        $this->derivatives["$entityTypeId-$fieldName"] = $derivative;
       }
     }
 
