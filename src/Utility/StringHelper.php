@@ -38,4 +38,30 @@ class StringHelper {
     return ctype_upper($result) ? strtolower($result) : lcfirst($result);
   }
 
+  /**
+   * Wraps a type string in brackets declaring it as a list.
+   *
+   * @param string $type
+   *   The type to declare as a list.
+   *
+   * @return string
+   *   The decorated type string.
+   */
+  public static function listType($type) {
+    return "[$type]";
+  }
+
+  /**
+   * Appends an exclamation mark to a type string declaring it as non-null.
+   *
+   * @param string $type
+   *   The type to declare as non-null.
+   *
+   * @return string
+   *   The decorated type string.
+   */
+  public static function nonNullType($type) {
+    return "$type!";
+  }
+
 }
