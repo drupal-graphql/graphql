@@ -12,11 +12,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Generates an enumeration of numbers.
  *
  * @GraphQLEnum(
- *   id = "available_languages",
- *   name = "AvailableLanguages"
+ *   id = "language_id",
+ *   name = "LanguageId"
  * )
  */
-class AvailableLanguages extends EnumPluginBase implements ContainerFactoryPluginInterface {
+class LanguageId extends EnumPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The language manager.
@@ -26,11 +26,19 @@ class AvailableLanguages extends EnumPluginBase implements ContainerFactoryPlugi
   protected $languageManager;
 
   /**
-   * {@inheritdoc}
+   * LanguageId constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param array $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, LanguageManagerInterface $languageManager) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-
     $this->languageManager = $languageManager;
   }
 
@@ -56,6 +64,7 @@ class AvailableLanguages extends EnumPluginBase implements ContainerFactoryPlugi
       $values[] = [
         'name' => str_replace('-', '_', $language->getId()),
         'value' => $language->getId(),
+        'description' => $language->getName(),
       ];
     }
 
