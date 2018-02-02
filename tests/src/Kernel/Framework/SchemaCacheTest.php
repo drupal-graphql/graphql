@@ -2,14 +2,10 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
-use Youshido\GraphQL\Type\Scalar\StringType;
 
 /**
  * Test schema caching.
@@ -17,13 +13,7 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  * @group graphql
  * @group cache
  */
-class SchemaCacheTest extends KernelTestBase {
-  use SchemaProphecyTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql'];
+class SchemaCacheTest extends GraphQLTestBase {
 
   /**
    * Test basic schema caching.
@@ -31,21 +21,19 @@ class SchemaCacheTest extends KernelTestBase {
   public function testCacheableSchema() {
     $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
 
-    // Prophesize a field with permanent cache.
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheMaxAge(Cache::PERMANENT);
-    $root = $this->prophesizeField('root', new StringType(), $metadata);
-    $root->resolve(Argument::any())->willReturn('test');
+    $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+    ], 'test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $getSchema = $this->injectSchema($schema);
+    $this->schemaManagerProphecy
+      ->getMethodProphecies('createInstance')[0]
+      ->shouldBeCalledTimes(1);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(1);
-
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(1);
   }
 
   /**
@@ -54,21 +42,20 @@ class SchemaCacheTest extends KernelTestBase {
   public function testUncacheableSchema() {
     $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
 
-    // Prophesize an uncacheable field.
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheMaxAge(0);
-    $root = $this->prophesizeField('root', new StringType(), $metadata);
-    $root->resolve(Argument::any())->willReturn('test');
+    $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+      'schema_cache_max_age' => 0,
+    ], 'test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $getSchema = $this->injectSchema($schema);
+    $this->schemaManagerProphecy
+      ->getMethodProphecies('createInstance')[0]
+      ->shouldBeCalledTimes(2);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(1);
-
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(2);
   }
 
   /**
@@ -99,23 +86,23 @@ class SchemaCacheTest extends KernelTestBase {
     /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
     $contextKeys = $contextManager->convertTokensToKeys($hasContext);
 
-    // Prophesize an uncacheable field.
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheContexts(['context']);
-    $root = $this->prophesizeField('root', new StringType(), $metadata);
-    $root->resolve(Argument::any())->willReturn('test');
+    $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+      'schema_cache_contexts' => ['context'],
+    ], 'test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $getSchema = $this->injectSchema($schema);
+    $this->schemaManagerProphecy
+      ->getMethodProphecies('createInstance')[0]
+      ->shouldBeCalledTimes(2);
 
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(1);
 
     $contextKeys->willReturn(new ContextCacheKeys(['b']));
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(2);
   }
 
   /**
@@ -124,23 +111,23 @@ class SchemaCacheTest extends KernelTestBase {
   public function testTags() {
     $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
 
-    // Prophesize an uncacheable field.
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheTags(['a', 'b']);
-    $root = $this->prophesizeField('root', new StringType(), $metadata);
-    $root->resolve(Argument::any())->willReturn('test');
+    $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+      'schema_cache_tags' => ['a'],
+    ], 'test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $getSchema = $this->injectSchema($schema);
+    $this->schemaManagerProphecy
+      ->getMethodProphecies('createInstance')[0]
+      ->shouldBeCalledTimes(2);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(1);
 
     $this->container->get('cache_tags.invalidator')->invalidateTags(['a']);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(2);
   }
 
 }

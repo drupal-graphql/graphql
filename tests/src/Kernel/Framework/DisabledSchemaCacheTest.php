@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
 use Prophecy\Argument;
 use Youshido\GraphQL\Type\Scalar\StringType;
@@ -16,23 +17,16 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  * @group graphql
  * @group cache
  */
-class DisabledSchemaCacheTest extends KernelTestBase {
-  use SchemaProphecyTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql'];
+class DisabledSchemaCacheTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
+    parent::register($container);
     $config = $container->getParameter('graphql.config');
     $config['schema_cache'] = FALSE;
     $container->setParameter('graphql.config', $config);
-    $this->injectSchemaManager($container);
-    parent::register($container);
   }
 
   /**
@@ -41,21 +35,19 @@ class DisabledSchemaCacheTest extends KernelTestBase {
   public function testDisabledCache() {
     $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
 
-    // Prophesize a field with permanent cache.
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheMaxAge(Cache::PERMANENT);
-    $root = $this->prophesizeField('root', new StringType(), $metadata);
-    $root->resolve(Argument::any())->willReturn('test');
+    $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+    ], 'test');
 
     /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $getSchema = $this->injectSchema($schema);
+    $this->schemaManagerProphecy
+      ->getMethodProphecies('createInstance')[0]
+      ->shouldBeCalledTimes(2);
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(1);
-
     $this->container->get('graphql.schema_loader')->getSchema('default');
-    $getSchema->shouldHaveBeenCalledTimes(2);
   }
 
 }
