@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
+use Drupal\graphql\Cache\CacheableQueryResponse;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -206,7 +207,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     }
 
     $response = $event->getResponse();
-    if (!$response instanceof CacheableResponseInterface) {
+    if (!$response instanceof CacheableQueryResponse) {
       return;
     }
 
@@ -239,31 +240,20 @@ class CacheSubscriber implements EventSubscriberInterface {
     }
 
     // Bail out early, if the response is not cacheable.
-    $responseMetadata = $response->getCacheableMetadata();
-    if ($responseMetadata->getCacheMaxAge() === 0) {
+    $metadata = $response->getCacheableMetadata();
+    if ($metadata->getCacheMaxAge() === 0) {
       return;
     }
 
-    // If the schema is not cacheable, the response isn't cacheable either.
-    $schema = $routeMatch->getRouteObject()->getDefault('schema');
-    $schemaMetadata = $this->schemaLoader->getResponseCacheMetadata($schema);
-    if ($schemaMetadata->getCacheMaxAge() === 0) {
-      return;
-    }
-
-    $mergedMetadata = new CacheableMetadata();
-    $mergedMetadata->addCacheableDependency($responseMetadata);
-    $mergedMetadata->addCacheableDependency($schemaMetadata);
-
-    $tags = $mergedMetadata->getCacheTags();
-    $expire = $this->maxAgeToExpire($mergedMetadata->getCacheMaxAge());
+    $tags = $metadata->getCacheTags();
+    $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
     // Write the cache entry for the cache metadata.
-    $ccid = $this->getCacheIdentifier($schemaMetadata);
-    $this->metadataCache->set($ccid, $mergedMetadata, $expire, $tags);
+    $ccid = $this->getCacheIdentifier($response->getSchemaResponseMetadata());
+    $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
     // Write the cache entry for the response object.
-    $cid = $this->getCacheIdentifier($mergedMetadata);
+    $cid = $this->getCacheIdentifier($metadata);
     $this->responseCache->set($cid, $response, $expire, $tags);
 
     // The response was generated, mark the response as a cache miss. The next

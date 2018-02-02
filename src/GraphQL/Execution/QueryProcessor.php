@@ -90,20 +90,22 @@ class QueryProcessor {
     $processor->processPayload($query, $variables);
 
     // Add collected cache metadata from the query processor.
-    $metadata = new CacheableMetadata();
+    $responseCacheMetadata = new CacheableMetadata();
     $context = $processor->getExecutionContext();
     $container = $context->getContainer();
     if ($container->has('metadata')) {
-      $metadata->addCacheableDependency($container->get('metadata'));
+      $responseCacheMetadata->addCacheableDependency($container->get('metadata'));
     }
 
     // Prevent caching if this is a mutation query or an error occurs.
     $request = $context->getRequest();
     if ((!empty($request) && $request->hasMutations()) || $context->hasErrors()) {
-      $metadata->setCacheMaxAge(0);
+      $responseCacheMetadata->setCacheMaxAge(0);
     }
 
-    return new QueryResult($processor->getResponseData(), $metadata);
+    // Load the schema's cache metadata.
+    $schemaCacheMetadata = $this->schemaLoader->getResponseCacheMetadata($schemaId);
+    return new QueryResult($processor->getResponseData(), $responseCacheMetadata, $schemaCacheMetadata);
   }
 
 }
