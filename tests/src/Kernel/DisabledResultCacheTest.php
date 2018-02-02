@@ -46,7 +46,7 @@ class DisabledResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
+      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), new CacheableMetadata()));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 

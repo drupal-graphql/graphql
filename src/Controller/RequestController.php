@@ -12,6 +12,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
+use Drupal\graphql\Cache\CacheableQueryResponse;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -217,11 +218,8 @@ class RequestController implements ContainerInjectionInterface {
       $result = $this->queryProcessor->processQuery($schema, $query, $variables);
     });
 
-    $response = new CacheableJsonResponse($result->getData());
-    // Apply the metadata to the response object.
-    $response->addCacheableDependency($result);
-
-    // Apply rendere context cache metadata to the response.
+    $response = new CacheableQueryResponse($result);
+    // Apply render context cache metadata to the response.
     if (!$context->isEmpty()) {
       $response->addCacheableDependency($context->pop());
     }
