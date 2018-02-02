@@ -3,7 +3,6 @@
 namespace Drupal\graphql_core\Plugin\Deriver\Interfaces;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -27,9 +26,7 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager')
-    );
+    return new static($container->get('entity_type.manager'));
   }
 
   /**
@@ -48,16 +45,15 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
   public function getDerivativeDefinitions($basePluginDefinition) {
     $this->derivatives = [];
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if ($type instanceof ContentEntityTypeInterface) {
-        $this->derivatives[$typeId] = [
-          'name' => StringHelper::camelCase($typeId),
-          'description' => $this->t("The '@type' entity type.", [
-            '@type' => $type->getLabel(),
-          ]),
-          'type' => "entity:$typeId",
-        ] + $basePluginDefinition;
-      }
+      $this->derivatives[$typeId] = [
+        'name' => StringHelper::camelCase($typeId),
+        'description' => $this->t("The '@type' entity type.", [
+          '@type' => $type->getLabel(),
+        ]),
+        'type' => "entity:$typeId",
+      ] + $basePluginDefinition;
     }
+
     return parent::getDerivativeDefinitions($basePluginDefinition);
   }
 

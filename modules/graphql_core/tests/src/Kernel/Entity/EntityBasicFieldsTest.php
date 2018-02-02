@@ -86,7 +86,9 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'entityUuid' => $node->uuid(),
       'entityLabel' => $node->label(),
       'entityType' => $node->getEntityTypeId(),
-      'entityBundle' => $node->bundle(),
+      'entityBundle' => [
+        'entityId' => $node->bundle(),
+      ],
       'entityLanguage' => [
         'id' => $node->language()->getId(),
         'name' => $node->language()->getName(),

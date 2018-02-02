@@ -9,11 +9,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Create GraphQL entityById fields based on available Drupal entity types.
- */
-class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
-
+class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
@@ -27,7 +23,9 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $basePluginId) {
-    return new static($container->get('entity_type.manager'));
+    return new static(
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -41,19 +39,14 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      $derivative = [
-        'name' => StringHelper::propCase($id, 'by', 'id'),
-        'type' => "entity:$id",
-        'description' => $this->t("Loads '@type' entities by their id.", ['@type' => $type->getLabel()]),
-        'entity_type' => $id,
-      ] + $basePluginDefinition;
+    foreach ($this->entityTypeManager->getDefinitions() as $id => $entityType) {
+      $bundleEntityType = $entityType->getBundleEntityType();
 
-      if ($type->isTranslatable()) {
-        $derivative['arguments']['language'] = [
-          'type' => 'AvailableLanguages',
-        ];
-      }
+      $derivative = [
+        'type' => $bundleEntityType === NULL ? 'String' : StringHelper::camelCase($bundleEntityType),
+        'description' => $this->t('Retrieves the bundle or bundle name of the entity.'),
+        'parents' => [StringHelper::camelCase($id)],
+      ] + $basePluginDefinition;
 
       $this->derivatives["entity:$id"] = $derivative;
     }
