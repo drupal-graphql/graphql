@@ -21,4 +21,11 @@ class GraphQLEnum extends GraphQLAnnotationBase {
    */
   public $type = NULL;
 
+  /**
+   * The enum's key / value pairs.
+   *
+   * @var array
+   */
+  public $values = [];
+
 }

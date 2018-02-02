@@ -39,8 +39,32 @@ abstract class EnumPluginBase extends PluginBase implements TypeSystemPluginInte
   }
 
   /**
-   * {@inheritdoc}
+   * Build the values for the enum.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
+   *   The schema builder.
+   *
+   * @return array
+   *   The list of possible values for the enum.
    */
-  abstract public function buildValues(PluggableSchemaBuilderInterface $schemaManager);
+  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
+    $values = $this->getPluginDefinition()['values'];
+    $output = [];
+
+    foreach ($values as $value => $definition) {
+      $item = [
+        'value' => $value,
+        'name' => is_array($definition) ? $definition['name'] : $definition,
+      ];
+
+      if (is_array($definition) && !empty($definition['description'])) {
+        $item['description'] = $definition['description'];
+      }
+
+      $output[] = $item;
+    }
+
+    return $output;
+  }
 
 }
