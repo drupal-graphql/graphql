@@ -8,7 +8,7 @@ use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Drupal\graphql\GraphQL\Execution\QueryResult;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\QueryTrait;
+use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Prophecy\Argument;
 
 /**
@@ -17,7 +17,7 @@ use Prophecy\Argument;
  * @group graphql
  */
 class PermissionsTest extends KernelTestBase {
-  use QueryTrait;
+  use HttpRequestTrait;
 
   /**
    * {@inheritdoc}

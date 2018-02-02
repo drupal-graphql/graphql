@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Common methods for GraphQL query tests.
  */
-trait QueryTrait {
+trait HttpRequestTrait {
 
   /**
    * Issue a simple query without caring about the result.

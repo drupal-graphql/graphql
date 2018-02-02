@@ -11,7 +11,7 @@ use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
-use Drupal\Tests\graphql\Traits\QueryTrait;
+use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Prophecy\Argument;
 
 /**
@@ -21,7 +21,7 @@ use Prophecy\Argument;
  * @group cache
  */
 class ResultCacheTest extends KernelTestBase {
-  use QueryTrait;
+  use HttpRequestTrait;
   use ByPassAccessTrait;
   use EnableCliCacheTrait;
 

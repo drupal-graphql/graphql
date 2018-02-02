@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Trait for running tests against GraphQL query files.
+ *
+ * @deprecated
  */
 trait GraphQLFileTestTrait {
 

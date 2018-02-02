@@ -253,7 +253,6 @@ class CacheSubscriber implements EventSubscriberInterface {
 
     $mergedMetadata = new CacheableMetadata();
     $mergedMetadata->addCacheableDependency($responseMetadata);
-    $mergedMetadata->addCacheableDependency($schemaMetadata);
 
     $tags = $mergedMetadata->getCacheTags();
     $expire = $this->maxAgeToExpire($mergedMetadata->getCacheMaxAge());

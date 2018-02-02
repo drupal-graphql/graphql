@@ -103,6 +103,8 @@ class QueryProcessor {
       $metadata->setCacheMaxAge(0);
     }
 
+    $metadata->addCacheableDependency($this->schemaLoader->getResponseCacheMetadata($schemaId));
+
     return new QueryResult($processor->getResponseData(), $metadata);
   }
 

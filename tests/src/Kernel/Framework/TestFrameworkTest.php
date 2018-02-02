@@ -2,21 +2,25 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\MockTypeSystemTrait;
-use Drupal\Tests\graphql\Traits\QueryTrait;
+use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\MockSchemaTrait;
+use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
-class MockingFrameworkTest extends KernelTestBase {
+class TestFrameworkTest extends KernelTestBase {
 
-  use QueryTrait;
+  use HttpRequestTrait;
   use ByPassAccessTrait;
   use MockSchemaTrait;
   use MockTypeSystemTrait;
+  use QueryResultAssertionTrait;
 
   public static $modules = [
     'system',
@@ -50,16 +54,35 @@ class MockingFrameworkTest extends KernelTestBase {
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
+      'response_cache_tags' => ['my_tag'],
     ], function ($value, array $args, ResolveInfo $info) {
-      yield 'test';
+      $metadata = new CacheableMetadata();
+      $metadata->setCacheMaxAge(42);
+      yield new CacheableValue('test', [$metadata]);
     });
 
-    $result = $this->query('{ root }');
-    $this->assertEquals([
-      'data' => [
-        'root' => 'test',
-      ],
-    ], json_decode($result->getContent(), TRUE));
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheMaxAge(42);
+    $metadata->addCacheTags([
+      'my_tag',
+    ]);
+
+    $this->assertResults('{ root }', [], [
+      'root' => 'test',
+    ], $metadata);
+  }
+
+  public function testErrorAssertion() {
+    $metadata = $this->defaultCacheMetaData();
+
+    // Errors are not cached at all.
+    $metadata->setCacheMaxAge(0);
+    $metadata->setCacheContexts(['gql']);
+
+    $this->assertErrors('{ root }', [], [
+      'Schema has to have fields',
+      'Field "root" not found in type "RootQuery". Available fields are: "__schema", "__type"',
+    ], $metadata);
   }
 
   public function testTypeMock() {
