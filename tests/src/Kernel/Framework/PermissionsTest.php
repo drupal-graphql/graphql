@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Session\AccountProxy;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
