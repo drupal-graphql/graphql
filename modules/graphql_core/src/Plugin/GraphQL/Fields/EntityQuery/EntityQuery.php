@@ -104,6 +104,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $query = $entityStorage->getQuery();
     $query->range($args['offset'], $args['limit']);
     $query->sort($entityType->getKey('id'));
+    $query->accessCheck(TRUE);
 
     if (!empty($args['filter'])) {
       /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
