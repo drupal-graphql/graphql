@@ -8,6 +8,8 @@ use Drupal\user\Entity\Role;
 
 /**
  * Run tests against a *.gql query file.
+ *
+ * @deprecated "User GraphQLTestBase" instead.
  */
 abstract class GraphQLFileTestBase extends KernelTestBase {
   use GraphQLFileTestTrait;

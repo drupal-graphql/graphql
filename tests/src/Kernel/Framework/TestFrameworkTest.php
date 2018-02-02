@@ -3,53 +3,19 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
-use Drupal\Tests\graphql\Traits\MockTypeSystemTrait;
-use Drupal\Tests\graphql\Traits\HttpRequestTrait;
-use Drupal\Tests\graphql\Traits\MockSchemaTrait;
-use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
-class TestFrameworkTest extends KernelTestBase {
+/**
+ * Test the test framework.
+ */
+class TestFrameworkTest extends GraphQLTestBase {
 
-  use HttpRequestTrait;
-  use ByPassAccessTrait;
-  use MockSchemaTrait;
-  use MockTypeSystemTrait;
-  use QueryResultAssertionTrait;
-
-  public static $modules = [
-    'system',
-    'graphql',
-  ];
-
-  function getSchemaDefinitions() {
-    return [
-      'default' => [
-        'id' => 'default',
-        'name' => 'default',
-        'path' => 'graphql',
-      ],
-    ];
-  }
-
-  public function register(ContainerBuilder $container) {
-    parent::register($container);
-    $this->registerSchemaPluginManager($container);
-    $this->registerTypeSystemPluginManagers($container);
-  }
-
-  protected function setUp() {
-    parent::setUp();
-    $this->byPassAccess();
-    $this->installConfig('system');
-    $this->installConfig('graphql');
-  }
-
+  /**
+   * Test mocked fields.
+   */
   public function testFieldMock() {
     $this->mockField('root', [
       'name' => 'root',
@@ -72,6 +38,9 @@ class TestFrameworkTest extends KernelTestBase {
     ], $metadata);
   }
 
+  /**
+   * Test result error assertions.
+   */
   public function testErrorAssertion() {
     $metadata = $this->defaultCacheMetaData();
 
@@ -85,6 +54,9 @@ class TestFrameworkTest extends KernelTestBase {
     ], $metadata);
   }
 
+  /**
+   * Test type mocking.
+   */
   public function testTypeMock() {
     $this->mockField('value', [
       'name' => 'value',
@@ -105,14 +77,14 @@ class TestFrameworkTest extends KernelTestBase {
       yield ['value' => 'test'];
     });
 
-    $result = json_decode($this->query('{ root { value } }')->getContent(), TRUE);
-    $this->assertEquals([
-      'data' => [
-        'root' => ['value' => 'test'],
-      ],
-    ], $result);
+    $this->assertResults('{ root { value } }', [], [
+      'root' => ['value' => 'test'],
+    ], $this->defaultCacheMetaData());
   }
 
+  /**
+   * Test mutation mocking.
+   */
   public function testMutationMock() {
     // Fake at least a root field, or the schema will return an error.
     $this->mockField('root', [
@@ -148,23 +120,23 @@ class TestFrameworkTest extends KernelTestBase {
       return $args['user']['age'] > 50 && $args['user']['gender'] == 'm';
     });
 
-    $result = json_decode($this->query('mutation ($user: User!) { addUser(user: $user) }', [
+    $metadata = $this->defaultCacheMetaData();
+    // Mutations are never cacheable.
+    $metadata->setCacheMaxAge(0);
+
+    $this->assertResults('mutation ($user: User!) { addUser(user: $user) }', [
       'user' => [
         'name' => 'John Doe',
         'age' => 52,
         'gender' => 'Male',
       ],
-    ])->getContent(), TRUE);
-
-    $this->assertEquals([
-      'data' => [
-        'addUser' => TRUE,
-      ],
-    ], $result);
+    ], ['addUser' => TRUE], $metadata);
   }
 
+  /**
+   * Test interface mocking.
+   */
   public function testInterfaceMock() {
-
     $this->mockInterface('token', [
       'name' => 'Token',
     ]);
@@ -173,7 +145,7 @@ class TestFrameworkTest extends KernelTestBase {
       'name' => 'Number',
       'interfaces' => ['Token'],
     ], function ($value) {
-      return is_integer($value['value']);
+      return is_int($value['value']);
     });
 
     $this->mockType('word', [
@@ -187,13 +159,17 @@ class TestFrameworkTest extends KernelTestBase {
       'name' => 'value',
       'type' => 'Int',
       'parents' => ['Number'],
-    ], function ($value) { yield $value['value']; });
+    ], function ($value) {
+      yield $value['value'];
+    });
 
     $this->mockField('string_value', [
       'name' => 'value',
       'type' => 'String',
       'parents' => ['Word'],
-    ], function ($value) { yield $value['value']; });
+    ], function ($value) {
+      yield $value['value'];
+    });
 
     $this->mockField('root', [
       'name' => 'root',
@@ -203,23 +179,20 @@ class TestFrameworkTest extends KernelTestBase {
       yield ['value' => 'GraphQL'];
     });
 
-    $result = json_decode($this->query('{ root { ... on Number { number:value } ... on Word { word:value }  } }')->getContent(), TRUE);
-
-    $this->assertEquals([
-      'data' => [
-        'root' => [
-          0 => ['number' => 42],
-          1 => ['word' => 'GraphQL'],
-        ],
+    $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
+      'root' => [
+        0 => ['number' => 42],
+        1 => ['word' => 'GraphQL'],
       ],
-    ], $result);
+    ], $this->defaultCacheMetaData());
   }
 
   /**
+   * Test union mocks.
+   *
    * @todo Unions are identical to interfaces right now, but they should not be.
    */
   public function testUnionMock() {
-
     $this->mockUnion('token', [
       'name' => 'Token',
     ]);
@@ -258,16 +231,12 @@ class TestFrameworkTest extends KernelTestBase {
       yield ['value' => 'GraphQL'];
     });
 
-    $result = json_decode($this->query('{ root { ... on Number { number:value } ... on Word { word:value }  } }')->getContent(), TRUE);
-
-    $this->assertEquals([
-      'data' => [
-        'root' => [
-          0 => ['number' => 42],
-          1 => ['word' => 'GraphQL'],
-        ],
+    $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
+      'root' => [
+        0 => ['number' => 42],
+        1 => ['word' => 'GraphQL'],
       ],
-    ], $result);
+    ], $this->defaultCacheMetaData());
   }
 
 }
