@@ -61,7 +61,6 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $this->derivatives = [];
     $bundles = $this->entityTypeBundleInfo->getAllBundleInfo();
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
       if ($type instanceof ContentEntityTypeInterface && array_key_exists($typeId, $bundles)) {

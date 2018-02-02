@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Url;
+use Drupal\graphql\Utility\StringHelper;
 
 define('GRAPHQL_SCALAR_PLUGIN', 'scalar');
 define('GRAPHQL_FIELD_PLUGIN', 'field');
@@ -98,11 +99,11 @@ function _graphql_decorate_deprecated_type(array &$definitions) {
   foreach ($definitions as &$definition) {
     if (!empty($definition['type'])) {
       if (!empty($definition['multi'])) {
-        $definition['type'] = "[{$definition['type']}]";
+        $definition['type'] = StringHelper::listType($definition['type']);
       }
 
       if (isset($definition['nullable']) && empty($definition['nullable'])) {
-        $definition['type'] = "{$definition['type']}!";
+        $definition['type'] = StringHelper::nonNullType($definition['type']);
       }
     }
 

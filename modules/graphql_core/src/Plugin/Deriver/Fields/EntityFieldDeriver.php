@@ -39,7 +39,7 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
     }
 
     if ($fieldDefinition->isMultiple()) {
-      $derivative['type'] = "[{$derivative['type']}]";
+      $derivative['type'] = StringHelper::listType($derivative['type']);
     }
 
     return [

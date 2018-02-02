@@ -11,7 +11,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_reference_reverse",
  *   secure = true,
  *   weight = -1,
- *   type = "EntityQueryResult",
+ *   type = "EntityQueryResult!",
  *   arguments = {
  *     "offset" = {
  *       "type" = "Int",

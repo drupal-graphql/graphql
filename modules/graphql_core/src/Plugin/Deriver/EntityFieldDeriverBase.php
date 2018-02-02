@@ -27,6 +27,9 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
    *   Field definition object.
    * @param array $basePluginDefinition
    *   Base definition array.
+   *
+   * @return array
+   *   The derived plugin definitions for the given field.
    */
   abstract protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition);
 
@@ -99,8 +102,7 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
-      $interfaces = class_implements($entityType->getClass());
-      if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
+      if (!$entityType->entityClassImplements(FieldableEntityInterface::class)) {
         continue;
       }
 
