@@ -43,7 +43,7 @@ class PermissionsTest extends KernelTestBase {
     // Set up a processor that just returns NULL. We just wan't to check access.
     $processor = $this->prophesize(QueryProcessor::class);
     $processor->processQuery(Argument::cetera())
-      ->willReturn(new QueryResult('test', new CacheableMetadata()));
+      ->willReturn(new QueryResult('test', new CacheableMetadata(), new CacheableMetadata()));
     $this->container->set('graphql.query_processor', $processor->reveal());
 
     // Set up a query map provider.

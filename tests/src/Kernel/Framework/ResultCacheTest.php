@@ -26,9 +26,22 @@ class ResultCacheTest extends KernelTestBase {
   use EnableCliCacheTrait;
 
   /**
+   * @var CacheableMetadata
+   */
+  protected $schemaMetadata;
+
+  /**
    * {@inheritdoc}
    */
   public static $modules = ['graphql', 'graphql_test'];
+
+  protected function setUp() {
+    parent::setUp();
+    $this->schemaMetadata = new CacheableMetadata();
+    $this->schemaMetadata->addCacheContexts(['gql']);
+    $this->schemaMetadata->addCacheTags(['graphql_response']);
+    $this->schemaMetadata->addCacheTags(['graphql_schema']);
+  }
 
   /**
    * Check basic result caching.
@@ -38,7 +51,7 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
+      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 
@@ -63,7 +76,7 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::any(), 'uncached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, $metadata));
+      ->willReturn(new QueryResult(NULL, $metadata, $this->schemaMetadata));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 
@@ -84,7 +97,7 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
+      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 
@@ -137,7 +150,7 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, $metadata));
+      ->willReturn(new QueryResult(NULL, $metadata, $this->schemaMetadata));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 
@@ -173,7 +186,7 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, $metadata));
+      ->willReturn(new QueryResult(NULL, $metadata, $this->schemaMetadata));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 
@@ -208,7 +221,7 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $process */
     $process = $processor->processQuery(Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
+      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
 
     $this->container->set('graphql.query_processor', $processor->reveal());
 
@@ -255,10 +268,10 @@ class ResultCacheTest extends KernelTestBase {
 
     /** @var \Prophecy\Prophecy\MethodProphecy $processA */
     $processA = $processor->processQuery(Argument::any(), 'A', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
+      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
     /** @var \Prophecy\Prophecy\MethodProphecy $processB */
     $processB = $processor->processQuery(Argument::any(), 'B', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata()));
+      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
 
     $this->persistedQuery('query','a');
     $processA->shouldHaveBeenCalledTimes(1);
