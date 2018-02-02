@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
@@ -16,28 +17,18 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  * @group graphql
  * @group cache
  */
-class ResultTest extends KernelTestBase {
-  use HttpRequestTrait;
-  use ByPassAccessTrait;
-  use SchemaProphecyTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql'];
+class ResultTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    $root = $this->prophesizeField('root', new StringType());
-    $root->resolve(Argument::cetera())->willReturn('test');
-
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $this->injectSchema($schema);
+    $this->mockField('root', [
+      'name' => 'root',
+      'type' => 'String',
+    ], 'test');
   }
-
 
   /**
    * Test a simple query result.
@@ -51,7 +42,6 @@ class ResultTest extends KernelTestBase {
       ],
     ], json_decode($result->getContent(), TRUE));
   }
-
 
   /**
    * Test a persisted query result.

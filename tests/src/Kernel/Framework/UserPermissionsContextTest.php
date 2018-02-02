@@ -2,12 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
-use Drupal\Tests\graphql\Traits\HttpRequestTrait;
-use Drupal\Tests\graphql\Traits\SchemaProphecyTrait;
-use Prophecy\Argument;
-use Youshido\GraphQL\Type\Scalar\StringType;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Verify that all queries declare the user.permissions cache context.
@@ -17,29 +12,17 @@ use Youshido\GraphQL\Type\Scalar\StringType;
  *
  * @group graphql
  */
-class UserPermissionsContextTest extends KernelTestBase {
-  use HttpRequestTrait;
-  use ByPassAccessTrait;
-  use SchemaProphecyTrait;
+class UserPermissionsContextTest extends GraphQLTestBase {
 
   /**
-   * {@inheritdoc}
+   * Assert user.permissions tag on results.
    */
-  public static $modules = ['graphql'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $root = $this->prophesizeField('root', new StringType());
-    $root->resolve(Argument::cetera())->willReturn('test');
-
-    $schema = $this->createSchema($this->container, $root->reveal());
-    $this->injectSchema($schema);
-  }
-
   public function testUserPermissionsContext() {
+    $this->mockField('root', [
+      'name' => 'root',
+      'type' => 'String',
+    ], 'test');
+
     $result = $this->query('query { root }');
     $this->assertContains('user.permissions', $result->getCacheableMetadata()->getCacheContexts());
   }

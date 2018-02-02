@@ -2,13 +2,10 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxy;
-use Drupal\graphql\GraphQL\Execution\QueryProcessor;
-use Drupal\graphql\GraphQL\Execution\QueryResult;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\HttpRequestTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
 
 /**
@@ -16,13 +13,7 @@ use Prophecy\Argument;
  *
  * @group graphql
  */
-class PermissionsTest extends KernelTestBase {
-  use HttpRequestTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql', 'graphql_test'];
+class PermissionsTest extends GraphQLTestBase {
 
   /**
    * The account prophecy.
@@ -31,6 +22,14 @@ class PermissionsTest extends KernelTestBase {
    */
   protected $account;
 
+  /**
+   * Disable the access bypass.
+   */
+  protected function byPassAccess() {}
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     // Replace the current user with a prophecy.
@@ -38,13 +37,15 @@ class PermissionsTest extends KernelTestBase {
 
     // We test permissions. It doesn't matter if the user is anonymous or not.
     $this->account->isAnonymous()->willReturn(TRUE);
+    $this->account->isAuthenticated()->willReturn(FALSE);
+    $this->account->id()->willReturn(0);
     $this->container->set('current_user', $this->account->reveal());
 
-    // Set up a processor that just returns NULL. We just wan't to check access.
-    $processor = $this->prophesize(QueryProcessor::class);
-    $processor->processQuery(Argument::cetera())
-      ->willReturn(new QueryResult('test', new CacheableMetadata(), new CacheableMetadata()));
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $this->mockField('root', [
+      'name' => 'root',
+      'type' => 'String',
+      'secure' => TRUE,
+    ], 'test');
 
     // Set up a query map provider.
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
@@ -52,7 +53,7 @@ class PermissionsTest extends KernelTestBase {
     $queryProvider->getQuery(Argument::allOf(
         Argument::withEntry('id', 'persisted'),
         Argument::withEntry('version', 'a')
-    ))->willReturn('persisted');
+    ))->willReturn('{ root }');
 
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
   }
@@ -68,7 +69,7 @@ class PermissionsTest extends KernelTestBase {
     $this->assertEquals(403, $this->persistedQuery('persisted', 'a')->getStatusCode());
 
     $batched = $this->batchedQueries([
-      ['query' => 'query'],
+      ['query' => '{ root }'],
       ['id' => 'persisted', 'version' => 'a'],
     ]);
 
@@ -86,17 +87,22 @@ class PermissionsTest extends KernelTestBase {
     $this->account->hasPermission(Argument::not('execute persisted graphql requests'))->willReturn(FALSE);
 
     // Only persisted queries should work.
-    $this->assertEquals(403, $this->query('query')->getStatusCode());
+    $this->assertEquals(403, $this->query('{ root }')->getStatusCode());
     $this->assertEquals(200, $this->persistedQuery('persisted', 'a')->getStatusCode());
 
     $batched = $this->batchedQueries([
-      ['query' => 'query'],
+      ['query' => '{ root }'],
       ['id' => 'persisted', 'version' => 'a'],
     ]);
 
     // If some queries fail, 200 is returned.
     $this->assertEquals(200, $batched->getStatusCode());
-    $this->assertEquals([NULL, 'test'], json_decode($batched->getContent(), TRUE));
+    $data = [
+      'data' => [
+        'root' => 'test',
+      ],
+    ];
+    $this->assertEquals([NULL, $data], json_decode($batched->getContent(), TRUE));
   }
 
   /**
@@ -109,16 +115,21 @@ class PermissionsTest extends KernelTestBase {
     $this->account->hasPermission(Argument::not('execute graphql requests'))->willReturn(FALSE);
 
     // All queries should work.
-    $this->assertEquals(200, $this->query('query')->getStatusCode());
+    $this->assertEquals(200, $this->query('{ root }')->getStatusCode());
     $this->assertEquals(200, $this->persistedQuery('persisted', 'a')->getStatusCode());
 
     $batched = $this->batchedQueries([
-      ['query' => 'query'],
+      ['query' => '{ root }'],
       ['id' => 'persisted', 'version' => 'a'],
     ]);
 
     $this->assertEquals(200, $batched->getStatusCode());
-    $this->assertEquals(['test', 'test'], json_decode($batched->getContent(), TRUE));
+    $data = [
+      'data' => [
+        'root' => 'test',
+      ],
+    ];
+    $this->assertEquals([$data, $data], json_decode($batched->getContent(), TRUE));
   }
 
 }

@@ -10,6 +10,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Test the test framework.
+ *
+ * @group graphql
  */
 class TestFrameworkTest extends GraphQLTestBase {
 
@@ -33,9 +35,27 @@ class TestFrameworkTest extends GraphQLTestBase {
       'my_tag',
     ]);
 
+    $schema = $this->introspect();
+    $this->assertArraySubset([
+      'types' => [
+        'RootQuery' => [
+          'fields' => [
+            'root' => [
+              'name' => 'root',
+              'type' => [
+                'kind' => 'SCALAR',
+                'name' => 'String',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ], $schema);
+
     $this->assertResults('{ root }', [], [
       'root' => 'test',
     ], $metadata);
+
   }
 
   /**

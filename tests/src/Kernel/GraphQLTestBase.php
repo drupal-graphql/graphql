@@ -8,6 +8,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
 use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
+use Drupal\Tests\graphql\Traits\IntrospectionTestTrait;
 use Drupal\Tests\graphql\Traits\MockSchemaTrait;
 use Drupal\Tests\graphql\Traits\MockTypeSystemTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
@@ -23,6 +24,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use MockTypeSystemTrait;
   use HttpRequestTrait;
   use QueryResultAssertionTrait;
+  use IntrospectionTestTrait;
   use QueryFileTrait;
 
   /**
