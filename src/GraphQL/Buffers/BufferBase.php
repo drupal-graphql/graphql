@@ -40,7 +40,7 @@ abstract class BufferBase {
    * @return \Closure
    *   The callback to invoke to load the result for this buffer item.
    */
-  protected function createBufferResolver($item) {
+  public function createBufferResolver($item) {
     $bufferId = $this->getBufferId($item);
     if (!isset($this->buffers[$bufferId])) {
       $this->buffers[$bufferId] = new \SplObjectStorage();
