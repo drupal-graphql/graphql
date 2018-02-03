@@ -109,6 +109,20 @@ trait MockTypeSystemTrait {
     });
   }
 
+  /**
+   * Mock a GraphQL field.
+   *
+   * @param $id
+   *   The field id.
+   * @param $definition
+   *   The plugin definition. Will be merged with the field defaults.
+   * @param mixed|null $result
+   *   A result for this field. Can be a value or a callback. If omitted, no
+   *   resolve method mock will be attached.
+   *
+   * @return \PHPUnit_Framework_MockObject_MockObject
+   *   The field mock object.
+   */
   protected function mockField($id, $definition, $result = NULL) {
     $definition = $this->getTypeSystemPluginDefaults(
      GraphQLField::class,
@@ -121,11 +135,13 @@ trait MockTypeSystemTrait {
         'resolveValues',
       ])->getMock();
 
-    $field
-      ->expects(static::any())
-      ->method('resolveValues')
-      ->with($this->anything(), $this->anything(), $this->anything())
-      ->will($this->toPromise($result));
+    if ($result) {
+      $field
+        ->expects(static::any())
+        ->method('resolveValues')
+        ->with($this->anything(), $this->anything(), $this->anything())
+        ->will($this->toPromise($result));
+    }
 
     $this->addTypeSystemPlugin($field);
 

@@ -5,13 +5,9 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
-use Drupal\graphql\GraphQL\Execution\QueryProcessor;
-use Drupal\graphql\GraphQL\Execution\QueryResult;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
-use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
-use Drupal\Tests\graphql\Traits\HttpRequestTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
 
 /**
@@ -20,98 +16,110 @@ use Prophecy\Argument;
  * @group graphql
  * @group cache
  */
-class ResultCacheTest extends KernelTestBase {
-  use HttpRequestTrait;
-  use ByPassAccessTrait;
-  use EnableCliCacheTrait;
-
-  /**
-   * @var CacheableMetadata
-   */
-  protected $schemaMetadata;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql', 'graphql_test'];
-
-  protected function setUp() {
-    parent::setUp();
-    $this->schemaMetadata = new CacheableMetadata();
-    $this->schemaMetadata->addCacheContexts(['gql']);
-    $this->schemaMetadata->addCacheTags(['graphql_response']);
-    $this->schemaMetadata->addCacheTags(['graphql_schema']);
-  }
+class ResultCacheTest extends GraphQLTestBase {
 
   /**
    * Check basic result caching.
    */
   public function testCacheableResult() {
-    $processor = $this->prophesize(QueryProcessor::class);
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+    ]);
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field
+      ->expects(static::once())
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'test';
+      });
 
     // The first request that is supposed to be cached.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(1);
+    $this->query('{ root }');
 
-    // This should not invoke the processor a second time.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(1);
+    // This should *not* invoke the processor a second time.
+    $this->query('{ root }');
   }
 
   /**
    * Verify that uncacheable results are not cached.
    */
   public function testUncacheableResult() {
-    $processor = $this->prophesize(QueryProcessor::class);
 
-    // Create an uncacheable cacheability metatdata object.
-    $metadata = new CacheableMetadata();
-    $metadata->setCacheMaxAge(0);
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+    ]);
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::any(), 'uncached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, $metadata, $this->schemaMetadata));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        $metadata = new CacheableMetadata();
+        $metadata->setCacheMaxAge(0);
+        yield new CacheableValue('test', [$metadata]);
+      });
 
     // The first request that is not supposed to be cached.
-    $this->query('uncached');
-    $process->shouldHaveBeenCalledTimes(1);
+    $this->query('{ root }');
 
     // This should invoke the processor a second time.
-    $this->query('uncached');
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }');
+  }
+
+  /**
+   * Verify that fields with uncacheable annotations are not cached.
+   */
+  public function testUncacheableResultAnnotation() {
+
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+      'response_cache_max_age' => 0,
+    ]);
+
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'test';
+      });
+
+    // The first request that is not supposed to be cached.
+    $this->query('{ root }');
+
+    // This should invoke the processor a second time.
+    $this->query('{ root }');
   }
 
   /**
    * Test if caching properly handles variabels.
    */
   public function testVariables() {
-    $processor = $this->prophesize(QueryProcessor::class);
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+    ]);
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'test';
+      });
 
     // This result will be stored in the cache.
-    $this->query('cached', ['value' => 'a']);
-    $process->shouldHaveBeenCalledTimes(1);
+    $this->query('{ root }', ['value' => 'a']);
 
     // This will trigger a new evaluation since it passes different variables.
-    $this->query('cached', ['value' => 'b']);
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }', ['value' => 'b']);
 
     // This should be served from cache.
-    $this->query('cached', ['value' => 'a']);
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }', ['value' => 'a']);
 
   }
 
@@ -142,35 +150,34 @@ class ResultCacheTest extends KernelTestBase {
     /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
     $contextKeys = $contextManager->convertTokensToKeys($hasContext);
 
-    // Set up a mocked processor that returns a result with a cache context.
-    $processor = $this->prophesize(QueryProcessor::class);
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+      'response_cache_contexts' => ['context'],
+    ]);
 
-    $metadata = new CacheableMetadata();
-    $metadata->addCacheContexts(['context']);
-
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, $metadata, $this->schemaMetadata));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'test';
+      });
 
     // Set the context value to 'a'/
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     // This will be stored in the cache key for context 'a'.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(1);
+    $this->query('{ root }');
 
     // Change the context value to 'b'.
     $contextKeys->willReturn(new ContextCacheKeys(['b']));
     // This will be stored in the cache key for context 'b'.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }');
 
     // Change the context value back to 'a'.
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     // This will be retrieved from cache for context 'a'.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }');
   }
 
   /**
@@ -178,35 +185,34 @@ class ResultCacheTest extends KernelTestBase {
    */
   public function testTags() {
 
-    // Set up a mocked processor that returns a result with cache tags.
-    $processor = $this->prophesize(QueryProcessor::class);
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+      'response_cache_tags' => ['a', 'b'],
+    ]);
 
-    $metadata = new CacheableMetadata();
-    $metadata->addCacheTags(['a', 'b']);
-
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, $metadata, $this->schemaMetadata));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'test';
+      });
 
     // First call that will be cached.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(1);
+    $this->query('{ root }');
 
     // Invalidate a tag that is part of the result metadata.
     $this->container->get('cache_tags.invalidator')->invalidateTags(['a']);
 
     // Another call will invoke the processor a second time.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }');
 
     // Invalidate a tag that is NOT part of the result metadata.
     $this->container->get('cache_tags.invalidator')->invalidateTags(['c']);
 
     // Result will be served from cache.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }');
   }
 
   /**
@@ -217,30 +223,56 @@ class ResultCacheTest extends KernelTestBase {
    * that each of them are cached separately.
    */
   public function testBatchedQueries() {
-    $processor = $this->prophesize(QueryProcessor::class);
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
-
-    $this->batchedQueries([
-      // First call: process + 1
-      ['query' => 'a', 'variables' => ['value' => 'a']],
-      // New query: process + 1
-      ['query' => 'b', 'variables' => ['value' => 'a']],
-      // New query: process + 1
-      ['query' => 'c'],
-      // Same query, new variable: process + 1
-      ['query' => 'a', 'variables' => ['value' => 'b']],
-      // Same query, same variable: process + 0
-      ['query' => 'b', 'variables' => ['value' => 'a']],
-      // Same query: process + 0
-      ['query' => 'c'],
+    $a = $this->mockField('a', [
+      'id' => 'a',
+      'name' => 'a',
+      'type' => 'String',
     ]);
 
-    $process->shouldHaveBeenCalledTimes(4);
+    $a
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'a';
+      });
+
+    $b = $this->mockField('b', [
+      'id' => 'b',
+      'name' => 'b',
+      'type' => 'String',
+    ]);
+
+    $b
+      ->expects(static::exactly(1))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'b';
+      });
+
+    $c = $this->mockField('c', [
+      'id' => 'c',
+      'name' => 'c',
+      'type' => 'String',
+    ]);
+
+    $c
+      ->expects(static::exactly(1))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'c';
+      });
+
+
+    $this->batchedQueries([
+      ['query' => '{ a }', 'variables' => ['value' => 'a']],
+      ['query' => '{ b }', 'variables' => ['value' => 'a']],
+      ['query' => '{ c }'],
+      ['query' => '{ a }', 'variables' => ['value' => 'b']],
+      ['query' => '{ b }', 'variables' => ['value' => 'a']],
+      ['query' => '{ c }'],
+    ]);
+
   }
 
   /**
@@ -256,34 +288,46 @@ class ResultCacheTest extends KernelTestBase {
     $queryProvider->getQuery(Argument::allOf(
       Argument::withEntry('version', 'a'),
       Argument::withEntry('id', 'query')
-    ))->willReturn('A');
+    ))->willReturn('{ a }');
 
     $queryProvider->getQuery(Argument::allOf(
       Argument::withEntry('version', 'b'),
       Argument::withEntry('id', 'query')
-    ))->willReturn('B');
+    ))->willReturn('{ b }');
 
-    $processor = $this->prophesize(QueryProcessor::class);
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field = $this->mockField('a', [
+      'id' => 'a',
+      'name' => 'a',
+      'type' => 'String',
+    ]);
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $processA */
-    $processA = $processor->processQuery(Argument::any(), 'A', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
-    /** @var \Prophecy\Prophecy\MethodProphecy $processB */
-    $processB = $processor->processQuery(Argument::any(), 'B', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), $this->schemaMetadata));
+    $field
+      ->expects(static::exactly(1))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'a';
+      });
 
-    $this->persistedQuery('query','a');
-    $processA->shouldHaveBeenCalledTimes(1);
+    $field = $this->mockField('b', [
+      'id' => 'b',
+      'name' => 'b',
+      'type' => 'String',
+    ]);
 
-    $this->persistedQuery('query', 'b');
-    $processB->shouldHaveBeenCalledTimes(1);
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'b';
+      });
 
     $this->persistedQuery('query', 'a');
-    $processA->shouldHaveBeenCalledTimes(1);
+
+    $this->persistedQuery('query', 'b');
+
+    $this->persistedQuery('query', 'a');
 
     $this->persistedQuery('query', 'b', ['value' => 'test']);
-    $processB->shouldHaveBeenCalledTimes(2);
   }
 
 }

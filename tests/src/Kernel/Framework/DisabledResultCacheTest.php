@@ -2,30 +2,16 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
-use Drupal\graphql\GraphQL\Execution\QueryResult;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
-use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
-use Drupal\Tests\graphql\Traits\HttpRequestTrait;
-use Prophecy\Argument;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test disabled result cache.
  *
  * @group graphql
  */
-class DisabledResultCacheTest extends KernelTestBase {
-  use HttpRequestTrait;
-  use ByPassAccessTrait;
-  use EnableCliCacheTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = ['graphql', 'graphql_test'];
+class DisabledResultCacheTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
@@ -43,20 +29,24 @@ class DisabledResultCacheTest extends KernelTestBase {
    */
   public function testDisabledCache() {
     $processor = $this->prophesize(QueryProcessor::class);
+    $field = $this->mockField('root', [
+      'id' => 'root',
+      'name' => 'root',
+      'type' => 'String',
+    ]);
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $process */
-    $process = $processor->processQuery(Argument::any(), 'cached', Argument::cetera())
-      ->willReturn(new QueryResult(NULL, new CacheableMetadata(), new CacheableMetadata()));
-
-    $this->container->set('graphql.query_processor', $processor->reveal());
+    $field
+      ->expects(static::exactly(2))
+      ->method('resolveValues')
+      ->willReturnCallback(function () {
+        yield 'test';
+      });
 
     // The first request that is not supposed to be cached.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(1);
+    $this->query('{ root }');
 
     // This should invoke the processor a second time.
-    $this->query('cached');
-    $process->shouldHaveBeenCalledTimes(2);
+    $this->query('{ root }');
   }
 
 }
