@@ -17,7 +17,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_translation",
  *   secure = true,
  *   name = "entityTranslation",
- *   weight = -1,
  *   type = "Entity",
  *   parents = {"Entity"},
  *   arguments = {

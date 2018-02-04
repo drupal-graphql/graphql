@@ -11,7 +11,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *
  * @GraphQLType(
  *   id = "entity_bundle",
- *   weight = -1,
  *   schema_cache_tags = {"entity_types", "entity_bundles"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Types\EntityBundleDeriver"
  * )

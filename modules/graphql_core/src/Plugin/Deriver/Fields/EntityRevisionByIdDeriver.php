@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
+class EntityRevisionByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   use StringTranslationTrait;
 
@@ -40,11 +40,11 @@ class EntityByIdDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      if ($type instanceof ContentEntityTypeInterface) {
+      if ($type instanceof ContentEntityTypeInterface && $type->isRevisionable()) {
         $derivative = [
-          'name' => StringHelper::propCase($id, 'by', 'id'),
+          'name' => StringHelper::propCase($id, 'revision', 'by', 'id'),
           'type' => "entity:$id",
-          'description' => $this->t("Loads '@type' entities by their id.", ['@type' => $type->getLabel()]),
+          'description' => $this->t("Loads '@type' entity revision by their revision id.", ['@type' => $type->getLabel()]),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 

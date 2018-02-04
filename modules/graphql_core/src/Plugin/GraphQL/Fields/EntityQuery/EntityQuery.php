@@ -11,14 +11,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a list of entities through an entity query.
- *
  * @GraphQLField(
  *   id = "entity_query",
  *   secure = true,
- *   name = "entityQuery",
  *   type = "EntityQueryResult!",
- *   weight = -1,
  *   arguments = {
  *     "offset" = {
  *       "type" = "Int",
@@ -27,6 +23,10 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *     "limit" = {
  *       "type" = "Int",
  *       "default" = 10
+ *     },
+ *     "revisions" = {
+ *       "type" = "EntityQueryRevisionMode",
+ *       "default" = "default"
  *     }
  *   },
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityQueryDeriver"
@@ -105,6 +105,14 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $query->range($args['offset'], $args['limit']);
     $query->sort($entityType->getKey('id'));
     $query->accessCheck(TRUE);
+
+    // Check if this is a query for all entity revisions.
+    if (!empty($args['revisions']) && $args['revisions'] === 'all') {
+      // Mark the query as such and sort by the revision id too.
+      $query->allRevisions();
+      $query->addTag('revisions');
+      $query->sort($entityType->getKey('revision'));
+    }
 
     if (!empty($args['filter'])) {
       /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */

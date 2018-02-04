@@ -10,9 +10,6 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Attach new properties to field types.
- */
 class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   /**

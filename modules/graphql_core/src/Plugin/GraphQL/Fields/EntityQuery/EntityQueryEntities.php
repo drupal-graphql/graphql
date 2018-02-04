@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
@@ -33,16 +34,25 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
   protected $entityBuffer;
 
   /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
+    EntityTypeManagerInterface $entityTypeManager,
     EntityBuffer $entityBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityBuffer = $entityBuffer;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
@@ -53,6 +63,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
       $configuration,
       $pluginId,
       $pluginDefinition,
+      $container->get('entity_type.manager'),
       $container->get('graphql.buffer.entity')
     );
   }
@@ -62,20 +73,43 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof QueryInterface) {
-      $resolve = $this->entityBuffer->add($value->getEntityTypeId(), $value->execute());
-      return function($value, array $args, ResolveInfo $info) use ($resolve) {
-        $entities = $resolve();
+      $type = $value->getEntityTypeId();
+      $result = $value->execute();
 
-        /** @var \Drupal\Core\Entity\EntityInterface $entity */
-        foreach ($entities as $entity) {
-          if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
-            yield new CacheableValue($entity, [$access]);
-          }
-          else {
-            yield new CacheableValue(NULL, [$access]);
-          }
-        }
-      };
+      if ($value->hasTag('revisions')) {
+        return $this->resolveFromRevisionIds($type, array_keys($result));
+      }
+
+      // If this is a revision query, the version ids are the array keys.
+      return $this->resolveFromEntityIds($type, array_values($result));
+    }
+  }
+
+  protected function resolveFromEntityIds($type, $ids) {
+    $resolve = $this->entityBuffer->add($type, $ids);
+    return function($value, array $args, ResolveInfo $info) use ($resolve) {
+      return $this->resolveEntities($resolve());
+    };
+  }
+
+  protected function resolveFromRevisionIds($type, $ids) {
+    $storage = $this->entityTypeManager->getStorage($type);
+    $entities = array_map(function ($id) use ($storage) {
+      return $storage->loadRevision($id);
+    }, $ids);
+
+    return $this->resolveEntities($entities);
+  }
+
+  protected function resolveEntities(array $entities) {
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    foreach ($entities as $entity) {
+      if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
+        yield new CacheableValue($entity, [$access]);
+      }
+      else {
+        yield new CacheableValue(NULL, [$access]);
+      }
     }
   }
 
