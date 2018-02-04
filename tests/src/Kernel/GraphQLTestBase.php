@@ -5,7 +5,7 @@ namespace Drupal\Tests\graphql\Kernel;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\graphql\Traits\ByPassAccessTrait;
+use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
 use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\IntrospectionTestTrait;
@@ -19,7 +19,7 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
  */
 abstract class GraphQLTestBase extends KernelTestBase {
   use EnableCliCacheTrait;
-  use ByPassAccessTrait;
+  use ProphesizePermissionsTrait;
   use MockSchemaTrait;
   use MockTypeSystemTrait;
   use HttpRequestTrait;
@@ -90,7 +90,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->byPassAccess();
+    $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
   }

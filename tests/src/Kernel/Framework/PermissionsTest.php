@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Session\AccountProxy;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
@@ -15,30 +14,17 @@ use Prophecy\Argument;
 class PermissionsTest extends GraphQLTestBase {
 
   /**
-   * The account prophecy.
-   *
-   * @var \Prophecy\Prophecy\ObjectProphecy
+   * {@inheritdoc}
    */
-  protected $account;
-
-  /**
-   * Disable the access bypass.
-   */
-  protected function byPassAccess() {}
+  protected function userPermissions() {
+    return [];
+  }
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    // Replace the current user with a prophecy.
-    $this->account = $this->prophesize(AccountProxy::class);
-
-    // We test permissions. It doesn't matter if the user is anonymous or not.
-    $this->account->isAnonymous()->willReturn(TRUE);
-    $this->account->isAuthenticated()->willReturn(FALSE);
-    $this->account->id()->willReturn(0);
-    $this->container->set('current_user', $this->account->reveal());
 
     $this->mockField('root', [
       'name' => 'root',
@@ -61,7 +47,7 @@ class PermissionsTest extends GraphQLTestBase {
    * Test if a user without permissions doesn't have access to any query.
    */
   public function testNoPermissions() {
-    $this->account->hasPermission(Argument::any())->willReturn(FALSE);
+    $this->accountProphecy->hasPermission(Argument::any())->willReturn(FALSE);
 
     // Any query should fail.
     $this->assertEquals(403, $this->query('query')->getStatusCode());
@@ -82,8 +68,8 @@ class PermissionsTest extends GraphQLTestBase {
    * The user is only allowed to access persisted queries, not arbitrary ones.
    */
   public function testPersistedQueryAccess() {
-    $this->account->hasPermission(Argument::is('execute persisted graphql requests'))->willReturn(TRUE);
-    $this->account->hasPermission(Argument::not('execute persisted graphql requests'))->willReturn(FALSE);
+    $this->accountProphecy->hasPermission(Argument::is('execute persisted graphql requests'))->willReturn(TRUE);
+    $this->accountProphecy->hasPermission(Argument::not('execute persisted graphql requests'))->willReturn(FALSE);
 
     // Only persisted queries should work.
     $this->assertEquals(403, $this->query('{ root }')->getStatusCode());
@@ -110,8 +96,8 @@ class PermissionsTest extends GraphQLTestBase {
    * The user is allowed to post any queries.
    */
   public function testFullQueryAccess() {
-    $this->account->hasPermission(Argument::is('execute graphql requests'))->willReturn(TRUE);
-    $this->account->hasPermission(Argument::not('execute graphql requests'))->willReturn(FALSE);
+    $this->accountProphecy->hasPermission(Argument::is('execute graphql requests'))->willReturn(TRUE);
+    $this->accountProphecy->hasPermission(Argument::not('execute graphql requests'))->willReturn(FALSE);
 
     // All queries should work.
     $this->assertEquals(200, $this->query('{ root }')->getStatusCode());
