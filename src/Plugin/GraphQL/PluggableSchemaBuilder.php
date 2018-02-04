@@ -39,13 +39,19 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   public function getInstance($pluginType, $pluginId, array $pluginConfiguration = []) {
     $cid = $this->getCacheIdentifier($pluginType, $pluginId, $pluginConfiguration);
     if (!isset($this->instances[$cid])) {
-      $manager = $this->pluginManagers->getPluginManager($pluginType);
-      if (empty($manager)) {
+      $managers = $this->pluginManagers->getPluginManagers($pluginType);
+      if (empty($managers)) {
         throw new \LogicException(sprintf('Could not find %s plugin manager for plugin %s.', $pluginType, $pluginId));
       }
 
       // We do not allow plugin configuration for now.
-      $instance = $manager->createInstance($pluginId, $pluginConfiguration);
+      $instance = NULL;
+      foreach ($managers as $manager) {
+        if($manager->hasDefinition($pluginId)) {
+          $instance = $manager->createInstance($pluginId, $pluginConfiguration);
+        }
+      }
+
       if (empty($instance)) {
         throw new \LogicException(sprintf('Failed to instantiate plugin %s of type %s.', $pluginId, $pluginType));
       }
@@ -63,21 +69,23 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
     $items = [];
 
     /** @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface $manager */
-    foreach ($this->pluginManagers as $type => $manager) {
+    foreach ($this->pluginManagers as $type => $managers) {
       if (!in_array($type, $types)) {
         continue;
       }
 
-      foreach ($manager->getDefinitions() as $id => $definition) {
-        $name = $definition['name'];
+      foreach ($managers as $manager) {
+        foreach ($manager->getDefinitions() as $id => $definition) {
+          $name = $definition['name'];
 
-        if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
-          if ($selector($definition)) {
-            $items[$name] = [
-              'weight' => $definition['weight'],
-              'id' => $id,
-              'type' => $type,
-            ];
+          if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
+            if ($selector($definition)) {
+              $items[$name] = [
+                'weight' => $definition['weight'],
+                'id' => $id,
+                'type' => $type,
+              ];
+            }
           }
         }
       }
