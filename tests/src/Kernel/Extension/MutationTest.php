@@ -3,14 +3,14 @@
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
 use Drupal\graphql_plugin_test\GarageInterface;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test a simple mutation.
  *
  * @group graphql
  */
-class MutationTest extends GraphQLFileTestBase {
+class MutationTest extends GraphQLTestBase {
   public static $modules = [
     'graphql_plugin_test',
   ];
@@ -32,9 +32,12 @@ class MutationTest extends GraphQLFileTestBase {
 
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $this->executeQueryFile('buy_car.gql', [
-      'car' => $car,
-    ]);
+    $query = $this->getQuery('buy_car.gql');
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheMaxAge(0);
+    $this->assertResults($query, ['car' => $car], [
+      'buyCar' => [],
+    ], $metadata);
   }
 
 }

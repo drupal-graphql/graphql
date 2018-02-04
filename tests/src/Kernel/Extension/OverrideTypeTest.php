@@ -3,14 +3,14 @@
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
 use Drupal\graphql_plugin_test\GarageInterface;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql
  */
-class OverrideTypeTest extends GraphQLFileTestBase {
+class OverrideTypeTest extends GraphQLTestBase {
   public static $modules = [
     'graphql_plugin_test',
     'graphql_override_test',
@@ -29,14 +29,22 @@ class OverrideTypeTest extends GraphQLFileTestBase {
     $prophecy->getVehicles()->willReturn($vehicles);
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $values = $this->executeQueryFile('fancy_garage.gql');
-    $garage = $values['data']['garage'];
-
-    $this->assertEquals(4, $garage[0]['wheels'], 'The car still has 4 wheels.');
-    $this->assertEquals(3, $garage[1]['wheels'], 'The bike has three wheels now.');
-    $this->assertEquals([
-      'Phone charger', 'GPS', 'Coffee machine',
-    ], $garage[1]['gadgets'], 'The bike is owned by a Drupal developer.');
+    $query = $this->getQuery('fancy_garage.gql');
+    $this->assertResults($query, [], [
+      'garage' => [
+        0 => [
+          'wheels' => 4,
+          'type' => 'Car',
+          'engine' => 'fuel',
+        ],
+        1 => [
+          'wheels' => 3,
+          'gadgets' => ['Phone charger', 'GPS', 'Coffee machine'],
+          'type' => 'Bike',
+          'gears' => 21,
+        ],
+      ],
+    ], $this->defaultCacheMetaData());
   }
 
 }

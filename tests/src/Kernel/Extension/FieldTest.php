@@ -2,14 +2,14 @@
 
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql
  */
-class FieldTest extends GraphQLFileTestBase {
+class FieldTest extends GraphQLTestBase {
   public static $modules = [
     'graphql_plugin_test',
   ];
@@ -19,8 +19,10 @@ class FieldTest extends GraphQLFileTestBase {
    */
   public function testRootField() {
     $string = 'Hello Echo!';
-    $values = $this->executeQueryFile('echo.gql', ['input' => $string]);
-    $this->assertEquals($values['data']['echo'], $string);
+    $query = $this->getQuery('echo.gql');
+    $this->assertResults($query, ['input' => $string], [
+      'echo' => $string,
+    ], $this->defaultCacheMetaData());
   }
 
 }

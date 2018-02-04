@@ -3,14 +3,14 @@
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
 use Drupal\graphql_plugin_test\GarageInterface;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql
  */
-class TypeTest extends GraphQLFileTestBase {
+class TypeTest extends GraphQLTestBase {
   public static $modules = [
     'graphql_plugin_test',
   ];
@@ -29,9 +29,10 @@ class TypeTest extends GraphQLFileTestBase {
     $prophecy->getVehicles()->willReturn($vehicles);
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $values = $this->executeQueryFile('garage.gql');
-    $this->assertArrayNotHasKey('errors', $values);
-    $this->assertArraySubset($vehicles, $values['data']['garage']);
+    $query = $this->getQuery('garage.gql');
+    $this->assertResults($query, [], [
+      'garage' => $vehicles,
+    ], $this->defaultCacheMetaData());
   }
 
 }

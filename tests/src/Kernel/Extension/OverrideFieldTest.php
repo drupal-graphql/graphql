@@ -2,14 +2,14 @@
 
 namespace Drupal\Tests\graphql\Kernel\Extension;
 
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql
  */
-class OverrideFieldTest extends GraphQLFileTestBase {
+class OverrideFieldTest extends GraphQLTestBase {
   public static $modules = [
     'graphql_plugin_test',
     'graphql_override_test',
@@ -20,8 +20,10 @@ class OverrideFieldTest extends GraphQLFileTestBase {
    */
   public function testEcho() {
     $string = 'Hello Echo!';
-    $values = $this->executeQueryFile('echo.gql', ['input' => $string]);
-    $this->assertEquals($values['data']['echo'], strtoupper($string));
+    $query = $this->getQuery('echo.gql');
+    $this->assertResults($query, ['input' => $string], [
+      'echo' => strtoupper($string),
+    ], $this->defaultCacheMetaData());
   }
 
 }
