@@ -59,7 +59,7 @@ class LanguageTest extends LanguageTestBase {
   /**
    * Test listing of available languages.
    */
-  public function testAvailableLanguages() {
+  public function testLanguageId() {
     $result = $this->executeQueryFile('languages.gql');
 
     $english = [

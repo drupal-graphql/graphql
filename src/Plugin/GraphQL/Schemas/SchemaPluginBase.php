@@ -127,6 +127,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       GRAPHQL_UNION_TYPE_PLUGIN,
       GRAPHQL_TYPE_PLUGIN,
       GRAPHQL_INPUT_TYPE_PLUGIN,
+      GRAPHQL_ENUM_PLUGIN,
     ]);
   }
 

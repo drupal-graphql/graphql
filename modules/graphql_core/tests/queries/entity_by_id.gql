@@ -1,4 +1,4 @@
-query($id: String, $language: AvailableLanguages) {
+query($id: String, $language: LanguageId) {
   nodeById(id: $id, language: $language) {
     entityLabel
   }
