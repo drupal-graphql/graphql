@@ -20,7 +20,7 @@ trait MockSchemaTrait {
    * @return array
    *   The schema plugin definitino array.
    */
-  abstract function getSchemaDefinitions();
+  abstract protected function getSchemaDefinitions();
 
   /**
    * The schema manager mock.
@@ -53,7 +53,6 @@ trait MockSchemaTrait {
   protected function registerSchemaPluginManager(ContainerBuilder $container) {
     assert($this instanceof KernelTestBase, 'MockSchemaTrait has to be used in a KernelTest.');
 
-    /** @var Php $schemaManager */
     $schemaManager = $this->getMockBuilder(SchemaPluginManager::class)
       ->disableOriginalConstructor()
       ->setMethods([
