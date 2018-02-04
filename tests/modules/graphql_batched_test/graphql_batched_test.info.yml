@@ -1,8 +1,0 @@
-type: module
-name: GraphQL Batched Test
-description: Test scenario for batched field resolving.
-package: Testing
-core: 8.x
-hidden: TRUE
-dependencies:
-- graphql_test

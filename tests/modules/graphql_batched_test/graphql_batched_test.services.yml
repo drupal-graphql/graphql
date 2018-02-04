@@ -1,7 +1,0 @@
-services:
-  graphql_batched_test.user_database:
-    class: '\Drupal\graphql_batched_test\UserDatabase'
-  graphql_batched_test.user_database_buffer:
-    class: '\Drupal\graphql_batched_test\UserDatabaseBuffer'
-    arguments:
-    - "@graphql_batched_test.user_database"
