@@ -29,7 +29,7 @@ class TypeTest extends GraphQLTestBase {
     $prophecy->getVehicles()->willReturn($vehicles);
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $query = $this->getQuery('garage.gql');
+    $query = $this->getQueryFromFile('garage.gql');
     $this->assertResults($query, [], [
       'garage' => $vehicles,
     ], $this->defaultCacheMetaData());

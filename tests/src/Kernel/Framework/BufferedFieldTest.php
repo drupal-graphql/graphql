@@ -103,7 +103,7 @@ class BufferedFieldTest extends GraphQLTestBase {
       };
     });
 
-    $query = $this->getQuery('batched.gql');
+    $query = $this->getQueryFromFile('batched.gql');
     $metadata = $this->defaultCacheMetaData();
     $this->assertResults($query, [], [
       'a' => [

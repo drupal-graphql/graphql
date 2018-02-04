@@ -26,7 +26,7 @@ trait QueryFileTrait {
    * @return string
    *   The graphql query string.
    */
-  public function getQuery($queryFile) {
+  public function getQueryFromFile($queryFile) {
     return file_get_contents($this->getQueriesDirectory() . '/' . $queryFile);
   }
 

@@ -33,7 +33,7 @@ class RecursiveTypeTest extends GraphQLTestBase {
     $prophecy->getVehicles()->willReturn($vehicles);
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $query = $this->getQuery('recursive_garage.gql');
+    $query = $this->getQueryFromFile('recursive_garage.gql');
     $this->assertResults($query, [], [
       'garage' => [
         0 => [

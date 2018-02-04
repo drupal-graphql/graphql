@@ -29,7 +29,7 @@ class OverrideTypeTest extends GraphQLTestBase {
     $prophecy->getVehicles()->willReturn($vehicles);
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
-    $query = $this->getQuery('fancy_garage.gql');
+    $query = $this->getQueryFromFile('fancy_garage.gql');
     $this->assertResults($query, [], [
       'garage' => [
         0 => [

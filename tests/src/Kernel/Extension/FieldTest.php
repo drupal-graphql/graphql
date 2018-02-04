@@ -19,7 +19,7 @@ class FieldTest extends GraphQLTestBase {
    */
   public function testRootField() {
     $string = 'Hello Echo!';
-    $query = $this->getQuery('echo.gql');
+    $query = $this->getQueryFromFile('echo.gql');
     $this->assertResults($query, ['input' => $string], [
       'echo' => $string,
     ], $this->defaultCacheMetaData());

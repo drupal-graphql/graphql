@@ -21,7 +21,7 @@ class EnumTest extends GraphQLTestBase {
    * Test enumeration plugins.
    */
   public function testEnumPlugins() {
-    $query = $this->getQuery('enums.gql');
+    $query = $this->getQueryFromFile('enums.gql');
     $this->assertResults($query, [], [
       'number' => 'ONE',
       'numbers' => [
