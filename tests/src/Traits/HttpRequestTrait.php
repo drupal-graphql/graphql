@@ -5,14 +5,14 @@ namespace Drupal\Tests\graphql\Traits;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Common methods for GraphQL query tests.
+ * Test trait for the GraphQL HTTP interface.
  */
 trait HttpRequestTrait {
 
   /**
-   * Issue a simple query without caring about the result.
+   * Issue a simple query over http.
    *
-   * @param $query
+   * @param string $query
    *   The query string.
    * @param array $variables
    *   Query variables.
@@ -28,7 +28,7 @@ trait HttpRequestTrait {
   }
 
   /**
-   * Issue a persisted query.
+   * Issue a persisted query over http.
    *
    * @param $id
    *   The query id.
@@ -49,10 +49,11 @@ trait HttpRequestTrait {
   }
 
   /**
-   * Simulate batched queries.
+   * Simulate batched queries over http.
    *
-   * @param $queries
+   * @param string[] $queries
    *   A set of queries to be executed in one go.
+   *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */

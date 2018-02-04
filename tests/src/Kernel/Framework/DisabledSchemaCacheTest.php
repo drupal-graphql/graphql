@@ -35,10 +35,13 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
       'type' => 'String',
     ], 'test');
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $this->schemaManagerProphecy
-      ->getMethodProphecies('createInstance')[0]
-      ->shouldBeCalledTimes(2);
+    $this->schemaManager
+      ->expects(static::exactly(2))
+      ->method('createInstance')
+      ->with(static::anything(), static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->mockSchema($id);
+      });
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $this->container->get('graphql.schema_loader')->getSchema('default');

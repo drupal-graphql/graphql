@@ -41,7 +41,7 @@ trait GraphQLFileTestTrait {
    *   The query result.
    */
   public function assertNoErrors(array $data) {
-    $errors = array_map(function($error) {
+    $errors = array_map(function ($error) {
       return $error['message'];
     }, array_key_exists('errors', $data) ? $data['errors'] : []);
     $this->assertEquals([], $errors, 'Invalid GraphQL query. Errors: ' . implode("\n* ", $errors));
@@ -87,6 +87,8 @@ trait GraphQLFileTestTrait {
    *
    * @return array
    *   The GraphQL result object.
+   *
+   * @throws \Exception
    */
   public function requestWithQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE) {
     $content = [

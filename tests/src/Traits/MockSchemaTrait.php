@@ -6,48 +6,108 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\KernelTests\KernelTestBase;
-use Prophecy\Argument;
 
+/**
+ * Inject mocked schema definitions.
+ */
 trait MockSchemaTrait {
 
+  /**
+   * Get the schema plugin definitions to mock.
+   *
+   * @see \Drupal\graphql\Annotation\GraphQLSchema
+   *
+   * @return array
+   *   The schema plugin definitino array.
+   */
   abstract function getSchemaDefinitions();
 
   /**
-   * @var \Prophecy\Prophecy\ObjectProphecy
+   * The schema manager mock.
+   *
+   * @var SchemaPluginManager
    */
-  protected $schemaManagerProphecy;
+  protected $schemaManager;
 
+  /**
+   * Factory method for the schema manager.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   *   The mocked schema manager instance.
+   *
+   * @internal
+   */
   public function schemaManagerFactory() {
-    return $this->schemaManagerProphecy->reveal();
+    return $this->schemaManager;
   }
 
+  /**
+   * Register the mocked plugin manager during container build.
+   *
+   * Injects the mocked schema manager into the drupal container. Has to be
+   * invoked during the KernelTest's register callback.
+   *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container builder instance.
+   */
   protected function registerSchemaPluginManager(ContainerBuilder $container) {
-    if ($this instanceof KernelTestBase) {
-      $this->schemaManagerProphecy = $this->prophesize(SchemaPluginManager::class);
+    assert($this instanceof KernelTestBase, 'MockSchemaTrait has to be used in a KernelTest.');
 
-      $that = $this;
+    /** @var Php $schemaManager */
+    $schemaManager = $this->getMockBuilder(SchemaPluginManager::class)
+      ->disableOriginalConstructor()
+      ->setMethods([
+        'getDefinitions',
+        'getDefinition',
+        'createInstance',
+      ])->getMock();
 
-      $this->schemaManagerProphecy->getDefinitions()->will(function () use ($that) {
-        return $that->getSchemaDefinitions();
+    $schemaManager
+      ->expects(static::any())
+      ->method('getDefinitions')
+      ->willReturnCallback(function () {
+        return $this->getSchemaDefinitions();
       });
 
-      $this->schemaManagerProphecy->getDefinition(Argument::type('string'))->will(function ($args) use ($that) {
-        return $that->getSchemaDefinitions()[$args[0]];
+    $schemaManager
+      ->expects(static::any())
+      ->method('getDefinition')
+      ->with(static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->getSchemaDefinitions()[$id];
       });
 
-      $this->schemaManagerProphecy->createInstance(Argument::type('string'), Argument::cetera())->will(function ($args) use ($that) {
-        return $that->getMockForAbstractClass(SchemaPluginBase::class, [
-          [],
-          'default',
-          $that->getSchemaDefinitions()[$args[0]],
-          $that->container->get('graphql.plugin_manager_aggregator'),
-        ]);
+    $schemaManager
+      ->expects(static::any())
+      ->method('createInstance')
+      ->with(static::anything(), static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->mockSchema($id);
       });
 
-      $definition = $container->getDefinition('plugin.manager.graphql.schema');
-      $definition->setClass(get_class($this->schemaManagerProphecy->reveal()));
-      $definition->setFactory([$this, 'schemaManagerFactory']);
-    }
+    $this->schemaManager = $schemaManager;
+
+    $definition = $container->getDefinition('plugin.manager.graphql.schema');
+    $definition->setClass(get_class($this->schemaManager));
+    $definition->setFactory([$this, 'schemaManagerFactory']);
+  }
+
+  /**
+   * Mock a schema instance.
+   *
+   * @param string $id
+   *   The schema id.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase
+   *   The schema plugin mock.
+   */
+  protected function mockSchema($id) {
+    return $this->getMockForAbstractClass(SchemaPluginBase::class, [
+      [],
+      $id,
+      $this->getSchemaDefinitions()[$id],
+      $this->container->get('graphql.plugin_manager_aggregator'),
+    ]);
   }
 
 }

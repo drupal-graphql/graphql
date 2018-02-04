@@ -27,10 +27,13 @@ class SchemaCacheTest extends GraphQLTestBase {
       'type' => 'String',
     ], 'test');
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $this->schemaManagerProphecy
-      ->getMethodProphecies('createInstance')[0]
-      ->shouldBeCalledTimes(1);
+    $this->schemaManager
+      ->expects(static::once())
+      ->method('createInstance')
+      ->with(static::anything(), static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->mockSchema($id);
+      });
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $this->container->get('graphql.schema_loader')->getSchema('default');
@@ -49,10 +52,13 @@ class SchemaCacheTest extends GraphQLTestBase {
       'schema_cache_max_age' => 0,
     ], 'test');
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $this->schemaManagerProphecy
-      ->getMethodProphecies('createInstance')[0]
-      ->shouldBeCalledTimes(2);
+    $this->schemaManager
+      ->expects(static::exactly(2))
+      ->method('createInstance')
+      ->with(static::anything(), static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->mockSchema($id);
+      });
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
     $this->container->get('graphql.schema_loader')->getSchema('default');
@@ -93,10 +99,13 @@ class SchemaCacheTest extends GraphQLTestBase {
       'schema_cache_contexts' => ['context'],
     ], 'test');
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $this->schemaManagerProphecy
-      ->getMethodProphecies('createInstance')[0]
-      ->shouldBeCalledTimes(2);
+    $this->schemaManager
+      ->expects(static::exactly(2))
+      ->method('createInstance')
+      ->with(static::anything(), static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->mockSchema($id);
+      });
 
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     $this->container->get('graphql.schema_loader')->getSchema('default');
@@ -118,10 +127,13 @@ class SchemaCacheTest extends GraphQLTestBase {
       'schema_cache_tags' => ['a'],
     ], 'test');
 
-    /** @var \Prophecy\Prophecy\MethodProphecy $getSchema */
-    $this->schemaManagerProphecy
-      ->getMethodProphecies('createInstance')[0]
-      ->shouldBeCalledTimes(2);
+    $this->schemaManager
+      ->expects(static::exactly(2))
+      ->method('createInstance')
+      ->with(static::anything(), static::anything())
+      ->willReturnCallback(function ($id) {
+        return $this->mockSchema($id);
+      });
 
     $this->container->get('graphql.schema_loader')->getSchema('default');
 
