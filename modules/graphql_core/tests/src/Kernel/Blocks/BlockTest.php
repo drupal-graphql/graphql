@@ -3,21 +3,23 @@
 namespace Drupal\Tests\graphql_core\Kernel\Blocks;
 
 use Drupal\block_content\Entity\BlockContent;
-use Drupal\simpletest\BlockCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test block retrieval via GraphQL.
  *
  * @group graphql_block
  */
-class BlockTest extends GraphQLFileTestBase {
+class BlockTest extends GraphQLTestBase {
   use BlockCreationTrait;
+
   /**
    * {@inheritdoc}
    */
   public static $modules = [
     'system',
+    'user',
     'block',
     'block_content',
     'text',
@@ -40,8 +42,11 @@ class BlockTest extends GraphQLFileTestBase {
     $themeInstaller->install(['stark']);
 
     $this->installEntitySchema('block_content');
+    $this->installEntitySchema('user');
     $this->installConfig('block_content');
     $this->installConfig('graphql_block_test');
+
+    $this->prophesize(BlockContent::class);
 
     $customBlock = BlockContent::create([
       'type' => 'basic',
@@ -63,17 +68,34 @@ class BlockTest extends GraphQLFileTestBase {
    * Test if two static blocks are in the content area.
    */
   public function testStaticBlocks() {
-    $result = $this->executeQueryFile('Blocks/blocks.gql');
-    $this->assertEquals(1, count($result['data']['route']['content']), 'Block listing respects visibility settings.');
-  }
+    $query = $this->getQueryFromFile('Blocks/blocks.gql');
+    $metadata = $this->defaultCacheMetaData();
 
-  /**
-   * Test placement of a content block.
-   */
-  public function testContentBlock() {
-    $result = $this->executeQueryFile('Blocks/blocks.gql');
-    $this->assertEquals(1, count($result['data']['route']['sidebar']), 'One content block in sidebar region.');
-    $this->assertEquals('<p>This is a test block content.</p>', $result['data']['route']['sidebar'][0]['body']['value'], 'Content block body contains expected text.');
-  }
+    $metadata->addCacheTags([
+      'block_content:1',
+      'config:block.block.stark_powered',
+      'config:field.storage.block_content.body',
+      'entity_bundles',
+      'entity_field_info',
+      'entity_types',
+    ]);
 
+    $this->assertResults($query, [], [
+      'route' => [
+        'content' => [
+          0 => [
+            '__typename' => 'UnexposedEntity',
+          ],
+        ],
+        'sidebar' => [
+          0 => [
+            '__typename' => 'BlockContentBasic',
+            'body' => [
+              'value' => '<p>This is a test block content.</p>',
+            ],
+          ],
+        ],
+      ],
+    ], $metadata);
+  }
 }

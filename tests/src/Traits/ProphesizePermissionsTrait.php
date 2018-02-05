@@ -35,10 +35,13 @@ trait ProphesizePermissionsTrait {
     // Replace the current user with a prophecy that has the defined
     // permissions.
     $user = $this->prophesize(AccountProxyInterface::class);
+    $permissions = $this->userPermissions();
 
-    $user->hasPermission(Argument::that(function ($arg) {
-      return in_array($arg, $this->userPermissions());
-    }))->willReturn(AccessResult::allowed());
+    $user
+      ->hasPermission(Argument::type('string'))
+      ->will(function ($args) use ($permissions) {
+        return AccessResult::allowedIf(in_array($args[0], $permissions));
+      });
 
     $user->id()->willReturn(0);
     $user->isAnonymous()->willReturn(TRUE);
