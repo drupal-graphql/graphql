@@ -2,18 +2,14 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Context;
 
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql_core
  */
-class ContextTest extends GraphQLFileTestBase {
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
+class ContextTest extends GraphQLTestBase {
 
   public static $modules = [
     'graphql_core',
@@ -24,11 +20,11 @@ class ContextTest extends GraphQLFileTestBase {
    * Test if the schema is created properly.
    */
   public function testSimpleContext() {
-    $values = $this->executeQueryFile('context.gql');
-    $this->assertEquals([
+    $query = $this->getQueryFromFile('context.gql');
+    $this->assertResults($query, [], [
       'a' => ['name' => 'graphql_context_test.a'],
       'b' => ['name' => 'graphql_context_test.b'],
-    ], $values['data']);
+    ], $this->defaultCacheMetaData());
   }
 
 }
