@@ -38,9 +38,9 @@ trait ProphesizePermissionsTrait {
     $permissions = $this->userPermissions();
 
     $user
-      ->hasPermission(Argument::type('string'))
+      ->hasPermission(Argument::type('string'), Argument::cetera())
       ->will(function ($args) use ($permissions) {
-        return AccessResult::allowedIf(in_array($args[0], $permissions));
+        return in_array($args[0], $permissions);
       });
 
     $user->id()->willReturn(0);
