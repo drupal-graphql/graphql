@@ -4,11 +4,8 @@ namespace Drupal\Tests\graphql_core\Kernel\Breadcrumbs;
 
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Link;
-use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Url;
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
 
 /**
@@ -16,9 +13,7 @@ use Prophecy\Argument;
  *
  * @group graphql_breadcrumbs
  */
-class BreadcrumbsTest extends GraphQLFileTestBase {
-  use NodeCreationTrait;
-  use ContentTypeCreationTrait;
+class BreadcrumbsTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
@@ -38,7 +33,7 @@ class BreadcrumbsTest extends GraphQLFileTestBase {
 
     $breadcrumbManager->build(Argument::any())
       ->will(function($args) {
-        /** @var RouteMatch $routeMatch */
+        /** @var \Drupal\Core\Routing\RouteMatch $routeMatch */
         $routeMatch = $args[0];
         $breadcrumb = new Breadcrumb();
         if ($routeMatch->getRouteName() == 'graphql_breadcrumbs_test.test') {
@@ -53,11 +48,18 @@ class BreadcrumbsTest extends GraphQLFileTestBase {
    * Test that the breadcrumb query returns breadcrumbs for given path.
    */
   public function testBreadcrumbs() {
-    $expected = [
-      ['text' => 'Test breadcrumb']
-    ];
-    $result = $this->executeQueryFile('breadcrumbs.gql', ['path' => '/breadcrumbs-test']);
-    $this->assertEquals($expected, $result['data']['route']['breadcrumb']);
+    $query = $this->getQueryFromFile('breadcrumbs.gql');
+
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+
+    $this->assertResults($query, ['path' => '/breadcrumbs-test'], [
+      'route' => [
+        'breadcrumb' => [
+          0 => ['text' => 'Test breadcrumb'],
+        ],
+      ],
+    ], $metadata);
   }
 
 }

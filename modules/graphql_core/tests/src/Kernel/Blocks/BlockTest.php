@@ -71,6 +71,7 @@ class BlockTest extends GraphQLTestBase {
     $query = $this->getQueryFromFile('Blocks/blocks.gql');
     $metadata = $this->defaultCacheMetaData();
 
+    // TODO: Check cache metadata.
     $metadata->addCacheTags([
       'block_content:1',
       'config:block.block.stark_powered',
