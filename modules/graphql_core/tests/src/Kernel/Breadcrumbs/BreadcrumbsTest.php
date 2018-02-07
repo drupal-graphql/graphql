@@ -32,7 +32,7 @@ class BreadcrumbsTest extends GraphQLTestBase {
     $breadcrumbManager = $this->prophesize('Drupal\Core\Breadcrumb\BreadcrumbManager');
 
     $breadcrumbManager->build(Argument::any())
-      ->will(function($args) {
+      ->will(function ($args) {
         /** @var \Drupal\Core\Routing\RouteMatch $routeMatch */
         $routeMatch = $args[0];
         $breadcrumb = new Breadcrumb();

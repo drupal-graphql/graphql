@@ -2,11 +2,7 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Entity;
 
-use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\node\Traits\NodeCreationTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\user\Entity\Role;
+use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 use DateTime;
 
 /**
@@ -14,18 +10,9 @@ use DateTime;
  *
  * @group graphql_content
  */
-class EntityBasicFieldsTest extends GraphQLTestBase {
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
-  use UserCreationTrait;
+class EntityBasicFieldsTest extends GraphQLContentTestBase {
 
   public static $modules = [
-    'graphql_core',
-    'user',
-    'node',
-    'field',
-    'filter',
-    'text',
     'language',
     'content_translation',
   ];
@@ -35,18 +22,6 @@ class EntityBasicFieldsTest extends GraphQLTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installConfig(['user']);
-    $this->installConfig(['node']);
-    $this->installConfig(['filter']);
-    $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installSchema('node', 'node_access');
-    $this->installSchema('system', 'sequences');
-
-    $this->createContentType([
-      'type' => 'test',
-    ]);
 
     $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
       'id' => 'fr',
@@ -62,9 +37,7 @@ class EntityBasicFieldsTest extends GraphQLTestBase {
    */
   protected function userPermissions() {
     $perms = parent::userPermissions();
-    $perms[] = 'access content';
     $perms[] = 'edit any test content';
-    $perms[] = 'access user profiles';
     return $perms;
   }
 
@@ -127,7 +100,6 @@ class EntityBasicFieldsTest extends GraphQLTestBase {
     $metadata->addCacheContexts([
       'languages:language_content',
       'user.node_grants:view',
-      'user.permissions',
     ]);
 
     $metadata->addCacheTags([
