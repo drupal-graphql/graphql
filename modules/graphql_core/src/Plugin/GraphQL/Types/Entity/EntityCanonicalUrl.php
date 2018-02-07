@@ -13,7 +13,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "entity_canonical_url",
  *   name = "EntityCanonicalUrl",
  *   description = @Translation("The canonical entity url."),
- *   interfaces = {"Url"},
+ *   interfaces = {"InternalUrl"},
  *   weight = 1
  * )
  */
