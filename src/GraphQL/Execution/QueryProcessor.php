@@ -2,22 +2,13 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Execution\Processor;
 
-/**
- * Drupal service for executing GraphQL queries.
- */
 class QueryProcessor {
-
-  /**
-   * The dependency injection container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
 
   /**
    * The current user account.
@@ -43,8 +34,6 @@ class QueryProcessor {
   /**
    * QueryProcessor constructor.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The dependency injection container.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
    * @param \Drupal\graphql\GraphQL\Schema\SchemaLoader $schemaLoader
@@ -53,12 +42,10 @@ class QueryProcessor {
    *   The graphql container parameters.
    */
   public function __construct(
-    ContainerInterface $container,
     SchemaLoader $schemaLoader,
     AccountProxyInterface $currentUser,
     array $parameters
   ) {
-    $this->container = $container;
     $this->currentUser = $currentUser;
     $this->parameters = $parameters;
     $this->schemaLoader = $schemaLoader;
@@ -84,20 +71,26 @@ class QueryProcessor {
       throw new \InvalidArgumentException(sprintf('Could not load schema %s', [$schemaId]));
     }
 
-    /** @var \Youshido\GraphQL\Schema\AbstractSchema $schema */
+    // Set up the processor with parameters to be used in the resolvers.
+    $processor = new Processor($schema);
+    $context = $processor->getExecutionContext();
+    $container = $context->getContainer();
     $secure = !!($bypassSecurity || $this->currentUser->hasPermission('bypass graphql field security') || $this->parameters['development']);
-    $processor = new Processor($this->container, $schema, $secure);
-    $processor->processPayload($query, $variables);
+    $container->set('secure', $secure);
+    $container->set('metadata', new CacheableMetadata());
+
+    // Run the query against the parser.
+    $result = $processor->processPayload($query, $variables)->getResponseData();
 
     // Add collected cache metadata from the query processor.
     $responseCacheMetadata = new CacheableMetadata();
-    $context = $processor->getExecutionContext();
-    $container = $context->getContainer();
-    if ($container->has('metadata')) {
-      $responseCacheMetadata->addCacheableDependency($container->get('metadata'));
+    if ($container->has('metadata') && ($metadata = $container->get('metadata'))) {
+      if ($metadata instanceof CacheableDependencyInterface) {
+        $responseCacheMetadata->addCacheableDependency($metadata);
+      }
     }
 
-    // Prevent caching if this is a mutation query or an error occurs.
+    // Prevent caching if this is a mutation query or an error occurred.
     $request = $context->getRequest();
     if ((!empty($request) && $request->hasMutations()) || $context->hasErrors()) {
       $responseCacheMetadata->setCacheMaxAge(0);
@@ -105,7 +98,7 @@ class QueryProcessor {
 
     // Load the schema's cache metadata.
     $schemaCacheMetadata = $this->schemaLoader->getResponseCacheMetadata($schemaId);
-    return new QueryResult($processor->getResponseData(), $responseCacheMetadata, $schemaCacheMetadata);
+    return new QueryResult($result, $responseCacheMetadata, $schemaCacheMetadata);
   }
 
 }

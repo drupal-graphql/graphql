@@ -3,7 +3,6 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -38,10 +37,7 @@ class Route extends FieldPluginBase {
         yield $url;
       }
       else {
-        $metadata = new CacheableMetadata();
-        $metadata->addCacheTags(['4xx-response']);
-
-        yield new CacheableValue(NULL, [$metadata]);
+        yield (new CacheableValue(NULL))->addCacheTags(['4xx-response']);
       }
     }
   }

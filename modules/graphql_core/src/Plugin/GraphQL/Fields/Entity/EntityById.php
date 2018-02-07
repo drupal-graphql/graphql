@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -93,24 +92,22 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
         // cache entry is purged whenever a new entity of this type is saved.
         $pluginDefinition = $this->getPluginDefinition();
         $entityType = $this->entityTypeManager->getDefinition($pluginDefinition['entity_type']);
-        $metadata = new CacheableMetadata();
-        $metadata->addCacheTags($entityType->getListCacheTags());
-
-        yield new CacheableValue(NULL, [$metadata]);
-      }
-      /** @var \Drupal\Core\Access\AccessResultInterface $access */
-      else if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
-        if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
-          $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
-        }
-
-        yield new CacheableValue($entity, [$access]);
+        yield (new CacheableValue(NULL))->addCacheTags($entityType->getListCacheTags());
       }
       else {
-        // If the entity exists but we do not grant access to it, we still want
-        // to have it's cache metadata in the output because future changes to
-        // the entity might affect its visibility for the user.
-        yield new CacheableValue(NULL, [$access]);
+        /** @var \Drupal\Core\Entity\EntityInterface $entity */
+        $access = $entity->access('view', NULL, TRUE);
+
+        if ($access->isAllowed()) {
+          if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
+            $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+          }
+
+          yield $entity->addCacheableDependency($access);
+        }
+        else {
+          yield new CacheableValue(NULL, [$access]);
+        }
       }
     };
   }

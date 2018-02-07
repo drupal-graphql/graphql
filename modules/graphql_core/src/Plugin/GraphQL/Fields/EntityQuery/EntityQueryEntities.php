@@ -68,8 +68,10 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
 
         /** @var \Drupal\Core\Entity\EntityInterface $entity */
         foreach ($entities as $entity) {
-          if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
-            yield new CacheableValue($entity, [$access]);
+          $access = $entity->access('view', NULL, TRUE);
+
+          if ($access->isAllowed()) {
+            yield $entity->addCacheableDependency($access);
           }
           else {
             yield new CacheableValue(NULL, [$access]);

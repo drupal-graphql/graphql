@@ -182,6 +182,21 @@ trait MockTypeSystemTrait {
   }
 
   /**
+   * Turn a value into a bound result promise.
+   *
+   * @param mixed $value
+   *   The return value. Can also be a value callback.
+   * @param mixed $scope
+   *   The resolver's bound object and class scope.
+   *
+   * @return \PHPUnit_Framework_MockObject_Stub_ReturnCallback
+   *   The return callback promise.
+   */
+  protected function toBoundPromise($value, $scope) {
+    return $this->toPromise(is_callable($value) ? \Closure::bind($value, $scope, $scope) : $value);
+  }
+
+  /**
    * Mock a GraphQL field.
    *
    * @param string $id
@@ -207,12 +222,12 @@ trait MockTypeSystemTrait {
         'resolveValues',
       ])->getMock();
 
-    if ($result) {
+    if (isset($result)) {
       $field
         ->expects(static::any())
         ->method('resolveValues')
         ->with($this->anything(), $this->anything(), $this->anything())
-        ->will($this->toPromise($result));
+        ->will($this->toBoundPromise($result, $field));
     }
 
     $this->addTypeSystemPlugin($field);
@@ -249,7 +264,7 @@ trait MockTypeSystemTrait {
       ->expects(static::any())
       ->method('applies')
       ->with($this->anything(), $this->anything())
-      ->will($this->toPromise($applies));
+      ->will($this->toBoundPromise($applies, $type));
 
     $this->addTypeSystemPlugin($type);
 
@@ -312,12 +327,12 @@ trait MockTypeSystemTrait {
         'resolve',
       ])->getMock();
 
-    if ($result) {
+    if (isset($result)) {
       $mutation
         ->expects(static::any())
         ->method('resolve')
         ->with($this->anything(), $this->anything(), $this->anything())
-        ->will($this->toPromise($result));
+        ->will($this->toBoundPromise($result, $mutation));
     }
 
     $this->addTypeSystemPlugin($mutation);
@@ -410,7 +425,7 @@ trait MockTypeSystemTrait {
       ->expects(static::any())
       ->method('buildValues')
       ->with($this->anything())
-      ->will($this->toPromise($values));
+      ->will($this->toBoundPromise($values, $enum));
 
     $this->addTypeSystemPlugin($enum);
 

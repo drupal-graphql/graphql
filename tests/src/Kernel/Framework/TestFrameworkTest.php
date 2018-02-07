@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -23,10 +22,8 @@ class TestFrameworkTest extends GraphQLTestBase {
       'name' => 'root',
       'type' => 'String',
       'response_cache_tags' => ['my_tag'],
-    ], function ($value, array $args, ResolveInfo $info) {
-      $metadata = new CacheableMetadata();
-      $metadata->setCacheMaxAge(42);
-      yield new CacheableValue('test', [$metadata]);
+    ], function () {
+      yield (new CacheableValue('test'))->mergeCacheMaxAge(42);
     });
 
     $metadata = $this->defaultCacheMetaData();
