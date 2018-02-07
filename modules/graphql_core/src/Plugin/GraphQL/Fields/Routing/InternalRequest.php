@@ -19,7 +19,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "request",
  *   type = "InternalResponse",
- *   parents = {"InternalUrl", "EntityCanonicalUrl"}
+ *   parents = {"InternalUrl"}
  * )
  */
 class InternalRequest extends FieldPluginBase implements ContainerFactoryPluginInterface {
