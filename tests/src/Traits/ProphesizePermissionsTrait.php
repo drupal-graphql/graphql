@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountProxyInterface;
 use Prophecy\Argument;
 
@@ -27,6 +26,15 @@ trait ProphesizePermissionsTrait {
   }
 
   /**
+   * Set the prophesized roles.
+   *
+   * @return string[]
+   */
+  protected function userRoles() {
+    return ['anonymous'];
+  }
+
+  /**
    * Bypass user access.
    *
    * @before
@@ -42,6 +50,10 @@ trait ProphesizePermissionsTrait {
       ->will(function ($args) use ($permissions) {
         return in_array($args[0], $permissions);
       });
+
+    $user
+      ->getRoles(Argument::any())
+      ->willReturn($this->userRoles());
 
     $user->id()->willReturn(0);
     $user->isAnonymous()->willReturn(TRUE);

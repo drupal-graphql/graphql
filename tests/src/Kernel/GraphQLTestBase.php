@@ -32,6 +32,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   public static $modules = [
     'system',
+    'user',
     'graphql',
   ];
 
@@ -73,7 +74,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function defaultCacheContexts() {
-    return ['gql', 'languages:language_interface', 'user'];
+    return ['gql', 'languages:language_interface', 'user.permissions'];
   }
 
   /**
