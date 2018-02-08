@@ -3,26 +3,22 @@
 namespace Drupal\Tests\graphql_core\Kernel\Languages;
 
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
-use Drupal\Tests\graphql\Traits\GraphQLFileTestTrait;
-use Drupal\Tests\language\Kernel\LanguageTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test multilingual behavior of `graphql_core` features.
  *
  * @group graphql_core
  */
-class LanguageTest extends LanguageTestBase {
-  use GraphQLFileTestTrait;
-  use ProphesizePermissionsTrait;
+class LanguageTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
+    'language',
     'graphql',
     'graphql_core',
-    'graphql_test',
     'graphql_context_test',
   ];
 
@@ -31,6 +27,9 @@ class LanguageTest extends LanguageTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->installEntitySchema('user');
+    $this->installconfig(['language']);
     $this->installEntitySchema('configurable_language');
     $this->container->get('router.builder')->rebuild();
 
@@ -60,49 +59,57 @@ class LanguageTest extends LanguageTestBase {
    * Test listing of available languages.
    */
   public function testLanguageId() {
-    $result = $this->executeQueryFile('languages.gql');
+    $metadata = $this->defaultCacheMetaData();
 
-    $english = [
-      'id' => 'en',
-      'name' => 'English',
-      'isDefault' => TRUE,
-      'isLocked' => FALSE,
-      'direction' => 'ltr',
-      'weight' => 0,
-      'argument' => 'en',
-    ];
+    // TODO: Check cache metadata.
+    $metadata->addCacheTags([
+      'entity_bundles',
+      'entity_field_info',
+      'entity_types',
+    ]);
 
-    $french = [
-      'id' => 'fr',
-      'name' => 'French',
-      'isDefault' => FALSE,
-      'isLocked' => FALSE,
-      'direction' => 'ltr',
-      'weight' => 1,
-      'argument' => 'fr',
-    ];
+    $this->assertResults($this->getQueryFromFile('languages.gql'), [], [
+      'languages' => [
+        0 => [
+          'id' => 'en',
+          'name' => 'English',
+          'isDefault' => TRUE,
+          'isLocked' => FALSE,
+          'direction' => 'ltr',
+          'weight' => 0,
+          'argument' => 'en',
+        ],
 
-    $spanish = [
-      'id' => 'es',
-      'name' => 'Spanish',
-      'isDefault' => FALSE,
-      'isLocked' => FALSE,
-      'direction' => 'ltr',
-      'weight' => 2,
-      'argument' => 'es',
-    ];
+        1 => [
+          'id' => 'fr',
+          'name' => 'French',
+          'isDefault' => FALSE,
+          'isLocked' => FALSE,
+          'direction' => 'ltr',
+          'weight' => 1,
+          'argument' => 'fr',
+        ],
 
-    $brazil = [
-      'id' => 'pt-br',
-      'name' => 'Portuguese, Brazil',
-      'isDefault' => FALSE,
-      'isLocked' => FALSE,
-      'direction' => 'ltr',
-      'weight' => 3,
-      'argument' => 'pt_br',
-    ];
-
-    $this->assertEquals([$english, $french, $spanish, $brazil], $result['data']['languages']);
+        2 => [
+          'id' => 'es',
+          'name' => 'Spanish',
+          'isDefault' => FALSE,
+          'isLocked' => FALSE,
+          'direction' => 'ltr',
+          'weight' => 2,
+          'argument' => 'es',
+        ],
+        3 => [
+          'id' => 'pt-br',
+          'name' => 'Portuguese, Brazil',
+          'isDefault' => FALSE,
+          'isLocked' => FALSE,
+          'direction' => 'ltr',
+          'weight' => 3,
+          'argument' => 'pt_br',
+        ],
+      ],
+    ], $metadata);
   }
 
 }
