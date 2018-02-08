@@ -3,21 +3,16 @@
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
 use Drupal\Core\Path\AliasManagerInterface;
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql_core
  */
-class RouteTest extends GraphQLFileTestBase {
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
+class RouteTest extends GraphQLCoreTestBase {
 
   public static $modules = [
-    'graphql_core',
     'graphql_context_test',
   ];
 
@@ -26,6 +21,7 @@ class RouteTest extends GraphQLFileTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
     $aliasManager = $this->prophesize(AliasManagerInterface::class);
     $aliasManager->getPathByAlias('/my/alias')->willReturn('/graphql/test/a');
     $aliasManager->getAliasByPath('/graphql/test/a')->willReturn('/my/other/alias');
@@ -37,20 +33,20 @@ class RouteTest extends GraphQLFileTestBase {
    * Test if the schema is created properly.
    */
   public function testRoute() {
-    $values = $this->executeQueryFile('routing.gql');
-    $this->assertEquals([
-      'internal' => '/graphql/test/a',
-      'aliased' => '/my/other/alias',
-      'routed' => TRUE,
-    ], $values['data']['route'], 'Routes and aliases are resolved properly.');
-  }
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      '4xx-response',
+    ]);
 
-  /**
-   * Test if the schema is created properly.
-   */
-  public function testDeniedRoute() {
-    $values = $this->executeQueryFile('routing.gql');
-    $this->assertNull($values['data']['denied'], 'Denied route returns null.');
+    $this->assertResults($this->getQueryFromFile('routing.gql'), [], [
+      'route' => [
+        'internal' => '/graphql/test/a',
+        'aliased' => '/my/other/alias',
+        'routed' => TRUE,
+      ],
+      'denied' => NULL,
+    ], $metadata);
   }
 
 }

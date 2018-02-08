@@ -2,34 +2,21 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Entity;
 
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-use Drupal\Tests\graphql_core\Traits\RevisionsTestTrait;
-use Drupal\user\Entity\Role;
+use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 
 /**
  * Test entity query support in GraphQL.
  *
  * @group graphql_content
  */
-class EntityByIdTest extends GraphQLFileTestBase {
-  use NodeCreationTrait;
-  use ContentTypeCreationTrait;
-  use RevisionsTestTrait;
+class EntityByIdTest extends GraphQLContentTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'node',
-    'field',
-    'filter',
     'language',
     'content_translation',
-    'text',
-    'graphql_test',
-    'graphql_core',
   ];
 
   /**
@@ -51,15 +38,6 @@ class EntityByIdTest extends GraphQLFileTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installConfig(['node', 'filter']);
-    $this->installSchema('node', 'node_access');
-    $this->createContentType(['type' => 'test']);
-
-    Role::load('anonymous')
-      ->grantPermission('access content')
-      ->save();
 
     $languageStorage = $this->container->get('entity.manager')->getStorage('configurable_language');
     $language = $languageStorage->create([
@@ -92,26 +70,45 @@ class EntityByIdTest extends GraphQLFileTestBase {
       ->setTitle('English node unpublished')
       ->save();
 
+    // TODO: Check chache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'entity_bundles',
+      'entity_field_info',
+      'entity_types',
+      'node:1',
+      'config:field.storage.node.body',
+    ]);
+
     // Check English node.
-    $result = $this->executeQueryFile('entity_by_id.gql', [
+    $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
       'language' => 'en',
-    ]);
-    $this->assertEquals(['entityLabel' => 'English node'], $result['data']['nodeById']);
+    ], [
+      'nodeById' => [
+        'entityLabel' => 'English node',
+      ],
+    ], $metadata);
 
     // Check French translation.
-    $result = $this->executeQueryFile('entity_by_id.gql', [
+    $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
       'language' => 'fr',
-    ]);
-    $this->assertEquals(['entityLabel' => 'French node'], $result['data']['nodeById']);
+    ], [
+      'nodeById' => [
+        'entityLabel' => 'French node',
+      ],
+    ], $metadata);
 
     // Check Chinese simplified translation.
-    $result = $this->executeQueryFile('entity_by_id.gql', [
+    $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
       'language' => 'zh_hans',
-    ]);
-    $this->assertEquals(['entityLabel' => 'Chinese simplified node'], $result['data']['nodeById']);
+    ], [
+      'nodeById' => [
+        'entityLabel' => 'Chinese simplified node',
+      ],
+    ], $metadata);
   }
 
 }

@@ -2,35 +2,22 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Images;
 
-use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\image\Entity\ImageStyle;
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-use Drupal\user\Entity\Role;
+use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 
 /**
  * Test file attachments.
  *
  * @group graphql_image
  */
-class ImageFieldTest extends GraphQLFileTestBase {
-  use NodeCreationTrait;
-  use ContentTypeCreationTrait;
+class ImageFieldTest extends GraphQLContentTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'node',
-    'field',
-    'text',
-    'filter',
     'file',
     'image',
-    'graphql_core',
   ];
 
   /**
@@ -38,38 +25,10 @@ class ImageFieldTest extends GraphQLFileTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig('node');
-    $this->installConfig('filter');
     $this->installConfig('image');
-    $this->installEntitySchema('node');
-    $this->installSchema('node', 'node_access');
     $this->installSchema('file', 'file_usage');
     $this->installEntitySchema('file');
-    $this->createContentType(['type' => 'test']);
-
-    Role::load('anonymous')
-      ->grantPermission('access content')
-      ->save();
-
-    EntityViewMode::create([
-      'targetEntityType' => 'node',
-      'id' => "node.graphql",
-    ])->save();
-
-
-    FieldStorageConfig::create([
-      'field_name' => 'image',
-      'type' => 'image',
-      'entity_type' => 'node',
-    ])->save();
-
-    FieldConfig::create([
-      'field_name' => 'image',
-      'entity_type' => 'node',
-      'bundle' => 'test',
-      'label' => 'Image',
-    ])->save();
-
+    $this->addField('image', 'image');
   }
 
   /**
@@ -85,15 +44,48 @@ class ImageFieldTest extends GraphQLFileTestBase {
 
     $a->save();
 
-    $result = $this->executeQueryFile('image.gql', ['path' => '/node/' . $a->id()]);
-    $image = $result['data']['route']['node']['image'];
 
-    $this->assertEquals($a->image->alt, $image['alt'], 'Alt text correct.');
-    $this->assertEquals($a->image->title, $image['title'], 'Title text correct.');
-    $this->assertEquals($a->image->entity->url(), $image['entity']['url'], 'Retrieve correct image url.');
-    $imageStyle = ImageStyle::load('thumbnail');
-    $styleUrl = $imageStyle->buildUrl($a->image->entity->uri->value);
-    $this->assertEquals($styleUrl, $image['thumbnailImage']['url']);
+    $style = ImageStyle::load('thumbnail');
+
+    $dimensions = [
+      'width' => $a->image[0]->width,
+      'height' => $a->image[0]->height,
+    ];
+
+    $style->transformDimensions($dimensions, $a->image[0]->entity->getFileUri());
+
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.image',
+      'entity_bundles',
+      'entity_field_info',
+      'entity_types',
+      'file:1',
+      'node:1',
+      // TODO: missing image style config cache tags?
+    ]);
+
+    $this->assertResults($this->getQueryFromFile('image.gql'), [
+      'path' => '/node/' . $a->id(),
+    ], [
+      'route' => [
+        'node' => [
+          'image' => [[
+            'alt' => $a->image->alt,
+            'title' => $a->image->title,
+            'entity' => ['url' => $a->image->entity->url()],
+            'width' => $a->image[0]->width,
+            'height' => $a->image[0]->height,
+            'thumbnailImage' => [
+              'url' => $style->buildUrl($a->image->entity->uri->value),
+              'width' => $dimensions['width'],
+              'height' => $dimensions['height'],
+            ],
+          ]],
+        ],
+      ],
+    ], $metadata);
   }
 
 }

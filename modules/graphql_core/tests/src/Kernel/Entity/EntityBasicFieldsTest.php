@@ -2,11 +2,7 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Entity;
 
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\simpletest\UserCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-use Drupal\user\Entity\Role;
+use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 use DateTime;
 
 /**
@@ -14,17 +10,9 @@ use DateTime;
  *
  * @group graphql_content
  */
-class EntityBasicFieldsTest extends GraphQLFileTestBase {
-  use ContentTypeCreationTrait;
-  use NodeCreationTrait;
-  use UserCreationTrait;
+class EntityBasicFieldsTest extends GraphQLContentTestBase {
 
   public static $modules = [
-    'graphql_core',
-    'node',
-    'field',
-    'filter',
-    'text',
     'language',
     'content_translation',
   ];
@@ -35,27 +23,22 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installConfig(['node']);
-    $this->installConfig(['filter']);
-    $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installSchema('node', 'node_access');
-    $this->installSchema('system', 'sequences');
-
-    $this->createContentType([
-      'type' => 'test',
-    ]);
-
-    Role::load('anonymous')
-      ->grantPermission('access content')
-      ->grantPermission('edit any test content')
-      ->grantPermission('access user profiles')
-      ->save();
-
     $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
       'id' => 'fr',
     ]);
     $language->save();
+  }
+
+  /**
+   * Set the prophesized permissions.
+   *
+   * @return string[]
+   *   The permissions to set on the prophesized user.
+   */
+  protected function userPermissions() {
+    $perms = parent::userPermissions();
+    $perms[] = 'edit any test content';
+    return $perms;
   }
 
   /**
@@ -73,10 +56,6 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
 
     $translation = $node->addTranslation('fr', ['title' => 'French node']);
     $translation->save();
-
-    $result = $this->executeQueryFile('basic_fields.gql', [
-      'nid' => (int) $node->id(),
-    ]);
 
     $created = (new DateTime())->setTimestamp($node->getCreatedTime())->format(DateTime::ISO8601);
     $changed = (new DateTime())->setTimestamp($node->getChangedTime())->format(DateTime::ISO8601);
@@ -113,7 +92,28 @@ class EntityBasicFieldsTest extends GraphQLFileTestBase {
       'deleteAccess' => FALSE,
     ];
 
-    $this->assertEquals($values, $result['data']['node']['entities'][0], 'Content type Interface resolves basic entity fields.');
+
+    $query = $this->getQueryFromFile('basic_fields.gql');
+
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheContexts([
+      'languages:language_content',
+      'user.node_grants:view',
+    ]);
+
+    $metadata->addCacheTags([
+      'entity_bundles',
+      'entity_field_info',
+      'entity_types',
+      'node:1',
+      'node_list',
+      'user:1',
+    ]);
+
+    $this->assertResults($query, ['nid' => (int) $node->id()], [
+      'node' => ['entities' => [$values]],
+    ], $metadata);
   }
 
 }

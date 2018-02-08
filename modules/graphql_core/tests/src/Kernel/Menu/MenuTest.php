@@ -4,7 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel\Menu;
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -12,16 +12,14 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group graphql_menu
  */
-class MenuTest extends GraphQLFileTestBase {
+class MenuTest extends GraphQLCoreTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'system',
     'menu_link_content',
     'link',
-    'graphql_core',
     'graphql_test_menu',
   ];
 
@@ -71,110 +69,73 @@ class MenuTest extends GraphQLFileTestBase {
   }
 
   /**
-   * Test if menu information is returned by GraphQL.
-   */
-  public function testMenuInfo() {
-    $result = $this->executeQueryFile('menu.gql');
-
-    $this->assertArrayHasKey('data', $result);
-
-    $this->assertArraySubset([
-      'info' => [
-        'name' => 'Test menu',
-        'description' => 'Menu for testing GraphQL menu access.',
-      ],
-    ], $result['data'], "Menu contains correct title and description.");
-  }
-
-  /**
    * Test menu tree data retrieval.
    */
   public function testMenuTree() {
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:system.menu.test',
+    ]);
 
-    $result = $this->executeQueryFile('menu.gql');
-
-    $this->assertArrayHasKey('data', $result);
-
-    $this->assertArraySubset([
-      'menu' => [
-        'links' => [
-          0 => [
-            'label' => 'Accessible',
-            'route' => [
-              'path' => '/graphql/test/accessible',
-              'routed' => TRUE,
-            ],
-          ],
+    $this->assertResults(
+      $this->getQueryFromFile('menu.gql'),
+      [],
+      [
+        'info' => [
+          'name' => 'Test menu',
+          'description' => 'Menu for testing GraphQL menu access.',
         ],
-      ],
-    ], $result['data'], 'Accessible root item is returned.');
-
-    $this->assertArraySubset([
-      'menu' => [
-        'links' => [
-          0 => [
-            'links' => [
-              0 => [
-                'label' => 'Nested A',
-                'route' => [
-                  'path' => '/graphql/test/accessible',
-                  'routed' => TRUE,
+        'menu' => [
+          'links' => [
+            0 => [
+              'label' => 'Accessible',
+              'route' => [
+                'path' => '/graphql/test/accessible',
+                'routed' => TRUE,
+              ],
+              'attribute' => NULL,
+              'links' => [
+                0 => [
+                  'label' => 'Nested A',
+                  'attribute' => NULL,
+                  'route' => [
+                    'path' => '/graphql/test/accessible',
+                    'routed' => TRUE,
+                  ],
+                ],
+                1 => [
+                  'label' => 'Nested B',
+                  'route' => [
+                    'path' => '/graphql/test/accessible',
+                    'routed' => TRUE,
+                  ],
+                  'attribute' => NULL,
                 ],
               ],
             ],
-          ],
-        ],
-      ],
-    ], $result['data'], 'Accessible nested item A is returned.');
-
-    $this->assertArraySubset([
-      'menu' => [
-        'links' => [
-          0 => [
-            'links' => [
-              1 => [
-                'label' => 'Nested B',
-                'route' => [
-                  'path' => '/graphql/test/accessible',
-                  'routed' => TRUE,
-                ],
+            1 => [
+              'label' => 'Inaccessible',
+              'route' => [
+                'path' => '/',
+                'routed' => TRUE,
               ],
+              'attribute' => NULL,
+              'links' => [],
+            ],
+            2 => [
+              'label' => 'Drupal',
+              'route' => [
+                'path' => 'http://www.drupal.org',
+                'routed' => FALSE,
+              ],
+              'attribute' => NULL,
+              'links' => [],
             ],
           ],
         ],
       ],
-    ], $result['data'], 'Accessible nested item B is returned.');
-
-    $this->assertArraySubset([
-      'menu' => [
-        'links' => [
-          1 => [
-            'label' => 'Inaccessible',
-            'route' => [
-              'path' => '/',
-              'routed' => TRUE,
-            ],
-          ],
-        ],
-      ],
-    ], $result['data'], 'Inaccessible root item is obfuscated.');
-
-    $inaccessibleChildren = $result['data']['menu']['links'][1]['links'];
-    $this->assertEmpty($inaccessibleChildren, 'Inaccessible items do not expose children.');
-
-    $this->assertArraySubset([
-      'menu' => [
-        'links' => [
-          2 => [
-            'label' => 'Drupal',
-            'route' => [
-              'path' => 'http://www.drupal.org',
-              'routed' => FALSE,
-            ],
-          ],
-        ],
-      ],
-    ], $result['data'], 'External menu link is included properly.');
+      $metadata
+    );
   }
-
 }

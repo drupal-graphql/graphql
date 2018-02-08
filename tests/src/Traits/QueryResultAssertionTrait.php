@@ -163,7 +163,17 @@ trait QueryResultAssertionTrait {
       $expected = new CacheableMetadata();
     }
     $this->assertEquals($expected->getCacheMaxAge(), $result->getCacheMaxAge(), 'Unexpected cache max age.');
-    $this->assertEquals($expected->getCacheContexts(), $result->getCacheContexts(), 'Unexpected cache contexts.');
-    $this->assertEquals($expected->getCacheTags(), $result->getCacheTags(), 'Unexpected cache tags.');
+
+    $missingContexts = array_diff($expected->getCacheContexts(), $result->getCacheContexts());
+    $this->assertEmpty($missingContexts, 'Missing cache contexts: ' . implode(', ', $missingContexts));
+
+    $unexpectedContexts = array_diff($result->getCacheContexts(), $expected->getCacheContexts());
+    $this->assertEmpty($unexpectedContexts, 'Unexpected cache contexts: ' . implode(', ', $unexpectedContexts));
+
+    $missingTags = array_diff($expected->getCacheTags(), $result->getCacheTags());
+    $this->assertEmpty($missingTags, 'Missing cache tags: '  . implode(', ', $missingTags));
+
+    $unexpectedTags = array_diff($result->getCacheTags(), $expected->getCacheTags());
+    $this->assertEmpty($unexpectedTags, 'Unexpected cache tags: ' . implode(', ', $unexpectedTags));
   }
 }
