@@ -2,8 +2,10 @@
 
 namespace Drupal\graphql\Routing;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\Utility\JsonHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -123,8 +125,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
-      'query' => is_string($values['query']) ? $values['query'] : '',
-      'variables' => is_array($values['variables']) ? $values['variables'] : [],
+      'query' => !empty($values['query']) && is_string($values['query']) ? $values['query'] : '',
+      'variables' => !empty($values['variables']) && is_array($values['variables']) ? $values['variables'] : [],
       'persisted' => empty($params['query']),
       'type' => static::SINGLE,
     ];
