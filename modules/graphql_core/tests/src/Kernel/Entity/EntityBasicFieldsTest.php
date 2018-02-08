@@ -94,16 +94,15 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
 
 
     $query = $this->getQueryFromFile('basic_fields.gql');
-    $metadata = $this->defaultCacheMetaData();
 
     // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts([
       'languages:language_content',
       'user.node_grants:view',
     ]);
 
     $metadata->addCacheTags([
-      'config:field.storage.node.body',
       'entity_bundles',
       'entity_field_info',
       'entity_types',

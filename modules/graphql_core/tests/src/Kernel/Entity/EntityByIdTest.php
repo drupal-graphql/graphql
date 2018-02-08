@@ -70,6 +70,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
       ->setTitle('English node unpublished')
       ->save();
 
+    // TODO: Check chache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
       'entity_bundles',

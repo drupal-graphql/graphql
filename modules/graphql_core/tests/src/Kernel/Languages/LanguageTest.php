@@ -3,22 +3,20 @@
 namespace Drupal\Tests\graphql_core\Kernel\Languages;
 
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
 /**
  * Test multilingual behavior of `graphql_core` features.
  *
  * @group graphql_core
  */
-class LanguageTest extends GraphQLTestBase {
+class LanguageTest extends GraphQLCoreTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
     'language',
-    'graphql',
-    'graphql_core',
     'graphql_context_test',
   ];
 
@@ -28,7 +26,6 @@ class LanguageTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('user');
     $this->installconfig(['language']);
     $this->installEntitySchema('configurable_language');
     $this->container->get('router.builder')->rebuild();
@@ -59,14 +56,8 @@ class LanguageTest extends GraphQLTestBase {
    * Test listing of available languages.
    */
   public function testLanguageId() {
-    $metadata = $this->defaultCacheMetaData();
-
     // TODO: Check cache metadata.
-    $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
-    ]);
+    $metadata = $this->defaultCacheMetaData();
 
     $this->assertResults($this->getQueryFromFile('languages.gql'), [], [
       'languages' => [

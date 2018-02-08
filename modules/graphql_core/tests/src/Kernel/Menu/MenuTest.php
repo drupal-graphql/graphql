@@ -4,8 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel\Menu;
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -13,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group graphql_menu
  */
-class MenuTest extends GraphQLTestBase {
+class MenuTest extends GraphQLCoreTestBase {
 
   /**
    * {@inheritdoc}
@@ -21,7 +20,6 @@ class MenuTest extends GraphQLTestBase {
   public static $modules = [
     'menu_link_content',
     'link',
-    'graphql_core',
     'graphql_test_menu',
   ];
 
@@ -30,7 +28,6 @@ class MenuTest extends GraphQLTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installEntitySchema('user');
     $this->installEntitySchema('menu_link_content');
     $this->installConfig('menu_link_content');
     $this->installConfig('graphql_test_menu');
@@ -75,13 +72,10 @@ class MenuTest extends GraphQLTestBase {
    * Test menu tree data retrieval.
    */
   public function testMenuTree() {
+    // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-
     $metadata->addCacheTags([
       'config:system.menu.test',
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
     ]);
 
     $this->assertResults(
@@ -107,7 +101,7 @@ class MenuTest extends GraphQLTestBase {
                   'attribute' => NULL,
                   'route' => [
                     'path' => '/graphql/test/accessible',
-                    'routed' => true,
+                    'routed' => TRUE,
                   ],
                 ],
                 1 => [

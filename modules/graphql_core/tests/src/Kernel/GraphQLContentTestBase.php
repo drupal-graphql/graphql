@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Tests\graphql_core\Traits\RevisionsTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -13,7 +12,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 /**
  * Base class for node based tests.
  */
-class GraphQLContentTestBase extends GraphQLTestBase {
+class GraphQLContentTestBase extends GraphQLCoreTestBase {
   use ContentTypeCreationTrait;
   use UserCreationTrait;
   use NodeCreationTrait;
@@ -23,8 +22,6 @@ class GraphQLContentTestBase extends GraphQLTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
-    'graphql_core',
-    'user',
     'node',
     'field',
     'filter',
@@ -51,13 +48,26 @@ class GraphQLContentTestBase extends GraphQLTestBase {
 
     $this->installConfig(['node', 'filter', 'text']);
     $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
 
     $this->installSchema('node', 'node_access');
     $this->installSchema('system', 'sequences');
 
     $this->createContentType([
       'type' => 'test',
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defaultCacheTags() {
+    // graphql_core adds the node body field to the schema, which means
+    // it's always part of the result cache tags, even if it has not been
+    // queried.
+    //
+    // https://github.com/drupal-graphql/graphql/issues/500
+    return array_merge(parent::defaultCacheTags(), [
+      'config:field.storage.node.body',
     ]);
   }
 

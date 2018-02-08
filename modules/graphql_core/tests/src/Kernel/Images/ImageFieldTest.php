@@ -44,7 +44,6 @@ class ImageFieldTest extends GraphQLContentTestBase {
 
     $a->save();
 
-    $metadata = $this->defaultCacheMetaData();
 
     $style = ImageStyle::load('thumbnail');
 
@@ -55,8 +54,9 @@ class ImageFieldTest extends GraphQLContentTestBase {
 
     $style->transformDimensions($dimensions, $a->image[0]->entity->getFileUri());
 
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
-      'config:field.storage.node.body',
       'config:field.storage.node.image',
       'entity_bundles',
       'entity_field_info',

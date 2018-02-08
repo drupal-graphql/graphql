@@ -5,7 +5,7 @@ namespace Drupal\Tests\graphql_core\Kernel\Breadcrumbs;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 use Prophecy\Argument;
 
 /**
@@ -13,13 +13,12 @@ use Prophecy\Argument;
  *
  * @group graphql_breadcrumbs
  */
-class BreadcrumbsTest extends GraphQLTestBase {
+class BreadcrumbsTest extends GraphQLCoreTestBase {
 
   /**
    * {@inheritdoc}
    */
   public static $modules = [
-    'graphql_core',
     'graphql_breadcrumbs_test',
   ];
 

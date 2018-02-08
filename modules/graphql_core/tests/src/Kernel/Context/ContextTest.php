@@ -2,17 +2,16 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Context;
 
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
 /**
  * Test plugin based schema generation.
  *
  * @group graphql_core
  */
-class ContextTest extends GraphQLTestBase {
+class ContextTest extends GraphQLCoreTestBase {
 
   public static $modules = [
-    'graphql_core',
     'graphql_context_test',
   ];
 
@@ -21,10 +20,14 @@ class ContextTest extends GraphQLTestBase {
    */
   public function testSimpleContext() {
     $query = $this->getQueryFromFile('context.gql');
+
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+
     $this->assertResults($query, [], [
       'a' => ['name' => 'graphql_context_test.a'],
       'b' => ['name' => 'graphql_context_test.b'],
-    ], $this->defaultCacheMetaData());
+    ], $metadata);
   }
 
 }
