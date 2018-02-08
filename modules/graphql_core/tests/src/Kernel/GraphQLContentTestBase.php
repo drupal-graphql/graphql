@@ -5,9 +5,9 @@ namespace Drupal\Tests\graphql_core\Kernel;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\graphql_core\Traits\RevisionsTestTrait;
-use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\node\Traits\NodeCreationTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\simpletest\ContentTypeCreationTrait;
+use Drupal\simpletest\NodeCreationTrait;
+use Drupal\simpletest\UserCreationTrait;
 
 /**
  * Base class for node based tests.
