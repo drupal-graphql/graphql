@@ -7,15 +7,14 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * GraphQL type for Drupal routes.
- *
  * @GraphQLType(
- *   id = "internal_url",
- *   name = "InternalUrl",
- *   interfaces = {"Url"}
+ *   id = "default_internal_url",
+ *   name = "DefaultInternalUrl",
+ *   interfaces = {"InternalUrl"},
+ *   weight = -1
  * )
  */
-class InternalUrl extends TypePluginBase {
+class DefaultInternalUrl extends TypePluginBase {
 
   /**
    * {@inheritdoc}
