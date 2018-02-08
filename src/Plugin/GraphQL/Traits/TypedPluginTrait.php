@@ -61,11 +61,11 @@ trait TypedPluginTrait {
       }
 
       if (!empty($matches[4][0])) {
-        array_push($decorators, [$this, 'nonNullType']);
+        array_unshift($decorators, [$this, 'nonNullType']);
       }
 
       if (!empty($matches[1][0]) && !empty($matches[3][0])) {
-        array_push($decorators, [$this, 'listType']);
+        array_unshift($decorators, [$this, 'listType']);
       }
 
       $unwrapped = $matches[2][0];
