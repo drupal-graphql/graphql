@@ -24,19 +24,19 @@ class EntityField extends EntityFieldBase {
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof FieldableEntityInterface) {
-      $fieldName = $this->getPluginDefinition()['field'];
-      if ($value->hasField($fieldName)) {
-        /** @var \Drupal\Core\Field\FieldItemListInterface $items */
-        $items = $value->get($fieldName);
+      $definition = $this->getPluginDefinition();
+      $name = $definition['field'];
 
-        if (($access = $items->access('view', NULL, TRUE)) && $access->isAllowed()) {
+      if ($value->hasField($name)) {
+        /** @var \Drupal\Core\Field\FieldItemListInterface $items */
+        $items = $value->get($name);
+        $access = $items->access('view', NULL, TRUE);
+
+        if ($access->isAllowed()) {
           foreach ($items as $item) {
-            if (!empty($this->getPluginDefinition()['property'])) {
-              yield new CacheableValue($this->resolveItem($item, $args, $info), [$access]);
-            }
-            else {
-              yield new CacheableValue($item, [$access]);
-            }
+            $output = !empty($definition['property']) ? $this->resolveItem($item, $args, $info) : $item;
+
+            yield new CacheableValue($output, [$access]);
           }
         }
       }

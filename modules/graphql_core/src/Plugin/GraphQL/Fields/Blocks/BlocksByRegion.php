@@ -23,7 +23,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "blocksByRegion",
  *   type = "[Entity]",
- *   parents = {"InternalUrl", "EntityCanonicalUrl"},
+ *   parents = {"InternalUrl"},
  *   arguments = {
  *     "region" = "String!"
  *   }
