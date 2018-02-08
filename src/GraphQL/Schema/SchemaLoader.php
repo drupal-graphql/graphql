@@ -66,7 +66,7 @@ class SchemaLoader {
   /**
    * Static cache of loaded schemas.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface[]
+   * @var \Youshido\GraphQL\Schema\AbstractSchema[]
    */
   protected $schemas = [];
 
@@ -115,7 +115,7 @@ class SchemaLoader {
    * @param string $name
    *   The name of the schema to load.
    *
-   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface
+   * @return \Youshido\GraphQL\Schema\AbstractSchema
    *   The generated GraphQL schema.
    */
   public function getSchema($name) {

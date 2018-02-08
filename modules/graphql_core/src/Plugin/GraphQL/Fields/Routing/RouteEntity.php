@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -77,29 +78,24 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-      list($prefix, $entityType, $suffix) = explode('.', $value->getRouteName());
+      list(, $entityType) = explode('.', $value->getRouteName());
       $parameters = $value->getRouteParameters();
+      $storage = $this->entityTypeManager->getStorage($entityType);
+      $entity = $storage->load($parameters[$entityType]);
+      $language = $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
 
-      if (!($prefix === 'entity' && $suffix === 'canonical') || !array_key_exists($entityType, $parameters)) {
-        return;
+      // Attempt to translate the entity.
+      if ($entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
+        $entity = $entity->getTranslation($language);
       }
 
-      $entity = $this->entityTypeManager
-        ->getStorage($entityType)
-        ->load($parameters[$entityType]);
-
-      $lang = $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
-
-      if ($entity instanceof TranslatableInterface && $entity->hasTranslation($lang)) {
-        $translation = $entity->getTranslation($lang);
-        if ($translation->access('view')) {
-          yield $translation;
-        }
+      $access = $entity->access('view', NULL, TRUE);
+      if ($access->isAllowed()) {
+        yield $entity->addCacheableDependency($access);
       }
-      else if ($entity->access('view')) {
-        yield $entity;
+      else {
+        yield new CacheableValue(NULL, [$access]);
       }
-
     }
   }
 

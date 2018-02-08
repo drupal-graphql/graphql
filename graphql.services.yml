@@ -68,7 +68,6 @@ services:
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
-      - '@service_container'
       - '@graphql.schema_loader'
       - '@current_user'
       - '%graphql.config%'

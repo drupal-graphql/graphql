@@ -2,13 +2,13 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Test query result caching.
@@ -46,21 +46,20 @@ class ResultCacheTest extends GraphQLTestBase {
    * Verify that uncacheable results are not cached.
    */
   public function testUncacheableResult() {
-
     $field = $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
     ]);
 
+    $callback = function () {
+      yield (new CacheableValue('test'))->mergeCacheMaxAge(0);
+    };
+
     $field
       ->expects(static::exactly(2))
       ->method('resolveValues')
-      ->willReturnCallback(function () {
-        $metadata = new CacheableMetadata();
-        $metadata->setCacheMaxAge(0);
-        yield new CacheableValue('test', [$metadata]);
-      });
+      ->will($this->toBoundPromise($callback, $field));
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');
@@ -73,7 +72,6 @@ class ResultCacheTest extends GraphQLTestBase {
    * Verify that fields with uncacheable annotations are not cached.
    */
   public function testUncacheableResultAnnotation() {
-
     $field = $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -120,14 +118,12 @@ class ResultCacheTest extends GraphQLTestBase {
 
     // This should be served from cache.
     $this->query('{ root }', ['value' => 'a']);
-
   }
 
   /**
    * Test if changing test context's trigger re-evaluations.
    */
   public function testContext() {
-
     // Prepare a prophesied context manager.
     $contextManager = $this->prophesize(CacheContextsManager::class);
     $this->container->set('cache_contexts_manager', $contextManager->reveal());
@@ -184,7 +180,6 @@ class ResultCacheTest extends GraphQLTestBase {
    * Test if results cache properly acts on cache tag clears.
    */
   public function testTags() {
-
     $field = $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -223,7 +218,6 @@ class ResultCacheTest extends GraphQLTestBase {
    * that each of them are cached separately.
    */
   public function testBatchedQueries() {
-
     $a = $this->mockField('a', [
       'id' => 'a',
       'name' => 'a',
@@ -322,11 +316,8 @@ class ResultCacheTest extends GraphQLTestBase {
       });
 
     $this->persistedQuery('query', 'a');
-
     $this->persistedQuery('query', 'b');
-
     $this->persistedQuery('query', 'a');
-
     $this->persistedQuery('query', 'b', ['value' => 'test']);
   }
 
