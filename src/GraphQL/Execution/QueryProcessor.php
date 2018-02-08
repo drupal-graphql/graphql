@@ -6,7 +6,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
-use Youshido\GraphQL\Execution\Processor;
 
 class QueryProcessor {
 
