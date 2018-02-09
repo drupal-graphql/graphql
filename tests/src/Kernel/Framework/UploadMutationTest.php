@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test file uploads with graphql.
+ *
+ * @group graphql
  */
 class UploadMutationTest extends GraphQLTestBase {
 

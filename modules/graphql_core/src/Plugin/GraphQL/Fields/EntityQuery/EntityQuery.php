@@ -5,9 +5,11 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Exception\ResolveException;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
@@ -16,6 +18,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   type = "EntityQueryResult!",
  *   arguments = {
+ *     "filter" = "EntityQueryFilterInput",
+ *     "sort" = "[EntityQuerySortInput]",
  *     "offset" = {
  *       "type" = "Int",
  *       "default" = 0
@@ -99,11 +103,9 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   protected function getQuery($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $entityStorage = $this->entityTypeManager->getStorage($entityTypeId);
-    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
 
     $query = $entityStorage->getQuery();
     $query->range($args['offset'], $args['limit']);
-    $query->sort($entityType->getKey('id'));
     $query->accessCheck(TRUE);
 
     // Check if this is a query for all entity revisions.
@@ -111,22 +113,162 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       // Mark the query as such and sort by the revision id too.
       $query->allRevisions();
       $query->addTag('revisions');
-      $query->sort($entityType->getKey('revision'));
     }
 
     if (!empty($args['filter'])) {
-      /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
-      $filter = $info->getField()->getArgument('filter')->getType();
-      /** @var \Drupal\graphql\GraphQL\Type\InputObjectType $filterType */
-      $filterType = $filter->getNamedType();
-      $filterFields = $filterType->getPlugin()->getPluginDefinition()['fields'];
+      $this->applyFilter($query, $args['filter']);
+    }
 
-      foreach ($args['filter'] as $key => $arg) {
-        $query->condition($filterFields[$key]['field_name'], $arg);
-      }
+    if (!empty($args['sort'])) {
+      $this->applySort($query, $args['sort']);
     }
 
     return $query;
+  }
+
+  /**
+   * Apply the specified sort directives to the query.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The entity query object.
+   * @param array $sort
+   *   The sort definitions from the field arguments.
+   */
+  protected function applySort(QueryInterface $query, array $sort) {
+    foreach ($sort as $item) {
+      $direction = !empty($item['direction']) ? $item['direction'] : 'DESC';
+      $query->sort($item['field'], $direction);
+    }
+  }
+
+  /**
+   * Apply the specified filter conditions to the query.
+   *
+   * Recursively picks up all filters and aggregates them into condition groups
+   * according to the nested structure of the filter argument.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The entity query object.
+   * @param array $filter
+   *   The filter definitions from the field arguments.
+   */
+  protected function applyFilter(QueryInterface $query, array $filter) {
+    $query->condition($this->buildFilterConditions($query, $filter));
+  }
+
+  /**
+   * Recursively builds the filter condition groups.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The entity query object.
+   * @param array $filter
+   *   The filter definitions from the field arguments.
+   *
+   * @return \Drupal\Core\Entity\Query\ConditionInterface
+   *   The generated condition group according to the given filter definitions.
+   *
+   * @throws \Youshido\GraphQL\Exception\ResolveException
+   *   If the given operator and value for a filter are invalid.
+   */
+  protected function buildFilterConditions(QueryInterface $query, array $filter) {
+    $conjunction = !empty($args['conjunction']) ? $args['conjunction'] : 'AND';
+    $group = $conjunction === 'AND' ? $query->andConditionGroup() : $query->orConditionGroup();
+
+    // Apply filter conditions.
+    $conditions = !empty($filter['conditions']) ? $filter['conditions'] : [];
+    foreach ($conditions as $condition) {
+      $field = $condition['field'];
+      $value = !empty($condition['value']) ? $condition['value'] : NULL;
+      $operator = !empty($condition['operator']) ? $condition['operator'] : NULL;
+      $language = !empty($condition['language']) ? $condition['language'] : NULL;
+
+      // We need at least a value or an operator.
+      if (empty($operator) && empty($value)) {
+        throw new ResolveException(sprintf("Missing value and operator in filter for '%s'.", $field));
+      }
+      // Unary operators need a single value.
+      else if (!empty($operator) && $this->isUnaryOperator($operator)) {
+        if (empty($value) || count($value) > 1) {
+          throw new ResolveException(sprintf("Unary operators must be associated with a single value (field '%s').", $field));
+        }
+
+        // Pick the first item from the values.
+        $value = reset($value);
+      }
+      // Range operators need exactly two values.
+      else if (!empty($operator) && $this->isRangeOperator($operator)) {
+        if (empty($value) || count($value) !== 2) {
+          throw new ResolveException(sprintf("Range operators must require exactly two values (field '%s').", $field));
+        }
+      }
+      // Null operators can't have a value set.
+      else if (!empty($operator) && $this->isNullOperator($operator)) {
+        if (!empty($value)) {
+          throw new ResolveException(sprintf("Null operators must not be associated with a filter value (field '%s').", $field));
+        }
+      }
+
+      // If no operator is set, however, we default to EQUALS or IN, depending
+      // on whether the given value is an array with one or more than one items.
+      if (empty($operator)) {
+        $value = count($value) === 1 ? reset($value) : $value;
+        $operator = is_array($value) ? 'IN' : '=';
+      }
+
+      // Add the condition for the current field.
+      $group->condition($field, $value, $operator, $language);
+    }
+
+    // Apply nested filter group conditions.
+    $groups = !empty($filter['groups']) ? $filter['groups'] : [];
+    foreach ($groups as $args) {
+      // By default, we use AND condition groups.
+      $group->condition($this->buildFilterConditions($query, $args));
+    }
+
+    return $group;
+  }
+
+  /**
+   * Checks if an operator is a unary operator.
+   *
+   * @param string $operator
+   *   The query operator to check against.
+   *
+   * @return bool
+   *   TRUE if the given operator is unary, FALSE otherwise.
+   */
+  protected function isUnaryOperator($operator) {
+    $unary = ["=", "<>", "<", "<=", ">", ">=", "LIKE", "NOT LIKE"];
+    return in_array($operator, $unary);
+  }
+
+  /**
+   * Checks if an operator is a null operator.
+   *
+   * @param string $operator
+   *   The query operator to check against.
+   *
+   * @return bool
+   *   TRUE if the given operator is a null operator, FALSE otherwise.
+   */
+  protected function isNullOperator($operator) {
+    $null = ["IS NULL", "IS NOT NULL"];
+    return in_array($operator, $null);
+  }
+
+  /**
+   * Checks if an operator is a range operator.
+   *
+   * @param string $operator
+   *   The query operator to check against.
+   *
+   * @return bool
+   *   TRUE if the given operator is a range operator, FALSE otherwise.
+   */
+  protected function isRangeOperator($operator) {
+    $null = ["BETWEEN", "NOT BETWEEN"];
+    return in_array($operator, $null);
   }
 
 }

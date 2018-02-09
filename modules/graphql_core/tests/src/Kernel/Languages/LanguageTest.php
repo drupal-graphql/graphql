@@ -6,7 +6,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
 /**
- * Test multilingual behavior of `graphql_core` features.
+ * Test multilingual behavior.
  *
  * @group graphql_core
  */

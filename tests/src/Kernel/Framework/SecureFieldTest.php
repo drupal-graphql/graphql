@@ -6,6 +6,8 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test access restrictions on secure fields.
+ *
+ * @group graphql
  */
 class SecureFieldTest extends GraphQLTestBase {
 

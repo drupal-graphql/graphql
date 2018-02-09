@@ -8,7 +8,7 @@ use DateTime;
 /**
  * Test basic entity fields.
  *
- * @group graphql_content
+ * @group graphql_core
  */
 class EntityBasicFieldsTest extends GraphQLContentTestBase {
 
@@ -111,7 +111,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'user:1',
     ]);
 
-    $this->assertResults($query, ['nid' => (int) $node->id()], [
+    $this->assertResults($query, ['nid' => (string) $node->id()], [
       'node' => ['entities' => [$values]],
     ], $metadata);
   }

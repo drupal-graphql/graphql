@@ -8,7 +8,7 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 /**
  * Test file attachments.
  *
- * @group graphql_image
+ * @group graphql_core
  */
 class ImageFieldTest extends GraphQLContentTestBase {
 

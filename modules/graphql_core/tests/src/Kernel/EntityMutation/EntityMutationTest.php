@@ -11,6 +11,8 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 
 /**
  * Test abstract entity mutation classes.
+ *
+ * @group graphql_core
  */
 class EntityMutationTest extends GraphQLContentTestBase {
 

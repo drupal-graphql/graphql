@@ -9,7 +9,6 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  * Test schema caching.
  *
  * @group graphql
- * @group cache
  */
 class DisabledSchemaCacheTest extends GraphQLTestBase {
 
