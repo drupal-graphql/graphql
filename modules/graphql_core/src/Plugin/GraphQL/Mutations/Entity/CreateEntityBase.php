@@ -48,8 +48,6 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    */
   public function resolve($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
-    $bundleName = $this->pluginDefinition['entity_bundle'];
-    $bundleKey = $this->entityTypeManager->getDefinition($entityTypeId)->getKey('bundle');
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
 
     // The raw input needs to be converted to use the proper field and property
@@ -57,10 +55,17 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
     // the schema.
     $input = $this->extractEntityInput($args, $info);
 
+    $entityDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
+    if ($entityDefinition->hasKey('bundle')) {
+      $bundleName = $this->pluginDefinition['entity_bundle'];
+      $bundleKey = $entityDefinition->getKey('bundle');
+
+      // Add the entity's bundle with the correct key.
+      $input[$bundleKey] = $bundleName;
+    }
+
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create($input + [
-      $bundleKey => $bundleName,
-    ]);
+    $entity = $storage->create($input);
 
     if (!$entity->access('create')) {
       return new EntityCrudOutputWrapper(NULL, NULL, [
