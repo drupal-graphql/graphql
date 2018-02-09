@@ -62,20 +62,6 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
-        /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition */
-        $definition = $this->typedDataManager->createDataDefinition("entity:$id");
-        $properties = $definition->getPropertyDefinitions();
-
-        $queryableProperties = array_filter($properties, function ($property) {
-          return $property instanceof BaseFieldDefinition && $property->isQueryable();
-        });
-
-        if (!empty($queryableProperties)) {
-          $derivative['arguments']['filter'] = [
-            'type' => StringHelper::camelCase($id, 'query', 'filter', 'input'),
-          ];
-        }
-
         $this->derivatives[$id] = $derivative;
       }
     }
