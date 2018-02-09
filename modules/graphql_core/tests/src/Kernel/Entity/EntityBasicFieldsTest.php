@@ -8,7 +8,7 @@ use DateTime;
 /**
  * Test basic entity fields.
  *
- * @group graphql_content
+ * @group graphql_core
  */
 class EntityBasicFieldsTest extends GraphQLContentTestBase {
 

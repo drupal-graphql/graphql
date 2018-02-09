@@ -9,7 +9,7 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 /**
  * Test block retrieval via GraphQL.
  *
- * @group graphql_block
+ * @group graphql_core
  */
 class BlockTest extends GraphQLCoreTestBase {
   use BlockCreationTrait;

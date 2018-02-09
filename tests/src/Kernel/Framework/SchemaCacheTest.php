@@ -11,7 +11,6 @@ use Prophecy\Argument;
  * Test schema caching.
  *
  * @group graphql
- * @group cache
  */
 class SchemaCacheTest extends GraphQLTestBase {
 

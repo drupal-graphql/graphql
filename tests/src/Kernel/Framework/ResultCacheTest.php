@@ -14,7 +14,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Test query result caching.
  *
  * @group graphql
- * @group cache
  */
 class ResultCacheTest extends GraphQLTestBase {
 

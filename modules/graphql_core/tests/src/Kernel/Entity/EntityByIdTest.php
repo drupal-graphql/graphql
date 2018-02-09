@@ -7,7 +7,7 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 /**
  * Test entity query support in GraphQL.
  *
- * @group graphql_content
+ * @group graphql_core
  */
 class EntityByIdTest extends GraphQLContentTestBase {
 

@@ -10,7 +10,6 @@ use Prophecy\Argument;
  * Test the whole query result pipeline.
  *
  * @group graphql
- * @group cache
  */
 class ResultTest extends GraphQLTestBase {
 

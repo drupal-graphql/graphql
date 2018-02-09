@@ -11,7 +11,7 @@ use Prophecy\Argument;
 /**
  * Test entity query support in GraphQL.
  *
- * @group graphql_breadcrumbs
+ * @group graphql_core
  */
 class BreadcrumbsTest extends GraphQLCoreTestBase {
 
