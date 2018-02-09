@@ -111,7 +111,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'user:1',
     ]);
 
-    $this->assertResults($query, ['nid' => (int) $node->id()], [
+    $this->assertResults($query, ['nid' => (string) $node->id()], [
       'node' => ['entities' => [$values]],
     ], $metadata);
   }

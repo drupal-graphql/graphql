@@ -1,21 +1,26 @@
-query ($nid: Int!) {
-  node:nodeQuery(filter: {nid: $nid}) {
+query ($nid: String!) {
+  node:nodeQuery(filter: {
+    conditions: [{
+      field: "nid"
+      value: [$nid]
+    }]
+  }) {
     entities {
-      entityId,
-      entityUuid,
-      entityLabel,
-      entityType,
-      entityBundle,
+      entityId
+      entityUuid
+      entityLabel
+      entityType
+      entityBundle
       entityLanguage {
-        id,
-        name,
-        direction,
+        id
+        name
+        direction
         weight
-      },
+      }
       entityRoute:entityUrl {
-        internalPath:path,
+        internalPath:path
         aliasedPath:alias
-      },
+      }
       entityOwner {
         entityLabel
       }
