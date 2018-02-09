@@ -69,6 +69,7 @@ class BlockTest extends GraphQLCoreTestBase {
 
     // TODO: Check cache metadata.
     $metadata->addCacheTags([
+      'config:block_list',
       'block_content:1',
       'config:block.block.stark_powered',
       'config:field.storage.block_content.body',

@@ -26,7 +26,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   parents = {"InternalUrl"},
  *   arguments = {
  *     "region" = "String!"
- *   }
+ *   },
+ *   response_cache_tags= {"config:block_list"}
  * )
  */
 class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginInterface {
