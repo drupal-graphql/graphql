@@ -12,9 +12,6 @@ use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Create GraphQL entityQuery fields based on available Drupal entity types.
- */
 class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 

@@ -10,7 +10,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * @GraphQLField(
  *   id = "entity_reference_reverse",
  *   secure = true,
- *   weight = -1,
  *   type = "EntityQueryResult!",
  *   arguments = {
  *     "offset" = {
