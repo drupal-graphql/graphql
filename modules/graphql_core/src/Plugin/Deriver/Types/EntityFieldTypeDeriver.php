@@ -15,12 +15,13 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
    * {@inheritdoc}
    */
   protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition) {
-    if ($this->isSinglePropertyField($fieldDefinition)) {
+    // Only create a type for fields with at least two properties.
+    $propertyDefinitions = $fieldDefinition->getPropertyDefinitions();
+    if (count($propertyDefinitions) <= 1) {
       return [];
     }
 
     $fieldName = $fieldDefinition->getName();
-
     return ["$entityTypeId-$fieldName" => [
       'name' => StringHelper::camelCase('field', $entityTypeId, $fieldName),
       'description' => $fieldDefinition->getDescription(),
