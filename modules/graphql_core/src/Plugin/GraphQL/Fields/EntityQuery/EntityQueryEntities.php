@@ -41,7 +41,18 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
   protected $entityTypeManager;
 
   /**
-   * {@inheritdoc}
+   * EntityQueryEntities constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   *   The entity buffer service.
    */
   public function __construct(
     array $configuration,
@@ -85,6 +96,17 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     }
   }
 
+  /**
+   * Resolves entities lazily through the entity buffer.
+   *
+   * @param string $type
+   *   The entity type.
+   * @param array $ids
+   *   The entity ids to load.
+   *
+   * @return \Closure
+   *   The deferred resolver.
+   */
   protected function resolveFromEntityIds($type, $ids) {
     $resolve = $this->entityBuffer->add($type, $ids);
     return function($value, array $args, ResolveInfo $info) use ($resolve) {
@@ -92,6 +114,17 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     };
   }
 
+  /**
+   * Resolves entity revisions.
+   *
+   * @param string $type
+   *   The entity type.
+   * @param array $ids
+   *   The entity revision ids to load.
+   *
+   * @return \Generator
+   *   The resolved revisions.
+   */
   protected function resolveFromRevisionIds($type, $ids) {
     $storage = $this->entityTypeManager->getStorage($type);
     $entities = array_map(function ($id) use ($storage) {
@@ -101,11 +134,22 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     return $this->resolveEntities($entities);
   }
 
+  /**
+   * Resolves entity objects and checks view permissions.
+   *
+   * @param array $entities
+   *   The entities to resolve.
+   *
+   * @return \Generator
+   *   The resolved entities.
+   */
   protected function resolveEntities(array $entities) {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     foreach ($entities as $entity) {
-      if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
-        yield new CacheableValue($entity, [$access]);
+      $access = $entity->access('view', NULL, TRUE);
+
+      if ($access->isAllowed()) {
+        yield $entity->addCacheableDependency($access);
       }
       else {
         yield new CacheableValue(NULL, [$access]);

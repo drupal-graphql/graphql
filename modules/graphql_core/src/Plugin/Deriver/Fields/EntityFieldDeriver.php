@@ -13,6 +13,10 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
    * {@inheritdoc}
    */
   protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition) {
+    if (!$propertyDefinitions = $fieldDefinition->getPropertyDefinitions()) {
+      return [];
+    }
+
     $fieldName = $fieldDefinition->getName();
     if (!$parents = $this->getParentsForField($entityTypeId, $fieldDefinition)) {
       return [];
@@ -26,13 +30,12 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
       'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
       'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
       'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
-    ];
+    ] + $basePluginDefinition;
 
-    $properties = $fieldDefinition->getPropertyDefinitions();
-    if (count($properties) === 1) {
+    if (count($propertyDefinitions) === 1) {
       // Flatten the structure for single-property fields.
-      $derivative['type'] = reset($properties)->getDataType();
-      $derivative['property'] = key($properties);
+      $derivative['type'] = reset($propertyDefinitions)->getDataType();
+      $derivative['property'] = key($propertyDefinitions);
     }
     else {
       $derivative['type'] = StringHelper::camelCase('field', $entityTypeId, $fieldName);
@@ -42,15 +45,19 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
       $derivative['type'] = StringHelper::listType($derivative['type']);
     }
 
-    return [
-      "$entityTypeId-$fieldName" => $derivative + $basePluginDefinition,
-    ];
+    return ["$entityTypeId-$fieldName" => $derivative];
   }
 
   /**
-   * @param $entityTypeId
+   * Determines the parent types for a field.
+   *
+   * @param string $entityTypeId
+   *   The entity type id of the field.
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $fieldDefinition
+   *   The field storage definition.
+   *
    * @return array
+   *   The pareants of the field.
    */
   protected function getParentsForField($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition) {
     if ($fieldDefinition->isBaseField()) {

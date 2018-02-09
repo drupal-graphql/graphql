@@ -72,13 +72,8 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
 
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
-    // the schema.
-    $inputArgs = $args['input'];
-    /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $type */
-    $type = $info->getField()->getArgument('input')->getType();
-    /** @var \Drupal\graphql\GraphQL\Type\InputObjectType $inputType */
-    $inputType = $type->getNamedType();
-    $input = $this->extractEntityInput($inputArgs, $inputType, $info);
+    // the schema. Allow the other implementations to control this easily.
+    $input = $this->extractEntityInput($args, $info);
 
     try {
       foreach ($input as $key => $value) {
@@ -107,16 +102,14 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
    *
    * Loops over all input values and assigns them to their original field names.
    *
-   * @param array $inputArgs
+   * @param array $args
    *   The entity values provided through the resolver args.
-   * @param \Drupal\graphql\GraphQL\Type\InputObjectType $inputType
-   *   The input type.
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
    *   The resolve info object.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  abstract protected function extractEntityInput(array $inputArgs, InputObjectType $inputType, ResolveInfo $info);
+  abstract protected function extractEntityInput(array $args, ResolveInfo $info);
 
 }

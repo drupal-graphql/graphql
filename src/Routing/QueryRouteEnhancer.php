@@ -2,8 +2,10 @@
 
 namespace Drupal\graphql\Routing;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\Utility\JsonHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -123,8 +125,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
     return $defaults + [
       '_controller' => $defaults['_graphql']['single'],
-      'query' => is_string($values['query']) ? $values['query'] : '',
-      'variables' => is_array($values['variables']) ? $values['variables'] : [],
+      'query' => !empty($values['query']) && is_string($values['query']) ? $values['query'] : '',
+      'variables' => !empty($values['variables']) && is_array($values['variables']) ? $values['variables'] : [],
       'persisted' => empty($params['query']),
       'type' => static::SINGLE,
     ];
@@ -143,16 +145,45 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    *   An associative array of query parameters.
    */
   protected function extractParams(Request $request) {
-    $values = ($content = $request->getContent()) ? json_decode($content, TRUE) : $request->query->all();
+    $values = JsonHelper::decodeParams($request->query->all());
 
-    return array_map(function($value) {
-      if (!is_string($value)) {
-        return $value;
+    // The request body parameters might contain file upload mutations. We treat
+    // them according to the graphql multipart request specification.
+    //
+    // @see https://github.com/jaydenseric/graphql-multipart-request-spec#server
+    if ($body = JsonHelper::decodeParams($request->request->all())) {
+      // Flatten the operations array if it exists.
+      $operations = isset($body['operations']) && is_array($body['operations']) ? $body['operations'] : [];
+      $values = array_merge($values, $body, $operations);
+    }
+
+    // The request body content has precedence of query parameters.
+    if ($content = $request->getContent()) {
+      $values = array_merge($values, JsonHelper::decodeParams(json_decode($content, TRUE)));
+    }
+
+    // According to the graphql multipart request specification, uploaded files
+    // are referenced to variable placeholders in a map. Here, we resolve this
+    // map by assigning the uploaded files to the corresponding variables.
+    if (!empty($values['map']) && is_array($values['map']) && $files = $request->files->all()) {
+      foreach ($files as $key => $file) {
+        if (!isset($values['map'][$key])) {
+          continue;
+        }
+
+        $paths = (array) $values['map'][$key];
+        foreach ($paths as $path) {
+          $path = explode('.', $path);
+
+          if (NestedArray::keyExists($values, $path)) {
+            NestedArray::setValue($values, $path, $file);
+          }
+        }
       }
+    }
 
-      $decoded = json_decode($value, TRUE);
-      return ($decoded != $value) && $decoded ? $decoded : $value;
-    }, $values ?: []);
+    return $values;
   }
+
 
 }

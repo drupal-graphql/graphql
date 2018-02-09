@@ -14,22 +14,26 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
    * {@inheritdoc}
    */
   protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition, $bundleId = NULL) {
-    $derivatives = [];
+    if (!$propertyDefinitions = $fieldDefinition->getPropertyDefinitions()) {
+      return [];
+    }
+
     $fieldName = $fieldDefinition->getName();
     $commonDefinition = [
       'parents' => [StringHelper::camelCase('field', $entityTypeId, $fieldName)],
       'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
       'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
       'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
-    ];
+    ] + $basePluginDefinition;
 
-    foreach ($fieldDefinition->getPropertyDefinitions() as $property => $propertyDefinition) {
+    $derivatives = [];
+    foreach ($propertyDefinitions as $property => $propertyDefinition) {
       $derivatives["$entityTypeId-$fieldName-$property"] = [
         'name' => StringHelper::propCase($property),
         'description' => $propertyDefinition->getDescription(),
         'property' => $property,
         'type' => $this->extractDataType($propertyDefinition),
-      ] + $commonDefinition + $basePluginDefinition;
+      ] + $commonDefinition;
     }
 
     return $derivatives;
