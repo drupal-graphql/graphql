@@ -139,13 +139,19 @@ class RequestController implements ContainerInjectionInterface {
     // authentication).
     $session = $request->getSession();
 
+    // Repeat the request on the previous route.
+    $url = Url::fromRoute($request->attributes->get('_route'))
+      ->toString(TRUE)
+      ->getGeneratedUrl();
+
+    // Extract the remaining needed parameters from the current request.
+    $cookies = $request->cookies->all();
+    $files = $request->files->all();
+    $server = $request->server->all();
+
     // Walk over all queries and issue a sub-request for each.
-    $responses = array_map(function($query) use ($request, $parameters, $content, $session, $method) {
-      $url = $request->getBaseUrl();
-      $cookies = $request->cookies->all();
-      $files = $request->files->all();
-      $server = $request->server->all();
-      $content = array_merge($content, $query);
+    $responses = array_map(function($query) use ($method, $parameters, $content, $session, $url, $cookies, $files, $server) {
+      $content = json_encode(array_merge($content, $query));
 
       // Create the sub-request with the batched query parameters merged into
       // the request body content. This is the best spot because the body
