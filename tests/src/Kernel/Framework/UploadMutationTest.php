@@ -38,7 +38,7 @@ class UploadMutationTest extends GraphQLTestBase {
       'variables' => ['upload' => NULL],
       // Then map the file upload name to the variable.
       'map' => [
-        'test' => 'variables.upload',
+        'test' => ['variables.upload'],
       ],
     ], [], [
       'test' => [
