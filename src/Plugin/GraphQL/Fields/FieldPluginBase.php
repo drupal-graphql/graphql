@@ -69,7 +69,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
     // If not resolving in a trusted environment, check if the field is secure.
     $container = $info->getExecutionContext()->getContainer();
     if ($container->has('secure') && !$container->get('secure') && !$this->isSecure()) {
-      throw new ResolveException(sprintf("Unable to resolve insecure field '%s' (%s).", $info->getField()->getName(), get_class($this)));
+      throw new ResolveException(sprintf("Unable to resolve insecure field '%s'.", $info->getField()->getName()));
     }
 
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
