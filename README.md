@@ -1,8 +1,8 @@
 # GraphQL for Drupal
 
-[![Build Status](https://img.shields.io/travis/fubhy/graphql-drupal.svg)](https://travis-ci.org/fubhy/graphql-drupal)
-[![Code Coverage](https://img.shields.io/codecov/c/github/fubhy/graphql-drupal.svg)](https://codecov.io/gh/fubhy/graphql-drupal)
-[![Code Quality](https://img.shields.io/scrutinizer/g/fubhy/graphql-drupal.svg)](https://scrutinizer-ci.com/g/fubhy/graphql-drupal/?branch=8.x-3.x)
+[![Build Status](https://img.shields.io/travis/drupal-graphql/graphql.svg)](https://travis-ci.org/drupal-graphql/graphql)
+[![Code Coverage](https://img.shields.io/codecov/c/github/drupal-graphql/graphql.svg)](https://codecov.io/gh/drupal-graphql/graphql)
+[![Code Quality](https://img.shields.io/scrutinizer/g/drupal-graphql/graphql.svg)](https://scrutinizer-ci.com/g/drupal-graphql/graphql/?branch=8.x-3.x)
 
 This module lets you craft and expose a [GraphQL] schema for [Drupal 8].
 
@@ -11,27 +11,18 @@ the full official GraphQL specification with all its features.
 
 You can use this module as a foundation for building your own schema through
 custom code or you can use and extend the generated schema using the plugin
-architecture of the contained sub-modules.
+architecture and the provided plugin implementations form the sub-module.
 
 For ease of development, it includes the [GraphiQL] interface at
-/graphql/explorer. Make sure to __enable__ the GraphiQL module.
+/graphql/explorer.
 
 [Drupal 8]: https://www.drupal.org/8
 [GraphQL]: http://graphql.org/
 [GraphiQL]: https://github.com/graphql/graphiql/
 
-## Built-in generated schema
-
-The `modules` directory contains a set of modules that help to automatically
-create a schema from Drupal data structures and components. By enabling these
-sub-modules you can expose much of the Drupal data graph without writing a
-single line of code.
-
-Please refer to `modules/README.md` for more information.
-
 ## Example implementation
 
-Check out https://github.com/fubhy/drupal-decoupled-app for a complete example
+Check out https://github.com/drupal-graphql/drupal-decoupled-app for a complete example
 of a fully decoupled React and GraphQL application. Feel free to use that
 repository as a starting point for your own decoupled application.
 
@@ -50,9 +41,11 @@ module works and how you can configure, adjust and extend it:
 * https://www.amazeelabs.com/en/blog/drupal-graphql-batteries-included
 * https://www.amazeelabs.com/en/blog/extending-graphql-part1-fields
 * https://www.amazeelabs.com/en/blog/extending-graphql-part-2
+* https://www.amazeelabs.com/en/blog/graphql-for-drupalers-fields
+* https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations
 
 ## Resources
  
 * Project homepage: https://www.drupal.org/project/graphql
-* Contributing: https://github.com/fubhy/graphql-drupal
+* Contributing: https://github.com/drupal-graphql/graphql
 

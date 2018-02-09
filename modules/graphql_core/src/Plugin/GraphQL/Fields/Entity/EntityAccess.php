@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
-use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -15,9 +14,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entityAccess",
  *   type = "Boolean",
- *   types = {"Entity"},
+ *   parents = {"Entity"},
  *   arguments = {
- *     "operation" = "String"
+ *     "operation" = "String!"
  *   }
  * )
  */

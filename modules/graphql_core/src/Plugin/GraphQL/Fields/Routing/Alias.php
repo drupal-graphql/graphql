@@ -6,12 +6,11 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
-use Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Path;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a routes canonical path.
+ * Retrieve a routes aliased path.
  *
  * TODO: Move this to `InternalUrl` (breaking change).
  *
@@ -19,8 +18,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "url_alias",
  *   secure = true,
  *   name = "alias",
+ *   description = @Translation("The route's path alias or canonical url if no alias is defined."),
  *   type = "String",
- *   types = {"Url"}
+ *   parents = {"Url"}
  * )
  */
 class Alias extends Path implements ContainerFactoryPluginInterface {

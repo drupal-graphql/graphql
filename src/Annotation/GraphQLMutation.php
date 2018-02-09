@@ -24,24 +24,6 @@ class GraphQLMutation extends GraphQLAnnotationBase {
   public $type = NULL;
 
   /**
-   * Cardinality.
-   *
-   * Defines if the field is a multi or single value field.
-   *
-   * @var bool
-   */
-  public $multi = FALSE;
-
-  /**
-   * Nullable state.
-   *
-   * Define if the field is nullable.
-   *
-   * @var bool
-   */
-  public $nullable = FALSE;
-
-  /**
    * The field arguments.
    *
    * Array keyed by argument names with Scalar or Input Type names as values.
@@ -49,5 +31,12 @@ class GraphQLMutation extends GraphQLAnnotationBase {
    * @var array
    */
   public $arguments = [];
+
+  /**
+   * The deprecation reason or FALSE if the field is not deprecated.
+   *
+   * @var string|boolean
+   */
+  public $deprecated = FALSE;
 
 }

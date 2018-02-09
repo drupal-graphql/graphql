@@ -7,14 +7,14 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Create GraphQL entityQuery fields based on available Drupal entity types.
- */
 class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeriverInterface {
+  use StringTranslationTrait;
+
   /**
    * The entity type manager service.
    *
@@ -57,7 +57,10 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
       if ($type instanceof ContentEntityTypeInterface) {
         $derivative = [
-          'name' => StringHelper::camelCase([$id, 'query', 'filter', 'input']),
+          'name' => StringHelper::camelCase($id, 'query', 'filter', 'input'),
+          'description' => $this->t("Entity query filter input type for loading '@type' entities.", [
+            '@type' => $type->getLabel(),
+          ]),
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
@@ -65,6 +68,7 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
         $definition = $this->typedDataManager->createDataDefinition("entity:$id");
         $properties = $definition->getPropertyDefinitions();
 
+        /** @var \Drupal\Core\Field\BaseFieldDefinition[] $queryableProperties */
         $queryableProperties = array_filter($properties, function($property) {
           return $property instanceof BaseFieldDefinition && $property->isQueryable();
         });
@@ -89,10 +93,8 @@ class EntityQueryFilterInputDeriver extends DeriverBase implements ContainerDeri
           }
 
           $derivative['fields'][$fieldName] = [
-            'multi' => FALSE,
-            'nullable' => TRUE,
             'field_name' => $key,
-            'data_type' => $mainPropertyDefinition->getDataType(),
+            'type' => $mainPropertyDefinition->getDataType(),
           ];
         }
 

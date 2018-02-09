@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Drupal\graphql\GraphQL\Utility\Introspection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller for the GraphiQL query builder IDE.
@@ -72,7 +73,7 @@ class ExplorerController implements ContainerInjectionInterface {
    * @return array The render array.
    *   The render array.
    */
-  public function viewExplorer($schema) {
+  public function viewExplorer($schema, Request $request) {
     $url = $this->urlGenerator->generate("graphql.query.$schema");
     $introspectionData = $this->introspection->introspect($schema);
 
@@ -84,6 +85,8 @@ class ExplorerController implements ContainerInjectionInterface {
         'drupalSettings' => [
           'graphqlRequestUrl' => $url,
           'graphqlIntrospectionData' => $introspectionData,
+          'graphqlQuery' => $request->get('query'),
+          'graphqlVariables' => $request->get('variables'),
         ],
       ],
     ];

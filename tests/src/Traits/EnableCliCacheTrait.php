@@ -10,7 +10,6 @@ use Prophecy\Argument;
  */
 trait EnableCliCacheTrait {
 
-
   /**
    * Enable caching in CLI environments.
    *

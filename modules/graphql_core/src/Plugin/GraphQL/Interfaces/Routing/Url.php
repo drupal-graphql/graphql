@@ -9,7 +9,8 @@ use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
  *
  * @GraphQLInterface(
  *   id = "url",
- *   name = "Url"
+ *   name = "Url",
+ *   description = @Translation("Common interface for internal and external urls.")
  * )
  */
 class Url extends InterfacePluginBase {

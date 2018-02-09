@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
-
-use Drupal\graphql\Annotation\GraphQLField;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "code",
  *   type = "Int",
- *   types = {"InternalResponse", "ExternalResponse"}
+ *   parents = {"InternalResponse", "ExternalResponse"}
  * )
  */
 class ResponseCode extends FieldPluginBase {
@@ -29,8 +27,7 @@ class ResponseCode extends FieldPluginBase {
     if ($value instanceof Response) {
       yield $value->getStatusCode();
     }
-
-    if ($value instanceof ResponseInterface) {
+    else if ($value instanceof ResponseInterface) {
       yield $value->getStatusCode();
     }
   }

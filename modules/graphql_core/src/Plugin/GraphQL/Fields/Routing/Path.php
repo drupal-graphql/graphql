@@ -13,15 +13,15 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "url_path",
  *   secure = true,
  *   name = "path",
+ *   description = @Translation("The route's canonical path."),
  *   type = "String",
  *   arguments = {
  *     "internal" = {
- *        "type"= "Boolean",
- *        "nullable" = true,
- *        "default" = false,
- *      }
+ *       "type"= "Boolean",
+ *       "default" = false
+ *     }
  *   },
- *   types = {"Url"}
+ *   parents = {"Url"}
  * )
  */
 class Path extends FieldPluginBase {

@@ -5,7 +5,6 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

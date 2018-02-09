@@ -13,9 +13,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "echo",
  *   type = "String",
- *   types = {"Root"},
+ *   parents = {"Root"},
  *   arguments = {
- *     "input" = "String"
+ *     "input" = "String!"
  *   }
  * )
  */

@@ -13,8 +13,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "url_routed",
  *   secure = true,
  *   name = "routed",
+ *   description = @Translation("Boolean indicating whether this is a routed (internal) path."),
  *   type = "Boolean",
- *   types = {"Url"}
+ *   parents = {"Url"}
  * )
  */
 class Routed extends FieldPluginBase {

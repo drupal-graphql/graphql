@@ -5,7 +5,6 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
-use Drupal\graphql\Annotation\GraphQLField;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GuzzleHttp\ClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,7 +17,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "external_request",
  *   name = "request",
  *   type = "ExternalResponse",
- *   types = {"ExternalUrl"}
+ *   parents = {"ExternalUrl"}
  * )
  */
 class ExternalRequest extends FieldPluginBase implements ContainerFactoryPluginInterface {

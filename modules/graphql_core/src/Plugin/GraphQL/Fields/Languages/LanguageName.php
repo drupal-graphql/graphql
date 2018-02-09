@@ -13,8 +13,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "language_name",
  *   secure = true,
  *   name = "name",
+ *   description = @Translation("The human-readable name of the language."),
  *   type = "String",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageName extends FieldPluginBase {

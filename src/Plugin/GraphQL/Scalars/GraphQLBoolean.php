@@ -2,10 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Type\Scalar\BooleanType;
 
 /**
@@ -14,17 +11,19 @@ use Youshido\GraphQL\Type\Scalar\BooleanType;
  * @GraphQLScalar(
  *   id = "boolean",
  *   name = "Boolean",
- *   data_type = "boolean"
+ *   type = "boolean"
  * )
  */
-class GraphQLBoolean extends BooleanType implements TypeSystemPluginInterface {
-  use PluginTrait;
-  use CacheablePluginTrait;
+class GraphQLBoolean extends ScalarPluginBase {
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
-    // Nothing to do here.
+  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
+    if (!isset($this->definition)) {
+      $this->definition = new BooleanType();
+    }
+
+    return $this->definition;
   }
 }

@@ -5,8 +5,8 @@
  * The GraphQL module.
  */
 
-use Drupal\graphql\Utility\StringHelper;
 use Drupal\Core\Url;
+use Drupal\graphql\Utility\StringHelper;
 
 define('GRAPHQL_SCALAR_PLUGIN', 'scalar');
 define('GRAPHQL_FIELD_PLUGIN', 'field');
@@ -90,6 +90,55 @@ function graphql_graphql_types_alter(&$definitions) {
 }
 
 /**
+ * Helper function to decorate legacy definitions.
+ *
+ * @param array $definitions
+ *   A plugin definitions array.
+ */
+function _graphql_decorate_deprecated_type(array &$definitions) {
+  foreach ($definitions as &$definition) {
+    if (!empty($definition['type'])) {
+      if (!empty($definition['multi'])) {
+        $definition['type'] = StringHelper::listType($definition['type']);
+      }
+
+      if (isset($definition['nullable']) && empty($definition['nullable'])) {
+        $definition['type'] = StringHelper::nonNullType($definition['type']);
+      }
+    }
+
+    if (!empty($definition['fields'])) {
+      _graphql_decorate_deprecated_type($definition['fields']);
+    }
+
+    if (!empty($definition['arguments'])) {
+      _graphql_decorate_deprecated_type($definition['arguments']);
+    }
+  }
+}
+
+/**
+ * Implements hook_graphql_fields_alter().
+ */
+function graphql_graphql_fields_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
+ * Implements hook_graphql_mutations_alter().
+ */
+function graphql_graphql_mutations_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
+ * Implements hook_graphql_input_types_alter().
+ */
+function graphql_graphql_input_types_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
  * Get a flattened list of a plugins interface inheritance tree.
  *
  * @param array $definitions
@@ -110,21 +159,6 @@ function graphql_list_interfaces(array &$definitions, $definition) {
   }, $parents), 'array_merge', $definition['interfaces']);
 
   return $interfaces;
-}
-
-/**
- * Alter the subrequest payload and add contextual data.
- */
-function graphql_graphql_subrequest_alter(&$data, $requirements) {
-  /** @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface $repository */
-  $repository = \Drupal::service('graphql.context_repository');
-  $requiredContexts = array_intersect(array_keys($repository->getAvailableContexts()), $requirements);
-  $runtimeContexts = $repository->getRuntimeContexts($requiredContexts);
-  foreach ($requiredContexts as $contextId) {
-    if (array_key_exists($contextId, $runtimeContexts)) {
-      $data[$contextId] = $runtimeContexts[$contextId]->getContextValue();
-    }
-  }
 }
 
 /**
@@ -150,24 +184,4 @@ function graphql_graphql_schema_operations($pluginId, array $pluginDefinition) {
   }
 
   return $operations;
-}
-
-/**
- * Turn a list of machine names into a camel-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
- *   Use \Drupal\graphql\Utility\StringHelper::camelCase() instead.
- */
-function graphql_camelcase($components) {
-  return StringHelper::camelCase($components);
-}
-
-/**
- * Turn a list of machine names into a property-cased string.
- *
- * @deprecated in graphql 3.x and will be removed before 3.0-alpha6.
- *   Use \Drupal\graphql\Utility\StringHelper::propCase() instead.
- */
-function graphql_propcase($components) {
-  return StringHelper::propCase($components);
 }

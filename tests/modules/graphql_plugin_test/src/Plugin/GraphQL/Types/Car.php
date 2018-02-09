@@ -3,6 +3,7 @@
 namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Types;
 
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
+use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * A bike type.
@@ -10,7 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
  * @GraphQLType(
  *   id = "car",
  *   name = "Car",
- *   interfaces = {"Vehicle"},
+ *   interfaces = {"MotorizedVehicle"},
  * )
  */
 class Car extends TypePluginBase {
@@ -18,7 +19,7 @@ class Car extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($value) {
+  public function applies($value, ResolveInfo $info = NULL) {
     return $value['type'] == 'Car';
   }
 

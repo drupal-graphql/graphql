@@ -13,8 +13,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "language_weight",
  *   secure = true,
  *   name = "weight",
+ *   description = @Translation("The weight of the language."),
  *   type = "Int",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageWeight extends FieldPluginBase {

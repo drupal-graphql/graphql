@@ -12,9 +12,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "gadgets",
  *   secure = true,
  *   name = "gadgets",
- *   type = "String",
- *   multi = true,
- *   types = {"Bike"},
+ *   type = "[String]",
+ *   parents = {"Bike"},
  *   weight = 1
  * )
  */

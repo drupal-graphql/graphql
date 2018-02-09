@@ -11,9 +11,8 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
+use Drupal\graphql\Cache\CacheableQueryResponse;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -174,12 +173,7 @@ class CacheSubscriber implements EventSubscriberInterface {
 
     // If the schema is not cacheable, the response isn't cacheable either.
     $schema = $routeMatch->getRouteObject()->getDefault('schema');
-    $schema = $this->schemaLoader->getSchema($schema);
-    if (!$schema instanceof SchemaPluginInterface) {
-      return;
-    }
-
-    $responseMetadata = $schema->getResponseCacheMetadata();
+    $responseMetadata = $this->schemaLoader->getResponseCacheMetadata($schema);
     if ($responseMetadata->getCacheMaxAge() === 0) {
       return;
     }
@@ -213,7 +207,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     }
 
     $response = $event->getResponse();
-    if (!$response instanceof CacheableResponseInterface) {
+    if (!$response instanceof CacheableQueryResponse) {
       return;
     }
 
@@ -245,15 +239,8 @@ class CacheSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    // If the schema is not cacheable, the response isn't cacheable either.
-    $schema = $routeMatch->getRouteObject()->getDefault('schema');
-    $schema = $this->schemaLoader->getSchema($schema);
-    if (!$schema instanceof SchemaPluginInterface) {
-      return;
-    }
-
+    // Bail out early, if the response is not cacheable.
     $metadata = $response->getCacheableMetadata();
-    // A max age of 0 is supposed to disable caching entirely.
     if ($metadata->getCacheMaxAge() === 0) {
       return;
     }
@@ -262,7 +249,7 @@ class CacheSubscriber implements EventSubscriberInterface {
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
 
     // Write the cache entry for the cache metadata.
-    $ccid = $this->getCacheIdentifier($schema->getResponseCacheMetadata());
+    $ccid = $this->getCacheIdentifier($response->getSchemaResponseMetadata());
     $this->metadataCache->set($ccid, $metadata, $expire, $tags);
 
     // Write the cache entry for the response object.

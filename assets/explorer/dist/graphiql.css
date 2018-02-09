@@ -43,6 +43,7 @@
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  overflow-x: hidden;
 }
 
 .graphiql-container .title {
@@ -83,6 +84,7 @@
       -ms-flex: 1;
           flex: 1;
   height: 34px;
+  overflow-y: visible;
   padding: 7px 14px 6px;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -760,7 +762,7 @@ div.CodeMirror-lint-tooltip > * + * {
 
 /* CURSOR */
 
-.CodeMirror div.CodeMirror-cursor {
+.CodeMirror .CodeMirror-cursor {
   border-left: 1px solid black;
 }
 /* Shown when moving in bi-directional text */
@@ -1230,7 +1232,6 @@ span.CodeMirror-selectedtext { background: none; }
   margin-left: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .graphiql-container .enum-value {
@@ -1258,7 +1259,7 @@ span.CodeMirror-selectedtext { background: none; }
 }
 
 .graphiql-container .arg-default-value {
-  color: #0B7FC7;
+  color: #43A047;
 }
 
 .graphiql-container .doc-deprecation {

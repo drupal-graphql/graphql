@@ -2,51 +2,69 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Enums;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\GraphQL\Type\EnumType;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Config\Object\EnumTypeConfig;
-use Youshido\GraphQL\Type\Enum\AbstractEnumType;
 
 /**
- * Base class for graphql field plugins.
+ * Base class for enum plugins.
  */
-abstract class EnumPluginBase extends AbstractEnumType implements TypeSystemPluginInterface {
-  use PluginTrait;
+abstract class EnumPluginBase extends PluginBase implements TypeSystemPluginInterface {
   use NamedPluginTrait;
   use CacheablePluginTrait;
 
   /**
+   * The type instance.
+   *
+   * @var \Drupal\graphql\GraphQL\Type\EnumType
+   */
+  protected $definition;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
+    if (!isset($this->definition)) {
+      $this->definition = new EnumType($this, $schemaBuilder, [
+        'name' => $this->buildName(),
+        'description' => $this->buildDescription(),
+        'values' => $this->buildValues($schemaBuilder),
+      ]);
+    }
+
+    return $this->definition;
   }
 
   /**
-   * {@inheritdoc}
+   * Build the values for the enum.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
+   *   The schema builder.
+   *
+   * @return array
+   *   The list of possible values for the enum.
    */
-  abstract public function buildValues(PluggableSchemaManagerInterface $schemaManager);
+  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
+    $values = $this->getPluginDefinition()['values'];
+    $output = [];
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getValues() {
-    return $this->config->get('values');
-  }
+    foreach ($values as $value => $definition) {
+      $item = [
+        'value' => $value,
+        'name' => is_array($definition) ? $definition['name'] : $definition,
+      ];
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
-    $this->config = new EnumTypeConfig([
-      'name' => $this->buildName(),
-      'description' => $this->buildDescription(),
-      'values' => $this->buildValues($schemaManager),
-    ]);
+      if (is_array($definition) && !empty($definition['description'])) {
+        $item['description'] = $definition['description'];
+      }
+
+      $output[] = $item;
+    }
+
+    return $output;
   }
 
 }

@@ -1,0 +1,51 @@
+<?php
+
+namespace Drupal\Tests\graphql_core\Kernel\Routing;
+
+use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
+
+/**
+ * Test file attachments.
+ *
+ * @group graphql_image
+ */
+class RouteEntityTest extends GraphQLContentTestBase {
+
+  public function testRouteEntity() {
+    $node = $this->createNode([
+      'title' => 'Node A',
+      'type' => 'test',
+    ]);
+
+    $node->save();
+
+    $query = $this->getQueryFromFile('route_entity.gql');
+    $vars = ['path' => '/node/' . $node->id()];
+
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'node:1',
+    ]);
+
+    $this->assertResults($query, $vars, [
+      'route' => [
+        'node' => [
+          'title' => 'Node A',
+        ],
+      ],
+    ], $metadata);
+
+    $node->setTitle('Node B');
+    $node->save();
+
+    $this->assertResults($query, $vars, [
+      'route' => [
+        'node' => [
+          'title' => 'Node B',
+        ],
+      ],
+    ], $metadata);
+  }
+
+}

@@ -17,7 +17,7 @@ Drupal.behaviors.graphQLRenderVoyager = {
 
     ReactDOM.render(<Voyager
       introspection={settings.graphqlIntrospectionData}
-      displayOptions={{ skipRelay: true }}
+      displayOptions={{ skipRelay: true, sortByAlphabet: true }}
     />, container);
   },
 };

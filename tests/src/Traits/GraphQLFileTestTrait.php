@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Trait for running tests against GraphQL query files.
+ *
+ * @deprecated
  */
 trait GraphQLFileTestTrait {
 
@@ -39,7 +41,7 @@ trait GraphQLFileTestTrait {
    *   The query result.
    */
   public function assertNoErrors(array $data) {
-    $errors = array_map(function($error) {
+    $errors = array_map(function ($error) {
       return $error['message'];
     }, array_key_exists('errors', $data) ? $data['errors'] : []);
     $this->assertEquals([], $errors, 'Invalid GraphQL query. Errors: ' . implode("\n* ", $errors));
@@ -57,7 +59,7 @@ trait GraphQLFileTestTrait {
    * @param bool $bypassSecurity
    *   Bypass field security for this query.
    *
-   * @return string
+   * @return array
    *   The GraphQL result object.
    */
   public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE, $bypassSecurity = FALSE) {
@@ -85,6 +87,8 @@ trait GraphQLFileTestTrait {
    *
    * @return array
    *   The GraphQL result object.
+   *
+   * @throws \Exception
    */
   public function requestWithQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE) {
     $content = [

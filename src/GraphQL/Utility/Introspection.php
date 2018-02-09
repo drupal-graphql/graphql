@@ -2,11 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Utility;
 
-use Drupal\graphql\GraphQL\Execution\Processor;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
-use Drupal\graphql\GraphQL\Reducers\ReducerManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Schema\AbstractSchema;
 
 class Introspection {
   protected $introspectionQuery = <<<TEXT

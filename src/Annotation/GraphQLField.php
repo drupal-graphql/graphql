@@ -28,7 +28,7 @@ class GraphQLField extends GraphQLAnnotationBase {
    *
    * @var string[]
    */
-  public $types = [];
+  public $parents = [];
 
   /**
    * The field type.
@@ -44,24 +44,6 @@ class GraphQLField extends GraphQLAnnotationBase {
   public $type = NULL;
 
   /**
-   * Cardinality.
-   *
-   * Defines if the field is a multi or single value field.
-   *
-   * @var bool
-   */
-  public $multi = FALSE;
-
-  /**
-   * Nullable state.
-   *
-   * Define if the field is nullable.
-   *
-   * @var bool
-   */
-  public $nullable = TRUE;
-
-  /**
    * The field arguments.
    *
    * Array keyed by argument names with Scalar or Input Type names as values.
@@ -71,12 +53,10 @@ class GraphQLField extends GraphQLAnnotationBase {
   public $arguments = [];
 
   /**
-   * The name for the Enum type.
+   * The deprecation reason or FALSE if the field is not deprecated.
    *
-   * Only required if $type is provided as an associative array.
-   *
-   * @var string|null
+   * @var string|boolean
    */
-  public $enum_type_name = NULL;
+  public $deprecated = FALSE;
 
 }

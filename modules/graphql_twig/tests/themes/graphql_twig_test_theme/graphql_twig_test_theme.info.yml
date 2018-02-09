@@ -1,6 +1,0 @@
-name: GraphQL Twig test
-type: theme
-description: 'Test theme for GraphQL Twig integration'
-package: GraphQL
-version: VERSION
-core: 8.x

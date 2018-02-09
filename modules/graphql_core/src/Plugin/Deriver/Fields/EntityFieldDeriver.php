@@ -2,49 +2,74 @@
 
 namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\graphql\Utility\StringHelper;
-use Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\EntityField;
-use Drupal\graphql_core\Plugin\GraphQL\Types\Entity\EntityFieldType;
+use Drupal\graphql_core\Plugin\Deriver\EntityFieldDeriverBase;
 
-// TODO Reduce single-property fields to scalars.
-
-// TODO Convert timestamps to strings?
-
-/**
- * Deriver for RawValue fields.
- */
 class EntityFieldDeriver extends EntityFieldDeriverBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function getBaseFieldDefinition($entityTypeId, BaseFieldDefinition $baseFieldDefinition, array $basePluginDefinition) {
-    $fieldName = $baseFieldDefinition->getName();
+  protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition) {
+    if (!$propertyDefinitions = $fieldDefinition->getPropertyDefinitions()) {
+      return [];
+    }
 
-    $this->derivatives["$entityTypeId-$fieldName"] = [
-      'types' => [StringHelper::camelCase([$entityTypeId])],
-      'name' => EntityField::getId($fieldName),
-      'multi' => $baseFieldDefinition->isMultiple(),
+    $fieldName = $fieldDefinition->getName();
+    if (!$parents = $this->getParentsForField($entityTypeId, $fieldDefinition)) {
+      return [];
+    }
+
+    $derivative = [
+      'parents' => $parents,
+      'name' => StringHelper::propCase($fieldName),
+      'description' => $fieldDefinition->getDescription(),
       'field' => $fieldName,
-      'type' => EntityFieldType::getId($entityTypeId, $fieldName),
+      'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
+      'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
+      'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
     ] + $basePluginDefinition;
+
+    if (count($propertyDefinitions) === 1) {
+      // Flatten the structure for single-property fields.
+      $derivative['type'] = reset($propertyDefinitions)->getDataType();
+      $derivative['property'] = key($propertyDefinitions);
+    }
+    else {
+      $derivative['type'] = StringHelper::camelCase('field', $entityTypeId, $fieldName);
+    }
+
+    if ($fieldDefinition->isMultiple()) {
+      $derivative['type'] = StringHelper::listType($derivative['type']);
+    }
+
+    return ["$entityTypeId-$fieldName" => $derivative];
   }
 
   /**
-   * {@inheritdoc}
+   * Determines the parent types for a field.
+   *
+   * @param string $entityTypeId
+   *   The entity type id of the field.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $fieldDefinition
+   *   The field storage definition.
+   *
+   * @return array
+   *   The pareants of the field.
    */
-  protected function getConfigFieldDefinition($entityTypeId, $bundleId, FieldStorageDefinitionInterface $storage, array $basePluginDefinition) {
-    $fieldName = $storage->getName();
+  protected function getParentsForField($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition) {
+    if ($fieldDefinition->isBaseField()) {
+      return [StringHelper::camelCase($entityTypeId)];
+    }
 
-    $this->derivatives["$entityTypeId-$bundleId-$fieldName"] = [
-      'types' => [StringHelper::camelCase([$entityTypeId, $bundleId])],
-      'name' => EntityField::getId($fieldName),
-      'multi' => $storage ? $storage->getCardinality() != 1 : FALSE,
-      'field' => $fieldName,
-      'type' => EntityFieldType::getId($entityTypeId, $fieldName),
-    ] + $basePluginDefinition;
+    if ($fieldDefinition instanceof FieldStorageConfigInterface) {
+      return array_values(array_map(function ($bundleId) use ($entityTypeId) {
+        return StringHelper::camelCase($entityTypeId, $bundleId);
+      }, $fieldDefinition->getBundles()));
+    }
+
+    return [];
   }
-
 }

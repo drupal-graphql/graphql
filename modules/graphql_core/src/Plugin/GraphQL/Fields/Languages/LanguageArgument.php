@@ -13,9 +13,9 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   id = "language_argument",
  *   secure = true,
  *   name = "argument",
- *   description = "The language id prepared as a language enum value.",
+ *   description = @Translation("The language id prepared as a language enum value."),
  *   type = "String",
- *   types = {"Language"}
+ *   parents = {"Language"}
  * )
  */
 class LanguageArgument extends FieldPluginBase {

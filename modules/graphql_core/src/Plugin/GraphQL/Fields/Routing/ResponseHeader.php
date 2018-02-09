@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
-
-use Drupal\graphql\Annotation\GraphQLField;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "header",
  *   type = "String",
- *   types = {"InternalResponse", "ExternalResponse"},
+ *   parents = {"InternalResponse", "ExternalResponse"},
  *   arguments={
  *     "key" = "String"
  *   }
@@ -32,8 +30,7 @@ class ResponseHeader extends FieldPluginBase {
     if ($value instanceof Response) {
       yield $value->headers->get($args['key']);
     }
-
-    if ($value instanceof ResponseInterface) {
+    else if ($value instanceof ResponseInterface) {
       yield implode(";", $value->getHeader($args['key']));
     }
   }

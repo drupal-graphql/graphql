@@ -2,32 +2,23 @@
 
 namespace Drupal\graphql\Plugin\GraphQL;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Traversable;
 
 class SchemaPluginManager extends DefaultPluginManager {
-
-  /**
-   * Static cache for plugin instances.
-   *
-   * @var object[]
-   */
-  protected $instances = [];
 
   /**
    * {@inheritdoc}
    */
   public function __construct(
     $pluginSubdirectory,
-    Traversable $namespaces,
+    \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     $pluginInterface,
     $pluginAnnotationName,
-    $alterInfo
+    $pluginType
   ) {
-    $this->alterInfo($alterInfo);
+    $this->alterInfo($pluginType);
 
     parent::__construct(
       $pluginSubdirectory,
@@ -36,20 +27,6 @@ class SchemaPluginManager extends DefaultPluginManager {
       $pluginInterface,
       $pluginAnnotationName
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createInstance($pluginId, array $configuration = []) {
-    if (!array_key_exists($pluginId, $this->instances)) {
-      $this->instances[$pluginId] = parent::createInstance($pluginId);
-      if (!$this->instances[$pluginId] instanceof SchemaPluginInterface) {
-        throw new \LogicException(sprintf('Plugin %s does not implement \Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface.', $pluginId));
-      }
-    }
-
-    return $this->instances[$pluginId];
   }
 
 }

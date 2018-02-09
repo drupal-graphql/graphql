@@ -2,46 +2,22 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\EntityQuery;
 
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\simpletest\NodeCreationTrait;
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
-use Drupal\user\Entity\Role;
+use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 
 /**
  * Test entity query support in GraphQL.
  *
  * @group graphql_core
  */
-class EntityQueryTest extends GraphQLFileTestBase {
-  use NodeCreationTrait;
-  use ContentTypeCreationTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'graphql_core',
-    'node',
-    'field',
-    'filter',
-    'text',
-  ];
+class EntityQueryTest extends GraphQLContentTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    $this->installEntitySchema('node');
-    $this->installConfig(['node', 'filter']);
-    $this->installSchema('node', 'node_access');
-
     $this->createContentType(['type' => 'a']);
     $this->createContentType(['type' => 'b']);
-
-    Role::load('anonymous')
-      ->grantPermission('access content')
-      ->save();
   }
 
   /**
@@ -73,50 +49,65 @@ class EntityQueryTest extends GraphQLFileTestBase {
     $c->save();
     $d->save();
 
-    $result = $this->executeQueryFile('entity_query.gql');
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheContexts(['user.node_grants:view']);
+    $metadata->addCacheTags([
+      'entity_bundles',
+      'entity_field_info',
+      'entity_types',
+      'node:' . $a->id(),
+      'node:' . $b->id(),
+      'node:' . $c->id(),
+      'node:' . $d->id(),
+      'node_list',
+    ]);
 
-    $this->assertEquals([
-      ['uuid' => $a->uuid()],
-      ['uuid' => $b->uuid()],
-      ['uuid' => $c->uuid()],
-    ], $result['data']['a']['entities'], 'Type A entities queried.');
-
-    $this->assertEquals(3, $result['data']['a']['count'], 'Correct count is returned');
-
-    $this->assertEquals([
-      ['uuid' => $d->uuid()],
-    ], $result['data']['b']['entities'], 'Type B entity queried.');
-
-    $this->assertEquals(1, $result['data']['b']['count'], 'Correct count is returned');
-
-    $this->assertEquals([
-      ['uuid' => $a->uuid()],
-      ['uuid' => $b->uuid()],
-    ], $result['data']['limit']['entities'], 'Limit works as expected.');
-
-    $this->assertEquals(3, $result['data']['limit']['count'], 'Correct count is returned');
-
-    $this->assertEquals([
-      ['uuid' => $b->uuid()],
-      ['uuid' => $c->uuid()],
-    ], $result['data']['offset']['entities'], 'Offset works as expected.');
-
-    $this->assertEquals(3, $result['data']['offset']['count'], 'Correct count is returned');
-
-    $this->assertEquals([
-      ['uuid' => $b->uuid()],
-    ], $result['data']['offset_limit']['entities'], 'Offset and limit combination works as expected.');
-
-    $this->assertEquals(3, $result['data']['offset_limit']['count'], 'Correct count is returned');
-
-    $this->assertEquals([
-      ['uuid' => $a->uuid()],
-      ['uuid' => $b->uuid()],
-      ['uuid' => $c->uuid()],
-      ['uuid' => $d->uuid()],
-    ], $result['data']['all_nodes']['entities'], 'All entities queried.');
-
-    $this->assertEquals(4, $result['data']['all_nodes']['count'], 'Correct count is returned');
+    $this->assertResults($this->getQueryFromFile('entity_query.gql'), [], [
+      'a' => [
+        'entities' => [
+          ['uuid' => $a->uuid()],
+          ['uuid' => $b->uuid()],
+          ['uuid' => $c->uuid()],
+        ],
+        'count' => 3,
+      ],
+      'b' => [
+        'entities' => [
+          ['uuid' => $d->uuid()],
+        ],
+        'count' => 1,
+      ],
+      'limit' => [
+        'entities' => [
+          ['uuid' => $a->uuid()],
+          ['uuid' => $b->uuid()],
+        ],
+        'count' => 3,
+      ],
+      'offset' => [
+        'entities' => [
+          ['uuid' => $b->uuid()],
+          ['uuid' => $c->uuid()],
+        ],
+        'count' => 3,
+      ],
+      'offset_limit' => [
+        'entities' => [
+          ['uuid' => $b->uuid()],
+        ],
+        'count' => 3,
+      ],
+      'all_nodes' => [
+        'entities' => [
+          ['uuid' => $a->uuid()],
+          ['uuid' => $b->uuid()],
+          ['uuid' => $c->uuid()],
+          ['uuid' => $d->uuid()],
+        ],
+        'count' => 4,
+      ],
+    ], $metadata);
   }
 
 }

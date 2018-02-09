@@ -11,25 +11,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a list of entities through an entity query.
- *
  * @GraphQLField(
  *   id = "entity_query",
  *   secure = true,
- *   name = "entityQuery",
- *   type = "EntityQueryResult",
- *   nullable = false,
- *   weight = -1,
+ *   type = "EntityQueryResult!",
  *   arguments = {
  *     "offset" = {
  *       "type" = "Int",
- *       "nullable" = true,
  *       "default" = 0
  *     },
  *     "limit" = {
  *       "type" = "Int",
- *       "nullable" = true,
  *       "default" = 10
+ *     },
+ *     "revisions" = {
+ *       "type" = "EntityQueryRevisionMode",
+ *       "default" = "default"
  *     }
  *   },
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityQueryDeriver"
@@ -68,7 +65,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  protected function getCacheDependencies($result, $value, array $args) {
+  protected function getCacheDependencies(array $result, $value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $type = $this->entityTypeManager->getDefinition($entityTypeId);
 
@@ -83,27 +80,53 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
+    yield $this->getQuery($value, $args, $info);
+  }
+
+  /**
+   * Create an entity query for the plugin's entity type.
+   *
+   * @param mixed $value
+   *   The parent entity type.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object.
+   */
+  protected function getQuery($value, array $args, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
-    $storage = $this->entityTypeManager->getStorage($entityTypeId);
-    $type = $this->entityTypeManager->getDefinition($entityTypeId);
+    $entityStorage = $this->entityTypeManager->getStorage($entityTypeId);
+    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
 
-    $query = $storage->getQuery();
+    $query = $entityStorage->getQuery();
     $query->range($args['offset'], $args['limit']);
-    $query->sort($type->getKey('id'));
+    $query->sort($entityType->getKey('id'));
+    $query->accessCheck(TRUE);
 
-    if (array_key_exists('filter', $args) && $args['filter']) {
+    // Check if this is a query for all entity revisions.
+    if (!empty($args['revisions']) && $args['revisions'] === 'all') {
+      // Mark the query as such and sort by the revision id too.
+      $query->allRevisions();
+      $query->addTag('revisions');
+      $query->sort($entityType->getKey('revision'));
+    }
+
+    if (!empty($args['filter'])) {
       /** @var \Youshido\GraphQL\Type\Object\AbstractObjectType $filter */
-      $filter = $this->config->getArgument('filter')->getType();
-      /** @var \Drupal\graphql_core\Plugin\GraphQL\InputTypes\EntityQuery\EntityQueryFilterInput $filterType */
+      $filter = $info->getField()->getArgument('filter')->getType();
+      /** @var \Drupal\graphql\GraphQL\Type\InputObjectType $filterType */
       $filterType = $filter->getNamedType();
-      $filterFields = $filterType->getPluginDefinition()['fields'];
+      $filterFields = $filterType->getPlugin()->getPluginDefinition()['fields'];
 
       foreach ($args['filter'] as $key => $arg) {
         $query->condition($filterFields[$key]['field_name'], $arg);
       }
     }
 
-    yield $query;
+    return $query;
   }
 
 }

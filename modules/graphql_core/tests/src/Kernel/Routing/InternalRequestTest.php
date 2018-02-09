@@ -2,31 +2,49 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
-use Drupal\Tests\graphql\Kernel\GraphQLFileTestBase;
+use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
 /**
  * Test internal requests.
  *
  * @group graphql_core
  */
-class InternalRequestTest extends GraphQLFileTestBase {
+class InternalRequestTest extends GraphQLCoreTestBase {
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql_requests_test', 'graphql_core'];
+  public static $modules = ['graphql_core', 'graphql_requests_test'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->installEntitySchema('user');
+  }
 
   /**
    * Test internal requests.
    */
   public function testInternalRequests() {
-    $result = $this->executeQueryFile('internal_requests.gql');
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
 
-    $this->assertEquals(200, $result['data']['ok']['request']['code']);
-    $this->assertContains('<p>Test</p>', $result['data']['ok']['request']['content']);
-
-    $this->assertEquals(302, $result['data']['redirect']['request']['code']);
-    $this->assertEquals('/graphql-request/test', $result['data']['redirect']['request']['location']);
+    $this->assertResults($this->getQueryFromFile('internal_requests.gql'), [], [
+      'ok' => [
+        'request' => [
+          'code' => 200,
+          'content' => '<p>Test</p>',
+        ],
+      ],
+      'redirect' => [
+        'request' => [
+          'code' => 302,
+          'location' => '/graphql-request/test',
+        ],
+      ],
+    ], $metadata);
   }
 
 }
