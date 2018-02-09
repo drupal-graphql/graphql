@@ -63,7 +63,7 @@ class ImageFieldTest extends GraphQLContentTestBase {
       'entity_types',
       'file:1',
       'node:1',
-      // TODO: missing image style config cache tags?
+      'config:image.style.thumbnail',
     ]);
 
     $this->assertResults($this->getQueryFromFile('image.gql'), [

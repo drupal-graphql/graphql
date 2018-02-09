@@ -2,9 +2,11 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Images;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -68,11 +70,11 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
 
       $style->transformDimensions($dimensions, $file->getFileUri());
 
-      yield [
+      yield new CacheableValue([
         'url' => $style->buildUrl($file->getFileUri()),
         'width' => $dimensions['width'],
         'height' => $dimensions['height'],
-      ];
+      ], [$style]);
     }
   }
 
