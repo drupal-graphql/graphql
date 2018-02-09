@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Blocks;
 
 use Drupal\block\Entity\Block;
 use Drupal\block_content\Plugin\Block\BlockContentBlock;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Condition\ConditionInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -11,6 +12,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
@@ -26,8 +28,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   parents = {"InternalUrl"},
  *   arguments = {
  *     "region" = "String!"
- *   },
- *   response_cache_tags= {"config:block_list"}
+ *   }
  * )
  */
 class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginInterface {
@@ -124,7 +125,9 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
       });
 
       return function ($value, array $args, ResolveInfo $info) use ($resolve) {
-        $blocks = array_map(function(Block $block) {
+        $metadata = new CacheableMetadata();
+        $metadata->addCacheTags(['config:block_list']);
+        $blocks = array_map(function (Block $block) {
           $plugin = $block->getPlugin();
           if ($plugin instanceof BlockContentBlock) {
             return $this->entityRepository->loadEntityByUuid('block_content', $plugin->getDerivativeId());
@@ -135,7 +138,7 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
         }, $resolve());
 
         foreach ($blocks as $block) {
-          yield $block;
+          yield new CacheableValue($block, [$metadata]);
         }
       };
     }
