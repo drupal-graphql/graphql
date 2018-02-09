@@ -11,7 +11,6 @@ use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Youshido\GraphQL\Field\Field;
-use Youshido\GraphQL\Type\TypeInterface;
 
 abstract class InputTypePluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;

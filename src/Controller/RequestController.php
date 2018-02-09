@@ -120,52 +120,62 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleBatchRequest(Request $request, array $queries = []) {
-    $filterNumeric = function($index) { return !is_numeric($index); };
+    $method = $request->getMethod();
+
+    // Array filter callback for filtering numeric values.
+    $filter = function($index) { return !is_numeric($index); };
 
     // PHP 5.5.x does not yet support the ARRAY_FILTER_USE_KEYS constant.
-    $requestParameters = $request->query->all();
-    $requestParametersKeys = array_filter(array_keys($requestParameters), $filterNumeric);
-    $requestParameters = array_intersect_key($requestParameters, array_flip($requestParametersKeys));
+    $parameters = $method === 'POST' ? $request->request->all() : $request->query->all();
+    $keys = array_filter(array_keys($parameters), $filter);
+    $parameters = array_intersect_key($parameters, array_flip($keys));
 
-    $requestContent = $request->query->all();
-    $requestContentKeys = array_filter($requestContent, $filterNumeric);
-    $requestContent = array_intersect_key($requestContent, array_flip($requestContentKeys));
+    $content = ($content = $request->getContent()) ? json_decode($content, TRUE) : [];
+    $keys = array_filter(array_keys($content), $filter);
+    $content = array_intersect_key($content, array_flip($keys));
     
     // Retain the original session for sub-requests. This is necessary in
-    // case of sub-requests that alter the session in some way (e.g. authentication).
-    $requestSession = $request->getSession();
+    // case of sub-requests that alter the session in some way (e.g.
+    // authentication).
+    $session = $request->getSession();
+
+    // Repeat the request on the previous route.
+    $url = Url::fromRoute($request->attributes->get('_route'))
+      ->toString(TRUE)
+      ->getGeneratedUrl();
+
+    // Extract the remaining needed parameters from the current request.
+    $cookies = $request->cookies->all();
+    $files = $request->files->all();
+    $server = $request->server->all();
 
     // Walk over all queries and issue a sub-request for each.
-    $responses = array_map(function($query) use ($request, $requestParameters, $requestContent, $requestSession) {
-      $method = $request->getMethod();
+    $responses = array_map(function($query) use ($method, $parameters, $content, $session, $url, $cookies, $files, $server) {
+      $content = json_encode(array_merge($content, $query));
 
-      // Make sure we remove the 'queries' parameter, otherwise the subsequent
-      // request could trigger the batch processing again.
-      $parameters = array_merge((array) $requestParameters, (array) $query);
-      $content = $method === 'POST' ? array_merge((array) $query, (array) $requestContent) : FALSE;
-      $content = $content ? json_encode($content) : '';
-      $graphqlUrl = Url::fromUri('internal:/graphql')->toString(TRUE)->getGeneratedUrl();
-
-      $subRequest = Request::create(
-        $graphqlUrl,
+      // Create the sub-request with the batched query parameters merged into
+      // the request body content. This is the best spot because the body
+      // content gets precedence over the GET or POST parameters.
+      $request = Request::create(
+        $url,
         $method,
         $parameters,
-        $request->cookies->all(),
-        $request->files->all(),
-        $request->server->all(),
+        $cookies,
+        $files,
+        $server,
         $content
       );
 
-      if (!empty($requestSession)) {
-        $subRequest->setSession($requestSession);
+      if (!empty($session)) {
+        $request->setSession($session);
       }
 
-      $output = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+      $output = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
 
       // TODO:
       // Remove the request stack manipulation once the core issue described at
       // https://www.drupal.org/node/2613044 is resolved.
-      while ($this->requestStack->getCurrentRequest() === $subRequest) {
+      while ($this->requestStack->getCurrentRequest() === $request) {
         $this->requestStack->pop();
       }
 
