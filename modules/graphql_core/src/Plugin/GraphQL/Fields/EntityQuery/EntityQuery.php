@@ -171,7 +171,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   If the given operator and value for a filter are invalid.
    */
   protected function buildFilterConditions(QueryInterface $query, array $filter) {
-    $conjunction = !empty($args['conjunction']) ? $args['conjunction'] : 'AND';
+    $conjunction = !empty($filter['conjunction']) ? $filter['conjunction'] : 'AND';
     $group = $conjunction === 'AND' ? $query->andConditionGroup() : $query->orConditionGroup();
 
     // Apply filter conditions.
