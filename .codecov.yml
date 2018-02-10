@@ -1,2 +1,5 @@
+codecov:
+  branch: '8.x-3.x'
+
 ignore:
-  - "**/tests/**/*" # Ignore all test directories.
+  - '**/tests/**/*' # Ignore all test directories.
