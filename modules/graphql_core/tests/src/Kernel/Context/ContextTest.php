@@ -23,6 +23,7 @@ class ContextTest extends GraphQLCoreTestBase {
 
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($query, [], [
       'a' => ['name' => 'graphql_context_test.a'],

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\Deriver\Interfaces;
+namespace Drupal\graphql_core\Plugin\Deriver\Types;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -19,8 +19,9 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
         continue;
       }
 
-      // Only create a base interface for types that support bundles.
-      if (!$type->hasKey('bundle')) {
+      // Create the entity type only for types that do not support bundles. For
+      // all others, we create common interfaces instead.
+      if ($type->hasKey('bundle')) {
         continue;
       }
 

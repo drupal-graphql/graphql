@@ -8,12 +8,12 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLType(
- *   id = "entity_bundle",
- *   schema_cache_tags = {"entity_types", "entity_bundles"},
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\Types\EntityBundleDeriver"
+ *   id = "entity_type",
+ *   schema_cache_tags = {"entity_types"},
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Types\EntityTypeDeriver"
  * )
  */
-class EntityBundle extends TypePluginBase {
+class EntityType extends TypePluginBase {
 
   /**
    * {@inheritdoc}
@@ -21,9 +21,7 @@ class EntityBundle extends TypePluginBase {
   public function applies($object, ResolveInfo $info = NULL) {
     if ($object instanceof EntityInterface) {
       $definition = $this->getPluginDefinition();
-      if ($object->getEntityTypeId() === $definition['entity_type']) {
-        return $object->bundle() === $definition['entity_bundle'];
-      }
+      return $object->getEntityTypeId() === $definition['entity_type'];
     }
 
     return FALSE;
