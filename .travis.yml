@@ -77,6 +77,10 @@ install:
   # Reference the module in the build site.
   - ln -s $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
 
+  # Copy the customized phpunit configuration file to the core directory so
+  # the relative paths are correct.
+  - cp $DRUPAL_BUILD_DIR/modules/graphql/phpunit.xml.dist $DRUPAL_BUILD_DIR/core/phpunit.xml
+
   # When running with phpdbg we need to replace all code occurrences that check
   # for 'cli' with 'phpdbg'. Some files might be write protected, hence the
   # fallback.
@@ -91,12 +95,12 @@ install:
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
-      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist --coverage-clover $TRAVIS_BUILD_DIR/coverage.xml $TRAVIS_BUILD_DIR;
+      then phpdbg -qrr $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml --coverage-clover $TRAVIS_BUILD_DIR/coverage.xml $TRAVIS_BUILD_DIR;
     fi
 
   # Run the unit tests with standard php otherwise.
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
-      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml.dist $TRAVIS_BUILD_DIR;
+      then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml $TRAVIS_BUILD_DIR;
     fi
 
 after_success:
