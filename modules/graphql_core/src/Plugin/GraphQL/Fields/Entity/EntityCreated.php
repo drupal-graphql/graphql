@@ -7,6 +7,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 use DateTime;
 
 /**
+ * TODO: Should we derive this for each entity type individually?
+ *
  * @GraphQLField(
  *   id = "entity_created",
  *   secure = true,

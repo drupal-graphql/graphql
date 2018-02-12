@@ -4,6 +4,8 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -70,8 +72,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   protected function getCacheDependencies(array $result, $value, array $args, ResolveInfo $info) {
-    $entityTypeId = $this->pluginDefinition['entity_type'];
-    $type = $this->entityTypeManager->getDefinition($entityTypeId);
+    $entityType = $this->getEntityType($value, $args, $info);
+    $type = $this->entityTypeManager->getDefinition($entityType);
 
     $metadata = new CacheableMetadata();
     $metadata->addCacheTags($type->getListCacheTags());
@@ -88,7 +90,33 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   }
 
   /**
-   * Create an entity query for the plugin's entity type.
+   * Retrieve the target entity type of this plugin.
+   *
+   * @param mixed $value
+   *   The parent entity type.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return string|null
+   *   The entity type object or NULL if none could be derived.
+   */
+  protected function getEntityType($value, array $args, ResolveInfo $info) {
+    $definition = $this->getPluginDefinition();
+    if (isset($definition['entity_type'])) {
+      return $definition['entity_type'];
+    }
+
+    if ($value instanceof EntityInterface) {
+      return $value->getEntityType()->id();
+    }
+
+    return NULL;
+  }
+
+  /**
+   * Create the full entity query for the plugin's entity type.
    *
    * @param mixed $value
    *   The parent entity type.
@@ -101,26 +129,63 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The entity query object.
    */
   protected function getQuery($value, array $args, ResolveInfo $info) {
-    $entityTypeId = $this->pluginDefinition['entity_type'];
-    $entityStorage = $this->entityTypeManager->getStorage($entityTypeId);
-
-    $query = $entityStorage->getQuery();
+    $query = $this->getBaseQuery($value, $args, $info);
     $query->range($args['offset'], $args['limit']);
+
+    if (array_key_exists('revisions', $args)) {
+      $query = $this->applyRevisionsMode($query, $args['revisions']);
+    }
+
+    if (array_key_exists('filter', $args)) {
+      $query = $this->applyFilter($query, $args['filter']);
+    }
+
+    if (array_key_exists('sort', $args)) {
+      $query = $this->applySort($query, $args['sort']);
+    }
+
+    return $query;
+  }
+
+  /**
+   * Create the basic entity query for the plugin's entity type.
+   *
+   * @param mixed $value
+   *   The parent entity type.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object.
+   */
+  protected function getBaseQuery($value, array $args, ResolveInfo $info) {
+    $entityType = $this->getEntityType($value, $args, $info);
+    $entityStorage = $this->entityTypeManager->getStorage($entityType);
+    $query = $entityStorage->getQuery();
     $query->accessCheck(TRUE);
 
-    // Check if this is a query for all entity revisions.
-    if (!empty($args['revisions']) && $args['revisions'] === 'all') {
+    return $query;
+  }
+
+
+  /**
+   * Apply the specified revision filtering mode to the query.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The entity query object.
+   * @param mixed $mode
+   *   The revision query mode.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object.
+   */
+  protected function applyRevisionsMode(QueryInterface $query, $mode) {
+    if ($mode === 'all') {
       // Mark the query as such and sort by the revision id too.
       $query->allRevisions();
       $query->addTag('revisions');
-    }
-
-    if (!empty($args['filter'])) {
-      $this->applyFilter($query, $args['filter']);
-    }
-
-    if (!empty($args['sort'])) {
-      $this->applySort($query, $args['sort']);
     }
 
     return $query;
@@ -131,14 +196,21 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *
    * @param \Drupal\Core\Entity\Query\QueryInterface $query
    *   The entity query object.
-   * @param array $sort
+   * @param mixed $sort
    *   The sort definitions from the field arguments.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object.
    */
-  protected function applySort(QueryInterface $query, array $sort) {
-    foreach ($sort as $item) {
-      $direction = !empty($item['direction']) ? $item['direction'] : 'DESC';
-      $query->sort($item['field'], $direction);
+  protected function applySort(QueryInterface $query, $sort) {
+    if (!empty($sort) && is_array($sort)) {
+      foreach ($sort as $item) {
+        $direction = !empty($item['direction']) ? $item['direction'] : 'DESC';
+        $query->sort($item['field'], $direction);
+      }
     }
+
+    return $query;
   }
 
   /**
@@ -149,11 +221,18 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *
    * @param \Drupal\Core\Entity\Query\QueryInterface $query
    *   The entity query object.
-   * @param array $filter
+   * @param mixed $filter
    *   The filter definitions from the field arguments.
+   *
+   * @return \Drupal\Core\Entity\Query\QueryInterface
+   *   The entity query object.
    */
-  protected function applyFilter(QueryInterface $query, array $filter) {
-    $query->condition($this->buildFilterConditions($query, $filter));
+  protected function applyFilter(QueryInterface $query, $filter) {
+    if (!empty($filter) && is_array($filter)) {
+      $query->condition($this->buildFilterConditions($query, $filter));
+    }
+
+    return $query;
   }
 
   /**

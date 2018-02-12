@@ -49,12 +49,6 @@ class EntityRenderedDeriver extends DeriverBase implements ContainerDeriverInter
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
-        if ($type->isTranslatable()) {
-          $derivative['arguments']['language'] = [
-            'type' => 'LanguageId',
-          ];
-        }
-
         $this->derivatives["entity:$id"] = $derivative;
       }
     }
