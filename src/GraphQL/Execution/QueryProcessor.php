@@ -33,10 +33,10 @@ class QueryProcessor {
   /**
    * QueryProcessor constructor.
    *
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *   The current user.
    * @param \Drupal\graphql\GraphQL\Schema\SchemaLoader $schemaLoader
    *   The schema loader service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+   *   The current user.
    * @param array $parameters
    *   The graphql container parameters.
    */
@@ -46,8 +46,8 @@ class QueryProcessor {
     array $parameters
   ) {
     $this->currentUser = $currentUser;
-    $this->parameters = $parameters;
     $this->schemaLoader = $schemaLoader;
+    $this->parameters = $parameters;
   }
 
   /**
@@ -92,6 +92,12 @@ class QueryProcessor {
     // Prevent caching if this is a mutation query or an error occurred.
     $request = $context->getRequest();
     if ((!empty($request) && $request->hasMutations()) || $context->hasErrors()) {
+      $responseCacheMetadata->setCacheMaxAge(0);
+    }
+
+    // Do not cache this response anywhere (even page cache) if the graphql
+    // cache is disabled through the service parameters.
+    if (empty($this->parameters['result_cache'])) {
       $responseCacheMetadata->setCacheMaxAge(0);
     }
 
