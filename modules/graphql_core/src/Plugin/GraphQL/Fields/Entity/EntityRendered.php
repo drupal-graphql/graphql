@@ -95,8 +95,7 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       $mode = isset($args['mode']) ? $args['mode'] : 'full';
-      $language = isset($args['language']) ? $args['language'] : $value->language()->getId();
-
+      $language = $value->language()->getId();
       $builder = $this->entityTypeManager->getViewBuilder($value->getEntityTypeId());
       $rendered = $builder->view($value, $mode, $language);
       yield $this->renderer->render($rendered);

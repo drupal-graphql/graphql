@@ -58,6 +58,7 @@ class LanguageTest extends GraphQLCoreTestBase {
   public function testLanguageId() {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($this->getQueryFromFile('languages.gql'), [], [
       'languages' => [

@@ -13,6 +13,11 @@ trait ArgumentAwarePluginTrait {
   use TypedPluginTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  abstract public function getPluginDefinition();
+
+  /**
    * Build the arguments list.
    *
    * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder

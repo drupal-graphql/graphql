@@ -30,7 +30,6 @@ class ExternalRequestTest extends GraphQLCoreTestBase {
    * Test external requests.
    */
   public function testExternalRequests() {
-
     $client = $this->prophesize(ClientInterface::class);
     $client->request('GET', 'http://drupal.graphql')->willReturn(new Response(
       200,
@@ -43,6 +42,7 @@ class ExternalRequestTest extends GraphQLCoreTestBase {
     // TODO: Check cache metadata.
     // Add cache information from external response?
     $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($this->getQueryFromFile('external_requests.gql'), [], [
       'route' => [

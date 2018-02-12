@@ -2,54 +2,25 @@
 
 namespace Drupal\graphql_core\Plugin\Deriver\Interfaces;
 
-use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_core\Plugin\Deriver\EntityTypeDeriverBase;
 
-class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface {
+class EntityTypeDeriver extends EntityTypeDeriverBase {
   use StringTranslationTrait;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, $basePluginId) {
-    return new static(
-      $container->get('entity_type.manager')
-    );
-  }
-
-  /**
-   * EntityTypeDeriver constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   Instance of an entity type manager.
-   */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
-    $this->entityTypeManager = $entityTypeManager;
-  }
 
   /**
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if (!$type instanceof ContentEntityTypeInterface) {
+      if (!($type instanceof ContentEntityTypeInterface)) {
         continue;
       }
 
       // Only create a base interface for types that support bundles.
-      if ($type->hasKey('bundle')) {
+      if (!$type->hasKey('bundle')) {
         continue;
       }
 
@@ -59,6 +30,8 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
           '@type' => $type->getLabel(),
         ]),
         'type' => "entity:$typeId",
+        'interfaces' => $this->getInterfaces($type, $basePluginDefinition),
+        'entity_type' => $typeId,
       ] + $basePluginDefinition;
     }
 
