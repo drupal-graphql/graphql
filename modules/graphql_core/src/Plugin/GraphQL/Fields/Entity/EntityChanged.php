@@ -8,8 +8,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 use DateTime;
 
 /**
- * Get the entities changed date if available.
- *
  * @GraphQLField(
  *   id = "entity_changed",
  *   secure = true,

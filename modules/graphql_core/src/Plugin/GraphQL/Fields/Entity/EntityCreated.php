@@ -7,8 +7,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 use DateTime;
 
 /**
- * Get the entities created date if available.
- *
  * @GraphQLField(
  *   id = "entity_created",
  *   secure = true,

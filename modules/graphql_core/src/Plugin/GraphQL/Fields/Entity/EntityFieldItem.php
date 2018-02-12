@@ -6,8 +6,6 @@ use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Generic field plugin for rendering entity field properties.
- *
  * @GraphQLField(
  *   id = "entity_field_item",
  *   secure = true,

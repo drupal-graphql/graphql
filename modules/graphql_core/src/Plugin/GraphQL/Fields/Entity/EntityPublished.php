@@ -7,8 +7,6 @@ use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Get an published state.
- *
  * @GraphQLField(
  *   id = "entity_published",
  *   secure = true,

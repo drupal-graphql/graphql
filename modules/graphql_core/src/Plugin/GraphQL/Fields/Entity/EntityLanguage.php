@@ -7,8 +7,6 @@ use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * GraphQL field resolving an Entity's language.
- *
  * @GraphQLField(
  *   id = "entity_language",
  *   secure = true,

@@ -7,8 +7,6 @@ use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * GraphQL field resolving an entity's bundle.
- *
  * @GraphQLField(
  *   id = "entity_bundle",
  *   secure = true,
