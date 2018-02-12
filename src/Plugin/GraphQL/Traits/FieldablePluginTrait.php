@@ -9,6 +9,11 @@ use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 trait FieldablePluginTrait {
 
   /**
+   * {@inheritdoc}
+   */
+  abstract public function getPluginDefinition();
+
+  /**
    * Build the list of implicit and explicit fields attached to the object type.
    *
    * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder

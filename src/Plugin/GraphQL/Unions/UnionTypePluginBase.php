@@ -28,12 +28,14 @@ abstract class UnionTypePluginBase extends PluginBase implements TypeSystemPlugi
    */
   public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
     if (!isset($this->definition)) {
-      $name = $this->buildName();
+      $definition = $this->getPluginDefinition();
+      $typeNames = $definition['types'];
+      $unionName = $this->buildName();
 
       $this->definition = new UnionType($this, $schemaBuilder, [
-        'name' => $name,
+        'name' => $unionName,
         'description' => $this->buildDescription(),
-        'types' => $this->buildTypes($schemaBuilder, $name),
+        'types' => $this->buildTypes($schemaBuilder, $unionName, $typeNames),
       ]);
     }
 
@@ -43,20 +45,25 @@ abstract class UnionTypePluginBase extends PluginBase implements TypeSystemPlugi
   /**
    * Builds the list of types that are contained within this union type.
    *
+   * Collects types that are explicitly referenced by this union type or that
+   * are implicitly assigned by the type itself.
+   *
    * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
    *   The schema manager.
-   * @param $name
+   * @param $unionName
    *   The name of this plugin.
+   * @param $typeNames
+   *   List of types that this union contains explicitly.
    *
    * @return \Drupal\graphql\GraphQL\Type\ObjectType[]
    *   An array of types to add to this union type.
    */
-  protected function buildTypes(PluggableSchemaBuilderInterface $schemaBuilder, $name) {
+  protected function buildTypes(PluggableSchemaBuilderInterface $schemaBuilder, $unionName, $typeNames) {
     /** @var \Drupal\graphql\GraphQL\Type\ObjectType[] $types */
-    $types = array_map(function (TypeSystemPluginInterface $type) use ($schemaBuilder) {
+    $types = array_map(function (TypeSystemPluginInterface $type) use ($typeNames, $schemaBuilder) {
       return $type->getDefinition($schemaBuilder);
-    }, $schemaBuilder->find(function ($type) use ($name) {
-      return in_array($name, $type['unions']);
+    }, $schemaBuilder->find(function ($type) use ($typeNames, $unionName) {
+      return in_array($unionName, $type['unions']) || in_array($type['name'], $typeNames);
     }, [
       GRAPHQL_TYPE_PLUGIN,
     ]));

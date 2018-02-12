@@ -11,6 +11,11 @@ use Youshido\GraphQL\Type\TypeInterface;
 trait TypedPluginTrait {
 
   /**
+   * {@inheritdoc}
+   */
+  abstract public function getPluginDefinition();
+
+  /**
    * Build the plugin type.
    *
    * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
