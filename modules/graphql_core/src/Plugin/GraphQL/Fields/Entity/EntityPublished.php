@@ -12,7 +12,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   name = "entityPublished",
  *   type = "Boolean",
- *   parents = {"Entity"}
+ *   parents = {"EntityPublishable"}
  * )
  */
 class EntityPublished extends FieldPluginBase {

@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\Deriver\Interfaces;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -46,19 +47,52 @@ class EntityTypeDeriver extends DeriverBase implements ContainerDeriverInterface
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
-    $this->derivatives = [];
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if ($type instanceof ContentEntityTypeInterface) {
-        $this->derivatives[$typeId] = [
-          'name' => StringHelper::camelCase($typeId),
-          'description' => $this->t("The '@type' entity type.", [
-            '@type' => $type->getLabel(),
-          ]),
-          'type' => "entity:$typeId",
-        ] + $basePluginDefinition;
+      if (!$type instanceof ContentEntityTypeInterface) {
+        continue;
+      }
+
+      $interfaces = isset($basePluginDefinition['interfaces']) ? $basePluginDefinition['interfaces'] : [];
+      $interfaces = array_unique(array_merge($interfaces, $this->getInterfaces($type)));
+
+      $this->derivatives[$typeId] = [
+        'name' => StringHelper::camelCase($typeId),
+        'description' => $this->t("The '@type' entity type.", [
+          '@type' => $type->getLabel(),
+        ]),
+        'type' => "entity:$typeId",
+        'interfaces' => $interfaces,
+      ] + $basePluginDefinition;
+    }
+
+    return parent::getDerivativeDefinitions($basePluginDefinition);
+  }
+
+  /**
+   * Retrieve the interfaces that the entity type should implement.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $type
+   *   The entity type to retrieve the interfaces for.
+   *
+   * @return array
+   *   The interfaces that this entity type should implement.
+   */
+  protected function getInterfaces(EntityTypeInterface $type) {
+    $pairs = [
+      '\Drupal\Core\Entity\EntityDescriptionInterface' => 'EntityDescribable',
+      '\Drupal\Core\Entity\EntityPublishedInterface' => 'EntityPublishable',
+      '\Drupal\Core\Entity\RevisionableInterface' => 'EntityRevisionable',
+      '\Drupal\user\EntityOwnerInterface' => 'EntityOwnable',
+    ];
+
+    $interfaces = [];
+    foreach ($pairs as $dependency => $interface) {
+      if ($type->entityClassImplements($dependency)) {
+        $interfaces[] = $interface;
       }
     }
-    return parent::getDerivativeDefinitions($basePluginDefinition);
+
+    return $interfaces;
   }
 
 }

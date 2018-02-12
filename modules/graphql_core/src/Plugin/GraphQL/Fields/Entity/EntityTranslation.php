@@ -23,7 +23,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * )
  */
 class EntityTranslation extends FieldPluginBase implements ContainerFactoryPluginInterface {
-
   use DependencySerializationTrait;
 
   /**
@@ -38,7 +37,6 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-
     $this->entityRepository = $entityRepository;
   }
 
