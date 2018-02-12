@@ -34,7 +34,10 @@ class SubrequestExtractionController extends ControllerBase {
   }
 
   /**
-   * Process the subrequest batch.
+   * Extracts the sub-request callback response.
+   *
+   * @return \Drupal\graphql\GraphQL\Buffers\SubRequestResponse
+   *   The sub-request response object.
    */
   public function extract() {
     $request = $this->requestStack->getCurrentRequest();

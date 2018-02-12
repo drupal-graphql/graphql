@@ -43,6 +43,30 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('entity_type.manager'),
+      $container->get('renderer')
+    );
+  }
+
+  /**
+   * EntityRendered constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   */
   public function __construct(
     array $configuration,
     $pluginId,
@@ -53,19 +77,6 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
     $this->renderer = $renderer;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $container->get('entity_type.manager'),
-      $container->get('renderer')
-    );
   }
 
   /**

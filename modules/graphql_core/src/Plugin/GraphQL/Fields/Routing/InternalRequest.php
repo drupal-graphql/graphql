@@ -60,7 +60,20 @@ class InternalRequest extends FieldPluginBase implements ContainerFactoryPluginI
   }
 
   /**
-   * {@inheritdoc}
+   * InternalRequest constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer $subRequestBuffer
+   *   The sub-request buffer service.
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   *   The http kernel.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    */
   public function __construct(
     array $configuration,
@@ -70,10 +83,10 @@ class InternalRequest extends FieldPluginBase implements ContainerFactoryPluginI
     HttpKernelInterface $httpKernel,
     RequestStack $requestStack
   ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->subRequestBuffer = $subRequestBuffer;
     $this->httpKernel = $httpKernel;
     $this->requestStack = $requestStack;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**

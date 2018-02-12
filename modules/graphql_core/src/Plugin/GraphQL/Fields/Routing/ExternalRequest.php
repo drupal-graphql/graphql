@@ -46,7 +46,16 @@ class ExternalRequest extends FieldPluginBase implements ContainerFactoryPluginI
   }
 
   /**
-   * {@inheritdoc}
+   * ExternalRequest constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \GuzzleHttp\ClientInterface $httpClient
+   *   The http client service.
    */
   public function __construct(
     array $configuration,
@@ -54,8 +63,8 @@ class ExternalRequest extends FieldPluginBase implements ContainerFactoryPluginI
     $pluginDefinition,
     ClientInterface $httpClient
   ) {
-    $this->httpClient = $httpClient;
     parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->httpClient = $httpClient;
   }
 
 

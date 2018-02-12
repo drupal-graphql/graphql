@@ -35,14 +35,6 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityRepositoryInterface $entityRepository) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityRepository = $entityRepository;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
@@ -50,6 +42,23 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
       $pluginDefinition,
       $container->get('entity.repository')
     );
+  }
+
+  /**
+   * EntityTranslation constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository service.
+   */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityRepositoryInterface $entityRepository) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->entityRepository = $entityRepository;
   }
 
   /**

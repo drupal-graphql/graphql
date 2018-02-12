@@ -22,6 +22,9 @@ class StringFormattingTest extends UnitTestCase {
 
   /**
    * @dataProvider providerTestStringFormatting
+   *
+   * @param $input
+   * @param $expected
    */
   public function testCamelCaseFormatting($input, $expected) {
     $this->assertSame($expected, call_user_func_array([StringHelper::class, 'camelCase'], $input));
@@ -29,6 +32,9 @@ class StringFormattingTest extends UnitTestCase {
 
   /**
    * @dataProvider providerTestStringFormatting
+   *
+   * @param $input
+   * @param $expected
    */
   public function testPropCaseFormatting($input, $expected) {
     $this->assertSame(lcfirst($expected), call_user_func_array([StringHelper::class, 'propCase'], $input));

@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
 class JsonQueryMapQueryProvider implements QueryProviderInterface {
+
   /**
    * The cache backend for storing query map file paths.
    *
@@ -22,7 +23,7 @@ class JsonQueryMapQueryProvider implements QueryProviderInterface {
   protected $lookupPaths;
 
   /**
-   * Constructs a QueryProvider object.
+   * QueryProvider constructor.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for storing query map file paths.
@@ -49,7 +50,7 @@ class JsonQueryMapQueryProvider implements QueryProviderInterface {
     $version = $params['version'];
     $id = $params['id'];
 
-    if (isset($versions[$version]) && file_exists($versions[$version])) {
+    if (isset($versions) && isset($versions[$version]) && file_exists($versions[$version])) {
       $contents = json_decode(file_get_contents($versions[$version]), TRUE);
       if ($query = array_search($id, $contents)) {
         return $query;

@@ -28,6 +28,13 @@ class QueryCacheContext implements CacheContextInterface {
   protected $contextCache;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function getLabel() {
+    return t('Query');
+  }
+
+  /**
    * Constructs a new QueryCacheContext class.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -36,13 +43,6 @@ class QueryCacheContext implements CacheContextInterface {
   public function __construct(RequestStack $requestStack) {
     $this->requestStack = $requestStack;
     $this->contextCache = new \SplObjectStorage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getLabel() {
-    return t('Query');
   }
 
   /**

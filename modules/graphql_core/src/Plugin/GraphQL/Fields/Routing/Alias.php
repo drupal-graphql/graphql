@@ -52,16 +52,25 @@ class Alias extends Path implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, AliasManagerInterface $aliasManager) {
-    $this->aliasManager = $aliasManager;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('path.alias_manager'));
   }
 
   /**
-   * {@inheritdoc}
+   * Alias constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\Core\Path\AliasManagerInterface $aliasManager
+   *   The alias manager service.
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static($configuration, $pluginId, $pluginDefinition, $container->get('path.alias_manager'));
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, AliasManagerInterface $aliasManager) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->aliasManager = $aliasManager;
   }
 
 }

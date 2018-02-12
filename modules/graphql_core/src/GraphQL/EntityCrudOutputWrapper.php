@@ -9,33 +9,33 @@ class EntityCrudOutputWrapper {
   /**
    * The create entity.
    *
-   * @var \Drupal\Core\Entity\EntityInterface|NULL
+   * @var \Drupal\Core\Entity\EntityInterface|null
    */
   protected $entity;
 
   /**
    * The constraint validation list.
    *
-   * @var \Symfony\Component\Validator\ConstraintViolationListInterface|NULL
+   * @var \Symfony\Component\Validator\ConstraintViolationListInterface|null
    */
   protected $violations;
 
   /**
    * An array of error messages.
    *
-   * @var array|NULL
+   * @var array|null
    */
   protected $errors;
 
   /**
-   * Creates a CreateEntityOutputWrapper object.
+   * CreateEntityOutputWrapper constructor.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|NULL $entity
+   * @param \Drupal\Core\Entity\EntityInterface|null $entity
    *   The entity object that has been created or NULL if creation failed.
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface|NULL $violations
+   * @param \Symfony\Component\Validator\ConstraintViolationListInterface|null $violations
    *   The validation errors that occurred during creation or NULL if validation
    *   succeeded.
-   * @param array|NULL $errors
+   * @param array|null $errors
    *   An array of non validation error messages. Can be used to provide
    *   additional error messages e.g. for access restrictions.
    */
@@ -52,7 +52,7 @@ class EntityCrudOutputWrapper {
   /**
    * Returns the entity that was created.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|NULL
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The created entity object or NULL if creation failed.
    */
   public function getEntity() {
@@ -62,7 +62,7 @@ class EntityCrudOutputWrapper {
   /**
    * Returns the constraint violations.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface|NULL
+   * @return \Symfony\Component\Validator\ConstraintViolationListInterface|null
    *   The constraint validations or NULL if validation passed.
    */
   public function getViolations() {
@@ -72,7 +72,7 @@ class EntityCrudOutputWrapper {
   /**
    * Returns a list of error messages that occurred during entity creation.
    *
-   * @return array|NULL
+   * @return array|null
    *   An array of error messages as plain strings.
    */
   public function getErrors() {

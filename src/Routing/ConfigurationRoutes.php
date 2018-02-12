@@ -20,7 +20,7 @@ class ConfigurationRoutes extends RouteSubscriberBase {
   protected $schemaManager;
 
   /**
-   * Constructs a QueryRoutes object.
+   * ConfigurationRoutes constructor.
    *
    * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
    *   The graphql schema plugin manager.

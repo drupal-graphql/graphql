@@ -78,7 +78,7 @@ class SchemaLoader {
   protected $metadata = [];
 
   /**
-   * Constructs a SchemaLoader object.
+   * SchemaLoader constructor.
    *
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.

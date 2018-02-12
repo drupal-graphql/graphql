@@ -25,6 +25,18 @@ class ImageStyleId extends EnumPluginBase implements ContainerFactoryPluginInter
   protected $entityTypeManager;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('entity_type.manager')
+    );
+  }
+
+  /**
    * ImageStyleId constructor.
    *
    * @param array $configuration
@@ -39,18 +51,6 @@ class ImageStyleId extends EnumPluginBase implements ContainerFactoryPluginInter
   public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $container->get('entity_type.manager')
-    );
   }
 
   /**

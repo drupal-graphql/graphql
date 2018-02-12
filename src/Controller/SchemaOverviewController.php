@@ -27,7 +27,17 @@ class SchemaOverviewController implements ContainerInjectionInterface {
   protected $moduleHandler;
 
   /**
-   * Constructs a SchemaOverviewController object.
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('module_handler'),
+      $container->get('plugin.manager.graphql.schema')
+    );
+  }
+
+  /**
+   * SchemaOverviewController constructor.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler srevice.
@@ -37,16 +47,6 @@ class SchemaOverviewController implements ContainerInjectionInterface {
   public function __construct(ModuleHandlerInterface $moduleHandler, SchemaPluginManager $schemaManager) {
     $this->schemaManager = $schemaManager;
     $this->moduleHandler = $moduleHandler;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('module_handler'),
-      $container->get('plugin.manager.graphql.schema')
-    );
   }
 
   /**

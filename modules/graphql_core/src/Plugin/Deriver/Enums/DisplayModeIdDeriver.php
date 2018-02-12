@@ -3,8 +3,6 @@
 namespace Drupal\graphql_core\Plugin\Deriver\Enums;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityViewModeInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;

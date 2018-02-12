@@ -41,6 +41,8 @@ class SubRequestBuffer extends BufferBase {
    *
    * @param \Drupal\Core\Url $url
    *   The url object to run the subrequest on.
+   * @param callable $extract
+   *   The callback to run within the sub-request.
    *
    * @return \Closure
    *   The callback to invoke to load the result for this buffer item.

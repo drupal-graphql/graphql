@@ -73,12 +73,16 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
    * Test if the basic fields are available on the interface.
    *
    * @dataProvider nodeValuesProvider
+   *
+   * @param array $actualFieldValues
+   * @param array $expectedFieldValues
    */
   public function testRawValues($actualFieldValues, $expectedFieldValues) {
     $values = [
       'title' => 'Test',
       'type' => 'test',
     ];
+
     $node = $this->createNode($values + $actualFieldValues);
 
     // Workaround for public file urls.
