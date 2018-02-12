@@ -33,7 +33,6 @@ class AvailableLanguages extends FieldPluginBase implements ContainerFactoryPlug
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, LanguageManagerInterface $languageManager) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-
     $this->languageManager = $languageManager;
   }
 
