@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\MenuLink;
 
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;

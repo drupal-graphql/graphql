@@ -23,9 +23,7 @@ class RouteTest extends GraphQLCoreTestBase {
     parent::setUp();
 
     $aliasManager = $this->prophesize(AliasManagerInterface::class);
-    $aliasManager->getPathByAlias('/my/alias')->willReturn('/graphql/test/a');
-    $aliasManager->getAliasByPath('/graphql/test/a')->willReturn('/my/other/alias');
-    $aliasManager->getAliasByPath('/graphql/test/c')->willReturn('/graphql/test/c');
+    $aliasManager->getAliasByPath('/graphql/test/a', NULL)->willReturn('/my/other/alias');
     $this->container->set('path.alias_manager', $aliasManager->reveal());
   }
 
@@ -42,9 +40,9 @@ class RouteTest extends GraphQLCoreTestBase {
 
     $this->assertResults($this->getQueryFromFile('routing.gql'), [], [
       'route' => [
+        'path' => '/my/other/alias',
         'internal' => '/graphql/test/a',
-        'aliased' => '/my/other/alias',
-        'routed' => TRUE,
+        'alias' => '/my/other/alias',
       ],
       'denied' => NULL,
     ], $metadata);
