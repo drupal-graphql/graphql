@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\InternalUrl;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
@@ -15,7 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Issue an internal request and retrieve the response object.
  *
  * @GraphQLField(
- *   id = "internal_request",
+ *   id = "internal_url_request",
  *   secure = true,
  *   name = "request",
  *   type = "InternalResponse",

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Response;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
@@ -8,27 +8,27 @@ use Symfony\Component\HttpFoundation\Response;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Get the response content of an internal or external request.
+ * Get the response code of an internal or external request.
  *
  * @GraphQLField(
- *   id = "response_content",
+ *   id = "response_code",
  *   secure = true,
- *   name = "content",
- *   type = "String",
+ *   name = "code",
+ *   type = "Int",
  *   parents = {"InternalResponse", "ExternalResponse"}
  * )
  */
-class ResponseContent extends FieldPluginBase {
+class ResponseCode extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Response) {
-      yield $value->getContent();
+      yield $value->getStatusCode();
     }
     else if ($value instanceof ResponseInterface) {
-      yield (string) $value->getBody();
+      yield $value->getStatusCode();
     }
   }
 

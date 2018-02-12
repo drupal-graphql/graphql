@@ -1,11 +1,12 @@
 query {
   route:route(path: "/graphql/test/a") {
-    internal:path
-    aliased:alias
-    routed:routed
+    path
+    alias:pathAlias
+    internal:pathInternal
   }
   denied:route(path: "/graphql/test/c") {
-    internal:path
-    aliased:alias
+    path
+    alias:pathAlias
+    internal:pathInternal
   }
 }

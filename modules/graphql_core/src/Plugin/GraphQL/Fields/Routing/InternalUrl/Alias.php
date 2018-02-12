@@ -1,9 +1,10 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\InternalUrl;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
@@ -13,19 +14,26 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLField(
- *   id = "url_path",
+ *   id = "internal_url_path_alias",
  *   secure = true,
- *   name = "path",
- *   description = @Translation("The processed url path."),
+ *   name = "pathAlias",
+ *   description = @Translation("The url's path alias if any."),
  *   type = "String",
- *   parents = {"Url"},
+ *   parents = {"InternalUrl"},
  *   arguments = {
  *     "language" = "LanguageId"
  *   }
  * )
  */
-class Path extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
+
+  /**
+   * Instance of an alias manager.
+   *
+   * @var \Drupal\Core\Path\AliasManagerInterface
+   */
+  protected $aliasManager;
 
   /**
    * The language manager service.
@@ -35,7 +43,7 @@ class Path extends FieldPluginBase implements ContainerFactoryPluginInterface {
   protected $languageManager;
 
   /**
-   * Path constructor.
+   * Alias constructor.
    *
    * @param array $configuration
    *   The plugin configuration array.
@@ -43,6 +51,8 @@ class Path extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
+   * @param \Drupal\Core\Path\AliasManagerInterface $aliasManager
+   *   The alias manager service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    */
@@ -50,9 +60,11 @@ class Path extends FieldPluginBase implements ContainerFactoryPluginInterface {
     array $configuration,
     $pluginId,
     $pluginDefinition,
+    AliasManagerInterface $aliasManager,
     LanguageManagerInterface $languageManager
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->aliasManager = $aliasManager;
     $this->languageManager = $languageManager;
   }
 
@@ -64,6 +76,7 @@ class Path extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $configuration,
       $pluginId,
       $pluginDefinition,
+      $container->get('path.alias_manager'),
       $container->get('language_manager')
     );
   }
@@ -73,14 +86,15 @@ class Path extends FieldPluginBase implements ContainerFactoryPluginInterface {
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
+      $internal = "/{$value->getInternalPath()}";
       $language = isset($args['language']) ? $this->languageManager->getLanguage($args['language']) : NULL;
-      if (!empty($language)) {
-        // Copy the url object and set the language.
-        $value = (clone $value)->setOption('language', $language);
-      }
+      $alias = $this->aliasManager->getAliasByPath($internal, $language);
 
-      $url = $value->toString(TRUE);
-      yield new CacheableValue($url->getGeneratedUrl(), [$url]);
+      // If the fetched alias is identical to the internal path, it means we do
+      // not have a configured alias for this path.
+      if ($internal !== $alias) {
+        yield $alias;
+      }
     }
   }
 

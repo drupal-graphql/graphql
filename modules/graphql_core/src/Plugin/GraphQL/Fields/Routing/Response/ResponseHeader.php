@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Response;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
