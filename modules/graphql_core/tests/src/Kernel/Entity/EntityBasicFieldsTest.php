@@ -72,9 +72,8 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
         'direction' => $node->language()->getDirection(),
         'weight' => $node->language()->getWeight(),
       ],
-      'entityRoute' => [
-        'internalPath' => '/node/' . $node->id(),
-        'aliasedPath' => '/node/' . $node->id(),
+      'entityUrl' => [
+        'path' => '/node/' . $node->id(),
       ],
       'entityOwner' => [
         'entityLabel' => $user->label(),
