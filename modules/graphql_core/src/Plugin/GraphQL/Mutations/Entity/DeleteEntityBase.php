@@ -26,14 +26,6 @@ abstract class DeleteEntityBase extends MutationPluginBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
-    $this->entityTypeManager = $entityTypeManager;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
@@ -41,6 +33,23 @@ abstract class DeleteEntityBase extends MutationPluginBase implements ContainerF
       $pluginDefinition,
       $container->get('entity_type.manager')
     );
+  }
+
+  /**
+   * DeleteEntityBase constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**

@@ -10,25 +10,27 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class VoyagerMenuLinkDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   /**
+   * The schema plugin manager service.
+   *
    * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
    */
   protected $schemaManager;
-
-  /**
-   * Constructs a ExplorerMenuLinkDeriver object.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
-   *   The schema plugin manager service.
-   */
-  public function __construct(SchemaPluginManager $schemaManager) {
-    $this->schemaManager = $schemaManager;
-  }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static($container->get('plugin.manager.graphql.schema'));
+  }
+
+  /**
+   * VoyagerMenuLinkDeriver constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
+   *   The schema plugin manager service.
+   */
+  public function __construct(SchemaPluginManager $schemaManager) {
+    $this->schemaManager = $schemaManager;
   }
 
   /**

@@ -5,6 +5,7 @@ namespace Drupal\graphql\QueryProvider;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 class EntityQueryMapQueryProvider implements QueryProviderInterface {
+
   /**
    * The entity type manager service.
    *
@@ -13,7 +14,7 @@ class EntityQueryMapQueryProvider implements QueryProviderInterface {
   protected $entityTypeManager;
 
   /**
-   * Constructs a QueryProvider object.
+   * QueryProvider constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.

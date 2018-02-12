@@ -25,7 +25,10 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * ContextDeriver constructor.
+   *
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $contextRepository
+   *   The context repository service.
    */
   public function __construct(ContextRepositoryInterface $contextRepository) {
     $this->contextRepository = $contextRepository;

@@ -11,6 +11,7 @@ use Drupal\graphql\GraphQL\TypeValidationTrait;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Youshido\GraphQL\Config\Object\InterfaceTypeConfig;
+use Youshido\GraphQL\Exception\ResolveException;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
 
@@ -27,7 +28,14 @@ class InterfaceType extends AbstractInterfaceType implements PluginReferenceInte
   protected $types;
 
   /**
-   * {@inheritdoc}
+   * InterfaceType constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase $plugin
+   *   The interface plugin instance.
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $builder
+   *   The schema builder.
+   * @param array $config
+   *   The interface type config array.
    */
   public function __construct(InterfacePluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;
@@ -77,7 +85,7 @@ class InterfaceType extends AbstractInterfaceType implements PluginReferenceInte
       }
     }
 
-    throw new \Exception(sprintf('Could not resolve type for interface %s.', $this->getName()));
+    throw new ResolveException(sprintf('Could not resolve type for interface %s.', $this->getName()));
   }
 
   /**

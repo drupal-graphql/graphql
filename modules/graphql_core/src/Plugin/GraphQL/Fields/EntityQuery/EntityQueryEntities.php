@@ -41,6 +41,19 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
   protected $entityTypeManager;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('entity_type.manager'),
+      $container->get('graphql.buffer.entity')
+    );
+  }
+
+  /**
    * EntityQueryEntities constructor.
    *
    * @param array $configuration
@@ -64,19 +77,6 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityBuffer = $entityBuffer;
     $this->entityTypeManager = $entityTypeManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $container->get('entity_type.manager'),
-      $container->get('graphql.buffer.entity')
-    );
   }
 
   /**

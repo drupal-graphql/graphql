@@ -29,9 +29,10 @@ class PersistQueryMapCommand extends Command {
   protected $entityTypeManager;
 
   /**
-   * Constructs a PersistQueryMapCommand object.
+   * PersistQueryMapCommand constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
@@ -85,7 +86,7 @@ class PersistQueryMapCommand extends Command {
     }
 
     $status = $storage->create([
-      'queryMap' => array_flip((array) json_decode($contents)),
+      'map' => array_flip((array) json_decode($contents)),
       'version' => $version,
     ])->save();
 

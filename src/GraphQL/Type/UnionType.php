@@ -11,6 +11,7 @@ use Drupal\graphql\GraphQL\TypeValidationTrait;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 use Youshido\GraphQL\Config\Object\UnionTypeConfig;
+use Youshido\GraphQL\Exception\ResolveException;
 use Youshido\GraphQL\Execution\ResolveInfo;
 use Youshido\GraphQL\Type\Union\AbstractUnionType;
 
@@ -20,7 +21,14 @@ class UnionType extends AbstractUnionType implements PluginReferenceInterface, T
   use TypeValidationTrait;
 
   /**
-   * {@inheritdoc}
+   * UnionType constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase $plugin
+   *   The union type plugin instance.
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $builder
+   *   The schema builder.
+   * @param array $config
+   *   The union type config array.
    */
   public function __construct(UnionTypePluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;
@@ -46,7 +54,7 @@ class UnionType extends AbstractUnionType implements PluginReferenceInterface, T
       }
     }
 
-    throw new \Exception(sprintf('Could not resolve type for union type %s.', $this->getName()));
+    throw new ResolveException(sprintf('Could not resolve type for union type %s.', $this->getName()));
   }
 
   /**

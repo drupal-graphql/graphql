@@ -62,7 +62,20 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
   }
 
   /**
-   * {@inheritdoc}
+   * Breadcrumbs constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer $subRequestBuffer
+   *   The sub-request buffer service.
+   * @param \Drupal\Core\Breadcrumb\BreadcrumbManager $breadcrumbManager
+   *   The breadcrumb manager service.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   *   The current route match.
    */
   public function __construct(
     array $configuration,
@@ -72,10 +85,10 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
     BreadcrumbManager $breadcrumbManager,
     RouteMatchInterface $routeMatch
   ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->subRequestBuffer = $subRequestBuffer;
     $this->breadcrumbManager = $breadcrumbManager;
     $this->routeMatch = $routeMatch;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
   /**

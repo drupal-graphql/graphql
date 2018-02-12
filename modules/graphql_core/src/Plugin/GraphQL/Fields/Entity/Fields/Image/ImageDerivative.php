@@ -42,16 +42,25 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, ImageFactory $imageFactory) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->imageFactory = $imageFactory;
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static($configuration, $pluginId, $pluginDefinition, $container->get('image.factory'));
   }
 
   /**
-   * {@inheritdoc}
+   * ImageDerivative constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Image\ImageFactory $imageFactory
+   *   The image factory service.
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static($configuration, $pluginId, $pluginDefinition, $container->get('image.factory'));
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, ImageFactory $imageFactory) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->imageFactory = $imageFactory;
   }
 
   /**

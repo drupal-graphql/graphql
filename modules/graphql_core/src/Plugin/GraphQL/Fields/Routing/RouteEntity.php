@@ -48,21 +48,6 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function __construct(
-    array $configuration,
-    $pluginId,
-    $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    LanguageManagerInterface $languageManager
-  ) {
-    $this->entityTypeManager = $entityTypeManager;
-    $this->languageManager = $languageManager;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
@@ -71,6 +56,32 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       $container->get('entity_type.manager'),
       $container->get('language_manager')
     );
+  }
+
+  /**
+   * RouteEntity constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
+   */
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    EntityTypeManagerInterface $entityTypeManager,
+    LanguageManagerInterface $languageManager
+  ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->entityTypeManager = $entityTypeManager;
+    $this->languageManager = $languageManager;
   }
 
   /**

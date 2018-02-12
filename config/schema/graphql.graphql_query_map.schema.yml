@@ -5,7 +5,7 @@ graphql.graphql_query_map.*:
     version:
       type: string
       label: 'Version'
-    query_map:
+    map:
       type: sequence
       label: 'QueryMap'
       sequence:

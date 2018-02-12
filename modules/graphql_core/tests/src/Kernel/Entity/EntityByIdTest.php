@@ -39,6 +39,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
   protected function setUp() {
     parent::setUp();
 
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $languageStorage */
     $languageStorage = $this->container->get('entity.manager')->getStorage('configurable_language');
     $language = $languageStorage->create([
       'id' => $this->frenchLangcode,
@@ -59,6 +60,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
       'title' => 'English node',
       'type' => 'test',
     ]);
+
     $node->save();
     $node->addTranslation($this->frenchLangcode, ['title' => 'French node'])->save();
     $node->addTranslation($this->chineseSimplifiedLangcode, ['title' => 'Chinese simplified node'])->save();

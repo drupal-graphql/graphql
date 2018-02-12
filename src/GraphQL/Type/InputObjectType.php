@@ -19,7 +19,14 @@ class InputObjectType extends AbstractInputObjectType implements PluginReference
   use TypeValidationTrait;
 
   /**
-   * {@inheritdoc}
+   * InputObjectType constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase $plugin
+   *   The input type plugin instance.
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $builder
+   *   The schema builder.
+   * @param array $config
+   *   The input object type config array.
    */
   public function __construct(InputTypePluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;

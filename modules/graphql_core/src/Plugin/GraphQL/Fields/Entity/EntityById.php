@@ -49,6 +49,33 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository'),
+      $container->get('graphql.buffer.entity')
+    );
+  }
+
+  /**
+   * EntityById constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository service.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   *   The entity buffer service.
+   */
   public function __construct(
     array $configuration,
     $pluginId,
@@ -61,20 +88,6 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
     $this->entityBuffer = $entityBuffer;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityRepository = $entityRepository;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $container->get('entity_type.manager'),
-      $container->get('entity.repository'),
-      $container->get('graphql.buffer.entity')
-    );
   }
 
   /**

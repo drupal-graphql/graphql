@@ -23,7 +23,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   },
  *   config_export = {
  *     "version",
- *     "queryMap",
+ *     "map",
  *   },
  *   links = {
  *     "inspect-form" = "/admin/config/graphql/query-maps/{graphql_query_map}",
@@ -36,18 +36,18 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 class QueryMap extends ConfigEntityBase implements QueryMapInterface {
 
   /**
-   * The GraphQL query map version ID.
+   * The query map version.
    *
    * @var string
    */
   public $version;
 
   /**
-   * The GraphQL query map.
+   * The query map.
    *
    * @var array
    */
-  public $queryMap = [];
+  public $map = [];
 
   /**
    * {@inheritdoc}
@@ -60,8 +60,8 @@ class QueryMap extends ConfigEntityBase implements QueryMapInterface {
    * {@inheritdoc}
    */
   public function getQuery($queryId) {
-    if (isset($this->queryMap[$queryId])) {
-      return $this->queryMap[$queryId];
+    if (isset($this->map[$queryId])) {
+      return $this->map[$queryId];
     }
 
     return NULL;

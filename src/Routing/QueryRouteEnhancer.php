@@ -31,7 +31,6 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $this->queryProvider = $queryProvider;
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -110,7 +109,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    *
-   * @return array|boolean
+   * @return array|bool
    *   The enhanced controller defaults.
    */
   protected function enhanceSingle(array $defaults, array $params, Request $request) {

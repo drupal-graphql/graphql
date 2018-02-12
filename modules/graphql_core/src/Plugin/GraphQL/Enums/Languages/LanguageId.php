@@ -26,6 +26,18 @@ class LanguageId extends EnumPluginBase implements ContainerFactoryPluginInterfa
   protected $languageManager;
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('language_manager')
+    );
+  }
+
+  /**
    * LanguageId constructor.
    *
    * @param array $configuration
@@ -40,18 +52,6 @@ class LanguageId extends EnumPluginBase implements ContainerFactoryPluginInterfa
   public function __construct(array $configuration, $pluginId, $pluginDefinition, LanguageManagerInterface $languageManager) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->languageManager = $languageManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
-    return new static(
-      $configuration,
-      $pluginId,
-      $pluginDefinition,
-      $container->get('language_manager')
-    );
   }
 
   /**

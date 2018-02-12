@@ -42,11 +42,20 @@ class MenuLinks extends FieldPluginBase implements ContainerFactoryPluginInterfa
   }
 
   /**
-   * {@inheritdoc}
+   * MenuLinks constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
+   *   The menu link tree service.
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, MenuLinkTreeInterface $menuLinkTree) {
-    $this->menuLinkTree = $menuLinkTree;
     parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->menuLinkTree = $menuLinkTree;
   }
 
   /**

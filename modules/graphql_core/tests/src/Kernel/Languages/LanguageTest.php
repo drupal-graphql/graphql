@@ -26,7 +26,7 @@ class LanguageTest extends GraphQLCoreTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installconfig(['language']);
+    $this->installConfig(['language']);
     $this->installEntitySchema('configurable_language');
     $this->container->get('router.builder')->rebuild();
 

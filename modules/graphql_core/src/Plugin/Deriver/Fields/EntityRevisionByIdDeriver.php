@@ -29,7 +29,10 @@ class EntityRevisionByIdDeriver extends DeriverBase implements ContainerDeriverI
   }
 
   /**
-   * {@inheritdoc}
+   * EntityRevisionByIdDeriver constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;

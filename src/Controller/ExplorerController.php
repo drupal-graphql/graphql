@@ -38,7 +38,18 @@ class ExplorerController implements ContainerInjectionInterface {
   protected $schemaLoader;
 
   /**
-   * Constructs a ExplorerController object.
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('url_generator'),
+      $container->get('graphql.introspection'),
+      $container->get('graphql.schema_loader')
+    );
+  }
+
+  /**
+   * ExplorerController constructor.
    *
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The url generator service.
@@ -54,21 +65,12 @@ class ExplorerController implements ContainerInjectionInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('url_generator'),
-      $container->get('graphql.introspection'),
-      $container->get('graphql.schema_loader')
-    );
-  }
-
-  /**
    * Controller for the GraphiQL query builder IDE.
    *
    * @param string $schema
    *   The name of the schema.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
    *
    * @return array The render array.
    *   The render array.
