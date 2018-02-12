@@ -15,9 +15,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   name = "url",
  *   type = "String",
  *   parents = {"ImageResource"},
- *   field_types = {"image"},
- *   provider = "image",
- *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
+ *   provider = "image"
  * )
  */
 class ImageResourceUrl extends FieldPluginBase {
@@ -26,13 +24,7 @@ class ImageResourceUrl extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof ImageItem && $value->entity->access('view')) {
-      yield file_create_url($value->entity->getFileUri());
-    }
-
-    if (is_array($value) && array_key_exists('url', $value)) {
-      yield $value['url'];
-    }
+    yield $value['url'];
   }
 
 }
