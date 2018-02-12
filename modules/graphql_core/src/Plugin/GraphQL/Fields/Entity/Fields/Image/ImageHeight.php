@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Images;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Fields\Image;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
@@ -10,21 +10,24 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Retrieve the image height.
  *
  * @GraphQLField(
- *   id = "image_style_height",
+ *   id = "image_height",
  *   secure = true,
  *   name = "height",
  *   type = "Int",
- *   parents = {"ImageResource"},
- *   provider = "image"
+ *   provider = "image",
+ *   field_types = {"image"},
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
  * )
  */
-class ImageResourceHeight extends FieldPluginBase {
+class ImageHeight extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveInfo $info) {
-    yield (int) $value['height'];
+    if ($value instanceof ImageItem && $value->entity->access('view')) {
+      yield (int) $value->height;
+    }
   }
 
 }

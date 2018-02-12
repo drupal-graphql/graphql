@@ -1,8 +1,7 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Images;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Fields\Image;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
