@@ -7,8 +7,6 @@ use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * GraphQL field resolving for entity access for the current user.
- *
  * @GraphQLField(
  *   id = "entity_access",
  *   secure = true,

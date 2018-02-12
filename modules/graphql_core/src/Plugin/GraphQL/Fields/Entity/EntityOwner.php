@@ -7,8 +7,6 @@ use Drupal\user\EntityOwnerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Get an entities owner if it implements the EntityOwnerInterface.
- *
  * @GraphQLField(
  *   id = "entity_owner",
  *   secure = true,

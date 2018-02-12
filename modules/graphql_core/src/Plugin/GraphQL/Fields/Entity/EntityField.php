@@ -8,8 +8,6 @@ use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Generic field plugin for rendering entity fields.
- *
  * @GraphQLField(
  *   id = "entity_field",
  *   secure = true,

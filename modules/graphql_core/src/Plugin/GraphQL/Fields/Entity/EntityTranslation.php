@@ -11,8 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve an entity translation.
- *
  * @GraphQLField(
  *   id = "entity_translation",
  *   secure = true,

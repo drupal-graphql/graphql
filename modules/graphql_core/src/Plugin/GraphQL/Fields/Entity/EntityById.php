@@ -13,8 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve an entity by its id.
- *
  * @GraphQLField(
  *   id = "entity_by_id",
  *   secure = true,
