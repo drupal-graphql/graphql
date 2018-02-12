@@ -4,7 +4,6 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\InternalUrl;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -13,23 +12,26 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLField(
- *   id = "internal_url_path_alias",
+ *   id = "internal_url_translate",
  *   secure = true,
- *   name = "pathAlias",
- *   description = @Translation("The url's path alias if any."),
+ *   name = "translate",
+ *   description = @Translation("The translated url object."),
  *   type = "String",
- *   parents = {"InternalUrl"}
+ *   parents = {"InternalUrl"},
+ *   arguments = {
+ *     "language" = "LanguageId!"
+ *   }
  * )
  */
-class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class Translate extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
-   * Instance of an alias manager.
+   * The language manager service.
    *
-   * @var \Drupal\Core\Path\AliasManagerInterface
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $aliasManager;
+  protected $languageManager;
 
   /**
    * {@inheritdoc}
@@ -39,7 +41,7 @@ class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('path.alias_manager')
+      $container->get('language_manager')
     );
   }
 
@@ -52,33 +54,26 @@ class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   * @param \Drupal\Core\Path\AliasManagerInterface $aliasManager
-   *   The alias manager service
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
    */
   public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
-    AliasManagerInterface $aliasManager
+    LanguageManagerInterface $languageManager
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->aliasManager = $aliasManager;
+    $this->languageManager = $languageManager;
   }
-
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-      $internal = "/{$value->getInternalPath()}";
-      $alias = $this->aliasManager->getAliasByPath($internal);
-
-      // If the fetched alias is identical to the internal path, it means we do
-      // not have a configured alias for this path.
-      if ($internal !== $alias) {
-        yield $alias;
-      }
+      $language =  $this->languageManager->getLanguage($args['language']);
+      yield (clone $value)->setOption('language', $language);
     }
   }
 
