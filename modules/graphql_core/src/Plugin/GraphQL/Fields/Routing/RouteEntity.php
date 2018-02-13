@@ -151,7 +151,6 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
     }
   }
 
-
   /**
    * Resolves the entity translation from the given url context.
    *
