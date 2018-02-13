@@ -119,39 +119,36 @@ class SchemaLoader {
    *   The generated GraphQL schema.
    */
   public function getSchema($name) {
-    if (array_key_exists($name, $this->schemas)) {
-      return $this->schemas[$name];
+    if (($schema = &$this->schemas[$name]) !== NULL) {
+      return $schema;
     }
 
-    // The cache key is made up of all of the globally known cache contexts.
-    if (!empty($this->config['schema_cache'])) {
-      if (($contextCache = $this->metadataCache->get("$name:schema")) && $contextCache->data) {
-        $cid = $this->getCacheIdentifier($name, $contextCache->data);
+    $schemaCache = !empty($this->config['schema_cache']);
+    if (!empty($schemaCache) && ($cache = $this->metadataCache->get("$name:schema")) && $cache->data) {
+      $cid = $this->getCacheIdentifier($name, $cache->data);
 
-        if (($schema = $this->schemaCache->get($cid)) && $schema->data) {
-          return $this->schemas[$name] = $schema->data;
-        }
+      if (($cache = $this->schemaCache->get($cid)) && $cache->data) {
+        return $schema = $cache->data;
       }
     }
 
-    $this->schemas[$name] = $this->schemaManager->createInstance($name)->getSchema();
-    // If the schema is not cacheable, just return it directly.
-    if (empty($this->config['schema_cache'])) {
-      return $this->schemas[$name];
+    // Get the schema object from the plugin instance.
+    $schema = $this->schemaManager->createInstance($name)->getSchema();
+    if (empty($schemaCache)) {
+      return $schema;
     }
 
-    // Compute the cache identifier, tag and expiry time.
-    $schemaCacheMetadata = $this->getSchemaCacheMetadata($name);
-    if ($schemaCacheMetadata->getCacheMaxAge() !== 0) {
-      $tags = $schemaCacheMetadata->getCacheTags();
-      $expire = $this->maxAgeToExpire($schemaCacheMetadata->getCacheMaxAge());
-      $cid = $this->getCacheIdentifier($name, $schemaCacheMetadata);
+    $metadata = $this->getSchemaCacheMetadata($name);
+    if ($metadata->getCacheMaxAge() !== 0) {
+      $tags = $metadata->getCacheTags();
+      $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
+      $cid = $this->getCacheIdentifier($name, $metadata);
 
       // Write the cache entry for the schema cache entries.
-      $this->schemaCache->set($cid, $this->schemas[$name], $expire, $tags);
+      $this->schemaCache->set($cid, $schema, $expire, $tags);
     }
 
-    return $this->schemas[$name];
+    return $schema;
   }
 
   /**
@@ -159,7 +156,7 @@ class SchemaLoader {
    *
    * @param string $name
    *   The name of the schema.
-   * @return \Drupal\Core\Cache\CacheableDependencyInterface
+   * @return \Drupal\Core\Cache\RefinableCacheableDependencyInterface
    *   The cache metadata for the schema.
    */
   public function getSchemaCacheMetadata($name) {
@@ -196,23 +193,22 @@ class SchemaLoader {
    *   The cache metadata.
    */
   protected function getCacheMetadata($name, $cid, callable $callback) {
-    if (array_key_exists($cid, $this->metadata)) {
-      return $this->metadata[$cid];
+    if (($metadata = &$this->metadata[$cid]) !== NULL) {
+      return $metadata;
     }
 
-    // The cache key is made up of all of the globally known cache contexts.
-    if (!empty($this->config['schema_cache'])) {
-      if (($metadataCache = $this->metadataCache->get($cid)) && $metadataCache->data) {
-        return $this->metadata[$name] = $metadataCache->data;
-      }
+    $schemaCache = !empty($this->config['schema_cache']);
+    if (!empty($schemaCache) && ($cache = $this->metadataCache->get($cid)) && $cache->data) {
+      return $metadata = $cache->data;
     }
 
     /** @var \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata */
     $schema = $this->getSchema($name);
     $metadata = $callback($schema);
-    $this->metadata[$cid] = $metadata;
-    if (empty($this->config['schema_cache'])) {
-      return $this->metadata[$cid];
+
+    // Make the schema uncacheable if it is configured that way.
+    if (empty($schemaCache)) {
+      return $metadata->mergeCacheMaxAge(0);
     }
 
     // Use the schema cache metadata to determine cache expiry and tags.
