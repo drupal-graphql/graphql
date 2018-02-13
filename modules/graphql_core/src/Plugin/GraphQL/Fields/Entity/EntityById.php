@@ -6,6 +6,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -104,14 +105,13 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
         yield (new CacheableValue(NULL))->addCacheTags($entityType->getListCacheTags());
       }
       else {
+        if (!empty($args['language']) && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
+          $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+        }
+
         /** @var \Drupal\Core\Entity\EntityInterface $entity */
         $access = $entity->access('view', NULL, TRUE);
-
         if ($access->isAllowed()) {
-          if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
-            $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
-          }
-
           yield $entity->addCacheableDependency($access);
         }
         else {

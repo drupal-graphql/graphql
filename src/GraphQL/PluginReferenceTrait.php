@@ -39,6 +39,28 @@ trait PluginReferenceTrait {
   /**
    * {@inheritdoc}
    */
+  public function getPluginDefinition() {
+    if (is_array($this->plugin)) {
+      return $this->plugin['definition'];
+    }
+
+    return $this->getPlugin()->getPluginDefinition();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginId() {
+    if (is_array($this->plugin)) {
+      return $this->plugin['id'];
+    }
+
+    return $this->getPlugin()->getPluginId();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function __sleep() {
     // Instead of serializing the referenced plugin, we just serialize the
     // plugin id and configuration.

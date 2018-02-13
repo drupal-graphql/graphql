@@ -39,4 +39,20 @@ class GraphQLMutation extends GraphQLAnnotationBase {
    */
   public $deprecated = FALSE;
 
+  /**
+   * The cost of this mutation for static query complexitiy analysis.
+   *
+   * @var int|callable|null
+   */
+  public $cost = NULL;
+
+  /**
+   * The cache max age for caching the response.
+   *
+   * Mutations are generally not cacheable.
+   *
+   * @var array
+   */
+  public $response_cache_max_age = 0;
+
 }

@@ -23,4 +23,5 @@ interface SecureFieldInterface {
    *   Boolean value if the field is considered secure or not.
    */
   public function isSecure();
+
 }

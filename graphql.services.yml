@@ -21,6 +21,13 @@ parameters:
     # @default false
     development: false
 
+    # Maximum complexity
+    #
+    # Can be set to an integer to restrict the complexity of your queries.
+    #
+    # @default false
+    max_complexity: false
+
 services:
   # Check access for executing graphql queries.
   access_check.graphql.query:
@@ -50,12 +57,6 @@ services:
       - { name: cache.bin }
     factory: cache_factory:get
     arguments: [graphql_response]
-  cache.graphql_response_metadata:
-    class: Drupal\Core\Cache\CacheBackendInterface
-    tags:
-      - { name: cache.bin }
-    factory: cache_factory:get
-    arguments: [graphql_response_metadata]
 
   # Cache context for graphql request parameters.
   cache_context.gql:
@@ -64,14 +65,17 @@ services:
     tags:
       - { name: cache.context }
 
-  # Schema and processor factory.
+  # Query processor and cache.
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
       - '@graphql.schema_loader'
       - '@current_user'
-      - '%graphql.config%'
+      - '@request_stack'
+      - '@cache.graphql_response'
+      - '@cache_contexts_manager'
 
+  # Schema loader and cache.
   graphql.schema_loader:
     class: Drupal\graphql\GraphQL\Schema\SchemaLoader
     arguments:
@@ -98,44 +102,14 @@ services:
     tags:
         - { name: graphql_query_provider }
 
-  # Service for graphql request caching.
-  graphql.cache_subscriber:
-    class: Drupal\graphql\EventSubscriber\CacheSubscriber
-    arguments:
-      - '@graphql.request_policy'
-      - '@graphql.response_policy'
-      - '@current_route_match'
-      - '@request_stack'
-      - '@cache.graphql_response'
-      - '@cache.graphql_response_metadata'
-      - '@cache_contexts_manager'
-      - '@graphql.schema_loader'
-      - '%graphql.config%'
-    tags:
-      - { name: event_subscriber }
-
+  # Route builder for query routes.
   graphql.query_routes:
     class: Drupal\graphql\Routing\QueryRoutes
     arguments: ['@plugin.manager.graphql.schema']
     tags:
       - { name: 'event_subscriber' }
 
-  # Cache request and response policies for graphql requests.
-  graphql.request_policy:
-    class: Drupal\Core\PageCache\ChainRequestPolicy
-    tags:
-      - { name: service_collector, tag: graphql_request_policy, call: addPolicy }
-  graphql.response_policy:
-    class: Drupal\Core\PageCache\ChainResponsePolicy
-    tags:
-      - { name: service_collector, tag: graphql_response_policy, call: addPolicy }
-    lazy: true
-  graphql.request_policy.deny_command_line:
-    class: Drupal\graphql\Cache\RequestPolicy\DenyCommandLine
-    tags:
-      - { name: graphql_request_policy }
-
-  # Deny caching in the dynamic page cache / page cache.
+  # Deny caching in the dynamic page cache.
   graphql.request_policy.deny_query:
     class: Drupal\graphql\Cache\RequestPolicy\DenyQuery
     tags:

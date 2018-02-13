@@ -15,44 +15,23 @@ class QueryResult implements CacheableDependencyInterface {
   protected $data;
 
   /**
-   * Merged cache metadata from the response and the schema.
+   * The cache metadata from the response and the schema.
    *
    * @var \Drupal\Core\Cache\CacheableDependencyInterface
    */
   protected $metadata;
 
   /**
-   * Cache metadata collected during query execution.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $responseMetadata;
-
-  /**
-   * Static response cache metadata from the schema.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $schemaResponseMetadata;
-
-  /**
    * QueryResult constructor.
    *
    * @param $data
    *   Result data.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $responseMetadata
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
    *   The cache metadata collected during query execution.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $schemaResponseMetadata
-   *   The schema's response cache metadata.
    */
-  public function __construct($data, CacheableDependencyInterface $responseMetadata, CacheableDependencyInterface $schemaResponseMetadata) {
+  public function __construct($data, CacheableDependencyInterface $metadata) {
     $this->data = $data;
-    $this->responseMetadata = $responseMetadata;
-    $this->schemaResponseMetadata = $schemaResponseMetadata;
-
-    $this->metadata = new CacheableMetadata();
-    $this->metadata->addCacheableDependency($responseMetadata);
-    $this->metadata->addCacheableDependency($schemaResponseMetadata);
+    $this->metadata = $metadata;
   }
 
   /**
@@ -84,26 +63,6 @@ class QueryResult implements CacheableDependencyInterface {
    */
   public function getCacheMaxAge() {
     return $this->metadata->getCacheMaxAge();
-  }
-
-  /**
-   * Gets the response cache metadata.
-   *
-   * @return \Drupal\Core\Cache\CacheableDependencyInterface
-   *   The response cache metadata.
-   */
-  public function getResponseMetadata() {
-    return $this->responseMetadata;
-  }
-
-  /**
-   * Gets the schema's response cache metadata.
-   *
-   * @return \Drupal\Core\Cache\CacheableDependencyInterface
-   *   The schema's response cache metadata.
-   */
-  public function getSchemaResponseMetadata() {
-    return $this->schemaResponseMetadata;
   }
 
 }

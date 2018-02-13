@@ -57,13 +57,11 @@ class ImageFieldTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
-      'config:field.storage.node.image',
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
+      'config:field.storage.node.image',
+      'config:image.style.thumbnail',
       'file:1',
       'node:1',
-      'config:image.style.thumbnail',
     ]);
 
     $this->assertResults($this->getQueryFromFile('image.gql'), [

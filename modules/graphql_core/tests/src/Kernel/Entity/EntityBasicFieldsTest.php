@@ -101,9 +101,6 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     ]);
 
     $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
       'node:1',
       'node_list',
       'user:1',

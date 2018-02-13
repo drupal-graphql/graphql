@@ -8,8 +8,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\ComplexFieldInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Youshido\GraphQL\Config\Field\FieldConfig;
 use Youshido\GraphQL\Exception\ResolveException;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -37,7 +39,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityQueryDeriver"
  * )
  */
-class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class EntityQuery extends FieldPluginBase implements ComplexFieldInterface, ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
@@ -57,6 +59,24 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       $pluginDefinition,
       $container->get('entity_type.manager')
     );
+  }
+
+  /**
+   * Calculates the complexity cost of this field.
+   *
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Config\Field\FieldConfig $fieldConfig
+   *   The field config object.
+   * @param int $childScore
+   *   The child score.
+   *
+   * @return int
+   *   The complexity cost of this field.
+   */
+  public static function calculateCost(array $args, FieldConfig $fieldConfig, $childScore = 0) {
+    $limit = (int) (isset($args['limit']) ? $args['limit'] : $fieldConfig->getArgument('limit')->getDefaultValue());
+    return $limit * $childScore;
   }
 
   /**
@@ -381,5 +401,4 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $null = ["BETWEEN", "NOT BETWEEN"];
     return in_array($operator, $null);
   }
-
 }

@@ -11,6 +11,7 @@ use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\ComplexityAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Youshido\GraphQL\Exception\ResolveException;
@@ -25,6 +26,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
   use CacheablePluginTrait;
   use NamedPluginTrait;
   use ArgumentAwarePluginTrait;
+  use ComplexityAwarePluginTrait;
 
   /**
    * The field instance.
@@ -45,6 +47,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
         'description' => $this->buildDescription(),
         'type' => $this->buildType($schemaBuilder),
         'args' => $this->buildArguments($schemaBuilder),
+        'cost' => $this->buildCost(),
         'isDeprecated' => !empty($definition['deprecated']),
         'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
       ];

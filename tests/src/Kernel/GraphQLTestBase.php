@@ -6,7 +6,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
-use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\IntrospectionTestTrait;
 use Drupal\Tests\graphql\Traits\MockSchemaTrait;
@@ -18,7 +17,6 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
  * Base class for GraphQL tests.
  */
 abstract class GraphQLTestBase extends KernelTestBase {
-  use EnableCliCacheTrait;
   use ProphesizePermissionsTrait;
   use MockSchemaTrait;
   use MockTypeSystemTrait;
@@ -67,7 +65,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function defaultCacheTags() {
-    return ['graphql_response', 'graphql_schema'];
+    return ['graphql_response'];
   }
 
   /**

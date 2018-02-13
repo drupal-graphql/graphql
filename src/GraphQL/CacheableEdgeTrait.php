@@ -17,14 +17,14 @@ trait CacheableEdgeTrait {
   /**
    * {@inheritdoc}
    */
-  public function getSchemaCacheMetadata(AbstractSchema $schema) {
+  public function getSchemaCacheMetadata() {
     return $this->getPlugin()->getSchemaCacheMetadata();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getResponseCacheMetadata(AbstractSchema $schema) {
+  public function getResponseCacheMetadata() {
     return $this->getPlugin()->getResponseCacheMetadata();
   }
 

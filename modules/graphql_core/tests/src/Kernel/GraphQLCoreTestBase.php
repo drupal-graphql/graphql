@@ -26,19 +26,4 @@ class GraphQLCoreTestBase extends GraphQLTestBase {
     $this->installEntitySchema('user');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheTags() {
-    // graphql_core derives fields and types from entity information, so the
-    // cache tags are applied to the schema and end up in every result.
-    //
-    // https://github.com/drupal-graphql/graphql/issues/500
-    return array_merge(parent::defaultCacheTags(), [
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
-    ]);
-  }
-
 }

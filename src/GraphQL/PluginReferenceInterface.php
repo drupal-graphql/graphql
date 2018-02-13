@@ -12,4 +12,20 @@ interface PluginReferenceInterface {
    */
   public function getPlugin();
 
+  /**
+   * Retrieves the plugin definition of the referenced plugin.
+   *
+   * @return mixed
+   *   The referenced plugin's definition.
+   */
+  public function getPluginDefinition();
+
+  /**
+   * Retrieves the plugin id of the referenced plugin.
+   *
+   * @return string
+   *   The referenced plugin's id.
+   */
+  public function getPluginId();
+
 }
