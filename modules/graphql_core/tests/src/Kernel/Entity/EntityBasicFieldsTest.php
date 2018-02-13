@@ -78,11 +78,11 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'entityOwner' => [
         'entityLabel' => $user->label(),
       ],
-      'entityTranslation' => [
-        // TODO: Fix this.
-        // 'entityLabel' => $translation->label(),
-        'entityTranslation' => NULL,
-      ],
+      // TODO: Fix this.
+      'entityTranslation' => NULL,
+//      'entityTranslation' => [
+//         'entityLabel' => $translation->label(),
+//      ],
       'entityPublished' => TRUE,
       'entityCreated' => $created,
       'entityChanged' => $changed,
