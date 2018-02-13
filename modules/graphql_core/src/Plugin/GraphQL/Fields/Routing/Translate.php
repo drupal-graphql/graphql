@@ -72,8 +72,9 @@ class Translate extends FieldPluginBase implements ContainerFactoryPluginInterfa
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-      $language =  $this->languageManager->getLanguage($args['language']);
-      yield (clone $value)->setOption('language', $language);
+      $language = $this->languageManager->getLanguage($args['language']);
+      $url = clone $value;
+      yield $url->setOption('language', $language);
     }
   }
 

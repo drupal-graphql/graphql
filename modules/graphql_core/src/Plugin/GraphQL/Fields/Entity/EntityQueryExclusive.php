@@ -40,7 +40,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * )
  */
 class EntityQueryExclusive extends EntityQuery {
-  use DependencySerializationTrait;
 
   /**
    * {@inheritdoc}
