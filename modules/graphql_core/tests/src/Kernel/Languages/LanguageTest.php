@@ -107,6 +107,7 @@ class LanguageTest extends GraphQLCoreTestBase {
   public function testLanguageSwitchLinks() {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheContexts(['languages:language_url']);
 
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
       'route' => [

@@ -26,6 +26,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
       'id' => 'fr',
     ]);
+
     $language->save();
   }
 
@@ -46,7 +47,6 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
    */
   public function testBasicFields() {
     $user = $this->createUser();
-
     $node = $this->createNode([
       'title' => 'Node in default language',
       'type' => 'test',
@@ -81,16 +81,13 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'entityTranslation' => [
         'entityLabel' => $translation->label(),
       ],
-      // EntityPublishedInterface has been added with 8.3.
-      // Below the field will return false.
-      'entityPublished' => version_compare(\Drupal::VERSION, '8.3', '<') ? FALSE : TRUE,
+      'entityPublished' => TRUE,
       'entityCreated' => $created,
       'entityChanged' => $changed,
       'viewAccess' => TRUE,
       'updateAccess' => TRUE,
       'deleteAccess' => FALSE,
     ];
-
 
     $query = $this->getQueryFromFile('basic_fields.gql');
 
