@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\InternalUrl;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -12,12 +12,12 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLField(
- *   id = "internal_url_translate",
+ *   id = "url_translate",
  *   secure = true,
  *   name = "translate",
  *   description = @Translation("The translated url object."),
- *   type = "String",
- *   parents = {"InternalUrl"},
+ *   type = "Url",
+ *   parents = {"Url"},
  *   arguments = {
  *     "language" = "LanguageId!"
  *   }
