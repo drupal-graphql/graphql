@@ -78,11 +78,9 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'entityOwner' => [
         'entityLabel' => $user->label(),
       ],
-      // TODO: Fix this.
-      'entityTranslation' => NULL,
-//      'entityTranslation' => [
-//         'entityLabel' => $translation->label(),
-//      ],
+      'entityTranslation' => [
+        'entityLabel' => $translation->label(),
+      ],
       'entityPublished' => TRUE,
       'entityCreated' => $created,
       'entityChanged' => $changed,
@@ -96,7 +94,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts([
-//      'languages:language_content',
+      'languages:language_content',
       'user.node_grants:view',
     ]);
 
