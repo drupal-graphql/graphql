@@ -57,7 +57,6 @@ class LanguageTest extends GraphQLCoreTestBase {
   public function testLanguageId() {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($this->getQueryFromFile('languages.gql'), [], [
       'languages' => [
@@ -108,6 +107,12 @@ class LanguageTest extends GraphQLCoreTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts(['languages:language_url']);
+    $metadata->addCacheTags([
+      'config:language.entity.en',
+      'config:language.entity.es',
+      'config:language.entity.fr',
+      'config:language.entity.pt-br',
+    ]);
 
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
       'route' => [
@@ -155,5 +160,13 @@ class LanguageTest extends GraphQLCoreTestBase {
         ],
       ],
     ], $metadata);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defaultCacheTags() {
+    $tags = parent::defaultCacheTags();
+    return array_diff($tags, ['entity_bundles']);
   }
 }
