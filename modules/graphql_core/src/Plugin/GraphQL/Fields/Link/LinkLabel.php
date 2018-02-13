@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Link;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;

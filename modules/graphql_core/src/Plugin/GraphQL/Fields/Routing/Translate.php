@@ -1,37 +1,37 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\TypedData\TranslatableInterface;
+use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * @GraphQLField(
- *   id = "entity_translation",
+ *   id = "url_translate",
  *   secure = true,
- *   name = "entityTranslation",
- *   type = "Entity",
- *   parents = {"Entity"},
+ *   name = "translate",
+ *   description = @Translation("The translated url object."),
+ *   type = "Url",
+ *   parents = {"Url"},
  *   arguments = {
  *     "language" = "LanguageId!"
  *   }
  * )
  */
-class EntityTranslation extends FieldPluginBase implements ContainerFactoryPluginInterface {
+class Translate extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
-   * The entity repository.
+   * The language manager service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $entityRepository;
+  protected $languageManager;
 
   /**
    * {@inheritdoc}
@@ -41,12 +41,12 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('entity.repository')
+      $container->get('language_manager')
     );
   }
 
   /**
-   * EntityTranslation constructor.
+   * Alias constructor.
    *
    * @param array $configuration
    *   The plugin configuration array.
@@ -54,20 +54,26 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    LanguageManagerInterface $languageManager
+  ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityRepository = $entityRepository;
+    $this->languageManager = $languageManager;
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof EntityInterface && $value instanceof TranslatableInterface && $value->isTranslatable()) {
-      yield $this->entityRepository->getTranslationFromContext($value, $args['language']);
+    if ($value instanceof Url) {
+      $language =  $this->languageManager->getLanguage($args['language']);
+      yield (clone $value)->setOption('language', $language);
     }
   }
 

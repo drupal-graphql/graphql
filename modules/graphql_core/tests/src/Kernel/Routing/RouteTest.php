@@ -2,8 +2,12 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Path\AliasManagerInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
+use Prophecy\Argument;
 
 /**
  * Test plugin based schema generation.
@@ -23,10 +27,21 @@ class RouteTest extends GraphQLCoreTestBase {
     parent::setUp();
 
     $aliasManager = $this->prophesize(AliasManagerInterface::class);
-    $aliasManager->getPathByAlias('/my/alias')->willReturn('/graphql/test/a');
-    $aliasManager->getAliasByPath('/graphql/test/a')->willReturn('/my/other/alias');
-    $aliasManager->getAliasByPath('/graphql/test/c')->willReturn('/graphql/test/c');
+    $aliasManager
+      ->getAliasByPath('/graphql/test/a', Argument::any())
+      ->willReturn('/my/other/alias');
+
+    $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+    $urlGenerator
+      ->getPathFromRoute('graphql_context_test.a', [])
+      ->willReturn('graphql/test/a');
+
+    $urlGenerator
+      ->generateFromRoute('graphql_context_test.a', [], ['routed_path' => '/graphql/test/a', 'query' => []], TRUE)
+      ->willReturn((new GeneratedUrl())->setGeneratedUrl('/my/other/alias'));
+
     $this->container->set('path.alias_manager', $aliasManager->reveal());
+    $this->container->set('url_generator', $urlGenerator->reveal());
   }
 
   /**
@@ -42,9 +57,9 @@ class RouteTest extends GraphQLCoreTestBase {
 
     $this->assertResults($this->getQueryFromFile('routing.gql'), [], [
       'route' => [
+        'path' => '/my/other/alias',
         'internal' => '/graphql/test/a',
-        'aliased' => '/my/other/alias',
-        'routed' => TRUE,
+        'alias' => '/my/other/alias',
       ],
       'denied' => NULL,
     ], $metadata);

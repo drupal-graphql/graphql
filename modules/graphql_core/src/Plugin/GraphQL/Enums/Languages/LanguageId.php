@@ -70,5 +70,4 @@ class LanguageId extends EnumPluginBase implements ContainerFactoryPluginInterfa
 
     return $values;
   }
-
 }

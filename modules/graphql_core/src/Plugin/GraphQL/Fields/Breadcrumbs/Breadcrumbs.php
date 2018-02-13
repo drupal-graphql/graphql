@@ -14,14 +14,12 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 /**
  * Retrieve the breadcrumbs.
  *
- * TODO: Move this to `InternalUrl` (breaking change).
- *
  * @GraphQLField(
  *   id = "breadcrumb",
  *   secure = true,
  *   name = "breadcrumb",
  *   type = "[Link]",
- *   parents = {"Url"},
+ *   parents = {"InternalUrl"},
  * )
  */
 class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInterface {

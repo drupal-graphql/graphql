@@ -17,9 +17,8 @@ query ($nid: String!) {
         direction
         weight
       }
-      entityRoute:entityUrl {
-        internalPath:path
-        aliasedPath:alias
+      entityUrl {
+        path
       }
       entityOwner {
         entityLabel
