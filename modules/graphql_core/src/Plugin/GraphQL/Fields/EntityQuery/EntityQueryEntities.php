@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -104,13 +105,14 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     if ($value instanceof QueryInterface) {
       $type = $value->getEntityTypeId();
       $result = $value->execute();
+      $context = $value->getMetaData('graphql_context');
 
       if ($value->hasTag('revisions')) {
-        return $this->resolveFromRevisionIds($type, array_keys($result), $args, $info);
+        return $this->resolveFromRevisionIds($type, array_keys($result), $context, $args, $info);
       }
 
       // If this is a revision query, the version ids are the array keys.
-      return $this->resolveFromEntityIds($type, array_values($result), $args, $info);
+      return $this->resolveFromEntityIds($type, array_values($result), $context, $args, $info);
     }
   }
 
@@ -121,6 +123,8 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The entity type.
    * @param array $ids
    *   The entity ids to load.
+   * @param mixed $context
+   *   The query context.
    * @param array $args
    *   The field arguments array.
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
@@ -129,10 +133,10 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    * @return \Closure
    *   The deferred resolver.
    */
-  protected function resolveFromEntityIds($type, $ids, array $args, ResolveInfo $info) {
+  protected function resolveFromEntityIds($type, $ids, $context, array $args, ResolveInfo $info) {
     $resolve = $this->entityBuffer->add($type, $ids);
-    return function($value, array $args, ResolveInfo $info) use ($resolve) {
-      return $this->resolveEntities($resolve(), $args, $info);
+    return function($value, array $args, ResolveInfo $info) use ($resolve, $context) {
+      return $this->resolveEntities($resolve(), $context, $args, $info);
     };
   }
 
@@ -143,6 +147,8 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The entity type.
    * @param array $ids
    *   The entity revision ids to load.
+   * @param mixed $context
+   *   The query context.
    * @param array $args
    *   The field arguments array.
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
@@ -151,13 +157,13 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    * @return \Generator
    *   The resolved revisions.
    */
-  protected function resolveFromRevisionIds($type, $ids, array $args, ResolveInfo $info) {
+  protected function resolveFromRevisionIds($type, $ids, $context, array $args, ResolveInfo $info) {
     $storage = $this->entityTypeManager->getStorage($type);
     $entities = array_map(function ($id) use ($storage) {
       return $storage->loadRevision($id);
     }, $ids);
 
-    return $this->resolveEntities($entities, $args, $info);
+    return $this->resolveEntities($entities, $context, $args, $info);
   }
 
   /**
@@ -165,6 +171,8 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *
    * @param array $entities
    *   The entities to resolve.
+   * @param mixed $context
+   *   The query context.
    * @param array $args
    *   The field arguments array.
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
@@ -173,12 +181,13 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    * @return \Generator
    *   The resolved entities.
    */
-  protected function resolveEntities(array $entities, array $args, ResolveInfo $info) {
+  protected function resolveEntities(array $entities, $context, array $args, ResolveInfo $info) {
+    $language = $this->negotiateLanguage($context, $args, $info);
+
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     foreach ($entities as $entity) {
       // Translate the entity if it is translatable and a language was given.
-      if (!empty($args['language']) && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
-        $language = $args['language'];
+      if ($language && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
         $entity = $this->entityRepository->getTranslationFromContext($entity, $language);
       }
 
@@ -190,6 +199,31 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
         yield new CacheableValue(NULL, [$access]);
       }
     }
+  }
+
+  /**
+   * Negotiate the language for the resolved entities.
+   *
+   * @param mixed $context
+   *   The query context.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return string|null
+   *   The negotiated language id.
+   */
+  protected function negotiateLanguage($context, $args, ResolveInfo $info) {
+    if (!empty($args['language'])) {
+      return $args['language'];
+    }
+
+    if (isset($context['parent']) && ($parent = $context['parent']) && $parent instanceof EntityInterface) {
+      return $parent->language()->getId();
+    }
+
+    return NULL;
   }
 
 }

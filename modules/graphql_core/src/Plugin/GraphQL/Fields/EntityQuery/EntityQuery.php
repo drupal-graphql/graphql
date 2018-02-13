@@ -101,7 +101,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * Retrieve the target entity type of this plugin.
    *
    * @param mixed $value
-   *   The parent entity type.
+   *   The parent value.
    * @param array $args
    *   The field arguments array.
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
@@ -174,9 +174,33 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $query = $entityStorage->getQuery();
     $query->accessCheck(TRUE);
 
+    // The context object can e.g. transport the parent entity language.
+    $query->addMetaData('graphql_context', $this->getQueryContext($value, $args, $info));
+
     return $query;
   }
 
+  /**
+   * Retrieves an arbitrary value to write into the query metadata.
+   *
+   * @param mixed $value
+   *   The parent value.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return mixed
+   *   The query context.
+   */
+  protected function getQueryContext($value, array $args, ResolveInfo $info) {
+    // Forward the whole set of arguments by default.
+    return [
+      'parent' => $value,
+      'args' => $args,
+      'info' => $info,
+    ];
+  }
 
   /**
    * Apply the specified revision filtering mode to the query.
