@@ -74,6 +74,12 @@ class Translate extends FieldPluginBase implements ContainerFactoryPluginInterfa
     if ($value instanceof Url) {
       $language = $this->languageManager->getLanguage($args['language']);
       $url = clone $value;
+
+      // The routed path is cached in the original object. Clear it.
+      if ($url->isRouted() && $url->getOption('routed_path')) {
+        $url->setOption('routed_path', NULL);
+      }
+
       yield $url->setOption('language', $language);
     }
   }
