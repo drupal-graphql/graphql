@@ -11,7 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
  *   fields = {
  *     "field" = "String!",
  *     "direction" = {
- *       "type" = "SortEnum",
+ *       "type" = "SortOrder",
  *       "default" = "DESC"
  *     }
  *   }
