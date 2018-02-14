@@ -1,30 +1,30 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\MenuLink;
 
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
- * Retrieve a menu links label.
+ * Retrieve a menu links route object.
  *
  * @GraphQLField(
- *   id = "menu_link_label",
+ *   id = "menu_link_url",
  *   secure = true,
- *   name = "label",
- *   type = "String",
+ *   name = "url",
+ *   type = "Url",
  *   parents = {"MenuLink"}
  * )
  */
-class MenuLinkLabel extends FieldPluginBase {
+class MenuLinkUrl extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof MenuLinkTreeElement) {
-      yield $value->link->getTitle();
+      yield $value->link->getUrlObject();
     }
   }
 

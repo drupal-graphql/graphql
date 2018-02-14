@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
+namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\ExternalUrl;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -14,7 +14,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * Issue an external request and retrieve the response object.
  *
  * @GraphQLField(
- *   id = "external_request",
+ *   id = "external_url_request",
  *   name = "request",
  *   type = "ExternalResponse",
  *   parents = {"ExternalUrl"}

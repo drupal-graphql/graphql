@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityReference;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery\EntityQuery;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -36,7 +36,7 @@ class EntityReferenceReverse extends EntityQuery {
    * {@inheritdoc}
    */
   public function getBaseQuery($value, array $args, ResolveInfo $info) {
-    if ($value instanceof EntityInterface) {
+    if ($value instanceof ContentEntityInterface) {
       $query = parent::getBaseQuery($value, $args, $info);
 
       // Add the target field condition to the query.

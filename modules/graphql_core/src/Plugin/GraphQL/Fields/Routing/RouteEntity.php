@@ -3,12 +3,15 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
+use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,8 +19,6 @@ use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Retrieve the current routes entity, if it is an entity route.
- *
- * TODO: Move this to `InternalUrl` (breaking change).
  *
  * @GraphQLField(
  *   id = "route_entity",
@@ -46,6 +47,20 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
   protected $languageManager;
 
   /**
+   * The sub-request buffer service.
+   *
+   * @var \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
+   */
+  protected $subrequestBuffer;
+
+  /**
+   * The entity repository service.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
@@ -54,7 +69,9 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       $pluginId,
       $pluginDefinition,
       $container->get('entity_type.manager'),
-      $container->get('language_manager')
+      $container->get('entity.repository'),
+      $container->get('language_manager'),
+      $container->get('graphql.buffer.subrequest')
     );
   }
 
@@ -69,19 +86,26 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
+   * @param \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer $subrequestBuffer
    */
   public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
-    LanguageManagerInterface $languageManager
+    EntityRepositoryInterface $entityRepository,
+    LanguageManagerInterface $languageManager,
+    SubRequestBuffer $subrequestBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
     $this->languageManager = $languageManager;
+    $this->subrequestBuffer = $subrequestBuffer;
+    $this->entityRepository = $entityRepository;
   }
 
   /**
@@ -89,25 +113,84 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   public function resolveValues($value, array $args, ResolveInfo $info) {
     if ($value instanceof Url) {
-      list(, $entityType) = explode('.', $value->getRouteName());
+      list(, $type) = explode('.', $value->getRouteName());
       $parameters = $value->getRouteParameters();
-      $storage = $this->entityTypeManager->getStorage($entityType);
-      $entity = $storage->load($parameters[$entityType]);
-      $language = $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
+      $storage = $this->entityTypeManager->getStorage($type);
 
-      // Attempt to translate the entity.
-      if ($entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
-        $entity = $entity->getTranslation($language);
+      if (!$entity = $storage->load($parameters[$type])) {
+        return $this->resolveMissingEntity($value, $args, $info);
       }
 
-      $access = $entity->access('view', NULL, TRUE);
-      if ($access->isAllowed()) {
-        yield $entity->addCacheableDependency($access);
+      if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
+        return $this->resolveEntityTranslation($entity, $value, $args, $info);
       }
-      else {
-        yield new CacheableValue(NULL, [$access]);
-      }
+
+      return $this->resolveEntity($entity, $value, $args, $info);
     }
   }
 
+  /**
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to resolve.
+   * @param \Drupal\Core\Url $url
+   *   The url of the entity to resolve.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return \Generator
+   */
+  protected function resolveEntity(EntityInterface $entity, Url $url, array $args, ResolveInfo $info) {
+    $access = $entity->access('view', NULL, TRUE);
+    if ($access->isAllowed()) {
+      yield $entity->addCacheableDependency($access);
+    }
+    else {
+      yield new CacheableValue(NULL, [$access]);
+    }
+  }
+
+  /**
+   * Resolves the entity translation from the given url context.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to resolve.
+   * @param \Drupal\Core\Url $url
+   *   The url of the entity to resolve.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return \Closure
+   */
+  protected function resolveEntityTranslation(EntityInterface $entity, Url $url, array $args, ResolveInfo $info) {
+    $resolve = $this->subrequestBuffer->add($url, function () {
+      return $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
+    });
+
+    return function ($value, array $args, ResolveInfo $info) use ($resolve, $entity) {
+      $language = $resolve();
+      $entity = $this->entityRepository->getTranslationFromContext($entity, $language);
+      return $this->resolveEntity($entity, $value, $args, $info);
+    };
+  }
+
+  /**
+   * m
+   *
+   * @param \Drupal\Core\Url $url
+   *   The url of the entity to resolve.
+   * @param array $args
+   *   The field arguments array.
+   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return \Generator
+   */
+  protected function resolveMissingEntity(Url $url, $args, $info) {
+    yield (new CacheableValue(NULL))->addCacheTags(['4xx-response']);
+  }
 }
+
