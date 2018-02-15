@@ -33,7 +33,10 @@ trait ArgumentAwarePluginTrait {
       $definition = $this->getPluginDefinition();
 
       foreach ($definition['arguments'] as $name => $argument) {
-        $type = $this->buildArgumentType($schemaBuilder, $argument);
+        if (!$type = $this->buildArgumentType($schemaBuilder, $argument)) {
+          continue;
+        }
+
         $config = [
           'name' => $name,
           'type' => $type,
@@ -58,17 +61,19 @@ trait ArgumentAwarePluginTrait {
    * @param array|string $argument
    *   The argument definition array or type name.
    *
-   * @return \Youshido\GraphQL\Type\TypeInterface
+   * @return \Youshido\GraphQL\Type\TypeInterface|null
    *   The type object.
    */
   protected function buildArgumentType(PluggableSchemaBuilderInterface $schemaBuilder, $argument) {
     $type = is_array($argument) ? $argument['type'] : $argument;
     return $this->parseType($type, function ($type) use ($schemaBuilder) {
-      return $schemaBuilder->findByDataTypeOrName($type, [
+      $type = $schemaBuilder->findByDataTypeOrName($type, [
         GRAPHQL_INPUT_TYPE_PLUGIN,
         GRAPHQL_SCALAR_PLUGIN,
         GRAPHQL_ENUM_PLUGIN,
-      ])->getDefinition($schemaBuilder);
+      ]);
+
+      return !empty($type) ? $type->getDefinition($schemaBuilder) : $type;
     });
   }
 

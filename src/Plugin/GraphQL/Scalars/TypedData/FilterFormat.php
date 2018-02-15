@@ -6,11 +6,11 @@ use Drupal\graphql\Plugin\GraphQL\Scalars\GraphQLString;
 
 /**
  * @GraphQLScalar(
- *   id = "date_time_iso8601",
- *   name = "DateTimeIso8601",
- *   type = "datetime_iso8601"
+ *   id = "filter_format",
+ *   name = "FilterFormat",
+ *   type = "filter_format"
  * )
  */
-class DateTimeIso8601 extends GraphQLString {
+class FilterFormat extends GraphQLString {
 
 }

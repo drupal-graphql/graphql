@@ -21,20 +21,22 @@ trait TypedPluginTrait {
    * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
    *   Instance of the schema manager to resolve dependencies.
    *
-   * @return \Youshido\GraphQL\Type\TypeInterface
+   * @return \Youshido\GraphQL\Type\TypeInterface|null
    *   The type object.
    */
   protected function buildType(PluggableSchemaBuilderInterface $schemaBuilder) {
     if ($this instanceof PluginInspectionInterface) {
       $definition = $this->getPluginDefinition();
       return $this->parseType($definition['type'], function ($type) use ($schemaBuilder) {
-        return $schemaBuilder->findByDataTypeOrName($type, [
+        $type = $schemaBuilder->findByDataTypeOrName($type, [
           GRAPHQL_SCALAR_PLUGIN,
           GRAPHQL_UNION_TYPE_PLUGIN,
           GRAPHQL_TYPE_PLUGIN,
           GRAPHQL_INTERFACE_PLUGIN,
           GRAPHQL_ENUM_PLUGIN,
-        ])->getDefinition($schemaBuilder);
+        ]);
+
+        return !empty($type) ? $type->getDefinition($schemaBuilder) : NULL;
       });
     }
 
@@ -76,9 +78,13 @@ trait TypedPluginTrait {
       $unwrapped = $matches[2][0];
     }
 
-    return array_reduce($decorators, function ($carry, $current) {
-      return $current($carry);
-    }, $callback($unwrapped));
+    if ($type = $callback($unwrapped)) {
+      return array_reduce($decorators, function ($carry, $current) {
+        return $current($carry);
+      }, $type);
+    }
+
+    return NULL;
   }
 
   /**

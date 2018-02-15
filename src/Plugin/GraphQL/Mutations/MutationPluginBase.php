@@ -33,14 +33,19 @@ abstract class MutationPluginBase extends PluginBase implements TypeSystemPlugin
     if (!isset($this->definition)) {
       $definition = $this->getPluginDefinition();
 
-      $this->definition = new Field($this, $schemaBuilder, [
-        'name' => $this->buildName(),
-        'description' => $this->buildDescription(),
-        'type' => $this->buildType($schemaBuilder),
-        'args' => $this->buildArguments($schemaBuilder),
-        'isDeprecated' => !empty($definition['deprecated']),
-        'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-      ]);
+      if ($type = $this->buildType($schemaBuilder)) {
+        $this->definition = new Field($this, $schemaBuilder, [
+          'name' => $this->buildName(),
+          'description' => $this->buildDescription(),
+          'type' => $type,
+          'isDeprecated' => !empty($definition['deprecated']),
+          'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
+        ]);
+
+        if ($args = $this->buildArguments($schemaBuilder)) {
+          $this->definition->addArguments($args);
+        }
+      }
     }
 
     return $this->definition;

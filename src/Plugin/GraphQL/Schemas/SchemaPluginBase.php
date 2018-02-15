@@ -83,9 +83,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The list of extracted type or field definitions.
    */
   protected function extractDefinitions(array $plugins) {
-    return array_map(function (TypeSystemPluginInterface $plugin) {
+    return array_filter(array_map(function (TypeSystemPluginInterface $plugin) {
       return $plugin->getDefinition($this->schemaBuilder);
-    }, $plugins);
+    }, $plugins));
   }
 
   /**
