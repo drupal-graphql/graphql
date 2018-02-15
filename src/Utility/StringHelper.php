@@ -64,4 +64,29 @@ class StringHelper {
     return "$type!";
   }
 
+  /**
+   * Decorates a type as non-null and/or as a list.
+   *
+   * @param string $type
+   *   The type to declare as non-null.
+   * @param bool $list
+   *   Whether to mark the type as a list.
+   * @param bool $required
+   *   Whether to mark the type as required.
+   *
+   * @return string
+   *   The decorated type.
+   */
+  public static function decorateType($type, $list = FALSE, $required = FALSE) {
+    if (!empty($list)) {
+      $type = static::listType($type);
+    }
+
+    if (!empty($required)) {
+      $type = static::nonNullType($type);
+    }
+
+    return $type;
+  }
+
 }
