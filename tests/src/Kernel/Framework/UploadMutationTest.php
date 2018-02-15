@@ -21,6 +21,12 @@ class UploadMutationTest extends GraphQLTestBase {
     $file = file_directory_temp() . '/graphql_upload_test.txt';
     touch($file);
 
+    // Mock a field because schemas need to have at least one field.
+    $this->mockField('nothing', [
+      'name' => 'nothing',
+      'type' => 'String',
+    ]);
+
     // Mock a mutation that accepts the upload input and just returns
     // the client filename.
     $this->mockMutation('store', [

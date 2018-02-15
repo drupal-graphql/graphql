@@ -73,11 +73,15 @@ query ($path: String!) {
           fieldReference {
             targetId
             entity {
-              title
-              fieldReference {
-                targetId
-                entity {
-                  title
+              ... on NodeTest {
+                title
+                fieldReference {
+                  targetId
+                  entity {
+                    ... on NodeTest {
+                      title
+                    }
+                  }
                 }
               }
             }

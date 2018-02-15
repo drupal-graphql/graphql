@@ -94,9 +94,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
     $metadata = $this->defaultCacheMetaData();
 
     $metadata->addCacheTags([
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
       'node:1',
       'config:field.storage.node.body',
       'config:field.storage.node.field_text',
@@ -112,9 +110,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'config:field.storage.node.field_string',
       'config:field.storage.node.field_timestamp',
       'config:field.storage.node.field_reference',
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
       'file:1',
       'file:2',
     ]);

@@ -26,13 +26,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class RequestController implements ContainerInjectionInterface {
 
   /**
-   * The system.performance config.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $config;
-
-  /**
    * The http kernel.
    *
    * @var \Symfony\Component\HttpKernel\HttpKernelInterface
@@ -68,23 +61,28 @@ class RequestController implements ContainerInjectionInterface {
   protected $schemaLoader;
 
   /**
+   * The service parameters.
+   *
+   * @var array
+   */
+  protected $parameters;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory')->get('system.performance'),
       $container->get('http_kernel'),
       $container->get('request_stack'),
       $container->get('renderer'),
-      $container->get('graphql.query_processor')
+      $container->get('graphql.query_processor'),
+      $container->getParameter('graphql.config')
     );
   }
 
   /**
    * RequestController constructor.
    *
-   * @param \Drupal\Core\Config\Config $config
-   *   The config service.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The http kernel service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -93,19 +91,20 @@ class RequestController implements ContainerInjectionInterface {
    *   The renderer service.
    * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $queryProcessor
    *   The query processor.
+   * @param array $parameters
    */
   public function __construct(
-    Config $config,
     HttpKernelInterface $httpKernel,
     RequestStack $requestStack,
     RendererInterface $renderer,
-    QueryProcessor $queryProcessor
+    QueryProcessor $queryProcessor,
+    array $parameters
   ) {
-    $this->config = $config;
     $this->httpKernel = $httpKernel;
     $this->requestStack = $requestStack;
     $this->renderer = $renderer;
     $this->queryProcessor = $queryProcessor;
+    $this->parameters = $parameters;
   }
 
   /**
@@ -225,7 +224,11 @@ class RequestController implements ContainerInjectionInterface {
     // Evaluating the GraphQL request can potentially invoke rendering. We allow
     // those to "leak" and collect them here in a render context.
     $this->renderer->executeInRenderContext($context, function() use ($schema, $query, $variables, &$result) {
-      $result = $this->queryProcessor->processQuery($schema, $query, $variables);
+      $maxComplexity = !empty($this->parameters['max_complexity']) ? $this->parameters['max_complexity'] : NULL;
+      $useCache = !empty($this->parameters['result_cache']);
+      $bypassSecurity = !empty($this->parameters['development']);
+
+      $result = $this->queryProcessor->processQuery($schema, $query, $variables, $useCache, $maxComplexity, $bypassSecurity);
     });
 
     $response = new CacheableQueryResponse($result);

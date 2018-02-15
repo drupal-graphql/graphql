@@ -59,4 +59,11 @@ class GraphQLField extends GraphQLAnnotationBase {
    */
   public $deprecated = FALSE;
 
+  /**
+   * The cost of this field for static query complexitiy analysis.
+   *
+   * @var int|callable|null
+   */
+  public $cost = NULL;
+
 }

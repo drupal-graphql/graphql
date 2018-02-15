@@ -65,10 +65,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $metadata->setCacheMaxAge(0);
     $metadata->setCacheContexts(['gql']);
 
-    $this->assertErrors('{ root }', [], [
-      'Schema has to have fields',
-      'Field "root" not found in type "RootQuery". Available fields are: "__schema", "__type"',
-    ], $metadata);
+    $this->assertErrors('{ root }', [], ['Schema has to have fields'], $metadata);
   }
 
   /**

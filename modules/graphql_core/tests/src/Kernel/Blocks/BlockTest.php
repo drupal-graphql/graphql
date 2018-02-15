@@ -73,9 +73,7 @@ class BlockTest extends GraphQLCoreTestBase {
       'block_content:1',
       'config:block.block.stark_powered',
       'config:field.storage.block_content.body',
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
     ]);
 
     $this->assertResults($query, [], [

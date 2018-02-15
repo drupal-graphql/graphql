@@ -20,18 +20,24 @@ query ($nid: String!) {
       entityUrl {
         path
       }
-      entityOwner {
-        entityLabel
-      }
       entityTranslation(language: fr) {
         entityLabel
       }
-      entityPublished
       entityCreated
       entityChanged
       viewAccess:entityAccess(operation: "view")
       updateAccess:entityAccess(operation: "update")
       deleteAccess:entityAccess(operation: "delete")
+
+      ... on EntityPublishable {
+        entityPublished
+      }
+
+      ... on EntityOwnable {
+        entityOwner {
+          entityLabel
+        }
+      }
     }
   }
 }
