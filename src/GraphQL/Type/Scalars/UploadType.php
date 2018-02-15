@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\GraphQL\Type;
+namespace Drupal\graphql\GraphQL\Type\Scalars;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Youshido\GraphQL\Type\Scalar\AbstractScalarType;

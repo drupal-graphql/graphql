@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
-use Drupal\graphql\GraphQL\Type\UploadType;
+use Drupal\graphql\GraphQL\Type\Scalars\UploadType;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 
 /**

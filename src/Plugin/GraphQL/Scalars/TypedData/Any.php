@@ -2,28 +2,27 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars\TypedData;
 
-use Drupal\graphql\GraphQL\Type\UndefinedType;
+use Drupal\graphql\GraphQL\Type\Scalars\AnyType;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Scalars\GraphQLString;
 
 /**
  * @GraphQLScalar(
- *   id = "undefined",
- *   name = "Undefined",
- *   type = "undefined"
+ *   id = "any",
+ *   name = "Any",
+ *   type = "any"
  * )
  */
-class Undefined extends ScalarPluginBase {
+class Any extends GraphQLString {
 
   /**
    * {@inheritdoc}
    */
   public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
     if (!isset($this->definition)) {
-      $this->definition = new UndefinedType();
+      $this->definition = new AnyType();
     }
 
     return $this->definition;
   }
-
 }
