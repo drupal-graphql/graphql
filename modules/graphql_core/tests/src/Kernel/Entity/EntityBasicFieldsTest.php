@@ -27,6 +27,10 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'id' => 'fr',
     ]);
 
+    // Enable content translation for the test node type.
+    $this->container->get('content_translation.manager')
+      ->setEnabled('node', 'test', TRUE);
+
     $language->save();
   }
 
@@ -94,7 +98,9 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts([
-      'languages:language_content',
+      // TODO: Do we need the language_content context?
+      // It can change by field, so one query could contain multiple language.
+      // 'languages:language_content',
       'user.node_grants:view',
     ]);
 
