@@ -11,6 +11,7 @@
 * [Introduction](queries/readme.md)
 * [Querying nodes](queries/querying-nodes.md)
 * [Querying taxonomies](queries/querying-taxonomies.md)
+* [Filters](queries/filters.md)
 
 ## Mutations
 
