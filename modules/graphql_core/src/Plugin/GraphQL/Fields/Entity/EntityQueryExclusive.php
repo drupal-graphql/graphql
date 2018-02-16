@@ -6,7 +6,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery\EntityQuery;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Query entities of the same type without the context's entity.

@@ -5,7 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\Response;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Get the response content of an internal or external request.

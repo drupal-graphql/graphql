@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Youshido\GraphQL\Type\Scalar\FloatType;
+use GraphQL\Type\Definition\Type;
 
 /**
  * Scalar float type.
@@ -16,15 +16,5 @@ use Youshido\GraphQL\Type\Scalar\FloatType;
  */
 class GraphQLFloat extends ScalarPluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new FloatType();
-    }
-
-    return $this->definition;
-  }
 }
 

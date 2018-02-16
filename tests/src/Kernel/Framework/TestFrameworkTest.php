@@ -5,7 +5,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Test the test framework.

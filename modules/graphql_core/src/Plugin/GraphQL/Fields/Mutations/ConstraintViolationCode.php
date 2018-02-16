@@ -4,7 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Mutations;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the error code of an entity constraint violation.

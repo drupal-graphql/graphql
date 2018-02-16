@@ -4,7 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Languages;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Whether the language is the default language.

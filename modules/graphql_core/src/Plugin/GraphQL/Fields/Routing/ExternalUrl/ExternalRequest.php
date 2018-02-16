@@ -8,7 +8,7 @@ use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GuzzleHttp\ClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Issue an external request and retrieve the response object.

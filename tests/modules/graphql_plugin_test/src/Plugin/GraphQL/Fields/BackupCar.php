@@ -3,7 +3,7 @@
 namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Fields;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * A car in a car. Not sure what's so funny about that.

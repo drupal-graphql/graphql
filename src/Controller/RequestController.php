@@ -12,7 +12,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
-use Drupal\graphql\Cache\CacheableQueryResponse;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,13 +23,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * Handles GraphQL requests.
  */
 class RequestController implements ContainerInjectionInterface {
-
-  /**
-   * The system.performance config.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
-  protected $config;
 
   /**
    * The http kernel.
@@ -61,18 +53,10 @@ class RequestController implements ContainerInjectionInterface {
   protected $queryProcessor;
 
   /**
-   * The schema loader.
-   *
-   * @var \Drupal\graphql\GraphQL\Schema\SchemaLoader
-   */
-  protected $schemaLoader;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory')->get('system.performance'),
       $container->get('http_kernel'),
       $container->get('request_stack'),
       $container->get('renderer'),
@@ -83,8 +67,6 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * RequestController constructor.
    *
-   * @param \Drupal\Core\Config\Config $config
-   *   The config service.
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
    *   The http kernel service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -95,7 +77,6 @@ class RequestController implements ContainerInjectionInterface {
    *   The query processor.
    */
   public function __construct(
-    Config $config,
     HttpKernelInterface $httpKernel,
     RequestStack $requestStack,
     RendererInterface $renderer,
@@ -228,7 +209,8 @@ class RequestController implements ContainerInjectionInterface {
       $result = $this->queryProcessor->processQuery($schema, $query, $variables);
     });
 
-    $response = new CacheableQueryResponse($result);
+    $response = new CacheableJsonResponse($result->getData());
+    $response->addCacheableDependency($response->getCacheableMetadata());
     // Apply render context cache metadata to the response.
     if (!$context->isEmpty()) {
       $response->addCacheableDependency($context->pop());

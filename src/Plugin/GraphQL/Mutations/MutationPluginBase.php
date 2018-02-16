@@ -3,59 +3,46 @@
 namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Field\Field;
-use Drupal\graphql\GraphQL\SecureFieldInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 
-/**
- * Base class for graphql mutation plugins.
- */
-abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface, SecureFieldInterface {
+abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;
-  use NamedPluginTrait;
+  use TypedPluginTrait;
+  use DescribablePluginTrait;
   use ArgumentAwarePluginTrait;
-
-  /**
-   * The field instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Field\Field
-   */
-  protected $definition;
+  use DeprecatablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $definition = $this->getPluginDefinition();
-
-      if ($type = $this->buildType($schemaBuilder)) {
-        $this->definition = new Field($this, $schemaBuilder, [
-          'name' => $this->buildName(),
-          'description' => $this->buildDescription(),
-          'type' => $type,
-          'isDeprecated' => !empty($definition['deprecated']),
-          'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-        ]);
-
-        if ($args = $this->buildArguments($schemaBuilder)) {
-          $this->definition->addArguments($args);
-        }
-      }
-    }
-
-    return $this->definition;
+  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+    return [
+      'args' => $builder->resolveArgs($definition['args']),
+      'resolve' => function ($args) use ($builder, $id) {
+        $instance = $builder->getPluginInstance(GRAPHQL_MUTATION_PLUGIN, $id);
+        return call_user_func_array([$instance, 'resolve'], $args);
+      },
+    ] + $definition;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isSecure() {
-    return TRUE;
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
+
+    return [
+      'type' => $this->buildType($definition),
+      'description' => $this->buildDescription($definition),
+      'args' => $this->buildArguments($definition),
+      'deprecationReason' => $this->buildDeprecationReason($definition)
+    ];
   }
 
 }

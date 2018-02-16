@@ -5,9 +5,6 @@ namespace Drupal\graphql\Plugin\GraphQL\Traits;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 
-/**
- * Methods for GraphQL plugins that are cacheable.
- */
 trait CacheablePluginTrait {
 
   /**

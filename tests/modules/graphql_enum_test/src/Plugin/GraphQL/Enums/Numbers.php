@@ -36,7 +36,7 @@ class Numbers extends EnumPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
+  public function buildValues(PluggableSchemaBuilderInterface $builder) {
     $values = [];
     foreach (static::$NUMBERS as $num => $word) {
       $values[] = [

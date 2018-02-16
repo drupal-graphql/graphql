@@ -14,7 +14,7 @@ use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the entity result set of an entity query.
@@ -127,7 +127,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Closure
@@ -151,7 +151,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
@@ -175,7 +175,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
@@ -208,7 +208,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return string|null

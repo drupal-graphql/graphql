@@ -4,7 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Fields\Image;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the image width.

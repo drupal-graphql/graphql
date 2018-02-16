@@ -4,7 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\File;
 
 use Drupal\file\FileInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Entity route field override for files.

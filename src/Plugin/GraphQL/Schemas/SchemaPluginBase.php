@@ -5,17 +5,16 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Schema\Schema;
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
+use GraphQL\Type\SchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Schema\InternalSchemaMutationObject;
-use Youshido\GraphQL\Schema\InternalSchemaQueryObject;
 
 abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface {
-
   use DependencySerializationTrait;
 
   /**
@@ -58,19 +57,35 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function getSchema() {
-    $mutation = new InternalSchemaMutationObject(['name' => 'RootMutation']);
-    $mutation->addFields($this->extractDefinitions(($this->getMutations())));
+    $config = new SchemaConfig();
 
-    $query = new InternalSchemaQueryObject(['name' => 'RootQuery']);
-    $query->addFields($this->extractDefinitions($this->getRootFields()));
+    if ($mutations = $this->getMutations()) {
+      $config->setMutation(new ObjectType([
+        'name' => 'MutationRoot',
+        'fields' => function () use ($mutations) {
+          return $this->schemaBuilder->resolveFields($mutations);
+        }
+      ]));
+    }
 
-    $types = $this->extractDefinitions($this->getTypes());
+    if ($query = $this->getRootFields()) {
+      $config->setQuery(new ObjectType([
+        'name' => 'QueryRoot',
+        'fields' => function () use ($query) {
+          return $this->schemaBuilder->resolveFields($query);
+        }
+      ]));
+    }
 
-    return new Schema([
-      'query' => $query,
-      'mutation' => $mutation,
-      'types' => $types,
-    ]);
+    $config->setTypes(function () {
+      return $this->getTypes();
+    });
+
+    $config->setTypeLoader(function ($name) {
+      return $this->schemaBuilder->getTypeByName($name);
+    });
+
+    return new Schema($config);
   }
 
   /**
@@ -95,9 +110,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The list of mutation plugins.
    */
   protected function getMutations() {
-    return $this->schemaBuilder->find(function() {
-      return TRUE;
-    }, [GRAPHQL_MUTATION_PLUGIN]);
+    return $this->schemaBuilder->getMutationMap();
   }
 
   /**
@@ -107,11 +120,18 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The list root field plugins.
    */
   protected function getRootFields() {
-    // Retrieve the list of fields that are not attached to any type or are
-    // explicitly attached to the artificial "Root" type.
-    return $this->schemaBuilder->find(function($definition) {
-      return empty($definition['parents']) || in_array('Root', $definition['parents']);
-    }, [GRAPHQL_FIELD_PLUGIN]);
+    return $this->getFields('Root');
+  }
+
+  /**
+   * Retrieve all fields that are not associated with a specific type.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface[]
+   *   The list root field plugins.
+   */
+  protected function getFields($type) {
+    $map = $this->schemaBuilder->getFieldMap();
+    return isset($map[$type]) ? $map[$type] : [];
   }
 
   /**
@@ -121,14 +141,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The list of types to be registered explicitly.
    */
   protected function getTypes() {
-    return $this->schemaBuilder->find(function() {
-      return TRUE;
-    }, [
-      GRAPHQL_UNION_TYPE_PLUGIN,
-      GRAPHQL_TYPE_PLUGIN,
-      GRAPHQL_INPUT_TYPE_PLUGIN,
-      GRAPHQL_ENUM_PLUGIN,
-    ]);
+    return array_filter(array_map(function ($type) {
+      return $this->schemaBuilder->getTypeByName($type);
+    }, array_keys($this->schemaBuilder->getTypeMap())));
   }
 
 }

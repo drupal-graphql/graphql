@@ -4,7 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\user\EntityOwnerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(

@@ -5,7 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\MenuLink;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve specific attributes of a menu link.

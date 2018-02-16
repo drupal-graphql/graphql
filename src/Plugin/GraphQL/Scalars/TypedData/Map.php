@@ -2,9 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars\TypedData;
 
-use Drupal\graphql\GraphQL\Type\Scalars\MapType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\graphql\Plugin\GraphQL\Scalars\GraphQLString;
 use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
 
 /**
@@ -19,12 +16,25 @@ class Map extends ScalarPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new MapType();
+  public static function serialize($value) {
+    if (is_array($value)) {
+      return json_encode($value);
     }
 
-    return $this->definition;
+    return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function parseValue($value) {
+    return json_decode($value, TRUE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function parseLiteral($ast) {
+    return json_decode($ast->value, TRUE);
+  }
 }

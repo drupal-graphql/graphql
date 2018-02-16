@@ -89,4 +89,39 @@ class StringHelper {
     return $type;
   }
 
+  /**
+   * Parses a type definition from a string and properly decorates it.
+   *
+   * Converts type strings (e.g. [Foo!]) to their object representations.
+   *
+   * @param string $type
+   *   The type string to parse.
+   *
+   * @return array
+   *   The extracted type with the type decorators.
+   */
+  public static function parseType($type) {
+    $decorators = [];
+    $unwrapped = $type;
+    $matches = NULL;
+
+    while (preg_match('/[\[\]!]/', $unwrapped) && preg_match_all('/^(\[?)(.*?)(\]?)(!*?)$/', $unwrapped, $matches)) {
+      if ($unwrapped === $matches[2][0] || empty($matches[1][0]) !== empty($matches[3][0])) {
+        throw new \InvalidArgumentException(sprintf("Invalid type declaration '%s'.", $type));
+      }
+
+      if (!empty($matches[4][0])) {
+        array_unshift($decorators, ['GraphQL\Type\Definition\Type', 'nonNull']);
+      }
+
+      if (!empty($matches[1][0]) && !empty($matches[3][0])) {
+        array_unshift($decorators, ['GraphQL\Type\Definition\Type', 'listOf']);
+      }
+
+      $unwrapped = $matches[2][0];
+    }
+
+    return [$unwrapped, $decorators];
+  }
+
 }

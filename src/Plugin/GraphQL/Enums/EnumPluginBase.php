@@ -3,70 +3,68 @@
 namespace Drupal\graphql\Plugin\GraphQL\Enums;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Type\EnumType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use GraphQL\Type\Definition\EnumType;
 
-/**
- * Base class for enum plugins.
- */
 abstract class EnumPluginBase extends PluginBase implements TypeSystemPluginInterface {
-  use NamedPluginTrait;
+  use DescribablePluginTrait;
   use CacheablePluginTrait;
-
-  /**
-   * The type instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Type\EnumType
-   */
-  protected $definition;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      if ($values = $this->buildValues($schemaBuilder)) {
-        $this->definition = new EnumType($this, $schemaBuilder, [
-          'name' => $this->buildName(),
-          'description' => $this->buildDescription(),
-          'values' => $values,
-        ]);
-      }
-    }
-
-    return $this->definition;
+  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+    return new EnumType($definition);
   }
 
   /**
-   * Build the values for the enum.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   The schema builder.
+   * {@inheritdoc}
+   */
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
+
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'values' => $this->buildEnumValues($definition),
+    ];
+  }
+
+  /**
+   * @param $definition
    *
    * @return array
-   *   The list of possible values for the enum.
    */
-  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
-    $values = $this->getPluginDefinition()['values'];
-    $output = [];
-
-    foreach ($values as $value => $definition) {
-      $item = [
-        'value' => $value,
-        'name' => is_array($definition) ? $definition['name'] : $definition,
+  protected function buildEnumValues($definition) {
+    return array_map(function ($value) use ($definition) {
+      return [
+        'value' => $this->buildEnumValue($value, $definition),
+        'description' => $this->buildEnumDescription($value, $definition),
       ];
+    }, $definition['values']);
+  }
 
-      if (is_array($definition) && !empty($definition['description'])) {
-        $item['description'] = $definition['description'];
-      }
+  /**
+   * @param $value
+   * @param $definition
+   *
+   * @return mixed
+   */
+  protected function buildEnumValue($value, $definition) {
+    return is_array($value) ? $value['value'] : $value;
+  }
 
-      $output[] = $item;
-    }
-
-    return $output;
+  /**
+   * @param $value
+   * @param $definition
+   *
+   * @return string
+   */
+  protected function buildEnumDescription($value, $definition) {
+    return (string) (is_array($value) ? $value['description'] : '');
   }
 
 }

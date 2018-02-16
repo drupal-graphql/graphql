@@ -2,12 +2,14 @@
 
 namespace Drupal\graphql\Plugin\GraphQL;
 
+use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
+/**
+ * TODO: This thing was just quickly put together to make the PoC work. Fix it!
+ */
 class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
-  use DependencySerializationTrait {
-    __sleep as sleepDependencies;
-  }
+  use DependencySerializationTrait;
 
   /**
    * The type system plugin manager aggregator service.
@@ -15,13 +17,6 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
    * @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator
    */
   protected $pluginManagers;
-
-  /**
-   * Static cache of type system plugin instances.
-   *
-   * @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface
-   */
-  protected $instances = [];
 
   /**
    * PluggableSchemaBuilder constructor.
@@ -34,173 +29,240 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * @param $type
+   * @param $id
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface
    */
-  public function getInstance($pluginType, $pluginId, array $pluginConfiguration = []) {
-    $cid = $this->getCacheIdentifier($pluginType, $pluginId, $pluginConfiguration);
-    if (!isset($this->instances[$cid])) {
-      $managers = $this->pluginManagers->getPluginManagers($pluginType);
-      if (empty($managers)) {
-        throw new \LogicException(sprintf('Could not find %s plugin manager for plugin %s.', $pluginType, $pluginId));
+  public function getPluginManager($type, $id) {
+    $managers = $this->pluginManagers->getPluginManagers($type);
+    foreach ($managers as $manager) {
+      if ($manager->hasDefinition($id)) {
+        return $manager;
       }
-
-      // We do not allow plugin configuration for now.
-      $instance = NULL;
-      foreach ($managers as $manager) {
-        if($manager->hasDefinition($pluginId)) {
-          $instance = $manager->createInstance($pluginId, $pluginConfiguration);
-        }
-      }
-
-      if (empty($instance)) {
-        throw new \LogicException(sprintf('Failed to instantiate plugin %s of type %s.', $pluginId, $pluginType));
-      }
-
-      $this->instances[$cid] = $instance;
     }
 
-    return $this->instances[$cid];
+    throw new \LogicException('Could not find plugin manager.');
   }
 
   /**
-   * {@inheritdoc}
+   * @param $type
+   * @param $id
+   *
+   * @return mixed
    */
-  public function find(callable $selector, array $types) {
-    $items = [];
+  public function getPluginDefinition($type, $id) {
+    return $this->getPluginManager($type, $id)->getDefinition($id);
+  }
 
-    /** @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface $manager */
+  /**
+   * @param $type
+   * @param $id
+   *
+   * @return object
+   */
+  public function getPluginInstance($type, $id) {
+    if (!isset($this->plugins[$type][$id])) {
+      return $this->plugins[$type][$id] = $this->getPluginManager($type, $id)->createInstance($id);
+    }
+
+    return $this->plugins[$type][$id];
+  }
+
+  /**
+   * @param $type
+   * @param $id
+   *
+   * @return mixed
+   */
+  public function getDefinition($type, $id) {
+    return $this->getPluginInstance($type, $id)->getDefinition();
+  }
+
+  /**
+   * @param $type
+   * @param $id
+   *
+   * @return mixed
+   */
+  public function getType($type, $id) {
+    if (!isset($this->instances[$type][$id])) {
+      $class = DefaultFactory::getPluginClass($id, $this->getPluginDefinition($type, $id));
+      $definition = $this->getDefinition($type, $id);
+      return $this->instances[$type][$id] = call_user_func([$class, 'createInstance'], $this, $definition, $id);
+    }
+
+    return $this->instances[$type][$id];
+  }
+
+  /**
+   * @return array
+   */
+  public function getTypeMap() {
+    if (isset($this->typeMap)) {
+      return $this->typeMap;
+    }
+
     foreach ($this->pluginManagers as $type => $managers) {
-      if (!in_array($type, $types)) {
+      if ($type === GRAPHQL_FIELD_PLUGIN || $type === GRAPHQL_MUTATION_PLUGIN) {
         continue;
       }
 
+      /** @var \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerInterface $manager */
       foreach ($managers as $manager) {
         foreach ($manager->getDefinitions() as $id => $definition) {
-          $name = $definition['name'];
+          $placeholder = &$this->typeMap[$definition['name']];
 
-          if (!array_key_exists($name, $items) || $items[$name]['weight'] < $definition['weight']) {
-            if ($selector($definition)) {
-              $items[$name] = [
-                'weight' => $definition['weight'],
-                'id' => $id,
-                'type' => $type,
-              ];
+          if (!empty($placeholder)) {
+            $existing = $this->getPluginDefinition($placeholder[0], $placeholder[1]);
+            // Do not override if the existing plugin has a higher weight.
+            if ($existing['weight'] > $definition['weight']) {
+              continue;
             }
           }
-        }
-      }
-    }
 
-    // Sort the plugins so that the ones with higher weight come first.
-    usort($items, function (array $a, array $b) {
-      if ($a['weight'] === $b['weight']) {
-        return 0;
-      }
-
-      return ($a['weight'] < $b['weight']) ? 1 : -1;
-    });
-
-    return array_map(function (array $item) {
-      return $this->getInstance($item['type'], $item['id']);
-    }, $items);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function findByDataType($type, array $types) {
-    $parts = explode(':', $type);
-    $chain = array_reverse(array_reduce($parts, function ($carry, $current) {
-      return array_merge($carry, [implode(':', array_filter([end($carry), $current]))]);
-    }, []), TRUE);
-
-    $result = $this->find(function($definition) use ($chain) {
-      if (!empty($definition['type'])) {
-        foreach ($chain as $priority => $part) {
-          if ($definition['type'] === $part) {
-            return TRUE;
+          $placeholder = [$type, $id];
+          if (isset($definition['type'])) {
+            $this->typeMap[$definition['type']] = &$placeholder;
           }
         }
       }
+    }
 
-      return FALSE;
-    }, $types);
-
-    return array_pop($result);
-  }
-
-  public function findByName($name, array $types) {
-    $result = $this->find(function($definition) use ($name) {
-      return $definition['name'] === $name;
-    }, $types);
-
-    return array_pop($result);
+    return $this->typeMap = array_filter($this->typeMap);
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function findByDataTypeOrName($input, array $types) {
-    if ($type = $this->findByDataType($input, $types)) {
-      return $type;
-    }
-
-    if ($type = $this->findByName($input, $types)) {
-      return $type;
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Creates a plugin instance cache identifier.
-   *
-   * @param string $pluginType
-   *   The plugin type.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param array $pluginConfiguration
-   *   The plugin configuration.
-   *
-   * @return string
-   */
-  protected function getCacheIdentifier($pluginType, $pluginId, array $pluginConfiguration) {
-    if (empty($pluginConfiguration)) {
-      return "$pluginType:::$pluginId";
-    }
-
-    $configCid = md5(serialize($this->sortRecursive($pluginConfiguration)));
-    return "$pluginType:::$pluginId:::$configCid";
-  }
-
-  /**
-   * Recursively sorts an array.
-   *
-   * Useful for generating a cache identifiers.
-   *
-   * @param array $subject
-   *   The array to sort.
-   *
    * @return array
-   *   The sorted array.
    */
-  protected function sortRecursive(array $subject) {
-    asort($subject);
-    foreach ($subject as $key => $item) {
-      if (is_array($item)) {
-        $subject[$key] = $this->sortRecursive($item);
+  public function getFieldMap() {
+    if (isset($this->fieldMap)) {
+      return $this->fieldMap;
+    }
+
+    $this->fieldMap = [];
+    foreach ($this->pluginManagers->getPluginManagers(GRAPHQL_FIELD_PLUGIN) as $manager) {
+      foreach ($manager->getDefinitions() as $id => $definition) {
+        $parents = $definition['parents'] ?: ['Root'];
+
+        foreach ($parents as $parent) {
+          $placeholder = &$this->fieldMap[$parent][$definition['name']];
+
+          if (!empty($placeholder)) {
+            // Do not override if the existing plugin has a higher weight.
+            $existing = $this->getPluginDefinition(GRAPHQL_FIELD_PLUGIN, $placeholder);
+            if ($existing['weight'] > $definition['weight']) {
+              continue;
+            }
+          }
+
+          $placeholder = $id;
+        }
       }
     }
 
-    return $subject;
+    return $this->fieldMap;
   }
 
   /**
-   * {@inheritdoc}
+   * @return array
    */
-  public function __sleep() {
-    // Don't write the plugin instances into the cache.
-    return array_diff($this->sleepDependencies(), ['instances']);
+  public function getMutationMap() {
+    if (isset($this->mutationMap)) {
+      return $this->mutationMap;
+    }
+
+    $this->mutationMap = [];
+    foreach ($this->pluginManagers->getPluginManagers(GRAPHQL_MUTATION_PLUGIN) as $manager) {
+      foreach ($manager->getDefinitions() as $id => $definition) {
+        $placeholder = &$this->mutationMap[$definition['name']];
+
+        if (!empty($placeholder)) {
+          // Do not override if the existing plugin has a higher weight.
+          $existing = $this->getPluginDefinition(GRAPHQL_MUTATION_PLUGIN, $placeholder);
+          if ($existing['weight'] > $definition['weight']) {
+            continue;
+          }
+        }
+
+        $placeholder = $id;
+      }
+    }
+
+    return $this->mutationMap;
+  }
+
+  /**
+   * @param $name
+   *
+   * @return mixed
+   */
+  public function getTypeByName($name) {
+    $map = $this->getTypeMap();
+    if (isset($map[$name])) {
+      return $this->getType($map[$name][0], $map[$name][1]);
+    }
+
+    while (($pos = strpos($name, ':')) !== FALSE && $name = substr($name, 0, $pos)) {
+      if (isset($map[$name])) {
+        return $this->getType($map[$name][0], $map[$name][1]);
+      }
+    }
+
+    throw new \LogicException('Could not find type in type map.');
+  }
+
+  /**
+   * @param $name
+   *
+   * @return array
+   */
+  public function getFieldsByType($name) {
+    $map = $this->getFieldMap();
+    if (empty($map[$name])) {
+      return [];
+    }
+
+    return $this->resolveFields($map[$name]);
+  }
+
+  /**
+   * @param $fields
+   *
+   * @return array
+   */
+  public function resolveFields($fields) {
+    return array_map(function ($id) use ($fields) {
+      $field = $this->getType(GRAPHQL_FIELD_PLUGIN, $id);
+      list($type, $decorators) = $field['type'];
+
+      $type = array_reduce($decorators, function ($a, $decorator) use ($type) {
+        return $decorator($a);
+      }, $this->getTypeByName($type));
+
+      return [
+        'type' => $type,
+      ] + $field;
+    }, $fields);
+  }
+
+  /**
+   * @param $args
+   *
+   * @return array
+   */
+  public function resolveArgs($args) {
+    return array_map(function ($arg) {
+      list($type, $decorators) = $arg['type'];
+
+      $type = array_reduce($decorators, function ($a, $decorator) use ($type) {
+        return $decorator($a);
+      }, $this->getTypeByName($type));
+
+      return [
+        'type' => $type,
+      ] + $arg;
+    }, $args);
   }
 
 }

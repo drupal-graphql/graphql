@@ -3,42 +3,37 @@
 namespace Drupal\graphql\Plugin\GraphQL\Interfaces;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Type\InterfaceType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use GraphQL\Type\Definition\InterfaceType;
 
-/**
- * Base class for GraphQL interface plugins.
- */
 abstract class InterfacePluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;
-  use NamedPluginTrait;
-  use FieldablePluginTrait;
-
-  /**
-   * The type instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Type\InterfaceType
-   */
-  protected $definition;
+  use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new InterfaceType($this, $schemaBuilder, [
-        'name' => $this->buildName(),
-        'description' => $this->buildDescription(),
-      ]);
+  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+    return new InterfaceType([
+      'fields' => function () use ($builder, $definition) {
+        return $builder->getFieldsByType($definition['name']);
+      }
+    ] + $definition);
+  }
 
-      $this->definition->addFields($this->buildFields($schemaBuilder));
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
 
-    return $this->definition;
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+    ];
   }
 
 }

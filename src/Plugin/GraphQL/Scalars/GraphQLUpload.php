@@ -2,9 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
-use Drupal\graphql\GraphQL\Type\Scalars\UploadType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-
 /**
  * @GraphQLScalar(
  *   id = "upload",
@@ -16,11 +13,22 @@ class GraphQLUpload extends ScalarPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new UploadType();
-    }
-
-    return $this->definition;
+  public static function serialize($value) {
+    throw new \LogicException('Cannot serialize uploaded files.');
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function parseValue($value) {
+    return $value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function parseLiteral($ast) {
+    throw new \LogicException('Uploaded files have to be referenced in variables.');
+  }
+
 }

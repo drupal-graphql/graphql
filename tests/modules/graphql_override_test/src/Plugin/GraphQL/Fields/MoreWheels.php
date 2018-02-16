@@ -3,7 +3,7 @@
 namespace Drupal\graphql_override_test\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_plugin_test\Plugin\GraphQL\Fields\Wheels;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Replace existing "wheels" field with ... one more wheel.

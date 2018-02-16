@@ -7,9 +7,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Traversable;
 
-/**
- * Base class for type system plugin managers or all sorts.
- */
 class TypeSystemPluginManager extends DefaultPluginManager implements TypeSystemPluginManagerInterface {
   use DependencySerializationTrait;
 

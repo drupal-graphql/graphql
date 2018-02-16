@@ -2,7 +2,7 @@
 
 This module lets you craft and expose a [GraphQL] schema for [Drupal 8].
 
-It is is built around https://github.com/Youshido/GraphQL. As such, it supports
+It is is built around https://github.com/webonyx/graphql-php. As such, it supports
 the full official GraphQL specification with all its features.
 
 You can use this module as a foundation for building your own schema through

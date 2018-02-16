@@ -10,7 +10,7 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
   /**
    * Retrieves the schema.
    *
-   * @return \Youshido\GraphQL\Schema\AbstractSchema
+   * @return \GraphQL\Type\Schema
    *   The schema.
    */
   public function getSchema();

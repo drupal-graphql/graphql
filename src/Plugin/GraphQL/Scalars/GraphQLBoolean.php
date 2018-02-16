@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Youshido\GraphQL\Type\Scalar\BooleanType;
+use GraphQL\Type\Definition\Type;
 
 /**
  * Scalar boolean type.
@@ -16,14 +16,4 @@ use Youshido\GraphQL\Type\Scalar\BooleanType;
  */
 class GraphQLBoolean extends ScalarPluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new BooleanType();
-    }
-
-    return $this->definition;
-  }
 }

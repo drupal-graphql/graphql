@@ -56,14 +56,13 @@ class ImageStyleId extends EnumPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
+  public function buildEnumValues($definition) {
     $items = [];
 
     $storage = $this->entityTypeManager->getStorage('image_style');
     foreach ($storage->loadMultiple() as $imageStyle) {
-      $items[$imageStyle->id()] = [
+      $items[strtoupper($imageStyle->id())] = [
         'value' => $imageStyle->id(),
-        'name' => $imageStyle->id(),
         'description' => $imageStyle->label(),
       ];
     }

@@ -9,20 +9,20 @@ use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
  *   id = "query_operator",
  *   name = "QueryOperator",
  *   values = {
- *     "=" = "EQUAL",
- *     "<>" = "NOT_EQUAL",
- *     "<" = "SMALLER_THAN",
- *     "<=" = "SMALLER_THAN_OR_EQUAL",
- *     ">" = "GREATER_THAN",
- *     ">=" = "GREATER_THAN_OR_EQUAL",
+ *     "EQUAL" = "=",
+ *     "NOT_EQUAL" = "<>",
+ *     "SMALLER_THAN" = "<",
+ *     "SMALLER_THAN_OR_EQUAL" = "<=",
+ *     "GREATER_THAN" = ">",
+ *     "GREATER_THAN_OR_EQUAL" = ">=",
  *     "IN" = "IN",
- *     "NOT IN" = "NOT_IN",
+ *     "NOT_IN" = "NOT IN",
  *     "LIKE" = "LIKE",
- *     "NOT LIKE" = "NOT_LIKE",
+ *     "NOT_LIKE" = "NOT LIKE",
  *     "BETWEEN" = "BETWEEN",
- *     "NOT BETWEEN" = "NOT_BETWEEN",
- *     "IS NULL" = "IS_NULL",
- *     "IS NOT NULL" = "IS_NOT_NULL"
+ *     "NOT_BETWEEN" = "NOT BETWEEN",
+ *     "IS_NULL" = "IS NULL",
+ *     "IS_NOT_NULL" = "IS NOT NULL"
  *   }
  * )
  */

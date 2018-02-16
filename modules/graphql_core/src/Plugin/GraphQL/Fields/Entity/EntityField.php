@@ -5,7 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(

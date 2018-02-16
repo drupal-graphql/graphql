@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class CreateEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
@@ -85,7 +85,7 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    *
    * @param array $args
    *   The entity values provided through the resolver args.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   the resolve info object.
    *
    * @return array
@@ -104,7 +104,7 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    *   The created entity.
    * @param array $args
    *   The arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return mixed

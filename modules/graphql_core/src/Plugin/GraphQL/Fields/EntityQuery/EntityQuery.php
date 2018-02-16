@@ -9,9 +9,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use GraphQL\Error\Error;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Exception\ResolveException;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -104,7 +104,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent value.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return string|null
@@ -130,7 +130,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent entity type.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
@@ -162,7 +162,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent entity type.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
@@ -187,7 +187,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent value.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return mixed
@@ -278,7 +278,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * @return \Drupal\Core\Entity\Query\ConditionInterface
    *   The generated condition group according to the given filter definitions.
    *
-   * @throws \Youshido\GraphQL\Exception\ResolveException
+   * @throws \GraphQL\Error\Error
    *   If the given operator and value for a filter are invalid.
    */
   protected function buildFilterConditions(QueryInterface $query, array $filter) {
@@ -295,12 +295,12 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
 
       // We need at least a value or an operator.
       if (empty($operator) && empty($value)) {
-        throw new ResolveException(sprintf("Missing value and operator in filter for '%s'.", $field));
+        throw new Error(sprintf("Missing value and operator in filter for '%s'.", $field));
       }
       // Unary operators need a single value.
       else if (!empty($operator) && $this->isUnaryOperator($operator)) {
         if (empty($value) || count($value) > 1) {
-          throw new ResolveException(sprintf("Unary operators must be associated with a single value (field '%s').", $field));
+          throw new Error(sprintf("Unary operators must be associated with a single value (field '%s').", $field));
         }
 
         // Pick the first item from the values.
@@ -309,13 +309,13 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       // Range operators need exactly two values.
       else if (!empty($operator) && $this->isRangeOperator($operator)) {
         if (empty($value) || count($value) !== 2) {
-          throw new ResolveException(sprintf("Range operators must require exactly two values (field '%s').", $field));
+          throw new Error(sprintf("Range operators must require exactly two values (field '%s').", $field));
         }
       }
       // Null operators can't have a value set.
       else if (!empty($operator) && $this->isNullOperator($operator)) {
         if (!empty($value)) {
-          throw new ResolveException(sprintf("Null operators must not be associated with a filter value (field '%s').", $field));
+          throw new Error(sprintf("Null operators must not be associated with a filter value (field '%s').", $field));
         }
       }
 

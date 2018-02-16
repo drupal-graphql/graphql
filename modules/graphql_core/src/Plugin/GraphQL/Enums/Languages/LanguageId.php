@@ -57,12 +57,12 @@ class LanguageId extends EnumPluginBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
-    $values = [];
+  public function buildEnumValues($definition) {
+    $values = parent::buildEnumValues($definition);
 
     foreach ($this->languageManager->getLanguages() as $language) {
-      $values[] = [
-        'name' => str_replace('-', '_', $language->getId()),
+      $name = str_replace('-', '_', $language->getId());
+      $values[strtoupper($name)] = [
         'value' => $language->getId(),
         'description' => $language->getName(),
       ];

@@ -3,7 +3,7 @@
 namespace Drupal\graphql_override_test\Plugin\GraphQL\Fields;
 
 use Drupal\graphql_plugin_test\Plugin\GraphQL\Fields\EchoChamber;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * This field will replace the existing "echo" field with a CAPSLOCK version.

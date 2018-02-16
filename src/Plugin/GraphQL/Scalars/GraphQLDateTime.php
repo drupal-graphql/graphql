@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
 use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Youshido\GraphQL\Type\Scalar\DateTimeType;
+use GraphQL\Type\Definition\Type;
 
 /**
  * Scalar string type.
@@ -15,14 +15,4 @@ use Youshido\GraphQL\Type\Scalar\DateTimeType;
  */
 class GraphQLDateTime extends ScalarPluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new DateTimeType();
-    }
-
-    return $this->definition;
-  }
 }

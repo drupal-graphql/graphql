@@ -15,7 +15,7 @@ use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the current routes entity, if it is an entity route.
@@ -136,7 +136,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The url of the entity to resolve.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
@@ -160,7 +160,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The url of the entity to resolve.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Closure
@@ -184,7 +184,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The url of the entity to resolve.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator

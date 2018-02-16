@@ -3,7 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\LanguageSwitch;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(

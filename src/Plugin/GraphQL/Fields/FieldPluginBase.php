@@ -4,75 +4,63 @@ namespace Drupal\graphql\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\graphql\GraphQL\Field\Field;
-use Drupal\graphql\GraphQL\SecureFieldInterface;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Exception\ResolveException;
-use Youshido\GraphQL\Execution\DeferredResolver;
-use Youshido\GraphQL\Execution\ResolveInfo;
-use Youshido\GraphQL\Type\ListType\ListType;
+use GraphQL\Deferred;
+use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Base class for field plugins.
- */
-abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInterface, SecureFieldInterface {
+abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;
-  use NamedPluginTrait;
+  use DescribablePluginTrait;
+  use TypedPluginTrait;
   use ArgumentAwarePluginTrait;
-
-  /**
-   * The field instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Field\Field
-   */
-  protected $definition;
+  use DeprecatablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $definition = $this->getPluginDefinition();
-
-      if ($type = $this->buildType($schemaBuilder)) {
-        $this->definition = new Field($this, $schemaBuilder, [
-          'name' => $this->buildName(),
-          'description' => $this->buildDescription(),
-          'type' => $type,
-          'isDeprecated' => !empty($definition['deprecated']),
-          'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-        ]);
-
-        if ($args = $this->buildArguments($schemaBuilder)) {
-          $this->definition->addArguments($args);
-        }
-      }
-    }
-
-    return $this->definition;
+  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+    return [
+      'args' => $builder->resolveArgs($definition['args']),
+      'resolve' => function ($value, array $args, $context, ResolveInfo $info) use ($builder, $id) {
+        $instance = $builder->getPluginInstance(GRAPHQL_FIELD_PLUGIN, $id);
+        return $instance->resolve($value, $args, $context, $info);
+      },
+    ] + $definition;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isSecure() {
-    return isset($this->getPluginDefinition()['secure']) && $this->getPluginDefinition()['secure'];
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
+
+    return [
+      'type' => $this->buildType($definition),
+      'description' => $this->buildDescription($definition),
+      'args' => $this->buildArguments($definition),
+      'deprecationReason' => $this->buildDeprecationReason($definition),
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, $context, ResolveInfo $info) {
     // If not resolving in a trusted environment, check if the field is secure.
-    $container = $info->getExecutionContext()->getContainer();
-    if ($container->has('secure') && !$container->get('secure') && !$this->isSecure()) {
-      throw new ResolveException(sprintf("Unable to resolve insecure field '%s'.", $info->getField()->getName()));
+    if (isset($context['secure']) && empty($context['secure'])) {
+      $definition = $this->getPluginDefinition();
+      if (empty($definition['secure'])) {
+        throw new \Exception(sprintf("Unable to resolve insecure field '%s'.", $info->fieldName));
+      }
     }
 
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
@@ -84,7 +72,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveInfo $info) {
     $result = $callback($value, $args, $info);
     if (is_callable($result)) {
-      return new DeferredResolver(function () use ($result, $args, $info, $value) {
+      return new Deferred(function () use ($result, $args, $info, $value) {
         return $this->resolveDeferred($result, $value, $args, $info);
       });
     }
@@ -92,15 +80,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
     // Extract the result array.
     $result = iterator_to_array($result);
 
-    // Commit the cache dependencies into the processor's cache collector.
-    if ($dependencies = $this->getCacheDependencies($result, $value, $args, $info)) {
-      $container = $info->getExecutionContext()->getContainer();
-      if ($container->has('metadata') && $metadata = $container->get('metadata')) {
-        if ($metadata instanceof RefinableCacheableDependencyInterface) {
-          array_walk($dependencies, [$metadata, 'addCacheableDependency']);
-        }
-      }
-    }
+    // TODO: Extract cache dependencies.
 
     return $this->unwrapResult($result, $info);
   }
@@ -110,7 +90,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
    *
    * @param array $result
    *   The resolved values.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return mixed
@@ -123,8 +103,8 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
     }, $result);
 
     // If this is a list, return the result as an array.
-    $type = $info->getReturnType()->getNullableType();
-    if ($type instanceof ListType) {
+    $type = $info->returnType;
+    if ($type instanceof ListOfType || ($type instanceof NonNull && $type->getWrappedType() instanceof ListOfType)) {
       return $result;
     }
 
@@ -140,7 +120,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
    *   The parent value.
    * @param array $args
    *   The arguments passed to the field.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return array
@@ -162,7 +142,7 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
    *   The current object value.
    * @param array $args
    *   Field arguments.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator

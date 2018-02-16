@@ -2,79 +2,53 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Traits;
 
-use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Youshido\GraphQL\Field\InputField;
+use Drupal\graphql\Utility\StringHelper;
 
-/**
- * Methods for argument aware plugins.
- */
 trait ArgumentAwarePluginTrait {
-  use TypedPluginTrait;
 
   /**
-   * {@inheritdoc}
-   */
-  abstract public function getPluginDefinition();
-
-  /**
-   * Build the arguments list.
+   * @param $definition
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   Instance of the schema manager to resolve dependencies.
-   *
-   * @return \Youshido\GraphQL\Field\InputFieldInterface[]
-   *   The list of arguments.
+   * @return array
    */
-  protected function buildArguments(PluggableSchemaBuilderInterface $schemaBuilder) {
-    $arguments = [];
-
-    if ($this instanceof PluginInspectionInterface) {
-      $definition = $this->getPluginDefinition();
-
-      foreach ($definition['arguments'] as $name => $argument) {
-        if (!$type = $this->buildArgumentType($schemaBuilder, $argument)) {
-          continue;
-        }
-
-        $config = [
-          'name' => $name,
-          'type' => $type,
-        ];
-
-        if (is_array($argument) && isset($argument['default'])) {
-          $config['defaultValue'] = $argument['default'];
-        }
-
-        $arguments[$name] = new InputField($config);
-      }
-    }
-
-    return $arguments;
+  protected function buildArguments($definition) {
+    return array_map(function ($argument) use ($definition) {
+      return [
+        'type' => $this->buildArgumentType($argument, $definition),
+        'description' => $this->buildArgumentDescription($argument, $definition),
+        'defaultValue' => $this->buildArgumentDefault($argument, $definition),
+      ];
+    }, $definition['arguments']);
   }
 
   /**
-   * Build the argument type.
+   * @param $argument
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   Instance of the schema manager to resolve dependencies.
-   * @param array|string $argument
-   *   The argument definition array or type name.
-   *
-   * @return \Youshido\GraphQL\Type\TypeInterface|null
-   *   The type object.
+   * @return array
    */
-  protected function buildArgumentType(PluggableSchemaBuilderInterface $schemaBuilder, $argument) {
+  protected function buildArgumentType($argument) {
     $type = is_array($argument) ? $argument['type'] : $argument;
-    return $this->parseType($type, function ($type) use ($schemaBuilder) {
-      $type = $schemaBuilder->findByDataTypeOrName($type, [
-        GRAPHQL_INPUT_TYPE_PLUGIN,
-        GRAPHQL_SCALAR_PLUGIN,
-        GRAPHQL_ENUM_PLUGIN,
-      ]);
+    return StringHelper::parseType($type);
+  }
 
-      return !empty($type) ? $type->getDefinition($schemaBuilder) : $type;
-    });
+  /**
+   * @param $argument
+   * @param $definition
+   *
+   * @return string
+   */
+  protected function buildArgumentDescription($argument, $definition) {
+    return (string) (isset($argument['description']) ? $argument['description'] : '');
+  }
+
+  /**
+   * @param $argument
+   * @param $definition
+   *
+   * @return null
+   */
+  protected function buildArgumentDefault($argument, $definition) {
+    return isset($argument['default']) ? $argument['default'] : NULL;
   }
 
 }

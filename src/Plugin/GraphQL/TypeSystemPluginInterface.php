@@ -11,15 +11,21 @@ use Drupal\Component\Plugin\DerivativeInspectionInterface;
 interface TypeSystemPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder $builder
+   * @param $definition
+   * @param $id
+   *
+   * @return mixed
+   */
+  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id);
+
+  /**
    * Returns the plugin's type or field definition for the schema.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   The schema builder.
-   *
-   * @return \Youshido\GraphQL\Field\AbstractField|\Youshido\GraphQL\Type\AbstractType
+   * @return array
    *   The type or field definition of the plugin.
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder);
+  public function getDefinition();
 
   /**
    * Returns the cache metadata affecting the schema.
