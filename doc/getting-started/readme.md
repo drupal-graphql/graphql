@@ -1,12 +1,12 @@
-#Getting Started
+# Getting Started
 
-##Introduction
+## Introduction
 
 The GraphQL Drupal module lets you query or mutate (update/delete)  any content or configuration using the official GraphQL query language. This is an extremely powerful tool which opens the door for Drupal to be used in a multitude of applications.
 
 
 
-##Who is this module for? 
+## Who is this module for? 
 
 Anyone who wants to get JSON data out of Drupal. 
 
@@ -17,7 +17,7 @@ Just a few examples of where the GraphQL module could be used:
 * Mobile applications that need a persistent data store
 * IOT data storage
 
-##Hello World (Quick Start)
+## Hello World (Quick Start)
 
 1. Familiarize yourself with the GraphQL language. The official GraphQL docs are very well written. 
 http://graphql.org/learn/
