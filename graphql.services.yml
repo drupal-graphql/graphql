@@ -42,8 +42,9 @@ services:
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
-      - '@plugin.manager.graphql.schema'
+      - '@renderer'
       - '@current_user'
+      - '@plugin.manager.graphql.schema'
       - '@graphql.query_provider'
       - '%graphql.config%'
 

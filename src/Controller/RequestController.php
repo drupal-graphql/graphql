@@ -25,13 +25,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class RequestController implements ContainerInjectionInterface {
 
   /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * The query processor.
    *
    * @var \Drupal\graphql\GraphQL\Execution\QueryProcessor
@@ -42,25 +35,16 @@ class RequestController implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('renderer'),
-      $container->get('graphql.query_processor')
-    );
+    return new static($container->get('graphql.query_processor'));
   }
 
   /**
    * RequestController constructor.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
    * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor
    *   The query processor.
    */
-  public function __construct(
-    RendererInterface $renderer,
-    QueryProcessor $processor
-  ) {
-    $this->renderer = $renderer;
+  public function __construct(QueryProcessor $processor) {
     $this->processor = $processor;
   }
 
@@ -76,23 +60,9 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleRequest($schema, $operations) {
-    /** @var \Drupal\graphql\GraphQL\Execution\QueryResult $result */
-    $result = NULL;
-    $context = new RenderContext();
-
-    // Evaluating the GraphQL request can potentially invoke rendering. We allow
-    // those to "leak" and collect them here in a render context.
-    $this->renderer->executeInRenderContext($context, function() use ($schema, $operations, &$result) {
-      $result = $this->processor->processQuery($schema, $operations);
-    });
-
-    $response = new CacheableJsonResponse($result->getData());
-    $response->addCacheableDependency($response->getCacheableMetadata());
-    // Apply render context cache metadata to the response.
-    if (!$context->isEmpty()) {
-      $response->addCacheableDependency($context->pop());
-    }
-
+    $result = $this->processor->processQuery($schema, $operations);
+    $response = new CacheableJsonResponse($result);
+    $response->addCacheableDependency($result);
     return $response;
   }
 }

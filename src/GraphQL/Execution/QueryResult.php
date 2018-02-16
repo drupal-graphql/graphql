@@ -4,7 +4,7 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 
-class QueryResult implements CacheableDependencyInterface {
+class QueryResult implements CacheableDependencyInterface, \JsonSerializable {
 
   /**
    * The query result.
@@ -19,7 +19,6 @@ class QueryResult implements CacheableDependencyInterface {
    * @var \Drupal\Core\Cache\CacheableDependencyInterface
    */
   protected $metadata;
-
 
   /**
    * QueryResult constructor.
@@ -65,4 +64,10 @@ class QueryResult implements CacheableDependencyInterface {
     return $this->metadata->getCacheMaxAge();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function jsonSerialize() {
+    return $this->getData();
+  }
 }

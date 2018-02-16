@@ -4,6 +4,8 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
@@ -55,25 +57,36 @@ class QueryProcessor {
   protected $queryProvider;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * QueryProcessor constructor.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $pluginManager
-   *   The schema plugin manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
+   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $pluginManager
+   *   The schema plugin manager.
    * @param \Drupal\graphql\QueryProvider\QueryProviderInterface $queryProvider
    *   The query provider service.
    * @param array $parameters
    *   The graphql container parameters.
    */
   public function __construct(
-    SchemaPluginManager $pluginManager,
+    RendererInterface $renderer,
     AccountProxyInterface $currentUser,
+    SchemaPluginManager $pluginManager,
     QueryProviderInterface $queryProvider,
     array $parameters
   ) {
-    $this->pluginManager = $pluginManager;
+    $this->renderer = $renderer;
     $this->currentUser = $currentUser;
+    $this->pluginManager = $pluginManager;
     $this->queryProvider = $queryProvider;
     $this->parameters = $parameters;
     $this->helper = new Helper();
@@ -89,8 +102,8 @@ class QueryProcessor {
    * @param mixed $context
    *   The context for the query.
    *
-   * @return \Drupal\graphql\GraphQL\Execution\QueryResult .
-   *   The GraphQL query result.
+   * @return \Drupal\graphql\GraphQL\Execution\QueryResult
+   *   The query result.
    */
   public function processQuery($schema, $operations, $context = NULL) {
     $debug = !empty($this->parameters['development']);
@@ -113,14 +126,25 @@ class QueryProcessor {
       throw new RequestError(sprintf("Failed to load query map for id '%s'.", $id));
     });
 
-    if (is_array($operations)) {
-      $output = $this->helper->executeBatch($server, $operations);
-    }
-    else {
-      $output = $this->helper->executeOperation($server, $operations);
+    // Evaluating the request can potentially invoke rendering. We allow those
+    // to "leak" and collect them here in a render context.
+    $context = new RenderContext();
+    /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
+    $result = $this->renderer->executeInRenderContext($context, function() use ($server, $operations) {
+      if (is_array($operations)) {
+        return $this->helper->executeBatch($server, $operations);
+      }
+
+      return $this->helper->executeOperation($server, $operations);
+    });
+
+    $metadata = new CacheableMetadata();
+    // Apply render context cache metadata to the response.
+    if (!$context->isEmpty()) {
+      $metadata->addCacheableDependency($context->pop());
     }
 
-    return new QueryResult($output->toArray($debug), new CacheableMetadata());
+    return new QueryResult($result, $metadata);
   }
 
 }
