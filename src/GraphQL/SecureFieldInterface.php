@@ -19,7 +19,7 @@ interface SecureFieldInterface {
   /**
    * Check if the field is considered secure.
    *
-   * @return boolean
+   * @return bool
    *   Boolean value if the field is considered secure or not.
    */
   public function isSecure();

@@ -9,6 +9,11 @@ use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 trait FieldablePluginTrait {
 
   /**
+   * {@inheritdoc}
+   */
+  abstract public function getPluginDefinition();
+
+  /**
    * Build the list of implicit and explicit fields attached to the object type.
    *
    * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
@@ -24,11 +29,11 @@ trait FieldablePluginTrait {
       if ($definition['name']) {
         $types = array_merge([$definition['name']], array_key_exists('interfaces', $definition) ? $definition['interfaces'] : []);
 
-        return array_map(function (TypeSystemPluginInterface $field) use ($schemaBuilder) {
+        return array_filter(array_map(function (TypeSystemPluginInterface $field) use ($schemaBuilder) {
           return $field->getDefinition($schemaBuilder);
         }, $schemaBuilder->find(function ($field) use ($types) {
           return array_intersect($types, $field['parents']);
-        }, [GRAPHQL_FIELD_PLUGIN]));
+        }, [GRAPHQL_FIELD_PLUGIN])));
       }
     }
 

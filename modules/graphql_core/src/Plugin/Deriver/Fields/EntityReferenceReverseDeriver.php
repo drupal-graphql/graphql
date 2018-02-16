@@ -98,18 +98,6 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
         ] + $basePluginDefinition;
 
         /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition */
-        $definition = $this->typedDataManager->createDataDefinition("entity:$targetTypeId");
-        $properties = $definition->getPropertyDefinitions();
-        $queryableProperties = array_filter($properties, function ($property) {
-          return $property instanceof BaseFieldDefinition && $property->isQueryable();
-        });
-
-        if (!empty($queryableProperties)) {
-          $derivative['arguments']['filter'] = [
-            'type' => StringHelper::camelCase($targetTypeId, 'query', 'filter', 'input'),
-          ];
-        }
-
         $this->derivatives["$entityTypeId-$fieldName"] = $derivative;
       }
     }

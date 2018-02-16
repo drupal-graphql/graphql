@@ -21,7 +21,17 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
   protected $cacheBackend;
 
   /**
-   * Constructs a QueryMapConfigForm object.
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('cache.default')
+    );
+  }
+
+  /**
+   * QueryMapConfigForm constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The factory for configuration objects.
@@ -31,16 +41,6 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
   public function __construct(ConfigFactoryInterface $configFactory, CacheBackendInterface $cacheBackend) {
     parent::__construct($configFactory);
     $this->cacheBackend = $cacheBackend;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('cache.default')
-    );
   }
 
   /**
@@ -60,7 +60,7 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $formState) {
     $config = $this->config('graphql.query_map_json.config');
 
     $form['lookup_paths'] = [
@@ -70,21 +70,21 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
       '#description' => $this->t('The path patterns to use for the query map lookup.'),
     ];
 
-    return parent::buildForm($form, $form_state);
+    return parent::buildForm($form, $formState);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $formState) {
     $this->cacheBackend->delete('graphql_query_map_json_versions');
 
-    $paths = array_map('trim', explode("\n", $form_state->getValue('lookup_paths', '')));
+    $paths = array_map('trim', explode("\n", $formState->getValue('lookup_paths', '')));
     $this->config('graphql.query_map_json.config')
       ->set('lookup_paths', $paths)
       ->save();
 
-    parent::submitForm($form, $form_state);
+    parent::submitForm($form, $formState);
   }
 
 }

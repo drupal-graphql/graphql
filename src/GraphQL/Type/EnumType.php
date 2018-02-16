@@ -19,7 +19,14 @@ class EnumType extends AbstractEnumType implements PluginReferenceInterface, Typ
   use TypeValidationTrait;
 
   /**
-   * {@inheritdoc}
+   * EnumType constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase $plugin
+   *   The enum plugin instance.
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $builder
+   *   The schema builder.
+   * @param array $config
+   *   The enum config array.
    */
   public function __construct(EnumPluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;

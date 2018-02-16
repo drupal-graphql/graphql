@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\EntityReference;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery\EntityQuery;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
@@ -12,6 +12,8 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   secure = true,
  *   type = "EntityQueryResult!",
  *   arguments = {
+ *     "filter" = "EntityQueryFilterInput",
+ *     "sort" = "[EntityQuerySortInput]",
  *     "offset" = {
  *       "type" = "Int",
  *       "default" = 0
@@ -19,6 +21,10 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *     "limit" = {
  *       "type" = "Int",
  *       "default" = 10
+ *     },
+ *     "revisions" = {
+ *       "type" = "EntityQueryRevisionMode",
+ *       "default" = "default"
  *     }
  *   },
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityReferenceReverseDeriver"
@@ -29,16 +35,16 @@ class EntityReferenceReverse extends EntityQuery {
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    if ($value instanceof EntityInterface) {
-      $definition = $this->getPluginDefinition();
-      $field = $definition['field'];
+  public function getBaseQuery($value, array $args, ResolveInfo $info) {
+    if ($value instanceof ContentEntityInterface) {
+      $query = parent::getBaseQuery($value, $args, $info);
 
       // Add the target field condition to the query.
-      $query = $this->getQuery($value, $args, $info);
+      $definition = $this->getPluginDefinition();
+      $field = $definition['field'];
       $query->condition($field, $value->id());
 
-      yield $query;
+      return $query;
     }
   }
 

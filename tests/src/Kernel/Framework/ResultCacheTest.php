@@ -8,7 +8,6 @@ use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
-use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**
  * Test query result caching.

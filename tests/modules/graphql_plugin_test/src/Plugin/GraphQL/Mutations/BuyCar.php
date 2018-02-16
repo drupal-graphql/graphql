@@ -35,23 +35,32 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
-    return $this->garage->insertVehicle($args['car']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static($configuration, $pluginId, $pluginDefinition, $container->get('graphql_test.garage'));
   }
 
   /**
-   * {@inheritdoc}
+   * BuyCar constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition array.
+   * @param \Drupal\graphql_plugin_test\GarageInterface $garage
+   *   The garage service.
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, GarageInterface $garage) {
-    $this->garage = $garage;
     parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->garage = $garage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resolve($value, array $args, ResolveInfo $info) {
+    return $this->garage->insertVehicle($args['car']);
   }
 
 }

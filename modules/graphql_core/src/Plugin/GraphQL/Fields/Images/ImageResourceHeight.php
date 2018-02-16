@@ -3,7 +3,6 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Images;
 
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
 /**

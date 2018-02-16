@@ -17,7 +17,7 @@ class QueryAccessCheck implements AccessInterface {
   protected $requestStack;
 
   /**
-   * Constructs a QueryAccessCheck object.
+   * QueryAccessCheck constructor.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.

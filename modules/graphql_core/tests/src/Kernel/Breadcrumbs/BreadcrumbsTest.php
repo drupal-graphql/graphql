@@ -29,7 +29,6 @@ class BreadcrumbsTest extends GraphQLCoreTestBase {
     parent::setUp();
 
     $breadcrumbManager = $this->prophesize('Drupal\Core\Breadcrumb\BreadcrumbManager');
-
     $breadcrumbManager->build(Argument::any())
       ->will(function ($args) {
         /** @var \Drupal\Core\Routing\RouteMatch $routeMatch */
@@ -38,8 +37,10 @@ class BreadcrumbsTest extends GraphQLCoreTestBase {
         if ($routeMatch->getRouteName() == 'graphql_breadcrumbs_test.test') {
           $breadcrumb->addLink(new Link('Test breadcrumb', Url::fromUserInput('/breadcrumbs-test')));
         }
+
         return $breadcrumb;
       });
+
     $this->container->set('breadcrumb', $breadcrumbManager->reveal());
   }
 
@@ -51,6 +52,7 @@ class BreadcrumbsTest extends GraphQLCoreTestBase {
 
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($query, ['path' => '/breadcrumbs-test'], [
       'route' => [

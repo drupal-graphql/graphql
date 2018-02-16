@@ -18,7 +18,14 @@ class VoyagerController implements ContainerInjectionInterface {
   protected $introspection;
 
   /**
-   * Constructs a VoyagerController object.
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static($container->get('graphql.introspection'));
+  }
+
+  /**
+   * VoyagerController constructor.
    *
    * @param \Drupal\graphql\GraphQL\Utility\Introspection $introspection
    *   The GraphQL introspection service.
@@ -28,20 +35,13 @@ class VoyagerController implements ContainerInjectionInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('graphql.introspection'));
-  }
-
-  /**
    * Display for the GraphQL Voyager visualization API.
    *
    * @param string $schema
    *   The name of the schema to use.
    *
    * @return array The render array.
-   * The render array.
+   *   The render array.
    */
   public function viewVoyager($schema) {
     $introspectionData = $this->introspection->introspect($schema);

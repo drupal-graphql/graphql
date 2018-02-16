@@ -5,7 +5,6 @@ namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManager;
@@ -40,7 +39,12 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
   }
 
   /**
-   * {@inheritdoc}
+   * EntityQueryDeriver constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\TypedData\TypedDataManager $typedDataManager
+   *   The typed data manager service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,

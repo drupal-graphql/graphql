@@ -149,7 +149,7 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
       return $type;
     }
 
-    return $this->getInstance('scalar', 'undefined');
+    return NULL;
   }
 
   /**

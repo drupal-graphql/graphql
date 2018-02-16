@@ -4,8 +4,6 @@ namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\PageCache\RequestPolicyInterface;
@@ -101,7 +99,7 @@ class CacheSubscriber implements EventSubscriberInterface {
   protected $config;
 
   /**
-   * Constructs a new CacheSubscriber object.
+   * CacheSubscriber constructor.
    *
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.

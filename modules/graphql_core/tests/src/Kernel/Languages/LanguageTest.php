@@ -17,7 +17,6 @@ class LanguageTest extends GraphQLCoreTestBase {
    */
   public static $modules = [
     'language',
-    'graphql_context_test',
   ];
 
   /**
@@ -26,7 +25,7 @@ class LanguageTest extends GraphQLCoreTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installconfig(['language']);
+    $this->installConfig(['language']);
     $this->installEntitySchema('configurable_language');
     $this->container->get('router.builder')->rebuild();
 
@@ -70,7 +69,6 @@ class LanguageTest extends GraphQLCoreTestBase {
           'weight' => 0,
           'argument' => 'en',
         ],
-
         1 => [
           'id' => 'fr',
           'name' => 'French',
@@ -80,7 +78,6 @@ class LanguageTest extends GraphQLCoreTestBase {
           'weight' => 1,
           'argument' => 'fr',
         ],
-
         2 => [
           'id' => 'es',
           'name' => 'Spanish',
@@ -103,4 +100,73 @@ class LanguageTest extends GraphQLCoreTestBase {
     ], $metadata);
   }
 
+  /**
+   * Test language switch links.
+   */
+  public function testLanguageSwitchLinks() {
+    // TODO: Check cache metadata.
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheContexts(['languages:language_url']);
+    $metadata->addCacheTags([
+      'config:language.entity.en',
+      'config:language.entity.es',
+      'config:language.entity.fr',
+      'config:language.entity.pt-br',
+    ]);
+
+    $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
+      'route' => [
+        'links' => [
+          0 => [
+            'language' => [
+              'id' => 'en',
+            ],
+            'url' => [
+              'path' => '/en',
+            ],
+            'title' => 'English',
+            'active' => TRUE,
+          ],
+          1 => [
+            'language' => [
+              'id' => 'fr',
+            ],
+            'url' => [
+              'path' => '/fr',
+            ],
+            'title' => NULL,
+            'active' => FALSE,
+          ],
+          2 => [
+            'language' => [
+              'id' => 'es',
+            ],
+            'url' => [
+              'path' => '/es',
+            ],
+            'title' => NULL,
+            'active' => FALSE,
+          ],
+          3 => [
+            'language' => [
+              'id' => 'pt-br',
+            ],
+            'url' => [
+              'path' => '/',
+            ],
+            'title' => NULL,
+            'active' => FALSE,
+          ],
+        ],
+      ],
+    ], $metadata);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defaultCacheTags() {
+    $tags = parent::defaultCacheTags();
+    return array_diff($tags, ['entity_bundles']);
+  }
 }

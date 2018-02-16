@@ -40,16 +40,19 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
     if (!isset($this->definition)) {
       $definition = $this->getPluginDefinition();
 
-      $config = [
-        'name' => $this->buildName(),
-        'description' => $this->buildDescription(),
-        'type' => $this->buildType($schemaBuilder),
-        'args' => $this->buildArguments($schemaBuilder),
-        'isDeprecated' => !empty($definition['deprecated']),
-        'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-      ];
+      if ($type = $this->buildType($schemaBuilder)) {
+        $this->definition = new Field($this, $schemaBuilder, [
+          'name' => $this->buildName(),
+          'description' => $this->buildDescription(),
+          'type' => $type,
+          'isDeprecated' => !empty($definition['deprecated']),
+          'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
+        ]);
 
-      $this->definition = new Field($this, $schemaBuilder, $config);
+        if ($args = $this->buildArguments($schemaBuilder)) {
+          $this->definition->addArguments($args);
+        }
+      }
     }
 
     return $this->definition;

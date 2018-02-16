@@ -46,7 +46,7 @@ class TypeCollector {
    * @param \Youshido\GraphQL\Type\TypeInterface[] $types
    *   The type map to write to.
    */
-  protected static function doCollectTypes(TypeInterface $type, array &$types = []) {
+  protected static function doCollectTypes($type, array &$types = []) {
     if (is_object($type) && array_key_exists($type->getName(), $types)) {
       return;
     }

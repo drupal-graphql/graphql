@@ -35,7 +35,7 @@ class GraphQLMutation extends GraphQLAnnotationBase {
   /**
    * The deprecation reason or FALSE if the field is not deprecated.
    *
-   * @var string|boolean
+   * @var string|bool
    */
   public $deprecated = FALSE;
 

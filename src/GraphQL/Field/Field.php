@@ -19,7 +19,14 @@ class Field extends AbstractField implements PluginReferenceInterface, Cacheable
   use CacheableEdgeTrait;
 
   /**
-   * {@inheritdoc}
+   * Field constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface $plugin
+   *   The type system plugin instance.
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $builder
+   *   The schema builder.
+   * @param array $config
+   *   The field config array.
    */
   public function __construct(TypeSystemPluginInterface $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;

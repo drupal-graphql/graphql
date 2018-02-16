@@ -68,7 +68,20 @@ class RequestController implements ContainerInjectionInterface {
   protected $schemaLoader;
 
   /**
-   * Constructs a RequestController object.
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory')->get('system.performance'),
+      $container->get('http_kernel'),
+      $container->get('request_stack'),
+      $container->get('renderer'),
+      $container->get('graphql.query_processor')
+    );
+  }
+
+  /**
+   * RequestController constructor.
    *
    * @param \Drupal\Core\Config\Config $config
    *   The config service.
@@ -93,19 +106,6 @@ class RequestController implements ContainerInjectionInterface {
     $this->requestStack = $requestStack;
     $this->renderer = $renderer;
     $this->queryProcessor = $queryProcessor;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory')->get('system.performance'),
-      $container->get('http_kernel'),
-      $container->get('request_stack'),
-      $container->get('renderer'),
-      $container->get('graphql.query_processor')
-    );
   }
 
   /**

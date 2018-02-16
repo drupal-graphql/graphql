@@ -20,7 +20,14 @@ class ObjectType extends AbstractObjectType implements PluginReferenceInterface,
   use TypeValidationTrait;
 
   /**
-   * {@inheritdoc}
+   * ObjectType constructor.
+   *
+   * @param \Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase $plugin
+   *   The type plugin instance.
+   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $builder
+   *   The schema builder.
+   * @param array $config
+   *   The object type config array.
    */
   public function __construct(TypePluginBase $plugin, PluggableSchemaBuilderInterface $builder, array $config = []) {
     $this->plugin = $plugin;

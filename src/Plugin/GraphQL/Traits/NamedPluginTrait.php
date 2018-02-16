@@ -7,6 +7,11 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 trait NamedPluginTrait {
 
   /**
+   * {@inheritdoc}
+   */
+  abstract public function getPluginDefinition();
+
+  /**
    * Build the plugin's name.
    *
    * @return string

@@ -6,7 +6,6 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql\GraphQL\Type\InputObjectType;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,14 +25,6 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
-    $this->entityTypeManager = $entityTypeManager;
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
@@ -41,6 +32,23 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
       $pluginDefinition,
       $container->get('entity_type.manager')
     );
+  }
+
+  /**
+   * UpdateEntityBase constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityTypeManagerInterface $entityTypeManager) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**

@@ -50,7 +50,18 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   }
 
   /**
-   * {@inheritdoc}
+   * Context constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer $subRequestBuffer
+   *   The sub-request buffer service.
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $contextRepository
+   *   The context repository service.
    */
   public function __construct(
     array $configuration,
