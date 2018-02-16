@@ -39,7 +39,9 @@ The response to the above query is going to return exactly what we mentioned we 
 
 As we can see the result just fills the entities array with the information we wanted out of each node. Lets then look at a bit more complex queries regarding nodes.
 
+### A note on filters
 
+The GraphQL module allows for very complex type of filters, for a deeper look into filters checkout the Filters guide in this section.
 
 ## Querying a single node by its node id
 
@@ -70,6 +72,4 @@ Simple right? Now what we get in response its again what we asked for in the que
 ```
 
 As you can see you can exactly map the response to what was asked in the query making it very intuitive to ask for new things and now what to expect in the resulting format.
-
-
 
