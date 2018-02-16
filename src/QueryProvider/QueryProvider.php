@@ -2,6 +2,8 @@
 
 namespace Drupal\graphql\QueryProvider;
 
+use GraphQL\Server\OperationParams;
+
 class QueryProvider implements QueryProviderInterface {
 
   /**
@@ -21,9 +23,9 @@ class QueryProvider implements QueryProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getQuery(array $params) {
+  public function getQuery($id, OperationParams $operation) {
     foreach ($this->getSortedProviders() as $provider) {
-      if ($query = $provider->getQuery($params)) {
+      if ($query = $provider->getQuery($id, $operation)) {
         return $query;
       }
     }

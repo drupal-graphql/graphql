@@ -3,6 +3,7 @@
 namespace Drupal\graphql\GraphQL\Utility;
 
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
+use GraphQL\Server\OperationParams;
 
 class Introspection {
   protected $introspectionQuery = <<<TEXT
@@ -124,7 +125,8 @@ TEXT;
    *   The introspection result as an array.
    */
   public function introspect($schema) {
-    $result = $this->queryProcessor->processQuery($schema, $this->introspectionQuery);
+    $operation = OperationParams::create(['query' => $this->introspectionQuery]);
+    $result = $this->queryProcessor->processQuery($schema, $operation);
     return $result->getData();
   }
 

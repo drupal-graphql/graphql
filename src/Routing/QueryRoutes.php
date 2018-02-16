@@ -41,10 +41,8 @@ class QueryRoutes extends RouteSubscriberBase {
     foreach ($this->schemaManager->getDefinitions() as $key => $definition) {
       $routes->add("graphql.query.$key", new Route($definition['path'], [
         'schema' => $key,
-        '_graphql' => [
-          'single' => '\Drupal\graphql\Controller\RequestController::handleRequest',
-          'multiple' => '\Drupal\graphql\Controller\RequestController::handleBatchRequest',
-        ],
+        '_graphql' => TRUE,
+        '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
       ], [
         '_graphql_query_access' => 'TRUE',
       ]));

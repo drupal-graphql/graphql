@@ -3,6 +3,7 @@
 namespace Drupal\graphql\QueryProvider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use GraphQL\Server\OperationParams;
 
 class EntityQueryMapQueryProvider implements QueryProviderInterface {
 
@@ -26,15 +27,18 @@ class EntityQueryMapQueryProvider implements QueryProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getQuery(array $params) {
-    if (empty($params['version']) || empty($params['id'])) {
+  public function getQuery($id, OperationParams $operation) {
+    list($version, $id) = explode(':', $id);
+
+    // Check that the id is properly formatted.
+    if (empty($version) || empty($id)) {
       return NULL;
     }
 
     $storage = $this->entityTypeManager->getStorage('graphql_query_map');
     /** @var \Drupal\graphql\Entity\QueryMapInterface $map */
-    if ($map = $storage->load($params['version'])) {
-      return $map->getQuery($params['id']);
+    if ($map = $storage->load($version)) {
+      return $map->getQuery($id);
     }
 
     return NULL;

@@ -44,6 +44,7 @@ services:
     arguments:
       - '@plugin.manager.graphql.schema'
       - '@current_user'
+      - '@graphql.query_provider'
       - '%graphql.config%'
 
   # Query map provider using the composite pattern.
