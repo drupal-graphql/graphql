@@ -7,5 +7,32 @@ GraphQL Fragments, as the name implies, are just pieces of a query. They mostly 
 
 
 
+Lets look at the following query : 
 
+```
+{
+  nodeById(id: "1", language: en) {
+    ... on NodeArticle {
+      fieldCategory {
+        entity {
+          ...termFragment
+        }
+      }
+      fieldTags {
+        entity {
+          ...termFragment
+        }
+      }
+    }
+  }
+}
+
+fragment termFragment on TaxonomyTerm {
+  name
+  tid
+}
+
+```
+
+The query uses two fragments.
 
