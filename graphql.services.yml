@@ -38,6 +38,14 @@ services:
     tags:
       - { name: cache.context }
 
+  # Type system plugin definitions cache.
+  cache.graphql_type_system:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_type_system]
+
   # Schema and processor factory.
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
@@ -114,6 +122,7 @@ services:
   # Schema builder service. Collects all registered type system plugin managers.
   graphql.plugin_manager_aggregator:
     class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator
+    arguments: ['@cache.graphql_type_system']
     tags:
       - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
 
@@ -126,6 +135,7 @@ services:
       - 'Plugin/GraphQL/UnionTypes'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLUnionType'
       - 'graphql_union_types'
@@ -137,6 +147,7 @@ services:
       - 'Plugin/GraphQL/Interfaces'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInterface'
       - 'graphql_interfaces'
@@ -148,6 +159,7 @@ services:
       - 'Plugin/GraphQL/Types'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLType'
       - 'graphql_types'
@@ -159,6 +171,7 @@ services:
       - 'Plugin/GraphQL/InputTypes'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInputType'
       - 'graphql_input_types'
@@ -170,6 +183,7 @@ services:
       - 'Plugin/GraphQL/Fields'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLField'
       - 'graphql_fields'
@@ -181,6 +195,7 @@ services:
       - 'Plugin/GraphQL/Mutations'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
       - 'graphql_mutations'
@@ -192,6 +207,7 @@ services:
       - 'Plugin/GraphQL/Scalars'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
       - 'graphql_scalars'
@@ -203,6 +219,7 @@ services:
       - 'Plugin/GraphQL/Enums'
       - '@container.namespaces'
       - '@module_handler'
+      - '@graphql.plugin_manager_aggregator'
       - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLEnum'
       - 'graphql_enums'
