@@ -39,3 +39,37 @@ The response to the above query is going to return exactly what we mentioned we 
 
 As we can see the result just fills the entities array with the information we wanted out of each node. Lets then look at a bit more complex queries regarding nodes.
 
+
+
+## Querying a single node by its node id
+
+Another common scenario is needing to fetch a single node by its id. In the GraphQL module this can be done by taking advantage of another query type called the **nodeById**
+
+Here is a simple example returning the node with id : 1
+
+```
+query {
+  nodeById(id: "1") {
+    entityLabel
+    entityBundle
+  }
+}
+```
+
+Simple right? Now what we get in response its again what we asked for in the query fields, in this case the entityLabel and the entityBundle :
+
+```
+{
+  "data": {
+    "nodeById": {
+      "entityLabel": "10 Reasons why you should be using GraphQL",
+      "entityBundle": "article"
+    }
+  }
+}
+```
+
+As you can see you can exactly map the response to what was asked in the query making it very intuitive to ask for new things and now what to expect in the resulting format.
+
+
+
