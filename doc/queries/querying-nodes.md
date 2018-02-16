@@ -73,3 +73,9 @@ Simple right? Now what we get in response its again what we asked for in the que
 
 As you can see you can exactly map the response to what was asked in the query making it very intuitive to ask for new things and now what to expect in the resulting format.
 
+Lets now explore a bit more about querying nodes and how the queryNode structure is used in the GraphQL module.
+
+
+
+
+
