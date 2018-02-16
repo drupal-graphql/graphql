@@ -9,8 +9,11 @@
 ## Queries
 
 * [Introduction](queries/readme.md)
+* [Querying nodes](queries/querying-nodes.md)
+* [Querying taxonomies](queries/querying-taxonomies.md)
 
 ## Mutations
 
 * [Introduction](mutations/readme.md)
+* Creating mutation plugins
 
