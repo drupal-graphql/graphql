@@ -98,9 +98,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts([
-      // TODO: Do we need the language_content context?
-      // It can change by field, so one query could contain multiple language.
-      // 'languages:language_content',
+      'languages:language_url',
       'user.node_grants:view',
     ]);
 
