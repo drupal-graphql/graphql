@@ -30,15 +30,15 @@ http://graphql.org/learn/
 
 4. **Read the comments** and then enter the following query in the left pane: 
 
-        ```javascript
-        query {
-          user: currentUserContext{
-            ...on UserUser {
-              name
-            }
-          }
-        }
-        ```
+     ```javascript
+     query {
+       user: currentUserContext{
+         ...on UserUser {
+           name
+         }
+       }
+     }
+     ```
 
 5. Press `Ctrl-Space` and you should see something like the following display in the right pane: 
     
