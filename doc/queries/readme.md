@@ -2,6 +2,8 @@
 
 Graphql is a query language and so the first thing we will be goign through is how can you start making queries to Drupal. One of the great benefits of GraphQL is how intuitive the query syntax and corresponsing responses look like. Essencially the query is a lot like how you want the response to look like but without the values. Lets have a look at the example we saw in the introduction:
 
+
+
 ```javascript
 query {
   user: currentUserContext{
