@@ -16,5 +16,5 @@ query {
 }
 ```
 
-
+This will fetch for a limit of 10 terms that belong to the vocabulary "tags".
 
