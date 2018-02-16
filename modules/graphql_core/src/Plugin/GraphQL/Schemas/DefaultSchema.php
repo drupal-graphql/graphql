@@ -11,6 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
  *   id = "default",
  *   name = "Default",
  *   path = "/graphql",
+ *   response_cache_contexts = ["languages:language_url"]
  * )
  */
 class DefaultSchema extends SchemaPluginBase {

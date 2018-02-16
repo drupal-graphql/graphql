@@ -27,6 +27,10 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'id' => 'fr',
     ]);
 
+    // Enable content translation for the test node type.
+    $this->container->get('content_translation.manager')
+      ->setEnabled('node', 'test', TRUE);
+
     $language->save();
   }
 
@@ -78,11 +82,9 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
       'entityOwner' => [
         'entityLabel' => $user->label(),
       ],
-      // TODO: Fix this.
-      'entityTranslation' => NULL,
-//      'entityTranslation' => [
-//         'entityLabel' => $translation->label(),
-//      ],
+      'entityTranslation' => [
+        'entityLabel' => $translation->label(),
+      ],
       'entityPublished' => TRUE,
       'entityCreated' => $created,
       'entityChanged' => $changed,
@@ -96,7 +98,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts([
-//      'languages:language_content',
+      'languages:language_url',
       'user.node_grants:view',
     ]);
 
