@@ -15,5 +15,5 @@
 ## Mutations
 
 * [Introduction](mutations/readme.md)
-* Creating mutation plugins
+* [Creating mutation plugins](mutations/creating-mutation-plugins.md)
 
