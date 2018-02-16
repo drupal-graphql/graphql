@@ -86,17 +86,17 @@ This is important so that you know what to expect when searching for fields in q
 
 ## Fields inside a query
 
-GraphQL has the potential to go and fetch fields from very different places without the need for extra requests, thats one of the benefits of using such a query language. Lets look at this example : 
+GraphQL has the potential to go and fetch fields from very different places without the need for extra requests, thats one of the benefits of using such a query language. Lets look at this example :
 
 ```
 query {
   nodeById(id: "1", language: en) {
     entityId
     entityCreated
-    
+
     title
     status
-    
+
     ... on NodeArticle {
       fieldSubtitle
     }
@@ -109,6 +109,22 @@ The query above fetches information from 3 different places :
 * **entityId** and **entityCreated** come from the Entity Interface. These fields are available for all entity objects. nodeById query returns a Node Interface which extends Entity Interface.
 * title and status are defined in the Node Interface and are available for all nodes, regardless of their content type.
 * **fieldSubtitle** is a field \(**field\_subtitle** in Drupal\) that has been added to the Article content type. It's not a part of neither Node nor Entity Interfaces, it is only available in the NodeArticle Type. **nodebyId** can return any node, not just Article, so we need to wrap the fieldSubtitle in a [GraphQL Fragment](http://graphql.org/learn/queries/#fragments).
+
+If we paste the above query in GraphiQL we will get the following result : 
+
+```
+{
+  "data": {
+    "nodeById": {
+      "entityId": "1",
+      "entityCreated": "2017-12-01T00:00:00+0100",
+      "title": "GraphQL rocks",
+      "status": 1,
+      "fieldSubtitle": "Try it out!"
+    }
+  }
+}
+```
 
 
 
