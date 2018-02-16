@@ -2,7 +2,7 @@
 
 Another common entity in Drupal and one that provides great benefits to the usage of Drupal is taxonomy. Taxonomies can also be queried using GraphQL and the structure is very similar to how you query a node. For taxonomies the query **taxonomyTermQuery** and **taxonomyTermById** can be used to perform queries for a list of taxonomies terms or a single taxonomy term.
 
-## Fetching a list of terms from a vocabulary
+## Querying a list of terms from a vocabulary
 
 One common use case for taxonomies is to get a list of terms for a given vocabulary. Because we are using EntityQuery again the format will look very much like querying for nodes in the previous article. Here is what a query for terms of the vocabulary with **vid** "tags" looks like :
 
@@ -17,6 +17,8 @@ query {
 ```
 
 This will fetch for a limit of 10 terms that belong to the vocabulary "tags".
+
+## Querying a single term by its id
 
 
 
