@@ -17,3 +17,7 @@
 * [Introduction](mutations/readme.md)
 * [Creating mutation plugins](mutations/creating-mutation-plugins.md)
 
+## Authentication
+
+* [Introduction](authentication/introduction.md)
+
