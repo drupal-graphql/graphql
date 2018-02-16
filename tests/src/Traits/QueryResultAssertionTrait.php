@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Execution\QueryResult;
+use GraphQL\Server\OperationParams;
 
 /**
  * Trait for easier assertion on GraphQL query results.
@@ -82,7 +83,10 @@ trait QueryResultAssertionTrait {
   protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata) {
     $result = $this->graphQlProcessor()->processQuery(
       $this->getDefaultSchema(),
-      $query,
+      OperationParams::create([
+        'query' => $query,
+        'variables' => $variables,
+      ]),
       $variables
     );
 
@@ -106,7 +110,10 @@ trait QueryResultAssertionTrait {
   protected function assertErrors($query, $variables, $expected, CacheableMetadata $metadata) {
     $result = $this->graphQlProcessor()->processQuery(
       $this->getDefaultSchema(),
-      $query,
+      OperationParams::create([
+        'query' => $query,
+        'variables' => $variables,
+      ]),
       $variables
     );
 
