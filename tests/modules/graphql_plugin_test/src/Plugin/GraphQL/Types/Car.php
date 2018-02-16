@@ -20,7 +20,7 @@ class Car extends TypePluginBase {
    * {@inheritdoc}
    */
   public function applies($object, $context, ResolveInfo $info) {
-    return $value['type'] == 'Car';
+    return $object['type'] == 'Car';
   }
 
 }

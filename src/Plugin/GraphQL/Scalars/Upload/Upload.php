@@ -1,40 +1,36 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\Scalars\TypedData;
+namespace Drupal\graphql\Plugin\GraphQL\Scalars\Upload;
 
 use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
 
 /**
  * @GraphQLScalar(
- *   id = "map",
- *   name = "Map",
- *   type = "map"
+ *   id = "upload",
+ *   name = "Upload"
  * )
  */
-class Map extends ScalarPluginBase {
+class Upload extends ScalarPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public static function serialize($value) {
-    if (is_array($value)) {
-      return json_encode($value);
-    }
-
-    return NULL;
+    throw new \LogicException('Cannot serialize uploaded files.');
   }
 
   /**
    * {@inheritdoc}
    */
   public static function parseValue($value) {
-    return json_decode($value, TRUE);
+    return $value;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function parseLiteral($ast) {
-    return json_decode($ast->value, TRUE);
+    throw new \LogicException('Uploaded files have to be referenced in variables.');
   }
+
 }

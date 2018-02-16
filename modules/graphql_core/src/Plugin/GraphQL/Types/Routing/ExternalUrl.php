@@ -21,7 +21,7 @@ class ExternalUrl extends TypePluginBase {
    * {@inheritdoc}
    */
   public function applies($object, $context, ResolveInfo $info) {
-    return $value instanceof Url && $value->isExternal();
+    return $object instanceof Url && $object->isExternal();
   }
 
 }

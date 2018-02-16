@@ -10,9 +10,6 @@ use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Base class for GraphQL type plugins.
- */
 abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInterface {
   use CacheablePluginTrait;
   use DescribablePluginTrait;

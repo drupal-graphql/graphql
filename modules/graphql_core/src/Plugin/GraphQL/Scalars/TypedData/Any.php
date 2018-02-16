@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\Scalars\TypedData;
+namespace Drupal\graphql_core\Plugin\GraphQL\Scalars\TypedData;
 
-use Drupal\graphql\Plugin\GraphQL\Scalars\GraphQLString;
+use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
 
 /**
  * @GraphQLScalar(
@@ -11,7 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\Scalars\GraphQLString;
  *   type = "any"
  * )
  */
-class Any extends GraphQLString {
+class Any extends ScalarPluginBase {
 
   /**
    * {@inheritdoc}
