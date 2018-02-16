@@ -1,5 +1,6 @@
 # Filters
 
+<<<<<<< HEAD
 The GraphQL module ships with integration with the EntityQuery to provide for some very complex filtering in queries. Its normal we need to do some complex scenarios like combining multiple filters with "AND" operators or "OR" operators,and even filter by fields in the Entities we query like filtering for a field that is a entity reference field such as a taxonomy term field or a field with a relation to another node. All of this is possible and we will see several examples of this in this article.
 
 Analysing how to use filters in Queries.
@@ -137,3 +138,7 @@ query {
 ```
 
 If the entity we are filtering is for example of type "Term reference" then the ``` client.entity.nid ``` should become ``` client.entity.tid ``` as it now should reference a term id and not a node id.
+=======
+Analysing how to use filters in Queries.
+
+>>>>>>> Query documentations. (#530)
