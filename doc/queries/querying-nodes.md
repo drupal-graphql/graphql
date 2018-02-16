@@ -45,7 +45,7 @@ The GraphQL module allows for very complex type of filters, for a deeper look in
 
 ## Querying a single node by its node id
 
-Another common scenario is needing to fetch a single node by its id. In the GraphQL module this can be done by taking advantage of another query type called the **nodeById**
+Another common scenario is needing to fetch a single node by its id. In the GraphQL module this can be done by taking advantage of another query called the **nodeById**
 
 Here is a simple example returning the node with id : 1
 
@@ -72,6 +72,4 @@ Simple right? Now what we get in response its again what we asked for in the que
 ```
 
 As you can see you can exactly map the response to what was asked in the query making it very intuitive to ask for new things and now what to expect in the resulting format.
-
-
 
