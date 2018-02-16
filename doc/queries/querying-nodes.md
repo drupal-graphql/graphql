@@ -37,7 +37,7 @@ The response to the above query is going to return exactly what we mentioned we 
 }
 ```
 
-As we can see the result just fills the entities array with the information we wanted out of each node. Lets then look at a bit more complex queries regarding nodes.
+As we can see the result just fills the entities list with the information we wanted out of each node. Lets then look at a bit more complex queries regarding nodes.
 
 ### A note on filters
 
