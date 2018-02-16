@@ -16,9 +16,54 @@ query {
 }
 ```
 
-This will fetch for a limit of 10 terms that belong to the vocabulary "tags".
+This will fetch for a limit of 10 terms that belong to the vocabulary "tags". The result will once again be very much like what we asked for : 
+
+```
+{
+  "data": {
+    "taxonomyTermQuery": {
+      "entities": [
+        {
+          "entityLabel": "Drupal"
+        },
+        {
+          "entityLabel": "GraphQL"
+        },
+        {
+          "entityLabel": "Web"
+        },
+        {
+          "entityLabel": "React"
+        }
+      ]
+    }
+  }
+}
+```
 
 ## Querying a single term by its id
 
+Querying a single term can be done by taking advantage of the query **taxonomyTermById** which takes  as argument the id for the term we want to get.
 
+```
+query {
+  taxonomyTermById(id: "3") {
+    entityLabel
+  }
+}
+```
+
+And the result of this query will be whatever we asked for, in this case the entityLabel alone : 
+
+```
+{
+  "data": {
+    "taxonomyTermById": {
+      "entityLabel": "Drupal"
+    }
+  }
+}
+```
+
+Once again, you can query multiple things inside this query so make sure to try GraphiQL and explore what items can be fetched.
 
