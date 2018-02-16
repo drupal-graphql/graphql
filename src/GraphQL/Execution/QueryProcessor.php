@@ -48,9 +48,11 @@ class QueryProcessor {
   protected $helper;
 
   /**
+   * The query provider service.
+   *
    * @var \Drupal\graphql\QueryProvider\QueryProviderInterface
    */
-  private $queryProvider;
+  protected $queryProvider;
 
   /**
    * QueryProcessor constructor.
@@ -84,12 +86,13 @@ class QueryProcessor {
    *   The name of the schema to execute.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
    *   The graphql operation(s) to execute.
-   * @param array $config
+   * @param mixed $context
+   *   The context for the query.
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult .
    *   The GraphQL query result.
    */
-  public function processQuery($schema, $operations, array $config = []) {
+  public function processQuery($schema, $operations, $context = NULL) {
     $debug = !empty($this->parameters['development']);
 
     // Load the plugin from the schema manager.
@@ -97,9 +100,10 @@ class QueryProcessor {
     $schema = $plugin->getSchema();
 
     // Create the server config.
-    $server = ServerConfig::create($config);
+    $server = ServerConfig::create();
     $server->setDebug($debug);
     $server->setSchema($schema);
+    $server->setContext($context);
     $server->setQueryBatching(TRUE);
     $server->setPersistentQueryLoader(function ($id, OperationParams $operation) {
       if ($query = $this->queryProvider->getQuery($id, $operation)) {
