@@ -133,3 +133,5 @@ query {
   }
 }
 ```
+
+If the entity you are filtering is for example of type "Term reference" then the ``` client.entity.nid ``` should become ``` client.entity.tid ``` as it now should reference a term id and not a node id.
