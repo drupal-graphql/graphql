@@ -35,7 +35,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $schema = $this->introspect();
     $this->assertArraySubset([
       'types' => [
-        'RootQuery' => [
+        'QueryRoot' => [
           'fields' => [
             'root' => [
               'name' => 'root',
@@ -66,8 +66,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $metadata->setCacheContexts(['gql']);
 
     $this->assertErrors('{ root }', [], [
-      'Schema has to have fields',
-      'Field "root" not found in type "RootQuery". Available fields are: "__schema", "__type"',
+      'Cannot query field "root" on type "QueryRoot".',
     ], $metadata);
   }
 

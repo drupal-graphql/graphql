@@ -75,7 +75,7 @@ trait MockTypeSystemTrait {
 
     foreach (array_keys($container->findTaggedServiceIds('graphql_plugin_manager')) as $id) {
       $definition = $container->getDefinition($id);
-      $this->typeSystemClassMap[$id] = $definition->getArguments()[3];
+      $this->typeSystemClassMap[$id] = $definition->getArguments()[4];
       $this->typeSystemPlugins[$id] = [];
 
       $manager = $this->getMockBuilder(TypeSystemPluginManager::class)
@@ -111,7 +111,6 @@ trait MockTypeSystemTrait {
         ->willReturnCallback(function ($pluginId) use ($id) {
           return $this->typeSystemPlugins[$id][$pluginId]->getPluginDefinition();
         });
-
 
       $manager
         ->expects(static::any())
@@ -213,7 +212,10 @@ trait MockTypeSystemTrait {
   protected function mockField($id, $definition, $result = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
      GraphQLField::class,
-     $definition + ['id' => $id]
+     $definition + [
+       'id' => $id,
+       'class' => FieldPluginBase::class,
+     ]
     );
 
     $field = $this->getMockBuilder(FieldPluginBase::class)
@@ -251,7 +253,10 @@ trait MockTypeSystemTrait {
   protected function mockType($id, array $definition, $applies = TRUE) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLType::class,
-      $definition + ['id' => $id]
+      $definition + [
+        'id' => $id,
+        'class' => TypePluginBase::class,
+      ]
     );
 
     $type = $this->getMockBuilder(TypePluginBase::class)
@@ -285,7 +290,10 @@ trait MockTypeSystemTrait {
   protected function mockInputType($id, array $definition) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLInputType::class,
-      $definition + ['id' => $id]
+      $definition + [
+        'id' => $id,
+        'class' => InputTypePluginBase::class,
+      ]
     );
 
     $input = $this->getMockForAbstractClass(
@@ -318,7 +326,10 @@ trait MockTypeSystemTrait {
   protected function mockMutation($id, array $definition, $result = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLMutation::class,
-      $definition + ['id' => $id]
+      $definition + [
+        'id' => $id,
+        'class' => MutationPluginBase::class,
+      ]
     );
 
     $mutation = $this->getMockBuilder(MutationPluginBase::class)
@@ -354,7 +365,10 @@ trait MockTypeSystemTrait {
   protected function mockInterface($id, array $definition) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLInterface::class,
-      $definition + ['id' => $id]
+      $definition + [
+        'id' => $id,
+        'class' => InterfacePluginBase::class,
+      ]
     );
 
     $interface = $this->getMockForAbstractClass(InterfacePluginBase::class, [
@@ -382,7 +396,10 @@ trait MockTypeSystemTrait {
   protected function mockUnion($id, array $definition) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLUnionType::class,
-      $definition + ['id' => $id]
+      $definition + [
+        'id' => $id,
+        'class' => UnionTypePluginBase::class,
+      ]
     );
 
     $union = $this->getMockForAbstractClass(UnionTypePluginBase::class, [
@@ -412,7 +429,10 @@ trait MockTypeSystemTrait {
   protected function mockEnum($id, array $definition, $values = []) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLEnum::class,
-      $definition + ['id' => $id]
+      $definition + [
+        'id' => $id,
+        'class' => EnumPluginBase::class,
+      ]
     );
 
     $enum = $this->getMockBuilder(EnumPluginBase::class)

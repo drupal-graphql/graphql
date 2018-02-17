@@ -34,9 +34,9 @@ trait IntrospectionTestTrait {
 
     if (count(array_filter(array_keys($data), 'is_int')) == count($data)) {
       // This is a list, remap it.
-      $data = array_combine(array_map(function ($row) {
-        return $row['name'];
-      }, $data), $data);
+      $data = array_combine(array_map(function ($key, $row) {
+        return is_array($row) && isset($row['name']) ? $row['name'] : $key;
+      }, array_keys($data), $data), $data);
     }
 
     foreach (array_keys($data) as $key) {

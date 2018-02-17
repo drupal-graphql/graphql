@@ -127,7 +127,7 @@ TEXT;
   public function introspect($schema) {
     $operation = OperationParams::create(['query' => $this->introspectionQuery]);
     $result = $this->queryProcessor->processQuery($schema, $operation);
-    return $result->getData();
+    return $result->getData()->toArray();
   }
 
 }
