@@ -13,6 +13,8 @@ use Drupal\Tests\graphql\Traits\MockSchemaTrait;
 use Drupal\Tests\graphql\Traits\MockTypeSystemTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
+use PHPUnit_Framework_Error_Notice;
+use PHPUnit_Framework_Error_Warning;
 
 /**
  * Base class for GraphQL tests.
@@ -91,6 +93,8 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    PHPUnit_Framework_Error_Warning::$enabled = FALSE;
+    PHPUnit_Framework_Error_Notice::$enabled = FALSE;
     $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
