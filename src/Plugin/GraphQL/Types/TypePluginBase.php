@@ -3,28 +3,32 @@
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 
-abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class TypePluginBase extends PluginBase implements TypePluginInterface {
   use CacheablePluginTrait;
   use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
     return new ObjectType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
       'fields' => function () use ($builder, $definition) {
-        $fields = $builder->getFieldsByType($definition['name']);
+        $fields = $builder->getFields($definition['name']);
 
         if (!empty($definition['interfaces'])) {
           $inherited = array_map(function ($name) use ($builder) {
-            return $builder->getFieldsByType($name);
+            return $builder->getFields($name);
           }, $definition['interfaces']);
 
           $inherited = call_user_func_array('array_merge', $inherited);
@@ -34,15 +38,17 @@ abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInte
         return $fields;
       },
       'interfaces' => function () use ($builder, $definition) {
-        return array_map(function ($name) use ($builder) {
-          return $builder->getTypeByName($name);
-        }, $definition['interfaces']);
+        return array_filter(array_map(function ($name) use ($builder) {
+          return $builder->getType($name);
+        }, $definition['interfaces']), function ($type) {
+          return $type instanceof InterfaceType;
+        });
       },
-      'isTypeOf' => function ($value, $context, ResolveInfo $info) use ($builder, $id) {
-        $instance = $builder->getPluginInstance(GRAPHQL_TYPE_PLUGIN, $id);
-        return $instance->applies($value, $context, $info);
-      },
-    ] + $definition);
+      'isTypeOf' => function ($object, $context, ResolveInfo $info) use ($manager, $id) {
+        $instance = $manager->createInstance($id);
+        return $instance->applies($object, $context, $info);
+      }
+    ]);
   }
 
   /**

@@ -1,0 +1,52 @@
+<?php
+
+namespace Drupal\graphql\Plugin;
+
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Plugin\DefaultPluginManager;
+
+class TypePluginManager extends DefaultPluginManager {
+
+  /**
+   * TypePluginManager constructor.
+   *
+   * @param bool|string $pluginSubdirectory
+   *   The plugin's subdirectory.
+   * @param \Traversable $namespaces
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   The cache backend.
+   * @param string|null $pluginInterface
+   *   The interface each plugin should implement.
+   * @param string $pluginAnnotationName
+   *   The name of the annotation that contains the plugin definition.
+   * @param string $pluginType
+   *   The plugin type.
+   */
+  public function __construct(
+    $pluginSubdirectory,
+    \Traversable $namespaces,
+    ModuleHandlerInterface $moduleHandler,
+    CacheBackendInterface $cacheBackend,
+    $pluginInterface,
+    $pluginAnnotationName,
+    $pluginType
+  ) {
+    parent::__construct(
+      $pluginSubdirectory,
+      $namespaces,
+      $moduleHandler,
+      $pluginInterface,
+      $pluginAnnotationName
+    );
+
+    $this->alterInfo("graphql_{$pluginType}");
+    $this->useCaches(TRUE);
+    $this->setCacheBackend($cacheBackend, $pluginType, ['graphql', "graphql:{$pluginType}"]);
+  }
+
+}

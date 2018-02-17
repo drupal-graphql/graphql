@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\QueryProvider;
+namespace Drupal\graphql\GraphQL\QueryProvider;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use GraphQL\Server\OperationParams;

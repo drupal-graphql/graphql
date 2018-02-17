@@ -76,7 +76,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function defaultCacheContexts() {
-    return ['gql', 'languages:language_interface', 'user.permissions'];
+    return ['languages:language_interface', 'user.permissions'];
   }
 
   /**
@@ -85,7 +85,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   public function register(ContainerBuilder $container) {
     parent::register($container);
     $this->registerSchemaPluginManager($container);
-    $this->registerTypeSystemPluginManagers($container);
+    $this->registerTypePluginManagers($container);
   }
 
   /**

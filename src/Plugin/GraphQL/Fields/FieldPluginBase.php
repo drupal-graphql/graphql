@@ -5,19 +5,20 @@ namespace Drupal\graphql\Plugin\GraphQL\Fields;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\FieldPluginInterface;
+use Drupal\graphql\Plugin\FieldPluginManager;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ResolveInfo;
 
-abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class FieldPluginBase extends PluginBase implements FieldPluginInterface {
   use CacheablePluginTrait;
   use DescribablePluginTrait;
   use TypedPluginTrait;
@@ -27,14 +28,17 @@ abstract class FieldPluginBase extends PluginBase implements TypeSystemPluginInt
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+  public static function createInstance(SchemaBuilder $builder, FieldPluginManager $manager, $definition, $id) {
     return [
-      'args' => $builder->resolveArgs($definition['args']),
-      'resolve' => function ($value, array $args, $context, ResolveInfo $info) use ($builder, $id) {
-        $instance = $builder->getPluginInstance(GRAPHQL_FIELD_PLUGIN, $id);
+      'description' => $definition['description'],
+      'deprecationReason' => $definition['deprecationReason'],
+      'type' => $builder->processType($definition['type']),
+      'args' => $builder->processArguments($definition['args']),
+      'resolve' => function ($value, array $args, $context, ResolveInfo $info) use ($manager, $id) {
+        $instance = $manager->createInstance($id);
         return $instance->resolve($value, $args, $context, $info);
       },
-    ] + $definition;
+    ];
   }
 
   /**

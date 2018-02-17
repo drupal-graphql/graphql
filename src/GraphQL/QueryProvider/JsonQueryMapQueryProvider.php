@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\QueryProvider;
+namespace Drupal\graphql\GraphQL\QueryProvider;
 
 use Drupal\Component\FileSystem\RegexDirectoryIterator;
 use Drupal\Core\Cache\CacheBackendInterface;

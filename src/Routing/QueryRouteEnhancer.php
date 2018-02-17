@@ -4,7 +4,7 @@ namespace Drupal\graphql\Routing;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
-use Drupal\graphql\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\Utility\JsonHelper;
 use GraphQL\Server\Helper;
 use Symfony\Component\HttpFoundation\Request;

@@ -5,7 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Enums\Languages;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

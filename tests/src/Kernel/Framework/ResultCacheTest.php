@@ -5,7 +5,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
-use Drupal\graphql\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
 

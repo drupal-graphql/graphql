@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -63,7 +63,6 @@ class TestFrameworkTest extends GraphQLTestBase {
 
     // Errors are not cached at all.
     $metadata->setCacheMaxAge(0);
-    $metadata->setCacheContexts(['gql']);
 
     $this->assertErrors('{ root }', [], [
       'Cannot query field "root" on type "QueryRoot".',
@@ -110,7 +109,7 @@ class TestFrameworkTest extends GraphQLTestBase {
 
     $this->mockEnum('gender', [
       'name' => 'Gender',
-    ], function (PluggableSchemaBuilderInterface $builder) {
+    ], function (SchemaBuilder $builder) {
       return [
         ['value' => 'f', 'name' => 'Female', 'description' => ''],
         ['value' => 'm', 'name' => 'Male', 'description' => ''],

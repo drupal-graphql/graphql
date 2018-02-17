@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL;
+namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;

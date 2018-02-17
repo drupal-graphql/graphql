@@ -7,7 +7,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Drupal\graphql\GraphQL\Utility\Introspection;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -34,7 +34,7 @@ class ExplorerController implements ContainerInjectionInterface {
   /**
    * The schema plugin manager.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $pluginManager;
 
@@ -56,7 +56,7 @@ class ExplorerController implements ContainerInjectionInterface {
    *   The url generator service.
    * @param \Drupal\graphql\GraphQL\Utility\Introspection $introspection
    *   The introspection service.
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $pluginManager
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
    */
   public function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaPluginManager $pluginManager) {

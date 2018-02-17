@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -32,7 +32,7 @@ trait MockSchemaTrait {
   /**
    * Factory method for the schema manager.
    *
-   * @return \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @return \Drupal\graphql\Plugin\SchemaPluginManager
    *   The mocked schema manager instance.
    *
    * @internal

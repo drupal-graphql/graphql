@@ -3,24 +3,32 @@
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
 use GraphQL\Type\Definition\CustomScalarType;
 
-abstract class ScalarPluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class ScalarPluginBase extends PluginBase implements TypePluginInterface {
   use CacheablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
     $callable = ['GraphQL\Type\Definition\Type', strtolower($definition['name'])];
     if (is_callable($callable)) {
       return $callable();
     }
 
-    return new CustomScalarType($definition);
+    $class = get_called_class();
+    return new CustomScalarType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'serialize' => [$class, 'serialize'],
+      'parseValue' => [$class, 'parseValue'],
+      'parseLiteral' => [$class, 'parseLiteral'],
+    ]);
   }
 
   /**

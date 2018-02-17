@@ -1,23 +1,21 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL;
+namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 
-/**
- * Interface for type and field plugins of all sorts.
- */
-interface TypeSystemPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
+interface MutationPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder $builder
+   * @param \Drupal\graphql\Plugin\SchemaBuilder $builder
+   * @param \Drupal\graphql\Plugin\MutationPluginManager $manager
    * @param $definition
    * @param $id
    *
    * @return mixed
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id);
+  public static function createInstance(SchemaBuilder $builder, MutationPluginManager $manager, $definition, $id);
 
   /**
    * Returns the plugin's type or field definition for the schema.

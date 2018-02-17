@@ -2,8 +2,9 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Scalars\TypedData;
 
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
+use Drupal\graphql\Plugin\TypePluginManager;
 use GraphQL\Type\Definition\Type;
 
 /**
@@ -18,7 +19,7 @@ class FilterFormat extends ScalarPluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
     return Type::string();
   }
 }

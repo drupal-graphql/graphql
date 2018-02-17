@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\QueryProvider;
+namespace Drupal\graphql\GraphQL\QueryProvider;
 
 use GraphQL\Server\OperationParams;
 
@@ -9,14 +9,14 @@ class QueryProvider implements QueryProviderInterface {
   /**
    * Unsorted list of query providers nested and keyed by priority.
    *
-   * @var \Drupal\graphql\QueryProvider\QueryProviderInterface[]
+   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface[]
    */
   protected $providers = [];
 
   /**
    * Sorted list of query providers.
    *
-   * @var \Drupal\graphql\QueryProvider\QueryProviderInterface[]
+   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface[]
    */
   protected $sortedProviders;
 
@@ -36,7 +36,7 @@ class QueryProvider implements QueryProviderInterface {
   /**
    * Adds a query provider.
    *
-   * @param \Drupal\graphql\QueryProvider\QueryProviderInterface $provider
+   * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $provider
    *   The query provider to add.
    * @param int $priority
    *   Priority of the query provider.
@@ -49,7 +49,7 @@ class QueryProvider implements QueryProviderInterface {
   /**
    * Returns the sorted array of query providers.
    *
-   * @return \Drupal\graphql\QueryProvider\QueryProviderInterface[]
+   * @return \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface[]
    *   An array of query provider objects.
    */
   protected function getSortedProviders() {

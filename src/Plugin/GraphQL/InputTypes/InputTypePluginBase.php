@@ -3,15 +3,16 @@
 namespace Drupal\graphql\Plugin\GraphQL\InputTypes;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
 use Drupal\graphql\Utility\StringHelper;
 use GraphQL\Type\Definition\InputObjectType;
 
-abstract class InputTypePluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class InputTypePluginBase extends PluginBase implements TypePluginInterface {
   use CacheablePluginTrait;
   use DescribablePluginTrait;
   use TypedPluginTrait;
@@ -19,12 +20,14 @@ abstract class InputTypePluginBase extends PluginBase implements TypeSystemPlugi
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
     return new InputObjectType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
       'fields' => function () use ($builder, $definition) {
-        return $builder->resolveArgs($definition['fields']);
+        return $builder->processArguments($definition['fields']);
       },
-    ] + $definition);
+    ]);
   }
 
   /**

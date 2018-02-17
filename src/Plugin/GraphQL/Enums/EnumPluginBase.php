@@ -3,21 +3,26 @@
 namespace Drupal\graphql\Plugin\GraphQL\Enums;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
 use GraphQL\Type\Definition\EnumType;
 
-abstract class EnumPluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class EnumPluginBase extends PluginBase implements TypePluginInterface {
   use DescribablePluginTrait;
   use CacheablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
-    return new EnumType($definition);
+  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
+    return new EnumType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'values' => $definition['values'],
+    ]);
   }
 
   /**

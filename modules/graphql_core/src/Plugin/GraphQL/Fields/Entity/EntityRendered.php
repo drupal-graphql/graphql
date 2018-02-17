@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -82,7 +82,7 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
 //  /**
 //   * {@inheritdoc}
 //   */
-//  protected function buildArguments(PluggableSchemaBuilderInterface $builder) {
+//  protected function buildArguments(SchemaBuilder $builder) {
 //    $arguments = parent::buildArguments($builder);
 //
 //    // TODO Fix this.

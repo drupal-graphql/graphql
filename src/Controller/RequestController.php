@@ -2,22 +2,10 @@
 
 namespace Drupal\graphql\Controller;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableJsonResponse;
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\CacheableResponseInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\Core\Config\Config;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Render\RenderContext;
-use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Handles GraphQL requests.

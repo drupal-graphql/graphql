@@ -31,20 +31,14 @@ services:
     tags:
       - { name: access_check, applies_to: _graphql_query_access }
 
-  # Cache context for graphql request parameters.
-  cache_context.gql:
-    class: Drupal\graphql\Cache\Context\QueryCacheContext
-    arguments: ['@request_stack']
-    tags:
-      - { name: cache.context }
-
-  # Type system plugin definitions cache.
-  cache.graphql_type_system:
+  # Cache bin for graphql plugin definitions.
+  # TODO: Make this do a batch / multiple cache lookup across all plugin types.
+  cache.graphql_plugin_definitions:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory: cache_factory:get
-    arguments: [graphql_type_system]
+    arguments: [graphql_plugin_definitions]
 
   # Schema and processor factory.
   graphql.query_processor:
@@ -58,16 +52,16 @@ services:
 
   # Query map provider using the composite pattern.
   graphql.query_provider:
-    class: Drupal\graphql\QueryProvider\QueryProvider
+    class: Drupal\graphql\GraphQL\QueryProvider\QueryProvider
     tags:
         - { name: service_collector, tag: graphql_query_provider, call: addQueryProvider }
   graphql.query_provider.query_map.entity:
-    class: Drupal\graphql\QueryProvider\EntityQueryMapQueryProvider
+    class: Drupal\graphql\GraphQL\QueryProvider\EntityQueryMapQueryProvider
     arguments: ['@entity_type.manager']
     tags:
         - { name: graphql_query_provider }
   graphql.query_provider.query_map.json:
-    class: Drupal\graphql\QueryProvider\JsonQueryMapQueryProvider
+    class: Drupal\graphql\GraphQL\QueryProvider\JsonQueryMapQueryProvider
     arguments: ['@cache.default', '@config.factory']
     tags:
         - { name: graphql_query_provider }
@@ -108,121 +102,121 @@ services:
     tags:
       - { name: service_collector, tag: context_provider, call: addContextProvider }
 
+  # Combines plugin definitions from all plugin managers.
+  graphql.schema_builder:
+    class: Drupal\graphql\Plugin\SchemaBuilder
+    arguments:
+      - '@plugin.manager.graphql.field'
+      - '@plugin.manager.graphql.mutation'
+    tags:
+      - { name: service_collector, tag: graphql_type_manager, call: addTypeManager }
+
   # Plugin manager for schemas
   plugin.manager.graphql.schema:
-    class: Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+    class: Drupal\graphql\Plugin\SchemaPluginManager
     arguments:
       - 'Plugin/GraphQL/Schemas'
       - '@container.namespaces'
       - '@module_handler'
+      - '@cache.graphql_plugin_definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
-      - 'graphql_schemas'
 
-  # Schema builder service. Collects all registered type system plugin managers.
-  graphql.plugin_manager_aggregator:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManagerAggregator
-    arguments: ['@cache.graphql_type_system']
-    tags:
-      - { name: service_collector, tag: graphql_plugin_manager, call: addPluginManager }
-
-  # Plugin manager implementations for schema types.
-  plugin.manager.graphql.union:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-    tags:
-      - { name: graphql_plugin_manager }
-    arguments:
-      - 'Plugin/GraphQL/UnionTypes'
-      - '@container.namespaces'
-      - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
-      - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
-      - '\Drupal\graphql\Annotation\GraphQLUnionType'
-      - 'graphql_union_types'
-  plugin.manager.graphql.interface:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-    tags:
-      - { name: graphql_plugin_manager }
-    arguments:
-      - 'Plugin/GraphQL/Interfaces'
-      - '@container.namespaces'
-      - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
-      - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
-      - '\Drupal\graphql\Annotation\GraphQLInterface'
-      - 'graphql_interfaces'
-  plugin.manager.graphql.type:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-    tags:
-      - { name: graphql_plugin_manager }
-    arguments:
-      - 'Plugin/GraphQL/Types'
-      - '@container.namespaces'
-      - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
-      - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
-      - '\Drupal\graphql\Annotation\GraphQLType'
-      - 'graphql_types'
-  plugin.manager.graphql.input:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-    tags:
-      - { name: graphql_plugin_manager }
-    arguments:
-      - 'Plugin/GraphQL/InputTypes'
-      - '@container.namespaces'
-      - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
-      - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
-      - '\Drupal\graphql\Annotation\GraphQLInputType'
-      - 'graphql_input_types'
+  # Plugin manager for fields.
   plugin.manager.graphql.field:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-    tags:
-      - { name: graphql_plugin_manager }
+    class: Drupal\graphql\Plugin\FieldPluginManager
     arguments:
       - 'Plugin/GraphQL/Fields'
       - '@container.namespaces'
       - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
+      - '@cache.graphql_plugin_definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLField'
-      - 'graphql_fields'
+
+  # Plugin manager for mutations.
   plugin.manager.graphql.mutation:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-    tags:
-      - { name: graphql_plugin_manager }
+    class: Drupal\graphql\Plugin\MutationPluginManager
     arguments:
       - 'Plugin/GraphQL/Mutations'
       - '@container.namespaces'
       - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
+      - '@cache.graphql_plugin_definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
-      - 'graphql_mutations'
-  plugin.manager.graphql.scalar:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
+
+  # Plugin manager implementations for schema types.
+  plugin.manager.graphql.union:
+    class: Drupal\graphql\Plugin\TypePluginManager
     tags:
-      - { name: graphql_plugin_manager }
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/UnionTypes'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql_plugin_definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLUnionType'
+      - 'union_types'
+  plugin.manager.graphql.interface:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/Interfaces'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql_plugin_definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLInterface'
+      - 'interfaces'
+  plugin.manager.graphql.type:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/Types'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql_plugin_definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLType'
+      - 'types'
+  plugin.manager.graphql.input:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/InputTypes'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql_plugin_definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLInputType'
+      - 'input_types'
+  plugin.manager.graphql.scalar:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
     arguments:
       - 'Plugin/GraphQL/Scalars'
       - '@container.namespaces'
       - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
+      - '@cache.graphql_plugin_definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
-      - 'graphql_scalars'
+      - 'scalars'
   plugin.manager.graphql.enum:
-    class: Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
+    class: Drupal\graphql\Plugin\TypePluginManager
     tags:
-      - { name: graphql_plugin_manager }
+      - { name: graphql_type_manager }
     arguments:
       - 'Plugin/GraphQL/Enums'
       - '@container.namespaces'
       - '@module_handler'
-      - '@graphql.plugin_manager_aggregator'
+      - '@cache.graphql_plugin_definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLEnum'
-      - 'graphql_enums'
+      - 'enums'
 
   # Voyager.
   graphql.voyager.page_display_variant_subscriber:

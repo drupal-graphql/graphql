@@ -2,22 +2,16 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\graphql\GraphQL\Schema\SchemaLoader;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
-use Drupal\graphql\QueryProvider\QueryProviderInterface;
-use GraphQL\Error\FormattedError;
-use GraphQL\Error\UserError;
-use GraphQL\GraphQL;
+use Drupal\graphql\Plugin\SchemaPluginManager;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Server\ServerConfig;
-use GraphQL\Type\Definition\ResolveInfo;
 
 class QueryProcessor {
 
@@ -38,7 +32,7 @@ class QueryProcessor {
   /**
    * The schema plugin manager.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $pluginManager;
 
@@ -52,7 +46,7 @@ class QueryProcessor {
   /**
    * The query provider service.
    *
-   * @var \Drupal\graphql\QueryProvider\QueryProviderInterface
+   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface
    */
   protected $queryProvider;
 
@@ -64,15 +58,15 @@ class QueryProcessor {
   protected $renderer;
 
   /**
-   * QueryProcessor constructor.
+   * Processor constructor.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $pluginManager
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
-   * @param \Drupal\graphql\QueryProvider\QueryProviderInterface $queryProvider
+   * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider
    *   The query provider service.
    * @param array $parameters
    *   The graphql container parameters.
@@ -93,7 +87,7 @@ class QueryProcessor {
   }
 
   /**
-   * Execute a GraphQL query.
+   * Processes one or multiple graphql operations.
    *
    * @param string $schema
    *   The name of the schema to execute.
@@ -126,8 +120,24 @@ class QueryProcessor {
       throw new RequestError(sprintf("Failed to load query map for id '%s'.", $id));
     });
 
-    // Evaluating the request can potentially invoke rendering. We allow those
-    // to "leak" and collect them here in a render context.
+    return $this->executeQuery($server, $operations);
+  }
+
+  /**
+   * Executes one or multiple graphql operations.
+   *
+   * @param \GraphQL\Server\ServerConfig $server
+   *   The graphql server config.
+   * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
+   *   The graphql operation(s) to execute.
+   *
+   * @return \Drupal\graphql\GraphQL\Execution\QueryResult
+   *   The result of executing the operations.
+   */
+  protected function executeQuery(ServerConfig $server, $operations) {
+    // Evaluating the request might lead to rendering of markup which in turn
+    // might "leak" cache metadata. Therefore, we execute the request within a
+    // render context and collect the leaked metadata afterwards.
     $context = new RenderContext();
     /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
     $result = $this->renderer->executeInRenderContext($context, function() use ($server, $operations) {

@@ -3,15 +3,16 @@
 namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilder;
+use Drupal\graphql\Plugin\MutationPluginInterface;
+use Drupal\graphql\Plugin\MutationPluginManager;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 
-abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class MutationPluginBase extends PluginBase implements MutationPluginInterface {
   use CacheablePluginTrait;
   use TypedPluginTrait;
   use DescribablePluginTrait;
@@ -21,14 +22,17 @@ abstract class MutationPluginBase extends PluginBase implements TypeSystemPlugin
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
+  public static function createInstance(SchemaBuilder $builder, MutationPluginManager $manager, $definition, $id) {
     return [
-      'args' => $builder->resolveArgs($definition['args']),
-      'resolve' => function ($source, $args) use ($builder, $id) {
-        $instance = $builder->getPluginInstance(GRAPHQL_MUTATION_PLUGIN, $id);
+      'description' => $definition['description'],
+      'deprecationReason' => $definition['deprecationReason'],
+      'type' => $builder->processType($definition['type']),
+      'args' => $builder->processArguments($definition['args']),
+      'resolve' => function ($args) use ($manager, $id) {
+        $instance = $manager->createInstance($id);
         return call_user_func_array([$instance, 'resolve'], $args);
       },
-    ] + $definition;
+    ];
   }
 
   /**
