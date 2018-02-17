@@ -1,6 +1,6 @@
 # Filters
 
-The GraphQL ships with integration with the EntityQuery to provide for some very complex filtering in queries. Its normal we need to do some complex scenarios like combining multiple filters with "AND" operators or "OR" operators,and even filter by fields in the Entities we query like filtering for a field that is a entity reference field such as a taxonomy term field or a field with a relation to another node. All of this is possible and we will see several examples of this in this article.
+The GraphQL module ships with integration with the EntityQuery to provide for some very complex filtering in queries. Its normal we need to do some complex scenarios like combining multiple filters with "AND" operators or "OR" operators,and even filter by fields in the Entities we query like filtering for a field that is a entity reference field such as a taxonomy term field or a field with a relation to another node. All of this is possible and we will see several examples of this in this article.
 
 ## Filter syntax
 
