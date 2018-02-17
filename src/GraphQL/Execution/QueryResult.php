@@ -7,6 +7,22 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 class QueryResult implements CacheableDependencyInterface, \JsonSerializable {
 
   /**
+   * Don't serialize this object.
+   *
+   * Drop any serialization, since this will break php unit because the
+   * backtrace contains this object and tries to serialize a closure thats
+   * hidden deep in webonyx.
+   *
+   * // TODO: Solve me differently.
+   *
+   * @return string[]
+   *   The properties to serialize.
+   */
+  public function __sleep() {
+    return [];
+  }
+
+  /**
    * The query result.
    *
    * @var mixed
