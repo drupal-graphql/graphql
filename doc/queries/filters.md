@@ -81,3 +81,55 @@ query {
 ```
 
 And this is it! We can make super complex queries using this syntax. Just keep in mind that this will be transformed into an EntityQuery and so you can easily relate this to how that query will end up like.
+
+## Filtering for fields in the entity
+
+A very common scenario is you want to filter for the value of a given field, we saw before how to filter for the type of the entity. Lets have a look how we can filter for a value of a field in the entity. lets adapt the first example to filter for the value of the status instead of the type.
+
+```
+query {
+  nodeQuery(filter: {conditions: [{operator: EQUAL, field: "status", value: ["1"]}]}) {
+    entities {
+      entityLabel
+    }
+  }
+}
+```
+
+Here we get all entities which are published.
+
+## Filtering for custom fields in the entity
+
+If we want to filter for a field that exists only within that entity, its not very different. Lets look at a simple example. Lets imagine we have an entity "Client" which has a custom telephone number field : 
+
+```
+query {
+  nodeQuery(filter: {conditions: [
+    {operator: EQUAL, field: "type", value: ["client"]},
+    {operator: EQUAL, field: "telephone", value: ["918273736"]}
+  ]}) {
+    entities {
+      entityLabel
+    }
+  }
+}
+```
+
+We can easily filter by this field just by providing its field name and value, together with the operator we want.
+
+## Filtering for entity reference fields
+
+Yet another common scenario is we need to filter for a field, but this field is a entity reference meaning that we should provide the key of the entity to be referenced in the value properly. In this example lets imagine we have a entity reference in the "Article" entity to a "Client". This field is an entity reference of type node. The way we filter for this field is as followed :
+
+```
+query {
+  nodeQuery(filter: {conditions: [
+    {operator: EQUAL, field: "type", value: ["article"]},
+    {operator: EQUAL, field: "client.entity.nid", value: ["13"]}
+  ]}) {
+    entities {
+      entityLabel
+    }
+  }
+}
+```
