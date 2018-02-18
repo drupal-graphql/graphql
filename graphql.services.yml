@@ -32,13 +32,12 @@ services:
       - { name: access_check, applies_to: _graphql_query_access }
 
   # Cache bin for graphql plugin definitions.
-  # TODO: Make this do a batch / multiple cache lookup across all plugin types.
-  cache.graphql_plugin_definitions:
+  cache.graphql.definitions:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory: cache_factory:get
-    arguments: [graphql_plugin_definitions]
+    arguments: [graphql_definitions]
 
   # Schema and processor factory.
   graphql.query_processor:
@@ -106,6 +105,7 @@ services:
   graphql.schema_builder:
     class: Drupal\graphql\Plugin\SchemaBuilder
     arguments:
+      - '@cache.graphql.definitions'
       - '@plugin.manager.graphql.field'
       - '@plugin.manager.graphql.mutation'
     tags:
@@ -118,7 +118,7 @@ services:
       - 'Plugin/GraphQL/Schemas'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
 
@@ -129,7 +129,7 @@ services:
       - 'Plugin/GraphQL/Fields'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLField'
 
@@ -140,7 +140,7 @@ services:
       - 'Plugin/GraphQL/Mutations'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
 
@@ -153,7 +153,7 @@ services:
       - 'Plugin/GraphQL/UnionTypes'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLUnionType'
       - 'union_types'
@@ -165,7 +165,7 @@ services:
       - 'Plugin/GraphQL/Interfaces'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInterface'
       - 'interfaces'
@@ -177,7 +177,7 @@ services:
       - 'Plugin/GraphQL/Types'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLType'
       - 'types'
@@ -189,7 +189,7 @@ services:
       - 'Plugin/GraphQL/InputTypes'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInputType'
       - 'input_types'
@@ -201,7 +201,7 @@ services:
       - 'Plugin/GraphQL/Scalars'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
       - 'scalars'
@@ -213,7 +213,7 @@ services:
       - 'Plugin/GraphQL/Enums'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql_plugin_definitions'
+      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLEnum'
       - 'enums'

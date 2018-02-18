@@ -3,8 +3,10 @@
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheBackendInterface;
 
-// TODO: Clean this up further and add caching.
+// TODO: Clean this up.
 class SchemaBuilder {
 
   /**
@@ -25,6 +27,11 @@ class SchemaBuilder {
   /**
    * @var array
    */
+  protected $cache;
+
+  /**
+   * @var array
+   */
   protected $fields;
 
   /**
@@ -38,17 +45,25 @@ class SchemaBuilder {
   protected $types;
 
   /**
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
    * SchemaBuilder constructor.
    *
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    * @param \Drupal\graphql\Plugin\FieldPluginManager $fieldManager
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
    */
   public function __construct(
+    CacheBackendInterface $cacheBackend,
     FieldPluginManager $fieldManager,
     MutationPluginManager $mutationManager
   ) {
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
+    $this->cacheBackend = $cacheBackend;
   }
 
   /**
@@ -140,6 +155,15 @@ class SchemaBuilder {
   }
 
   /**
+   * @param $mutations
+   *
+   * @return array
+   */
+  public function processMutations($mutations) {
+    return array_map([$this, 'buildMutation'], $mutations);
+  }
+
+  /**
    * @param $fields
    *
    * @return array
@@ -172,17 +196,6 @@ class SchemaBuilder {
     return array_reduce($decorators, function ($type, $decorator) {
       return $decorator($type);
     }, $this->getType($type));
-  }
-
-  /**
-   * @return array
-   */
-  protected function getTypeMap() {
-    if (!isset($this->typeMap)) {
-      $this->typeMap = $this->buildTypeMap();
-    }
-
-    return $this->typeMap;
   }
 
   /**
@@ -225,6 +238,19 @@ class SchemaBuilder {
     }
 
     return $this->mutations[$mutation['id']];
+  }
+
+  /**
+   * @return array
+   */
+  protected function getTypeMap() {
+    if (!isset($this->cache['types'])) {
+      if (!isset($this->cache) && $this->cacheGet('types') === NULL) {
+        $this->cacheSet('types', $this->buildTypeMap());
+      }
+    }
+
+    return $this->cache['types'];
   }
 
   /**
@@ -277,11 +303,13 @@ class SchemaBuilder {
    * @return array
    */
   protected function getTypeReferenceMap() {
-    if (!isset($this->typeReferenceMap)) {
-      $this->typeReferenceMap = $this->buildTypeReferenceMap();
+    if (!isset($this->cache['types:references'])) {
+      if (!isset($this->cache) && $this->cacheGet('types:references') === NULL) {
+        $this->cacheSet('types:references', $this->buildTypeReferenceMap());
+      }
     }
 
-    return $this->typeReferenceMap;
+    return $this->cache['types:references'];
   }
 
   /**
@@ -312,11 +340,13 @@ class SchemaBuilder {
    * @return array
    */
   protected function getFieldAssociationMap() {
-    if (!isset($this->fieldAssociationMap)) {
-      $this->fieldAssociationMap = $this->buildFieldAssociationMap();
+    if (!isset($this->cache['fields:associations'])) {
+      if (!isset($this->cache) && $this->cacheGet('fields:associations') === NULL) {
+        $this->cacheSet('fields:associations', $this->buildFieldAssociationMap());
+      }
     }
 
-    return $this->fieldAssociationMap;
+    return $this->cache['fields:associations'];
   }
 
   /**
@@ -365,11 +395,13 @@ class SchemaBuilder {
    * @return array
    */
   protected function getFieldMap() {
-    if (!isset($this->fieldMap)) {
-      $this->fieldMap = $this->buildFieldMap();
+    if (!isset($this->cache['fields'])) {
+      if (!isset($this->cache) && $this->cacheGet('fields') === NULL) {
+        $this->cacheSet('fields', $this->buildFieldMap());
+      }
     }
 
-    return $this->fieldMap;
+    return $this->cache['fields'];
   }
 
   /**
@@ -399,11 +431,13 @@ class SchemaBuilder {
    * @return array
    */
   protected function getMutationMap() {
-    if (!isset($this->mutationMap)) {
-      $this->mutationMap = $this->buildMutationMap();
+    if (!isset($this->cache['mutations'])) {
+      if (!isset($this->cache) && $this->cacheGet('mutations') === NULL) {
+        $this->cacheSet('mutations', $this->buildMutationMap());
+      }
     }
 
-    return $this->mutationMap;
+    return $this->cache['mutations'];
   }
 
   /**
@@ -435,5 +469,39 @@ class SchemaBuilder {
         'definition' => $instance->getDefinition(),
       ];
     }, $mutations);
+  }
+
+  /**
+   * @param $id
+   * @param $data
+   */
+  protected function cacheSet($id, $data) {
+    $this->cacheBackend->set("builder:$id", $data, Cache::PERMANENT);
+    $this->cache[$id] = $data;
+  }
+
+  /**
+   * @param $id
+   *
+   * @return mixed
+   */
+  protected function cacheGet($id) {
+    $keys = [
+      'builder:types' => 'types',
+      'builder:types:references' => 'types:references',
+      'builder:fields' => 'fields',
+      'builder:fields:associations' => 'fields:associations',
+      'builder:mutations' => 'mutations',
+    ];
+
+    $ids = array_keys($keys);
+    $result = $this->cacheBackend->getMultiple($ids);
+
+    $this->cache = [];
+    foreach ($result as $key => $data) {
+      $this->cache[$keys[$key]] = $data->data;
+    }
+
+    return $this->cache[$id];
   }
 }
