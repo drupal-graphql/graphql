@@ -75,9 +75,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       ]));
     }
 
-//    $config->setTypes(function () {
-//      return $this->schemaBuilder->getTypes();
-//    });
+    $config->setTypes(function () {
+      return $this->schemaBuilder->getTypes();
+    });
 
     $config->setTypeLoader(function ($name) {
       return $this->schemaBuilder->getType($name);
