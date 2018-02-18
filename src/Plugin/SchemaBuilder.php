@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 
+// TODO: Clean this up further and add caching.
 class SchemaBuilder {
 
   /**
