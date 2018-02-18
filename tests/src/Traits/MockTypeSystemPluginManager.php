@@ -61,6 +61,16 @@ class MockTypeSystemPluginManager extends TypeSystemPluginManager {
   /**
    * {@inheritdoc}
    */
+  public function getDefinition($id, $exception = TRUE) {
+    if ($this->mockPluginManager->hasDefinition($id)) {
+      return $this->mockPluginManager->getDefinition($id, $exception);
+    }
+    return parent::getDefinition($id, $exception);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function createInstance($plugin_id, array $configuration = []) {
     if ($this->mockPluginManager->hasDefinition($plugin_id)) {
       return $this->mockPluginManager->createInstance($plugin_id, $configuration);
