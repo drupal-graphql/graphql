@@ -231,9 +231,9 @@ class PluggableSchemaBuilder implements PluggableSchemaBuilderInterface {
    *
    * @return array
    */
-  public function resolveFields($fields) {
-    return array_map(function ($id) use ($fields) {
-      $field = $this->getType(GRAPHQL_FIELD_PLUGIN, $id);
+  public function resolveFields($fields, $pluginType = GRAPHQL_FIELD_PLUGIN) {
+    return array_map(function ($id) use ($fields, $pluginType) {
+      $field = $this->getType($pluginType, $id);
       list($type, $decorators) = $field['type'];
 
       $type = array_reduce($decorators, function ($a, $decorator) use ($type) {

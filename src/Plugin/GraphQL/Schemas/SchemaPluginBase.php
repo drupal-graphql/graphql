@@ -62,14 +62,14 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $config->setMutation(new ObjectType([
       'name' => 'MutationRoot',
       'fields' => function () {
-        return $this->schemaBuilder->resolveFields($this->getMutations());
+        return $this->schemaBuilder->resolveFields($this->getMutations(), GRAPHQL_MUTATION_PLUGIN);
       },
     ]));
 
     $config->setQuery(new ObjectType([
       'name' => 'QueryRoot',
       'fields' => function () {
-        return $this->schemaBuilder->resolveFields($this->getRootFields());
+        return $this->schemaBuilder->resolveFields($this->getRootFields(), GRAPHQL_FIELD_PLUGIN);
       },
     ]));
 
