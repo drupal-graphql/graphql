@@ -9,6 +9,13 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class TypePluginManager extends DefaultPluginManager {
 
   /**
+   * Static cache of plugin instances.
+   *
+   * @var \Drupal\graphql\Plugin\TypePluginInterface[]
+   */
+  protected $instances;
+
+  /**
    * TypePluginManager constructor.
    *
    * @param bool|string $pluginSubdirectory
@@ -47,6 +54,17 @@ class TypePluginManager extends DefaultPluginManager {
     $this->alterInfo("graphql_{$pluginType}");
     $this->useCaches(TRUE);
     $this->setCacheBackend($cacheBackend, $pluginType, ['graphql', "graphql:{$pluginType}"]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInstance(array $options) {
+    if (!isset($this->instances[$options['id']])) {
+      $this->instances[$options['id']] = $this->createInstance($options['id']);
+    }
+
+    return $this->instances[$options['id']];
   }
 
 }

@@ -35,7 +35,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       'type' => $builder->processType($definition['type']),
       'args' => $builder->processArguments($definition['args']),
       'resolve' => function ($value, array $args, $context, ResolveInfo $info) use ($manager, $id) {
-        $instance = $manager->createInstance($id);
+        $instance = $manager->getInstance(['id' => $id]);
         return $instance->resolve($value, $args, $context, $info);
       },
     ];

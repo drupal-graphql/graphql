@@ -291,7 +291,7 @@ class SchemaBuilder {
     return array_map(function ($type) {
       $manager = $this->typeManagers[$type['type']];
       /** @var \Drupal\graphql\Plugin\TypePluginInterface $instance */
-      $instance = $manager->createInstance($type['id']);
+      $instance = $manager->getInstance(['id' => $type['id']]);
 
       return [
         'definition' => $instance->getDefinition(),
@@ -412,7 +412,7 @@ class SchemaBuilder {
     return array_reduce($association, function ($carry, $fields) {
       return array_reduce($fields, function ($carry, $id) {
         if (!isset($carry[$id])) {
-          $instance = $this->fieldManager->createInstance($id);
+          $instance = $this->fieldManager->getInstance(['id' => $id]);
           $definition = $this->fieldManager->getDefinition($id);
 
           $carry[$id] = [
@@ -462,7 +462,7 @@ class SchemaBuilder {
 
     return array_map(function ($definition) {
       $id = $definition['id'];
-      $instance = $this->mutationManager->createInstance($id);
+      $instance = $this->mutationManager->getInstance(['id' => $id]);
 
       $carry[$id] = [
         'id' => $id,

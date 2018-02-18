@@ -9,6 +9,13 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class MutationPluginManager extends DefaultPluginManager {
 
   /**
+   * Static cache of plugin instances.
+   *
+   * @var \Drupal\graphql\Plugin\MutationPluginInterface[]
+   */
+  protected $instances;
+
+  /**
    * FieldPluginManager constructor.
    *
    * @param bool|string $pluginSubdirectory
@@ -44,6 +51,17 @@ class MutationPluginManager extends DefaultPluginManager {
     $this->alterInfo('graphql_mutations');
     $this->useCaches(TRUE);
     $this->setCacheBackend($cacheBackend, 'mutations', ['graphql', 'graphql:mutations']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInstance(array $options) {
+    if (!isset($this->instances[$options['id']])) {
+      $this->instances[$options['id']] = $this->createInstance($options['id']);
+    }
+
+    return $this->instances[$options['id']];
   }
 
 }

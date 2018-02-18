@@ -130,7 +130,7 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
-      - '\Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase'
+      - '\Drupal\graphql\Plugin\FieldPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLField'
 
   # Plugin manager for mutations.
@@ -141,7 +141,7 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
-      - '\Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase'
+      - '\Drupal\graphql\Plugin\MutationPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
 
   # Plugin manager implementations for schema types.

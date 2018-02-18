@@ -9,6 +9,13 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class FieldPluginManager extends DefaultPluginManager {
 
   /**
+   * Static cache of plugin instances.
+   *
+   * @var \Drupal\graphql\Plugin\FieldPluginInterface[]
+   */
+  protected $instances;
+
+  /**
    * FieldPluginManager constructor.
    *
    * @param bool|string $pluginSubdirectory
@@ -44,6 +51,17 @@ class FieldPluginManager extends DefaultPluginManager {
     $this->alterInfo('graphql_fields');
     $this->useCaches(TRUE);
     $this->setCacheBackend($cacheBackend, 'fields', ['graphql', 'graphql:fields']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInstance(array $options) {
+    if (!isset($this->instances[$options['id']])) {
+      $this->instances[$options['id']] = $this->createInstance($options['id']);
+    }
+
+    return $this->instances[$options['id']];
   }
 
 }

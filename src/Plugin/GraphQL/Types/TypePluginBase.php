@@ -45,7 +45,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
         });
       },
       'isTypeOf' => function ($object, $context, ResolveInfo $info) use ($manager, $id) {
-        $instance = $manager->createInstance($id);
+        $instance = $manager->getInstance(['id' => $id]);
         return $instance->applies($object, $context, $info);
       }
     ]);
