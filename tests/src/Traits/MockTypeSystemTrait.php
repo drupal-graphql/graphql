@@ -21,6 +21,7 @@ use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 use Drupal\KernelTests\KernelTestBase;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -122,8 +123,10 @@ trait MockTypeSystemTrait {
 
       $this->typeSystemPluginManagers[$id] = $manager;
 
+      $definition->setClass(MockTypeSystemPluginManager::class);
+      $definition->addArgument(new Reference('test.' . $id));
+
       $new = $container->register('test.' . $id, TypeSystemPluginManager::class);
-      $new->addTag('graphql_plugin_manager');
       $new->setFactory([$this, 'typeSystemPluginManagerFactory']);
       $new->addArgument($id);
     }
