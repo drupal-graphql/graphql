@@ -24,7 +24,7 @@ abstract class MutationPluginBase extends PluginBase implements TypeSystemPlugin
   public static function createInstance(PluggableSchemaBuilder $builder, $definition, $id) {
     return [
       'args' => $builder->resolveArgs($definition['args']),
-      'resolve' => function ($args) use ($builder, $id) {
+      'resolve' => function ($source, $args) use ($builder, $id) {
         $instance = $builder->getPluginInstance(GRAPHQL_MUTATION_PLUGIN, $id);
         return call_user_func_array([$instance, 'resolve'], $args);
       },
@@ -41,7 +41,7 @@ abstract class MutationPluginBase extends PluginBase implements TypeSystemPlugin
       'type' => $this->buildType($definition),
       'description' => $this->buildDescription($definition),
       'args' => $this->buildArguments($definition),
-      'deprecationReason' => $this->buildDeprecationReason($definition)
+      'deprecationReason' => $this->buildDeprecationReason($definition),
     ];
   }
 
