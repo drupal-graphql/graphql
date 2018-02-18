@@ -1,12 +1,12 @@
 # Query variables
 
-Until now we have looked at querie, but they are all static. We have been passing the values directly in the query to whatever we want to query. So how can we do the same but provide those values in a dynamic fashion? With variables.
+Until now we have looked at queries, but they are all static. We have been passing the values directly in the query to whatever we want to fetch. So how can we do the same but provide those values in a dynamic fashion? With variables.
 
 The offical [GraphQL documentation](http://graphql.org/learn/queries/#variables) has a great overview of variables, but lets have a look at it here in any case.
 
 ## How to prepare the query to receive variables
 
-The way to make your query ready to use variables is to provide a wrapper for it that takes the variables and injects them into the query. Lets take an example from the Query nodes examples where we wanted to query for nodes of type "Article" and make this type dynamic so we can pass whatever we want.
+The way to make your query ready to use variables is to provide the variables as parameters for the query and then using it inside. Lets take an example from the Query nodes examples where we wanted to query for nodes of type "Article" and make this type dynamic so we can pass whatever we want.
 
 The old query looked like this :
 
