@@ -10,7 +10,7 @@ use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\IntrospectionTestTrait;
 use Drupal\Tests\graphql\Traits\MockSchemaTrait;
-use Drupal\Tests\graphql\Traits\MockTypeSystemTrait;
+use Drupal\Tests\graphql\Traits\MockGraphQLPluginTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use PHPUnit_Framework_Error_Notice;
@@ -22,8 +22,7 @@ use PHPUnit_Framework_Error_Warning;
 abstract class GraphQLTestBase extends KernelTestBase {
   use EnableCliCacheTrait;
   use ProphesizePermissionsTrait;
-  use MockSchemaTrait;
-  use MockTypeSystemTrait;
+  use MockGraphQLPluginTrait;
   use HttpRequestTrait;
   use QueryResultAssertionTrait;
   use IntrospectionTestTrait;
@@ -84,8 +83,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   public function register(ContainerBuilder $container) {
     parent::register($container);
-    $this->registerSchemaPluginManager($container);
-    $this->registerTypePluginManagers($container);
   }
 
   /**
@@ -93,11 +90,14 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->injectTypeSystemPluginManagers($this->container);
     PHPUnit_Framework_Error_Warning::$enabled = FALSE;
     PHPUnit_Framework_Error_Notice::$enabled = FALSE;
     $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
+
+    $this->mockSchema('default');
   }
 
 }

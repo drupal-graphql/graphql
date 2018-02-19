@@ -2,6 +2,9 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\Factory\FactoryInterface;
+use Drupal\Core\DependencyInjection\Container;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\Annotation\GraphQLEnum;
@@ -16,51 +19,39 @@ use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
-use Drupal\KernelTests\KernelTestBase;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Trait for mocking GraphQL type system plugins.
  */
-trait MockTypeSystemTrait {
-
-  /**
-   * The mocked type system plugin managers.
-   *
-   * @var TypeSystemPluginManager[]
-   */
-  protected $typeSystemPluginManagers = [];
+trait MockGraphQLPluginTrait {
 
   /**
    * The list of mocked type system plugins.
    *
    * @var \Drupal\Component\Plugin\PluginInspectionInterface[][]
    */
-  protected $typeSystemPlugins = [];
+  protected $graphQLPlugins = [];
 
   /**
    * Maps type system manager id's to required plugin interfaces.
    *
    * @var string[]
    */
-  protected $typeSystemClassMap = [];
-
-  /**
-   * Container factory method to retrieve a type system plugin manager.
-   *
-   * @param $id
-   *   The manager id.
-   *
-   * @return \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginManager
-   *   The plugin manager instance.
-   */
-  public function typeSystemPluginManagerFactory($id) {
-    return $this->typeSystemPluginManagers[$id];
-  }
+  protected $graphQLPluginClassMap = [
+    'plugin.manager.graphql.schema' => SchemaPluginBase::class,
+    'plugin.manager.graphql.field' => FieldPluginBase::class,
+    'plugin.manager.graphql.mutation' => MutationPluginBase::class,
+    'plugin.manager.graphql.union' => UnionTypePluginBase::class,
+    'plugin.manager.graphql.interface' => InterfacePluginBase::class,
+    'plugin.manager.graphql.type' => TypePluginBase::class,
+    'plugin.manager.graphql.input' => InputTypePluginBase::class,
+    'plugin.manager.graphql.scalar' => ScalarPluginBase::class,
+    'plugin.manager.graphql.enum' => EnumPluginBase::class,
+  ];
 
   /**
    * Register the mocked plugin managers during container build.
@@ -68,67 +59,89 @@ trait MockTypeSystemTrait {
    * Injects the mocked schema managers into the drupal container. Has to be
    * invoked during the KernelTest's register callback.
    *
-   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
-   *   The container builder instance.
+   * @param \Drupal\Core\DependencyInjection\Container $container
+   *   The container instance.
    */
-  protected function registerTypeSystemPluginManagers(ContainerBuilder $container) {
-    assert($this instanceof KernelTestBase, 'MockSchemaTrait has to be used in a KernelTest.');
+  protected function injectTypeSystemPluginManagers(ContainerBuilder $container) {
 
-    foreach (array_keys($container->findTaggedServiceIds('graphql_plugin_manager')) as $id) {
-      $definition = $container->getDefinition($id);
-      $this->typeSystemClassMap[$id] = $definition->getArguments()[4];
-      $this->typeSystemPlugins[$id] = [];
+    foreach (array_keys($this->graphQLPluginClassMap) as $id) {
+      /** @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
+      $manager = $container->get($id);
 
-      $manager = $this->getMockBuilder(TypeSystemPluginManager::class)
-        ->disableOriginalConstructor()
+      // Really?
+      $factoryMethod = new \ReflectionMethod($manager, 'getFactory');
+      $factoryMethod->setAccessible(TRUE);
+      $factoryProp = new \ReflectionProperty($manager, 'factory');
+      $factoryProp->setAccessible(TRUE);
+
+      $discoveryMethod = new \ReflectionMethod($manager, 'getDiscovery');
+      $discoveryMethod->setAccessible(TRUE);
+      $discoveryProp = new \ReflectionProperty($manager, 'discovery');
+      $discoveryProp->setAccessible(TRUE);
+
+      /** @var FactoryInterface $factory */
+      $factory = $factoryMethod->invoke($manager);
+      /** @var DiscoveryInterface $discovery */
+      $discovery = $discoveryMethod->invoke($manager);
+
+      $this->graphQLPlugins[$id] = [];
+
+      $mockFactory = $this
+        ->getMockBuilder(FactoryInterface::class)
         ->setMethods([
-          'getDefinitions',
-          'hasDefinition',
-          'getDefinition',
           'createInstance',
-        ])->getMock();
+        ])
+        ->getMock();
 
-      $manager
-        ->expects(static::any())
-        ->method('getDefinitions')
-        ->willReturnCallback(function () use ($id) {
-          return array_map(function (PluginInspectionInterface $plugin) {
-            return $plugin->getPluginDefinition();
-          }, $this->typeSystemPlugins[$id]);
+      $mockDiscovery = $this
+        ->getMockBuilder(DiscoveryInterface::class)
+        ->setMethods([
+          'hasDefinition',
+          'getDefinitions',
+          'getDefinition',
+        ])
+        ->getMock();
+
+      $mockFactory->expects(static::any())
+        ->method('createInstance')
+        ->with(static::anything(), static::anything())
+        ->willReturnCallback(function ($pluginId, $configuration) use ($id, $factory) {
+          if (array_key_exists($pluginId, $this->graphQLPlugins[$id])) {
+            return $this->graphQLPlugins[$id][$pluginId];
+          }
+          return $factory->createInstance($pluginId, $configuration);
         });
 
-      $manager
+      $mockDiscovery
+        ->expects(static::any())
+        ->method('getDefinitions')
+        ->willReturnCallback(function () use ($id, $discovery) {
+          return array_map(function (PluginInspectionInterface $plugin) {
+            return $plugin->getPluginDefinition();
+          }, $this->graphQLPlugins[$id]) + $discovery->getDefinitions();
+        });
+
+      $mockDiscovery
         ->expects(static::any())
         ->method('hasDefinition')
         ->with(static::anything())
-        ->willReturnCallback(function ($pluginId) use ($id) {
-          return isset($this->typeSystemPlugins[$id][$pluginId]);
+        ->willReturnCallback(function ($pluginId) use ($id, $discovery) {
+          return isset($this->graphQLPlugins[$id][$pluginId]) || $discovery->hasDefinition($pluginId);
         });
 
-      $manager
+      $mockDiscovery
         ->expects(static::any())
         ->method('getDefinition')
-        ->with(static::anything())
-        ->willReturnCallback(function ($pluginId) use ($id) {
-          return $this->typeSystemPlugins[$id][$pluginId]->getPluginDefinition();
-        });
-
-      $manager
-        ->expects(static::any())
-        ->method('createInstance')
         ->with(static::anything(), static::anything())
-        ->willReturnCallback(function ($pluginId) use ($id) {
-          return $this->typeSystemPlugins[$id][$pluginId];
+        ->willReturnCallback(function ($pluginId, $except) use ($id, $discovery) {
+          if (array_key_exists($pluginId, $this->graphQLPlugins[$id])) {
+            return $this->graphQLPlugins[$id][$pluginId];
+          }
+          return $discovery->getDefinition($pluginId, $except);
         });
 
-      $this->typeSystemPluginManagers[$id] = $manager;
-
-      $definition->setClass(MockTypeSystemPluginManager::class);
-      $definition->addArgument(new Reference('test.' . $id));
-
-      $new = $container->register('test.' . $id, TypeSystemPluginManager::class);
-      $new->setFactory([$this, 'typeSystemPluginManagerFactory']);
-      $new->addArgument($id);
+      $factoryProp->setValue($manager, $mockFactory);
+      $discoveryProp->setValue($manager, $mockDiscovery);
     }
   }
 
@@ -155,15 +168,15 @@ trait MockTypeSystemTrait {
   /**
    * Add a new plugin to the GraphQL type system.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface $plugin
+   * @param \Drupal\Component\Plugin\PluginInspectionInterface $plugin
    *   The plugin to add.
    *
    * @internal
    */
-  protected function addTypeSystemPlugin(TypeSystemPluginInterface $plugin) {
-    foreach ($this->typeSystemClassMap as $id => $class) {
+  protected function addTypeSystemPlugin(PluginInspectionInterface $plugin) {
+    foreach ($this->graphQLPluginClassMap as $id => $class) {
       if ($plugin instanceof $class) {
-        $this->typeSystemPlugins[$id][$plugin->getPluginId()] = $plugin;
+        $this->graphQLPlugins[$id][$plugin->getPluginId()] = $plugin;
       }
     }
   }
@@ -196,6 +209,26 @@ trait MockTypeSystemTrait {
    */
   protected function toBoundPromise($value, $scope) {
     return $this->toPromise(is_callable($value) ? \Closure::bind($value, $scope, $scope) : $value);
+  }
+
+  /**
+   * Mock a schema instance.
+   *
+   * @param string $id
+   *   The schema id.
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase
+   *   The schema plugin mock.
+   */
+  protected function mockSchema($id) {
+    $schema = $this->getMockForAbstractClass(SchemaPluginBase::class, [
+      [],
+      $id,
+      $this->getSchemaDefinitions()[$id],
+      $this->container->get('graphql.schema_builder'),
+    ]);
+    $this->addTypeSystemPlugin($schema);
+    return $schema;
   }
 
   /**
