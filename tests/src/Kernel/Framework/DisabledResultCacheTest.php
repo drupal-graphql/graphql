@@ -18,9 +18,9 @@ class DisabledResultCacheTest extends GraphQLTestBase {
    */
   public function register(ContainerBuilder $container) {
     parent::register($container);
-    // Set the result_cache parameter to FALSE.
+    // Set the development parameter to TRUE.
     $parameters = $container->getParameter('graphql.config');
-    $parameters['result_cache'] = FALSE;
+    $parameters['development'] = TRUE;
     $container->setParameter('graphql.config', $parameters);
   }
 

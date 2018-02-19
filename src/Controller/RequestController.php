@@ -20,10 +20,20 @@ class RequestController implements ContainerInjectionInterface {
   protected $processor;
 
   /**
+   * The service configuration parameters.
+   *
+   * @var array
+   */
+  protected $parameters;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('graphql.query_processor'));
+    return new static(
+      $container->get('graphql.query_processor'),
+      $container->getParameter('graphql.config')
+    );
   }
 
   /**
@@ -31,13 +41,16 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor
    *   The query processor.
+   * @param array $parameters
+   *   The service configuration parameters.
    */
-  public function __construct(QueryProcessor $processor) {
+  public function __construct(QueryProcessor $processor, array $parameters) {
     $this->processor = $processor;
+    $this->parameters = $parameters;
   }
 
   /**
-   * Handles GraphQL requests.
+   * Handles graphql requests.
    *
    * @param string $schema
    *   The name of the schema.
@@ -48,7 +61,8 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleRequest($schema, $operations) {
-    $result = $this->processor->processQuery($schema, $operations);
+    $debug = !empty($this->parameters['development']);
+    $result = $this->processor->processQuery($schema, $operations, NULL, $debug);
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
     return $response;

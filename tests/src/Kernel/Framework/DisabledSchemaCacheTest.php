@@ -18,7 +18,7 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
   public function register(ContainerBuilder $container) {
     parent::register($container);
     $config = $container->getParameter('graphql.config');
-    $config['schema_cache'] = FALSE;
+    $config['development'] = TRUE;
     $container->setParameter('graphql.config', $config);
   }
 

@@ -1,24 +1,12 @@
 parameters:
   graphql.config:
-    # GraphQL result cache:
-    #
-    # By default, the GraphQL results get cached. This can be disabled during development.
-    #
-    # @default true
-    result_cache: true
-
-    # GraphQL schema cache:
-    #
-    # By default, the GraphQL schema gets cached. This can be disabled during development.
-    #
-    # @default true
-    schema_cache: true
-
     # Development mode:
     #
-    # Enables debugging mode and disables field security.
+    # Enables debugging mode and disables field security and caching.
     #
-    # When enabled, all fields can be resolved without restrictions.
+    # When enabled, all fields can be resolved without restrictions
+    # and the caching strategy of the schema and query results is
+    # disabled entirely.
     #
     # @default false
     development: false

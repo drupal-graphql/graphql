@@ -10,6 +10,11 @@ use Drupal\Core\Cache\CacheBackendInterface;
 class SchemaBuilder {
 
   /**
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
    * @var \Drupal\graphql\Plugin\FieldPluginManager
    */
   protected $fieldManager;
@@ -43,11 +48,6 @@ class SchemaBuilder {
    * @var array
    */
   protected $types;
-
-  /**
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cacheBackend;
 
   /**
    * SchemaBuilder constructor.
