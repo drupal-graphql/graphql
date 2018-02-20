@@ -43,8 +43,11 @@ class QueryAccessCheck implements AccessInterface {
 
     $request = $this->requestStack->getCurrentRequest();
     /** @var \GraphQL\Server\OperationParams[] $operations */
-    $operations = (array) $request->attributes->get('operations');
+    if (!$operations = $request->attributes->get('operations', [])) {
+      return AccessResult::forbidden();
+    }
 
+    $operations = is_array($operations) ? $operations : [$operations];
     foreach ($operations as $operation) {
       // If a query was provided by the user, this is an arbitrary query (it's
       // not a persisted query). Hence, we only grant access if the user has the

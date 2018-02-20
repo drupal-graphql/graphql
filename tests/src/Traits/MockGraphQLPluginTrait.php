@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
-use Drupal\Core\DependencyInjection\Container;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\Annotation\GraphQLEnum;
@@ -59,11 +58,10 @@ trait MockGraphQLPluginTrait {
    * Injects the mocked schema managers into the drupal container. Has to be
    * invoked during the KernelTest's register callback.
    *
-   * @param \Drupal\Core\DependencyInjection\Container $container
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The container instance.
    */
   protected function injectTypeSystemPluginManagers(ContainerBuilder $container) {
-
     foreach (array_keys($this->graphQLPluginClassMap) as $id) {
       /** @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
       $manager = $container->get($id);

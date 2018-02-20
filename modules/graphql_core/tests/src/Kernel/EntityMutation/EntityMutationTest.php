@@ -46,7 +46,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity creation.
    */
   public function testCreateEntityMutation() {
-    $definition = $this->getTypePluginDefinition(GraphQLMutation::class, [
+    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
       'id' => 'createNode',
       'name' => 'createNode',
       'entity_type' => 'node',
@@ -108,7 +108,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity creation violations.
    */
   public function testCreateEntityMutationViolation() {
-    $definition = $this->getTypePluginDefinition(GraphQLMutation::class, [
+    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
       'id' => 'createNode',
       'name' => 'createNode',
       'entity_type' => 'node',
@@ -171,7 +171,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity updates.
    */
   public function testUpdateEntityMutation() {
-    $definition = $this->getTypePluginDefinition(GraphQLMutation::class, [
+    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
       'id' => 'updateNode',
       'name' => 'updateNode',
       'entity_type' => 'node',
@@ -239,7 +239,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity deletion.
    */
   public function testDeleteEntityMutation() {
-    $definition = $this->getTypePluginDefinition(GraphQLMutation::class, [
+    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
       'id' => 'deleteNode',
       'name' => 'deleteNode',
       'entity_type' => 'node',
