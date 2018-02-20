@@ -85,7 +85,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check English node.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'en',
+      'language' => 'EN',
     ], [
       'nodeById' => [
         'entityLabel' => 'English node',
@@ -95,7 +95,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check French translation.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'fr',
+      'language' => 'FR',
     ], [
       'nodeById' => [
         'entityLabel' => 'French node',
