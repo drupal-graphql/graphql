@@ -6,7 +6,9 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Utility\StringHelper;
@@ -109,8 +111,20 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
       $mode = isset($args['mode']) ? $args['mode'] : 'full';
       $language = $value->language()->getId();
       $builder = $this->entityTypeManager->getViewBuilder($value->getEntityTypeId());
-      $rendered = $builder->view($value, $mode, $language);
-      yield $this->renderer->render($rendered);
+      $view = $builder->view($value, $mode, $language);
+
+      $context = new RenderContext();
+      /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
+      $result = $this->renderer->executeInRenderContext($context, function() use ($view) {
+        return $this->renderer->render($view);
+      });
+
+      if (!$context->isEmpty()) {
+        yield new CacheableValue($result, [$context->pop()]);
+      }
+      else {
+        yield $result;
+      }
     }
   }
 

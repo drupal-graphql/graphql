@@ -3,31 +3,10 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use GraphQL\Executor\ExecutionResult;
 
-class QueryResult implements CacheableDependencyInterface, \JsonSerializable {
-
-  /**
-   * Don't serialize this object.
-   *
-   * Drop any serialization, since this will break php unit because the
-   * backtrace contains this object and tries to serialize a closure thats
-   * hidden deep in webonyx.
-   *
-   * // TODO: Solve me differently.
-   *
-   * @return string[]
-   *   The properties to serialize.
-   */
-  public function __sleep() {
-    return [];
-  }
-
-  /**
-   * The query result.
-   *
-   * @var mixed
-   */
-  protected $data;
+class QueryResult extends ExecutionResult implements CacheableDependencyInterface {
 
   /**
    * Cache metadata collected during query execution.
@@ -39,24 +18,22 @@ class QueryResult implements CacheableDependencyInterface, \JsonSerializable {
   /**
    * QueryResult constructor.
    *
-   * @param $data
+   * @param array $data
    *   Result data.
+   * @param array $errors
+   *   Errors collected during execution.
+   * @param array $extensions
+   *   User specified array of extensions.
    * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
    *   The cache metadata collected during query execution.
    */
-  public function __construct($data, CacheableDependencyInterface $metadata) {
+  public function __construct(array $data = null, array $errors = [], array $extensions = [], CacheableDependencyInterface $metadata = NULL) {
     $this->data = $data;
-    $this->metadata = $metadata;
-  }
+    $this->errors = $errors;
+    $this->extensions = $extensions;
 
-  /**
-   * Retrieve query result data.
-   *
-   * @return mixed
-   *   The result data object.
-   */
-  public function getData() {
-    return $this->data;
+    // If no cache metadata was given, assume this result is not cacheable.
+    $this->metadata = $metadata ?: (new CacheableMetadata())->setCacheMaxAge(0);
   }
 
   /**
@@ -81,9 +58,18 @@ class QueryResult implements CacheableDependencyInterface, \JsonSerializable {
   }
 
   /**
-   * {@inheritdoc}
+   * Don't serialize this object.
+   *
+   * Drop any serialization, since this will break php unit because the
+   * backtrace contains this object and tries to serialize a closure thats
+   * hidden deep in webonyx.
+   *
+   * // TODO: Solve me differently.
+   *
+   * @return string[]
+   *   The properties to serialize.
    */
-  public function jsonSerialize() {
-    return $this->getData();
+  public function __sleep() {
+    return [];
   }
 }

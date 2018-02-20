@@ -3,9 +3,8 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Render\RenderContext;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\graphql\GraphQL\Visitors\CacheMetadataCollector;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use GraphQL\Error\Error;
@@ -14,10 +13,8 @@ use GraphQL\Executor\ExecutionResult;
 use GraphQL\Executor\Executor;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\Executor\Promise\PromiseAdapter;
-use GraphQL\GraphQL;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
-use GraphQL\Language\Source;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
@@ -51,17 +48,8 @@ class QueryProcessor {
   protected $queryProvider;
 
   /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * Processor constructor.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
@@ -70,12 +58,10 @@ class QueryProcessor {
    *   The query provider service.
    */
   public function __construct(
-    RendererInterface $renderer,
     AccountProxyInterface $currentUser,
     SchemaPluginManager $pluginManager,
     QueryProviderInterface $queryProvider
   ) {
-    $this->renderer = $renderer;
     $this->currentUser = $currentUser;
     $this->pluginManager = $pluginManager;
     $this->queryProvider = $queryProvider;
@@ -93,7 +79,7 @@ class QueryProcessor {
    * @param bool $debug
    *   Whether to run this query in debugging mode.
    *
-   * @return \Drupal\graphql\GraphQL\Execution\QueryResult
+   * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
    */
   public function processQuery($schema, $params, $context = NULL, $debug = FALSE) {
@@ -115,41 +101,11 @@ class QueryProcessor {
       throw new RequestError(sprintf("Failed to load query map for id '%s'.", $id));
     });
 
-    return $this->executeQuery($config, $params);
-  }
-
-  /**
-   * Executes one or multiple graphql operations.
-   *
-   * @param \GraphQL\Server\ServerConfig $config
-   *   The server config.
-   * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $params
-   *   The graphql operation(s) to execute.
-   *
-   * @return \Drupal\graphql\GraphQL\Execution\QueryResult
-   *   The result of executing the operations.
-   */
-  protected function executeQuery(ServerConfig $config, $params) {
-    // Evaluating the request might lead to rendering of markup which in turn
-    // might "leak" cache metadata. Therefore, we execute the request within a
-    // render context and collect the leaked metadata afterwards.
-    $context = new RenderContext();
-    /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
-    $result = $this->renderer->executeInRenderContext($context, function() use ($config, $params) {
-      if (is_array($params)) {
-        return $this->executeBatch($config, $params);
-      }
-
-      return $this->executeSingle($config, $params);
-    });
-
-    $metadata = new CacheableMetadata();
-    // Apply render context cache metadata to the response.
-    if (!$context->isEmpty()) {
-      $metadata->addCacheableDependency($context->pop());
+    if (is_array($params)) {
+      return $this->executeBatch($config, $params);
     }
 
-    return new QueryResult($result, $metadata);
+    return $this->executeSingle($config, $params);
   }
 
   /**
@@ -173,7 +129,7 @@ class QueryProcessor {
   public function executeBatch(ServerConfig $config, array $params) {
     $adapter = new SyncPromiseAdapter();
     $result = array_map(function ($params) use ($adapter, $config) {
-      $this->promiseToExecuteOperation($adapter, $config, $params, TRUE);
+      return $this->promiseToExecuteOperation($adapter, $config, $params, TRUE);
     }, $params);
 
     $result = $adapter->all($result);
@@ -203,9 +159,7 @@ class QueryProcessor {
           return Error::createLocatedError($err, NULL, NULL);
         });
 
-        return $adapter->createFulfilled(
-          new ExecutionResult(NULL, $errors)
-        );
+        return $adapter->createFulfilled(new QueryResult(NULL, $errors));
       }
 
       $variables = $params->variables;
@@ -237,13 +191,13 @@ class QueryProcessor {
       );
     }
     catch (RequestError $exception) {
-      $result = $adapter->createFulfilled(new ExecutionResult(NULL, [Error::createLocatedError($exception)]));
+      $result = $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
     }
     catch (Error $exception) {
-      $result = $adapter->createFulfilled(new ExecutionResult(NULL, [$exception]));
+      $result = $adapter->createFulfilled(new QueryResult(NULL, [$exception]));
     }
 
-    return $result->then(function(ExecutionResult $result) use ($config) {
+    return $result->then(function(QueryResult $result) use ($config) {
       if ($config->getErrorsHandler()) {
         $result->setErrorsHandler($config->getErrorsHandler());
       }
@@ -281,15 +235,32 @@ class QueryProcessor {
     array $rules = NULL
   ) {
     try {
+      $metadata = new CacheableMetadata();
+      $visitor = new CacheMetadataCollector($metadata, $variables);
+      $rules = array_merge($rules ?: DocumentValidator::allRules(), [$visitor]);
       if ($errors = DocumentValidator::validate($schema, $document, $rules)) {
-        return $adapter->createFulfilled(new ExecutionResult(NULL, $errors));
+        return $adapter->createFulfilled(new QueryResult(NULL, $errors));
       }
 
-      // TODO: Visit the document nodes, extract cache metadata and perform a cache lookup.
-      return Executor::promiseToExecute($adapter, $schema, $document, $root, $context, $variables, $operation, $resolver);
+      // TODO: Implement cache backend lookup with collected cache metadata.
+
+      // Add the metadata bag to the context so fields can
+
+      return (Executor::promiseToExecute(
+        $adapter,
+        $schema,
+        $document,
+        $root,
+        $context,
+        $variables,
+        $operation,
+        $resolver
+      ))->then(function (ExecutionResult $result) use ($metadata) {
+        return new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
+      });
     }
     catch (Error $exception) {
-      return $adapter->createFulfilled(new ExecutionResult(NULL, [$exception]));
+      return $adapter->createFulfilled(new QueryResult(NULL, [$exception]));
     }
   }
 

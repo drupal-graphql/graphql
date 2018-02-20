@@ -64,7 +64,14 @@ class RequestController implements ContainerInjectionInterface {
     $debug = !empty($this->parameters['development']);
     $result = $this->processor->processQuery($schema, $operations, NULL, $debug);
     $response = new CacheableJsonResponse($result);
-    $response->addCacheableDependency($result);
+
+    // In case of a batch request, the result is an array.
+    $dependencies = is_array($operations) ? $result : [$result];
+    foreach ($dependencies as $dependency) {
+      $response->addCacheableDependency($dependency);
+    }
+
     return $response;
   }
+
 }

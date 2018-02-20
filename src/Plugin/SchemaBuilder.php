@@ -245,9 +245,11 @@ class SchemaBuilder {
    */
   protected function getTypeMap() {
     if (!isset($this->cache['types'])) {
-      if (!isset($this->cache) && $this->cacheGet('types') === NULL) {
-        $this->cacheSet('types', $this->buildTypeMap());
+      if (!isset($this->cache) && ($result = $this->cacheGet('types')) !== NULL) {
+        return $result;
       }
+
+      $this->cacheSet('types', $this->buildTypeMap());
     }
 
     return $this->cache['types'];
@@ -304,9 +306,11 @@ class SchemaBuilder {
    */
   protected function getTypeReferenceMap() {
     if (!isset($this->cache['types:references'])) {
-      if (!isset($this->cache) && $this->cacheGet('types:references') === NULL) {
-        $this->cacheSet('types:references', $this->buildTypeReferenceMap());
+      if (!isset($this->cache) && ($result = $this->cacheGet('types:references')) !== NULL) {
+        return $result;
       }
+
+      $this->cacheSet('types:references', $this->buildTypeReferenceMap());
     }
 
     return $this->cache['types:references'];
@@ -341,9 +345,11 @@ class SchemaBuilder {
    */
   protected function getFieldAssociationMap() {
     if (!isset($this->cache['fields:associations'])) {
-      if (!isset($this->cache) && $this->cacheGet('fields:associations') === NULL) {
-        $this->cacheSet('fields:associations', $this->buildFieldAssociationMap());
+      if (!isset($this->cache) && ($result = $this->cacheGet('fields:associations')) !== NULL) {
+        return $result;
       }
+
+      $this->cacheSet('fields:associations', $this->buildFieldAssociationMap());
     }
 
     return $this->cache['fields:associations'];
@@ -396,9 +402,11 @@ class SchemaBuilder {
    */
   protected function getFieldMap() {
     if (!isset($this->cache['fields'])) {
-      if (!isset($this->cache) && $this->cacheGet('fields') === NULL) {
-        $this->cacheSet('fields', $this->buildFieldMap());
+      if (!isset($this->cache) && ($result = $this->cacheGet('fields')) !== NULL) {
+        return $result;
       }
+
+      $this->cacheSet('fields', $this->buildFieldMap());
     }
 
     return $this->cache['fields'];
@@ -432,9 +440,11 @@ class SchemaBuilder {
    */
   protected function getMutationMap() {
     if (!isset($this->cache['mutations'])) {
-      if (!isset($this->cache) && $this->cacheGet('mutations') === NULL) {
-        $this->cacheSet('mutations', $this->buildMutationMap());
+      if (!isset($this->cache) && ($result = $this->cacheGet('mutations')) !== NULL) {
+        return $result;
       }
+
+      $this->cacheSet('mutations', $this->buildMutationMap());
     }
 
     return $this->cache['mutations'];
