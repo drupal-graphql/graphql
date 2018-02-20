@@ -109,10 +109,10 @@ class TestFrameworkTest extends GraphQLTestBase {
 
     $this->mockEnum('gender', [
       'name' => 'Gender',
-    ], function (SchemaBuilder $builder) {
+    ], function () {
       return [
-        ['value' => 'f', 'name' => 'Female', 'description' => ''],
-        ['value' => 'm', 'name' => 'Male', 'description' => ''],
+        'Female' => ['value' => 'f', 'description' => ''],
+        'Male' => ['value' => 'm', 'description' => ''],
       ];
     });
 

@@ -474,12 +474,12 @@ trait MockGraphQLPluginTrait {
     $enum = $this->getMockBuilder(EnumPluginBase::class)
       ->setConstructorArgs([[], $id, $definition])
       ->setMethods([
-        'buildValues',
+        'buildEnumValues',
       ])->getMock();
 
     $enum
       ->expects(static::any())
-      ->method('buildValues')
+      ->method('buildEnumValues')
       ->with($this->anything())
       ->will($this->toBoundPromise($values, $enum));
 
