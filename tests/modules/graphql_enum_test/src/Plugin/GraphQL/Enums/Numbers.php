@@ -36,12 +36,11 @@ class Numbers extends EnumPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildValues(SchemaBuilder $builder) {
+  public function buildEnumValues($definition) {
     $values = [];
     foreach (static::$NUMBERS as $num => $word) {
-      $values[] = [
+      $values[strtoupper($word)] = [
         'value' => $num,
-        'name' => strtoupper($word),
         'description' => ucfirst($word),
       ];
     }
