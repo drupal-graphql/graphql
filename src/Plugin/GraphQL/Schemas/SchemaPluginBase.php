@@ -57,23 +57,19 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   public function getSchema() {
     $config = new SchemaConfig();
 
-    if ($this->schemaBuilder->hasMutations()) {
-      $config->setMutation(new ObjectType([
-        'name' => 'MutationRoot',
-        'fields' => function () {
-          return $this->schemaBuilder->getMutations();
-        }
-      ]));
-    }
+    $config->setMutation(new ObjectType([
+      'name' => 'MutationRoot',
+      'fields' => function () {
+        return $this->schemaBuilder->getMutations();
+      },
+    ]));
 
-    if ($this->schemaBuilder->hasFields('Root')) {
-      $config->setQuery(new ObjectType([
-        'name' => 'QueryRoot',
-        'fields' => function () {
-          return $this->schemaBuilder->getFields('Root');
-        }
-      ]));
-    }
+    $config->setQuery(new ObjectType([
+      'name' => 'QueryRoot',
+      'fields' => function () {
+        return $this->schemaBuilder->getFields('Root');
+      },
+    ]));
 
     $config->setTypes(function () {
       return $this->schemaBuilder->getTypes();

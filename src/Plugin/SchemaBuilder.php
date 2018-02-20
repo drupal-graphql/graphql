@@ -234,7 +234,7 @@ class SchemaBuilder {
   protected function buildMutation($mutation) {
     if (!isset($this->mutations[$mutation['id']])) {
       $creator = [$mutation['class'], 'createInstance'];
-      $this->fields[$mutation['id']] = $creator($this, $this->mutationManager, $mutation['definition'], $mutation['id']);
+      $this->mutations[$mutation['id']] = $creator($this, $this->mutationManager, $mutation['definition'], $mutation['id']);
     }
 
     return $this->mutations[$mutation['id']];
@@ -473,11 +473,9 @@ class SchemaBuilder {
     return array_map(function ($definition) {
       $id = $definition['id'];
       $instance = $this->mutationManager->getInstance(['id' => $id]);
-
-      $carry[$id] = [
-        'id' => $id,
+      return [
         'definition' => $instance->getDefinition(),
-      ];
+      ] + $definition;
     }, $mutations);
   }
 

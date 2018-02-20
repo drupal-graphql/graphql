@@ -132,7 +132,7 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultData(QueryResult $result, $expected) {
-    $data = $result->getData()->toArray();
+    $data = $result->toArray();
     $this->assertArrayHasKey('data', $data, 'No result data.');
     $this->assertEquals($expected, $data['data'], 'Unexpected query result.');
   }
@@ -148,7 +148,7 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultErrors(QueryResult $result, array $expected) {
-    $data = $result->getData()->toArray();
+    $data = $result->toArray();
     $errors = array_map(function ($error) {
       return $error['message'];
     }, array_key_exists('errors', $data) ? $data['errors'] : []);
