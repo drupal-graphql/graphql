@@ -62,6 +62,36 @@ class RequestController implements ContainerInjectionInterface {
    */
   public function handleRequest($schema, $operations) {
     $debug = !empty($this->parameters['development']);
+
+    if (is_array($operations)) {
+      return $this->handleBatch($schema, $operations, $debug);
+    }
+
+    return $this->handleSingle($schema, $operations, $debug);
+  }
+
+  /**
+   * @param $schema
+   * @param $operations
+   * @param bool $debug
+   *
+   * @return \Drupal\Core\Cache\CacheableJsonResponse
+   */
+  protected function handleSingle($schema, $operations, $debug = FALSE) {
+    $result = $this->processor->processQuery($schema, $operations, NULL, $debug);
+    $response = new CacheableJsonResponse($result);
+    $response->addCacheableDependency($result);
+    return $response;
+  }
+
+  /**
+   * @param $schema
+   * @param $operations
+   * @param bool $debug
+   *
+   * @return \Drupal\Core\Cache\CacheableJsonResponse
+   */
+  protected function handleBatch($schema, $operations, $debug = FALSE) {
     $result = $this->processor->processQuery($schema, $operations, NULL, $debug);
     $response = new CacheableJsonResponse($result);
 
