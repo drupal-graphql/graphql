@@ -502,6 +502,6 @@ class SchemaBuilder {
       $this->cache[$keys[$key]] = $data->data;
     }
 
-    return $this->cache[$id];
+    return isset($this->cache[$id]) ? $this->cache[$id] : NULL;
   }
 }
