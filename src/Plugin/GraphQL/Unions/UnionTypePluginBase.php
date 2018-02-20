@@ -24,17 +24,15 @@ abstract class UnionTypePluginBase extends PluginBase implements TypePluginInter
       'description' => $definition['description'],
       'types' => function () use ($builder, $definition) {
         return array_map(function ($type) use ($builder) {
-          if (!(($type = $builder->getTypeByName($type)) instanceof ObjectType)) {
+          if (!(($type = $builder->getType($type)) instanceof ObjectType)) {
             throw new \LogicException('Union types can only reference object types.');
           }
-
           return $type;
-        }, $definition['types']);
+        }, $builder->getSubTypes($definition));
       },
-      // TODO: Implement this.
-//    'resolveType' => function () use ($builder, $definition) {
-//      return $builder->getPossibleTypes($definition['name']);
-//    },
+      'resolveType' => function ($value, $context, $info) use ($builder, $definition) {
+        return $builder->resolveType($definition, $value, $context, $info);
+      },
     ]);
   }
 
@@ -45,6 +43,7 @@ abstract class UnionTypePluginBase extends PluginBase implements TypePluginInter
     $definition = $this->getPluginDefinition();
 
     return [
+      'name' => $definition['name'],
       'description' => $this->buildDescription($definition),
       'types' => $this->buildTypes($definition),
     ];

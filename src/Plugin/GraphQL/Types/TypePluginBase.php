@@ -47,7 +47,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
       'isTypeOf' => function ($object, $context, ResolveInfo $info) use ($manager, $id) {
         $instance = $manager->getInstance(['id' => $id]);
         return $instance->applies($object, $context, $info);
-      }
+      },
     ]);
   }
 
@@ -61,6 +61,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
       'name' => $definition['name'],
       'description' => $this->buildDescription($definition),
       'interfaces' => $this->buildInterfaces($definition),
+      'unions' => $this->buildUnions($definition),
     ];
   }
 
@@ -71,6 +72,15 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
    */
   protected function buildInterfaces($definition) {
     return array_unique($definition['interfaces']);
+  }
+
+  /**
+   * @param $definition
+   *
+   * @return array
+   */
+  protected function buildUnions($definition) {
+    return array_unique($definition['unions']);
   }
 
   /**

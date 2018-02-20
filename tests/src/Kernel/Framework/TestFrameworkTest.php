@@ -210,18 +210,18 @@ class TestFrameworkTest extends GraphQLTestBase {
   public function testUnionMock() {
     $this->mockUnion('token', [
       'name' => 'Token',
+      'types' => ['Word'],
     ]);
 
     $this->mockType('number', [
       'name' => 'Number',
       'unions' => ['Token'],
     ], function ($value) {
-      return is_integer($value['value']);
+      return is_int($value['value']);
     });
 
     $this->mockType('word', [
       'name' => 'Word',
-      'unions' => ['Token'],
     ], function ($value) {
       return is_string($value['value']);
     });

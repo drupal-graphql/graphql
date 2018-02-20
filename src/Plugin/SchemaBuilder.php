@@ -201,7 +201,7 @@ class SchemaBuilder {
   /**
    * @param $type
    *
-   * @return mixed
+   * @return \Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase
    */
   protected function buildType($type) {
     if (!isset($this->types[$type['id']])) {
@@ -295,7 +295,7 @@ class SchemaBuilder {
       /** @var \Drupal\graphql\Plugin\TypePluginInterface $instance */
       $instance = $manager->getInstance(['id' => $type['id']]);
 
-      return [
+      return $type + [
         'definition' => $instance->getDefinition(),
       ] + $type;
     }, $types);
@@ -395,6 +395,96 @@ class SchemaBuilder {
         return $field['id'];
       }, $fields);
     }, $fields);
+  }
+
+  /**
+   * @return array
+   */
+  protected function getTypeAssociationMap() {
+    if (!isset($this->cache['types:associations'])) {
+      if (!isset($this->cache) && ($result = $this->cacheGet('types:associations')) !== NULL) {
+        return $result;
+      }
+
+      $this->cacheSet('types:associations', $this->buildTypeAssociationMap());
+    }
+
+    return $this->cache['types:associations'];
+  }
+
+  /**
+   * @return array
+   */
+  protected function buildTypeAssociationMap() {
+    $typeMap = $this->getTypeMap();
+    return array_map('array_unique',
+      array_reduce(array_filter(
+        array_map(function ($type) use ($typeMap) {
+          // If this is an object type, just return a mapping for it's interfaces.
+          if ($type['type'] === 'type') {
+            return array_map(function () use ($type) {
+              return [$type['definition']['name']];
+            }, array_flip($type['definition']['interfaces']));
+          }
+
+          // For interfaces, find all object types that declare to implement it.
+          if ($type['type'] === 'interface') {
+            return [$type['definition']['name'] => array_values(array_map(function ($type) {
+              return $type['definition']['name'];
+            }, array_filter($this->getTypeMap(), function ($subType) use ($type) {
+              return $subType['type'] === 'type' && in_array($type['definition']['name'], $subType['definition']['interfaces']);
+            })))];
+          }
+
+          // Union types combine the two approaches above.
+          if ($type['type'] === 'union') {
+            $explicit = $type['definition']['types'];
+
+            $implicit = array_values(array_map(function ($type) {
+              return $type['definition']['name'];
+            }, array_filter($typeMap, function ($subType) use ($type) {
+              return $subType['type'] === 'type' && in_array($type['definition']['name'], $subType['definition']['unions']);
+            })));
+
+            return [$type['definition']['name'] => array_merge($explicit, $implicit)];
+          }
+
+          return [];
+        }, $typeMap)
+      ), 'array_merge_recursive', [])
+    );
+  }
+
+  /**
+   * Retrieve the list of derivatives associated with a composite type.
+   *
+   * @return string[]
+   *   The list of possible sub typenames.
+   */
+  public function getSubTypes($definition) {
+    $typeMap = $this->getTypeAssociationMap();
+    return isset($typeMap[$definition['name']]) ? $typeMap[$definition['name']] : [];
+  }
+
+  /**
+   * Resolve the matching type.
+   */
+  public function resolveType($definition, $value, $context, $info) {
+    $typeMap = $this->getTypeMap();
+    foreach ($this->getTypeAssociationMap() as $parent => $types) {
+      if ($parent === $definition['name']) {
+        foreach ($types as $type) {
+          // TODO: Avoid loading the type for the check.
+          // Requires `applies` to become static.
+          if (array_key_exists($type, $typeMap) && $instance = $this->buildType($typeMap[$type])) {
+            if ($instance->isTypeOf($value, $context, $info)) {
+              return $instance;
+            }
+          }
+        }
+      }
+    }
+    return NULL;
   }
 
   /**
