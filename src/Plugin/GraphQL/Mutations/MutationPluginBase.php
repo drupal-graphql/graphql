@@ -28,9 +28,9 @@ abstract class MutationPluginBase extends PluginBase implements MutationPluginIn
       'deprecationReason' => $definition['deprecationReason'],
       'type' => $builder->processType($definition['type']),
       'args' => $builder->processArguments($definition['args']),
-      'resolve' => function ($args) use ($manager, $id) {
+      'resolve' => function ($value, $args, $context, $info) use ($manager, $id) {
         $instance = $manager->getInstance(['id' => $id]);
-        return call_user_func_array([$instance, 'resolve'], $args);
+        return call_user_func_array([$instance, 'resolve'], [$value, $args, $context, $info]);
       },
     ];
   }

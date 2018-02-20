@@ -378,7 +378,7 @@ trait MockGraphQLPluginTrait {
       $mutation
         ->expects(static::any())
         ->method('resolve')
-        ->with($this->anything(), $this->anything(), $this->anything())
+        ->with(static::anything(), static::anything(), static::anything(), static::anything())
         ->will($this->toBoundPromise($result, $mutation));
     }
 
