@@ -25,7 +25,7 @@ abstract class InterfacePluginBase extends PluginBase implements TypePluginInter
         return $builder->getFields($definition['name']);
       },
       'resolveType' => function ($value, $context, $info) use ($builder, $definition) {
-        return $builder->resolveType($definition, $value, $context, $info);
+        return $builder->resolveType($definition['name'], $value, $context, $info);
       },
     ]);
   }

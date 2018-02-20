@@ -27,11 +27,12 @@ abstract class UnionTypePluginBase extends PluginBase implements TypePluginInter
           if (!(($type = $builder->getType($type)) instanceof ObjectType)) {
             throw new \LogicException('Union types can only reference object types.');
           }
+
           return $type;
-        }, $builder->getSubTypes($definition));
+        }, $builder->getSubTypes($definition['name']));
       },
       'resolveType' => function ($value, $context, $info) use ($builder, $definition) {
-        return $builder->resolveType($definition, $value, $context, $info);
+        return $builder->resolveType($definition['name'], $value, $context, $info);
       },
     ]);
   }

@@ -416,43 +416,41 @@ class SchemaBuilder {
    * @return array
    */
   protected function buildTypeAssociationMap() {
-    $typeMap = $this->getTypeMap();
-    return array_map('array_unique',
-      array_reduce(array_filter(
-        array_map(function ($type) use ($typeMap) {
-          // If this is an object type, just return a mapping for it's interfaces.
-          if ($type['type'] === 'type') {
-            return array_map(function () use ($type) {
-              return [$type['definition']['name']];
-            }, array_flip($type['definition']['interfaces']));
-          }
+    $types = $this->getTypeMap();
+    $assocations = array_filter(array_map(function ($type) use ($types) {
+      // If this is an object type, just return a mapping for it's interfaces.
+      if ($type['type'] === 'type') {
+        return array_map(function () use ($type) {
+          return [$type['definition']['name']];
+        }, array_flip($type['definition']['interfaces']));
+      }
 
-          // For interfaces, find all object types that declare to implement it.
-          if ($type['type'] === 'interface') {
-            return [$type['definition']['name'] => array_values(array_map(function ($type) {
-              return $type['definition']['name'];
-            }, array_filter($this->getTypeMap(), function ($subType) use ($type) {
-              return $subType['type'] === 'type' && in_array($type['definition']['name'], $subType['definition']['interfaces']);
-            })))];
-          }
+      // For interfaces, find all object types that declare to implement it.
+      if ($type['type'] === 'interface') {
+        return [$type['definition']['name'] => array_values(array_map(function ($type) {
+          return $type['definition']['name'];
+        }, array_filter($types, function ($subType) use ($type) {
+          return $subType['type'] === 'type' && in_array($type['definition']['name'], $subType['definition']['interfaces']);
+        })))];
+      }
 
-          // Union types combine the two approaches above.
-          if ($type['type'] === 'union') {
-            $explicit = $type['definition']['types'];
+      // Union types combine the two approaches above.
+      if ($type['type'] === 'union') {
+        $explicit = $type['definition']['types'];
 
-            $implicit = array_values(array_map(function ($type) {
-              return $type['definition']['name'];
-            }, array_filter($typeMap, function ($subType) use ($type) {
-              return $subType['type'] === 'type' && in_array($type['definition']['name'], $subType['definition']['unions']);
-            })));
+        $implicit = array_values(array_map(function ($type) {
+          return $type['definition']['name'];
+        }, array_filter($types, function ($subType) use ($type) {
+          return $subType['type'] === 'type' && in_array($type['definition']['name'], $subType['definition']['unions']);
+        })));
 
-            return [$type['definition']['name'] => array_merge($explicit, $implicit)];
-          }
+        return [$type['definition']['name'] => array_merge($explicit, $implicit)];
+      }
 
-          return [];
-        }, $typeMap)
-      ), 'array_merge_recursive', [])
-    );
+      return [];
+    }, $types));
+
+    return array_map('array_unique', array_reduce($assocations, 'array_merge_recursive', []));
   }
 
   /**
@@ -461,31 +459,33 @@ class SchemaBuilder {
    * @return string[]
    *   The list of possible sub typenames.
    */
-  public function getSubTypes($definition) {
-    $typeMap = $this->getTypeAssociationMap();
-    return isset($typeMap[$definition['name']]) ? $typeMap[$definition['name']] : [];
+  public function getSubTypes($name) {
+    $types = $this->getTypeAssociationMap();
+    return isset($types[$name]) ? $types[$name] : [];
   }
 
   /**
    * Resolve the matching type.
    */
-  public function resolveType($definition, $value, $context, $info) {
-    $typeMap = $this->getTypeMap();
-    foreach ($this->getTypeAssociationMap() as $parent => $types) {
-      if ($parent === $definition['name']) {
-        foreach ($types as $type) {
-          // TODO: Avoid loading the type for the check.
-          // Requires `applies` to become static.
-          if (array_key_exists($type, $typeMap) && $instance = $this->buildType($typeMap[$type])) {
-            if ($instance->isTypeOf($value, $context, $info)) {
-              return $instance;
-            }
-          }
+  public function resolveType($name, $value, $context, $info) {
+    $types = $this->getTypeMap();
+    $associations = $this->getTypeAssociationMap();
+    if (!isset($associations[$name])) {
+      return NULL;
+    }
+
+    foreach ($associations[$name] as $type) {
+      // TODO: Avoid loading the type for the check. Make it static!
+      if (array_key_exists($type, $types) && $instance = $this->buildType($types[$type])) {
+        if ($instance->isTypeOf($value, $context, $info)) {
+          return $instance;
         }
       }
     }
+
     return NULL;
   }
+
 
   /**
    * @return array
