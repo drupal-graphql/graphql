@@ -36,7 +36,9 @@ class MutationTest extends GraphQLTestBase {
     $metadata = $this->defaultCacheMetaData();
     $metadata->setCacheMaxAge(0);
     $this->assertResults($query, ['car' => $car], [
-      'buyCar' => [],
+      'buyCar' => [
+        '__typename' => 'Car',
+      ],
     ], $metadata);
   }
 

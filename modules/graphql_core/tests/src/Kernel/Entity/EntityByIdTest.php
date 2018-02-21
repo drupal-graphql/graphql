@@ -105,7 +105,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check Chinese simplified translation.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'zh_hans',
+      'language' => 'ZH_HANS',
     ], [
       'nodeById' => [
         'entityLabel' => 'Chinese simplified node',

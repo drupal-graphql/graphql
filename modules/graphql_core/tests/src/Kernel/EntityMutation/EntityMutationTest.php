@@ -224,7 +224,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
     $metadata->addCacheTags(['node:1']);
 
     $this->assertResults('mutation ($node: NodeInput!, $nid: String!) { updateNode(id: $nid, input: $node) { entity { entityLabel } } }', [
-      'nid' => 1,
+      'nid' => '1',
       'node' => [
         'title' => 'Test',
       ],
@@ -274,7 +274,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
     $metadata->addCacheTags(['node:1']);
 
     $this->assertResults('mutation ($nid: String!) { deleteNode(id: $nid) { entity { entityLabel } } }', [
-      'nid' => 1,
+      'nid' => '1',
     ], [
       'deleteNode' => [
         'entity' => [

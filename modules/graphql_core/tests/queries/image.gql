@@ -2,7 +2,7 @@ query ($path: String!) {
   route:route(path: $path) {
     ... on EntityCanonicalUrl {
       node:entity {
-        ... on Node {
+        ... on NodeTest {
           image {
             alt
             title
