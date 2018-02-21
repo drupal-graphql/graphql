@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
@@ -34,7 +35,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       'deprecationReason' => $definition['deprecationReason'],
       'type' => $builder->processType($definition['type']),
       'args' => $builder->processArguments($definition['args']),
-      'resolve' => function ($value, array $args, $context, ResolveInfo $info) use ($manager, $id) {
+      'resolve' => function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($manager, $id) {
         $instance = $manager->getInstance(['id' => $id]);
         return $instance->resolve($value, $args, $context, $info);
       },
@@ -52,40 +53,41 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       'description' => $this->buildDescription($definition),
       'args' => $this->buildArguments($definition),
       'deprecationReason' => $this->buildDeprecationReason($definition),
-    ];
+    ] + $this->buildCacheMetadata($definition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, $context, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // If not resolving in a trusted environment, check if the field is secure.
-    if (isset($context['secure']) && empty($context['secure'])) {
+    if (!$context->getGlobal('development', FALSE)) {
       $definition = $this->getPluginDefinition();
       if (empty($definition['secure'])) {
         throw new \Exception(sprintf("Unable to resolve insecure field '%s'.", $info->fieldName));
       }
     }
 
-    // TODO: Add context.
-    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
+    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function resolveDeferred(callable $callback, $value, array $args, ResolveInfo $info) {
-    $result = $callback($value, $args, $info);
+  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $result = $callback($value, $args, $context, $info);
     if (is_callable($result)) {
-      return new Deferred(function () use ($result, $args, $info, $value) {
-        return $this->resolveDeferred($result, $value, $args, $info);
+      return new Deferred(function () use ($result, $value, $args, $context, $info) {
+        return $this->resolveDeferred($result, $value, $args, $context, $info);
       });
     }
 
     // Extract the result array.
     $result = iterator_to_array($result);
-
-    // TODO: Extract cache dependencies.
+    $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
+    foreach ($dependencies as $dependency) {
+      $context->addCacheableDependency($dependency);
+    }
 
     return $this->unwrapResult($result, $info);
   }
@@ -125,13 +127,15 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    *   The parent value.
    * @param array $args
    *   The arguments passed to the field.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return array
-   *   A list of cacheable dependencies.
+   * @return array A list of cacheable dependencies.
+   * A list of cacheable dependencies.
    */
-  protected function getCacheDependencies(array $result, $parent, array $args, ResolveInfo $info) {
+  protected function getCacheDependencies(array $result, $parent, array $args, ResolveContext $context, ResolveInfo $info) {
     return array_filter($result, function ($item) {
       return $item instanceof CacheableDependencyInterface;
     });
@@ -147,13 +151,15 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    *   The current object value.
    * @param array $args
    *   Field arguments.
+   * @param $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
    *   The value generator.
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // Allow overriding this class without having to declare this method.
     yield NULL;
   }

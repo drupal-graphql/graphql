@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\LanguageSwitch;
 
 use Drupal\Core\Url;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -20,7 +21,7 @@ class LanguageSwitchLinkUrl extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     /** @var \Drupal\Core\Language\LanguageInterface $language */
     $language = $value['link']['language'];
 

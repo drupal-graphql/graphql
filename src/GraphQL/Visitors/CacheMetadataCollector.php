@@ -3,6 +3,9 @@
 namespace Drupal\graphql\GraphQL\Visitors;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\SelectionSetNode;
+use GraphQL\Language\Visitor;
 use GraphQL\Validator\Rules\AbstractQuerySecurity;
 use GraphQL\Validator\ValidationContext;
 
@@ -40,7 +43,28 @@ class CacheMetadataCollector extends AbstractQuerySecurity {
    * {@inheritdoc}
    */
   public function getVisitor(ValidationContext $context) {
-    // TODO: Implememt this.
-    return $this->invokeIfNeeded($context, []);
+    $this->variables = new \ArrayObject();
+    $this->structure = new \ArrayObject();
+
+    return $this->invokeIfNeeded($context, [
+      NodeKind::SELECTION_SET => function (SelectionSetNode $selectionSet) use ($context) {
+        $this->structure = $this->collectFieldASTsAndDefs(
+          $context,
+          $context->getParentType(),
+          $selectionSet,
+          NULL,
+          $this->structure
+        );
+      },
+      NodeKind::VARIABLE_DEFINITION => function ($definition, &$variables) {
+        array_push( $this->variables, $definition);
+        return Visitor::skipNode();
+      },
+//      NodeKind::OPERATION_DEFINITION => [
+//        'leave' => function () {
+//          $foo = '';
+//        },
+//      ],
+    ]);
   }
 }

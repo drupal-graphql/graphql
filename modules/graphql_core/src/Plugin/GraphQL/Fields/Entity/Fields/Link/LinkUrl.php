@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Fields\Link;
 
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\link\LinkItemInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -23,7 +24,7 @@ class LinkUrl extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof LinkItemInterface) {
       yield $value->getUrl();
     }

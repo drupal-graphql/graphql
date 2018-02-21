@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
@@ -88,15 +89,15 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
    *
    * @param mixed $object
    *   The object to check against.
-   * @param mixed $context
-   *   The execution context.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return null|bool
    *   TRUE if this type applies to the given object or FALSE if it doesn't.
    */
-  public function applies($object, $context, ResolveInfo $info) {
+  public function applies($object, ResolveContext $context, ResolveInfo $info) {
     return NULL;
   }
 

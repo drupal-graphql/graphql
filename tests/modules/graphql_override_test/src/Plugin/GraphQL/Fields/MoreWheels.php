@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_override_test\Plugin\GraphQL\Fields;
 
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_plugin_test\Plugin\GraphQL\Fields\Wheels;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -24,8 +25,8 @@ class MoreWheels extends Wheels {
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    foreach (parent::resolveValues($value, $args, $info) as $wheels) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    foreach (parent::resolveValues($value, $args, $context, $info) as $wheels) {
       yield $wheels + 1;
     }
   }

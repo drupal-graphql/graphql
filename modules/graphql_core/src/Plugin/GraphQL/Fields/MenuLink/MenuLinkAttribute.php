@@ -4,6 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\MenuLink;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -26,7 +27,7 @@ class MenuLinkAttribute extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof MenuLinkTreeElement) {
       $options = $value->link->getOptions();
       yield NestedArray::getValue($options, ['attributes', $args['key']]);

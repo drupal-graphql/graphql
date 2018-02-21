@@ -61,24 +61,25 @@ class RequestController implements ContainerInjectionInterface {
    *   The JSON formatted response.
    */
   public function handleRequest($schema, $operations) {
-    $debug = !empty($this->parameters['development']);
+    $development = !empty($this->parameters['development']);
+    $globals = ['development' => $development];
 
     if (is_array($operations)) {
-      return $this->handleBatch($schema, $operations, $debug);
+      return $this->handleBatch($schema, $operations, $globals);
     }
 
-    return $this->handleSingle($schema, $operations, $debug);
+    return $this->handleSingle($schema, $operations, $globals);
   }
 
   /**
    * @param $schema
    * @param $operations
-   * @param bool $debug
+   * @param array $globals
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    */
-  protected function handleSingle($schema, $operations, $debug = FALSE) {
-    $result = $this->processor->processQuery($schema, $operations, NULL, $debug);
+  protected function handleSingle($schema, $operations, $globals) {
+    $result = $this->processor->processQuery($schema, $operations, $globals);
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
     return $response;
@@ -87,12 +88,12 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * @param $schema
    * @param $operations
-   * @param bool $debug
+   * @param array $globals
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    */
-  protected function handleBatch($schema, $operations, $debug = FALSE) {
-    $result = $this->processor->processQuery($schema, $operations, NULL, $debug);
+  protected function handleBatch($schema, $operations, $globals) {
+    $result = $this->processor->processQuery($schema, $operations, $globals);
     $response = new CacheableJsonResponse($result);
 
     // In case of a batch request, the result is an array.

@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -77,7 +78,7 @@ class TestFrameworkTest extends GraphQLTestBase {
       'name' => 'value',
       'parents' => ['Test'],
       'type' => 'String',
-    ], function ($value, array $args, ResolveInfo $info) {
+    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
       yield $value['value'];
     });
 
@@ -88,7 +89,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'Test',
-    ], function ($value, array $args, ResolveInfo $info) {
+    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
       yield ['value' => 'test'];
     });
 

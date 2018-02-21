@@ -74,25 +74,28 @@ class QueryProcessor {
    *   The plugin id of the schema to use.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $params
    *   The graphql operation(s) to execute.
-   * @param mixed $context
+   * @param array $globals
    *   The query context.
-   * @param bool $debug
-   *   Whether to run this query in debugging mode.
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
+   *
    */
-  public function processQuery($schema, $params, $context = NULL, $debug = FALSE) {
+  public function processQuery($schema, $params, array $globals = []) {
     // Load the plugin from the schema manager.
     $plugin = $this->pluginManager->createInstance($schema);
     $schema = $plugin->getSchema();
+
+    // Build the resolve context which is handed to each field resolver.
+    $context = new ResolveContext($globals);
+    $debug = $context->getGlobal('development', FALSE);
 
     // Create the server config.
     $config = ServerConfig::create();
     $config->setDebug($debug);
     $config->setSchema($schema);
-    $config->setContext($context);
     $config->setQueryBatching(TRUE);
+    $config->setContext($context);
     $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
       if ($query = $this->queryProvider->getQuery($id, $params)) {
         return $query;
@@ -243,8 +246,6 @@ class QueryProcessor {
       }
 
       // TODO: Implement cache backend lookup with collected cache metadata.
-
-      // Add the metadata bag to the context so fields can
 
       return (Executor::promiseToExecute(
         $adapter,

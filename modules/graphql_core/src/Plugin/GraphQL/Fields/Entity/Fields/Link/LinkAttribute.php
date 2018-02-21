@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Fields\Link;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\link\LinkItemInterface;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -27,7 +28,7 @@ class LinkAttribute extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof LinkItemInterface) {
       $options = $value->getUrl()->getOptions();
       yield NestedArray::getValue($options, ['attributes', $args['key']]);

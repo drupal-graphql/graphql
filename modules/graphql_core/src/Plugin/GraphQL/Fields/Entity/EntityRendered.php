@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Utility\StringHelper;
@@ -87,7 +88,6 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
 //  protected function buildArguments(SchemaBuilder $builder) {
 //    $arguments = parent::buildArguments($builder);
 //
-//    // TODO Fix this.
 //    if (empty($arguments['mode'])) {
 //      $definition = $this->getPluginDefinition();
 //      $type = StringHelper::camelCase($definition['entity_type'], 'display', 'mode', 'id');
@@ -106,7 +106,7 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       $mode = isset($args['mode']) ? $args['mode'] : 'full';
       $language = $value->language()->getId();

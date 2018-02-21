@@ -30,8 +30,7 @@ abstract class MutationPluginBase extends PluginBase implements MutationPluginIn
       'args' => $builder->processArguments($definition['args']),
       'resolve' => function ($value, $args, $context, $info) use ($manager, $id) {
         $instance = $manager->getInstance(['id' => $id]);
-        // TODO: Add context.
-        return call_user_func_array([$instance, 'resolve'], [$value, $args, $info]);
+        return call_user_func_array([$instance, 'resolve'], [$value, $args, $context, $info]);
       },
     ];
   }
@@ -47,7 +46,6 @@ abstract class MutationPluginBase extends PluginBase implements MutationPluginIn
       'description' => $this->buildDescription($definition),
       'args' => $this->buildArguments($definition),
       'deprecationReason' => $this->buildDeprecationReason($definition),
-    ];
+    ] + $this->buildCacheMetadata($definition);
   }
-
 }

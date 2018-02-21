@@ -51,7 +51,7 @@ abstract class InterfacePluginBase extends PluginBase implements TypePluginInter
       'name' => $definition['name'],
       'description' => $this->buildDescription($definition),
       'interfaces' => $this->buildInterfaces($definition),
-    ];
+    ] + $this->buildCacheMetadata($definition);
   }
 
   /**

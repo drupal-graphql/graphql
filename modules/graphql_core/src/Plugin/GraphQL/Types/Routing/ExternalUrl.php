@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Types\Routing;
 
 use Drupal\Core\Url;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -20,7 +21,7 @@ class ExternalUrl extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($object, $context, ResolveInfo $info) {
+  public function applies($object, ResolveContext $context, ResolveInfo $info) {
     return $object instanceof Url && $object->isExternal();
   }
 

@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\ScalarType;
@@ -16,7 +17,7 @@ class EntityFieldBase extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveItem($item, array $args, ResolveInfo $info) {
+  protected function resolveItem($item, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($item instanceof FieldItemInterface) {
       $definition = $this->getPluginDefinition();
       $property = $definition['property'];

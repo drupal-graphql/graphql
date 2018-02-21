@@ -40,7 +40,7 @@ abstract class InputTypePluginBase extends PluginBase implements TypePluginInter
       'name' => $definition['name'],
       'description' => $this->buildDescription($definition),
       'fields' => $this->buildFields($definition),
-    ];
+    ] + $this->buildCacheMetadata($definition);
   }
 
   /**

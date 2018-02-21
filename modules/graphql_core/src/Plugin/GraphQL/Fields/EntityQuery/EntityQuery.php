@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use GraphQL\Error\Error;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -79,8 +80,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  protected function getCacheDependencies(array $result, $value, array $args, ResolveInfo $info) {
-    $entityType = $this->getEntityType($value, $args, $info);
+  protected function getCacheDependencies(array $result, $value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $entityType = $this->getEntityType($value, $args, $context, $info);
     $type = $this->entityTypeManager->getDefinition($entityType);
 
     $metadata = new CacheableMetadata();
@@ -93,8 +94,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    yield $this->getQuery($value, $args, $info);
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    yield $this->getQuery($value, $args, $context, $info);
   }
 
   /**
@@ -104,13 +105,15 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent value.
    * @param array $args
    *   The field arguments array.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return string|null
+   * @return null|string
    *   The entity type object or NULL if none could be derived.
    */
-  protected function getEntityType($value, array $args, ResolveInfo $info) {
+  protected function getEntityType($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $definition = $this->getPluginDefinition();
     if (isset($definition['entity_type'])) {
       return $definition['entity_type'];
@@ -130,14 +133,16 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent entity type.
    * @param array $args
    *   The field arguments array.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
    */
-  protected function getQuery($value, array $args, ResolveInfo $info) {
-    $query = $this->getBaseQuery($value, $args, $info);
+  protected function getQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $query = $this->getBaseQuery($value, $args, $context, $info);
     $query->range($args['offset'], $args['limit']);
 
     if (array_key_exists('revisions', $args)) {
@@ -162,20 +167,22 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent entity type.
    * @param array $args
    *   The field arguments array.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
    */
-  protected function getBaseQuery($value, array $args, ResolveInfo $info) {
-    $entityType = $this->getEntityType($value, $args, $info);
+  protected function getBaseQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $entityType = $this->getEntityType($value, $args, $context, $info);
     $entityStorage = $this->entityTypeManager->getStorage($entityType);
     $query = $entityStorage->getQuery();
     $query->accessCheck(TRUE);
 
     // The context object can e.g. transport the parent entity language.
-    $query->addMetaData('graphql_context', $this->getQueryContext($value, $args, $info));
+    $query->addMetaData('graphql_context', $this->getQueryContext($value, $args, $context, $info));
 
     return $query;
   }
@@ -187,13 +194,15 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent value.
    * @param array $args
    *   The field arguments array.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return mixed
    *   The query context.
    */
-  protected function getQueryContext($value, array $args, ResolveInfo $info) {
+  protected function getQueryContext($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // Forward the whole set of arguments by default.
     return [
       'parent' => $value,
