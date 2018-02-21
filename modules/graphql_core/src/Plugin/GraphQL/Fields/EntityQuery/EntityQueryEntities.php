@@ -138,7 +138,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    */
   protected function resolveFromEntityIds($type, $ids, $metadata, array $args, ResolveContext $context, ResolveInfo $info) {
     $resolve = $this->entityBuffer->add($type, $ids);
-    return function($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $metadata, $context) {
+    return function($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $metadata) {
       return $this->resolveEntities($resolve(), $metadata, $args,  $context, $info);
     };
   }

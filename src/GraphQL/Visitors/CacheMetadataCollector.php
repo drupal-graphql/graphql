@@ -43,28 +43,7 @@ class CacheMetadataCollector extends AbstractQuerySecurity {
    * {@inheritdoc}
    */
   public function getVisitor(ValidationContext $context) {
-    $this->variables = new \ArrayObject();
-    $this->structure = new \ArrayObject();
-
-    return $this->invokeIfNeeded($context, [
-      NodeKind::SELECTION_SET => function (SelectionSetNode $selectionSet) use ($context) {
-        $this->structure = $this->collectFieldASTsAndDefs(
-          $context,
-          $context->getParentType(),
-          $selectionSet,
-          NULL,
-          $this->structure
-        );
-      },
-      NodeKind::VARIABLE_DEFINITION => function ($definition, &$variables) {
-        array_push( $this->variables, $definition);
-        return Visitor::skipNode();
-      },
-//      NodeKind::OPERATION_DEFINITION => [
-//        'leave' => function () {
-//          $foo = '';
-//        },
-//      ],
-    ]);
+    // TODO: Implement cache metadata collection.
+    return $this->invokeIfNeeded($context, []);
   }
 }
