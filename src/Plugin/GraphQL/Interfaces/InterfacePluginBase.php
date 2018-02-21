@@ -32,6 +32,8 @@ abstract class InterfacePluginBase extends PluginBase implements TypePluginInter
           $inherited = call_user_func_array('array_merge', $inherited);
           return array_merge($inherited, $fields);
         }
+
+        return $fields;
       },
       'resolveType' => function ($value, $context, $info) use ($builder, $definition) {
         return $builder->resolveType($definition['name'], $value, $context, $info);
