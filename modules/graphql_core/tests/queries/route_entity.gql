@@ -2,7 +2,9 @@ query ($path: String!) {
   route:route(path: $path) {
     ... on EntityCanonicalUrl {
       node:entity {
-        title
+        ... on Node {
+          title
+        }
       }
     }
   }
