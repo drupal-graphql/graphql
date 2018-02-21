@@ -120,10 +120,10 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
       });
 
       if (!$context->isEmpty()) {
-        yield new CacheableValue($result, [$context->pop()]);
+        yield new CacheableValue((string) $result, [$context->pop()]);
       }
       else {
-        yield $result;
+        yield (string) $result;
       }
     }
   }
