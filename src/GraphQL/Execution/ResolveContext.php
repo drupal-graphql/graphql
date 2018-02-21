@@ -38,14 +38,13 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @return mixed|null
    */
   public function getContext($name, ResolveInfo $info, $default = NULL) {
-    // TODO: Use operation name in path.
-    $operation = $info->operation;
+    $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
     $path = $info->path;
 
     do {
       $key = implode('.', $path);
-      if (isset($this->contexts[$key][$name])) {
-        return $this->contexts[$key][$name];
+      if (isset($this->contexts[$operation][$key][$name])) {
+        return $this->contexts[$operation][$key][$name];
       }
     } while (array_pop($path) && !empty($path));
 
@@ -60,10 +59,9 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @return $this
    */
   public function setContext($name, $value, ResolveInfo $info) {
-    // TODO: Use operation name in path.
-    $operation = $info->operation;
+    $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
     $key = implode('.', $info->path);
-    $this->contexts[$key][$name] = $value;
+    $this->contexts[$operation][$key][$name] = $value;
 
     return $this;
   }
