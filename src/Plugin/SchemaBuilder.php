@@ -544,9 +544,9 @@ class SchemaBuilder {
    * @return array
    */
   protected function buildMutationMap() {
-    $mutations = $this->mutationManager->getDefinitions();
-    $mutations = array_reduce(array_keys($mutations), function ($carry, $id) use ($mutations) {
-      $current = $mutations[$id];
+    $definitions = $this->mutationManager->getDefinitions();
+    $mutations = array_reduce(array_keys($definitions), function ($carry, $id) use ($definitions) {
+      $current = $definitions[$id];
       $name = $current['name'];
 
       if (empty($carry[$name]) || $carry[$name]['weight'] < $current['weight']) {
