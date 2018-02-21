@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql_core\Kernel\EntityMutation;
 
 use Drupal\graphql\Annotation\GraphQLMutation;
+use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\DeleteEntityBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\UpdateEntityBase;
@@ -47,6 +48,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    */
   public function testCreateEntityMutation() {
     $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
+      'class' => MutationPluginBase::class,
       'id' => 'createNode',
       'name' => 'createNode',
       'entity_type' => 'node',
@@ -109,6 +111,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    */
   public function testCreateEntityMutationViolation() {
     $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
+      'class' => MutationPluginBase::class,
       'id' => 'createNode',
       'name' => 'createNode',
       'entity_type' => 'node',
@@ -172,6 +175,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    */
   public function testUpdateEntityMutation() {
     $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
+      'class' => MutationPluginBase::class,
       'id' => 'updateNode',
       'name' => 'updateNode',
       'entity_type' => 'node',
@@ -240,6 +244,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    */
   public function testDeleteEntityMutation() {
     $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
+      'class' => MutationPluginBase::class,
       'id' => 'deleteNode',
       'name' => 'deleteNode',
       'entity_type' => 'node',
