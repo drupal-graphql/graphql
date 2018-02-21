@@ -15,6 +15,7 @@ use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
+use GraphQL\Language\Visitor;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
@@ -86,16 +87,19 @@ class QueryProcessor {
     $plugin = $this->pluginManager->createInstance($schema);
     $schema = $plugin->getSchema();
 
-    // Build the resolve context which is handed to each field resolver.
-    $context = new ResolveContext($globals);
-    $debug = $context->getGlobal('development', FALSE);
-
     // Create the server config.
     $config = ServerConfig::create();
-    $config->setDebug($debug);
+    $config->setDebug(!empty($globals['development']));
     $config->setSchema($schema);
     $config->setQueryBatching(TRUE);
-    $config->setContext($context);
+    $config->setContext(function () use ($globals) {
+      // Each document (e.g. in a batch query) gets its own resolve context but
+      // the global parameters are shared. This allows us to collect the cache
+      // metadata and contextual values (e.g. inheritance for language) for each
+      // query separately.
+      return new ResolveContext($globals);
+    });
+
     $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
       if ($query = $this->queryProvider->getQuery($id, $params)) {
         return $query;
@@ -119,7 +123,7 @@ class QueryProcessor {
    */
   public function executeSingle(ServerConfig $config, OperationParams $params) {
     $adapter = new SyncPromiseAdapter();
-    $result = $this->promiseToExecuteOperation($adapter, $config, $params, FALSE);
+    $result = $this->executeOperation($adapter, $config, $params, FALSE);
     return $adapter->wait($result);
   }
 
@@ -132,7 +136,7 @@ class QueryProcessor {
   public function executeBatch(ServerConfig $config, array $params) {
     $adapter = new SyncPromiseAdapter();
     $result = array_map(function ($params) use ($adapter, $config) {
-      return $this->promiseToExecuteOperation($adapter, $config, $params, TRUE);
+      return $this->executeOperation($adapter, $config, $params, TRUE);
     }, $params);
 
     $result = $adapter->all($result);
@@ -147,7 +151,7 @@ class QueryProcessor {
    *
    * @return \GraphQL\Executor\Promise\Promise
    */
-  protected function promiseToExecuteOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
+  protected function executeOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     try {
       if (!$config->getSchema()) {
         throw new \LogicException('Missing schema for query execution.');
@@ -165,23 +169,32 @@ class QueryProcessor {
         return $adapter->createFulfilled(new QueryResult(NULL, $errors));
       }
 
+      $schema = $config->getSchema();
       $variables = $params->variables;
       $operation = $params->operation;
       $document = $params->queryId ? $this->loadPersistedQuery($config, $params) : $params->query;
       if (!$document instanceof DocumentNode) {
         $document = Parser::parse($document);
+
+        // Assume that pre-parsed documents are already validated. This allows
+        // us to store pre-validated query documents e.g. for persisted queries
+        // effectively improving performance by skipping run-time validation.
+        $rules = $this->resolveValidationRules($config, $params, $document, $operation);
+        if ($errors = DocumentValidator::validate($schema, $document, $rules)) {
+          return $adapter->createFulfilled(new QueryResult(NULL, $errors));
+        }
       }
 
       if ($params->isReadOnly() && AST::getOperation($document, $operation) !== 'query') {
         throw new RequestError('GET requests are only supported for query operations.');
       }
 
-      $schema = $config->getSchema();
+      // TODO: Collect cache metadata from AST and perform a cach lookup.
+
       $resolver = $config->getFieldResolver();
       $root = $this->resolveRootValue($config, $params, $document, $operation);
       $context = $this->resolveContextValue($config, $params, $document, $operation);
-      $rules = $this->resolveValidationRules($config, $params, $document, $operation);
-      $result = $this->promiseToExecute(
+      $promise = Executor::promiseToExecute(
         $adapter,
         $schema,
         $document,
@@ -189,9 +202,13 @@ class QueryProcessor {
         $context,
         $variables,
         $operation,
-        $resolver,
-        $rules
+        $resolver
       );
+
+      return $promise->then(function (ExecutionResult $result) use ($context) {
+        $metadata = (new CacheableMetadata())->addCacheableDependency($context);
+        return new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
+      });
     }
     catch (RequestError $exception) {
       $result = $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
@@ -211,58 +228,6 @@ class QueryProcessor {
 
       return $result;
     });
-  }
-
-  /**
-   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Type\Schema $schema
-   * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param null $root
-   * @param null $context
-   * @param null $variables
-   * @param null $operation
-   * @param callable|NULL $resolver
-   * @param array|NULL $rules
-   *
-   * @return \GraphQL\Executor\Promise\Promise
-   */
-  protected function promiseToExecute(
-    PromiseAdapter $adapter,
-    Schema $schema,
-    DocumentNode $document,
-    $root = NULL,
-    $context = NULL,
-    $variables = NULL,
-    $operation = NULL,
-    callable $resolver = NULL,
-    array $rules = NULL
-  ) {
-    try {
-      $metadata = new CacheableMetadata();
-      $visitor = new CacheMetadataCollector($metadata, $variables);
-      $rules = array_merge($rules ?: DocumentValidator::allRules(), [$visitor]);
-      if ($errors = DocumentValidator::validate($schema, $document, $rules)) {
-        return $adapter->createFulfilled(new QueryResult(NULL, $errors));
-      }
-
-      // TODO: Implement cache backend lookup with collected cache metadata.
-
-      return (Executor::promiseToExecute(
-        $adapter,
-        $schema,
-        $document,
-        $root,
-        $context,
-        $variables,
-        $operation,
-        $resolver
-      ))->then(function (ExecutionResult $result) use ($metadata) {
-        return new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
-      });
-    }
-    catch (Error $exception) {
-      return $adapter->createFulfilled(new QueryResult(NULL, [$exception]));
-    }
   }
 
   /**

@@ -3,7 +3,9 @@
 namespace Drupal\graphql\GraphQL\Visitors;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use GraphQL\Language\Visitor;
 use GraphQL\Validator\Rules\AbstractQuerySecurity;
@@ -43,7 +45,33 @@ class CacheMetadataCollector extends AbstractQuerySecurity {
    * {@inheritdoc}
    */
   public function getVisitor(ValidationContext $context) {
-    // TODO: Implement cache metadata collection.
-    return $this->invokeIfNeeded($context, []);
+    $variableDefs = new \ArrayObject();
+    $fieldNodeAndDefs = new \ArrayObject();
+
+    return $this->invokeIfNeeded($context, [
+      NodeKind::SELECTION_SET => function (SelectionSetNode $selectionSet) use ($context, &$fieldNodeAndDefs) {
+      $foo = '';
+        $fieldNodeAndDefs->exchangeArray($this->collectFieldASTsAndDefs(
+          $context,
+          $context->getParentType(),
+          $selectionSet,
+          null,
+          $fieldNodeAndDefs
+        ));
+      },
+      NodeKind::VARIABLE_DEFINITION => function ($def) use (&$variableDefs) {
+        $variableDefs->append($def);
+        return Visitor::skipNode();
+      },
+      NodeKind::DOCUMENT => [
+        'leave' => function (DocumentNode $document) use ($context, $fieldNodeAndDefs, &$variableDefs) {
+          $errors = $context->getErrors();
+
+          if (empty($errors)) {
+            $foo = '';
+          }
+        },
+      ],
+    ]);
   }
 }
