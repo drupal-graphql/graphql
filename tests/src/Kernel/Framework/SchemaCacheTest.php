@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Prophecy\Argument;
 
@@ -15,59 +16,82 @@ use Prophecy\Argument;
 class SchemaCacheTest extends GraphQLTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container) {
+    parent::register($container);
+
+    // Disable static caching in schema builder and field manager.
+    $this->container->getDefinition('graphql.schema_builder')->setShared(FALSE);
+    $this->container->getDefinition('plugin.manager.graphql.field')->setShared(FALSE);
+  }
+
+  /**
    * Test basic schema caching.
    */
   public function testCacheableSchema() {
-    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
-
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
+    // Create a first field.
+    $this->mockField('foo', [
+      'id' => 'foo',
+      'name' => 'foo',
       'type' => 'String',
-    ], 'test');
+    ], 'foo');
 
-    $this->schemaManager
-      ->expects(static::once())
-      ->method('createInstance')
-      ->with(static::anything(), static::anything())
-      ->willReturnCallback(function ($id) {
-        return $this->mockSchema($id);
-      });
+    // Run introspect to populate the schema cache.
+    $this->introspect();
 
-    $this->container->get('graphql.schema_loader')->getSchema('default');
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+    // Add another field.
+    $this->mockField('bar', [
+      'id' => 'bar',
+      'name' => 'bar',
+      'type' => 'String',
+    ], 'bar');
+
+    // Run introspect again, the new field should not appear immediately.
+    $schema = $this->introspect();
+    $this->assertArrayNotHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema has not been cached.'
+    );
   }
 
   /**
    * Test an uncacheable schema.
    */
   public function testUncacheableSchema() {
-    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
-
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
+    // Create a first field.
+    $this->mockField('foo', [
+      'id' => 'foo',
+      'name' => 'foo',
       'type' => 'String',
       'schema_cache_max_age' => 0,
-    ], 'test');
+    ], 'foo');
 
-    $this->schemaManager
-      ->expects(static::exactly(2))
-      ->method('createInstance')
-      ->with(static::anything(), static::anything())
-      ->willReturnCallback(function ($id) {
-        return $this->mockSchema($id);
-      });
+    // Run introspect to populate the schema cache.
+    $this->introspect();
 
-    $this->container->get('graphql.schema_loader')->getSchema('default');
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+    // Add another field.
+    $this->mockField('bar', [
+      'id' => 'bar',
+      'name' => 'bar',
+      'type' => 'String',
+    ], 'bar');
+
+    // Run introspect again, the new field should appear immediately.
+    $schema = $this->introspect();
+    $this->assertArrayHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema has not been cached.'
+    );
+
   }
 
   /**
    * Test context based schema invalidation.
    */
   public function testContext() {
-    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
 
     // Prepare a prophesied context manager.
     $contextManager = $this->prophesize(CacheContextsManager::class);
@@ -91,54 +115,86 @@ class SchemaCacheTest extends GraphQLTestBase {
     /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
     $contextKeys = $contextManager->convertTokensToKeys($hasContext);
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
+    // Create a first field.
+    $this->mockField('foo', [
+      'id' => 'foo',
+      'name' => 'foo',
       'type' => 'String',
       'schema_cache_contexts' => ['context'],
-    ], 'test');
+    ], 'foo');
 
-    $this->schemaManager
-      ->expects(static::exactly(2))
-      ->method('createInstance')
-      ->with(static::anything(), static::anything())
-      ->willReturnCallback(function ($id) {
-        return $this->mockSchema($id);
-      });
-
+    // Set a cache context.
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+    // Run introspect to populate the schema cache.
+    $this->introspect();
 
+    // Add another field.
+    $this->mockField('bar', [
+      'id' => 'bar',
+      'name' => 'bar',
+      'type' => 'String',
+    ], 'bar');
+
+    // Run introspect again, the new field should not appear immediately.
+    $schema = $this->introspect();
+    $this->assertArrayNotHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema has not been cached.'
+    );
+
+    // Set a different cache context.
     $contextKeys->willReturn(new ContextCacheKeys(['b']));
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+
+    // Now the new field should appear.
+    $schema = $this->introspect();
+    $this->assertArrayHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema does not contain the new field.'
+    );
   }
 
   /**
    * Test tag based schema invalidation.
    */
   public function testTags() {
-    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
-
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
+    // Create a first field.
+    $this->mockField('foo', [
+      'id' => 'foo',
+      'name' => 'foo',
       'type' => 'String',
-      'schema_cache_tags' => ['a'],
-    ], 'test');
+      'schema_cache_tags' => ['foo'],
+    ], 'foo');
 
-    $this->schemaManager
-      ->expects(static::exactly(2))
-      ->method('createInstance')
-      ->with(static::anything(), static::anything())
-      ->willReturnCallback(function ($id) {
-        return $this->mockSchema($id);
-      });
+    // Run introspect to populate the schema cache.
+    $this->introspect();
 
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+    // Add another field.
+    $this->mockField('bar', [
+      'id' => 'bar',
+      'name' => 'bar',
+      'type' => 'String',
+    ], 'bar');
 
-    $this->container->get('cache_tags.invalidator')->invalidateTags(['a']);
+    // Run introspect again, the new field should not appear immediately.
+    $schema = $this->introspect();
+    $this->assertArrayNotHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema has not been cached.'
+    );
 
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+    // Clear the fields schema cache tag.
+    $this->container->get('cache_tags.invalidator')->invalidateTags(['foo']);
+
+    // Now the new field should appear.
+    $schema = $this->introspect();
+    $this->assertArrayHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema does not contain the new field.'
+    );
   }
 
 }
