@@ -82,7 +82,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
         ];
       }));
 
-    $this->addTypePlugin($mutation);
+    $this->addTypeSystemPlugin($mutation);
 
     $metadata = $this->defaultCacheMetaData();
     $metadata->setCacheMaxAge(0);
@@ -143,7 +143,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
         ];
       }));
 
-    $this->addTypePlugin($mutation);
+    $this->addTypeSystemPlugin($mutation);
 
     $metadata = $this->defaultCacheMetaData();
     $metadata->setCacheMaxAge(0);
@@ -204,7 +204,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
         ];
       }));
 
-    $this->addTypePlugin($mutation);
+    $this->addTypeSystemPlugin($mutation);
 
     $this->createNode([
       'title' => 'Old title',
@@ -256,7 +256,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
       $this->container->get('entity_type.manager'),
     ]);
 
-    $this->addTypePlugin($mutation);
+    $this->addTypeSystemPlugin($mutation);
 
     $this->createNode([
       'title' => 'Test',
