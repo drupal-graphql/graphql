@@ -63,6 +63,25 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
   protected function extractBody(Request $request) {
     $values = [];
 
+    // Extract the request content.
+    if ($content = $request->getContent()) {
+      $values = array_merge($values, JsonHelper::decodeParams(json_decode($content, TRUE)));
+    }
+
+    if (stripos($request->headers->get('content-type'), 'multipart/form-data') !== FALSE) {
+      return $this->extractMultipart($request, $values);
+    }
+
+    return $values;
+  }
+
+  /**
+   * Handles file uploads from multipart/form-data requests.
+   *
+   * @return array
+   *   The query parameters with added file uploads.
+   */
+  protected function extractMultipart(Request $request, $values) {
     // The request body parameters might contain file upload mutations. We treat
     // them according to the graphql multipart request specification.
     //
@@ -73,26 +92,6 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       $values = array_merge($values, $body, $operations);
     }
 
-    // Extract the request content.
-    if ($content = $request->getContent()) {
-      $values = array_merge($values, JsonHelper::decodeParams(json_decode($content, TRUE)));
-    }
-
-    return $values;
-  }
-
-  /**
-   * TODO: Re-add this.
-   *
-   * Extract an associative array of query parameters from the request.
-   *
-   * If the given request does not have any POST body content it uses the GET
-   * query parameters instead.
-   *
-   * @return array
-   *   An associative array of query parameters.
-   */
-  protected function applyFiles(Request $request, $values) {
     // According to the graphql multipart request specification, uploaded files
     // are referenced to variable placeholders in a map. Here, we resolve this
     // map by assigning the uploaded files to the corresponding variables.

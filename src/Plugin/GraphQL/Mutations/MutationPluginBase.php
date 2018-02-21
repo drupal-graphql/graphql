@@ -30,7 +30,8 @@ abstract class MutationPluginBase extends PluginBase implements MutationPluginIn
       'args' => $builder->processArguments($definition['args']),
       'resolve' => function ($value, $args, $context, $info) use ($manager, $id) {
         $instance = $manager->getInstance(['id' => $id]);
-        return call_user_func_array([$instance, 'resolve'], [$value, $args, $context, $info]);
+        // TODO: Add context.
+        return call_user_func_array([$instance, 'resolve'], [$value, $args, $info]);
       },
     ];
   }

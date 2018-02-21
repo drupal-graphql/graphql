@@ -67,6 +67,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
     }
 
+    // TODO: Add context.
     return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $info);
   }
 
