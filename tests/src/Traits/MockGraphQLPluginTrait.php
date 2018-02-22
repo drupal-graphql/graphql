@@ -247,6 +247,7 @@ trait MockGraphQLPluginTrait {
     $definition = $this->getTypeSystemPluginDefinition(
      GraphQLField::class,
      $definition + [
+       'secure' => TRUE,
        'id' => $id,
        'class' => FieldPluginBase::class,
      ]
@@ -262,7 +263,7 @@ trait MockGraphQLPluginTrait {
       $field
         ->expects(static::any())
         ->method('resolveValues')
-        ->with($this->anything(), $this->anything(), $this->anything())
+        ->with(static::anything(), static::anything(), static::anything(), static::anything())
         ->will($this->toBoundPromise($result, $field));
     }
 
