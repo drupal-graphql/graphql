@@ -63,6 +63,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
       'description' => $this->buildDescription($definition),
       'interfaces' => $this->buildInterfaces($definition),
       'unions' => $this->buildUnions($definition),
+      'weight' => $definition['weight'],
     ];
   }
 

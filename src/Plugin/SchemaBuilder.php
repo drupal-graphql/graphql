@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 
@@ -450,7 +451,20 @@ class SchemaBuilder {
       return [];
     }, $types));
 
-    return array_map('array_unique', array_reduce($assocations, 'array_merge_recursive', []));
+    $assocations = array_map('array_unique', array_reduce($assocations, 'array_merge_recursive', []));
+
+    $assocations = array_map(function ($parent) use ($types) {
+      $children = array_map(function ($child) use ($types) {
+        return $types[$child] + ['name' => $child];
+      }, $parent);
+      uasort($children,[SortArray::class, 'sortByWeightElement']);
+      $children = array_reverse($children);
+      return array_map(function ($child) {
+        return $child['name'];
+      }, $children);
+    }, $assocations);
+
+    return $assocations;
   }
 
   /**
