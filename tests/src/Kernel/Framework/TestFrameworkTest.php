@@ -68,6 +68,10 @@ class TestFrameworkTest extends GraphQLTestBase {
     $this->assertErrors('{ root }', [], [
       'Cannot query field "root" on type "QueryRoot".',
     ], $metadata);
+
+    $this->assertErrors('{ root }', [], [
+      '/root.*QueryRoot/',
+    ], $metadata);
   }
 
   /**

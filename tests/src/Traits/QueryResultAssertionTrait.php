@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Execution\QueryResult;
+use GraphQL\Error\Error;
 use GraphQL\Server\OperationParams;
 
 /**
@@ -143,16 +144,49 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\graphql\GraphQL\Execution\QueryResult $result
    *   The query result object.
    * @param array $expected
-   *   The list of expected error messages.
+   *   The list of expected error messages. Also allows regular expressions.
    *
    * @internal
    */
   private function assertResultErrors(QueryResult $result, array $expected) {
-    $data = $result->toArray();
-    $errors = array_map(function ($error) {
-      return $error['message'];
-    }, array_key_exists('errors', $data) ? $data['errors'] : []);
-    $this->assertEquals($expected, $errors, 'Invalid GraphQL query. Errors: ' . implode("\n* ", $errors));
+    // Retrieve the list of error strings.
+    $errors = array_map(function (Error $error) {
+      return $error->getMessage();
+    }, $result->errors);
+
+    // Initalize the status.
+    $unexpected = [];
+    $matchCount = array_map(function () {
+      return 0;
+    }, array_flip($expected));
+
+    // Iterate through error messages.
+    // Collect unmatched errors and count pattern hits.
+    while ($error = array_pop($errors)) {
+      $match = FALSE;
+      foreach ($expected as $pattern) {
+        if (@preg_match($pattern, NULL) === FALSE) {
+          $match = $match || $pattern == $error;
+          $matchCount[$pattern]++;
+        }
+        else {
+          $match = $match || preg_match($pattern, $error);
+          $matchCount[$pattern]++;
+        }
+      }
+
+      if (!$match) {
+        $unexpected[] = $error;
+      }
+    }
+
+    // Create a list of patterns that never matched.
+    $missing = array_keys(array_filter($matchCount, function ($count) {
+      return $count == 0;
+    }));
+
+    $this->assertEquals([], $missing, "Missing errors:\n* " . implode("\n* ", $missing));
+    $this->assertEquals([], $unexpected, "Unexpected errors:\n* " . implode("\n* ", $unexpected));
   }
 
   /**
