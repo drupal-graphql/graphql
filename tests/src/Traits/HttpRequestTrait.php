@@ -40,10 +40,9 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function persistedQuery($id, $version, array $variables = []) {
+  protected function persistedQuery($id, array $variables = []) {
     return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
-      'id' => $id,
-      'version' => $version,
+      'queryId' => $id,
       'variables' => $variables,
     ]));
   }
@@ -58,7 +57,7 @@ trait HttpRequestTrait {
    *   The http response object.
    */
   protected function batchedQueries($queries) {
-    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [], [], [], [], json_encode($queries)));
+    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'POST', [], [], [], [], json_encode($queries)));
   }
 
 }

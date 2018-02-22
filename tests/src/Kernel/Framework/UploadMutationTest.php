@@ -51,6 +51,7 @@ class UploadMutationTest extends GraphQLTestBase {
         'error' => UPLOAD_ERR_OK,
       ],
     ]);
+    $uploadRequest->headers->add(['content-type' => 'multipart/form-data']);
 
     $response = $this->container->get('http_kernel')->handle($uploadRequest);
     $result = json_decode($response->getContent());

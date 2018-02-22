@@ -277,15 +277,9 @@ class ResultCacheTest extends GraphQLTestBase {
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
-    $queryProvider->getQuery(Argument::allOf(
-      Argument::withEntry('version', 'a'),
-      Argument::withEntry('id', 'query')
-    ))->willReturn('{ a }');
+    $queryProvider->getQuery('query:a', Argument::any())->willReturn('{ a }');
 
-    $queryProvider->getQuery(Argument::allOf(
-      Argument::withEntry('version', 'b'),
-      Argument::withEntry('id', 'query')
-    ))->willReturn('{ b }');
+    $queryProvider->getQuery('query:b', Argument::any())->willReturn('{ b }');
 
     $field = $this->mockField('a', [
       'id' => 'a',
@@ -313,10 +307,10 @@ class ResultCacheTest extends GraphQLTestBase {
         yield 'b';
       });
 
-    $this->persistedQuery('query', 'a');
-    $this->persistedQuery('query', 'b');
-    $this->persistedQuery('query', 'a');
-    $this->persistedQuery('query', 'b', ['value' => 'test']);
+    $this->persistedQuery('query:a');
+    $this->persistedQuery('query:b');
+    $this->persistedQuery('query:a');
+    $this->persistedQuery('query:b', ['value' => 'test']);
   }
 
 }
