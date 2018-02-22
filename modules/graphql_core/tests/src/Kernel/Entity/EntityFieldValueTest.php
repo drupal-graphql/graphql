@@ -136,6 +136,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'body' => [
         'value' => 'test',
         'summary' => 'test summary',
+        'format' => 'full_html',
       ],
       'field_text' => ['a', 'b', 'c'],
       'field_boolean' => [TRUE, FALSE],
@@ -213,7 +214,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => NULL,
+        'format' => 'full_html',
       ],
       'fieldText' => [
         ['value' => 'a'],
