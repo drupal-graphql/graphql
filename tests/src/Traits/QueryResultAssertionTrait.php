@@ -198,9 +198,6 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultMetadata(QueryResult $result, CacheableMetadata $expected) {
-    // TODO: Re-enable cache metadata assertions.
-    return;
-
     if (!$expected) {
       $expected = new CacheableMetadata();
     }
