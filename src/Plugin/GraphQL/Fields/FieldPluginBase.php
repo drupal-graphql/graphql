@@ -3,7 +3,9 @@
 namespace Drupal\graphql\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
@@ -107,6 +109,10 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   protected function unwrapResult($result, ResolveInfo $info) {
     $result = array_map(function ($item) {
       return $item instanceof ValueWrapperInterface ? $item->getValue() : $item;
+    }, $result);
+
+    $result = array_map(function ($item) {
+      return $item instanceof MarkupInterface ? $item->__toString() : $item;
     }, $result);
 
     // If this is a list, return the result as an array.

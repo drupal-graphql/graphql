@@ -73,8 +73,8 @@ class EntityMutationTest extends GraphQLContentTestBase {
     $mutation
       ->expects(static::any())
       ->method('extractEntityInput')
-      ->with($this->anything(), $this->anything())
-      ->will($this->returnCallback(function ($args, $info) {
+      ->with(static::anything(), static::anything(), static::anything(), static::anything())
+      ->will($this->returnCallback(function ($source, $args, $context, $info) {
         return [
           'title' => $args['input']['title'],
           'status' => 1,
@@ -136,8 +136,8 @@ class EntityMutationTest extends GraphQLContentTestBase {
     $mutation
       ->expects(static::any())
       ->method('extractEntityInput')
-      ->with($this->anything(), $this->anything())
-      ->will($this->returnCallback(function ($args, $info) {
+      ->with(static::anything(), static::anything(), static::anything(), static::anything())
+      ->will($this->returnCallback(function ($source, $args, $context, $info) {
         return [
           'status' => 1,
           'body' => [
@@ -201,8 +201,8 @@ class EntityMutationTest extends GraphQLContentTestBase {
     $mutation
       ->expects(static::any())
       ->method('extractEntityInput')
-      ->with($this->anything(), $this->anything())
-      ->will($this->returnCallback(function ($args, $info) {
+      ->with(static::anything(), static::anything(), static::anything(), static::anything())
+      ->will($this->returnCallback(function ($source, $args, $context, $info) {
         return [
           'title' => $args['input']['title'],
         ];

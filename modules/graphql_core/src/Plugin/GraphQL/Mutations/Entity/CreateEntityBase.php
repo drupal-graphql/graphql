@@ -63,7 +63,7 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
     // the schema.
-    $input = $this->extractEntityInput($args, $info);
+    $input = $this->extractEntityInput($value, $args, $context, $info);
 
     $entityDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
     if ($entityDefinition->hasKey('bundle')) {
@@ -84,15 +84,19 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    *
    * Loops over all input values and assigns them to their original field names.
    *
+   * @param $value
+   *   The parent value.
    * @param array $args
    *   The entity values provided through the resolver args.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *   the resolve info object.
+   *   The resolve info object.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  abstract protected function extractEntityInput(array $args, ResolveInfo $info);
+  abstract protected function extractEntityInput($value, array $args, ResolveContext $context, ResolveInfo $info);
 
   /**
    * Formats the output of the mutation.

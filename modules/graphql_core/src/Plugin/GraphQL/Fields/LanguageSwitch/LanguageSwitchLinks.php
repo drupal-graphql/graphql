@@ -77,7 +77,7 @@ class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPlu
         return [$current, $links];
       });
 
-      return function ($value, $args, ResolveInfo $info) use ($resolve) {
+      return function () use ($resolve) {
         list($current, $links) = $resolve();
 
         if (!empty($links->links)) {

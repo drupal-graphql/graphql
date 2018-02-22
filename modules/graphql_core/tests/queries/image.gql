@@ -11,7 +11,7 @@ query ($path: String!) {
             entity {
               url
             }
-            thumbnailImage:derivative(style: thumbnail) {
+            thumbnailImage:derivative(style: THUMBNAIL) {
               width
               height
               url
