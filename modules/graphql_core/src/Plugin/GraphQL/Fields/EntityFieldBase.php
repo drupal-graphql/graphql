@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -22,6 +23,7 @@ class EntityFieldBase extends FieldPluginBase {
       $definition = $this->getPluginDefinition();
       $property = $definition['property'];
       $result = $item->get($property)->getValue();
+      $result = $result instanceof MarkupInterface ? $result->__toString() : $result;
 
       $type = $info->returnType;
       $type = $type instanceof WrappingType ? $type->getWrappedType(TRUE) : $type;

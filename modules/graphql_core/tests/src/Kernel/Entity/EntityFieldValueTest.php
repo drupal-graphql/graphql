@@ -157,7 +157,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'field_timestamp' => [0, 300],
       'field_email' => ['test@test.com'],
       'field_string' => ['test', '123'],
-      'field_reference' => [
+      'field_reference' =>  [
         ['target_id' => 1],
       ],
       'field_file' => [
@@ -204,10 +204,10 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
         'entity' => NULL,
       ],
       'title' => 'Test',
-      'status' => 1,
-      'promote' => 1,
-      'sticky' => 0,
-      'revisionTranslationAffected' => 1,
+      'status' => TRUE,
+      'promote' => TRUE,
+      'sticky' => FALSE,
+      'revisionTranslationAffected' => TRUE,
       'body' => [
         'value' => 'test',
         'summary' => 'test summary',
