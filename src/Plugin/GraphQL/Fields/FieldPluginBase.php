@@ -61,7 +61,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    */
   public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // If not resolving in a trusted environment, check if the field is secure.
-    if (!$context->getGlobal('development', FALSE)) {
+    if (!$context->getGlobal('development', FALSE) && !$context->getGlobal('bypass field security', FALSE)) {
       $definition = $this->getPluginDefinition();
       if (empty($definition['secure'])) {
         throw new \Exception(sprintf("Unable to resolve insecure field '%s'.", $info->fieldName));

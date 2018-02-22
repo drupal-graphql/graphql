@@ -87,8 +87,7 @@ trait QueryResultAssertionTrait {
       OperationParams::create([
         'query' => $query,
         'variables' => $variables,
-      ]),
-      $variables
+      ])
     );
 
     $this->assertResultErrors($result, []);
@@ -114,8 +113,7 @@ trait QueryResultAssertionTrait {
       OperationParams::create([
         'query' => $query,
         'variables' => $variables,
-      ]),
-      $variables
+      ])
     );
 
     $this->assertResultErrors($result, $expected);

@@ -87,6 +87,10 @@ class QueryProcessor {
     $plugin = $this->pluginManager->createInstance($schema);
     $schema = $plugin->getSchema();
 
+    // If the current user has appropriate permissions, allow to bypass
+    // the secure fields restriction.
+    $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
+
     // Create the server config.
     $config = ServerConfig::create();
     $config->setDebug(!empty($globals['development']));
