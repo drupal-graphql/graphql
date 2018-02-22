@@ -78,14 +78,8 @@ class PermissionsTest extends GraphQLTestBase {
       ['queryId' => 'persisted:a'],
     ]);
 
-    // If some queries fail, 200 is returned.
-    $this->assertEquals(200, $batched->getStatusCode());
-    $data = [
-      'data' => [
-        'root' => 'test',
-      ],
-    ];
-    $this->assertEquals([NULL, $data], json_decode($batched->getContent(), TRUE));
+    // If some queries fail, 403 is returned.
+    $this->assertEquals(403, $batched->getStatusCode());
   }
 
   /**
