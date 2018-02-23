@@ -3,7 +3,10 @@
 namespace Drupal\Tests\graphql_core\Kernel\Entity;
 
 use Drupal\file\Entity\File;
+use Drupal\graphql\Utility\StringHelper;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
+use GraphQL\Server\OperationParams;
 
 /**
  * Test basic entity fields.
@@ -37,7 +40,136 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
    */
   protected function setUp() {
     parent::setUp();
+  }
 
+  /**
+   * Test boolean fields.
+   */
+  public function testBoolean() {
+    $this->addField('boolean', "field_boolean", FALSE);
+
+    $this->mockNode([
+      'field_boolean' => TRUE,
+    ]);
+
+    $this->assertGraphQLFields([
+      ['NodeTest', 'fieldBoolean', 'Boolean'],
+    ]);
+
+    $query = <<<GQL
+query {
+  node {
+    fieldBoolean
+  }
+}
+GQL;
+
+    $this->assertResults($query, [], [
+      'node' => [
+        'fieldBoolean' => TRUE,
+      ],
+    ], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * Test a simple text field.
+   */
+  public function testText() {
+    $this->addField('text', "field_text", FALSE);
+    $this->mockNode([
+      'field_text' => [
+        'value' => 'Foo',
+      ],
+    ]);
+
+    $this->assertGraphQLFields([
+      ['NodeTest', 'fieldText', 'FieldNodeFieldText'],
+      ['FieldNodeFieldText', 'value', 'String'],
+      ['FieldNodeFieldText', 'processed', 'String'],
+      ['FieldNodeFieldText', 'format', 'String'],
+    ]);
+
+    $query = <<<GQL
+query {
+  node {
+    fieldText {
+      value
+      processed
+      format
+    }
+  }
+}
+GQL;
+
+    $this->assertResults($query, [], [
+      'node' => [
+        'fieldText' => [
+          0 => [
+            'value' => 'Foo',
+            'processed' => "<p>Foo</p>\n",
+            'format' => 'null',
+          ],
+        ],
+      ],
+    ], $this->defaultCacheMetaData());
+
+  }
+
+  /**
+   * Test filtered text fields.
+   */
+  public function testFilteredText() {
+    $this->mockNode([
+      'body' => [
+        'value' => 'http://www.drupal.org',
+        'format' => 'plain_text',
+      ],
+    ]);
+
+    $this->assertGraphQLFields([
+      ['NodeTest', 'body', 'FieldNodeBody'],
+      ['FieldNodeBody', 'format', 'String'],
+      ['FieldNodeBody', 'value', 'String'],
+      ['FieldNodeBody', 'processed', 'String'],
+      ['FieldNodeBody', 'summary', 'String'],
+      ['FieldNodeBody', 'summaryProcessed', 'String'],
+    ]);
+
+    $query = <<<GQL
+query {
+  node {
+    body {
+      value
+      processed
+      summary
+      summaryProcessed
+    }
+  }
+}
+GQL;
+
+
+    $this->assertResults($query, [], [
+      'node' => [
+        'body' => [
+          'value' => 'http://www.drupal.org',
+          'processed' => "<p><a href=\"http://www.drupal.org\">http://www.drupal.org</a></p>\n",
+          'summary' => 'null',
+          'summaryProcessed' => '',
+        ],
+      ],
+    ], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * Test if the basic fields are available on the interface.
+   *
+   * @dataProvider nodeValuesProvider
+   *
+   * @param array $actualFieldValues
+   * @param array $expectedFieldValues
+   */
+  public function testRawValues($actualFieldValues, $expectedFieldValues) {
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);
     $this->addField('text', "field_text");
@@ -67,17 +199,6 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'uri' => 'public://example.png',
     ]);
     $this->testImage->save();
-  }
-
-  /**
-   * Test if the basic fields are available on the interface.
-   *
-   * @dataProvider nodeValuesProvider
-   *
-   * @param array $actualFieldValues
-   * @param array $expectedFieldValues
-   */
-  public function testRawValues($actualFieldValues, $expectedFieldValues) {
     $values = [
       'title' => 'Test',
       'type' => 'test',
@@ -136,7 +257,6 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'body' => [
         'value' => 'test',
         'summary' => 'test summary',
-        'format' => 'full_html',
       ],
       'field_text' => ['a', 'b', 'c'],
       'field_boolean' => [TRUE, FALSE],
@@ -214,7 +334,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => 'full_html',
+        'format' => 'null',
       ],
       'fieldText' => [
         ['value' => 'a'],

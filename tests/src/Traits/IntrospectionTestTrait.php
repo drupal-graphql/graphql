@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
+use Drupal\graphql\Utility\StringHelper;
+
 /**
  * Trait to retrieve a name-indexed schema to run assertions on it.
  */
@@ -20,6 +22,36 @@ trait IntrospectionTestTrait {
   }
 
   /**
+   * Assert certain fields in the GraphQL schema.
+   *
+   * @param array $fields
+   *   Array of [ParentType, FieldName, FieldType] triples. Field type can use
+   *   the GraphQL type notation.
+   */
+  protected function assertGraphQLFields(array $fields) {
+    $schema = $this->introspect();
+    foreach ($fields as list($parent, $name, $type)) {
+      $this->assertArrayHasKey($parent, $schema['types'], "Type $parent not found.");
+      $this->assertArrayHasKey($name, $schema['types'][$parent]['fields'], "Field $name not found on type $parent.");
+      $field = $schema['types'][$parent]['fields'][$name];
+
+      list($type, $decorators) = StringHelper::parseType($type);
+
+      $decorators = array_map(function ($decorator) {
+        return $decorator[1];
+      }, $decorators);
+
+      if (in_array('listOf', $decorators)) {
+        $this->assertEquals('LIST', $field['type']['kind'], "Expected field $name to be a list.");
+        $this->assertEquals($type, $field['type']['ofType']['name'], "Expected field $name to be a list of $type.");
+      }
+      else {
+        $this->assertEquals($type, $field['type']['name'], "Expected field $name to be $type.");
+      }
+    }
+  }
+
+  /**
    * Recursively index all sequences by name.
    *
    * @param array $data
@@ -27,11 +59,7 @@ trait IntrospectionTestTrait {
    *
    * @internal
    */
-  protected function indexByName(&$data) {
-    if (!is_array($data)) {
-      return;
-    }
-
+  private function indexByName(array &$data) {
     if (count(array_filter(array_keys($data), 'is_int')) == count($data)) {
       // This is a list, remap it.
       $data = array_combine(array_map(function ($key, $row) {
@@ -40,7 +68,10 @@ trait IntrospectionTestTrait {
     }
 
     foreach (array_keys($data) as $key) {
-      $this->indexByName($data[$key]);
+      if (is_array($data[$key])) {
+        $this->indexByName($data[$key]);
+      }
     }
   }
+
 }
