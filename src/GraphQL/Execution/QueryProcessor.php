@@ -230,7 +230,7 @@ class QueryProcessor {
 
       // If one of the validation rules found any problems, do not resolve the
       // query and bail out early instead.
-      if ($errors = $context->getErrors()) {
+      if ($errors = $validation->getErrors()) {
         return $adapter->createFulfilled(new QueryResult(NULL, $errors));
       }
 
