@@ -109,14 +109,14 @@ class QueryProcessor {
     });
 
     $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
-      if (!isset($params->queryId)) {
+      if (isset($params->queryId)) {
         // Assume that pre-parsed documents are already validated. This allows
         // us to store pre-validated query documents e.g. for persisted queries
         // effectively improving performance by skipping run-time validation.
         return [];
       }
 
-      return DocumentValidator::allRules();
+      return array_values(DocumentValidator::allRules());
     });
 
     $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
@@ -215,14 +215,14 @@ class QueryProcessor {
       // for static query analysis (e.g. for calculating the query complexity or
       // for determining the cache metadata of a query so we can perform cache
       // lookups).
-      $visitors = array_map(function (AbstractValidationRule $rule) use ($validation, $context) {
+      $visitors = array_values(array_map(function (AbstractValidationRule $rule) use ($validation, $context) {
         return $rule->getVisitor($validation);
       }, array_merge($rules, [new QueryEdgeCollector(array_filter([
         // Query operations can be cached. Collect static cache metadata from
         // the document during the visitor phase.
         $type === 'query' ? new CacheMetadataCalculator($context) : NULL,
         $complexity !== NULL ? new ComplexityCalculator($complexity) : NULL,
-      ]))]));
+      ]))])));
 
       // Run the query visitor with the prepared validation rules and the cache
       // metadata collector and query complexity calculator.
