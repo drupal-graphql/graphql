@@ -4,7 +4,9 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\graphql\GraphQL\Visitors\CacheMetadataCollector;
+use Drupal\graphql\GraphQL\Visitors\CacheMetadataCalculator;
+use Drupal\graphql\GraphQL\Visitors\ComplexityCalculator;
+use Drupal\graphql\GraphQL\Visitors\QueryEdgeCollector;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use GraphQL\Error\Error;
@@ -20,10 +22,12 @@ use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Server\ServerConfig;
-use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
+use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
 use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\AbstractValidationRule;
+use GraphQL\Validator\ValidationContext;
 
 class QueryProcessor {
 
@@ -104,6 +108,17 @@ class QueryProcessor {
       return new ResolveContext($globals);
     });
 
+    $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
+      if (!isset($params->queryId)) {
+        // Assume that pre-parsed documents are already validated. This allows
+        // us to store pre-validated query documents e.g. for persisted queries
+        // effectively improving performance by skipping run-time validation.
+        return [];
+      }
+
+      return DocumentValidator::allRules();
+    });
+
     $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
       if ($query = $this->queryProvider->getQuery($id, $params)) {
         return $query;
@@ -179,25 +194,50 @@ class QueryProcessor {
       $document = $params->queryId ? $this->loadPersistedQuery($config, $params) : $params->query;
       if (!$document instanceof DocumentNode) {
         $document = Parser::parse($document);
-
-        // Assume that pre-parsed documents are already validated. This allows
-        // us to store pre-validated query documents e.g. for persisted queries
-        // effectively improving performance by skipping run-time validation.
-        $rules = $this->resolveValidationRules($config, $params, $document, $operation);
-        if ($errors = DocumentValidator::validate($schema, $document, $rules)) {
-          return $adapter->createFulfilled(new QueryResult(NULL, $errors));
-        }
       }
 
-      if ($params->isReadOnly() && AST::getOperation($document, $operation) !== 'query') {
+      // Read the operation type from the document. Subscriptions and mutations
+      // only work through POST requests. One cannot have mutations and queries
+      // in the same document, hence this check is sufficient.
+      $type = AST::getOperation($document, $operation);
+      if ($params->isReadOnly() && $type !== 'query') {
         throw new RequestError('GET requests are only supported for query operations.');
       }
 
-      // TODO: Collect cache metadata from AST and perform a cach lookup.
+      $context = $this->resolveContextValue($config, $params, $document, $operation);
+      $complexity = $this->resolveAllowedComplexity($config, $params, $document, $operation);
+      $rules = $this->resolveValidationRules($config, $params, $document, $operation);
+      $info = new TypeInfo($schema);
+      $validation = new ValidationContext($schema, $document, $info);
+
+      // Add a special visitor to the set of validation rules which will collect
+      // all nodes and fields (all possible edges) from the document to allow
+      // for static query analysis (e.g. for calculating the query complexity or
+      // for determining the cache metadata of a query so we can perform cache
+      // lookups).
+      $visitors = array_map(function (AbstractValidationRule $rule) use ($validation, $context) {
+        return $rule->getVisitor($validation);
+      }, array_merge($rules, [new QueryEdgeCollector(array_filter([
+        // Query operations can be cached. Collect static cache metadata from
+        // the document during the visitor phase.
+        $type === 'query' ? new CacheMetadataCalculator($context) : NULL,
+        $complexity !== NULL ? new ComplexityCalculator($complexity) : NULL,
+      ]))]));
+
+      // Run the query visitor with the prepared validation rules and the cache
+      // metadata collector and query complexity calculator.
+      Visitor::visit($document, Visitor::visitWithTypeInfo($info, Visitor::visitInParallel($visitors)));
+
+      // If one of the validation rules found any problems, do not resolve the
+      // query and bail out early instead.
+      if ($errors = $context->getErrors()) {
+        return $adapter->createFulfilled(new QueryResult(NULL, $errors));
+      }
+
+      // TODO: Perform a cach lookup.
 
       $resolver = $config->getFieldResolver();
       $root = $this->resolveRootValue($config, $params, $document, $operation);
-      $context = $this->resolveContextValue($config, $params, $document, $operation);
       $promise = Executor::promiseToExecute(
         $adapter,
         $schema,
@@ -240,7 +280,7 @@ class QueryProcessor {
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
    *
-   * @return callable|mixed
+   * @return mixed
    */
   protected function resolveRootValue(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
     $root = $config->getRootValue();
@@ -257,7 +297,7 @@ class QueryProcessor {
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
    *
-   * @return callable|mixed
+   * @return mixed
    */
   protected function resolveContextValue(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
     $context = $config->getContext();
@@ -274,7 +314,7 @@ class QueryProcessor {
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
    *
-   * @return array|callable
+   * @return array
    */
   protected function resolveValidationRules(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
     // Allow customizing validation rules per operation:
@@ -287,6 +327,18 @@ class QueryProcessor {
     }
 
     return $rules;
+  }
+
+  /**
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   * @param $operation
+   *
+   * @return int|null
+   */
+  protected function resolveAllowedComplexity(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
+    return NULL;
   }
 
   /**
