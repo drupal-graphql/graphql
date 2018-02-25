@@ -204,6 +204,7 @@ class QueryProcessor {
         throw new RequestError('GET requests are only supported for query operations.');
       }
 
+      /** @var \Drupal\graphql\GraphQL\Execution\ResolveContext $context */
       $context = $this->resolveContextValue($config, $params, $document, $operation);
       $complexity = $this->resolveAllowedComplexity($config, $params, $document, $operation);
       $rules = $this->resolveValidationRules($config, $params, $document, $operation);
@@ -235,6 +236,9 @@ class QueryProcessor {
       }
 
       // TODO: Perform a cach lookup.
+      if ($context->getCacheMaxAge() !== 0) {
+        $hash = hash('sha256', $this->serializeDocument($document));
+      }
 
       $resolver = $config->getFieldResolver();
       $root = $this->resolveRootValue($config, $params, $document, $operation);
@@ -359,6 +363,32 @@ class QueryProcessor {
     }
 
     return $source;
+  }
+
+  /**
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *
+   * @return array
+   */
+  protected function serializeDocument(DocumentNode $document) {
+    return $this->sanitizeRecursive(AST::toArray($document));
+  }
+
+  /**
+   * @param array $item
+   *
+   * @return array
+   */
+  protected function sanitizeRecursive(array $item) {
+    unset($item['loc']);
+
+    foreach ($item as &$value) {
+      if (is_array($value)) {
+        $value = $this->sanitizeRecursive($value);
+      }
+    }
+
+    return $item;
   }
 
 }
