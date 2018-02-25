@@ -237,7 +237,7 @@ class QueryProcessor {
 
       // TODO: Perform a cach lookup.
       if ($context->getCacheMaxAge() !== 0) {
-        $hash = hash('sha256', $this->serializeDocument($document));
+        $hash = hash('sha256', json_encode($this->serializeDocument($document)));
       }
 
       $resolver = $config->getFieldResolver();
