@@ -11,6 +11,7 @@
 * [Introduction](queries/readme.md)
 * [Querying nodes](queries/querying-nodes.md)
 * [Querying taxonomies](queries/querying-taxonomies.md)
+* [Querying routes](queries/routes.md)
 * [Query Fragments](queries/query-fragments.md)
 * [Variables](queries/variables.md)
 * [Filters](queries/filters.md)
