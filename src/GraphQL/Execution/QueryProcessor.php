@@ -299,8 +299,11 @@ class QueryProcessor {
         ));
       }
 
-      // Add the statically collected cache contexts to the result.
+      // Add the statically collected cache contexts and the global default
+      // cache tag (useful for clearing all cached responses) to the result.
       $result->addCacheableDependency($metadata);
+      $result->addCacheTags(['graphql_response']);
+
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
