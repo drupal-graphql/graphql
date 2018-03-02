@@ -25,8 +25,6 @@ class FieldPluginManager extends DefaultPluginManager {
    *   keyed by the corresponding namespace to look for plugin implementations.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
    * @param string|null $pluginInterface
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
@@ -36,7 +34,6 @@ class FieldPluginManager extends DefaultPluginManager {
     $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
-    CacheBackendInterface $cacheBackend,
     $pluginInterface,
     $pluginAnnotationName
   ) {
@@ -49,8 +46,7 @@ class FieldPluginManager extends DefaultPluginManager {
     );
 
     $this->alterInfo('graphql_fields');
-    $this->useCaches(TRUE);
-    $this->setCacheBackend($cacheBackend, 'fields', ['graphql', 'graphql:fields']);
+    $this->useCaches(FALSE);
   }
 
   /**

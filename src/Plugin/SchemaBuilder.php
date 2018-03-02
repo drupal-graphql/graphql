@@ -4,8 +4,10 @@ namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\SortArray;
-use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 // TODO: Clean this up.
 class SchemaBuilder {
@@ -51,20 +53,43 @@ class SchemaBuilder {
   protected $types;
 
   /**
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager
+   */
+  protected $contextsManager;
+
+  /**
+   * @var array
+   */
+  protected $parameters;
+
+  /**
    * SchemaBuilder constructor.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    * @param \Drupal\graphql\Plugin\FieldPluginManager $fieldManager
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    */
   public function __construct(
     CacheBackendInterface $cacheBackend,
     FieldPluginManager $fieldManager,
-    MutationPluginManager $mutationManager
+    MutationPluginManager $mutationManager,
+    RequestStack $requestStack,
+    CacheContextsManager $contextsManager,
+    array $parameters
   ) {
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
     $this->cacheBackend = $cacheBackend;
+    $this->requestStack = $requestStack;
+    $this->contextsManager = $contextsManager;
+    $this->parameters = $parameters;
   }
 
   /**
@@ -584,11 +609,68 @@ class SchemaBuilder {
   }
 
   /**
+   * Collect schema cache metadata from plugin managers.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   *   The accumulated cache metadata.
+   */
+  protected function getCacheMetadata() {
+    $metadata = new CacheableMetadata();
+    foreach (array_merge($this->typeManagers, [$this->mutationManager, $this->fieldManager]) as $manager) {
+      /** @var PluginManagerInterface $manager */
+      foreach ($manager->getDefinitions() as $definition) {
+        $pluginMetadata = new CacheableMetadata();
+        $pluginMetadata->setCacheMaxAge($definition['schema_cache_max_age']);
+        $pluginMetadata->setCacheContexts($definition['schema_cache_contexts']);
+        $pluginMetadata->setCacheTags($definition['schema_cache_tags']);
+        $metadata = $metadata->merge($pluginMetadata);
+      }
+    }
+    return $metadata;
+  }
+
+  /**
+   * Retrieve schema cache key based on cache contexts.
+   */
+  protected function getCacheKey() {
+    if ($contextsCache = $this->cacheBackend->get('builder:contexts')) {
+      $contexts = $contextsCache->data;
+    }
+    else {
+      $metadata = $this->getCacheMetadata();
+      $contexts = $metadata->getCacheContexts();
+      $this->cacheBackend->set('builder:contexts', $contexts, $this->calculateExpiration($metadata), $metadata->getCacheTags());
+    }
+
+    $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
+
+    return implode(':', array_values($keys));
+  }
+
+  /**
+   * Calculate the actual expiration timestamp.
+   *
+   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   *
+   * @return int
+   */
+  protected function calculateExpiration(CacheableMetadata $metadata) {
+    $maxAge = $metadata->getCacheMaxAge();
+    return  $maxAge <= 0 ? $maxAge : \Drupal::time()->getRequestTime() + $maxAge;
+  }
+
+  /**
    * @param $id
    * @param $data
    */
   protected function cacheSet($id, $data) {
-    $this->cacheBackend->set("builder:$id", $data, Cache::PERMANENT);
+    $metadata = $this->getCacheMetadata();
+    $this->cacheBackend->set(
+      "builder:$id:{$this->getCacheKey()}",
+      $data,
+      $this->calculateExpiration($metadata),
+      $metadata->getCacheTags()
+    );
     $this->cache[$id] = $data;
   }
 
@@ -598,12 +680,17 @@ class SchemaBuilder {
    * @return mixed
    */
   protected function cacheGet($id) {
+    if ($this->parameters['development']) {
+      return NULL;
+    }
+
+    $key = $this->getCacheKey();
     $keys = [
-      'builder:types' => 'types',
-      'builder:types:references' => 'types:references',
-      'builder:fields' => 'fields',
-      'builder:fields:associations' => 'fields:associations',
-      'builder:mutations' => 'mutations',
+      "builder:types:$key" => 'types',
+      "builder:types:references:$key" => 'types:references',
+      "builder:fields:$key" => 'fields',
+      "builder:fields:associations:$key" => 'fields:associations',
+      "builder:mutations:$key" => 'mutations',
     ];
 
     $ids = array_keys($keys);
@@ -615,5 +702,19 @@ class SchemaBuilder {
     }
 
     return isset($this->cache[$id]) ? $this->cache[$id] : NULL;
+  }
+
+  /**
+   * Clear all static caches.
+   *
+   * @internal Used for tests to simulate multiple requests.
+   */
+  public function reset() {
+    $this->cache = NULL;
+    $this->fieldManager->clearCachedDefinitions();
+    $this->mutationManager->clearCachedDefinitions();
+    foreach ($this->typeManagers as $manager) {
+      $manager->clearCachedDefinitions();
+    }
   }
 }
