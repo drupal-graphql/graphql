@@ -4,16 +4,12 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use GraphQL\Executor\ExecutionResult;
 
-class QueryResult extends ExecutionResult implements CacheableDependencyInterface {
-
-  /**
-   * Cache metadata collected during query execution.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $metadata;
+class QueryResult extends ExecutionResult implements RefinableCacheableDependencyInterface {
+  use RefinableCacheableDependencyTrait;
 
   /**
    * QueryResult constructor.
@@ -33,43 +29,6 @@ class QueryResult extends ExecutionResult implements CacheableDependencyInterfac
     $this->extensions = $extensions;
 
     // If no cache metadata was given, assume this result is not cacheable.
-    $this->metadata = $metadata ?: (new CacheableMetadata())->setCacheMaxAge(0);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts() {
-    return $this->metadata->getCacheContexts();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    return $this->metadata->getCacheTags();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge() {
-    return $this->metadata->getCacheMaxAge();
-  }
-
-  /**
-   * Don't serialize this object.
-   *
-   * Drop any serialization, since this will break php unit because the
-   * backtrace contains this object and tries to serialize a closure thats
-   * hidden deep in webonyx.
-   *
-   * // TODO: Solve me differently.
-   *
-   * @return string[]
-   *   The properties to serialize.
-   */
-  public function __sleep() {
-    return [];
+    $this->addCacheableDependency($metadata);
   }
 }

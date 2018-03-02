@@ -4,7 +4,6 @@ namespace Drupal\graphql\Plugin\GraphQL\Enums;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\Plugin\SchemaBuilder;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\TypePluginInterface;
 use Drupal\graphql\Plugin\TypePluginManager;
@@ -12,7 +11,6 @@ use GraphQL\Type\Definition\EnumType;
 
 abstract class EnumPluginBase extends PluginBase implements TypePluginInterface {
   use DescribablePluginTrait;
-  use CacheablePluginTrait;
 
   /**
    * {@inheritdoc}

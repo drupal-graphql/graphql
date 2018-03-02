@@ -27,14 +27,23 @@ services:
     factory: cache_factory:get
     arguments: [graphql_definitions]
 
+  # Cache bin for graphql query results.
+  cache.graphql.results:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_results]
+
   # Schema and processor factory.
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
       - '@current_user'
+      - '@cache_contexts_manager'
       - '@plugin.manager.graphql.schema'
       - '@graphql.query_provider'
-      - '%graphql.config%'
+      - '@cache.graphql.results'
 
   # Query map provider using the composite pattern.
   graphql.query_provider:

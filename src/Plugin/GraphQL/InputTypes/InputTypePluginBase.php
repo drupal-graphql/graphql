@@ -4,7 +4,6 @@ namespace Drupal\graphql\Plugin\GraphQL\InputTypes;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\Plugin\SchemaBuilder;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
 use Drupal\graphql\Plugin\TypePluginInterface;
@@ -13,7 +12,6 @@ use Drupal\graphql\Utility\StringHelper;
 use GraphQL\Type\Definition\InputObjectType;
 
 abstract class InputTypePluginBase extends PluginBase implements TypePluginInterface {
-  use CacheablePluginTrait;
   use DescribablePluginTrait;
   use TypedPluginTrait;
 
@@ -40,7 +38,7 @@ abstract class InputTypePluginBase extends PluginBase implements TypePluginInter
       'name' => $definition['name'],
       'description' => $this->buildDescription($definition),
       'fields' => $this->buildFields($definition),
-    ] + $this->buildCacheMetadata($definition);
+    ];
   }
 
   /**

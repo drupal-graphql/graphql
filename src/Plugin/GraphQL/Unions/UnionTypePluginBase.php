@@ -3,7 +3,6 @@
 namespace Drupal\graphql\Plugin\GraphQL\Unions;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\TypePluginInterface;
@@ -12,7 +11,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
 
 abstract class UnionTypePluginBase extends PluginBase implements TypePluginInterface {
-  use CacheablePluginTrait;
   use DescribablePluginTrait;
 
   /**
@@ -58,5 +56,4 @@ abstract class UnionTypePluginBase extends PluginBase implements TypePluginInter
   protected function buildTypes($definition) {
     return $definition['types'] ?: [];
   }
-
 }

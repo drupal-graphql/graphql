@@ -5,7 +5,6 @@ namespace Drupal\graphql\Plugin\GraphQL\Fields;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
@@ -34,6 +33,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   public static function createInstance(SchemaBuilder $builder, FieldPluginManager $manager, $definition, $id) {
     return [
       'description' => $definition['description'],
+      'contexts' => $definition['contexts'],
       'deprecationReason' => $definition['deprecationReason'],
       'type' => $builder->processType($definition['type']),
       'args' => $builder->processArguments($definition['args']),
@@ -55,7 +55,8 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       'description' => $this->buildDescription($definition),
       'args' => $this->buildArguments($definition),
       'deprecationReason' => $this->buildDeprecationReason($definition),
-    ] + $this->buildCacheMetadata($definition);
+      'contexts' => $this->buildCacheContexts($definition),
+    ];
   }
 
   /**

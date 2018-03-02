@@ -3,10 +3,10 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\graphql\GraphQL\Visitors\CacheMetadataCalculator;
-use Drupal\graphql\GraphQL\Visitors\ComplexityCalculator;
-use Drupal\graphql\GraphQL\Visitors\QueryEdgeCollector;
+use Drupal\graphql\GraphQL\Visitors\CacheContextsCollector;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use GraphQL\Error\Error;
@@ -53,23 +53,45 @@ class QueryProcessor {
   protected $queryProvider;
 
   /**
+   * The cache backend for caching query results.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
+   * The cache contexts manager service.
+   *
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager
+   */
+  protected $contextsManager;
+
+  /**
    * Processor constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache contexts manager service.
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
    * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider
    *   The query provider service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   The cache backend for caching query results.
    */
   public function __construct(
     AccountProxyInterface $currentUser,
+    CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
-    QueryProviderInterface $queryProvider
+    QueryProviderInterface $queryProvider,
+    CacheBackendInterface $cacheBackend
   ) {
     $this->currentUser = $currentUser;
+    $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
     $this->queryProvider = $queryProvider;
+    $this->cacheBackend = $cacheBackend;
   }
 
   /**
@@ -116,7 +138,7 @@ class QueryProcessor {
         return [];
       }
 
-      return array_values(DocumentValidator::allRules());
+      return array_values(DocumentValidator::defaultRules());
     });
 
     $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
@@ -180,17 +202,10 @@ class QueryProcessor {
         throw new RequestError('Batched queries are not supported by this server.');
       }
 
-      if ($errors = (new Helper())->validateOperationParams($params)) {
-        $errors = Utils::map($errors, function (RequestError $err) {
-          return Error::createLocatedError($err, NULL, NULL);
-        });
-
+      if ($errors = $this->validateOperationParams($params)) {
         return $adapter->createFulfilled(new QueryResult(NULL, $errors));
       }
 
-      $schema = $config->getSchema();
-      $variables = $params->variables;
-      $operation = $params->operation;
       $document = $params->queryId ? $this->loadPersistedQuery($config, $params) : $params->query;
       if (!$document instanceof DocumentNode) {
         $document = Parser::parse($document);
@@ -199,64 +214,24 @@ class QueryProcessor {
       // Read the operation type from the document. Subscriptions and mutations
       // only work through POST requests. One cannot have mutations and queries
       // in the same document, hence this check is sufficient.
+      $operation = $params->operation;
       $type = AST::getOperation($document, $operation);
       if ($params->isReadOnly() && $type !== 'query') {
         throw new RequestError('GET requests are only supported for query operations.');
       }
 
-      /** @var \Drupal\graphql\GraphQL\Execution\ResolveContext $context */
-      $context = $this->resolveContextValue($config, $params, $document, $operation);
-      $complexity = $this->resolveAllowedComplexity($config, $params, $document, $operation);
-      $rules = $this->resolveValidationRules($config, $params, $document, $operation);
-      $info = new TypeInfo($schema);
-      $validation = new ValidationContext($schema, $document, $info);
-
-      // Add a special visitor to the set of validation rules which will collect
-      // all nodes and fields (all possible edges) from the document to allow
-      // for static query analysis (e.g. for calculating the query complexity or
-      // for determining the cache metadata of a query so we can perform cache
-      // lookups).
-      $visitors = array_values(array_map(function (AbstractValidationRule $rule) use ($validation, $context) {
-        return $rule->getVisitor($validation);
-      }, array_merge($rules, [new QueryEdgeCollector(array_filter([
-        // Query operations can be cached. Collect static cache metadata from
-        // the document during the visitor phase.
-        $type === 'query' ? new CacheMetadataCalculator($context) : NULL,
-        $complexity !== NULL ? new ComplexityCalculator($complexity) : NULL,
-      ]))])));
-
-      // Run the query visitor with the prepared validation rules and the cache
-      // metadata collector and query complexity calculator.
-      Visitor::visit($document, Visitor::visitWithTypeInfo($info, Visitor::visitInParallel($visitors)));
-
       // If one of the validation rules found any problems, do not resolve the
       // query and bail out early instead.
-      if ($errors = $validation->getErrors()) {
+      if ($errors = $this->validateOperation($config, $params, $document)) {
         return $adapter->createFulfilled(new QueryResult(NULL, $errors));
       }
 
-      // TODO: Perform a cach lookup.
-      if ($context->getCacheMaxAge() !== 0) {
-        $hash = hash('sha256', json_encode($this->serializeDocument($document)));
+      // Only queries can be cached (mutations and subscriptions can't).
+      if ($type === 'query') {
+        return $this->executeCacheableOperation($adapter, $config, $params, $document);
       }
 
-      $resolver = $config->getFieldResolver();
-      $root = $this->resolveRootValue($config, $params, $document, $operation);
-      $promise = Executor::promiseToExecute(
-        $adapter,
-        $schema,
-        $document,
-        $root,
-        $context,
-        $variables,
-        $operation,
-        $resolver
-      );
-
-      return $promise->then(function (ExecutionResult $result) use ($context) {
-        $metadata = (new CacheableMetadata())->addCacheableDependency($context);
-        return new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
-      });
+      return $this->executeUncachableOperation($adapter, $config, $params, $document);
     }
     catch (RequestError $exception) {
       $result = $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
@@ -265,6 +240,7 @@ class QueryProcessor {
       $result = $adapter->createFulfilled(new QueryResult(NULL, [$exception]));
     }
 
+    // Format and print errors.
     return $result->then(function(QueryResult $result) use ($config) {
       if ($config->getErrorsHandler()) {
         $result->setErrorsHandler($config->getErrorsHandler());
@@ -276,6 +252,136 @@ class QueryProcessor {
 
       return $result;
     });
+  }
+
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *
+   * @return \GraphQL\Executor\Promise\Promise|mixed
+   */
+  protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
+    $schema = $config->getSchema();
+
+    // Collect cache contexts from the query document.
+    $contexts = [];
+    $info = new TypeInfo($schema);
+    $visitor = (new CacheContextsCollector())->getVisitor($info, $contexts);
+    Visitor::visit($document, Visitor::visitWithTypeInfo($info, $visitor));
+
+    $metadata = (new CacheableMetadata())->addCacheContexts($contexts);
+    $cid = $this->cacheIdentifier($document, $metadata);
+    if (($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
+      return $adapter->createFulfilled($result);
+    }
+
+    $result = $this->doExecuteOperation($adapter, $config, $params, $document);
+    return $result->then(function (QueryResult $result) use ($cid, $contexts) {
+      if (array_diff($result->getCacheContexts(), $contexts)) {
+        throw new \LogicException('The query result yielded cache contexts that were not part of the static query analysis.');
+      }
+
+      // Add the statically collected cache contexts to the result.
+      $result->addCacheContexts($contexts);
+
+      // Write this query into the cache if it is cacheable.
+      if ($result->getCacheMaxAge() !== 0) {
+        $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
+      }
+
+      return $result;
+    });
+  }
+
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *
+   * @return \GraphQL\Executor\Promise\Promise
+   */
+  protected function executeUncachableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
+    return $this->doExecuteOperation($adapter, $config, $params, $document);
+  }
+
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *
+   * @return \GraphQL\Executor\Promise\Promise
+   */
+  protected function doExecuteOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
+    $operation = $params->operation;
+    $variables = $params->variables;
+    $context = $this->resolveContextValue($config, $params, $document);
+    $root = $this->resolveRootValue($config, $params, $document, $operation);
+    $resolver = $config->getFieldResolver();
+    $schema = $config->getSchema();
+
+    $promise = Executor::promiseToExecute(
+      $adapter,
+      $schema,
+      $document,
+      $root,
+      $context,
+      $variables,
+      $operation,
+      $resolver
+    );
+
+    return $promise->then(function (ExecutionResult $result) use ($context) {
+      // Add the collected cache metadata to the result.
+      $metadata = (new CacheableMetadata())->addCacheableDependency($context);
+      $output = new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
+
+      return $output;
+    });
+  }
+
+  /**
+   * @param \GraphQL\Server\OperationParams $params
+   *
+   * @return array
+   */
+  protected function validateOperationParams(OperationParams $params) {
+    $errors = (new Helper())->validateOperationParams($params);
+    return array_map(function (RequestError $error) {
+      return Error::createLocatedError($error, NULL, NULL);
+    }, $errors);
+  }
+
+  /**
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *
+   * @return \GraphQL\Error\Error[]
+   */
+  protected function validateOperation(ServerConfig $config, OperationParams $params, DocumentNode $document) {
+    $operation = $params->operation;
+    // Skip validation if there are no validation rules to be applied.
+    if (!$rules = $this->resolveValidationRules($config, $params, $document, $operation)) {
+      return [];
+    }
+
+    $schema = $config->getSchema();
+    $info = new TypeInfo($schema);
+    $validation = new ValidationContext($schema, $document, $info);
+    $visitors = array_values(array_map(function (AbstractValidationRule $rule) use ($validation) {
+      return $rule($validation);
+    }, $rules));
+
+    // Run the query visitor with the prepared validation rules and the cache
+    // metadata collector and query complexity calculator.
+    Visitor::visit($document, Visitor::visitWithTypeInfo($info, Visitor::visitInParallel($visitors)));
+
+    // Return any possible errors collected during validation.
+    return $validation->getErrors();
   }
 
   /**
@@ -336,18 +442,6 @@ class QueryProcessor {
   /**
    * @param \GraphQL\Server\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
-   * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param $operation
-   *
-   * @return int|null
-   */
-  protected function resolveAllowedComplexity(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
-    return NULL;
-  }
-
-  /**
-   * @param \GraphQL\Server\ServerConfig $config
-   * @param \GraphQL\Server\OperationParams $params
    *
    * @return mixed
    * @throws \GraphQL\Server\RequestError
@@ -391,4 +485,17 @@ class QueryProcessor {
     return $item;
   }
 
+  /**
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   *
+   * @return string
+   */
+  protected function cacheIdentifier(DocumentNode $document, CacheableMetadata $metadata) {
+    $contexts = $metadata->getCacheContexts();
+    $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
+    // Prepend the hash of the serialized document to the cache contexts.
+    $hash = hash('sha256', json_encode($this->serializeDocument($document)));
+    return implode(':', array_values(array_merge([$hash], $keys)));
+  }
 }

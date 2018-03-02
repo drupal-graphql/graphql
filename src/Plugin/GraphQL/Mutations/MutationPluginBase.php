@@ -7,13 +7,11 @@ use Drupal\graphql\Plugin\MutationPluginInterface;
 use Drupal\graphql\Plugin\MutationPluginManager;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
 
 abstract class MutationPluginBase extends PluginBase implements MutationPluginInterface {
-  use CacheablePluginTrait;
   use TypedPluginTrait;
   use DescribablePluginTrait;
   use ArgumentAwarePluginTrait;
@@ -46,6 +44,6 @@ abstract class MutationPluginBase extends PluginBase implements MutationPluginIn
       'description' => $this->buildDescription($definition),
       'args' => $this->buildArguments($definition),
       'deprecationReason' => $this->buildDeprecationReason($definition),
-    ] + $this->buildCacheMetadata($definition);
+    ];
   }
 }
