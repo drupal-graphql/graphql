@@ -271,6 +271,7 @@ class QueryProcessor {
     $visitor = (new CacheContextsCollector())->getVisitor($info, $contexts);
     Visitor::visit($document, Visitor::visitWithTypeInfo($info, $visitor));
 
+    // Generate a cache identifier from the collected contexts.
     $metadata = (new CacheableMetadata())->addCacheContexts($contexts);
     $cid = $this->cacheIdentifier($document, $metadata);
     if (($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
@@ -278,14 +279,13 @@ class QueryProcessor {
     }
 
     $result = $this->doExecuteOperation($adapter, $config, $params, $document);
-    return $result->then(function (QueryResult $result) use ($cid, $contexts) {
-      if (array_diff($result->getCacheContexts(), $contexts)) {
+    return $result->then(function (QueryResult $result) use ($cid, $metadata) {
+      if (array_diff($result->getCacheContexts(), $metadata->getCacheContexts())) {
         throw new \LogicException('The query result yielded cache contexts that were not part of the static query analysis.');
       }
 
       // Add the statically collected cache contexts to the result.
-      $result->addCacheContexts($contexts);
-
+      $result->addCacheableDependency($metadata);
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
@@ -318,7 +318,7 @@ class QueryProcessor {
   protected function doExecuteOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
     $operation = $params->operation;
     $variables = $params->variables;
-    $context = $this->resolveContextValue($config, $params, $document);
+    $context = $this->resolveContextValue($config, $params, $document, $operation);
     $root = $this->resolveRootValue($config, $params, $document, $operation);
     $resolver = $config->getFieldResolver();
     $schema = $config->getSchema();
