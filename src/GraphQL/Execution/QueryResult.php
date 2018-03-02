@@ -31,4 +31,12 @@ class QueryResult extends ExecutionResult implements RefinableCacheableDependenc
     // If no cache metadata was given, assume this result is not cacheable.
     $this->addCacheableDependency($metadata);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep() {
+    // Do not serialize the error handlers.
+    return ['data', 'errors', 'extensions', 'cacheContexts', 'cacheTags', 'cacheMaxAge'];
+  }
 }

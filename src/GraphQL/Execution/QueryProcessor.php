@@ -164,7 +164,7 @@ class QueryProcessor {
    */
   public function executeSingle(ServerConfig $config, OperationParams $params) {
     $adapter = new SyncPromiseAdapter();
-    $result = $this->executeOperation($adapter, $config, $params, FALSE);
+    $result = $this->executeOperationWithReporting($adapter, $config, $params, FALSE);
     return $adapter->wait($result);
   }
 
@@ -177,11 +177,36 @@ class QueryProcessor {
   public function executeBatch(ServerConfig $config, array $params) {
     $adapter = new SyncPromiseAdapter();
     $result = array_map(function ($params) use ($adapter, $config) {
-      return $this->executeOperation($adapter, $config, $params, TRUE);
+      return $this->executeOperationWithReporting($adapter, $config, $params, TRUE);
     }, $params);
 
     $result = $adapter->all($result);
     return $adapter->wait($result);
+  }
+
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param bool $batching
+   *
+   * @return \GraphQL\Executor\Promise\Promise
+   */
+  protected function executeOperationWithReporting(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
+    $result = $this->executeOperation($adapter, $config, $params, $batching);
+
+    // Format and print errors.
+    return $result->then(function(QueryResult $result) use ($config) {
+      if ($config->getErrorsHandler()) {
+        $result->setErrorsHandler($config->getErrorsHandler());
+      }
+
+      if ($config->getErrorFormatter() || $config->getDebug()) {
+        $result->setErrorFormatter(FormattedError::prepareFormatter($config->getErrorFormatter(), $config->getDebug()));
+      }
+
+      return $result;
+    });
   }
 
   /**
@@ -234,24 +259,11 @@ class QueryProcessor {
       return $this->executeUncachableOperation($adapter, $config, $params, $document);
     }
     catch (RequestError $exception) {
-      $result = $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
+      return $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
     }
     catch (Error $exception) {
-      $result = $adapter->createFulfilled(new QueryResult(NULL, [$exception]));
+      return $adapter->createFulfilled(new QueryResult(NULL, [$exception]));
     }
-
-    // Format and print errors.
-    return $result->then(function(QueryResult $result) use ($config) {
-      if ($config->getErrorsHandler()) {
-        $result->setErrorsHandler($config->getErrorsHandler());
-      }
-
-      if ($config->getErrorFormatter() || $config->getDebug()) {
-        $result->setErrorFormatter(FormattedError::prepareFormatter($config->getErrorFormatter(), $config->getDebug()));
-      }
-
-      return $result;
-    });
   }
 
   /**
