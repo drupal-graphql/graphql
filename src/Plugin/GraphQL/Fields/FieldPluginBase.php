@@ -158,9 +158,9 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       $self->mergeCacheMaxAge($definition['response_cache_max_age']);
     }
 
-    return array_merge(array_filter($result, function ($item) {
+    return array_merge([$self], array_filter($result, function ($item) {
       return $item instanceof CacheableDependencyInterface;
-    }, [$self]));
+    }));
   }
 
   /**
