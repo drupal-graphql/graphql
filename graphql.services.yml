@@ -104,6 +104,9 @@ services:
       - '@cache.graphql.definitions'
       - '@plugin.manager.graphql.field'
       - '@plugin.manager.graphql.mutation'
+      - '@request_stack'
+      - '@cache_contexts_manager'
+      - '%graphql.config%'
     tags:
       - { name: service_collector, tag: graphql_type_manager, call: addTypeManager }
 
@@ -125,7 +128,6 @@ services:
       - 'Plugin/GraphQL/Fields'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\FieldPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLField'
 
@@ -136,7 +138,6 @@ services:
       - 'Plugin/GraphQL/Mutations'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\MutationPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
 
@@ -149,7 +150,6 @@ services:
       - 'Plugin/GraphQL/UnionTypes'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLUnionType'
       - 'union_types'
@@ -161,7 +161,6 @@ services:
       - 'Plugin/GraphQL/Interfaces'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInterface'
       - 'interfaces'
@@ -173,7 +172,6 @@ services:
       - 'Plugin/GraphQL/Types'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLType'
       - 'types'
@@ -185,7 +183,6 @@ services:
       - 'Plugin/GraphQL/InputTypes'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInputType'
       - 'input_types'
@@ -197,7 +194,6 @@ services:
       - 'Plugin/GraphQL/Scalars'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
       - 'scalars'
@@ -209,7 +205,6 @@ services:
       - 'Plugin/GraphQL/Enums'
       - '@container.namespaces'
       - '@module_handler'
-      - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLEnum'
       - 'enums'

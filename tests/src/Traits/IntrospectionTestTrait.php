@@ -16,6 +16,9 @@ trait IntrospectionTestTrait {
    *   The name-indexed schema.
    */
   protected function introspect() {
+    // Reset the schema builder static caches before every introspection run.
+    $this->container->get('graphql.schema_builder')->reset();
+
     $introspection = $this->container->get('graphql.introspection')->introspect($this->getDefaultSchema());
     $this->indexByName($introspection['data']);
     return $introspection['data']['__schema'];

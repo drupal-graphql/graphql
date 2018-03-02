@@ -20,10 +20,6 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
     $config = $container->getParameter('graphql.config');
     $config['development'] = TRUE;
     $container->setParameter('graphql.config', $config);
-
-    // Disable static caching in schema builder and field manager.
-    $this->container->getDefinition('graphql.schema_builder')->setShared(FALSE);
-    $this->container->getDefinition('plugin.manager.graphql.field')->setShared(FALSE);
   }
 
   /**

@@ -16,14 +16,51 @@ use Prophecy\Argument;
 class SchemaCacheTest extends GraphQLTestBase {
 
   /**
-   * {@inheritdoc}
+   * @var \Prophecy\Prophecy\MethodProphecy
+   */
+  protected $contextKeys;
+
+  /**
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $contextsManager;
+
+  /**
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    */
   public function register(ContainerBuilder $container) {
     parent::register($container);
 
-    // Disable static caching in schema builder and field manager.
-    $this->container->getDefinition('graphql.schema_builder')->setShared(FALSE);
-    $this->container->getDefinition('plugin.manager.graphql.field')->setShared(FALSE);
+    // Prepare a prophesied context manager.
+    $this->contextsManager = $this->prophesize(CacheContextsManager::class);
+
+    // All tokens are valid for this test.
+    $this->contextsManager->assertValidTokens(Argument::any())
+      ->willReturn(TRUE);
+
+    // Argument patterns that check if the 'context' is in the list.
+    $hasContext = Argument::containing('context');
+    $hasNotContext = Argument::that(function ($arg) {
+      return !in_array('context', $arg);
+    });
+
+    // If 'context' is not defined, we return no cache keys.
+    $this->contextsManager->convertTokensToKeys($hasNotContext)
+      ->willReturn(new ContextCacheKeys([]));
+
+    // Store the method prophecy so we can replace the result on the fly.
+    /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
+    $this->contextKeys = $this->contextsManager->convertTokensToKeys($hasContext);
+    if ($definition = $this->container->getDefinition('cache_contexts_manager')) {
+      $definition->setFactory([$this, 'contextsManagerFactory']);
+    }
+  }
+
+  /**
+   * @return object
+   */
+  public function contextsManagerFactory() {
+    return $this->contextsManager->reveal();
   }
 
   /**
@@ -93,28 +130,6 @@ class SchemaCacheTest extends GraphQLTestBase {
    */
   public function testContext() {
 
-    // Prepare a prophesied context manager.
-    $contextManager = $this->prophesize(CacheContextsManager::class);
-    $this->container->set('cache_contexts_manager', $contextManager->reveal());
-
-    // All tokens are valid for this test.
-    $contextManager->assertValidTokens(Argument::any())
-      ->willReturn(TRUE);
-
-    // Argument patterns that check if the 'context' is in the list.
-    $hasContext = Argument::containing('context');
-    $hasNotContext = Argument::that(function ($arg) {
-      return !in_array('context', $arg);
-    });
-
-    // If 'context' is not defined, we return no cache keys.
-    $contextManager->convertTokensToKeys($hasNotContext)
-      ->willReturn(new ContextCacheKeys([]));
-
-    // Store the method prophecy so we can replace the result on the fly.
-    /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
-    $contextKeys = $contextManager->convertTokensToKeys($hasContext);
-
     // Create a first field.
     $this->mockField('foo', [
       'id' => 'foo',
@@ -124,7 +139,7 @@ class SchemaCacheTest extends GraphQLTestBase {
     ], 'foo');
 
     // Set a cache context.
-    $contextKeys->willReturn(new ContextCacheKeys(['a']));
+    $this->contextKeys->willReturn(new ContextCacheKeys(['a']));
     // Run introspect to populate the schema cache.
     $this->introspect();
 
@@ -144,7 +159,7 @@ class SchemaCacheTest extends GraphQLTestBase {
     );
 
     // Set a different cache context.
-    $contextKeys->willReturn(new ContextCacheKeys(['b']));
+    $this->contextKeys->willReturn(new ContextCacheKeys(['b']));
 
     // Now the new field should appear.
     $schema = $this->introspect();

@@ -25,8 +25,6 @@ class TypePluginManager extends DefaultPluginManager {
    *   keyed by the corresponding namespace to look for plugin implementations.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
    * @param string|null $pluginInterface
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
@@ -38,7 +36,6 @@ class TypePluginManager extends DefaultPluginManager {
     $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
-    CacheBackendInterface $cacheBackend,
     $pluginInterface,
     $pluginAnnotationName,
     $pluginType
@@ -52,8 +49,7 @@ class TypePluginManager extends DefaultPluginManager {
     );
 
     $this->alterInfo("graphql_{$pluginType}");
-    $this->useCaches(TRUE);
-    $this->setCacheBackend($cacheBackend, $pluginType, ['graphql', "graphql:{$pluginType}"]);
+    $this->useCaches(FALSE);
   }
 
   /**
