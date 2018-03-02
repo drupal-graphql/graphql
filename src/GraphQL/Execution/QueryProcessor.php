@@ -362,6 +362,11 @@ class QueryProcessor {
       $metadata = (new CacheableMetadata())->addCacheableDependency($context);
       $output = new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
 
+      // Do not cache in development mode.
+      if ($context->getGlobal('development')) {
+        $metadata->setCacheMaxAge(0);
+      }
+
       return $output;
     });
   }
