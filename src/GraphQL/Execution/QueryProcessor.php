@@ -322,7 +322,12 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise
    */
   protected function executeUncachableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
-    return $this->doExecuteOperation($adapter, $config, $params, $document);
+    $result = $this->doExecuteOperation($adapter, $config, $params, $document);
+    return $result->then(function (QueryResult $result) {
+      // Mark the query result as uncacheable.
+      $result->mergeCacheMaxAge(0);
+      return $result;
+    });
   }
 
   /**
