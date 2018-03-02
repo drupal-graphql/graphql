@@ -280,8 +280,11 @@ class QueryProcessor {
 
     $result = $this->doExecuteOperation($adapter, $config, $params, $document);
     return $result->then(function (QueryResult $result) use ($cid, $metadata) {
-      if (array_diff($result->getCacheContexts(), $metadata->getCacheContexts())) {
-        throw new \LogicException('The query result yielded cache contexts that were not part of the static query analysis.');
+      if ($missing = array_diff($result->getCacheContexts(), $metadata->getCacheContexts())) {
+        throw new \LogicException(sprintf(
+          'The query result yielded cache contexts (%s) that were not part of the static query analysis.',
+          implode(', ', $missing)
+        ));
       }
 
       // Add the statically collected cache contexts to the result.
