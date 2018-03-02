@@ -5,6 +5,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Fields;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
@@ -139,13 +140,27 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return array A list of cacheable dependencies.
-   * A list of cacheable dependencies.
+   * @return array
+   *   A list of cacheable dependencies.
    */
   protected function getCacheDependencies(array $result, $parent, array $args, ResolveContext $context, ResolveInfo $info) {
-    return array_filter($result, function ($item) {
+    $self = new CacheableMetadata();
+    $definition = $this->getPluginDefinition();
+    if (!empty($definition['response_cache_contexts'])) {
+      $self->addCacheContexts($definition['response_cache_contexts']);
+    }
+
+    if (!empty($definition['response_cache_tags'])) {
+      $self->addCacheTags($definition['response_cache_tags']);
+    }
+
+    if (isset($definition['response_cache_max_age'])) {
+      $self->mergeCacheMaxAge($definition['response_cache_max_age']);
+    }
+
+    return array_merge(array_filter($result, function ($item) {
       return $item instanceof CacheableDependencyInterface;
-    });
+    }, [$self]));
   }
 
   /**
