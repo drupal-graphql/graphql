@@ -285,7 +285,7 @@ class QueryProcessor {
 
     // Generate a cache identifier from the collected contexts.
     $metadata = (new CacheableMetadata())->addCacheContexts($contexts);
-    $cid = $this->cacheIdentifier($document, $metadata);
+    $cid = $this->cacheIdentifier($params, $document, $metadata);
     if (($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
       return $adapter->createFulfilled($result);
     }
@@ -504,16 +504,26 @@ class QueryProcessor {
   }
 
   /**
+   * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\Core\Cache\CacheableMetadata $metadata
    *
    * @return string
    */
-  protected function cacheIdentifier(DocumentNode $document, CacheableMetadata $metadata) {
+  protected function cacheIdentifier(OperationParams $params, DocumentNode $document, CacheableMetadata $metadata) {
     $contexts = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
+
+    // Sorting the variables will cause fewer cache vectors.
+    $variables = $params->variables ?: [];
+    ksort($variables);
+
     // Prepend the hash of the serialized document to the cache contexts.
-    $hash = hash('sha256', json_encode($this->serializeDocument($document)));
+    $hash = hash('sha256', json_encode([
+      'query' => $this->serializeDocument($document),
+      'variables' => $variables,
+    ]));
+
     return implode(':', array_values(array_merge([$hash], $keys)));
   }
 }
