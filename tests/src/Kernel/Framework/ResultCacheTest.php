@@ -209,65 +209,6 @@ class ResultCacheTest extends GraphQLTestBase {
   }
 
   /**
-   * Test batched query caching.
-   *
-   * Batched queries are split up into kernel subrequests for every single
-   * query. Therefore we don't need to test every edge case, but just verify
-   * that each of them are cached separately.
-   */
-  public function testBatchedQueries() {
-    $a = $this->mockField('a', [
-      'id' => 'a',
-      'name' => 'a',
-      'type' => 'String',
-    ]);
-
-    $a
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'a';
-      });
-
-    $b = $this->mockField('b', [
-      'id' => 'b',
-      'name' => 'b',
-      'type' => 'String',
-    ]);
-
-    $b
-      ->expects(static::exactly(1))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'b';
-      });
-
-    $c = $this->mockField('c', [
-      'id' => 'c',
-      'name' => 'c',
-      'type' => 'String',
-    ]);
-
-    $c
-      ->expects(static::exactly(1))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'c';
-      });
-
-
-    $this->batchedQueries([
-      ['query' => '{ a }', 'variables' => ['value' => 'a']],
-      ['query' => '{ b }', 'variables' => ['value' => 'a']],
-      ['query' => '{ c }'],
-      ['query' => '{ a }', 'variables' => ['value' => 'b']],
-      ['query' => '{ b }', 'variables' => ['value' => 'a']],
-      ['query' => '{ c }'],
-    ]);
-
-  }
-
-  /**
    * Test persisted query handling.
    *
    * Ensure caching properly handles different query map versions of the same
