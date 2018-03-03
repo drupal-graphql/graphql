@@ -4,8 +4,8 @@ namespace Drupal\graphql\Plugin\GraphQL\Types;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\TypePluginInterface;
 use Drupal\graphql\Plugin\TypePluginManager;
 use GraphQL\Type\Definition\InterfaceType;
@@ -18,7 +18,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
     return new ObjectType([
       'name' => $definition['name'],
       'description' => $definition['description'],

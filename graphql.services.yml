@@ -97,13 +97,9 @@ services:
     tags:
       - { name: service_collector, tag: context_provider, call: addContextProvider }
 
-  # Combines plugin definitions from all plugin managers.
-  graphql.schema_builder:
-    class: Drupal\graphql\Plugin\SchemaBuilder
-    arguments:
-      - '@cache.graphql.definitions'
-      - '@plugin.manager.graphql.field'
-      - '@plugin.manager.graphql.mutation'
+  # Combines all type plugin managers.
+  graphql.type_manager_aggregator:
+    class: Drupal\graphql\Plugin\TypePluginManagerAggregator
     tags:
       - { name: service_collector, tag: graphql_type_manager, call: addTypeManager }
 

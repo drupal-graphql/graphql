@@ -8,14 +8,14 @@ use Drupal\Component\Plugin\DerivativeInspectionInterface;
 interface FieldPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
-   * @param \Drupal\graphql\Plugin\SchemaBuilder $builder
+   * @param \Drupal\graphql\Plugin\SchemaBuilderInterface $builder
    * @param \Drupal\graphql\Plugin\FieldPluginManager $manager
    * @param $definition
    * @param $id
    *
    * @return mixed
    */
-  public static function createInstance(SchemaBuilder $builder, FieldPluginManager $manager, $definition, $id);
+  public static function createInstance(SchemaBuilderInterface $builder, FieldPluginManager $manager, $definition, $id);
 
   /**
    * Returns the plugin's type or field definition for the schema.

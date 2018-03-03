@@ -223,7 +223,9 @@ trait MockGraphQLPluginTrait {
       [],
       $id,
       $this->getSchemaDefinitions()[$id],
-      $this->container->get('graphql.schema_builder'),
+      $this->container->get('plugin.manager.graphql.field'),
+      $this->container->get('plugin.manager.graphql.mutation'),
+      $this->container->get('graphql.type_manager_aggregator'),
     ]);
     $this->addTypeSystemPlugin($schema);
     return $schema;

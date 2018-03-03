@@ -4,7 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
-use Drupal\graphql\Plugin\SchemaBuilder;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\TypePluginInterface;
 use Drupal\graphql\Plugin\TypePluginManager;
 use GraphQL\Type\Definition\CustomScalarType;
@@ -15,7 +15,7 @@ abstract class ScalarPluginBase extends PluginBase implements TypePluginInterfac
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
     $callable = ['GraphQL\Type\Definition\Type', strtolower($definition['name'])];
     if (is_callable($callable)) {
       return $callable();

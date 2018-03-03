@@ -299,10 +299,8 @@ class QueryProcessor {
         ));
       }
 
-      // Add the statically collected cache contexts and the global default
-      // cache tag (useful for clearing all cached responses) to the result.
+      // Add the statically collected cache contexts.
       $result->addCacheableDependency($metadata);
-      $result->addCacheTags(['graphql_response']);
 
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
@@ -359,15 +357,16 @@ class QueryProcessor {
 
     return $promise->then(function (ExecutionResult $result) use ($context) {
       // Add the collected cache metadata to the result.
-      $metadata = (new CacheableMetadata())->addCacheableDependency($context);
-      $output = new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
+      $metadata = (new CacheableMetadata())
+        ->addCacheableDependency($context)
+        ->addCacheTags(['graphql_response']);
 
-      // Do not cache in development mode.
-      if ($context->getGlobal('development')) {
+      // Do not cache in development mode or if there are any errors.
+      if ($context->getGlobal('development') || !empty($result->errors)) {
         $metadata->setCacheMaxAge(0);
       }
 
-      return $output;
+      return new QueryResult($result->data, $result->errors, $result->extensions, $metadata);
     });
   }
 

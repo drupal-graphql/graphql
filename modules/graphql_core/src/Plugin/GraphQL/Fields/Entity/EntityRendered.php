@@ -11,8 +11,6 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql\Plugin\SchemaBuilder;
-use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -85,7 +83,7 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
 //  /**
 //   * {@inheritdoc}
 //   */
-//  protected function buildArguments(SchemaBuilder $builder) {
+//  protected function buildArguments(SchemaBuilderInterface $builder) {
 //    $arguments = parent::buildArguments($builder);
 //
 //    if (empty($arguments['mode'])) {

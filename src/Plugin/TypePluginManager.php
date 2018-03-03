@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
-class TypePluginManager extends DefaultPluginManager {
+class TypePluginManager extends DefaultPluginManager implements TypePluginManagerInterface {
 
   /**
    * Static cache of plugin instances.

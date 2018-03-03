@@ -10,12 +10,12 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
-use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
@@ -31,7 +31,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(SchemaBuilder $builder, FieldPluginManager $manager, $definition, $id) {
+  public static function createInstance(SchemaBuilderInterface $builder, FieldPluginManager $manager, $definition, $id) {
     return [
       'description' => $definition['description'],
       'contexts' => $definition['contexts'],

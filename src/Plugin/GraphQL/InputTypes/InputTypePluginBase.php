@@ -3,9 +3,9 @@
 namespace Drupal\graphql\Plugin\GraphQL\InputTypes;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\TypePluginInterface;
 use Drupal\graphql\Plugin\TypePluginManager;
 use Drupal\graphql\Utility\StringHelper;
@@ -18,7 +18,7 @@ abstract class InputTypePluginBase extends PluginBase implements TypePluginInter
   /**
    * {@inheritdoc}
    */
-  public static function createInstance(SchemaBuilder $builder, TypePluginManager $manager, $definition, $id) {
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
     return new InputObjectType([
       'name' => $definition['name'],
       'description' => $definition['description'],
