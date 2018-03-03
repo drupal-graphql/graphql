@@ -114,17 +114,11 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     MutationPluginManager $mutationManager,
     TypePluginManagerAggregator $typeManagers
   ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
     $this->typeManagers = $typeManagers;
-
-    // Construct the optimized plugin definitions for building the schema.
-    $this->typeMap = $this->buildTypeMap(iterator_to_array($this->typeManagers));
-    $this->typeReferenceMap = $this->buildTypeReferenceMap($this->typeMap);
-    $this->typeAssocationMap = $this->buildTypeAssociationMap($this->typeMap);
-    $this->fieldAssocationMap = $this->buildFieldAssociationMap($this->fieldManager, $this->typeMap);
-    $this->fieldMap = $this->buildFieldMap($this->fieldManager, $this->fieldAssocationMap);
-    $this->mutationMap = $this->buildMutationMap($this->mutationManager);
   }
 
   /**
@@ -132,6 +126,15 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    */
   public function getSchema() {
     $config = new SchemaConfig();
+
+    // Construct the optimized plugin definitions for building the schema.
+    // TODO: Add caching.
+    $this->typeMap = $this->buildTypeMap(iterator_to_array($this->typeManagers));
+    $this->typeReferenceMap = $this->buildTypeReferenceMap($this->typeMap);
+    $this->typeAssocationMap = $this->buildTypeAssociationMap($this->typeMap);
+    $this->fieldAssocationMap = $this->buildFieldAssociationMap($this->fieldManager, $this->typeMap);
+    $this->fieldMap = $this->buildFieldMap($this->fieldManager, $this->fieldAssocationMap);
+    $this->mutationMap = $this->buildMutationMap($this->mutationManager);
 
     if ($this->hasMutations()) {
       $config->setMutation(new ObjectType([

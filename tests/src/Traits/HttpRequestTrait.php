@@ -32,8 +32,6 @@ trait HttpRequestTrait {
    *
    * @param $id
    *   The query id.
-   * @param $version
-   *   The query map version.
    * @param array $variables
    *   Query variables.
    *

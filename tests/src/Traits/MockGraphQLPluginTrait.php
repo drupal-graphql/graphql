@@ -247,12 +247,12 @@ trait MockGraphQLPluginTrait {
    */
   protected function mockField($id, $definition, $result = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
-     GraphQLField::class,
-     $definition + [
-       'secure' => TRUE,
-       'id' => $id,
-       'class' => FieldPluginBase::class,
-     ]
+      GraphQLField::class,
+      $definition + [
+        'secure' => TRUE,
+        'id' => $id,
+        'class' => FieldPluginBase::class,
+      ]
     );
 
     $field = $this->getMockBuilder(FieldPluginBase::class)
