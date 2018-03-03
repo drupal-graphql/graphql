@@ -86,10 +86,6 @@ class EntityMutationTest extends GraphQLContentTestBase {
 
     $this->addTypeSystemPlugin($mutation);
 
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-    $metadata->addCacheTags(['node:1']);
-
     $this->assertResults('mutation ($node: NodeInput!) { createNode(input: $node) { entity { entityId } } }', [
       'node' => [
         'title' => 'Test',
@@ -101,7 +97,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           'entityId' => 1,
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEquals('Test', Node::load(1)->getTitle());
   }
@@ -148,9 +144,6 @@ class EntityMutationTest extends GraphQLContentTestBase {
 
     $this->addTypeSystemPlugin($mutation);
 
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-
     $this->assertResults('mutation ($node: NodeInput!) { createNode(input: $node) { violations { message path } } }', [
       'node' => [
         'title' => 'Test',
@@ -165,7 +158,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           ],
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEmpty(Node::load(1));
   }
@@ -219,10 +212,6 @@ class EntityMutationTest extends GraphQLContentTestBase {
       ],
     ]);
 
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-    $metadata->addCacheTags(['node:1']);
-
     $this->assertResults('mutation ($node: NodeInput!, $nid: String!) { updateNode(id: $nid, input: $node) { entity { entityLabel } } }', [
       'nid' => '1',
       'node' => [
@@ -234,7 +223,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           'entityLabel' => 'Test',
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEquals('Test', Node::load(1)->getTitle());
   }
@@ -269,10 +258,6 @@ class EntityMutationTest extends GraphQLContentTestBase {
       'type' => 'test',
     ]);
 
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-    $metadata->addCacheTags(['node:1']);
-
     $this->assertResults('mutation ($nid: String!) { deleteNode(id: $nid) { entity { entityLabel } } }', [
       'nid' => '1',
     ], [
@@ -281,7 +266,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           'entityLabel' => 'Test',
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEmpty(Node::load(1));
   }

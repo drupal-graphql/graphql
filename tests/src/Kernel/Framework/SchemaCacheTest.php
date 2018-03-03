@@ -22,7 +22,6 @@ class SchemaCacheTest extends GraphQLTestBase {
     parent::register($container);
 
     // Disable static caching in schema and field manager.
-    $this->container->getDefinition('plugin.manager.graphql.schema')->setShared(FALSE);
     $this->container->getDefinition('plugin.manager.graphql.field')->setShared(FALSE);
   }
 

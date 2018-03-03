@@ -300,8 +300,7 @@ class QueryProcessor {
       }
 
       // Add the statically collected cache contexts.
-      $result->addCacheableDependency($metadata);
-
+      $result->addCacheableDependency($metadata)->addCacheTags(['graphql_response']);
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
@@ -357,9 +356,7 @@ class QueryProcessor {
 
     return $promise->then(function (ExecutionResult $result) use ($context) {
       // Add the collected cache metadata to the result.
-      $metadata = (new CacheableMetadata())
-        ->addCacheableDependency($context)
-        ->addCacheTags(['graphql_response']);
+      $metadata = (new CacheableMetadata())->addCacheableDependency($context);
 
       // Do not cache in development mode or if there are any errors.
       if ($context->getGlobal('development') || !empty($result->errors)) {

@@ -70,6 +70,18 @@ trait QueryResultAssertionTrait {
   }
 
   /**
+   * The default mutation cache metadata object.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   *   The cache metadata object.
+   */
+  protected function defaultMutationCacheMetaData() {
+    $metadata = new CacheableMetadata();
+    $metadata->setCacheMaxAge(0);
+    return $metadata;
+  }
+
+  /**
    * Assert a result for a graphql query and variables.
    *
    * @param string $query
@@ -198,9 +210,6 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultMetadata(QueryResult $result, CacheableMetadata $expected) {
-    if (!$expected) {
-      $expected = new CacheableMetadata();
-    }
     $this->assertEquals($expected->getCacheMaxAge(), $result->getCacheMaxAge(), 'Unexpected cache max age.');
 
     $missingContexts = array_diff($expected->getCacheContexts(), $result->getCacheContexts());

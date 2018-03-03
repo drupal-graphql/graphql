@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaBuilder;
@@ -60,9 +61,8 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test result error assertions.
    */
   public function testErrorAssertion() {
-    $metadata = $this->defaultCacheMetaData();
-
     // Errors are not cached at all.
+    $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
 
     $this->assertErrors('{ root }', [], [
@@ -140,10 +140,7 @@ class TestFrameworkTest extends GraphQLTestBase {
       return $args['user']['age'] > 50 && $args['user']['gender'] == 'm';
     });
 
-    $metadata = $this->defaultCacheMetaData();
-    // Mutations are never cacheable.
-    $metadata->setCacheMaxAge(0);
-
+    $metadata = $this->defaultMutationCacheMetaData();
     $this->assertResults('mutation ($user: User!) { addUser(user: $user) }', [
       'user' => [
         'name' => 'John Doe',

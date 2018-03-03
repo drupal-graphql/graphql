@@ -18,7 +18,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   secure = true,
  *   name = "languageSwitchLinks",
  *   type = "[LanguageSwitchLink]",
- *   parents = {"InternalUrl"}
+ *   parents = {"InternalUrl"},
+ *   response_cache_contexts = {"languages:language_url"}
  * )
  */
 class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPluginInterface {

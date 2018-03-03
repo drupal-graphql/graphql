@@ -75,11 +75,8 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // TODO: Check chache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
       'node:1',
-      'config:field.storage.node.body',
     ]);
 
     // Check English node.

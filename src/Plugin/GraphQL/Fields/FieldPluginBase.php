@@ -88,9 +88,14 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
 
     // Extract the result array.
     $result = iterator_to_array($result);
-    $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
-    foreach ($dependencies as $dependency) {
-      $context->addCacheableDependency($dependency);
+
+    // Only collect cache metadata if this is a query. All other operation types
+    // are not cacheable anyways.
+    if ($info->operation->operation === 'query') {
+      $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
+      foreach ($dependencies as $dependency) {
+        $context->addCacheableDependency($dependency);
+      }
     }
 
     return $this->unwrapResult($result, $info);

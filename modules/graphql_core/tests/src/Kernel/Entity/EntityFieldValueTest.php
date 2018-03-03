@@ -64,11 +64,17 @@ query {
 }
 GQL;
 
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.field_boolean',
+      'entity_field_info',
+    ]);
+
     $this->assertResults($query, [], [
       'node' => [
         'fieldBoolean' => TRUE,
       ],
-    ], $this->defaultCacheMetaData());
+    ], $metadata);
   }
 
   /**
@@ -101,17 +107,21 @@ query {
 }
 GQL;
 
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.field_text',
+      'entity_field_info',
+    ]);
+
     $this->assertResults($query, [], [
       'node' => [
         'fieldText' => [
-          0 => [
-            'value' => 'Foo',
-            'processed' => "<p>Foo</p>\n",
-            'format' => 'null',
-          ],
+          'value' => 'Foo',
+          'processed' => "<p>Foo</p>\n",
+          'format' => 'null',
         ],
       ],
-    ], $this->defaultCacheMetaData());
+    ], $metadata);
 
   }
 
@@ -148,6 +158,11 @@ query {
 }
 GQL;
 
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.body',
+      'entity_field_info',
+    ]);
 
     $this->assertResults($query, [], [
       'node' => [
@@ -158,7 +173,7 @@ GQL;
           'summaryProcessed' => '',
         ],
       ],
-    ], $this->defaultCacheMetaData());
+    ], $metadata);
   }
 
   /**
@@ -213,12 +228,7 @@ GQL;
     $expectedFieldValues['fieldImage'][1]['entity']['url'] = file_create_url($this->testImage->getFileUri());
 
     $metadata = $this->defaultCacheMetaData();
-
     $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
-      'node:1',
       'config:field.storage.node.body',
       'config:field.storage.node.field_text',
       'config:field.storage.node.field_boolean',
@@ -233,9 +243,8 @@ GQL;
       'config:field.storage.node.field_string',
       'config:field.storage.node.field_timestamp',
       'config:field.storage.node.field_reference',
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
+      'node:1',
       'file:1',
       'file:2',
     ]);

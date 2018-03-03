@@ -59,20 +59,6 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheTags() {
-    // graphql_core adds the node body field to the schema, which means
-    // it's always part of the result cache tags, even if it has not been
-    // queried.
-    //
-    // https://github.com/drupal-graphql/graphql/issues/500
-    return array_merge(parent::defaultCacheTags(), [
-      'config:field.storage.node.body',
-    ]);
-  }
-
-  /**
    * Mock a field that emits a test node.
    *
    * ```
