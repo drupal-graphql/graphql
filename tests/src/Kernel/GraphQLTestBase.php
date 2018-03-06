@@ -46,6 +46,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
         'id' => 'default',
         'name' => 'default',
         'path' => 'graphql',
+        'deriver' => 'Drupal\graphql\Plugin\Deriver\PluggableSchemaDeriver',
       ],
     ];
   }
@@ -54,7 +55,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function getDefaultSchema() {
-    return 'default';
+    return 'default:default';
   }
 
   /**

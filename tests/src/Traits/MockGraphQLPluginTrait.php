@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\graphql\Annotation\GraphQLEnum;
 use Drupal\graphql\Annotation\GraphQLField;
 use Drupal\graphql\Annotation\GraphQLInputType;
@@ -31,7 +32,7 @@ trait MockGraphQLPluginTrait {
   /**
    * The list of mocked type system plugins.
    *
-   * @var \Drupal\Component\Plugin\PluginInspectionInterface[][]
+   * @var array
    */
   protected $graphQLPlugins = [];
 
@@ -60,9 +61,13 @@ trait MockGraphQLPluginTrait {
    *
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The container instance.
+   *
+   * @throws \Exception
+   * @throws \ReflectionException
    */
   protected function injectTypeSystemPluginManagers(ContainerBuilder $container) {
-    foreach (array_keys($this->graphQLPluginClassMap) as $id) {
+    foreach ($this->graphQLPluginClassMap as $id => $class) {
+      $this->graphQLPlugins[$class] = [];
       /** @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
       $manager = $container->get($id);
 
@@ -100,47 +105,67 @@ trait MockGraphQLPluginTrait {
         ])
         ->getMock();
 
-      $mockFactory->expects(static::any())
-        ->method('createInstance')
-        ->with(static::anything(), static::anything())
-        ->willReturnCallback(function ($pluginId, $configuration) use ($id, $factory) {
-          if (array_key_exists($pluginId, $this->graphQLPlugins[$id])) {
-            return $this->graphQLPlugins[$id][$pluginId];
-          }
-          return $factory->createInstance($pluginId, $configuration);
-        });
+      $decoratedDiscovery = new ContainerDerivativeDiscoveryDecorator($mockDiscovery);
 
       $mockDiscovery
         ->expects(static::any())
         ->method('getDefinitions')
-        ->willReturnCallback(function () use ($id, $discovery) {
-          return array_map(function (PluginInspectionInterface $plugin) {
-            return $plugin->getPluginDefinition();
-          }, $this->graphQLPlugins[$id]) + $discovery->getDefinitions();
+        ->willReturnCallback(function () use ($class, $discovery) {
+          $mockDefinitions = array_map(function ($plugin) {
+            return $plugin['definition'];
+          }, $this->graphQLPlugins[$class]);
+          $realDefinitions = $discovery->getDefinitions();
+          return array_merge($mockDefinitions, $realDefinitions);
         });
 
       $mockDiscovery
         ->expects(static::any())
         ->method('hasDefinition')
         ->with(static::anything())
-        ->willReturnCallback(function ($pluginId) use ($id, $discovery) {
-          return isset($this->graphQLPlugins[$id][$pluginId]) || $discovery->hasDefinition($pluginId);
+        ->willReturnCallback(function ($pluginId) use ($class, $discovery) {
+          $basePluginId = $this->getBasePluginId($pluginId);
+          return isset($this->graphQLPlugins[$class][$basePluginId]) || $discovery->hasDefinition($pluginId);
         });
 
       $mockDiscovery
         ->expects(static::any())
         ->method('getDefinition')
         ->with(static::anything(), static::anything())
-        ->willReturnCallback(function ($pluginId, $except) use ($id, $discovery) {
-          if (array_key_exists($pluginId, $this->graphQLPlugins[$id])) {
-            return $this->graphQLPlugins[$id][$pluginId];
+        ->willReturnCallback(function ($pluginId, $except) use ($class, $discovery) {
+          $basePluginId = $this->getBasePluginId($pluginId);
+          if (array_key_exists($basePluginId, $this->graphQLPlugins[$class])) {
+            return $this->graphQLPlugins[$class][$basePluginId]['definition'];
           }
           return $discovery->getDefinition($pluginId, $except);
         });
 
+      $discoveryProp->setValue($manager, $decoratedDiscovery);
+
+      $mockFactory->expects(static::any())
+        ->method('createInstance')
+        ->with(static::anything(), static::anything())
+        ->willReturnCallback(function ($pluginId, $configuration) use ($class, $factory, $decoratedDiscovery) {
+          $basePluginId = $this->getBasePluginId($pluginId);
+          if (array_key_exists($basePluginId, $this->graphQLPlugins[$class])) {
+            $definition = $decoratedDiscovery->getDefinition($pluginId);
+            $args = $this->graphQLPlugins[$class][$basePluginId];
+            $args['definition'] = $definition;
+            return call_user_func_array([$this, $definition['mock_factory']], $args);
+          }
+          return $factory->createInstance($pluginId, $configuration);
+        });
+
       $factoryProp->setValue($manager, $mockFactory);
-      $discoveryProp->setValue($manager, $mockDiscovery);
     }
+  }
+
+  /**
+   * @param $pluginId
+   *
+   * @return mixed
+   */
+  private function getBasePluginId($pluginId) {
+    return strpos($pluginId, ':') ? explode(':', $pluginId)[0] : $pluginId;
   }
 
   /**
@@ -214,20 +239,32 @@ trait MockGraphQLPluginTrait {
    *
    * @param string $id
    *   The schema id.
-   *
-   * @return \Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase
-   *   The schema plugin mock.
+   * @param callable|null $builder
+   *   A builder callback to modify the mock instance.
    */
-  protected function mockSchema($id) {
+  protected function mockSchema($id, $builder = NULL) {
+    $this->graphQLPlugins[SchemaPluginBase::class][$id] = [
+      'definition' => $this->getSchemaDefinitions()[$id] + [
+        'mock_factory' => 'mockSchemaFactory',
+      ],
+      'builder' => $builder,
+    ];
+  }
+
+  protected function mockSchemaFactory($definition, $builder) {
     $schema = $this->getMockForAbstractClass(SchemaPluginBase::class, [
       [],
-      $id,
-      $this->getSchemaDefinitions()[$id],
+      $definition['id'],
+      $definition,
       $this->container->get('plugin.manager.graphql.field'),
       $this->container->get('plugin.manager.graphql.mutation'),
       $this->container->get('graphql.type_manager_aggregator'),
     ]);
-    $this->addTypeSystemPlugin($schema);
+
+    if (is_callable($builder)) {
+      $builder($schema);
+    }
+
     return $schema;
   }
 
@@ -241,22 +278,30 @@ trait MockGraphQLPluginTrait {
    * @param mixed|null $result
    *   A result for this field. Can be a value or a callback. If omitted, no
    *   resolve method mock will be attached.
-   *
-   * @return \PHPUnit_Framework_MockObject_MockObject
-   *   The field mock object.
+   * @param callable|null $builder
+   *   A builder callback to modify the mock instance.
    */
-  protected function mockField($id, $definition, $result = NULL) {
+  protected function mockField($id, $definition, $result = NULL, $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLField::class,
       $definition + [
         'secure' => TRUE,
         'id' => $id,
         'class' => FieldPluginBase::class,
+        'mock_factory' => 'mockFieldFactory',
       ]
     );
 
+    $this->graphQLPlugins[FieldPluginBase::class][$id] = [
+      'definition' => $definition,
+      'result' => $result,
+      'builder' => $builder,
+    ];
+  }
+
+  protected function mockFieldFactory($definition, $result = NULL, $builder = NULL) {
     $field = $this->getMockBuilder(FieldPluginBase::class)
-      ->setConstructorArgs([[], $id, $definition])
+      ->setConstructorArgs([[], $definition['id'], $definition])
       ->setMethods([
         'resolveValues',
       ])->getMock();
@@ -269,7 +314,9 @@ trait MockGraphQLPluginTrait {
         ->will($this->toBoundPromise($result, $field));
     }
 
-    $this->addTypeSystemPlugin($field);
+    if (is_callable($builder)) {
+      $builder($field);
+    }
 
     return $field;
   }
@@ -287,17 +334,27 @@ trait MockGraphQLPluginTrait {
    * @return \PHPUnit_Framework_MockObject_MockObject
    *   The type mock object.
    */
-  protected function mockType($id, array $definition, $applies = TRUE) {
+  protected function mockType($id, array $definition, $applies = TRUE, $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLType::class,
       $definition + [
         'id' => $id,
         'class' => TypePluginBase::class,
+        'mock_factory' => 'mockTypeFactory',
       ]
     );
 
+    $this->graphQLPlugins[TypePluginBase::class][$id] = [
+      'definition' => $definition,
+      'applies' => $applies,
+      'builder' => $builder,
+    ];
+
+  }
+
+  protected function mockTypeFactory($definition, $applies = TRUE, $builder = NULL) {
     $type = $this->getMockBuilder(TypePluginBase::class)
-      ->setConstructorArgs([[], $id, $definition])
+      ->setConstructorArgs([[], $definition['id'], $definition])
       ->setMethods([
         'applies',
       ])->getMock();
@@ -308,7 +365,9 @@ trait MockGraphQLPluginTrait {
       ->with($this->anything(), $this->anything())
       ->will($this->toBoundPromise($applies, $type));
 
-    $this->addTypeSystemPlugin($type);
+    if (is_callable($builder)) {
+      $builder($type);
+    }
 
     return $type;
   }
@@ -320,28 +379,34 @@ trait MockGraphQLPluginTrait {
    *   The input type id.
    * @param array $definition
    *   The plugin definition. Will be merged with the input type defaults.
-   *
-   * @return \PHPUnit_Framework_MockObject_MockObject
-   *   The input type mock object.
    */
-  protected function mockInputType($id, array $definition) {
+  protected function mockInputType($id, array $definition, $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLInputType::class,
       $definition + [
         'id' => $id,
         'class' => InputTypePluginBase::class,
+        'mock_factory' => 'mockInputTypeFactory',
       ]
     );
+    $this->graphQLPlugins[InputTypePluginBase::class][$id] = [
+      'definition' => $definition,
+      'builder' => $builder,
+    ];
+  }
 
+  protected function mockInputTypeFactory($definition, $builder) {
     $input = $this->getMockForAbstractClass(
       InputTypePluginBase::class, [
         [],
-        $id,
+        $definition['id'],
         $definition,
       ]
     );
 
-    $this->addTypeSystemPlugin($input);
+    if (is_callable($builder)) {
+      $builder($input);
+    }
 
     return $input;
   }
@@ -360,17 +425,26 @@ trait MockGraphQLPluginTrait {
    * @return \PHPUnit_Framework_MockObject_MockObject
    *   The mutation mock object.
    */
-  protected function mockMutation($id, array $definition, $result = NULL) {
+  protected function mockMutation($id, array $definition, $result = NULL, $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLMutation::class,
       $definition + [
         'id' => $id,
         'class' => MutationPluginBase::class,
+        'mock_factory' => 'mockMutationFactory',
       ]
     );
 
+    $this->graphQLPlugins[MutationPluginBase::class][$id] = [
+      'definition' => $definition,
+      'result' => $result,
+      'builder' => $builder,
+    ];
+  }
+
+  protected function mockMutationFactory($definition, $result = NULL, $builder = NULL) {
     $mutation = $this->getMockBuilder(MutationPluginBase::class)
-      ->setConstructorArgs([[], $id, $definition])
+      ->setConstructorArgs([[], $definition['id'], $definition])
       ->setMethods([
         'resolve',
       ])->getMock();
@@ -383,7 +457,9 @@ trait MockGraphQLPluginTrait {
         ->will($this->toBoundPromise($result, $mutation));
     }
 
-    $this->addTypeSystemPlugin($mutation);
+    if (is_callable($builder)) {
+      $builder($mutation);
+    }
 
     return $mutation;
   }
@@ -399,25 +475,36 @@ trait MockGraphQLPluginTrait {
    * @return \PHPUnit_Framework_MockObject_MockObject
    *   The interface mock object.
    */
-  protected function mockInterface($id, array $definition) {
+  protected function mockInterface($id, array $definition, $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLInterface::class,
       $definition + [
         'id' => $id,
         'class' => InterfacePluginBase::class,
+        'mock_factory' => 'mockInterfaceFactory',
       ]
     );
 
+    $this->graphQLPlugins[InputTypePluginBase::class][$id] = [
+      'definition' => $definition,
+      'builder' => $builder,
+    ];
+  }
+
+  protected function mockInterfaceFactory($definition, $builder = NULL) {
     $interface = $this->getMockForAbstractClass(InterfacePluginBase::class, [
       [],
-      $id,
+      $definition['id'],
       $definition,
     ]);
 
-    $this->addTypeSystemPlugin($interface);
+    if (is_callable($builder)) {
+      $builder($interface);
+    }
 
     return $interface;
   }
+
 
   /**
    * Mock a GraphQL union.
@@ -430,22 +517,32 @@ trait MockGraphQLPluginTrait {
    * @return \PHPUnit_Framework_MockObject_MockObject
    *   The union mock object.
    */
-  protected function mockUnion($id, array $definition) {
+  protected function mockUnion($id, array $definition, $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLUnionType::class,
       $definition + [
         'id' => $id,
         'class' => UnionTypePluginBase::class,
+        'mock_factory' => 'mockUnionFactory',
       ]
     );
 
+    $this->graphQLPlugins[UnionTypePluginBase::class][$id] = [
+      'definition' => $definition,
+      'builder' => $builder,
+    ];
+  }
+
+  protected function mockUnionFactory($definition, $builder) {
     $union = $this->getMockForAbstractClass(UnionTypePluginBase::class, [
       [],
-      $id,
+      $definition['id'],
       $definition,
     ]);
 
-    $this->addTypeSystemPlugin($union);
+    if (is_callable($union)) {
+      $builder($union);
+    }
 
     return $union;
   }
@@ -459,21 +556,27 @@ trait MockGraphQLPluginTrait {
    *   The plugin definition. Will be merged with the enum defaults.
    * @param mixed $values
    *   The array enum values. Can also be a value callback.
-   *
-   * @return \PHPUnit_Framework_MockObject_MockObject
-   *   The enum mock object.
    */
-  protected function mockEnum($id, array $definition, $values = []) {
+  protected function mockEnum($id, array $definition, $values = [], $builder = NULL) {
     $definition = $this->getTypeSystemPluginDefinition(
       GraphQLEnum::class,
       $definition + [
         'id' => $id,
         'class' => EnumPluginBase::class,
+        'mock_factory' => 'mockEnumFactory',
       ]
     );
 
+    $this->graphQLPlugins[EnumPluginBase::class][$id] = [
+      'definition' => $definition,
+      'values' => $values,
+      'builder' => $builder,
+    ];
+  }
+
+  protected function mockEnumFactory($definition, $values = [], $builder = NULL) {
     $enum = $this->getMockBuilder(EnumPluginBase::class)
-      ->setConstructorArgs([[], $id, $definition])
+      ->setConstructorArgs([[], $definition['id'], $definition])
       ->setMethods([
         'buildEnumValues',
       ])->getMock();
@@ -484,7 +587,9 @@ trait MockGraphQLPluginTrait {
       ->with($this->anything())
       ->will($this->toBoundPromise($values, $enum));
 
-    $this->addTypeSystemPlugin($enum);
+    if (is_callable($builder)) {
+      $builder($enum);
+    }
 
     return $enum;
   }
