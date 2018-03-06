@@ -20,18 +20,19 @@ class ResultCacheTest extends GraphQLTestBase {
    * Check basic result caching.
    */
   public function testCacheableResult() {
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-    ]);
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::once())
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'test';
+        });
+    });
 
-    $field
-      ->expects(static::once())
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'test';
-      });
 
     // The first request that is supposed to be cached.
     $this->query('{ root }');
@@ -44,20 +45,21 @@ class ResultCacheTest extends GraphQLTestBase {
    * Verify that uncacheable results are not cached.
    */
   public function testUncacheableResult() {
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-    ]);
+    ], NULL, function ($field) {
+      $callback = function () {
+        yield (new CacheableValue('test'))->mergeCacheMaxAge(0);
+      };
 
-    $callback = function () {
-      yield (new CacheableValue('test'))->mergeCacheMaxAge(0);
-    };
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->will($this->toBoundPromise($callback, $field));
+    });
 
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->will($this->toBoundPromise($callback, $field));
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');
@@ -70,19 +72,20 @@ class ResultCacheTest extends GraphQLTestBase {
    * Verify that fields with uncacheable annotations are not cached.
    */
   public function testUncacheableResultAnnotation() {
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
       'response_cache_max_age' => 0,
-    ]);
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'test';
+        });
+    });
 
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'test';
-      });
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');
@@ -95,18 +98,18 @@ class ResultCacheTest extends GraphQLTestBase {
    * Test if caching properly handles variabels.
    */
   public function testVariables() {
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-    ]);
-
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'test';
-      });
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'test';
+        });
+    });
 
     // This result will be stored in the cache.
     $this->query('{ root }', ['value' => 'a']);
@@ -144,19 +147,19 @@ class ResultCacheTest extends GraphQLTestBase {
     /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
     $contextKeys = $contextManager->convertTokensToKeys($hasContext);
 
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
       'response_cache_contexts' => ['context'],
-    ]);
-
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'test';
-      });
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'test';
+        });
+    });
 
     // Set the context value to 'a'/
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
@@ -178,19 +181,19 @@ class ResultCacheTest extends GraphQLTestBase {
    * Test if results cache properly acts on cache tag clears.
    */
   public function testTags() {
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
       'response_cache_tags' => ['a', 'b'],
-    ]);
-
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'test';
-      });
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'test';
+        });
+    });
 
     // First call that will be cached.
     $this->query('{ root }');
@@ -222,31 +225,32 @@ class ResultCacheTest extends GraphQLTestBase {
 
     $queryProvider->getQuery('query:b', Argument::any())->willReturn('{ b }');
 
-    $field = $this->mockField('a', [
+    $this->mockField('a', [
       'id' => 'a',
       'name' => 'a',
       'type' => 'String',
-    ]);
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(1))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'a';
+        });
+    });
 
-    $field
-      ->expects(static::exactly(1))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'a';
-      });
-
-    $field = $this->mockField('b', [
+    $this->mockField('b', [
       'id' => 'b',
       'name' => 'b',
       'type' => 'String',
-    ]);
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'b';
+        });
+    });
 
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'b';
-      });
 
     $this->persistedQuery('query:a');
     $this->persistedQuery('query:b');
