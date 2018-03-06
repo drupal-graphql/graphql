@@ -219,7 +219,7 @@ trait QueryResultAssertionTrait {
     $this->assertEmpty($unexpectedContexts, 'Unexpected cache contexts: ' . implode(', ', $unexpectedContexts));
 
     $missingTags = array_diff($expected->getCacheTags(), $result->getCacheTags());
-    $this->assertEmpty($missingTags, 'Missing cache tags: '  . implode(', ', $missingTags));
+    $this->assertEmpty($missingTags, 'Missing cache tags: ' . implode(', ', $missingTags));
 
     $unexpectedTags = array_diff($result->getCacheTags(), $expected->getCacheTags());
     $this->assertEmpty($unexpectedTags, 'Unexpected cache tags: ' . implode(', ', $unexpectedTags));
