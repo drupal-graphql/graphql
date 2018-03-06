@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
+use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -87,6 +88,10 @@ trait MockGraphQLPluginTrait {
       /** @var DiscoveryInterface $discovery */
       $discovery = $discoveryMethod->invoke($manager);
 
+      $decoratedProp = new \ReflectionProperty(DerivativeDiscoveryDecorator::class, 'decorated');
+      $decoratedProp->setAccessible(TRUE);
+      $unwrappedDiscovery = $decoratedProp->getValue($discovery);
+
       $this->graphQLPlugins[$id] = [];
 
       $mockFactory = $this
@@ -110,11 +115,11 @@ trait MockGraphQLPluginTrait {
       $mockDiscovery
         ->expects(static::any())
         ->method('getDefinitions')
-        ->willReturnCallback(function () use ($class, $discovery) {
+        ->willReturnCallback(function () use ($class, $unwrappedDiscovery) {
           $mockDefinitions = array_map(function ($plugin) {
             return $plugin['definition'];
           }, $this->graphQLPlugins[$class]);
-          $realDefinitions = $discovery->getDefinitions();
+          $realDefinitions = $unwrappedDiscovery->getDefinitions();
           return array_merge($mockDefinitions, $realDefinitions);
         });
 
