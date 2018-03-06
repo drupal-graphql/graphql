@@ -11,7 +11,7 @@ query {
   }
 }
 
-You can run this query in your browser, via a GET request, after enabling the module. Note, if you are logged in already, the query should return a result. If you want the anonymous user to run the following query, you will need to enable the `Execute arbitrary GraphQL requests` permission. 
+You can run the the above query in your browser, via a GET request, after enabling the module. Note, if you are logged in already, the query should return a result. If you want the anonymous user to run the following query, you will need to enable the `Execute arbitrary GraphQL requests` permission. You can also run this query in the GraphiQL browser provided with the module at : `/graphql/explorer`
 ```
 [YOUR DOMAIN]/graphql?query=query{user:currentUserContext{...on%20User{name}}}
 ``` 
