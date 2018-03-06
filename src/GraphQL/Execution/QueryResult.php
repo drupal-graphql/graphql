@@ -12,6 +12,18 @@ class QueryResult extends ExecutionResult implements RefinableCacheableDependenc
   use RefinableCacheableDependencyTrait;
 
   /**
+   * Don't serialize errors, since they might contain closures.
+   *
+   * return string[]
+   *   The property names to serialize.
+   */
+  public function __sleep() {
+    return array_filter(array_keys(get_object_vars($this)), function ($prop) {
+      return $prop != 'errors';
+    });
+  }
+
+  /**
    * QueryResult constructor.
    *
    * @param array $data
