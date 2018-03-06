@@ -11,8 +11,10 @@ query {
   }
 }
 ```
+[YOUR DOMAIN]/graphql?query=query{%20user:%20currentUserContext{%20uid,%20uuid%20}%20}
+``` 
 
-and the response :
+This would return a result similar to: 
 
 ```javascript
 {
