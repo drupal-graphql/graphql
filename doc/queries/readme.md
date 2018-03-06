@@ -1,6 +1,8 @@
 # Queries
 
+
 Graphql is a query language and so the first thing we will be going through is how can you start making queries to Drupal. One of the great benefits of GraphQL is how intuitive the query syntax and corresponsing responses look. Essentially, the query is a lot like how you want the response to look but without the values. Lets have a look at the example we saw in the introduction:
+
 
 ```javascript
 query {
@@ -17,6 +19,8 @@ You can run the the above query in your browser, via a GET request, after enabli
 ``` 
 
 This would return a result similar to: 
+=======
+```
 
 ```javascript
 {
@@ -69,7 +73,7 @@ The query above fetches information from 3 different places :
 
 If we paste the above query in GraphiQL we will get the following result :
 
-
+=======
 
 ```
 {
