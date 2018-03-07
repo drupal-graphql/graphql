@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql\Plugin;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
@@ -41,7 +43,8 @@ class TypePluginManager extends DefaultPluginManager implements TypePluginManage
     CacheBackendInterface $cacheBackend,
     $pluginInterface,
     $pluginAnnotationName,
-    $pluginType
+    $pluginType,
+    array $config
   ) {
     parent::__construct(
       $pluginSubdirectory,
@@ -52,7 +55,7 @@ class TypePluginManager extends DefaultPluginManager implements TypePluginManage
     );
 
     $this->alterInfo("graphql_{$pluginType}");
-    $this->useCaches(TRUE);
+    $this->useCaches(empty($config['development']));
     $this->setCacheBackend($cacheBackend, $pluginType, ['graphql', "graphql:{$pluginType}"]);
   }
 
@@ -67,4 +70,53 @@ class TypePluginManager extends DefaultPluginManager implements TypePluginManage
     return $this->instances[$options['id']];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCachedDefinitions() {
+    parent::clearCachedDefinitions();
+    $this->instances = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setCachedDefinitions($definitions) {
+    $this->definitions = $definitions;
+    $this->cacheSet($this->cacheKey, $definitions, $this->getCacheMaxAge(), $this->getCacheTags());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $definitions = $this->getDefinitions();
+    return array_reduce($definitions, function ($carry, $current) {
+      if (!empty($current['schema_cache_tags'])) {
+        return Cache::mergeTags($carry, $current['schema_cache_tags']);
+      }
+
+      return $carry;
+    }, $this->cacheTags);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    $definitions = $this->getDefinitions();
+    $age = Cache::PERMANENT;
+    foreach ($definitions as $definition) {
+      if (!isset($definition['schema_cache_max_age'])) {
+        continue;
+      }
+
+      // Bail out early if the cache max age is 0.
+      if (($age = Cache::mergeMaxAges($age, $definition['schema_cache_max_age'])) === 0) {
+        return $age;
+      }
+    }
+
+    return $age;
+  }
 }

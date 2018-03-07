@@ -113,6 +113,7 @@ services:
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
+      - '%graphql.config%'
 
   # Plugin manager for fields.
   plugin.manager.graphql.field:
@@ -124,6 +125,7 @@ services:
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\FieldPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLField'
+      - '%graphql.config%'
 
   # Plugin manager for mutations.
   plugin.manager.graphql.mutation:
@@ -135,6 +137,7 @@ services:
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\MutationPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
+      - '%graphql.config%'
 
   # Plugin manager implementations for schema types.
   plugin.manager.graphql.union:
@@ -149,6 +152,7 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLUnionType'
       - 'union_types'
+      - '%graphql.config%'
   plugin.manager.graphql.interface:
     class: Drupal\graphql\Plugin\TypePluginManager
     tags:
@@ -161,6 +165,7 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInterface'
       - 'interfaces'
+      - '%graphql.config%'
   plugin.manager.graphql.type:
     class: Drupal\graphql\Plugin\TypePluginManager
     tags:
@@ -173,6 +178,7 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLType'
       - 'types'
+      - '%graphql.config%'
   plugin.manager.graphql.input:
     class: Drupal\graphql\Plugin\TypePluginManager
     tags:
@@ -185,6 +191,7 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
       - '\Drupal\graphql\Annotation\GraphQLInputType'
       - 'input_types'
+      - '%graphql.config%'
   plugin.manager.graphql.scalar:
     class: Drupal\graphql\Plugin\TypePluginManager
     tags:
@@ -197,6 +204,7 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLScalar'
       - 'scalars'
+      - '%graphql.config%'
   plugin.manager.graphql.enum:
     class: Drupal\graphql\Plugin\TypePluginManager
     tags:
@@ -209,6 +217,7 @@ services:
       - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
       - '\Drupal\graphql\Annotation\GraphQLEnum'
       - 'enums'
+      - '%graphql.config%'
 
   # Voyager.
   graphql.voyager.page_display_variant_subscriber:

@@ -3,7 +3,10 @@
 namespace Drupal\graphql\Plugin\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
@@ -67,6 +70,19 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
     $fieldMap = $this->buildFieldMap($this->fieldManager, $fieldAssocationMap);
     $mutationMap = $this->buildMutationMap($this->mutationManager);
 
+    $managers = array_merge([$this->fieldManager, $this->mutationManager], iterator_to_array($this->typeManagers));
+    $cacheTags = array_reduce($managers, function ($carry, CacheableDependencyInterface $current) {
+      return Cache::mergeTags($carry, $current->getCacheTags());
+    }, []);
+
+    $cacheContexts = array_reduce($managers, function ($carry, CacheableDependencyInterface $current) {
+      return Cache::mergeContexts($carry, $current->getCacheContexts());
+    }, []);
+
+    $cacheMaxAge = array_reduce($managers, function ($carry, CacheableDependencyInterface $current) {
+      return Cache::mergeMaxAges($carry, $current->getCacheMaxAge());
+    }, Cache::PERMANENT);
+
     $this->derivatives[$this->basePluginId] = [
       'type_map' => $typeMap,
       'type_reference_map' => $typeReferenceMap,
@@ -74,6 +90,9 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
       'field_association_map' => $fieldAssocationMap,
       'field_map' => $fieldMap,
       'mutation_map' => $mutationMap,
+      'schema_cache_tags' => $cacheTags,
+      'schema_cache_contexts' => $cacheContexts,
+      'schema_cache_max_age' => $cacheMaxAge,
     ] + $basePluginDefinition;
 
     return $this->derivatives;
