@@ -106,7 +106,7 @@ class LanguageTest extends GraphQLCoreTestBase {
   public function testLanguageSwitchLinks() {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->addCacheContexts(['languages:language_url']);
+    $metadata->addCacheContexts(['languages:language_url', 'languages:language_interface']);
     $metadata->addCacheTags([
       'config:language.entity.en',
       'config:language.entity.es',

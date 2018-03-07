@@ -19,7 +19,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   name = "languageSwitchLinks",
  *   type = "[LanguageSwitchLink]",
  *   parents = {"InternalUrl"},
- *   response_cache_contexts = {"languages:language_url"}
+ *   response_cache_contexts = {
+ *     "languages:language_url",
+ *     "languages:language_interface"
+ *   }
  * )
  */
 class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPluginInterface {
