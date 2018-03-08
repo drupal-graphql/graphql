@@ -72,14 +72,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
     return [
       'graphql_response',
       'graphql',
-      'graphql:enums',
-      'graphql:fields',
-      'graphql:input_types',
-      'graphql:interfaces',
-      'graphql:mutations',
-      'graphql:scalars',
-      'graphql:types',
-      'graphql:union_types',
     ];
   }
 
@@ -103,12 +95,13 @@ abstract class GraphQLTestBase extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
     $this->injectTypeSystemPluginManagers($this->container);
+
     PHPUnit_Framework_Error_Warning::$enabled = FALSE;
     PHPUnit_Framework_Error_Notice::$enabled = FALSE;
+
     $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
-
     $this->mockSchema('default');
   }
 
