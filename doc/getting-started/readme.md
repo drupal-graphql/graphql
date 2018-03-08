@@ -10,7 +10,7 @@ The GraphQL Drupal module lets you query or mutate (update/delete)  any content 
 
 Anyone who wants to get JSON data out of Drupal. 
 
-Just a few examples of where the GraphQL module could be used:
+A few examples of where the GraphQL module could be used:
 
 * Decoupled Drupal applications with a javascript front-end (React, Angular, Ember, etc), 
 * Twig Templates (Drupal theming)
@@ -55,7 +55,12 @@ http://graphql.org/learn/
 
 
 **NOTES:**
-* The GraphiQL explorer is your friend, it’s amazing. You will most likely use the GraphiQL explorer to build and test more complicated queries. 
-* GraphQL is introspective, meaning that the entire schema (data model) is known up front. 
-* You can use GraphiQL to explore your way through the data and configuration, once you know the basic GraphQL syntax. 
+* The GraphiQL explorer, included with the module, is your friend, it’s amazing. You will most likely use the GraphiQL explorer to build and test more complicated queries. 
+* GraphQL is introspective, meaning that the entire schema (data model) is known up front. This is important as it allows tools like GraphiQL to implement autocompletion. 
+* You can use GraphiQL to explore your way through the data and configuration, once you know the basic GraphQL syntax. You can use the tab key in the explorer like you would with autocompletion or intellisense in modern IDEs.
 * The `... UserUser` in the query above is a fragment which exposes all of the fields on the UserUser entity to us. Inline fragments like this can be a very powerful way to explore the schema. 
+
+
+**Resources**
+* https://github.com/drupal-graphql/graphql
+* https://drupal.slack.org - The GraphQL Slack Channel is very active
