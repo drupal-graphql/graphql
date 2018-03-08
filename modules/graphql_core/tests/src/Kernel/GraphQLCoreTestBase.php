@@ -20,6 +20,17 @@ class GraphQLCoreTestBase extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function defaultCacheTags() {
+    return array_merge([
+      'entity_bundles',
+      'entity_types',
+      'entity_field_info',
+    ], parent::defaultCacheTags());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     // User entity schema is required for the currentUserContext field.

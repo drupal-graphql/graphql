@@ -7,6 +7,7 @@ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\graphql\Annotation\GraphQLEnum;
 use Drupal\graphql\Annotation\GraphQLField;
@@ -36,6 +37,29 @@ trait MockGraphQLPluginTrait {
    * @var array
    */
   protected $graphQLPlugins = [];
+
+  protected $graphQLPluginManagers = [];
+
+  protected $graphqlPluginDecorators = [];
+
+  /**
+   * Reset static caches in plugin managers.
+   */
+  protected function resetStaticCaches() {
+    $definitionsProperty = new \ReflectionProperty(DefaultPluginManager::class, 'definitions');
+    $definitionsProperty->setAccessible(TRUE);
+
+    foreach ($this->graphQLPluginManagers as $manager) {
+      $definitionsProperty->setValue($manager, NULL);
+    }
+
+    $deriversProperty = new \ReflectionProperty(DerivativeDiscoveryDecorator::class, 'derivers');
+    $deriversProperty->setAccessible(TRUE);
+
+    foreach ($this->graphqlPluginDecorators as $decorator) {
+      $deriversProperty->setValue($decorator, NULL);
+    }
+  }
 
   /**
    * Maps type system manager id's to required plugin interfaces.
@@ -71,6 +95,8 @@ trait MockGraphQLPluginTrait {
       $this->graphQLPlugins[$class] = [];
       /** @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
       $manager = $container->get($id);
+
+      $this->graphQLPluginManagers[$id] = $manager;
 
       // Really?
       $factoryMethod = new \ReflectionMethod($manager, 'getFactory');
@@ -111,6 +137,8 @@ trait MockGraphQLPluginTrait {
         ->getMock();
 
       $decoratedDiscovery = new ContainerDerivativeDiscoveryDecorator($mockDiscovery);
+
+      $this->graphqlPluginDecorators[$id] = $decoratedDiscovery;
 
       $mockDiscovery
         ->expects(static::any())

@@ -16,6 +16,9 @@ trait IntrospectionTestTrait {
    *   The name-indexed schema.
    */
   protected function introspect() {
+    if (method_exists($this, 'resetStaticCaches')) {
+      $this->resetStaticCaches();
+    }
     $introspection = $this->container->get('graphql.introspection')->introspect($this->getDefaultSchema());
     $this->indexByName($introspection['data']);
     return $introspection['data']['__schema'];
@@ -27,8 +30,10 @@ trait IntrospectionTestTrait {
    * @param array $fields
    *   Array of [ParentType, FieldName, FieldType] triples. Field type can use
    *   the GraphQL type notation.
+   * @param bool $invert
+   *   Invert the result and check for non-existence instead.
    */
-  protected function assertGraphQLFields(array $fields) {
+  protected function assertGraphQLFields(array $fields, $invert = FALSE) {
     $schema = $this->introspect();
     foreach ($fields as list($parent, $name, $type)) {
       $this->assertArrayHasKey($parent, $schema['types'], "Type $parent not found.");

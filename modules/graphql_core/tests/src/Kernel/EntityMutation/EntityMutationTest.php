@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\EntityMutation;
 
-use Drupal\graphql\Annotation\GraphQLMutation;
-use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\DeleteEntityBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\UpdateEntityBase;

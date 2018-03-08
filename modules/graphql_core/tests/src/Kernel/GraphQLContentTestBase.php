@@ -31,6 +31,15 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
 
   /**
    * {@inheritdoc}
+   */
+  protected function defaultCacheTags() {
+    return array_merge([
+      'config:field.storage.node.body',
+    ], parent::defaultCacheTags());
+  }
+
+  /**
+   * {@inheritdoc}
    *
    * Add the 'access content' permission to the mocked account.
    */

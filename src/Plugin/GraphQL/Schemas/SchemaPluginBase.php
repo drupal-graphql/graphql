@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
@@ -14,7 +15,8 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface {
+abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
+
 
   /**
    * @var \Drupal\graphql\Plugin\FieldPluginManager
@@ -312,5 +314,26 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     }
 
     return $this->mutations[$mutation['id']];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return $this->pluginDefinition['schema_cache_tags'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    return $this->pluginDefinition['schema_cache_max_age'];
   }
 }

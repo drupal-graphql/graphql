@@ -78,6 +78,7 @@ trait QueryResultAssertionTrait {
   protected function defaultMutationCacheMetaData() {
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
+    $metadata->setCacheTags($this->defaultCacheTags());
     return $metadata;
   }
 

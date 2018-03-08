@@ -44,6 +44,7 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@graphql.query_provider'
       - '@cache.graphql.results'
+      - '%graphql.config%'
 
   # Query map provider using the composite pattern.
   graphql.query_provider:

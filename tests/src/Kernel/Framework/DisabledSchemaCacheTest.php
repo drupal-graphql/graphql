@@ -19,9 +19,6 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
     parent::register($container);
     $config = $container->getParameter('graphql.config');
     $container->setParameter('graphql.config', ['development' => TRUE] + $config);
-
-    // Disable static caching in the plugin managers.
-    $this->container->getDefinition('plugin.manager.graphql.field')->setShared(FALSE);
   }
 
   /**

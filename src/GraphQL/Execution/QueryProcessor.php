@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -67,6 +68,13 @@ class QueryProcessor {
   protected $contextsManager;
 
   /**
+   * GraphQL configuration.
+   *
+   * @var array
+   */
+  protected $config;
+
+  /**
    * Processor constructor.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
@@ -85,13 +93,15 @@ class QueryProcessor {
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
     QueryProviderInterface $queryProvider,
-    CacheBackendInterface $cacheBackend
+    CacheBackendInterface $cacheBackend,
+    array $config
   ) {
     $this->currentUser = $currentUser;
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
     $this->queryProvider = $queryProvider;
     $this->cacheBackend = $cacheBackend;
+    $this->config = $config;
   }
 
   /**
@@ -119,15 +129,19 @@ class QueryProcessor {
 
     // Create the server config.
     $config = ServerConfig::create();
-    $config->setDebug(!empty($globals['development']));
+    $config->setDebug(!empty($this->config['development']));
     $config->setSchema($schema);
     $config->setQueryBatching(TRUE);
-    $config->setContext(function () use ($globals) {
+    $config->setContext(function () use ($globals, $plugin) {
       // Each document (e.g. in a batch query) gets its own resolve context but
       // the global parameters are shared. This allows us to collect the cache
       // metadata and contextual values (e.g. inheritance for language) for each
       // query separately.
-      return new ResolveContext($globals);
+      $context = new ResolveContext($globals);
+      if ($plugin instanceof CacheableDependencyInterface) {
+        $context->addCacheableDependency($plugin)->addCacheTags(['graphql_response']);
+      }
+      return $context;
     });
 
     $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
@@ -286,7 +300,7 @@ class QueryProcessor {
     // Generate a cache identifier from the collected contexts.
     $metadata = (new CacheableMetadata())->addCacheContexts($contexts);
     $cid = $this->cacheIdentifier($params, $document, $metadata);
-    if (($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
+    if (!$config->getDebug() && ($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
       return $adapter->createFulfilled($result);
     }
 
@@ -300,7 +314,7 @@ class QueryProcessor {
       }
 
       // Add the statically collected cache contexts.
-      $result->addCacheableDependency($metadata)->addCacheTags(['graphql_response']);
+      $result->addCacheableDependency($metadata);
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
