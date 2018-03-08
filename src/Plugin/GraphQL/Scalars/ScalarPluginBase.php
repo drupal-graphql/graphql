@@ -44,25 +44,36 @@ abstract class ScalarPluginBase extends PluginBase implements TypePluginInterfac
   }
 
   /**
+   * Serializes the scalar value.
+   *
    * @param mixed $value
+   *   The value to serialize.
    */
   public static function serialize($value) {
     throw new \LogicException('Missing method.');
   }
 
   /**
+   * Parses a value.
+   *
    * @param mixed $value
+   *   The value to parse.
    *
    * @return mixed
+   *   The parsed value.
    */
   public static function parseValue($value) {
     throw new \LogicException('Missing method.');
   }
 
   /**
+   * Parses a node.
+   *
    * @param mixed $node
+   *   The node to parse.
    *
    * @return mixed
+   *   The parsed node.
    */
   public static function parseLiteral($node) {
     throw new \LogicException('Missing method.');

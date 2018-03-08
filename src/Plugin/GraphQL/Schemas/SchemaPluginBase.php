@@ -5,45 +5,58 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
 
-
   /**
+   * The field plugin manager.
+   *
    * @var \Drupal\graphql\Plugin\FieldPluginManager
    */
   protected $fieldManager;
 
   /**
+   * The mutation plugin manager.
+   *
    * @var \Drupal\graphql\Plugin\MutationPluginManager
    */
   protected $mutationManager;
 
   /**
+   * The type manager aggregator service.
+   *
    * @var \Drupal\graphql\Plugin\TypePluginManagerAggregator
    */
   protected $typeManagers;
 
   /**
+   * Static cache of field definitions.
+   *
    * @var array
    */
   protected $fields = [];
 
   /**
+   * Static cache of mutation definitions.
+   *
    * @var array
    */
   protected $mutations = [];
 
   /**
+   * Static cache of type instances.
+   *
    * @var array
    */
   protected $types = [];
@@ -72,8 +85,11 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * @param array $pluginDefinition
    *   The plugin definition array.
    * @param \Drupal\graphql\Plugin\FieldPluginManager $fieldManager
+   *   The field plugin manager.
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
+   *   The mutation plugin manager.
    * @param \Drupal\graphql\Plugin\TypePluginManagerAggregator $typeManagers
+   *   The type manager aggregator service.
    */
   public function __construct(
     $configuration,
@@ -123,28 +139,28 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @return bool
+   * {@inheritdoc}
    */
   public function hasFields($type) {
     return isset($this->pluginDefinition['field_association_map'][$type]);
   }
 
   /**
-   * @return bool
+   * {@inheritdoc}
    */
   public function hasMutations() {
     return !empty($this->pluginDefinition['mutation_map']);
   }
 
   /**
-   * @return bool
+   * {@inheritdoc}
    */
   public function hasType($name) {
     return isset($this->pluginDefinition['type_map'][$name]);
   }
 
   /**
-   * @return array
+   * {@inheritdoc}
    */
   public function getFields($type) {
     $association = $this->pluginDefinition['field_association_map'];
@@ -160,14 +176,14 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @return array
+   * {@inheritdoc}
    */
   public function getMutations() {
     return $this->processMutations($this->pluginDefinition['mutation_map']);
   }
 
   /**
-   * @return array
+   * {@inheritdoc}
    */
   public function getTypes() {
     return array_map(function ($name) {
@@ -176,10 +192,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * Retrieve the list of derivatives associated with a composite type.
-   *
-   * @return string[]
-   *   The list of possible sub typenames.
+   * {@inheritdoc}
    */
   public function getSubTypes($name) {
     $association = $this->pluginDefinition['type_association_map'];
@@ -187,9 +200,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * Resolve the matching type.
+   * {@inheritdoc}
    */
-  public function resolveType($name, $value, $context, $info) {
+  public function resolveType($name, $value, ResolveContext $context, ResolveInfo $info) {
     $association = $this->pluginDefinition['type_association_map'];
     $types = $this->pluginDefinition['type_map'];
     if (!isset($association[$name])) {
@@ -197,7 +210,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     }
 
     foreach ($association[$name] as $type) {
-      // TODO: Avoid loading the type for the check. Make it static!
+      // TODO: Try to avoid loading the type for the check. Consider to make it static!
       if (isset($types[$type]) && $instance = $this->buildType($types[$type])) {
         if ($instance->isTypeOf($value, $context, $info)) {
           return $instance;
@@ -209,9 +222,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @param $name
-   *
-   * @return mixed
+   * {@inheritdoc}
    */
   public function getType($name) {
     $types = $this->pluginDefinition['type_map'];
@@ -230,27 +241,21 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @param $mutations
-   *
-   * @return array
+   * {@inheritdoc}
    */
   public function processMutations($mutations) {
     return array_map([$this, 'buildMutation'], $mutations);
   }
 
   /**
-   * @param $fields
-   *
-   * @return array
+   * {@inheritdoc}
    */
   public function processFields($fields) {
     return array_map([$this, 'buildField'], $fields);
   }
 
   /**
-   * @param $args
-   *
-   * @return array
+   * {@inheritdoc}
    */
   public function processArguments($args) {
     return array_map(function ($arg) {
@@ -261,9 +266,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @param $type
-   *
-   * @return mixed
+   * {@inheritdoc}
    */
   public function processType($type) {
     list($type, $decorators) = $type;
@@ -274,9 +277,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @param $type
+   * Retrieves the type instance for the given reference.
    *
-   * @return \Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase
+   * @param array $type
+   *   The type reference.
+   *
+   * @return \GraphQL\Type\Definition\Type
+   *   The type instance.
    */
   protected function buildType($type) {
     if (!isset($this->types[$type['id']])) {
@@ -289,9 +296,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @param $field
+   * Retrieves the field definition for a given field reference.
    *
-   * @return mixed
+   * @param array $field
+   *   The type reference.
+   *
+   * @return array
+   *   The field definition.
    */
   protected function buildField($field) {
     if (!isset($this->fields[$field['id']])) {
@@ -303,9 +314,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   }
 
   /**
-   * @param $mutation
+   * Retrieves the mutation definition for a given field reference.
    *
-   * @return mixed
+   * @param array $mutation
+   *   The mutation reference.
+   *
+   * @return array
+   *   The mutation definition.
    */
   protected function buildMutation($mutation) {
     if (!isset($this->mutations[$mutation['id']])) {

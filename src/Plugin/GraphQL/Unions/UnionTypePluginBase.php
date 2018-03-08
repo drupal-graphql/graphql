@@ -49,9 +49,13 @@ abstract class UnionTypePluginBase extends PluginBase implements TypePluginInter
   }
 
   /**
-   * @param $definition
+   * Builds the list of types contained within this union type.
    *
-   * @return mixed
+   * @param array $definition
+   *   The plugin definion array.
+   *
+   * @return array
+   *   The list of types contained within this union type.
    */
   protected function buildTypes($definition) {
     return $definition['types'] ?: [];

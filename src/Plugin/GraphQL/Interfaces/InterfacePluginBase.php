@@ -53,9 +53,13 @@ abstract class InterfacePluginBase extends PluginBase implements TypePluginInter
   }
 
   /**
-   * @param $definition
+   * Builds the list of interfaces inherited by this interface.
    *
-   * @return mixed
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return array
+   *   The list of interfaces that this interface inherits from.
    */
   protected function buildInterfaces($definition) {
     return $definition['interfaces'] ?: [];

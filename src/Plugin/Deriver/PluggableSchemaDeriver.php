@@ -16,14 +16,31 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * @var
+   * The base plugin id.
+   *
+   * @var string
    */
-  private $basePluginId;
+  protected $basePluginId;
 
+  /**
+   * The field manager service.
+   *
+   * @var \Drupal\graphql\Plugin\FieldPluginManager
+   */
   protected $fieldManager;
 
+  /**
+   * The mutation manager service.
+   *
+   * @var \Drupal\graphql\Plugin\MutationPluginManager
+   */
   protected $mutationManager;
 
+  /**
+   * The type manager aggregator service.
+   *
+   * @var \Drupal\graphql\Plugin\TypePluginManagerAggregator
+   */
   protected $typeManagers;
 
   /**
@@ -39,12 +56,16 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
-   * SchemaPluginBase constructor.
+   * PluggableSchemaDeriver constructor.
    *
    * @param $basePluginId
+   *   The base plugin id.
    * @param \Drupal\graphql\Plugin\FieldPluginManager $fieldManager
+   *   The field plugin manager.
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
+   *   The mutation plugin manager.
    * @param \Drupal\graphql\Plugin\TypePluginManagerAggregator $typeManagers
+   *   The type manager aggregator service.
    */
   public function __construct(
     $basePluginId,
@@ -99,7 +120,13 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
+   * Builds an optimized map of types registered with any of the type managers.
+   *
+   * @param array $managers
+   *   The registered type plugin managers.
+   *
    * @return array
+   *   The optimized representation/registry of type definitions.
    */
   protected function buildTypeMap(array $managers) {
     // First collect all definitions by their name, overwriting those with
@@ -145,7 +172,13 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
+   * Builds an optimized map of data type and type name references.
+   *
+   * @param array $types
+   *   The list of types registered with any of the plugin managers.
+   *
    * @return array
+   *   The optimized list of data type to type name references.
    */
   protected function buildTypeReferenceMap(array $types) {
     $references = array_reduce(array_keys($types), function ($references, $name) use ($types) {
@@ -168,7 +201,15 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
+   * Builds an optimized representation of fields keyed by their parent types.
+   *
+   * @param \Drupal\graphql\Plugin\FieldPluginManager $manager
+   *   The field plugin manager.
+   * @param $types
+   *   The optimized list of types.
+   *
    * @return array
+   *   The list of fields keyed by their parent types.
    */
   protected function buildFieldAssociationMap(FieldPluginManager $manager, $types) {
     $definitions = $manager->getDefinitions();
@@ -209,7 +250,13 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
+   * Builds an optimized representation of type and composite type relations.
+   *
+   * @param array $types
+   *   The optimized list of types.
+   *
    * @return array
+   *   The optimized list of types and their associated unions/interfaces.
    */
   protected function buildTypeAssociationMap(array $types) {
     $assocations = array_filter(array_map(function ($type) use ($types) {
@@ -263,7 +310,15 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
+   * Builds an optimization representation of all registered fields.
+   *
+   * @param \Drupal\graphql\Plugin\FieldPluginManager $manager
+   *   The field plugin manager.
+   * @param $association
+   *   The type/field association map.
+   *
    * @return array
+   *   The optimized list of all registered fields.
    */
   protected function buildFieldMap(FieldPluginManager $manager, $association) {
     return array_reduce($association, function ($carry, $fields) use ($manager) {
@@ -285,7 +340,13 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   }
 
   /**
+   * Builds an optimized representation of all registered mutations.
+   *
+   * @param \Drupal\graphql\Plugin\MutationPluginManager $manager
+   *   The mutation plugin manager.
+   *
    * @return array
+   *   The optimized list of all registered mutations.
    */
   protected function buildMutationMap(MutationPluginManager $manager) {
     $definitions = $manager->getDefinitions();

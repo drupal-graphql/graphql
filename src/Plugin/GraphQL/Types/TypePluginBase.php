@@ -66,18 +66,26 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
   }
 
   /**
-   * @param $definition
+   * Builds the list of interfaces that this type implements.
+   *
+   * @param array $definition
+   *   The plugin definition array.
    *
    * @return array
+   *   The list of interfaces implemented by this type.
    */
   protected function buildInterfaces($definition) {
     return array_unique($definition['interfaces']);
   }
 
   /**
-   * @param $definition
+   * Builds the list of unions that this type belongs to.
+   *
+   * @param array $definition
+   *   The plugin definition array.
    *
    * @return array
+   *   The list of unions that this type belongs to.
    */
   protected function buildUnions($definition) {
     return array_unique($definition['unions']);

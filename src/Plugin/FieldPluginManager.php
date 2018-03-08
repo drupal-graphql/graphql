@@ -32,6 +32,8 @@ class FieldPluginManager extends DefaultPluginManager {
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
    *   The name of the annotation that contains the plugin definition.
+   * @param array $config
+   *   The configuration service parameter.
    */
   public function __construct(
     $pluginSubdirectory,
@@ -52,7 +54,7 @@ class FieldPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_fields');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, 'fields', ['graphql', 'graphql:fields']);
+    $this->setCacheBackend($cacheBackend, 'fields', ['graphql']);
   }
 
   /**

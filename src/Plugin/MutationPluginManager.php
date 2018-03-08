@@ -4,7 +4,6 @@ namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
@@ -33,6 +32,8 @@ class MutationPluginManager extends DefaultPluginManager {
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
    *   The name of the annotation that contains the plugin definition.
+   * @param array $config
+   *   The configuration service parameter.
    */
   public function __construct(
     $pluginSubdirectory,
@@ -53,7 +54,7 @@ class MutationPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_mutations');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, 'mutations', ['graphql', 'graphql:mutations']);
+    $this->setCacheBackend($cacheBackend, 'mutations', ['graphql']);
   }
 
   /**

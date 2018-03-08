@@ -42,9 +42,13 @@ abstract class InputTypePluginBase extends PluginBase implements TypePluginInter
   }
 
   /**
+   * Builds the fields of the type definition.
+   *
    * @param $definition
+   *   The plugin definition array.
    *
    * @return array
+   *   The list of fields for the input type.
    */
   protected function buildFields($definition) {
     return array_map(function ($field) use ($definition) {
@@ -57,9 +61,13 @@ abstract class InputTypePluginBase extends PluginBase implements TypePluginInter
   }
 
   /**
-   * @param $field
+   * Builds a field's type.
+   *
+   * @param array $field
+   *   The field definition array.
    *
    * @return array
+   *   The parsed type definition array.
    */
   protected function buildFieldType($field) {
     $type = is_array($field) ? $field['type'] : $field;
@@ -67,20 +75,30 @@ abstract class InputTypePluginBase extends PluginBase implements TypePluginInter
   }
 
   /**
-   * @param $field
-   * @param $definition
+   * Builds a field's description.
+   *
+   * @param array $field
+   *   The field definition array.
+   * @param array $definition
+   *   The plugin definition array.
    *
    * @return string
+   *   The field's description.
    */
   protected function buildFieldDescription($field, $definition) {
     return (string) (isset($field['description']) ? $field['description'] : '');
   }
 
   /**
-   * @param $field
-   * @param $definition
+   * Builds a field's default value.
    *
-   * @return null
+   * @param array $field
+   *   The field definition array.
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return mixed
+   *   The field's default value.
    */
   protected function buildFieldDefault($field, $definition) {
     return isset($field['default']) ? $field['default'] : NULL;

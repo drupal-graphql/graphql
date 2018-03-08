@@ -4,7 +4,6 @@ namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
@@ -35,6 +34,8 @@ class TypePluginManager extends DefaultPluginManager implements TypePluginManage
    *   The name of the annotation that contains the plugin definition.
    * @param string $pluginType
    *   The plugin type.
+   * @param array $config
+   *   The configuration service parameter.
    */
   public function __construct(
     $pluginSubdirectory,
@@ -56,7 +57,7 @@ class TypePluginManager extends DefaultPluginManager implements TypePluginManage
 
     $this->alterInfo("graphql_{$pluginType}");
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, $pluginType, ['graphql', "graphql:{$pluginType}"]);
+    $this->setCacheBackend($cacheBackend, $pluginType, ['graphql']);
   }
 
   /**

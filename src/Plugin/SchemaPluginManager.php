@@ -25,6 +25,8 @@ class SchemaPluginManager extends DefaultPluginManager {
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
    *   The name of the annotation that contains the plugin definition.
+   * @param array $config
+   *   The configuration service parameter.
    */
   public function __construct(
     $pluginSubdirectory,
@@ -45,7 +47,7 @@ class SchemaPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_schema');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, 'schemas', ['graphql', 'graphql:schemas']);
+    $this->setCacheBackend($cacheBackend, 'schemas', ['graphql']);
   }
 
   /**

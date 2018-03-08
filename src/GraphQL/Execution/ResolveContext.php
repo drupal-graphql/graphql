@@ -17,6 +17,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   protected $globals;
 
   /**
+   * The context stack.
+   *
    * @var array
    */
   protected $contexts = [];
@@ -25,17 +27,27 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * ResolveContext constructor.
    *
    * @param array $globals
+   *   List of global values to expose to field resolvers.
    */
   public function __construct(array $globals = []) {
     $this->globals = $globals;
   }
 
   /**
-   * @param $name
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param null $default
+   * Get a contextual value for the current field.
    *
-   * @return mixed|null
+   * Allows field resolvers to inherit contextual values from their ancestors.
+   *
+   * @param string $name
+   *   The name of the context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
+   * @param mixed $default
+   *   An arbitrary default value in case the context is not set.
+   *
+   * @return mixed
+   *   The current value of the given context or the given default value if the
+   *   context wasn't set.
    */
   public function getContext($name, ResolveInfo $info, $default = NULL) {
     $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
@@ -52,9 +64,17 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
-   * @param $name
+   * Sets a contextual value for the current field and its decendents.
+   *
+   * Allows field resolvers to set contextual values which can be inherited by
+   * their descendents.
+   *
+   * @param string $name
+   *   The name of the context.
    * @param $value
+   *   The value of the context.
    * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
    *
    * @return $this
    */
@@ -67,10 +87,16 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
-   * @param $name
-   * @param null $default
+   * Retrieve a global/static parameter value.
+   *
+   * @param string $name
+   *   The name of the global parameter.
+   * @param mixed $default
+   *   An arbitrary default value in case the context is not set.
    *
    * @return mixed|null
+   *   The requested global parameter value or the given default value if the
+   *   parameter is not set.
    */
   public function getGlobal($name, $default = NULL) {
     if (isset($this->globals[$name])) {

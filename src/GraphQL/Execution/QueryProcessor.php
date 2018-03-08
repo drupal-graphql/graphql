@@ -30,6 +30,7 @@ use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
 
+// TODO: Refactor this and clean it up.
 class QueryProcessor {
 
   /**
@@ -68,7 +69,7 @@ class QueryProcessor {
   protected $contextsManager;
 
   /**
-   * GraphQL configuration.
+   * The configuration service parameter.
    *
    * @var array
    */
@@ -87,6 +88,8 @@ class QueryProcessor {
    *   The query provider service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for caching query results.
+   * @param array $config
+   *   The configuration service parameter.
    */
   public function __construct(
     AccountProxyInterface $currentUser,
@@ -141,6 +144,7 @@ class QueryProcessor {
       if ($plugin instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($plugin)->addCacheTags(['graphql_response']);
       }
+
       return $context;
     });
 

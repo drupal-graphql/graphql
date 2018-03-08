@@ -37,9 +37,13 @@ abstract class EnumPluginBase extends PluginBase implements TypePluginInterface 
   }
 
   /**
-   * @param $definition
+   * Builds the enum values.
+   *
+   * @param array $definition
+   *   The plugin definition array/
    *
    * @return array
+   *   The enum values.
    */
   protected function buildEnumValues($definition) {
     return array_map(function ($value) use ($definition) {
@@ -51,20 +55,30 @@ abstract class EnumPluginBase extends PluginBase implements TypePluginInterface 
   }
 
   /**
-   * @param $value
-   * @param $definition
+   * Builds the value of an enum item.
+   *
+   * @param mixed $value
+   *   The enum's value definition.
+   * @param array $definition
+   *   The plugin definition array.
    *
    * @return mixed
+   *   The value of the enum item.
    */
   protected function buildEnumValue($value, $definition) {
     return is_array($value) ? $value['value'] : $value;
   }
 
   /**
-   * @param $value
-   * @param $definition
+   * Builds the description of an enum item.
+   *
+   * @param mixed $value
+   *   The enum's value definition.
+   * @param array $definition
+   *   The plugin definition array.
    *
    * @return string
+   *   The description of the enum item.
    */
   protected function buildEnumDescription($value, $definition) {
     return (string) (is_array($value) ? $value['description'] : '');

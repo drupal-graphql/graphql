@@ -3,25 +3,12 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use GraphQL\Executor\ExecutionResult;
 
 class QueryResult extends ExecutionResult implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
-
-  /**
-   * Don't serialize errors, since they might contain closures.
-   *
-   * return string[]
-   *   The property names to serialize.
-   */
-  public function __sleep() {
-    return array_filter(array_keys(get_object_vars($this)), function ($prop) {
-      return $prop != 'errors';
-    });
-  }
 
   /**
    * QueryResult constructor.
@@ -42,6 +29,19 @@ class QueryResult extends ExecutionResult implements RefinableCacheableDependenc
 
     // If no cache metadata was given, assume this result is not cacheable.
     $this->addCacheableDependency($metadata);
+  }
+
+  /**
+   * Don't serialize errors, since they might contain closures.
+   *
+   * @return string[]
+   *   The property names to serialize.
+   */
+  public function __sleep() {
+    // TODO: Find a better way to solve this.
+    return array_filter(array_keys(get_object_vars($this)), function ($prop) {
+      return $prop != 'errors';
+    });
   }
 
 }
