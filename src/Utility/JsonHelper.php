@@ -20,7 +20,7 @@ class JsonHelper {
       }
 
       if (($decoded = json_decode($value, TRUE)) !== NULL && $decoded != $value) {
-        return static::decodeParams($decoded);
+        return is_array($decoded) ? static::decodeParams($decoded) : $decoded;
       }
 
       return $value;
