@@ -12,9 +12,10 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the entity result set of an entity query.
@@ -101,18 +102,18 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof QueryInterface) {
       $type = $value->getEntityTypeId();
       $result = $value->execute();
-      $context = $value->getMetaData('graphql_context');
+      $metadata = $value->getMetaData('graphql_context');
 
       if ($value->hasTag('revisions')) {
-        return $this->resolveFromRevisionIds($type, array_keys($result), $context, $args, $info);
+        return $this->resolveFromRevisionIds($type, array_keys($result), $metadata, $args, $context, $info);
       }
 
       // If this is a revision query, the version ids are the array keys.
-      return $this->resolveFromEntityIds($type, array_values($result), $context, $args, $info);
+      return $this->resolveFromEntityIds($type, array_values($result), $metadata, $args, $context, $info);
     }
   }
 
@@ -123,20 +124,22 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The entity type.
    * @param array $ids
    *   The entity ids to load.
-   * @param mixed $context
+   * @param mixed $metadata
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Closure
    *   The deferred resolver.
    */
-  protected function resolveFromEntityIds($type, $ids, $context, array $args, ResolveInfo $info) {
+  protected function resolveFromEntityIds($type, $ids, $metadata, array $args, ResolveContext $context, ResolveInfo $info) {
     $resolve = $this->entityBuffer->add($type, $ids);
-    return function($value, array $args, ResolveInfo $info) use ($resolve, $context) {
-      return $this->resolveEntities($resolve(), $context, $args, $info);
+    return function($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $metadata) {
+      return $this->resolveEntities($resolve(), $metadata, $args,  $context, $info);
     };
   }
 
@@ -147,23 +150,25 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The entity type.
    * @param array $ids
    *   The entity revision ids to load.
-   * @param mixed $context
+   * @param mixed $metadata
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
    *   The resolved revisions.
    */
-  protected function resolveFromRevisionIds($type, $ids, $context, array $args, ResolveInfo $info) {
+  protected function resolveFromRevisionIds($type, $ids, $metadata, array $args, ResolveContext $context, ResolveInfo $info) {
     $storage = $this->entityTypeManager->getStorage($type);
     $entities = array_map(function ($id) use ($storage) {
       return $storage->loadRevision($id);
     }, $ids);
 
-    return $this->resolveEntities($entities, $context, $args, $info);
+    return $this->resolveEntities($entities, $metadata, $args, $context, $info);
   }
 
   /**
@@ -171,18 +176,20 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *
    * @param array $entities
    *   The entities to resolve.
-   * @param mixed $context
+   * @param mixed $metadata
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
    *   The resolved entities.
    */
-  protected function resolveEntities(array $entities, $context, array $args, ResolveInfo $info) {
-    $language = $this->negotiateLanguage($context, $args, $info);
+  protected function resolveEntities(array $entities, $metadata, array $args, ResolveContext $context, ResolveInfo $info) {
+    $language = $this->negotiateLanguage($metadata, $args, $context, $info);
 
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     foreach ($entities as $entity) {
@@ -204,22 +211,24 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
   /**
    * Negotiate the language for the resolved entities.
    *
-   * @param mixed $context
+   * @param mixed $metadata
    *   The query context.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return string|null
    *   The negotiated language id.
    */
-  protected function negotiateLanguage($context, $args, ResolveInfo $info) {
+  protected function negotiateLanguage($metadata, $args, ResolveContext $context, ResolveInfo $info) {
     if (!empty($args['language'])) {
       return $args['language'];
     }
 
-    if (isset($context['parent']) && ($parent = $context['parent']) && $parent instanceof EntityInterface) {
+    if (isset($metadata['parent']) && ($parent = $metadata['parent']) && $parent instanceof EntityInterface) {
       return $parent->language()->getId();
     }
 

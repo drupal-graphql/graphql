@@ -13,9 +13,10 @@ use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the current routes entity, if it is an entity route.
@@ -111,7 +112,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof Url) {
       list(, $type) = explode('.', $value->getRouteName());
       $parameters = $value->getRouteParameters();
@@ -136,7 +137,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The url of the entity to resolve.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator
@@ -160,7 +161,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The url of the entity to resolve.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Closure
@@ -170,7 +171,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       return $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
     });
 
-    return function ($value, array $args, ResolveInfo $info) use ($resolve, $entity) {
+    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $entity) {
       $language = $resolve();
       $entity = $this->entityRepository->getTranslationFromContext($entity, $language);
       return $this->resolveEntity($entity, $value, $args, $info);
@@ -184,7 +185,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The url of the entity to resolve.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Generator

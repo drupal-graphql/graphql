@@ -2,8 +2,9 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 use DateTime;
 
 /**
@@ -25,7 +26,7 @@ class EntityCreated extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // `getCreatedTime` is on NodeInterface which feels weird, since there
     // is a generic `EntityInterface`. Checking for method existence for now.
     if (method_exists($value, 'getCreatedTime')) {

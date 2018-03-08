@@ -2,8 +2,9 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\graphql\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use GraphQL\Server\OperationParams;
 use Prophecy\Argument;
 
 /**
@@ -44,12 +45,9 @@ class ResultTest extends GraphQLTestBase {
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
-    $queryProvider->getQuery(Argument::allOf(
-      Argument::withEntry('version', 'b'),
-      Argument::withEntry('id', 'a')
-    ))->willReturn('query { root }');
+    $queryProvider->getQuery('a', Argument::any())->willReturn('query { root }');
 
-    $result = $this->persistedQuery('a', 'b');
+    $result = $this->persistedQuery('a');
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame([
       'data' => [
@@ -66,14 +64,12 @@ class ResultTest extends GraphQLTestBase {
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
     $queryProvider->getQuery(Argument::any())->willReturn(NULL);
-    $queryProvider->getQuery(Argument::allOf(
-      Argument::withEntry('version', 'b'),
-      Argument::withEntry('id', 'a')
-    ))->willReturn('query { root }');
+    $queryProvider->getQuery('a', Argument::any())
+      ->willReturn('query { root }');
 
     $result = $this->batchedQueries([
       ['query' => 'query { root } '],
-      ['id' => 'a', 'version' => 'b'],
+      ['queryId' => 'a'],
     ]);
 
     $this->assertSame(200, $result->getStatusCode());

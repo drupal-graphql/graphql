@@ -25,6 +25,7 @@ class RouteEntityTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
+      'entity_field_info',
       'node:1',
     ]);
 

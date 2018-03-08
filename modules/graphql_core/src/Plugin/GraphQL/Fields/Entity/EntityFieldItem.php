@@ -2,8 +2,9 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -18,8 +19,8 @@ class EntityFieldItem extends EntityFieldBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
-    yield $this->resolveItem($value, $args, $info);
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    yield $this->resolveItem($value, $args, $context, $info);
   }
 
 }

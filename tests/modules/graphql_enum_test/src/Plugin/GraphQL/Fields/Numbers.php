@@ -2,8 +2,9 @@
 
 namespace Drupal\graphql_enum_test\Plugin\GraphQL\Fields;
 
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * A number field that returns a number with enum checking.
@@ -23,7 +24,7 @@ class Numbers extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     foreach ($args['numbers'] as $number) {
       yield $number;
     }

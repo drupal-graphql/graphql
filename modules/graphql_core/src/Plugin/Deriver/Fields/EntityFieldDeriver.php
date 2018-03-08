@@ -22,14 +22,21 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
       return [];
     }
 
+    $tags = array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']);
+    $maxAge = $fieldDefinition->getCacheMaxAge();
+    $contexts = $fieldDefinition->getCacheContexts();
+
     $derivative = [
       'parents' => $parents,
       'name' => StringHelper::propCase($fieldName),
       'description' => $fieldDefinition->getDescription(),
       'field' => $fieldName,
-      'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
-      'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
-      'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
+      'schema_cache_tags' => $tags,
+      'schema_cache_contexts' => $contexts,
+      'schema_cache_max_age' => $maxAge,
+      'response_cache_tags' => $tags,
+      'response_cache_contexts' => $contexts,
+      'response_cache_max_age' => $maxAge,
     ] + $basePluginDefinition;
 
     if (count($propertyDefinitions) === 1) {

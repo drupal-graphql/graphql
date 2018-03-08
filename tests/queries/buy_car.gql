@@ -1,3 +1,5 @@
 mutation($car: CarInput!) {
-  buyCar(car: $car)
+  buyCar(car: $car) {
+    __typename
+  }
 }

@@ -3,70 +3,85 @@
 namespace Drupal\graphql\Plugin\GraphQL\Enums;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Type\EnumType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use GraphQL\Type\Definition\EnumType;
 
-/**
- * Base class for enum plugins.
- */
-abstract class EnumPluginBase extends PluginBase implements TypeSystemPluginInterface {
-  use NamedPluginTrait;
-  use CacheablePluginTrait;
-
-  /**
-   * The type instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Type\EnumType
-   */
-  protected $definition;
+abstract class EnumPluginBase extends PluginBase implements TypePluginInterface {
+  use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      if ($values = $this->buildValues($schemaBuilder)) {
-        $this->definition = new EnumType($this, $schemaBuilder, [
-          'name' => $this->buildName(),
-          'description' => $this->buildDescription(),
-          'values' => $values,
-        ]);
-      }
-    }
-
-    return $this->definition;
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
+    return new EnumType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'values' => $definition['values'],
+    ]);
   }
 
   /**
-   * Build the values for the enum.
+   * {@inheritdoc}
+   */
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
+
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'values' => $this->buildEnumValues($definition),
+    ];
+  }
+
+  /**
+   * Builds the enum values.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   The schema builder.
+   * @param array $definition
+   *   The plugin definition array/
    *
    * @return array
-   *   The list of possible values for the enum.
+   *   The enum values.
    */
-  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
-    $values = $this->getPluginDefinition()['values'];
-    $output = [];
-
-    foreach ($values as $value => $definition) {
-      $item = [
-        'value' => $value,
-        'name' => is_array($definition) ? $definition['name'] : $definition,
+  protected function buildEnumValues($definition) {
+    return array_map(function ($value) use ($definition) {
+      return [
+        'value' => $this->buildEnumValue($value, $definition),
+        'description' => $this->buildEnumDescription($value, $definition),
       ];
+    }, $definition['values']);
+  }
 
-      if (is_array($definition) && !empty($definition['description'])) {
-        $item['description'] = $definition['description'];
-      }
+  /**
+   * Builds the value of an enum item.
+   *
+   * @param mixed $value
+   *   The enum's value definition.
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return mixed
+   *   The value of the enum item.
+   */
+  protected function buildEnumValue($value, $definition) {
+    return is_array($value) ? $value['value'] : $value;
+  }
 
-      $output[] = $item;
-    }
-
-    return $output;
+  /**
+   * Builds the description of an enum item.
+   *
+   * @param mixed $value
+   *   The enum's value definition.
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return string
+   *   The description of the enum item.
+   */
+  protected function buildEnumDescription($value, $definition) {
+    return (string) (is_array($value) ? $value['description'] : '');
   }
 
 }

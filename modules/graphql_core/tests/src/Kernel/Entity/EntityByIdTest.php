@@ -75,17 +75,13 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // TODO: Check chache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
       'node:1',
-      'config:field.storage.node.body',
     ]);
 
     // Check English node.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'en',
+      'language' => 'EN',
     ], [
       'nodeById' => [
         'entityLabel' => 'English node',
@@ -95,7 +91,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check French translation.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'fr',
+      'language' => 'FR',
     ], [
       'nodeById' => [
         'entityLabel' => 'French node',
@@ -105,7 +101,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check Chinese simplified translation.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'zh_hans',
+      'language' => 'ZH_HANS',
     ], [
       'nodeById' => [
         'entityLabel' => 'Chinese simplified node',

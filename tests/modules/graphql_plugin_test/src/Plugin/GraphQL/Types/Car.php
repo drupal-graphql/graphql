@@ -2,8 +2,9 @@
 
 namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Types;
 
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * A bike type.
@@ -19,8 +20,8 @@ class Car extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($value, ResolveInfo $info = NULL) {
-    return $value['type'] == 'Car';
+  public function applies($object, ResolveContext $context, ResolveInfo $info) {
+    return $object['type'] == 'Car';
   }
 
 }

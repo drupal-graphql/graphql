@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * The GraphQL module.
- */
-
 use Drupal\Core\Url;
 use Drupal\graphql\Utility\StringHelper;
 

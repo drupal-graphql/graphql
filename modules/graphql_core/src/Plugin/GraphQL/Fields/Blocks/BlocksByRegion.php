@@ -13,9 +13,10 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * List all blocks within a theme region.
@@ -118,7 +119,7 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof Url) {
       $activeTheme = $this->themeManager->getActiveTheme();
       $blockStorage = $this->entityTypeManager->getStorage('block');
@@ -139,7 +140,7 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
         return $blocks;
       });
 
-      return function ($value, array $args, ResolveInfo $info) use ($resolve) {
+      return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve) {
         $metadata = new CacheableMetadata();
         $metadata->addCacheTags(['config:block_list']);
         $blocks = array_map(function (Block $block) {

@@ -8,10 +8,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class CreateEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
@@ -56,13 +57,13 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
 
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
     // the schema.
-    $input = $this->extractEntityInput($args, $info);
+    $input = $this->extractEntityInput($value, $args, $context, $info);
 
     $entityDefinition = $this->entityTypeManager->getDefinition($entityTypeId);
     if ($entityDefinition->hasKey('bundle')) {
@@ -83,15 +84,19 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    *
    * Loops over all input values and assigns them to their original field names.
    *
+   * @param $value
+   *   The parent value.
    * @param array $args
    *   The entity values provided through the resolver args.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
-   *   the resolve info object.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  abstract protected function extractEntityInput(array $args, ResolveInfo $info);
+  abstract protected function extractEntityInput($value, array $args, ResolveContext $context, ResolveInfo $info);
 
   /**
    * Formats the output of the mutation.
@@ -104,7 +109,7 @@ abstract class CreateEntityBase extends MutationPluginBase implements ContainerF
    *   The created entity.
    * @param array $args
    *   The arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return mixed

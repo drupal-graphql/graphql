@@ -6,10 +6,11 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class UpdateEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
@@ -54,7 +55,7 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $bundleName = $this->pluginDefinition['entity_bundle'];
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
@@ -81,7 +82,7 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
     // the schema. Allow the other implementations to control this easily.
-    $input = $this->extractEntityInput($args, $info);
+    $input = $this->extractEntityInput($value, $args, $context, $info);
 
     try {
       foreach ($input as $key => $value) {
@@ -110,14 +111,18 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
    *
    * Loops over all input values and assigns them to their original field names.
    *
+   * @param $value
+   *   The parent value.
    * @param array $args
    *   The entity values provided through the resolver args.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  abstract protected function extractEntityInput(array $args, ResolveInfo $info);
+  abstract protected function extractEntityInput($value, array $args, ResolveContext $context, ResolveInfo $info);
 
 }

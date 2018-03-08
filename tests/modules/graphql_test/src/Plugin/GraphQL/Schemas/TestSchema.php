@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql_test\Plugin\GraphQL\Schemas;
 
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginInterface;
+use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 
 /**

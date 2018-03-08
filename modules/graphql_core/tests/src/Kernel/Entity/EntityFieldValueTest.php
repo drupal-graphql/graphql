@@ -3,7 +3,10 @@
 namespace Drupal\Tests\graphql_core\Kernel\Entity;
 
 use Drupal\file\Entity\File;
+use Drupal\graphql\Utility\StringHelper;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
+use GraphQL\Server\OperationParams;
 
 /**
  * Test basic entity fields.
@@ -37,7 +40,151 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
    */
   protected function setUp() {
     parent::setUp();
+  }
 
+  /**
+   * Test boolean fields.
+   */
+  public function testBoolean() {
+    $this->addField('boolean', "field_boolean", FALSE);
+
+    $this->mockNode([
+      'field_boolean' => TRUE,
+    ]);
+
+    $this->assertGraphQLFields([
+      ['NodeTest', 'fieldBoolean', 'Boolean'],
+    ]);
+
+    $query = <<<GQL
+query {
+  node {
+    fieldBoolean
+  }
+}
+GQL;
+
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.field_boolean',
+      'entity_field_info',
+    ]);
+
+    $this->assertResults($query, [], [
+      'node' => [
+        'fieldBoolean' => TRUE,
+      ],
+    ], $metadata);
+  }
+
+  /**
+   * Test a simple text field.
+   */
+  public function testText() {
+    $this->addField('text', "field_text", FALSE);
+    $this->mockNode([
+      'field_text' => [
+        'value' => 'Foo',
+      ],
+    ]);
+
+    $this->assertGraphQLFields([
+      ['NodeTest', 'fieldText', 'FieldNodeFieldText'],
+      ['FieldNodeFieldText', 'value', 'String'],
+      ['FieldNodeFieldText', 'processed', 'String'],
+      ['FieldNodeFieldText', 'format', 'String'],
+    ]);
+
+    $query = <<<GQL
+query {
+  node {
+    fieldText {
+      value
+      processed
+      format
+    }
+  }
+}
+GQL;
+
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.field_text',
+      'entity_field_info',
+    ]);
+
+    $this->assertResults($query, [], [
+      'node' => [
+        'fieldText' => [
+          'value' => 'Foo',
+          'processed' => "<p>Foo</p>\n",
+          'format' => 'null',
+        ],
+      ],
+    ], $metadata);
+
+  }
+
+  /**
+   * Test filtered text fields.
+   */
+  public function testFilteredText() {
+    $this->mockNode([
+      'body' => [
+        'value' => 'http://www.drupal.org',
+        'format' => 'plain_text',
+      ],
+    ]);
+
+    $this->assertGraphQLFields([
+      ['NodeTest', 'body', 'FieldNodeBody'],
+      ['FieldNodeBody', 'format', 'String'],
+      ['FieldNodeBody', 'value', 'String'],
+      ['FieldNodeBody', 'processed', 'String'],
+      ['FieldNodeBody', 'summary', 'String'],
+      ['FieldNodeBody', 'summaryProcessed', 'String'],
+    ]);
+
+    $query = <<<GQL
+query {
+  node {
+    body {
+      value
+      processed
+      summary
+      summaryProcessed
+    }
+  }
+}
+GQL;
+
+    $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:field.storage.node.body',
+      'entity_field_info',
+    ]);
+
+    $this->assertResults($query, [], [
+      'node' => [
+        'body' => [
+          'value' => 'http://www.drupal.org',
+          'processed' => "<p><a href=\"http://www.drupal.org\">http://www.drupal.org</a></p>\n",
+          'summary' => 'null',
+          'summaryProcessed' => '',
+        ],
+      ],
+    ], $metadata);
+  }
+
+  /**
+   * Test if the basic fields are available on the interface.
+   *
+   * @dataProvider nodeValuesProvider
+   *
+   * @param array $actualFieldValues
+   * @param array $expectedFieldValues
+   */
+  public function testRawValues($actualFieldValues, $expectedFieldValues) {
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);
     $this->addField('text', "field_text");
@@ -67,17 +214,6 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'uri' => 'public://example.png',
     ]);
     $this->testImage->save();
-  }
-
-  /**
-   * Test if the basic fields are available on the interface.
-   *
-   * @dataProvider nodeValuesProvider
-   *
-   * @param array $actualFieldValues
-   * @param array $expectedFieldValues
-   */
-  public function testRawValues($actualFieldValues, $expectedFieldValues) {
     $values = [
       'title' => 'Test',
       'type' => 'test',
@@ -92,12 +228,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
     $expectedFieldValues['fieldImage'][1]['entity']['url'] = file_create_url($this->testImage->getFileUri());
 
     $metadata = $this->defaultCacheMetaData();
-
     $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
-      'node:1',
       'config:field.storage.node.body',
       'config:field.storage.node.field_text',
       'config:field.storage.node.field_boolean',
@@ -112,9 +243,8 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'config:field.storage.node.field_string',
       'config:field.storage.node.field_timestamp',
       'config:field.storage.node.field_reference',
-      'entity_bundles',
       'entity_field_info',
-      'entity_types',
+      'node:1',
       'file:1',
       'file:2',
     ]);
@@ -157,7 +287,7 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
       'field_timestamp' => [0, 300],
       'field_email' => ['test@test.com'],
       'field_string' => ['test', '123'],
-      'field_reference' => [
+      'field_reference' =>  [
         ['target_id' => 1],
       ],
       'field_file' => [
@@ -204,16 +334,16 @@ class EntityFieldValueTest extends GraphQLContentTestBase {
         'entity' => NULL,
       ],
       'title' => 'Test',
-      'status' => 1,
-      'promote' => 1,
-      'sticky' => 0,
-      'revisionTranslationAffected' => 1,
+      'status' => TRUE,
+      'promote' => TRUE,
+      'sticky' => FALSE,
+      'revisionTranslationAffected' => TRUE,
       'body' => [
         'value' => 'test',
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => NULL,
+        'format' => 'null',
       ],
       'fieldText' => [
         ['value' => 'a'],

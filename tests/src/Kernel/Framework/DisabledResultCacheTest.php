@@ -18,9 +18,9 @@ class DisabledResultCacheTest extends GraphQLTestBase {
    */
   public function register(ContainerBuilder $container) {
     parent::register($container);
-    // Set the result_cache parameter to FALSE.
+    // Set the development parameter to TRUE.
     $parameters = $container->getParameter('graphql.config');
-    $parameters['result_cache'] = FALSE;
+    $parameters['development'] = TRUE;
     $container->setParameter('graphql.config', $parameters);
   }
 
@@ -28,18 +28,18 @@ class DisabledResultCacheTest extends GraphQLTestBase {
    * Test if disabling the result cache has the desired effect.
    */
   public function testDisabledCache() {
-    $field = $this->mockField('root', [
+    $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-    ]);
-
-    $field
-      ->expects(static::exactly(2))
-      ->method('resolveValues')
-      ->willReturnCallback(function () {
-        yield 'test';
-      });
+    ], NULL, function ($field) {
+      $field
+        ->expects(static::exactly(2))
+        ->method('resolveValues')
+        ->willReturnCallback(function () {
+          yield 'test';
+        });
+    });
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');
