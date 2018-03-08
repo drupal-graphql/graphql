@@ -1,18 +1,26 @@
 # Queries
 
-Graphql is a query language and so the first thing we will be goign through is how can you start making queries to Drupal. One of the great benefits of GraphQL is how intuitive the query syntax and corresponsing responses look like. Essentially, the query is a lot like how you want the response to look like but without the values. Lets have a look at the example we saw in the introduction:
+
+Graphql is a query language and so the first thing we will be going through is how can you start making queries to Drupal. One of the great benefits of GraphQL is how intuitive the query syntax and corresponsing responses look. Essentially, the query is a lot like how you want the response to look but without the values. Lets have a look at the example we saw in the introduction:
+
 
 ```javascript
 query {
   user: currentUserContext{
-    ...on UserUser {
+    ...on User {
       name
     }
   }
 }
-```
 
-and the response :
+You can run the the above query in your browser, via a GET request, after enabling the module. Note, if you are logged in already, the query should return a result. If you want the anonymous user to run the following query, you will need to enable the `Execute arbitrary GraphQL requests` permission. You can also run this query in the GraphiQL browser provided with the module at : `/graphql/explorer`
+```
+[YOUR DOMAIN]/graphql?query=query{user:currentUserContext{...on%20User{name}}}
+``` 
+
+This would return a result similar to: 
+=======
+```
 
 ```javascript
 {
@@ -64,6 +72,8 @@ The query above fetches information from 3 different places :
 * **fieldSubtitle** is a field \(**field\_subtitle** in Drupal\) that has been added to the Article content type. It's not a part of neither Node nor Entity Interfaces, it is only available in the NodeArticle Type. **nodebyId** can return any node, not just Article, so we need to wrap the fieldSubtitle in a [GraphQL Fragment](http://graphql.org/learn/queries/#fragments).
 
 If we paste the above query in GraphiQL we will get the following result :
+
+=======
 
 ```
 {
