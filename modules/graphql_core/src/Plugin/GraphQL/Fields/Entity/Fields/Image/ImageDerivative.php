@@ -6,10 +6,11 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\image\Entity\ImageStyle;
 
 /**
@@ -66,7 +67,7 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof ImageItem && $value->entity->access('view') && $style = ImageStyle::load($args['style'])) {
       $file = $value->entity;
 

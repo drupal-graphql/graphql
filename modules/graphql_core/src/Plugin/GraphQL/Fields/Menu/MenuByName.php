@@ -5,10 +5,11 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve a menu by it's name.
@@ -61,7 +62,7 @@ class MenuByName extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $entity = $this->entityTypeManager->getStorage('menu')->load($args['name']);
 
     if ($entity instanceof MenuInterface) {

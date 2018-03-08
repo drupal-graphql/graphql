@@ -3,8 +3,9 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Types\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLType(
@@ -18,7 +19,7 @@ class EntityType extends TypePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function applies($object, ResolveInfo $info = NULL) {
+  public function applies($object, ResolveContext $context, ResolveInfo $info) {
     if ($object instanceof EntityInterface) {
       $definition = $this->getPluginDefinition();
       return $object->getEntityTypeId() === $definition['entity_type'];

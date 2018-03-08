@@ -9,12 +9,12 @@ use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
  *   id = "entity_query_revision_mode",
  *   name = "EntityQueryRevisionMode",
  *   values = {
- *     "default" = {
- *       "name" = "default",
+ *     "DEFAULT" = {
+ *       "value" = "default",
  *       "description" = @Translation("Loads the current (default) revisions."),
  *     },
- *     "all" = {
- *       "name" = "all",
+ *     "ALL" = {
+ *       "value" = "all",
  *       "description" = @Translation("Loads all revisions."),
  *     }
  *   }

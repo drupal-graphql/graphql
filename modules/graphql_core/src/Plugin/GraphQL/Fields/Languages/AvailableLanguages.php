@@ -4,9 +4,10 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Languages;
 
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * List site-wide configured languages.
@@ -60,7 +61,7 @@ class AvailableLanguages extends FieldPluginBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     foreach ($this->languageManager->getLanguages() as $language) {
       yield $language;
     }

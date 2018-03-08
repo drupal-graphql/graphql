@@ -1,9 +1,11 @@
 query {
   route(path: "http://drupal.graphql") {
-    request {
-      code
-      content
-      header(key: "graphql")
+    ... on ExternalUrl {
+      request {
+        code
+        content
+        header(key: "graphql")
+      }
     }
   }
 }

@@ -3,78 +3,92 @@
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Type\InterfaceType;
-use Drupal\graphql\GraphQL\Type\ObjectType;
-use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Base class for GraphQL type plugins.
- */
-abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInterface {
-  use CacheablePluginTrait;
-  use NamedPluginTrait;
-  use FieldablePluginTrait;
-
-  /**
-   * The type instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Type\ObjectType
-   */
-  protected $definition;
+abstract class TypePluginBase extends PluginBase implements TypePluginInterface {
+  use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $interfaces = $this->buildInterfaces($schemaBuilder);
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
+    return new ObjectType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'fields' => function () use ($builder, $definition) {
+        $fields = $builder->getFields($definition['name']);
 
-      $this->definition = new ObjectType($this, $schemaBuilder, [
-        'name' => $this->buildName(),
-        'description' => $this->buildDescription(),
-        'interfaces' => $interfaces,
-      ]);
+        if (!empty($definition['interfaces'])) {
+          $inherited = array_map(function ($name) use ($builder) {
+            return $builder->getFields($name);
+          }, $definition['interfaces']);
 
-      $this->definition->addFields($this->buildFields($schemaBuilder));
-
-      foreach ($interfaces as $interface) {
-        if ($interface instanceof InterfaceType) {
-          $interface->registerType($this->definition, $this->getPluginDefinition()['weight']);
+          $inherited = call_user_func_array('array_merge', $inherited);
+          return array_merge($inherited, $fields);
         }
-      }
-    }
 
-    return $this->definition;
+        return $fields;
+      },
+      'interfaces' => function () use ($builder, $definition) {
+        return array_filter(array_map(function ($name) use ($builder) {
+          return $builder->getType($name);
+        }, $definition['interfaces']), function ($type) {
+          return $type instanceof InterfaceType;
+        });
+      },
+      'isTypeOf' => function ($object, $context, ResolveInfo $info) use ($manager, $id) {
+        $instance = $manager->getInstance(['id' => $id]);
+        return $instance->applies($object, $context, $info);
+      },
+    ]);
   }
 
   /**
-   * Build the list of interfaces.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   Instance of the schema manager to resolve dependencies.
-   *
-   * @return \Youshido\GraphQL\Type\AbstractInterfaceTypeInterface[]
-   *   The list of interfaces.
+   * {@inheritdoc}
    */
-  protected function buildInterfaces(PluggableSchemaBuilderInterface $schemaBuilder) {
+  public function getDefinition() {
     $definition = $this->getPluginDefinition();
-    if ($definition['interfaces']) {
-      return array_map(function (TypeSystemPluginInterface $interface) use ($schemaBuilder) {
-        return $interface->getDefinition($schemaBuilder);
-      }, array_filter($schemaBuilder->find(function ($interface) use ($definition) {
-        return in_array($interface['name'], $definition['interfaces']);
-      }, [GRAPHQL_INTERFACE_PLUGIN]), function ($interface) {
-        return $interface instanceof InterfacePluginBase;
-      }));
-    }
 
-    return [];
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'interfaces' => $this->buildInterfaces($definition),
+      'unions' => $this->buildUnions($definition),
+      'weight' => $definition['weight'],
+    ];
+  }
+
+  /**
+   * Builds the list of interfaces that this type implements.
+   *
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return array
+   *   The list of interfaces implemented by this type.
+   */
+  protected function buildInterfaces($definition) {
+    return array_unique($definition['interfaces']);
+  }
+
+  /**
+   * Builds the list of unions that this type belongs to.
+   *
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return array
+   *   The list of unions that this type belongs to.
+   */
+  protected function buildUnions($definition) {
+    return array_unique($definition['unions']);
   }
 
   /**
@@ -82,14 +96,16 @@ abstract class TypePluginBase extends PluginBase implements TypeSystemPluginInte
    *
    * @param mixed $object
    *   The object to check against.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo|null $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return bool
-   *   TRUE if this type applies to the given object, FALSE otherwise.
+   * @return null|bool
+   *   TRUE if this type applies to the given object or FALSE if it doesn't.
    */
-  public function applies($object, ResolveInfo $info = NULL) {
-    return FALSE;
+  public function applies($object, ResolveContext $context, ResolveInfo $info) {
+    return NULL;
   }
 
 }

@@ -18,32 +18,68 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
   public function register(ContainerBuilder $container) {
     parent::register($container);
     $config = $container->getParameter('graphql.config');
-    $config['schema_cache'] = FALSE;
-    $container->setParameter('graphql.config', $config);
+    $container->setParameter('graphql.config', ['development' => TRUE] + $config);
   }
 
   /**
-   * Test basic schema caching.
+   * Test disabled schema caching without cache metadata.
    */
-  public function testDisabledCache() {
-    $this->container->getDefinition('graphql.schema_loader')->setShared(FALSE);
-
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
+  public function testDisabledCacheWithoutCacheMetadata() {
+    // Create a first field.
+    $this->mockField('foo', [
+      'id' => 'foo',
+      'name' => 'foo',
       'type' => 'String',
-    ], 'test');
+    ], 'foo');
 
-    $this->schemaManager
-      ->expects(static::exactly(2))
-      ->method('createInstance')
-      ->with(static::anything(), static::anything())
-      ->willReturnCallback(function ($id) {
-        return $this->mockSchema($id);
-      });
+    // Run introspect to populate the schema cache.
+    $this->introspect();
 
-    $this->container->get('graphql.schema_loader')->getSchema('default');
-    $this->container->get('graphql.schema_loader')->getSchema('default');
+    // Add another field.
+    $this->mockField('bar', [
+      'id' => 'bar',
+      'name' => 'bar',
+      'type' => 'String',
+    ], 'bar');
+
+    // Run introspect again, the new field should appear immediately.
+    $schema = $this->introspect();
+    $this->assertArrayHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema does not contain the new field.'
+    );
+  }
+
+  /**
+   * Test disabled schema caching with cache metadata.
+   */
+  public function testDisabledCacheWithCacheMetadata() {
+    // Create a first field.
+    $this->mockField('foo', [
+      'id' => 'foo',
+      'name' => 'foo',
+      'type' => 'String',
+      'schema_cache_tags' => ['foo'],
+    ], 'foo');
+
+    // Run introspect to populate the schema cache.
+    $this->introspect();
+
+    // Add another field.
+    $this->mockField('bar', [
+      'id' => 'bar',
+      'name' => 'bar',
+      'type' => 'String',
+    ], 'bar');
+
+    // Run introspect again, the new field should appear immediately.
+    $schema = $this->introspect();
+    $this->assertArrayHasKey(
+      'bar',
+      $schema['types']['QueryRoot']['fields'],
+      'Schema does not contain the new field.'
+    );
   }
 
 }

@@ -3,95 +3,104 @@
 namespace Drupal\graphql\Plugin\GraphQL\InputTypes;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\graphql\GraphQL\Type\InputObjectType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Field\Field;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use Drupal\graphql\Utility\StringHelper;
+use GraphQL\Type\Definition\InputObjectType;
 
-abstract class InputTypePluginBase extends PluginBase implements TypeSystemPluginInterface {
-  use CacheablePluginTrait;
-  use NamedPluginTrait;
+abstract class InputTypePluginBase extends PluginBase implements TypePluginInterface {
+  use DescribablePluginTrait;
   use TypedPluginTrait;
-
-  /**
-   * The type instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Type\InputObjectType
-   */
-  protected $definition;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new InputObjectType($this, $schemaBuilder, [
-        'name' => $this->buildName(),
-        'description' => $this->buildDescription(),
-      ]);
-
-      $this->definition->addFields($this->buildFields($schemaBuilder));
-    }
-
-    return $this->definition;
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
+    return new InputObjectType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'fields' => function () use ($builder, $definition) {
+        return $builder->processArguments($definition['fields']);
+      },
+    ]);
   }
 
   /**
-   * Build the field list.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   Instance of the schema manager to resolve dependencies.
-   *
-   * @return \Youshido\GraphQL\Field\FieldInterface[]
-   *   The list of fields.
+   * {@inheritdoc}
    */
-  protected function buildFields(PluggableSchemaBuilderInterface $schemaBuilder) {
-    $arguments = [];
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
 
-    if ($this instanceof PluginInspectionInterface) {
-      $definition = $this->getPluginDefinition();
-
-      foreach ($definition['fields'] as $name => $argument) {
-        $type = $this->buildFieldType($schemaBuilder, $argument);
-        $config = [
-          'name' => $name,
-          'type' => $type,
-        ];
-
-        if (is_array($argument) && isset($argument['default'])) {
-          $config['defaultValue'] = $argument['default'];
-        }
-
-        $arguments[$name] = new Field($config);
-      }
-    }
-
-    return $arguments;
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'fields' => $this->buildFields($definition),
+    ];
   }
 
   /**
-   * Build the field type.
+   * Builds the fields of the type definition.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface $schemaBuilder
-   *   Instance of the schema manager to resolve dependencies.
-   * @param array|string $field
-   *   The field definition array or type name.
+   * @param $definition
+   *   The plugin definition array.
    *
-   * @return \Youshido\GraphQL\Type\TypeInterface
-   *   The type object.
+   * @return array
+   *   The list of fields for the input type.
    */
-  protected function buildFieldType(PluggableSchemaBuilderInterface $schemaBuilder, $field) {
+  protected function buildFields($definition) {
+    return array_map(function ($field) use ($definition) {
+      return [
+        'type' => $this->buildFieldType($field, $definition),
+        'description' => $this->buildFieldDescription($field, $definition),
+        'default' => $this->buildFieldDefault($field, $definition),
+      ];
+    }, $definition['fields']);
+  }
+
+  /**
+   * Builds a field's type.
+   *
+   * @param array $field
+   *   The field definition array.
+   *
+   * @return array
+   *   The parsed type definition array.
+   */
+  protected function buildFieldType($field) {
     $type = is_array($field) ? $field['type'] : $field;
-    return $this->parseType($type, function ($type) use ($schemaBuilder) {
-      return $schemaBuilder->findByDataTypeOrName($type, [
-        GRAPHQL_INPUT_TYPE_PLUGIN,
-        GRAPHQL_SCALAR_PLUGIN,
-        GRAPHQL_ENUM_PLUGIN,
-      ])->getDefinition($schemaBuilder);
-    });
+    return StringHelper::parseType($type);
+  }
+
+  /**
+   * Builds a field's description.
+   *
+   * @param array $field
+   *   The field definition array.
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return string
+   *   The field's description.
+   */
+  protected function buildFieldDescription($field, $definition) {
+    return (string) (isset($field['description']) ? $field['description'] : '');
+  }
+
+  /**
+   * Builds a field's default value.
+   *
+   * @param array $field
+   *   The field definition array.
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return mixed
+   *   The field's default value.
+   */
+  protected function buildFieldDefault($field, $definition) {
+    return isset($field['default']) ? $field['default'] : NULL;
   }
 }

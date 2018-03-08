@@ -6,9 +6,10 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Request arbitrary drupal context objects with GraphQL.
@@ -78,7 +79,7 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if (!($value instanceof Url)) {
       $value = Url::fromRoute('<front>');
     }
@@ -89,7 +90,7 @@ class Context extends FieldPluginBase implements ContainerFactoryPluginInterface
       return isset($contexts[$id]) ? $contexts[$id]->getContextValue() : NULL;
     });
 
-    return function ($value, array $args, ResolveInfo $info) use ($resolve) {
+    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve) {
       yield $resolve();
     };
   }

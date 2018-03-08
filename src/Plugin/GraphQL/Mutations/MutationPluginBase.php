@@ -3,59 +3,47 @@
 namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Field\Field;
-use Drupal\graphql\GraphQL\SecureFieldInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\Plugin\MutationPluginInterface;
+use Drupal\graphql\Plugin\MutationPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
 
-/**
- * Base class for graphql mutation plugins.
- */
-abstract class MutationPluginBase extends PluginBase implements TypeSystemPluginInterface, SecureFieldInterface {
-  use CacheablePluginTrait;
-  use NamedPluginTrait;
+abstract class MutationPluginBase extends PluginBase implements MutationPluginInterface {
+  use TypedPluginTrait;
+  use DescribablePluginTrait;
   use ArgumentAwarePluginTrait;
-
-  /**
-   * The field instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Field\Field
-   */
-  protected $definition;
+  use DeprecatablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $definition = $this->getPluginDefinition();
-
-      if ($type = $this->buildType($schemaBuilder)) {
-        $this->definition = new Field($this, $schemaBuilder, [
-          'name' => $this->buildName(),
-          'description' => $this->buildDescription(),
-          'type' => $type,
-          'isDeprecated' => !empty($definition['deprecated']),
-          'deprecationReason' => !empty($definition['deprecated']) ? !empty($definition['deprecated']) : '',
-        ]);
-
-        if ($args = $this->buildArguments($schemaBuilder)) {
-          $this->definition->addArguments($args);
-        }
-      }
-    }
-
-    return $this->definition;
+  public static function createInstance(SchemaBuilderInterface $builder, MutationPluginManager $manager, $definition, $id) {
+    return [
+      'description' => $definition['description'],
+      'deprecationReason' => $definition['deprecationReason'],
+      'type' => $builder->processType($definition['type']),
+      'args' => $builder->processArguments($definition['args']),
+      'resolve' => function ($value, $args, $context, $info) use ($manager, $id) {
+        $instance = $manager->getInstance(['id' => $id]);
+        return call_user_func_array([$instance, 'resolve'], [$value, $args, $context, $info]);
+      },
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isSecure() {
-    return TRUE;
-  }
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
 
+    return [
+      'type' => $this->buildType($definition),
+      'description' => $this->buildDescription($definition),
+      'args' => $this->buildArguments($definition),
+      'deprecationReason' => $this->buildDeprecationReason($definition),
+    ];
+  }
 }

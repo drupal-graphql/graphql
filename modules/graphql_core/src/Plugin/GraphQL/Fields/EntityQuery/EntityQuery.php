@@ -8,10 +8,11 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use GraphQL\Error\Error;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Exception\ResolveException;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -79,8 +80,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  protected function getCacheDependencies(array $result, $value, array $args, ResolveInfo $info) {
-    $entityType = $this->getEntityType($value, $args, $info);
+  protected function getCacheDependencies(array $result, $value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $entityType = $this->getEntityType($value, $args, $context, $info);
     $type = $this->entityTypeManager->getDefinition($entityType);
 
     $metadata = new CacheableMetadata();
@@ -93,8 +94,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
-    yield $this->getQuery($value, $args, $info);
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    yield $this->getQuery($value, $args, $context, $info);
   }
 
   /**
@@ -104,13 +105,15 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent value.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return string|null
+   * @return null|string
    *   The entity type object or NULL if none could be derived.
    */
-  protected function getEntityType($value, array $args, ResolveInfo $info) {
+  protected function getEntityType($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $definition = $this->getPluginDefinition();
     if (isset($definition['entity_type'])) {
       return $definition['entity_type'];
@@ -130,14 +133,16 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent entity type.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
    */
-  protected function getQuery($value, array $args, ResolveInfo $info) {
-    $query = $this->getBaseQuery($value, $args, $info);
+  protected function getQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $query = $this->getBaseQuery($value, $args, $context, $info);
     $query->range($args['offset'], $args['limit']);
 
     if (array_key_exists('revisions', $args)) {
@@ -162,20 +167,22 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent entity type.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
    */
-  protected function getBaseQuery($value, array $args, ResolveInfo $info) {
-    $entityType = $this->getEntityType($value, $args, $info);
+  protected function getBaseQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $entityType = $this->getEntityType($value, $args, $context, $info);
     $entityStorage = $this->entityTypeManager->getStorage($entityType);
     $query = $entityStorage->getQuery();
     $query->accessCheck(TRUE);
 
     // The context object can e.g. transport the parent entity language.
-    $query->addMetaData('graphql_context', $this->getQueryContext($value, $args, $info));
+    $query->addMetaData('graphql_context', $this->getQueryContext($value, $args, $context, $info));
 
     return $query;
   }
@@ -187,13 +194,15 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The parent value.
    * @param array $args
    *   The field arguments array.
-   * @param \Youshido\GraphQL\Execution\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
    * @return mixed
    *   The query context.
    */
-  protected function getQueryContext($value, array $args, ResolveInfo $info) {
+  protected function getQueryContext($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // Forward the whole set of arguments by default.
     return [
       'parent' => $value,
@@ -278,7 +287,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * @return \Drupal\Core\Entity\Query\ConditionInterface
    *   The generated condition group according to the given filter definitions.
    *
-   * @throws \Youshido\GraphQL\Exception\ResolveException
+   * @throws \GraphQL\Error\Error
    *   If the given operator and value for a filter are invalid.
    */
   protected function buildFilterConditions(QueryInterface $query, array $filter) {
@@ -295,12 +304,12 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
 
       // We need at least a value or an operator.
       if (empty($operator) && empty($value)) {
-        throw new ResolveException(sprintf("Missing value and operator in filter for '%s'.", $field));
+        throw new Error(sprintf("Missing value and operator in filter for '%s'.", $field));
       }
       // Unary operators need a single value.
       else if (!empty($operator) && $this->isUnaryOperator($operator)) {
         if (empty($value) || count($value) > 1) {
-          throw new ResolveException(sprintf("Unary operators must be associated with a single value (field '%s').", $field));
+          throw new Error(sprintf("Unary operators must be associated with a single value (field '%s').", $field));
         }
 
         // Pick the first item from the values.
@@ -309,13 +318,13 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       // Range operators need exactly two values.
       else if (!empty($operator) && $this->isRangeOperator($operator)) {
         if (empty($value) || count($value) !== 2) {
-          throw new ResolveException(sprintf("Range operators must require exactly two values (field '%s').", $field));
+          throw new Error(sprintf("Range operators must require exactly two values (field '%s').", $field));
         }
       }
       // Null operators can't have a value set.
       else if (!empty($operator) && $this->isNullOperator($operator)) {
         if (!empty($value)) {
-          throw new ResolveException(sprintf("Null operators must not be associated with a filter value (field '%s').", $field));
+          throw new Error(sprintf("Null operators must not be associated with a filter value (field '%s').", $field));
         }
       }
 

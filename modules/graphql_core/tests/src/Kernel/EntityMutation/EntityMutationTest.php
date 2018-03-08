@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\EntityMutation;
 
-use Drupal\graphql\Annotation\GraphQLMutation;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\DeleteEntityBase;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\UpdateEntityBase;
@@ -42,25 +41,15 @@ class EntityMutationTest extends GraphQLContentTestBase {
     ]);
   }
 
-  /**
-   * Test entity creation.
-   */
-  public function testCreateEntityMutation() {
-    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
-      'id' => 'createNode',
-      'name' => 'createNode',
-      'entity_type' => 'node',
-      'entity_bundle' => 'test',
-      'arguments' => [
-        'input' => 'NodeInput',
-      ],
-      'type' => 'EntityCrudOutput',
-    ]);
-
-    $mutation = $this->getMockBuilder(CreateEntityBase::class)
+  protected function mockMutationFactory($definition, $result = NULL, $builder = NULL) {
+    $mutation = $this->getMockBuilder([
+      'createNode' => CreateEntityBase::class,
+      'updateNode' => UpdateEntityBase::class,
+      'deleteNode' => DeleteEntityBase::class,
+    ][$definition['id']])
       ->setConstructorArgs([
         [],
-        'createNode',
+        $definition['id'],
         $definition,
         $this->container->get('entity_type.manager'),
       ])
@@ -68,11 +57,34 @@ class EntityMutationTest extends GraphQLContentTestBase {
         'extractEntityInput',
       ])->getMock();
 
-    $mutation
-      ->expects(static::any())
-      ->method('extractEntityInput')
-      ->with($this->anything(), $this->anything())
-      ->will($this->returnCallback(function ($args, $info) {
+    if (isset($result)) {
+      $mutation
+        ->expects(static::any())
+        ->method('extractEntityInput')
+        ->with(static::anything(), static::anything(), static::anything(), static::anything())
+        ->will($this->toBoundPromise($result, $mutation));
+    }
+
+    if (is_callable($builder)) {
+      $builder($mutation);
+    }
+
+    return $mutation;
+  }
+
+  /**
+   * Test entity creation.
+   */
+  public function testCreateEntityMutation() {
+    $this->mockMutation('createNode', [
+      'name' => 'createNode',
+      'entity_type' => 'node',
+      'entity_bundle' => 'test',
+      'arguments' => [
+        'input' => 'NodeInput',
+      ],
+      'type' => 'EntityCrudOutput',
+    ], function ($source, $args, $context, $info) {
         return [
           'title' => $args['input']['title'],
           'status' => 1,
@@ -80,13 +92,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
             'value' => $args['input']['body'],
           ],
         ];
-      }));
-
-    $this->addTypeSystemPlugin($mutation);
-
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-    $metadata->addCacheTags(['node:1']);
+    });
 
     $this->assertResults('mutation ($node: NodeInput!) { createNode(input: $node) { entity { entityId } } }', [
       'node' => [
@@ -99,7 +105,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           'entityId' => 1,
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEquals('Test', Node::load(1)->getTitle());
   }
@@ -108,8 +114,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity creation violations.
    */
   public function testCreateEntityMutationViolation() {
-    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
-      'id' => 'createNode',
+    $this->mockMutation('createNode', [
       'name' => 'createNode',
       'entity_type' => 'node',
       'entity_bundle' => 'test',
@@ -117,36 +122,14 @@ class EntityMutationTest extends GraphQLContentTestBase {
         'input' => 'NodeInput',
       ],
       'type' => 'EntityCrudOutput',
-    ]);
-
-    $mutation = $this->getMockBuilder(CreateEntityBase::class)
-      ->setConstructorArgs([
-        [],
-        'createNode',
-        $definition,
-        $this->container->get('entity_type.manager'),
-      ])
-      ->setMethods([
-        'extractEntityInput',
-      ])->getMock();
-
-    $mutation
-      ->expects(static::any())
-      ->method('extractEntityInput')
-      ->with($this->anything(), $this->anything())
-      ->will($this->returnCallback(function ($args, $info) {
-        return [
-          'status' => 1,
-          'body' => [
-            'value' => $args['input']['body'],
-          ],
-        ];
-      }));
-
-    $this->addTypeSystemPlugin($mutation);
-
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
+    ], function ($source, $args, $context, $info) {
+      return [
+        'status' => 1,
+        'body' => [
+          'value' => $args['input']['body'],
+        ],
+      ];
+    });
 
     $this->assertResults('mutation ($node: NodeInput!) { createNode(input: $node) { violations { message path } } }', [
       'node' => [
@@ -162,7 +145,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           ],
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEmpty(Node::load(1));
   }
@@ -171,8 +154,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity updates.
    */
   public function testUpdateEntityMutation() {
-    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
-      'id' => 'updateNode',
+    $this->mockMutation('updateNode', [
       'name' => 'updateNode',
       'entity_type' => 'node',
       'entity_bundle' => 'test',
@@ -181,30 +163,11 @@ class EntityMutationTest extends GraphQLContentTestBase {
         'input' => 'NodeInput',
       ],
       'type' => 'EntityCrudOutput',
-    ]);
-
-    $mutation = $this->getMockBuilder(UpdateEntityBase::class)
-      ->setConstructorArgs([
-        [],
-        'updateNode',
-        $definition,
-        $this->container->get('entity_type.manager'),
-      ])
-      ->setMethods([
-        'extractEntityInput',
-      ])->getMock();
-
-    $mutation
-      ->expects(static::any())
-      ->method('extractEntityInput')
-      ->with($this->anything(), $this->anything())
-      ->will($this->returnCallback(function ($args, $info) {
-        return [
-          'title' => $args['input']['title'],
-        ];
-      }));
-
-    $this->addTypeSystemPlugin($mutation);
+    ], function ($source, $args, $context, $info) {
+      return [
+        'title' => $args['input']['title'],
+      ];
+    });
 
     $this->createNode([
       'title' => 'Old title',
@@ -215,12 +178,8 @@ class EntityMutationTest extends GraphQLContentTestBase {
       ],
     ]);
 
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-    $metadata->addCacheTags(['node:1']);
-
     $this->assertResults('mutation ($node: NodeInput!, $nid: String!) { updateNode(id: $nid, input: $node) { entity { entityLabel } } }', [
-      'nid' => 1,
+      'nid' => '1',
       'node' => [
         'title' => 'Test',
       ],
@@ -230,7 +189,7 @@ class EntityMutationTest extends GraphQLContentTestBase {
           'entityLabel' => 'Test',
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEquals('Test', Node::load(1)->getTitle());
   }
@@ -239,24 +198,15 @@ class EntityMutationTest extends GraphQLContentTestBase {
    * Test entity deletion.
    */
   public function testDeleteEntityMutation() {
-    $definition = $this->getTypeSystemPluginDefinition(GraphQLMutation::class, [
-      'id' => 'deleteNode',
+    $this->mockMutation('deleteNode', [
       'name' => 'deleteNode',
       'entity_type' => 'node',
+      'entity_bundle' => 'test',
       'arguments' => [
         'id' => 'String',
       ],
       'type' => 'EntityCrudOutput',
     ]);
-
-    $mutation = $this->getMockForAbstractClass(DeleteEntityBase::class, [
-      [],
-      'deleteNode',
-      $definition,
-      $this->container->get('entity_type.manager'),
-    ]);
-
-    $this->addTypeSystemPlugin($mutation);
 
     $this->createNode([
       'title' => 'Test',
@@ -264,19 +214,15 @@ class EntityMutationTest extends GraphQLContentTestBase {
       'type' => 'test',
     ]);
 
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
-    $metadata->addCacheTags(['node:1']);
-
     $this->assertResults('mutation ($nid: String!) { deleteNode(id: $nid) { entity { entityLabel } } }', [
-      'nid' => 1,
+      'nid' => '1',
     ], [
       'deleteNode' => [
         'entity' => [
           'entityLabel' => 'Test',
         ],
       ],
-    ], $metadata);
+    ], $this->defaultMutationCacheMetaData());
 
     $this->assertEmpty(Node::load(1));
   }

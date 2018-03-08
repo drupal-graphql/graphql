@@ -4,7 +4,7 @@ namespace Drupal\graphql\Plugin\MenuLink\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ExplorerMenuLinkDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -12,7 +12,7 @@ class ExplorerMenuLinkDeriver extends DeriverBase implements ContainerDeriverInt
   /**
    * The schema plugin manager service.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $schemaManager;
 
@@ -26,7 +26,7 @@ class ExplorerMenuLinkDeriver extends DeriverBase implements ContainerDeriverInt
   /**
    * ExplorerMenuLinkDeriver constructor.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $schemaManager
    *   The schema plugin manager service.
    */
   public function __construct(SchemaPluginManager $schemaManager) {
