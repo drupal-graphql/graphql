@@ -25,7 +25,6 @@ class GraphQLCoreTestBase extends GraphQLTestBase {
       'entity_bundles',
       'entity_types',
       'entity_field_info',
-      'languages:language_content',
     ], parent::defaultCacheTags());
   }
 

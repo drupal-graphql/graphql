@@ -29,6 +29,12 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
     'text',
   ];
 
+  protected function defaultCacheContexts() {
+    return array_merge([
+      'languages:language_content',
+    ], parent::defaultCacheContexts());
+  }
+
   /**
    * {@inheritdoc}
    */

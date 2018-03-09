@@ -98,7 +98,11 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
 
     $cacheContexts = array_reduce($managers, function ($carry, CacheableDependencyInterface $current) {
       return Cache::mergeContexts($carry, $current->getCacheContexts());
-    }, []);
+    }, [
+      // As long as the endpoint url language might have effect, we have to
+      // keep it.
+      'languages:language_url',
+    ]);
 
     $cacheMaxAge = array_reduce($managers, function ($carry, CacheableDependencyInterface $current) {
       return Cache::mergeMaxAges($carry, $current->getCacheMaxAge());
