@@ -88,7 +88,7 @@ install:
       then grep -rl 'cli' $DRUPAL_BUILD_DIR/core $DRUPAL_BUILD_DIR/modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
     fi
 
-  # Bring in the module depe  ndencies without requiring a merge plugin. The
+  # Bring in the module dependencies without requiring a merge plugin. The
   # require also triggers a full 'composer install'.
   - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.11.5
 
