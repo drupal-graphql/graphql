@@ -34,7 +34,7 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
         'interfaces' => $this->getInterfaces($type, $basePluginDefinition),
         'entity_type' => $typeId,
       ] + $basePluginDefinition;
-      
+
       if ($typeId === 'node') {
         // TODO: Make this more generic somehow.
         $derivative['response_cache_contexts'][] = 'user.node_grants:view';

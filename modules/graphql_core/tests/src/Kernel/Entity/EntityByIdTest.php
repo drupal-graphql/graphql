@@ -78,6 +78,8 @@ class EntityByIdTest extends GraphQLContentTestBase {
       'node:1',
     ]);
 
+    $metadata->addCacheContexts(['user.node_grants:view']);
+
     // Check English node.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),

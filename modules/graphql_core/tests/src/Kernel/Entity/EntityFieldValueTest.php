@@ -70,6 +70,8 @@ GQL;
       'entity_field_info',
     ]);
 
+    $metadata->addCacheContexts(['user.node_grants:view']);
+
     $this->assertResults($query, [], [
       'node' => [
         'fieldBoolean' => TRUE,
@@ -112,6 +114,8 @@ GQL;
       'config:field.storage.node.field_text',
       'entity_field_info',
     ]);
+
+    $metadata->addCacheContexts(['user.node_grants:view']);
 
     $this->assertResults($query, [], [
       'node' => [
@@ -163,6 +167,8 @@ GQL;
       'config:field.storage.node.body',
       'entity_field_info',
     ]);
+
+    $metadata->addCacheContexts(['user.node_grants:view']);
 
     $this->assertResults($query, [], [
       'node' => [
@@ -248,6 +254,8 @@ GQL;
       'file:1',
       'file:2',
     ]);
+
+    $metadata->addCacheContexts(['user.node_grants:view']);
 
     $this->assertResults($this->getQueryFromFile('raw_field_values.gql'), [
       'path' => '/node/' . $node->id(),
