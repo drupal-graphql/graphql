@@ -172,8 +172,11 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
     });
 
     return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $entity) {
-      $language = $resolve();
-      $entity = $this->entityRepository->getTranslationFromContext($entity, $language);
+      /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
+      $response = $resolve();
+      $entity = $this->entityRepository->getTranslationFromContext($entity, $response->getValue());
+      $entity->addCacheableDependency($response);
+
       return $this->resolveEntity($entity, $value, $args, $info);
     };
   }

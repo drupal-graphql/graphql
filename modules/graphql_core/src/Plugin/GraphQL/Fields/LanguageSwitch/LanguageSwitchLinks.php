@@ -7,6 +7,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -82,16 +83,18 @@ class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPlu
       });
 
       return function () use ($resolve) {
-        list($current, $links) = $resolve();
+        /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
+        $response = $resolve();
+        list($current, $links) = $response->getValue();
 
         if (!empty($links->links)) {
           foreach ($links->links as $link) {
             // Yield the link array and the language object of the language
             // context resolved from the sub-request.
-            yield [
+            yield new CacheableValue([
               'link' => $link,
               'context' => $current,
-            ];
+            ], [$response]);
           }
         }
       };
