@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql\GraphQL\Buffers;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -60,20 +62,27 @@ class SubRequestBuffer extends BufferBase {
    * {@inheritdoc}
    */
   protected function getBufferId($item) {
-    /** @var \Drupal\Core\Url $url */
-    $url = $item['url'];
-    return $url->toString();
+    /** @var \Drupal\Core\GeneratedUrl $url */
+    $url = $item['url']->toString(TRUE);
+
+    return hash('sha256', json_encode([
+      'url' => $url->getGeneratedUrl(),
+      'tags' => $url->getCacheTags(),
+      'contexts' => $url->getCacheContexts(),
+      'age' => $url->getCacheMaxAge(),
+    ]));
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolveBufferArray(array $buffer) {
-    /** @var \Drupal\Core\Url $url */
-    $url = reset($buffer)['url'];
+    /** @var \Drupal\Core\GeneratedUrl $url */
+    $url = reset($buffer)['url']->toString(TRUE);
+
     $currentRequest = $this->requestStack->getCurrentRequest();
     $request = Request::create(
-      $url->getOption('routed_path') ?: $url->toString(),
+      $url->getGeneratedUrl(),
       'GET',
       $currentRequest->query->all(),
       $currentRequest->cookies->all(),
@@ -93,6 +102,9 @@ class SubRequestBuffer extends BufferBase {
 
     /** @var \Drupal\graphql\GraphQL\Buffers\SubRequestResponse $response */
     $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+    if ($url instanceof CacheableDependencyInterface) {
+      $response->addCacheableDependency($url);
+    }
 
     // TODO:
     // Remove the request stack manipulation once the core issue described at
@@ -101,7 +113,9 @@ class SubRequestBuffer extends BufferBase {
       $this->requestStack->pop();
     }
 
-    return $response->getResult();
+    return array_map(function ($value) use ($response) {
+      return new CacheableValue($value, [$response]);
+    }, $response->getResult());
   }
 
 }

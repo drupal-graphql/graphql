@@ -7,6 +7,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -101,9 +102,12 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
       });
 
       return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve) {
-        $links = $resolve();
+        /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
+        $response = $resolve();
+        $links = $response->getValue();
+
         foreach ($links as $link) {
-          yield $link;
+          yield new CacheableValue($link, [$response]);
         }
       };
     }
