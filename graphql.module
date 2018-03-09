@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
 use Drupal\graphql\Utility\StringHelper;
 
@@ -63,7 +64,7 @@ function graphql_graphql_interfaces_alter(&$definitions) {
   }, $definitions);
 
   foreach ($interfaces as $index => $list) {
-    $definition['interfaces'] = $list;
+    $definitions[$index]['interfaces'] = $list;
   }
 }
 

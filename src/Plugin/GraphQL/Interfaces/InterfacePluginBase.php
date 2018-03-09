@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Interfaces;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
@@ -21,7 +22,20 @@ abstract class InterfacePluginBase extends PluginBase implements TypePluginInter
     return new InterfaceType([
       'name' => $definition['name'],
       'description' => $definition['description'],
-      'contexts' => $definition['contexts'],
+      'contexts' => function () use ($builder, $definition) {
+        $types = $builder->getSubTypes($definition['name']);
+
+        return array_reduce($types, function ($carry, $current) use ($builder) {
+          $type = $builder->getType($current);
+          if (!empty($type->config['contexts'])) {
+            $contexts = $type->config['contexts'];
+            $contexts = is_callable($contexts) ? $contexts() : $contexts;
+            return Cache::mergeContexts($carry, $contexts);
+          }
+
+          return $carry;
+        }, $definition['contexts']);
+      },
       'fields' => function () use ($builder, $definition) {
         $fields = $builder->getFields($definition['name']);
 
