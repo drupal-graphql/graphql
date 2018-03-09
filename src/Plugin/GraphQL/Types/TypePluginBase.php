@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Types;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\TypePluginInterface;
@@ -13,6 +14,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class TypePluginBase extends PluginBase implements TypePluginInterface {
+  use CacheablePluginTrait;
   use DescribablePluginTrait;
 
   /**
@@ -22,6 +24,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
     return new ObjectType([
       'name' => $definition['name'],
       'description' => $definition['description'],
+      'contexts' => $definition['contexts'],
       'fields' => function () use ($builder, $definition) {
         $fields = $builder->getFields($definition['name']);
 
@@ -61,6 +64,7 @@ abstract class TypePluginBase extends PluginBase implements TypePluginInterface 
       'description' => $this->buildDescription($definition),
       'interfaces' => $this->buildInterfaces($definition),
       'unions' => $this->buildUnions($definition),
+      'contexts' => $this->buildCacheContexts($definition),
       'weight' => $definition['weight'],
     ];
   }

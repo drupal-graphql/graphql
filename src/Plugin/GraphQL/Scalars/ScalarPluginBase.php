@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Scalars;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\TypePluginInterface;
@@ -10,6 +11,7 @@ use Drupal\graphql\Plugin\TypePluginManager;
 use GraphQL\Type\Definition\CustomScalarType;
 
 abstract class ScalarPluginBase extends PluginBase implements TypePluginInterface {
+  use CacheablePluginTrait;
   use DescribablePluginTrait;
 
   /**
@@ -25,6 +27,7 @@ abstract class ScalarPluginBase extends PluginBase implements TypePluginInterfac
     return new CustomScalarType([
       'name' => $definition['name'],
       'description' => $definition['description'],
+      'contexts' => $definition['contexts'],
       'serialize' => [$class, 'serialize'],
       'parseValue' => [$class, 'parseValue'],
       'parseLiteral' => [$class, 'parseLiteral'],
@@ -40,6 +43,7 @@ abstract class ScalarPluginBase extends PluginBase implements TypePluginInterfac
     return [
       'name' => $definition['name'],
       'description' => $this->buildDescription($definition),
+      'contexts' => $this->buildCacheContexts($definition),
     ];
   }
 

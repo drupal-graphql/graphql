@@ -19,6 +19,8 @@ class CacheContextsCollector {
           if (!empty($definition->config['contexts'])) {
             $contexts = array_unique(array_merge($contexts, $definition->config['contexts']));
           }
+
+          $type = $definition->getType();
         },
       ],
     ];
