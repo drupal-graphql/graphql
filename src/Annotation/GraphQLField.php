@@ -61,25 +61,4 @@ class GraphQLField extends GraphQLAnnotationBase {
    */
   public $deprecated = FALSE;
 
-  /**
-   * The cache contexts for caching the response.
-   *
-   * @var array
-   */
-  public $response_cache_contexts = ['user.permissions'];
-
-  /**
-   * The cache tags for caching theresponse.
-   *
-   * @var array
-   */
-  public $response_cache_tags = [];
-
-  /**
-   * The cache max age for caching the response.
-   *
-   * @var array
-   */
-  public $response_cache_max_age = CacheBackendInterface::CACHE_PERMANENT;
-
 }

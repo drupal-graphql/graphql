@@ -73,7 +73,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       foreach ($bundles[$typeId] as $bundle => $bundleDefinition) {
-        $this->derivatives[$typeId . '-' . $bundle] = [
+        $derivative = [
           'name' => StringHelper::camelCase($typeId, $bundle),
           'description' => $this->t("The '@bundle' bundle of the '@type' entity type.", [
             '@bundle' => $bundleDefinition['label'],
@@ -84,6 +84,13 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
           'entity_type' => $typeId,
           'entity_bundle' => $bundle,
         ] + $basePluginDefinition;
+
+        if ($typeId === 'node') {
+          // TODO: Make this more generic somehow.
+          $derivative['response_cache_contexts'][] = 'user.node_grants:view';
+        }
+
+        $this->derivatives[$typeId . '-' . $bundle] = $derivative;
       }
     }
 
