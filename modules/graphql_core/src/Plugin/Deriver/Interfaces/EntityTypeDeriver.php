@@ -39,6 +39,10 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
         $derivative['response_cache_contexts'][] = 'user.node_grants:view';
       }
 
+      if ($type->isTranslatable()) {
+        $derivative['response_cache_contexts'][] = 'languages:language_content';
+      }
+
       $this->derivatives[$typeId] = $derivative;
     }
 
