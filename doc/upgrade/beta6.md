@@ -221,12 +221,12 @@ Instead of:
 ]
 ```
 
-By convention the enums keys should be uppercases.
+By convention the enums keys should be uppercased.
 
 ### Resolve context
 The field plugins resolve methods receive an additional argument of type `ResolveContext`, that can be used to pass information to children down the query tree.
 
-If you field plugins have strict method annotations like this:
+If your field plugins have strict method annotations like this:
 ```php
 public function resolveValues($value, $args, ResolveInfo $info) {
 ...
