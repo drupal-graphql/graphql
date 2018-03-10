@@ -9,9 +9,9 @@ In a nutshell, if you were using this kind of query:
 
 ```
 query {
-	route(path: "/node/1") {
+  route(path: "/node/1") {
     entity {
-		entityLabel
+      entityLabel
     }
   }
 }
@@ -20,10 +20,10 @@ query {
 It has to become this:
 ```
 query {
-	route(path: "/node/1") {
-	  ... EntityCanonicalUrl {
+  route(path: "/node/1") {
+    ... EntityCanonicalUrl {
       entity {
-		  entityLabel
+        entityLabel
       }
     }
   }
@@ -153,17 +153,58 @@ Due to the way the new execution library handles results, `null` values in Strin
 ## API changes
 These changes affect you if you’ve been developing custom schema plugins.
 
-## API changes
 ### Development flag
 The three settings for result cache, schema cache and field security have been replaced with one `development` flag, which turns the GraphQL module into development mode. This will also enable advanced error reporting in the underlying execution library.
+
+Before:
+```yaml
+parameters:
+  graphql.config:
+    # GraphQL result cache:
+    #
+    # By default, the GraphQL results get cached. This can be disabled during development.
+    #
+    # @default true
+    result_cache: true
+
+    # GraphQL schema cache:
+    #
+    # By default, the GraphQL schema gets cached. This can be disabled during development.
+    #
+    # @default true
+    schema_cache: true
+
+    # Development mode:
+    #
+    # Disables field security. All fields can be resolved without restrictions.
+    #
+    # @default false
+    development: false
+```
+
+After:
+```yaml
+parameters:
+  graphql.config:
+    # Development mode:
+    #
+    # Enables debugging mode and disables field security and caching.
+    #
+    # When enabled, all fields can be resolved without restrictions
+    # and the caching strategy of the schema and query results is
+    # disabled entirely.
+    #
+    # @default false
+    development: false
+```
 
 ### Enum definitions
 `buildEnumValues` has to return an array of the following structure:
 
 ```php
 [
-	'VALUE_A' => [
-	  'value' => 'a',
+  'VALUE_A' => [
+    'value' => 'a',
     'description' => 'The letter a',
   ],
 ]
@@ -172,9 +213,9 @@ The three settings for result cache, schema cache and field security have been r
 Instead of:
 ```php
 [
-	[
-	  'value' => 'a',
-	  'name' => 'VALUE_A',
+  [
+    'value' => 'a',
+    'name' => 'VALUE_A',
     'description' => 'The letter a',
   ],
 ]
