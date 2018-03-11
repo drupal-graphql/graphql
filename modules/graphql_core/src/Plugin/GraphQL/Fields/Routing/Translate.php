@@ -22,7 +22,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   response_cache_contexts={"languages:language_url"},
  *   arguments = {
  *     "language" = "LanguageId!"
- *   }
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class Translate extends FieldPluginBase implements ContainerFactoryPluginInterface {

@@ -21,7 +21,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   parents = {"Entity"},
  *   arguments = {
  *     "language" = "LanguageId!"
- *   }
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class EntityTranslation extends FieldPluginBase implements ContainerFactoryPluginInterface {

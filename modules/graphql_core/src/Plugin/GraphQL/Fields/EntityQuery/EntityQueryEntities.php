@@ -28,7 +28,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   parents = {"EntityQueryResult"},
  *   arguments = {
  *     "language" = "LanguageId"
- *   }
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPluginInterface {

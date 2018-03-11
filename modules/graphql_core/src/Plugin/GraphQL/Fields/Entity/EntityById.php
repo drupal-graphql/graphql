@@ -20,6 +20,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   arguments = {
  *     "id" = "String!"
  *   },
+ *   contextual_arguments = {"language"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityByIdDeriver"
  * )
  */

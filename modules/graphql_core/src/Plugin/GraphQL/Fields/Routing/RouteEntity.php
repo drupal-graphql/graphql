@@ -15,6 +15,7 @@ use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -27,6 +28,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   name = "entity",
  *   description = @Translation("The entity belonging to the current url."),
  *   parents = {"EntityCanonicalUrl"},
+ *   contextual_arguments={"language"},
  *   type = "Entity"
  * )
  */
@@ -164,21 +166,11 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return \Closure
+   * @return \Iterator
    */
   protected function resolveEntityTranslation(EntityInterface $entity, Url $url, array $args, ResolveInfo $info) {
-    $resolve = $this->subrequestBuffer->add($url, function () {
-      return $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
-    });
-
-    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $entity) {
-      /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
-      $response = $resolve();
-      $entity = $this->entityRepository->getTranslationFromContext($entity, $response->getValue());
-      $entity->addCacheableDependency($response);
-
-      return $this->resolveEntity($entity, $value, $args, $info);
-    };
+    $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+    return $this->resolveEntity($entity, $url, $args, $info);
   }
 
   /**
