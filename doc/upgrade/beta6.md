@@ -147,6 +147,20 @@ After:
 }
 ```
 
+### Using persisted queries
+
+If you have been using persisted queries, your clients where calling the endpoint url and passing separate `id` and `version` arguments.
+
+```
+/graphql?id=myquery&version=123
+```
+
+These have been merged into one `queryId` argument.
+
+```
+/graphql?queryId=123:myquery
+```
+
 ### Null in string results
 Due to the way the new execution library handles results, `null` values in Strings, an empty string field will not yield `null` but a string containing `”null”`.
 
