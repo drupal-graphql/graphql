@@ -58,7 +58,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
       if (isset($this->contexts[$operation][$key][$name])) {
         return $this->contexts[$operation][$key][$name];
       }
-    } while (array_pop($path) && !empty($path));
+      array_pop($path);
+    } while (count($path));
 
     return $default;
   }
