@@ -50,13 +50,6 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
   protected $languageManager;
 
   /**
-   * The sub-request buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
-   */
-  protected $subrequestBuffer;
-
-  /**
    * The entity repository service.
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
@@ -73,8 +66,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       $pluginDefinition,
       $container->get('entity_type.manager'),
       $container->get('entity.repository'),
-      $container->get('language_manager'),
-      $container->get('graphql.buffer.subrequest')
+      $container->get('language_manager')
     );
   }
 
@@ -93,7 +85,6 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The entity repository service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
-   * @param \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer $subrequestBuffer
    */
   public function __construct(
     array $configuration,
@@ -101,13 +92,11 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
     $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
-    LanguageManagerInterface $languageManager,
-    SubRequestBuffer $subrequestBuffer
+    LanguageManagerInterface $languageManager
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
     $this->languageManager = $languageManager;
-    $this->subrequestBuffer = $subrequestBuffer;
     $this->entityRepository = $entityRepository;
   }
 
@@ -169,7 +158,9 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    * @return \Iterator
    */
   protected function resolveEntityTranslation(EntityInterface $entity, Url $url, array $args, ResolveInfo $info) {
-    $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+    if ($entity instanceof TranslatableInterface && isset($args['language'])) {
+      $entity = $entity->getTranslation($args['language']);
+    }
     return $this->resolveEntity($entity, $url, $args, $info);
   }
 

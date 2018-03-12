@@ -7,7 +7,6 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,10 +19,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   name = "languageSwitchLinks",
  *   type = "[LanguageSwitchLink]",
  *   parents = {"InternalUrl"},
- *   response_cache_contexts = {
- *     "languages:language_url",
- *     "languages:language_interface"
- *   }
+ *   arguments={
+ *     "language": "LanguageId"
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPluginInterface {
@@ -77,7 +76,7 @@ class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPlu
     if ($value instanceof Url) {
 
       $links = $this->languageManager->getLanguageSwitchLinks(LanguageInterface::TYPE_URL, $value);
-      $current = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL);
+      $current = $this->languageManager->getLanguage($args['language']);
 
       if (!empty($links->links)) {
         foreach ($links->links as $link) {
