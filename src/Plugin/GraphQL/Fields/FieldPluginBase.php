@@ -15,6 +15,7 @@ use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
+use Drupal\graphql\Plugin\LanguageNegotiation\LanguageNegotiationGraphQL;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ListOfType;
@@ -90,14 +91,27 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
     $result = $callback($value, $args, $context, $info);
+
     if (is_callable($result)) {
       return new Deferred(function () use ($result, $value, $args, $context, $info) {
         return $this->resolveDeferred($result, $value, $args, $context, $info);
       });
     }
 
+    // Set the context language to the current language parameter.
+    LanguageNegotiationGraphQL::setCurrentLanguage($context->getContext('language', $info));
+
     // Extract the result array.
-    $result = iterator_to_array($result);
+    try {
+      $result = iterator_to_array($result);
+    }
+    catch (\Exception $exc) {
+      throw $exc;
+    }
+    finally {
+      // In any case, set the language context back to null.
+      LanguageNegotiationGraphQL::unsetCurrentLanguage();
+    }
 
     // Only collect cache metadata if this is a query. All other operation types
     // are not cacheable anyways.
