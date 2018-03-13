@@ -21,23 +21,15 @@ class LanguageNegotiationTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installConfig(['language']);
-    $this->installEntitySchema('configurable_language');
+    $this->container->get('language_negotiator')
+      ->setCurrentUser($this->accountProphecy->reveal());
 
+    $this->installEntitySchema('configurable_language');
     ConfigurableLanguage::create([
       'id' => 'fr',
       'weight' => 1,
     ])->save();
 
-    $languages = $this->config('language.types');
-    $this->container->get('language_negotiator')->setCurrentUser($this->accountProphecy->reveal());
-
-    $negotiation = $languages->get('negotiation');
-    foreach (array_keys($negotiation) as $type) {
-      $negotiation[$type]['enabled']['language-graphql'] = -1;
-      asort($negotiation[$type]['enabled']);
-    }
-    $languages->set('negotiation', $negotiation);
-    $languages->save();
 
     $this->mockType('node', ['name' => 'Node']);
 
