@@ -51,7 +51,7 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('path.validator'),
-      $container->get('language_negotiator')
+      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL
     );
   }
 
@@ -66,7 +66,7 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The plugin definition.
    * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
-   * @param \Drupal\language\LanguageNegotiator $languageNegotiator
+   * @param \Drupal\language\LanguageNegotiator|null $languageNegotiator
    *   The language negotiator.
    */
   public function __construct(
@@ -74,7 +74,7 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
-    LanguageNegotiator $languageNegotiator
+    $languageNegotiator
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
@@ -88,8 +88,10 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($args['path'])) && $url->access()) {
 
       // For now we just take the "url" negotiator into account.
-      if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
-        $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
+      if ($this->languageNegotiator) {
+        if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
+          $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
+        }
       }
 
       yield $url;
