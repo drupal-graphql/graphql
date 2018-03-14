@@ -77,6 +77,9 @@ class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPlu
 
       $links = $this->languageManager->getLanguageSwitchLinks(LanguageInterface::TYPE_URL, $value);
       $current = $this->languageManager->getLanguage($args['language']);
+      if (!$current) {
+        $current = $this->languageManager->getDefaultLanguage();
+      }
 
       if (!empty($links->links)) {
         foreach ($links->links as $link) {

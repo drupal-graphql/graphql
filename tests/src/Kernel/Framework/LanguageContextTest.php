@@ -57,15 +57,6 @@ class LanguageNegotiationTest extends GraphQLTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheContexts() {
-    return array_merge([
-      'languages:language_interface',
-    ], parent::defaultCacheContexts());
-  }
-
-  /**
    * Test root language.
    */
   public function testRootLanguage() {

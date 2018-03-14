@@ -376,6 +376,13 @@ class QueryProcessor {
       // Add the collected cache metadata to the result.
       $metadata = (new CacheableMetadata())->addCacheableDependency($context);
 
+      // Remove any language cache contexts.
+      // Since GraphQL imposes it's one language handler, language cache
+      // contexts never apply.
+      $metadata->setCacheContexts(array_filter($metadata->getCacheContexts(), function ($context) {
+        return strpos($context, 'languages:') !== 0;
+      }));
+
       // Do not cache in development mode or if there are any errors.
       if ($context->getGlobal('development') || !empty($result->errors)) {
         $metadata->setCacheMaxAge(0);
