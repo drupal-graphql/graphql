@@ -196,7 +196,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     foreach ($entities as $entity) {
       // Translate the entity if it is translatable and a language was given.
       if ($language && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
-        return $entity->getTranslation($language);
+        yield $entity->getTranslation($language);
       }
 
       $access = $entity->access('view', NULL, TRUE);
