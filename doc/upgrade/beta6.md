@@ -11,14 +11,18 @@ Multilingual queries changed drastically. The endpoints language negotiation is 
 query {
   route(path: "/node/1") {
     ... on EntityCanonicalUrl {
-      # Will emit the default language.
-      entityLabel
+      entity {
+        # Will emit the default language.
+        entityLabel
+      }
     }
   }
   route(path: "/fr/node/1") {
     ... on EntityCanonicalUrl {
-      # Will emit the french translation.
-      entityLabel
+      entity {
+        # Will emit the french translation.
+        entityLabel
+      }
     }
   }
 }
