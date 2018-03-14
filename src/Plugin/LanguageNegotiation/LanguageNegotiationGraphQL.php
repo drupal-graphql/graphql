@@ -30,6 +30,13 @@ class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase {
   protected static $currentLangcode;
 
   /**
+   * State if the language context is currently active.
+   *
+   * @var bool
+   */
+  protected static $contextActive;
+
+  /**
    * Set the current context language.
    *
    * @param string $langcode
@@ -38,6 +45,7 @@ class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase {
   public static function setCurrentLanguage($langcode) {
     \Drupal::languageManager()->reset();
     static::$currentLangcode = $langcode;
+    static::$contextActive = TRUE;
   }
 
   /**
@@ -45,13 +53,16 @@ class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase {
    */
   public static function unsetCurrentLanguage() {
     static::$currentLangcode = NULL;
+    static::$contextActive = FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getLangcode(Request $request = NULL) {
-    return static::$currentLangcode ?: $this->languageManager->getDefaultLanguage()->getId();
+    return static::$contextActive
+      ? (static::$currentLangcode ?: \Drupal::languageManager()->getDefaultLanguage()->getId())
+      : NULL;
   }
 
 }

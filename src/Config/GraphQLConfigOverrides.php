@@ -35,12 +35,13 @@ class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
    */
   public function loadOverrides($names) {
     if (in_array('language.types', $names)) {
-      $config = $this->baseStorage->read('language.types');
-      foreach (array_keys($config['negotiation']) as $type) {
-        $config['negotiation'][$type]['enabled']['language-graphql'] = -999;
-        asort($config['negotiation'][$type]['enabled']);
+      if ($config = $this->baseStorage->read('language.types')) {
+        foreach (array_keys($config['negotiation']) as $type) {
+          $config['negotiation'][$type]['enabled']['language-graphql'] = -999;
+          asort($config['negotiation'][$type]['enabled']);
+        }
+        return ['language.types' => $config];
       }
-      return ['language.types' => $config];
     }
     return [];
   }
