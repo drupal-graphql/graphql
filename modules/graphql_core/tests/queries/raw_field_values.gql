@@ -76,7 +76,9 @@ query ($path: String!) {
             description
             entity {
               url
-              uri
+#              uri {
+#                value
+#              }
             }
           }
           fieldImage {
@@ -87,7 +89,9 @@ query ($path: String!) {
             height
             entity {
               url
-              uri
+#              uri {
+#                value
+#              }
             }
           }
         }
