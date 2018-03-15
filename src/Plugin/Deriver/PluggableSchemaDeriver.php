@@ -217,11 +217,11 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
    */
   protected function buildFieldAssociationMap(FieldPluginManager $manager, $types) {
     $definitions = $manager->getDefinitions();
-    $fields = array_reduce(array_keys($definitions), function ($carry, $id) use ($definitions) {
+    $fields = array_reduce(array_keys($definitions), function ($carry, $id) use ($definitions, $types) {
       $current = $definitions[$id];
       $parents = $current['parents'] ?: ['Root'];
 
-      return array_reduce($parents, function ($carry, $parent) use ($current, $id) {
+      return array_reduce($parents, function ($carry, $parent) use ($current, $id, $types) {
         // Allow plugins to define a different name for each parent.
         if (strpos($parent, ':') !== FALSE) {
           list($parent, $name) = explode(':', $parent);
@@ -238,6 +238,28 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
         return $carry;
       }, $carry);
     }, []);
+
+    $rename = [];
+
+    foreach ($fields as $parent => $fieldList) {
+      foreach ($fieldList as $field => $info) {
+        if (!array_key_exists($parent, $types)) {
+          continue;
+        }
+        foreach ($types[$parent]['definition']['interfaces'] as $interface) {
+          if (isset($fields[$interface][$field]) && $definitions[$fields[$interface][$field]['id']]['type'] != $definitions[$info['id']]['type']) {
+            $rename[$parent][$field] = TRUE;
+          }
+        }
+      }
+    }
+
+    foreach ($rename as $parent => $names) {
+      foreach (array_keys($names) as $name) {
+        $fields[$parent][$name . 'Of' . $parent] = $fields[$parent][$name];
+        unset($fields[$parent][$name]);
+      }
+    }
 
     // Only return fields for types that are actually fieldable.
     $fieldable = [GRAPHQL_TYPE_PLUGIN, GRAPHQL_INTERFACE_PLUGIN];
