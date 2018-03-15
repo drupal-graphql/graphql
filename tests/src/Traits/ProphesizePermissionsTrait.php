@@ -36,8 +36,6 @@ trait ProphesizePermissionsTrait {
 
   /**
    * Bypass user access.
-   *
-   * @before
    */
   protected function injectAccount() {
     // Replace the current user with a prophecy that has the defined
