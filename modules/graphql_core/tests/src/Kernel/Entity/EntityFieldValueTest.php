@@ -413,9 +413,9 @@ GQL;
           'display' => FALSE,
           'description' => 'description test 1',
           'entity' => [
-            'uri' => [
-              'value' => 'public://example.txt',
-            ],
+//            'uri' => [
+//              'value' => 'public://example.txt',
+//            ],
           ],
         ],
         [
@@ -423,9 +423,9 @@ GQL;
           'display' => TRUE,
           'description' => 'description test 2',
           'entity' => [
-            'uri' => [
-              'value' => 'public://example.png',
-            ],
+//            'uri' => [
+//              'value' => 'public://example.png',
+//            ],
           ],
         ],
       ],
@@ -437,9 +437,9 @@ GQL;
           'width' => 100,
           'height' => 50,
           'entity' => [
-            'uri' => [
-              'value' => 'public://example.txt',
-            ],
+//            'uri' => [
+//              'value' => 'public://example.txt',
+//            ],
           ],
         ],
         [
@@ -449,9 +449,9 @@ GQL;
           'width' => 200,
           'height' => 100,
           'entity' => [
-            'uri' => [
-              'value' => 'public://example.png',
-            ],
+//            'uri' => [
+//              'value' => 'public://example.png',
+//            ],
           ],
         ],
       ],
