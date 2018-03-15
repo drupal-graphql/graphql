@@ -97,7 +97,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
     $this->injectTypeSystemPluginManagers($this->container);
 
     PHPUnit_Framework_Error_Warning::$enabled = FALSE;
-    PHPUnit_Framework_Error_Notice::$enabled = FALSE;
 
     $this->injectAccount();
     $this->installConfig('system');
