@@ -410,18 +410,22 @@ GQL;
       'fieldFile' => [
         [
           'targetId' => 1,
-          'display' => 0,
+          'display' => FALSE,
           'description' => 'description test 1',
           'entity' => [
-            'uri' => 'public://example.txt',
+//            'uri' => [
+//              'value' => 'public://example.txt',
+//            ],
           ],
         ],
         [
           'targetId' => 2,
-          'display' => 1,
+          'display' => TRUE,
           'description' => 'description test 2',
           'entity' => [
-            'uri' => 'public://example.png',
+//            'uri' => [
+//              'value' => 'public://example.png',
+//            ],
           ],
         ],
       ],
@@ -433,7 +437,9 @@ GQL;
           'width' => 100,
           'height' => 50,
           'entity' => [
-            'uri' => 'public://example.txt',
+//            'uri' => [
+//              'value' => 'public://example.txt',
+//            ],
           ],
         ],
         [
@@ -443,7 +449,9 @@ GQL;
           'width' => 200,
           'height' => 100,
           'entity' => [
-            'uri' => 'public://example.png',
+//            'uri' => [
+//              'value' => 'public://example.png',
+//            ],
           ],
         ],
       ],

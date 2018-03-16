@@ -68,7 +68,7 @@ class EntityBundleDeriver extends DeriverBase implements ContainerDeriverInterfa
       }
 
       // Only create a bundle type for entity types that support bundles.
-      if (!$type->hasKey('bundle')) {
+      if (!$type->hasKey('bundle') || !array_key_exists($typeId, $bundles)) {
         continue;
       }
 
