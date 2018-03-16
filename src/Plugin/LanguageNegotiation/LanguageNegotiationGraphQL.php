@@ -2,7 +2,10 @@
 
 namespace Drupal\graphql\Plugin\LanguageNegotiation;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQLLanguageContext;
 use Drupal\language\LanguageNegotiationMethodBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -15,7 +18,36 @@ use Symfony\Component\HttpFoundation\Request;
  *   description = @Translation("The current GraphQL language context. Only available while executing a query.")
  * )
  */
-class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase {
+class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The graphql language context.
+   *
+   * @var \Drupal\graphql\GraphQLLanguageContext
+   */
+  protected $languageContext;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
+    $plugin_definition
+  ) {
+    return new static($container->get('graphql.language_context'));
+  }
+
+  /**
+   * LanguageNegotiationGraphQL constructor.
+   *
+   * @param \Drupal\graphql\GraphQLLanguageContext $languageContext
+   *   Instance of the GraphQL language context.
+   */
+  public function __construct(GraphQLLanguageContext $languageContext) {
+    $this->languageContext = $languageContext;
+  }
 
   /**
    * The language negotiation method id.
@@ -23,46 +55,10 @@ class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase {
   const METHOD_ID = 'language-graphql';
 
   /**
-   * The current langcode.
-   *
-   * @var string|null
-   */
-  protected static $currentLangcode;
-
-  /**
-   * State if the language context is currently active.
-   *
-   * @var bool
-   */
-  protected static $contextActive;
-
-  /**
-   * Set the current context language.
-   *
-   * @param string $langcode
-   *   The language to be set.
-   */
-  public static function setCurrentLanguage($langcode) {
-    \Drupal::languageManager()->reset();
-    static::$currentLangcode = $langcode;
-    static::$contextActive = TRUE;
-  }
-
-  /**
-   * Unset the current language.
-   */
-  public static function unsetCurrentLanguage() {
-    static::$currentLangcode = NULL;
-    static::$contextActive = FALSE;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getLangcode(Request $request = NULL) {
-    return static::$contextActive
-      ? (static::$currentLangcode ?: \Drupal::languageManager()->getDefaultLanguage()->getId())
-      : NULL;
+    return $this->languageContext->getCurrentLanguage();
   }
 
 }

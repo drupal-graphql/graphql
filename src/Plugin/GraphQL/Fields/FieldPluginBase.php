@@ -83,7 +83,10 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
     }
 
-    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+    return \Drupal::service('graphql.language_context')
+      ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
+        return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+      }, $context->getContext('language', $info));
   }
 
   /**
@@ -98,20 +101,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       });
     }
 
-    // Set the context language to the current language parameter.
-    LanguageNegotiationGraphQL::setCurrentLanguage($context->getContext('language', $info));
-
-    // Extract the result array.
-    try {
-      $result = iterator_to_array($result);
-    }
-    catch (\Exception $exc) {
-      throw $exc;
-    }
-    finally {
-      // In any case, set the language context back to null.
-      LanguageNegotiationGraphQL::unsetCurrentLanguage();
-    }
+    $result = iterator_to_array($result);
 
     // Only collect cache metadata if this is a query. All other operation types
     // are not cacheable anyways.
