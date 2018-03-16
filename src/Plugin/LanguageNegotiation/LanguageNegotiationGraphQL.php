@@ -58,6 +58,7 @@ class LanguageNegotiationGraphQL extends LanguageNegotiationMethodBase implement
    * {@inheritdoc}
    */
   public function getLangcode(Request $request = NULL) {
+    die('Hi Travis!');
     return $this->languageContext->getCurrentLanguage();
   }
 
