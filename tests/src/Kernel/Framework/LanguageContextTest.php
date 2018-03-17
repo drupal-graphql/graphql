@@ -64,10 +64,19 @@ class LanguageContextTest extends GraphQLTestBase {
    */
   public function testNegotiatorInjection() {
     $context = $this->container->get('graphql.language_context');
+    $negotiator = $this->container->get('language_negotiator');
 
-    $methods = $this->container->get('language_negotiator')
-      ->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
+    $methods = $negotiator->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
     $this->assertEquals('language-graphql', array_keys($methods)[0], 'GraphQL is not the first negotiator.');
+
+    $getEnabledNegotiators = new \ReflectionMethod(FixedLanguageNegotiator::class, 'getEnabledNegotiators');
+    $getEnabledNegotiators->setAccessible(TRUE);
+    $negotiators = $getEnabledNegotiators->invokeArgs($negotiator, [LanguageInterface::TYPE_INTERFACE]);
+
+    $this->assertEquals([
+      'language-graphql' => -999,
+      'language-url' => 0,
+    ], $negotiators);
 
     $result = $context->executeInLanguageContext(function () {
       return \Drupal::service('language_negotiator')->initializeType(LanguageInterface::TYPE_INTERFACE);
