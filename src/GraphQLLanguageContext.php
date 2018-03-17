@@ -72,7 +72,7 @@ class GraphQLLanguageContext {
     $this->languageManager->reset();
     // Extract the result array.
     try {
-      return $callable();
+      return call_user_func($callable);
     }
     catch (\Exception $exc) {
       throw $exc;
