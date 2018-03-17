@@ -30,6 +30,13 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   use DeprecatablePluginTrait;
 
   /**
+   * The language context service.
+   *
+   * @var \Drupal\graphql\GraphQLLanguageContext
+   */
+  protected $languageContext;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(SchemaBuilderInterface $builder, FieldPluginManager $manager, $definition, $id) {
@@ -45,13 +52,6 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       },
     ];
   }
-
-  /**
-   * The language context service.
-   *
-   * @var \Drupal\graphql\GraphQLLanguageContext
-   */
-  protected $languageContext;
 
   /**
    * Get the language context instance.
