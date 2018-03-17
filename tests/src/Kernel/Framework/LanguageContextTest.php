@@ -21,11 +21,11 @@ class LanguageContextTest extends GraphQLTestBase {
    */
   protected function setUp() {
     parent::setUp();
+    $this->installEntitySchema('configurable_language');
     $this->installConfig(['language']);
     $this->container->get('language_negotiator')
       ->setCurrentUser($this->accountProphecy->reveal());
 
-    $this->installEntitySchema('configurable_language');
     ConfigurableLanguage::create([
       'id' => 'fr',
       'weight' => 1,
@@ -58,11 +58,32 @@ class LanguageContextTest extends GraphQLTestBase {
   }
 
   /**
+   * Test that the test setup is correct.
+   */
+  public function testTestSetup() {
+    $this->assertTrue($this->container->get('language_manager')->isMultilingual(), 'Setup is not multilingual.');
+  }
+
+  /**
    * Test if the language negotiator is injected properly.
    */
   public function testNegotiatorInjection() {
     $methods = $this->container->get('language_negotiator')->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
-    $this->assertEquals('language-graphql', array_keys($methods)[0], 'GraphQL is the first negotiator.');
+    $this->assertEquals('language-graphql', array_keys($methods)[0], 'GraphQL is not the first negotiator.');
+  }
+
+  /**
+   * Test negotiator initialization.
+   */
+  public function testNegotiatorInitialization() {
+    $context = $this->container->get('graphql.language_context');
+
+    $result =$context->executeInLanguageContext(function () {
+      return $this->container->get('language_negotiator')->initializeType(LanguageInterface::TYPE_INTERFACE);
+    }, 'fr');
+
+    $this->assertEquals('language-graphql', array_keys($result)[0]);
+    $this->assertEquals('fr', $result['language-graphql']->getId());
   }
 
   /**
@@ -70,14 +91,6 @@ class LanguageContextTest extends GraphQLTestBase {
    */
   public function testLanguageContext() {
     $context = $this->container->get('graphql.language_context');
-
-    $this->assertEquals('en', $context->executeInLanguageContext(function () {
-      return \Drupal::service('graphql.language_context')->getCurrentLanguage();
-    }, NULL), 'Unexpected language context result.');
-
-    $this->assertEquals('en', $context->executeInLanguageContext(function () {
-      return \Drupal::service('graphql.language_context')->getCurrentLanguage();
-    }, 'en'), 'Unexpected language context result.');
 
     $this->assertEquals('fr', $context->executeInLanguageContext(function () {
       return \Drupal::service('graphql.language_context')->getCurrentLanguage();
@@ -89,14 +102,6 @@ class LanguageContextTest extends GraphQLTestBase {
    */
   public function testLanguageNegotiation() {
     $context = $this->container->get('graphql.language_context');
-
-    $this->assertEquals('en', $context->executeInLanguageContext(function () {
-      return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
-    }, NULL), 'Unexpected language negotiation result.');
-
-    $this->assertEquals('en', $context->executeInLanguageContext(function () {
-      return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
-    }, 'en'), 'Unexpected language negotiation result.');
 
     $this->assertEquals('fr', $context->executeInLanguageContext(function () {
       return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
