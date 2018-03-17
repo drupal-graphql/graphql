@@ -72,16 +72,35 @@ class LanguageContextTest extends GraphQLTestBase {
     $context = $this->container->get('graphql.language_context');
 
     $this->assertEquals('en', $context->executeInLanguageContext(function () {
-      return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
-    }, NULL));
+      return \Drupal::service('graphql.language_context')->getCurrentLanguage();
+    }, NULL), 'Unexpected language context result.');
+
+    $this->assertEquals('en', $context->executeInLanguageContext(function () {
+      return \Drupal::service('graphql.language_context')->getCurrentLanguage();
+    }, 'en'), 'Unexpected language context result.');
+
+    $this->assertEquals('fr', $context->executeInLanguageContext(function () {
+      return \Drupal::service('graphql.language_context')->getCurrentLanguage();
+    }, 'fr'), 'Unexpected language context result.');
+  }
+
+  /**
+   * Test the language negotiation within a context.
+   */
+  public function testLanguageNegotiation() {
+    $context = $this->container->get('graphql.language_context');
 
     $this->assertEquals('en', $context->executeInLanguageContext(function () {
       return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
-    }, 'en'));
+    }, NULL), 'Unexpected language negotiation result.');
+
+    $this->assertEquals('en', $context->executeInLanguageContext(function () {
+      return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
+    }, 'en'), 'Unexpected language negotiation result.');
 
     $this->assertEquals('fr', $context->executeInLanguageContext(function () {
       return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
-    }, 'fr'));
+    }, 'fr'), 'Unexpected language negotiation result.');
   }
 
   /**
