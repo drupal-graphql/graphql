@@ -18,7 +18,7 @@ class FixedLanguageNegotiator extends LanguageNegotiator {
    */
   protected function getEnabledNegotiators($type) {
     $negotiators = parent::getEnabledNegotiators($type);
-    asort($negotiators);
+    asort($negotiators, SORT_NUMERIC);
     return $negotiators;
   }
 

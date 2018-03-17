@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\LanguageNegotiator;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
@@ -58,32 +59,17 @@ class LanguageContextTest extends GraphQLTestBase {
   }
 
   /**
-   * Test that the test setup is correct.
-   */
-  public function testTestSetup() {
-    $this->assertTrue($this->container->get('language_manager')->isMultilingual(), 'Setup is not multilingual.');
-  }
-
-  /**
    * Test if the language negotiator is injected properly.
    */
   public function testNegotiatorInjection() {
-    $methods = $this->container->get('language_negotiator')->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
+    $methods = $this->container->get('language_negotiator')
+      ->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
     $this->assertEquals('language-graphql', array_keys($methods)[0], 'GraphQL is not the first negotiator.');
-  }
 
-  /**
-   * Test negotiator initialization.
-   */
-  public function testNegotiatorInitialization() {
-    $context = $this->container->get('graphql.language_context');
-
-    $result =$context->executeInLanguageContext(function () {
-      return $this->container->get('language_negotiator')->initializeType(LanguageInterface::TYPE_INTERFACE);
-    }, 'fr');
+    $result = $this->container->get('language_negotiator')
+      ->initializeType(LanguageInterface::TYPE_INTERFACE);
 
     $this->assertEquals('language-graphql', array_keys($result)[0]);
-    $this->assertEquals('fr', $result['language-graphql']->getId());
   }
 
   /**
