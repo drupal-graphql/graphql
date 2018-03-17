@@ -14,6 +14,7 @@ class GraphQLCoreTestBase extends GraphQLTestBase {
    */
   public static $modules = [
     'graphql_core',
+    'language',
     'user',
   ];
 

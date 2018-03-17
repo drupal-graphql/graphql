@@ -34,7 +34,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
   public static $modules = [
     'system',
     'user',
-    'language',
     'graphql',
   ];
 
