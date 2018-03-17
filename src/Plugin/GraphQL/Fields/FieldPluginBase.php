@@ -6,10 +6,8 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
-use Drupal\graphql\GraphQLLanguageContext;
 use Drupal\graphql\Plugin\FieldPluginInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
@@ -30,23 +28,6 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   use TypedPluginTrait;
   use ArgumentAwarePluginTrait;
   use DeprecatablePluginTrait;
-
-  /**
-   * The language context, for simulating active languages in fields.
-   *
-   * @var \Drupal\graphql\GraphQLLanguageContext
-   */
-  protected $languageContext;
-
-  /**
-   * Set the language context instance.
-   *
-   * @param \Drupal\graphql\GraphQLLanguageContext $languageContext
-   *   The language context instance.
-   */
-  public function setLanguageContext(GraphQLLanguageContext $languageContext) {
-    $this->languageContext = $languageContext;
-  }
 
   /**
    * {@inheritdoc}
@@ -102,7 +83,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
     }
 
-    return $this->languageContext
+    return \Drupal::service('graphql.language_context')
       ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
         return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
       }, $context->getContext('language', $info));
