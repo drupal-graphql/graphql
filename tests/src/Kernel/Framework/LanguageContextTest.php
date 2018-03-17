@@ -8,7 +8,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 /**
  * Test contextual language negotiation.
  */
-class LanguageNegotiationTest extends GraphQLTestBase {
+class LanguageContextTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
