@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @LanguageNegotiation(
  *   id = Drupal\graphql\Plugin\LanguageNegotiation\LanguageNegotiationGraphQL::METHOD_ID,
- *   weight = 12,
+ *   weight = -999,
  *   name = @Translation("GraphQL context"),
  *   description = @Translation("The current GraphQL language context. Only available while executing a query.")
  * )
