@@ -47,6 +47,26 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   }
 
   /**
+   * The language context service.
+   *
+   * @var \Drupal\graphql\GraphQLLanguageContext
+   */
+  protected $languageContext;
+
+  /**
+   * Get the language context instance.
+   *
+   * @return \Drupal\graphql\GraphQLLanguageContext
+   *   The language context service.
+   */
+  protected function getLanguageContext() {
+    if (!isset($this->languageContext)) {
+      $this->languageContext = \Drupal::service('graphql.language_context');
+    }
+    return $this->languageContext;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getDefinition() {
