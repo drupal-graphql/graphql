@@ -72,11 +72,19 @@ class LanguageContextTest extends GraphQLTestBase {
     $getEnabledNegotiators = new \ReflectionMethod(FixedLanguageNegotiator::class, 'getEnabledNegotiators');
     $getEnabledNegotiators->setAccessible(TRUE);
     $negotiators = $getEnabledNegotiators->invokeArgs($negotiator, [LanguageInterface::TYPE_INTERFACE]);
-
     $this->assertEquals([
       'language-graphql' => -999,
       'language-url' => 0,
     ], $negotiators);
+
+    $language = $context->executeInLanguageContext(function () use ($negotiator) {
+      $negotiateLanguage = new \ReflectionMethod(FixedLanguageNegotiator::class, 'negotiateLanguage');
+      $negotiateLanguage->setAccessible(TRUE);
+      return $negotiateLanguage->invokeArgs($negotiator, [LanguageInterface::TYPE_INTERFACE, 'language-graphql']);
+    }, 'fr');
+
+    $this->assertNotNull($language);
+    $this->assertEquals('fr', $language->getId());
 
     $result = $context->executeInLanguageContext(function () {
       return \Drupal::service('language_negotiator')->initializeType(LanguageInterface::TYPE_INTERFACE);
