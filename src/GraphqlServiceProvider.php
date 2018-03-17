@@ -8,7 +8,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 /**
  * GraphQL service provider.
  */
-class GraphQLServiceProvider extends ServiceProviderBase {
+class GraphqlServiceProvider extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}
