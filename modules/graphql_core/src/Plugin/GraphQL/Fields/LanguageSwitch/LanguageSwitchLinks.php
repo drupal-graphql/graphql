@@ -19,8 +19,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   name = "languageSwitchLinks",
  *   type = "[LanguageSwitchLink]",
  *   parents = {"InternalUrl"},
- *   arguments={
- *     "language": "LanguageId"
+ *   arguments = {
+ *     "language" = "LanguageId"
  *   },
  *   contextual_arguments = {"language"}
  * )
