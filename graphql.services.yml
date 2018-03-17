@@ -124,6 +124,7 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
+      - '@graphql.language_context'
       - '\Drupal\graphql\Plugin\FieldPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLField'
       - '%graphql.config%'

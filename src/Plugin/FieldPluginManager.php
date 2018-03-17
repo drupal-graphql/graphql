@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\graphql\GraphQLLanguageContext;
 
 class FieldPluginManager extends DefaultPluginManager {
 
@@ -15,6 +16,15 @@ class FieldPluginManager extends DefaultPluginManager {
    * @var \Drupal\graphql\Plugin\FieldPluginInterface[]
    */
   protected $instances;
+
+  /**
+   * The language context.
+   *
+   * Will be passed on to all plugin instances.
+   *
+   * @var \Drupal\graphql\GraphQLLanguageContext
+   */
+  protected $languageContext;
 
   /**
    * FieldPluginManager constructor.
@@ -28,6 +38,8 @@ class FieldPluginManager extends DefaultPluginManager {
    *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
+   * @param \Drupal\graphql\GraphQLLanguageContext $languageContext
+   *   The language context.
    * @param string|null $pluginInterface
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
@@ -40,10 +52,12 @@ class FieldPluginManager extends DefaultPluginManager {
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $cacheBackend,
+    GraphQLLanguageContext $languageContext,
     $pluginInterface,
     $pluginAnnotationName,
     array $config
   ) {
+
     parent::__construct(
       $pluginSubdirectory,
       $namespaces,
@@ -52,9 +66,20 @@ class FieldPluginManager extends DefaultPluginManager {
       $pluginAnnotationName
     );
 
+    $this->languageContext = $languageContext;
     $this->alterInfo('graphql_fields');
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($cacheBackend, 'fields', ['graphql']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstance($plugin_id, array $configuration = []) {
+    /** @var \Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase $plugin */
+    $plugin = parent::createInstance($plugin_id, $configuration);
+    $plugin->setLanguageContext($this->languageContext);
+    return $plugin;
   }
 
   /**
