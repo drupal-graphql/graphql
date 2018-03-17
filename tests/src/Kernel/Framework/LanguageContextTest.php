@@ -68,7 +68,9 @@ class LanguageContextTest extends GraphQLTestBase {
     $this->assertInstanceOf(FixedLanguageNegotiator::class, $negotiator);
 
     // Test if graphql is the first negotiator.
-    $methods = $negotiator->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
+    $methods = $context->executeInLanguageContext(function () use ($negotiator) {
+      return $negotiator->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
+    }, 'fr');
     $this->assertEquals('language-graphql', array_keys($methods)[0], 'GraphQL is not the first negotiator.');
 
     // Check if the order of negotiators is correct.
