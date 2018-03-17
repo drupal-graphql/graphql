@@ -16,10 +16,10 @@ class FixedLanguageNegotiator extends LanguageNegotiator {
   /**
    * {@inheritdoc}
    */
-//  protected function getEnabledNegotiators($type) {
-//    $negotiators = parent::getEnabledNegotiators($type);
-//    asort($negotiators, SORT_NUMERIC);
-//    return $negotiators;
-//  }
+  protected function getEnabledNegotiators($type) {
+    $negotiators = parent::getEnabledNegotiators($type);
+    asort($negotiators, SORT_NUMERIC);
+    return $negotiators;
+  }
 
 }
