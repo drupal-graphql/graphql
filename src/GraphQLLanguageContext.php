@@ -41,18 +41,6 @@ class GraphQLLanguageContext {
   }
 
   /**
-   * Set the current context language.
-   *
-   * @param string $langcode
-   *   The language to be set.
-   */
-  protected function setCurrentLanguage($langcode) {
-    $this->currentLanguage = $langcode;
-    $this->isActive = TRUE;
-    $this->languageManager->reset();
-  }
-
-  /**
    * Retrieve the current language.
    *
    * @return string|null
@@ -79,7 +67,9 @@ class GraphQLLanguageContext {
    *   Any exception caught while executing the callable.
    */
   public function executeInLanguageContext(callable $callable, $language) {
-    $this->setCurrentLanguage($language);
+    $this->currentLanguage = $language;
+    $this->isActive = TRUE;
+    $this->languageManager->reset();
     // Extract the result array.
     try {
       return $callable();
@@ -89,17 +79,10 @@ class GraphQLLanguageContext {
     }
     finally {
       // In any case, set the language context back to null.
-      $this->reset();
+      $this->currentLanguage = NULL;
+      $this->isActive = FALSE;
+      $this->languageManager->reset();
     }
-  }
-
-  /**
-   * Reset the context..
-   */
-  public function reset() {
-    $this->currentLanguage = NULL;
-    $this->isActive = FALSE;
-    $this->languageManager->reset();
   }
 
 }
