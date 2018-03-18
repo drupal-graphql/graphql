@@ -103,10 +103,29 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
     }
 
-    return \Drupal::service('graphql.language_context')
-      ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
-        return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-      }, $context->getContext('language', $info));
+    if ($this->isLanguageAwareField()) {
+      return $this->getLanguageContext()
+        ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
+          return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+        }, $context->getContext('language', $info));
+    }
+    else {
+      return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+    }
+  }
+
+  /**
+   * Indicator if the field is language aware.
+   *
+   * Checks for 'languages:*' cache contexts on the fields definition.
+   *
+   * @return bool
+   *   The fields language awareness status.
+   */
+  protected function isLanguageAwareField() {
+    return (boolean) count(array_filter($this->getPluginDefinition()['response_cache_contexts'], function ($context) {
+      return strpos($context, 'languages:') === 0;
+    }));
   }
 
   /**

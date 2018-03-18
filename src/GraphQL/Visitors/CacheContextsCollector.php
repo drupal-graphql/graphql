@@ -50,13 +50,6 @@ class CacheContextsCollector {
     if (is_callable($contexts)) {
       $contexts = $contexts();
     }
-    // Remove any language cache contexts.
-    // Since GraphQL imposes it's one language handler, language cache
-    // contexts never apply.
-    $contexts = array_filter($contexts, function ($context) {
-      return strpos($context, 'languages:') !== 0;
-    });
-
     return $contexts;
   }
 

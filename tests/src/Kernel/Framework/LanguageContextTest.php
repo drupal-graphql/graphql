@@ -2,8 +2,10 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\graphql\FixedLanguageNegotiator;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
@@ -32,7 +34,6 @@ class LanguageContextTest extends GraphQLTestBase {
       'weight' => 1,
     ])->save();
 
-
     $this->mockType('node', ['name' => 'Node']);
 
     $this->mockField('edge', [
@@ -54,6 +55,25 @@ class LanguageContextTest extends GraphQLTestBase {
       yield \Drupal::languageManager()->getCurrentLanguage()->getId();
     });
 
+    $this->mockField('unaware', [
+      'name' => 'unaware',
+      'parents' => ['Root', 'Node'],
+      'type' => 'String',
+    ], function () {
+      yield \Drupal::languageManager()->getCurrentLanguage()->getId();
+    });
+
+    $this->mockField('leaking', [
+      'name' => 'leaking',
+      'parents' => ['Root', 'Node'],
+      'type' => 'String',
+    ], function () {
+      yield new CacheableValue('leak', [
+        (new CacheableMetadata())->addCacheContexts([
+          'languages:language_interface',
+        ]),
+      ]);
+    });
 
     $this->container->get('router.builder')->rebuild();
   }
@@ -131,7 +151,7 @@ query {
 GQL;
     $this->assertResults($query, [], [
       'language' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
-    ], $this->defaultCacheMetaData());
+    ], $this->defaultCacheMetaData()->addCacheContexts(['languages:language_interface']));
 
   }
 
@@ -151,7 +171,7 @@ GQL;
       'edge' => [
         'language' => 'fr',
       ],
-    ], $this->defaultCacheMetaData());
+    ], $this->defaultCacheMetaData()->addCacheContexts(['languages:language_interface']));
   }
 
   /**
@@ -175,6 +195,53 @@ GQL;
         'edge' => [
           'language' => 'en',
         ],
+      ],
+    ], $this->defaultCacheMetaData()->addCacheContexts(['languages:language_interface']));
+  }
+
+  /**
+   * Test an language unaware field.
+   *
+   * If a field doesn't declare language cache contexts, the context is
+   * not inactive and the standard language negotiation should kick in.
+   */
+  public function testUnawareField() {
+    $query = <<<GQL
+query {
+  edge(language: "fr") {
+    unaware
+  }
+}
+GQL;
+
+    $this->assertResults($query, [], [
+      'edge' => [
+        'unaware' => 'en',
+      ],
+    ], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * Test a field that is leaking cache contexts.
+   *
+   * If the field yields a cacheable result with language cache contexts but
+   * it doesn't declare them, this indicates an error where the field might
+   * not handle languages correctly.
+   */
+  public function testLeakingField() {
+    $query = <<<GQL
+query {
+  edge(language: "fr") {
+    leaking
+  }
+}
+GQL;
+
+    // We expect a logic exception to be thrown.
+    $this->expectException(\LogicException::class);
+    $this->assertResults($query, [], [
+      'edge' => [
+        'leaking' => 'leak',
       ],
     ], $this->defaultCacheMetaData());
   }

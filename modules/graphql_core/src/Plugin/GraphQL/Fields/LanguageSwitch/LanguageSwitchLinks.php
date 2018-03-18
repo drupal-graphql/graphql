@@ -22,6 +22,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   arguments = {
  *     "language" = "LanguageId"
  *   },
+ *   response_cache_contexts = {
+ *     "languages:language_url",
+ *     "languages:language_interface",
+ *   },
  *   contextual_arguments = {"language"}
  * )
  */

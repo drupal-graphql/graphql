@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -22,7 +23,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   type = "Menu",
  *   arguments = {
  *     "name" = "String!"
- *   }
+ *   },
+ *   response_cache_contexts = {"languages:language_interface"}
  * )
  */
 class MenuByName extends FieldPluginBase implements ContainerFactoryPluginInterface {
