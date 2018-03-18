@@ -14,7 +14,6 @@ class GraphQLCoreTestBase extends GraphQLTestBase {
    */
   public static $modules = [
     'graphql_core',
-    'language',
     'user',
   ];
 
@@ -36,7 +35,6 @@ class GraphQLCoreTestBase extends GraphQLTestBase {
     parent::setUp();
     // User entity schema is required for the currentUserContext field.
     $this->installEntitySchema('user');
-    $this->container->get('language_negotiator')->setCurrentUser($this->accountProphecy->reveal());
   }
 
 }

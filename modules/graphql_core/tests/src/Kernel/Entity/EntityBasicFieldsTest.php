@@ -12,26 +12,6 @@ use DateTime;
  */
 class EntityBasicFieldsTest extends GraphQLContentTestBase {
 
-  public static $modules = [
-    'language',
-    'content_translation',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $this->container->get('content_translation.manager')->setEnabled('node', 'test', TRUE);
-
-    $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
-      'id' => 'fr',
-    ]);
-
-    $language->save();
-  }
-
   /**
    * Set the prophesized permissions.
    *

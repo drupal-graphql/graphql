@@ -30,11 +30,6 @@ class LanguageTest extends GraphQLCoreTestBase {
     $this->container->get('router.builder')->rebuild();
 
     ConfigurableLanguage::create([
-      'id' => 'fr',
-      'weight' => 1,
-    ])->save();
-
-    ConfigurableLanguage::create([
       'id' => 'es',
       'weight' => 2,
     ])->save();

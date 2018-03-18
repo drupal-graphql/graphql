@@ -23,6 +23,7 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'content_translation',
     'node',
     'field',
     'filter',
@@ -65,6 +66,9 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
     $this->createContentType([
       'type' => 'test',
     ]);
+
+    $this->container->get('content_translation.manager')
+      ->setEnabled('node', 'test', TRUE);
   }
 
   /**

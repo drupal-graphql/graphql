@@ -6,7 +6,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\graphql\FixedLanguageNegotiator;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
@@ -24,15 +23,6 @@ class LanguageContextTest extends GraphQLTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installEntitySchema('configurable_language');
-    $this->installConfig(['language']);
-    $this->container->get('language_negotiator')
-      ->setCurrentUser($this->accountProphecy->reveal());
-
-    ConfigurableLanguage::create([
-      'id' => 'fr',
-      'weight' => 1,
-    ])->save();
 
     $this->mockType('node', ['name' => 'Node']);
 
@@ -86,10 +76,6 @@ class LanguageContextTest extends GraphQLTestBase {
     $negotiator = $this->container->get('language_negotiator');
 
     $this->assertInstanceOf(FixedLanguageNegotiator::class, $negotiator);
-
-    // Test if graphql is the first negotiator.
-    $methods = $negotiator->getNegotiationMethods(LanguageInterface::TYPE_INTERFACE);
-    $this->assertEquals('language-graphql', array_keys($methods)[0], 'GraphQL is not the first negotiator.');
 
     // Check if the order of negotiators is correct.
     $getEnabledNegotiators = new \ReflectionMethod(FixedLanguageNegotiator::class, 'getEnabledNegotiators');
