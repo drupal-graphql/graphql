@@ -27,6 +27,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   secure = true,
  *   name = "entity",
  *   description = @Translation("The entity belonging to the current url."),
+ *   response_cache_contexts={"languages:language_content"},
  *   parents = {"EntityCanonicalUrl"},
  *   contextual_arguments={"language"},
  *   type = "Entity"

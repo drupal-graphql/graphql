@@ -268,6 +268,7 @@ GQL;
 
     $metadata->addCacheContexts([
       'languages:language_interface',
+      'languages:language_content',
       'user.node_grants:view',
     ]);
 
