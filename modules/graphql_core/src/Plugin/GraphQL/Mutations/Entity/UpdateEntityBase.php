@@ -23,17 +23,15 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  * * type - has to be "EntityCrudOutput:
  *
  * Example:
- * @GraphQLMutation(
- *   id = "publish_page",
- *   secure = true,
- *   name = "publishPage",
- *   type = "EntityCrudOutput",
- *   entity_type = "node",
- *   entity_bundle = "page",
- *   arguments = {
- *     "id" = "Int"
- *   }
- * )
+ * id = "publish_page",
+ * secure = true,
+ * name = "publishPage",
+ * type = "EntityCrudOutput",
+ * entity_type = "node",
+ * entity_bundle = "page",
+ * arguments = {
+ *   "id" = "Int"
+ * }
  */
 abstract class UpdateEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
