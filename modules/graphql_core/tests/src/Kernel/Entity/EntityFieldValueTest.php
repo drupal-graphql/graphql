@@ -65,12 +65,17 @@ query {
 GQL;
 
     $metadata = $this->defaultCacheMetaData();
+
+
     $metadata->addCacheTags([
       'config:field.storage.node.field_boolean',
       'entity_field_info',
     ]);
 
-    $metadata->addCacheContexts(['user.node_grants:view']);
+    $metadata->addCacheContexts([
+      'user.node_grants:view',
+      'languages:language_interface',
+    ]);
 
     $this->assertResults($query, [], [
       'node' => [
@@ -115,7 +120,10 @@ GQL;
       'entity_field_info',
     ]);
 
-    $metadata->addCacheContexts(['user.node_grants:view']);
+    $metadata->addCacheContexts([
+      'user.node_grants:view',
+      'languages:language_interface',
+    ]);
 
     $this->assertResults($query, [], [
       'node' => [
@@ -166,6 +174,9 @@ GQL;
     $metadata->addCacheTags([
       'config:field.storage.node.body',
       'entity_field_info',
+    ]);
+    $metadata->addCacheContexts([
+      'languages:language_interface',
     ]);
 
     $metadata->addCacheContexts(['user.node_grants:view']);
@@ -255,7 +266,11 @@ GQL;
       'file:2',
     ]);
 
-    $metadata->addCacheContexts(['user.node_grants:view']);
+    $metadata->addCacheContexts([
+      'languages:language_interface',
+      'languages:language_content',
+      'user.node_grants:view',
+    ]);
 
     $this->assertResults($this->getQueryFromFile('raw_field_values.gql'), [
       'path' => '/node/' . $node->id(),

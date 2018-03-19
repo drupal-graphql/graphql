@@ -244,8 +244,19 @@ services:
 
   # Buffers.
   graphql.buffer.entity:
-      class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
-      arguments: ['@entity_type.manager']
+    class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
+    arguments: ['@entity_type.manager']
   graphql.buffer.subrequest:
-      class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
-      arguments: ['@http_kernel', '@request_stack']
+    class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
+    arguments: ['@http_kernel', '@request_stack']
+
+  graphql.language_context:
+    class: Drupal\graphql\GraphQLLanguageContext
+    arguments: ['@language_manager']
+
+  graphql.config_factory_override:
+    class: Drupal\graphql\Config\GraphQLConfigOverrides
+    arguments: ['@config.storage']
+    tags:
+      - { name: config.factory.override, priority: -253 }
+

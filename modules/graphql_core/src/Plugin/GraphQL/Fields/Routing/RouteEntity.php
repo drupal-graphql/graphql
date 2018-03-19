@@ -15,6 +15,7 @@ use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -26,7 +27,9 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   secure = true,
  *   name = "entity",
  *   description = @Translation("The entity belonging to the current url."),
+ *   response_cache_contexts={"languages:language_content"},
  *   parents = {"EntityCanonicalUrl"},
+ *   contextual_arguments={"language"},
  *   type = "Entity"
  * )
  */
@@ -48,13 +51,6 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
   protected $languageManager;
 
   /**
-   * The sub-request buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
-   */
-  protected $subrequestBuffer;
-
-  /**
    * The entity repository service.
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
@@ -71,8 +67,7 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
       $pluginDefinition,
       $container->get('entity_type.manager'),
       $container->get('entity.repository'),
-      $container->get('language_manager'),
-      $container->get('graphql.buffer.subrequest')
+      $container->get('language_manager')
     );
   }
 
@@ -91,7 +86,6 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The entity repository service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
-   * @param \Drupal\graphql\GraphQL\Buffers\SubRequestBuffer $subrequestBuffer
    */
   public function __construct(
     array $configuration,
@@ -99,13 +93,11 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
     $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
-    LanguageManagerInterface $languageManager,
-    SubRequestBuffer $subrequestBuffer
+    LanguageManagerInterface $languageManager
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
     $this->languageManager = $languageManager;
-    $this->subrequestBuffer = $subrequestBuffer;
     $this->entityRepository = $entityRepository;
   }
 
@@ -164,21 +156,13 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return \Closure
+   * @return \Iterator
    */
   protected function resolveEntityTranslation(EntityInterface $entity, Url $url, array $args, ResolveInfo $info) {
-    $resolve = $this->subrequestBuffer->add($url, function () {
-      return $this->languageManager->getCurrentLanguage(Language::TYPE_CONTENT)->getId();
-    });
-
-    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $entity) {
-      /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
-      $response = $resolve();
-      $entity = $this->entityRepository->getTranslationFromContext($entity, $response->getValue());
-      $entity->addCacheableDependency($response);
-
-      return $this->resolveEntity($entity, $value, $args, $info);
-    };
+    if ($entity instanceof TranslatableInterface && isset($args['language'])) {
+      $entity = $entity->getTranslation($args['language']);
+    }
+    return $this->resolveEntity($entity, $url, $args, $info);
   }
 
   /**

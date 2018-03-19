@@ -7,6 +7,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -20,6 +21,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   arguments = {
  *     "id" = "String!"
  *   },
+ *   contextual_arguments = {"language"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityRevisionByIdDeriver"
  * )
  */
@@ -98,8 +100,8 @@ class EntityRevisionById extends FieldPluginBase implements ContainerFactoryPlug
     }
     /** @var \Drupal\Core\Access\AccessResultInterface $access */
     else if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
-      if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
-        $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+      if ($entity instanceof TranslatableInterface && isset($args['language']) && $args['language'] != $entity->language()->getId()) {
+        $entity = $entity->getTranslation($args['language']);
       }
 
       yield new CacheableValue($entity, [$access]);

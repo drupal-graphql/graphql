@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;

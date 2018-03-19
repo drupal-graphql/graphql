@@ -5,6 +5,7 @@ namespace Drupal\Tests\graphql\Kernel;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
 use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
@@ -34,6 +35,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   public static $modules = [
     'system',
     'user',
+    'language',
     'graphql',
   ];
 
@@ -102,6 +104,16 @@ abstract class GraphQLTestBase extends KernelTestBase {
     $this->installConfig('system');
     $this->installConfig('graphql');
     $this->mockSchema('default');
+
+    $this->installEntitySchema('configurable_language');
+    $this->installConfig(['language']);
+    $this->container->get('language_negotiator')
+      ->setCurrentUser($this->accountProphecy->reveal());
+
+    ConfigurableLanguage::create([
+      'id' => 'fr',
+      'weight' => 1,
+    ])->save();
   }
 
 }

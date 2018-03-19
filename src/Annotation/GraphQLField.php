@@ -2,8 +2,6 @@
 
 namespace Drupal\graphql\Annotation;
 
-use Drupal\Core\Cache\CacheBackendInterface;
-
 /**
  * Annotation for GraphQL field plugins.
  *
@@ -53,6 +51,16 @@ class GraphQLField extends GraphQLAnnotationBase {
    * @var array
    */
   public $arguments = [];
+
+  /**
+   * Contextual arguments.
+   *
+   * List of argument identifiers that will be merged with the current query
+   * context.
+   *
+   * @var string[]
+   */
+  public $contextual_arguments = [];
 
   /**
    * The deprecation reason or FALSE if the field is not deprecated.

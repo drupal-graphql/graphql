@@ -30,11 +30,6 @@ class LanguageTest extends GraphQLCoreTestBase {
     $this->container->get('router.builder')->rebuild();
 
     ConfigurableLanguage::create([
-      'id' => 'fr',
-      'weight' => 1,
-    ])->save();
-
-    ConfigurableLanguage::create([
       'id' => 'es',
       'weight' => 2,
     ])->save();
@@ -106,12 +101,16 @@ class LanguageTest extends GraphQLCoreTestBase {
   public function testLanguageSwitchLinks() {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->addCacheContexts(['languages:language_url', 'languages:language_interface']);
     $metadata->addCacheTags([
       'config:language.entity.en',
       'config:language.entity.es',
       'config:language.entity.fr',
       'config:language.entity.pt-br',
+    ]);
+
+    $metadata->addCacheContexts([
+      'languages:language_interface',
+      'languages:language_url',
     ]);
 
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [

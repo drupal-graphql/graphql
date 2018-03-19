@@ -53,7 +53,7 @@ abstract class GraphQLAnnotationBase extends Plugin {
    *
    * @var array
    */
-  public $schema_cache_contexts = ['languages:language_interface'];
+  public $schema_cache_contexts = [];
 
   /**
    * The cache tags for caching the type system definition in the schema.

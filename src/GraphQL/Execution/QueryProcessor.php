@@ -535,7 +535,10 @@ class QueryProcessor {
    * @return string
    */
   protected function cacheIdentifier(OperationParams $params, DocumentNode $document, CacheableMetadata $metadata) {
-    $contexts = $metadata->getCacheContexts();
+    // Ignore language contexts since they are handled by graphql internally.
+    $contexts = array_filter($metadata->getCacheContexts(), function ($context) {
+      return strpos($context, 'languages:') !== 0;
+    });
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
 
     // Sorting the variables will cause fewer cache vectors.

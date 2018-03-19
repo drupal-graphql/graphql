@@ -23,17 +23,12 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'content_translation',
     'node',
     'field',
     'filter',
     'text',
   ];
-
-  protected function defaultCacheContexts() {
-    return array_merge([
-      'languages:language_content',
-    ], parent::defaultCacheContexts());
-  }
 
   /**
    * {@inheritdoc}
@@ -71,6 +66,9 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
     $this->createContentType([
       'type' => 'test',
     ]);
+
+    $this->container->get('content_translation.manager')
+      ->setEnabled('node', 'test', TRUE);
   }
 
   /**

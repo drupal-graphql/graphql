@@ -19,10 +19,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   description = @Translation("The translated url object."),
  *   type = "Url",
  *   parents = {"Url"},
- *   response_cache_contexts={"languages:language_url"},
  *   arguments = {
  *     "language" = "LanguageId!"
- *   }
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class Translate extends FieldPluginBase implements ContainerFactoryPluginInterface {

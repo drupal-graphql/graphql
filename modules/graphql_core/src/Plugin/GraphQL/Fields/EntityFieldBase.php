@@ -3,6 +3,9 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -29,6 +32,10 @@ class EntityFieldBase extends FieldPluginBase {
       $type = $type instanceof WrappingType ? $type->getWrappedType(TRUE) : $type;
       if ($type instanceof ScalarType) {
         $result = $type->serialize($result);
+      }
+
+      if ($result instanceof ContentEntityInterface && $result->isTranslatable() && $language = $context->getContext('language', $info)) {
+        $result = $result->getTranslation($language);
       }
 
       return $result;

@@ -12,24 +12,6 @@ use DateTime;
  */
 class EntityBasicFieldsTest extends GraphQLContentTestBase {
 
-  public static $modules = [
-    'language',
-    'content_translation',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    $language = $this->container->get('entity.manager')->getStorage('configurable_language')->create([
-      'id' => 'fr',
-    ]);
-
-    $language->save();
-  }
-
   /**
    * Set the prophesized permissions.
    *
@@ -79,10 +61,9 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
         'entityLabel' => $user->label(),
       ],
       // TODO: Fix this.
-      'entityTranslation' => NULL,
-//      'entityTranslation' => [
-//         'entityLabel' => $translation->label(),
-//      ],
+      'entityTranslation' => [
+        'entityLabel' => $translation->label(),
+      ],
       'entityPublished' => TRUE,
       'entityCreated' => $created,
       'entityChanged' => $changed,
@@ -96,7 +77,6 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts([
-//      'languages:language_content',
       'user.node_grants:view',
     ]);
 

@@ -19,6 +19,10 @@ class RouteEntityTest extends GraphQLContentTestBase {
 
     $node->save();
 
+    $node->addTranslation('fr', [
+      'title' => 'Node A french',
+    ])->save();
+
     $query = $this->getQueryFromFile('route_entity.gql');
     $vars = ['path' => '/node/' . $node->id()];
 
@@ -29,7 +33,10 @@ class RouteEntityTest extends GraphQLContentTestBase {
       'node:1',
     ]);
 
-    $metadata->addCacheContexts(['user.node_grants:view']);
+    $metadata->addCacheContexts([
+      'user.node_grants:view',
+      'languages:language_content',
+    ]);
 
     $this->assertResults($query, $vars, [
       'route' => [

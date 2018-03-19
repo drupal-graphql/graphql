@@ -7,7 +7,6 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,10 +19,14 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   name = "languageSwitchLinks",
  *   type = "[LanguageSwitchLink]",
  *   parents = {"InternalUrl"},
+ *   arguments = {
+ *     "language" = "LanguageId"
+ *   },
  *   response_cache_contexts = {
  *     "languages:language_url",
- *     "languages:language_interface"
- *   }
+ *     "languages:language_interface",
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPluginInterface {
@@ -75,29 +78,23 @@ class LanguageSwitchLinks extends FieldPluginBase implements ContainerFactoryPlu
    */
   protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof Url) {
-      $resolve = $this->subRequestBuffer->add($value, function (Url $url) {
-        $links = $this->languageManager->getLanguageSwitchLinks(LanguageInterface::TYPE_URL, $url);
-        $current = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL);
 
-        return [$current, $links];
-      });
+      $links = $this->languageManager->getLanguageSwitchLinks(LanguageInterface::TYPE_URL, $value);
+      $current = $this->languageManager->getLanguage($args['language']);
+      if (!$current) {
+        $current = $this->languageManager->getDefaultLanguage();
+      }
 
-      return function () use ($resolve) {
-        /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
-        $response = $resolve();
-        list($current, $links) = $response->getValue();
-
-        if (!empty($links->links)) {
-          foreach ($links->links as $link) {
-            // Yield the link array and the language object of the language
-            // context resolved from the sub-request.
-            yield new CacheableValue([
-              'link' => $link,
-              'context' => $current,
-            ], [$response]);
-          }
+      if (!empty($links->links)) {
+        foreach ($links->links as $link) {
+          // Yield the link array and the language object of the language
+          // context resolved from the sub-request.
+          yield [
+            'link' => $link,
+            'context' => $current,
+          ];
         }
-      };
+      }
     }
   }
 

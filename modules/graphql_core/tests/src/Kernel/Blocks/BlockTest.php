@@ -67,10 +67,6 @@ class BlockTest extends GraphQLCoreTestBase {
     $query = $this->getQueryFromFile('Blocks/blocks.gql');
     $metadata = $this->defaultCacheMetaData();
 
-    $metadata->addCacheContexts([
-      'languages:language_content',
-    ]);
-
     // TODO: Check cache metadata.
     $metadata->addCacheTags([
       'config:block_list',
@@ -78,6 +74,10 @@ class BlockTest extends GraphQLCoreTestBase {
       'config:block.block.stark_powered',
       'config:field.storage.block_content.body',
       'entity_field_info',
+    ]);
+
+    $metadata->addCacheContexts([
+      'languages:language_interface',
     ]);
 
     $this->assertResults($query, [], [

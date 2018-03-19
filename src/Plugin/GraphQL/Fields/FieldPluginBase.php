@@ -15,6 +15,7 @@ use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
+use Drupal\graphql\Plugin\LanguageNegotiation\LanguageNegotiationGraphQL;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ListOfType;
@@ -27,6 +28,13 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   use TypedPluginTrait;
   use ArgumentAwarePluginTrait;
   use DeprecatablePluginTrait;
+
+  /**
+   * The language context service.
+   *
+   * @var \Drupal\graphql\GraphQLLanguageContext
+   */
+  protected $languageContext;
 
   /**
    * {@inheritdoc}
@@ -43,6 +51,19 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
         return $instance->resolve($value, $args, $context, $info);
       },
     ];
+  }
+
+  /**
+   * Get the language context instance.
+   *
+   * @return \Drupal\graphql\GraphQLLanguageContext
+   *   The language context service.
+   */
+  protected function getLanguageContext() {
+    if (!isset($this->languageContext)) {
+      $this->languageContext = \Drupal::service('graphql.language_context');
+    }
+    return $this->languageContext;
   }
 
   /**
@@ -64,15 +85,47 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * {@inheritdoc}
    */
   public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $definition = $this->getPluginDefinition();
+
     // If not resolving in a trusted environment, check if the field is secure.
     if (!$context->getGlobal('development', FALSE) && !$context->getGlobal('bypass field security', FALSE)) {
-      $definition = $this->getPluginDefinition();
       if (empty($definition['secure'])) {
         throw new \Exception(sprintf("Unable to resolve insecure field '%s'.", $info->fieldName));
       }
     }
 
-    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+    foreach ($definition['contextual_arguments'] as $argument) {
+      if (array_key_exists($argument, $args) && !is_null($args[$argument])) {
+        $context->setContext($argument, $args[$argument], $info);
+      }
+      else {
+        $args[$argument] = $context->getContext($argument, $info);
+      }
+    }
+
+    if ($this->isLanguageAwareField()) {
+      return $this->getLanguageContext()
+        ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
+          return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+        }, $context->getContext('language', $info));
+    }
+    else {
+      return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+    }
+  }
+
+  /**
+   * Indicator if the field is language aware.
+   *
+   * Checks for 'languages:*' cache contexts on the fields definition.
+   *
+   * @return bool
+   *   The fields language awareness status.
+   */
+  protected function isLanguageAwareField() {
+    return (boolean) count(array_filter($this->getPluginDefinition()['response_cache_contexts'], function ($context) {
+      return strpos($context, 'languages:') === 0;
+    }));
   }
 
   /**
@@ -80,13 +133,13 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
     $result = $callback($value, $args, $context, $info);
+
     if (is_callable($result)) {
       return new Deferred(function () use ($result, $value, $args, $context, $info) {
         return $this->resolveDeferred($result, $value, $args, $context, $info);
       });
     }
 
-    // Extract the result array.
     $result = iterator_to_array($result);
 
     // Only collect cache metadata if this is a query. All other operation types

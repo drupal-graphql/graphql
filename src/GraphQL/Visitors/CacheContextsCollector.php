@@ -48,9 +48,9 @@ class CacheContextsCollector {
    */
   protected function collectCacheContexts($contexts) {
     if (is_callable($contexts)) {
-      return $contexts();
+      $contexts = $contexts();
     }
-
     return $contexts;
   }
+
 }

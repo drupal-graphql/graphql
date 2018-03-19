@@ -28,7 +28,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   parents = {"EntityQueryResult"},
  *   arguments = {
  *     "language" = "LanguageId"
- *   }
+ *   },
+ *   contextual_arguments = {"language"}
  * )
  */
 class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPluginInterface {
@@ -195,7 +196,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
     foreach ($entities as $entity) {
       // Translate the entity if it is translatable and a language was given.
       if ($language && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
-        $entity = $this->entityRepository->getTranslationFromContext($entity, $language);
+        yield $entity->getTranslation($language);
       }
 
       $access = $entity->access('view', NULL, TRUE);

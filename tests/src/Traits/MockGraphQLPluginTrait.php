@@ -118,7 +118,7 @@ trait MockGraphQLPluginTrait {
       $decoratedProp->setAccessible(TRUE);
       $unwrappedDiscovery = $decoratedProp->getValue($discovery);
 
-      $this->graphQLPlugins[$id] = [];
+      $this->graphQLPlugins[$class] = [];
 
       $mockFactory = $this
         ->getMockBuilder(FactoryInterface::class)

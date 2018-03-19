@@ -2,15 +2,15 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
+use Drupal\language\LanguageNegotiator;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Retrieve a route object based on a path.
@@ -36,6 +36,13 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   protected $pathValidator;
 
   /**
+   * The language negotiator service.
+   *
+   * @var \Drupal\language\LanguageNegotiator
+   */
+  protected $languageNegotiator;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -43,7 +50,8 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('path.validator')
+      $container->get('path.validator'),
+      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL
     );
   }
 
@@ -58,10 +66,19 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The plugin definition.
    * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
+   * @param \Drupal\language\LanguageNegotiator|null $languageNegotiator
+   *   The language negotiator.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, PathValidatorInterface $pathValidator) {
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    PathValidatorInterface $pathValidator,
+    $languageNegotiator
+  ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
+    $this->languageNegotiator = $languageNegotiator;
   }
 
   /**
@@ -69,7 +86,16 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($args['path'])) && $url->access()) {
+
+      // For now we just take the "url" negotiator into account.
+      if ($this->languageNegotiator) {
+        if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
+          $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
+        }
+      }
+
       yield $url;
+
     }
     else {
       yield (new CacheableValue(NULL))->addCacheTags(['4xx-response']);

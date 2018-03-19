@@ -12,14 +12,6 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 class EntityByIdTest extends GraphQLContentTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'language',
-    'content_translation',
-  ];
-
-  /**
    * The added French language.
    *
    * @var string
@@ -41,10 +33,6 @@ class EntityByIdTest extends GraphQLContentTestBase {
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $languageStorage */
     $languageStorage = $this->container->get('entity.manager')->getStorage('configurable_language');
-    $language = $languageStorage->create([
-      'id' => $this->frenchLangcode,
-    ]);
-    $language->save();
 
     $language = $languageStorage->create([
       'id' => $this->chineseSimplifiedLangcode,
