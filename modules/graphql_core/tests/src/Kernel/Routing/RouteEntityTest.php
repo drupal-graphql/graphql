@@ -19,6 +19,10 @@ class RouteEntityTest extends GraphQLContentTestBase {
 
     $node->save();
 
+    $node->addTranslation('fr', [
+      'title' => 'Node A french',
+    ])->save();
+
     $query = $this->getQueryFromFile('route_entity.gql');
     $vars = ['path' => '/node/' . $node->id()];
 
