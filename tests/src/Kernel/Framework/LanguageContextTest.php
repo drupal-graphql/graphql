@@ -213,6 +213,8 @@ GQL;
    * If the field yields a cacheable result with language cache contexts but
    * it doesn't declare them, this indicates an error where the field might
    * not handle languages correctly.
+   *
+   * @expectedException \LogicException
    */
   public function testLeakingField() {
     $query = <<<GQL
@@ -224,7 +226,6 @@ query {
 GQL;
 
     // We expect a logic exception to be thrown.
-    $this->expectException(\LogicException::class);
     $this->assertResults($query, [], [
       'edge' => [
         'leaking' => 'leak',
