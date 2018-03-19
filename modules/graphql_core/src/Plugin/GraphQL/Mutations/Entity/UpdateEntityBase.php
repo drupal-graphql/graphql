@@ -3,6 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -12,6 +13,28 @@ use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Youshido\GraphQL\Execution\ResolveInfo;
 
+/**
+ * Entity update mutation base class.
+ *
+ * Required annotation fields:
+ * * entity_type - type of the edited entity (eg. node)
+ * * entity_bundle - bundle of the edited entity (eg. page)
+ * * id - id of the edited entity
+ * * type - has to be "EntityCrudOutput:
+ *
+ * Example:
+ * @GraphQLMutation(
+ *   id = "publish_page",
+ *   secure = true,
+ *   name = "publishPage",
+ *   type = "EntityCrudOutput",
+ *   entity_type = "node",
+ *   entity_bundle = "page",
+ *   arguments = {
+ *     "id" = "Int"
+ *   }
+ * )
+ */
 abstract class UpdateEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
   use StringTranslationTrait;
@@ -73,7 +96,7 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
     // The raw input needs to be converted to use the proper field and property
     // keys because we usually convert them to camel case when adding them to
     // the schema. Allow the other implementations to control this easily.
-    $input = $this->extractEntityInput($args, $info);
+    $input = $this->extractEntityInput($args, $info, $entity);
 
     try {
       foreach ($input as $key => $value) {
@@ -106,10 +129,12 @@ abstract class UpdateEntityBase extends MutationPluginBase implements ContainerF
    *   The entity values provided through the resolver args.
    * @param \Youshido\GraphQL\Execution\ResolveInfo $info
    *   The resolve info object.
+   * @param EntityInterface $entity
+   *   The entity that will be updated.
    *
    * @return array
    *   The extracted entity values with their proper, internal field names.
    */
-  abstract protected function extractEntityInput(array $args, ResolveInfo $info);
+  abstract protected function extractEntityInput(array $args, ResolveInfo $info, EntityInterface $entity);
 
 }
