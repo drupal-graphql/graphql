@@ -72,9 +72,14 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
     }
 
     if ($fieldDefinition instanceof FieldStorageConfigInterface) {
-      return array_values(array_map(function ($bundleId) use ($entityTypeId) {
-        return StringHelper::camelCase($entityTypeId, $bundleId);
-      }, $fieldDefinition->getBundles()));
+      if ($fieldDefinition->getEntityType()->hasKey('bundle')) {
+        return array_values(array_map(function ($bundleId) use ($entityTypeId) {
+          return StringHelper::camelCase($entityTypeId, $bundleId);
+        }, $fieldDefinition->getBundles()));
+      }
+      else {
+        return [StringHelper::camelCase($entityTypeId)];
+      }
     }
 
     return [];
