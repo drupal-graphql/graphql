@@ -281,5 +281,28 @@ public function resolveValues($value, $args, ResolveContext $context, ResolveInf
 }
 ```
 
+### Mutations: extractEntityInput
+The mutation plugins resolve methods receive an additional argument of type `ResolveContext` and `$value`, that can be used to pass information to children down the query tree.
+
+If your field plugins have strict method annotations and a signature that accepts two parameters like this:
+```php
+public function extractEntityInput(array $args, ResolveInfo $info) {
+...
+}
+```
+
+They have to be changed to:
+```php
+public function extractEntityInput($value, array $args, ResolveContext $context, ResolveInfo $info) {
+...
+}
+```
+
+Change/Amend the use statements for those classes like so:
+```
+use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
+```
+
 ### Processors and persisted Queries
 The interfaces for the `QueryProcessor` and `QueryProvider` changed slightly. The `QueryProcessor` doesn’t accept a pair of `$query` and `$variables` any more, but an object of type `OperationParams`. The `QueryProviders` `$id` and `$version` arguments have been merged into one `$id` argument that has to contain both.
