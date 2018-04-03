@@ -21,7 +21,7 @@ A few examples of where the GraphQL module could be used:
 
 1. Familiarize yourself with the GraphQL language. The official GraphQL docs are very well written. 
 http://graphql.org/learn/
-2. Install the module and enable GraphQL, this will also enable GraphQL Core
+2. Install the module and enable GraphQL, as well as GraphQL Core (machine names are `graphql` and `graphql_core` respectively).
 
 3. Login and navigate to `/graphql/explorer` 
 (Configuration > Web Services > GraphQL > Schemas > Explorer)
