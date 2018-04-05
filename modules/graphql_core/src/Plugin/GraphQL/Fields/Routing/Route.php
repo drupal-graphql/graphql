@@ -83,19 +83,39 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * Execute routing in language context.
+   *
+   * Language context has to be inferred from the path prefix, but set before
+   * `resolveValues` is invoked.
+   */
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    // For now we just take the "url" negotiator into account.
+    if ($this->languageNegotiator) {
+      if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
+        $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
+      }
+    }
+
+    return parent::resolve($value, $args, $context, $info);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Route field is always language aware since it sets it's context from
+   * the prefix.
+   */
+  protected function isLanguageAwareField() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($args['path'])) && $url->access()) {
-
-      // For now we just take the "url" negotiator into account.
-      if ($this->languageNegotiator) {
-        if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
-          $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
-        }
-      }
-
       yield $url;
-
     }
     else {
       yield (new CacheableValue(NULL))->addCacheTags(['4xx-response']);
