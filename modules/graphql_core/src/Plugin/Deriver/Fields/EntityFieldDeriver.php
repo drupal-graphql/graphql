@@ -13,7 +13,7 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
    * {@inheritdoc}
    */
   protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition) {
-    if (!$propertyDefinitions = $fieldDefinition->getPropertyDefinitions()) {
+    if (!$propertyDefinitions = $this->getAccessiblePropertyDefinitions($fieldDefinition)) {
       return [];
     }
 

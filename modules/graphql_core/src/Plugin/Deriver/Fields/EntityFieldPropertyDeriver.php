@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\EntityTypeDeriverBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -59,7 +60,7 @@ class EntityFieldPropertyDeriver extends DeriverBase implements ContainerDeriver
     $parents = [];
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
       $interfaces = class_implements($entityType->getClass());
-      if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
+      if (!array_key_exists(FieldableEntityInterface::class, $interfaces) || !EntityTypeDeriverBase::isAccessibleEntityType($entityType)) {
         continue;
       }
 

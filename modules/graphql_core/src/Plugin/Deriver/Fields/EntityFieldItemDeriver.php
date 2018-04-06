@@ -14,7 +14,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
    * {@inheritdoc}
    */
   protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition, $bundleId = NULL) {
-    if (!$propertyDefinitions = $fieldDefinition->getPropertyDefinitions()) {
+    if (!$propertyDefinitions = $this->getAccessiblePropertyDefinitions($fieldDefinition)) {
       return [];
     }
 

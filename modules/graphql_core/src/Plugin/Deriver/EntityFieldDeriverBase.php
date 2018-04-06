@@ -10,6 +10,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\TypedData\DataDefinitionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,6 +24,8 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
    *
    * @param string $entityTypeId
    *   The host entity type.
+   * @param string $bundle
+   *   The host bundle.
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $fieldDefinition
    *   Field definition object.
    * @param array $basePluginDefinition
@@ -31,7 +34,7 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
    * @return array
    *   The derived plugin definitions for the given field.
    */
-  abstract protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition);
+  abstract protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, $bundle, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition);
 
   /**
    * The entity type manager.
@@ -114,6 +117,21 @@ abstract class EntityFieldDeriverBase extends DeriverBase implements ContainerDe
     }
 
     return $this->derivatives;
+  }
+
+  /**
+   * Get accessible (non-internal) properties of a field.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $fieldStorageDefinition
+   *   The field storage definition.
+   *
+   * @return DataDefinitionInterface[]
+   *   The property data definitions.
+   */
+  protected function getAccessiblePropertyDefinitions(FieldStorageDefinitionInterface $fieldStorageDefinition) {
+    return array_filter($fieldStorageDefinition->getPropertyDefinitions(), function (DataDefinitionInterface $definition) {
+      return !method_exists($definition, 'isInternal') || !$definition->isInternal();
+    });
   }
 
 }

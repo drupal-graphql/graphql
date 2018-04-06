@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\EntityTypeDeriverBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityRenderedDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -42,7 +43,7 @@ class EntityRenderedDeriver extends DeriverBase implements ContainerDeriverInter
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      if ($type instanceof ContentEntityTypeInterface) {
+      if ($type instanceof ContentEntityTypeInterface && EntityTypeDeriverBase::isAccessibleEntityType($type)) {
         $derivative = [
           'parents' => [StringHelper::camelCase($id)],
           'description' => $this->t("Renders '@type' entities in the given view mode.", ['@type' => $type->getLabel()]),

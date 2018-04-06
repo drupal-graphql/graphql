@@ -16,7 +16,7 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
    */
   protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition) {
     // Only create a type for fields with at least two properties.
-    $propertyDefinitions = $fieldDefinition->getPropertyDefinitions();
+    $propertyDefinitions = $this->getAccessiblePropertyDefinitions($fieldDefinition);
     if (count($propertyDefinitions) <= 1) {
       return [];
     }

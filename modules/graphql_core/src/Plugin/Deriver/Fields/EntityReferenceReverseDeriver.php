@@ -11,6 +11,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\EntityTypeDeriverBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -74,7 +75,7 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
       $interfaces = class_implements($entityType->getClass());
-      if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
+      if (!array_key_exists(FieldableEntityInterface::class, $interfaces) || !EntityTypeDeriverBase::isAccessibleEntityType($entityType)) {
         continue;
       }
 

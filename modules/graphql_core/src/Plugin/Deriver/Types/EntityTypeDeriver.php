@@ -15,7 +15,7 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $typeId => $type) {
-      if (!($type instanceof ContentEntityTypeInterface)) {
+      if (!($type instanceof ContentEntityTypeInterface && $this->isAccessibleEntityType($type))) {
         continue;
       }
 

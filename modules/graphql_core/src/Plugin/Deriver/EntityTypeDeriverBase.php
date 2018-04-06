@@ -65,4 +65,17 @@ abstract class EntityTypeDeriverBase extends DeriverBase implements ContainerDer
     return array_unique($interfaces);
   }
 
+  /**
+   * Check if an entity type is accessible.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $type
+   *   The entity type to check.
+   *
+   * @return bool
+   *   TRUE if the type is not internal.
+   */
+  public static function isAccessibleEntityType(EntityTypeInterface $type) {
+    return !method_exists($type, 'isInternal' || !$type->isInternal());
+  }
+
 }
