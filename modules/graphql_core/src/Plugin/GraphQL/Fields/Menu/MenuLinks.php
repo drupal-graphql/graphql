@@ -22,7 +22,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   secure = true,
  *   name = "links",
  *   type = "[MenuLink]",
- *   parents = {"Menu"}
+ *   parents = {"Menu"},
+ *   response_cache_contexts = {"languages:language_url"}
  * )
  */
 class MenuLinks extends FieldPluginBase implements ContainerFactoryPluginInterface {

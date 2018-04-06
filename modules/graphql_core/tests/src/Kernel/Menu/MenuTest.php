@@ -80,6 +80,7 @@ class MenuTest extends GraphQLCoreTestBase {
 
     $metadata->addCacheContexts([
       "languages:language_interface",
+      "languages:language_url",
     ]);
 
     $this->assertResults(
