@@ -32,9 +32,7 @@ query ($path: String!) {
           fieldText {
             value
           }
-          fieldBoolean {
-            value
-          }
+          fieldBoolean
           fieldLink {
             title
             uri
@@ -49,35 +47,25 @@ query ($path: String!) {
             }
 
           }
-          fieldInteger {
-            value
-          }
-          fieldFloat {
-            value
-          }
-          fieldDecimal {
-            value
-          }
+          fieldInteger
+          fieldFloat
+          fieldDecimal
           fieldDatetime {
             value
           }
-          fieldTimestamp {
-            value
-          }
-          fieldEmail {
-            value
-          }
-          fieldString {
-            value
-          }
+          fieldTimestamp
+          fieldEmail
+          fieldString
           fieldReference {
             targetId
             entity {
-              title
-              fieldReference {
-                targetId
-                entity {
-                  title
+              ... on NodeTest {
+                title
+                fieldReference {
+                  targetId
+                  entity {
+                    title
+                  }
                 }
               }
             }
@@ -88,7 +76,9 @@ query ($path: String!) {
             description
             entity {
               url
-              uri
+#              uri {
+#                value
+#              }
             }
           }
           fieldImage {
@@ -99,7 +89,9 @@ query ($path: String!) {
             height
             entity {
               url
-              uri
+#              uri {
+#                value
+#              }
             }
           }
         }

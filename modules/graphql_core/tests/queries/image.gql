@@ -2,18 +2,20 @@ query ($path: String!) {
   route:route(path: $path) {
     ... on EntityCanonicalUrl {
       node:entity {
-        image {
-          alt
-          title
-          width
-          height
-          entity {
-            url
-          }
-          thumbnailImage:derivative(style: thumbnail) {
+        ... on NodeTest {
+          image {
+            alt
+            title
             width
             height
-            url
+            entity {
+              url
+            }
+            thumbnailImage:derivative(style: THUMBNAIL) {
+              width
+              height
+              url
+            }
           }
         }
       }

@@ -24,7 +24,7 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
         continue;
       }
 
-      $this->derivatives[$typeId] = [
+      $derivative = [
         'name' => StringHelper::camelCase($typeId),
         'description' => $this->t("The '@type' entity type.", [
           '@type' => $type->getLabel(),
@@ -33,6 +33,13 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
         'interfaces' => $this->getInterfaces($type, $basePluginDefinition),
         'entity_type' => $typeId,
       ] + $basePluginDefinition;
+
+      if ($typeId === 'node') {
+        // TODO: Make this more generic somehow.
+        $derivative['response_cache_contexts'][] = 'user.node_grants:view';
+      }
+
+      $this->derivatives[$typeId] = $derivative;
     }
 
     return parent::getDerivativeDefinitions($basePluginDefinition);

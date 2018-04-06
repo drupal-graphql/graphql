@@ -66,6 +66,11 @@ class EntityQueryDeriver extends DeriverBase implements ContainerDeriverInterfac
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
+        if ($id === 'node') {
+          // TODO: Make this more generic.
+          $derivative['response_cache_contexts'][] = 'user.node_grants:view';
+        }
+
         $this->derivatives[$id] = $derivative;
       }
     }

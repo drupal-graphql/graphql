@@ -5,8 +5,9 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery\EntityQuery;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Query entities of the same type without the context's entity.
@@ -44,13 +45,13 @@ class EntityQueryExclusive extends EntityQuery {
   /**
    * {@inheritdoc}
    */
-  protected function getBaseQuery($value, array $args, ResolveInfo $info) {
+  protected function getBaseQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       $type = $value->getEntityType();
       $id = $type->getKey('id');
 
       // Filter out the current entity.
-      $query = parent::getBaseQuery($value, $args, $info);
+      $query = parent::getBaseQuery($value, $args, $context, $info);
       $query->condition($id, $value->id(), '<>');
 
       if (array_key_exists('bundles', $args)) {

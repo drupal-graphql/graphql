@@ -6,13 +6,13 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
-use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
-use Youshido\GraphQL\Field\InputField;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -79,37 +79,50 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
     $this->renderer = $renderer;
   }
 
+  // TODO: Fix this.
+//  /**
+//   * {@inheritdoc}
+//   */
+//  protected function buildArguments(SchemaBuilderInterface $builder) {
+//    $arguments = parent::buildArguments($builder);
+//
+//    if (empty($arguments['mode'])) {
+//      $definition = $this->getPluginDefinition();
+//      $type = StringHelper::camelCase($definition['entity_type'], 'display', 'mode', 'id');
+//
+//      if ($type = $builder->findByName($type, [GRAPHQL_ENUM_PLUGIN])) {
+//        $arguments['mode'] = new InputField([
+//          'name' => 'mode',
+//          'type' => $type->getDefinition($builder),
+//        ]);
+//      }
+//    }
+//
+//    return $arguments;
+//  }
+
   /**
    * {@inheritdoc}
    */
-  protected function buildArguments(PluggableSchemaBuilderInterface $schemaBuilder) {
-    $arguments = parent::buildArguments($schemaBuilder);
-
-    if (empty($arguments['mode'])) {
-      $definition = $this->getPluginDefinition();
-      $type = StringHelper::camelCase($definition['entity_type'], 'display', 'mode', 'id');
-
-      if ($type = $schemaBuilder->findByName($type, [GRAPHQL_ENUM_PLUGIN])) {
-        $arguments['mode'] = new InputField([
-          'name' => 'mode',
-          'type' => $type->getDefinition($schemaBuilder),
-        ]);
-      }
-    }
-
-    return $arguments;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof ContentEntityInterface) {
       $mode = isset($args['mode']) ? $args['mode'] : 'full';
       $language = $value->language()->getId();
       $builder = $this->entityTypeManager->getViewBuilder($value->getEntityTypeId());
-      $rendered = $builder->view($value, $mode, $language);
-      yield $this->renderer->render($rendered);
+      $view = $builder->view($value, $mode, $language);
+
+      $context = new RenderContext();
+      /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
+      $result = $this->renderer->executeInRenderContext($context, function() use ($view) {
+        return $this->renderer->render($view);
+      });
+
+      if (!$context->isEmpty()) {
+        yield new CacheableValue((string) $result, [$context->pop()]);
+      }
+      else {
+        yield (string) $result;
+      }
     }
   }
 

@@ -12,14 +12,6 @@ use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
 class EntityByIdTest extends GraphQLContentTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'language',
-    'content_translation',
-  ];
-
-  /**
    * The added French language.
    *
    * @var string
@@ -41,10 +33,6 @@ class EntityByIdTest extends GraphQLContentTestBase {
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $languageStorage */
     $languageStorage = $this->container->get('entity.manager')->getStorage('configurable_language');
-    $language = $languageStorage->create([
-      'id' => $this->frenchLangcode,
-    ]);
-    $language->save();
 
     $language = $languageStorage->create([
       'id' => $this->chineseSimplifiedLangcode,
@@ -75,17 +63,15 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // TODO: Check chache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
       'node:1',
-      'config:field.storage.node.body',
     ]);
+
+    $metadata->addCacheContexts(['user.node_grants:view']);
 
     // Check English node.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'en',
+      'language' => 'EN',
     ], [
       'nodeById' => [
         'entityLabel' => 'English node',
@@ -95,7 +81,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check French translation.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'fr',
+      'language' => 'FR',
     ], [
       'nodeById' => [
         'entityLabel' => 'French node',
@@ -105,7 +91,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     // Check Chinese simplified translation.
     $this->assertResults($this->getQueryFromFile('entity_by_id.gql'), [
       'id' => $node->id(),
-      'language' => 'zh_hans',
+      'language' => 'ZH_HANS',
     ], [
       'nodeById' => [
         'entityLabel' => 'Chinese simplified node',

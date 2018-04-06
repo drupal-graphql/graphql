@@ -5,7 +5,6 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Enums\Images;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -56,14 +55,13 @@ class ImageStyleId extends EnumPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function buildValues(PluggableSchemaBuilderInterface $schemaBuilder) {
+  public function buildEnumValues($definition) {
     $items = [];
 
     $storage = $this->entityTypeManager->getStorage('image_style');
     foreach ($storage->loadMultiple() as $imageStyle) {
-      $items[$imageStyle->id()] = [
+      $items[strtoupper($imageStyle->id())] = [
         'value' => $imageStyle->id(),
-        'name' => $imageStyle->id(),
         'description' => $imageStyle->label(),
       ];
     }

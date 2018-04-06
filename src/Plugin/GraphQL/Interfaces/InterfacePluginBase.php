@@ -3,42 +3,84 @@
 namespace Drupal\graphql\Plugin\GraphQL\Interfaces;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\graphql\GraphQL\Type\InterfaceType;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use GraphQL\Type\Definition\InterfaceType;
 
-/**
- * Base class for GraphQL interface plugins.
- */
-abstract class InterfacePluginBase extends PluginBase implements TypeSystemPluginInterface {
+abstract class InterfacePluginBase extends PluginBase implements TypePluginInterface {
   use CacheablePluginTrait;
-  use NamedPluginTrait;
-  use FieldablePluginTrait;
-
-  /**
-   * The type instance.
-   *
-   * @var \Drupal\graphql\GraphQL\Type\InterfaceType
-   */
-  protected $definition;
+  use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function getDefinition(PluggableSchemaBuilderInterface $schemaBuilder) {
-    if (!isset($this->definition)) {
-      $this->definition = new InterfaceType($this, $schemaBuilder, [
-        'name' => $this->buildName(),
-        'description' => $this->buildDescription(),
-      ]);
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
+    return new InterfaceType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'contexts' => function () use ($builder, $definition) {
+        $types = $builder->getSubTypes($definition['name']);
 
-      $this->definition->addFields($this->buildFields($schemaBuilder));
-    }
+        return array_reduce($types, function ($carry, $current) use ($builder) {
+          $type = $builder->getType($current);
+          if (!empty($type->config['contexts'])) {
+            $contexts = $type->config['contexts'];
+            $contexts = is_callable($contexts) ? $contexts() : $contexts;
+            return Cache::mergeContexts($carry, $contexts);
+          }
 
-    return $this->definition;
+          return $carry;
+        }, $definition['contexts']);
+      },
+      'fields' => function () use ($builder, $definition) {
+        $fields = $builder->getFields($definition['name']);
+
+        if (!empty($definition['interfaces'])) {
+          $inherited = array_map(function ($name) use ($builder) {
+            return $builder->getFields($name);
+          }, $definition['interfaces']);
+
+          $inherited = call_user_func_array('array_merge', $inherited);
+          return array_merge($inherited, $fields);
+        }
+
+        return $fields;
+      },
+      'resolveType' => function ($value, $context, $info) use ($builder, $definition) {
+        return $builder->resolveType($definition['name'], $value, $context, $info);
+      },
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
+
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'interfaces' => $this->buildInterfaces($definition),
+      'contexts' => $this->buildCacheContexts($definition),
+    ];
+  }
+
+  /**
+   * Builds the list of interfaces inherited by this interface.
+   *
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return array
+   *   The list of interfaces that this interface inherits from.
+   */
+  protected function buildInterfaces($definition) {
+    return $definition['interfaces'] ?: [];
   }
 
 }

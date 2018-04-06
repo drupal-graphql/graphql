@@ -2,10 +2,12 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaBuilderInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Test the test framework.
@@ -35,7 +37,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $schema = $this->introspect();
     $this->assertArraySubset([
       'types' => [
-        'RootQuery' => [
+        'QueryRoot' => [
           'fields' => [
             'root' => [
               'name' => 'root',
@@ -59,15 +61,16 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test result error assertions.
    */
   public function testErrorAssertion() {
-    $metadata = $this->defaultCacheMetaData();
-
     // Errors are not cached at all.
+    $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
-    $metadata->setCacheContexts(['gql']);
 
     $this->assertErrors('{ root }', [], [
-      'Schema has to have fields',
-      'Field "root" not found in type "RootQuery". Available fields are: "__schema", "__type"',
+      'Cannot query field "root" on type "QueryRoot".',
+    ], $metadata);
+
+    $this->assertErrors('{ root }', [], [
+      '/root.*QueryRoot/',
     ], $metadata);
   }
 
@@ -79,7 +82,7 @@ class TestFrameworkTest extends GraphQLTestBase {
       'name' => 'value',
       'parents' => ['Test'],
       'type' => 'String',
-    ], function ($value, array $args, ResolveInfo $info) {
+    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
       yield $value['value'];
     });
 
@@ -90,7 +93,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'Test',
-    ], function ($value, array $args, ResolveInfo $info) {
+    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
       yield ['value' => 'test'];
     });
 
@@ -111,10 +114,10 @@ class TestFrameworkTest extends GraphQLTestBase {
 
     $this->mockEnum('gender', [
       'name' => 'Gender',
-    ], function (PluggableSchemaBuilderInterface $builder) {
+    ], function () {
       return [
-        ['value' => 'f', 'name' => 'Female', 'description' => ''],
-        ['value' => 'm', 'name' => 'Male', 'description' => ''],
+        'Female' => ['value' => 'f', 'description' => ''],
+        'Male' => ['value' => 'm', 'description' => ''],
       ];
     });
 
@@ -137,10 +140,7 @@ class TestFrameworkTest extends GraphQLTestBase {
       return $args['user']['age'] > 50 && $args['user']['gender'] == 'm';
     });
 
-    $metadata = $this->defaultCacheMetaData();
-    // Mutations are never cacheable.
-    $metadata->setCacheMaxAge(0);
-
+    $metadata = $this->defaultMutationCacheMetaData();
     $this->assertResults('mutation ($user: User!) { addUser(user: $user) }', [
       'user' => [
         'name' => 'John Doe',
@@ -212,18 +212,18 @@ class TestFrameworkTest extends GraphQLTestBase {
   public function testUnionMock() {
     $this->mockUnion('token', [
       'name' => 'Token',
+      'types' => ['Word'],
     ]);
 
     $this->mockType('number', [
       'name' => 'Number',
       'unions' => ['Token'],
     ], function ($value) {
-      return is_integer($value['value']);
+      return is_int($value['value']);
     });
 
     $this->mockType('word', [
       'name' => 'Word',
-      'unions' => ['Token'],
     ], function ($value) {
       return is_string($value['value']);
     });

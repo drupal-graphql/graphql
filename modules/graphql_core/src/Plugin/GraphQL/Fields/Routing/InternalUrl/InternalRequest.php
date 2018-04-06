@@ -5,11 +5,13 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\InternalUrl;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Issue an internal request and retrieve the response object.
@@ -92,7 +94,7 @@ class InternalRequest extends FieldPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof Url) {
       $resolve = $this->subRequestBuffer->add($value, function () {
         $request = $this->requestStack->getCurrentRequest()->duplicate();
@@ -112,8 +114,10 @@ class InternalRequest extends FieldPluginBase implements ContainerFactoryPluginI
         return $response;
       });
 
-      return function ($value, array $args, ResolveInfo $info) use ($resolve) {
-        yield $resolve();
+      return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve) {
+        /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
+        $response = $resolve();
+        yield new CacheableValue($response->getValue(), [$response]);
       };
     }
   }

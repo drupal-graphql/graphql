@@ -3,8 +3,9 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery\EntityQuery;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -32,9 +33,9 @@ class EntityRevisions extends EntityQuery {
   /**
    * {@inheritdoc}
    */
-  public function getBaseQuery($value, array $args, ResolveInfo $info) {
+  public function getBaseQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof EntityInterface) {
-      $query = parent::getBaseQuery($value, $args, $info);
+      $query = parent::getBaseQuery($value, $args, $context, $info);
 
       // Add the entity id as a filter condition.
       $key = $value->getEntityType()->getKey('id');

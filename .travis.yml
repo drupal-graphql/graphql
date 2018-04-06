@@ -15,6 +15,7 @@ env:
   matrix:
     - DRUPAL_CORE=8.3.x
     - DRUPAL_CORE=8.4.x
+    - DRUPAL_CORE=8.5.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -88,9 +89,9 @@ install:
       then grep -rl 'cli' $DRUPAL_BUILD_DIR/core $DRUPAL_BUILD_DIR/modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
     fi
 
-  # Bring in the module depe  ndencies without requiring a merge plugin. The
+  # Bring in the module dependencies without requiring a merge plugin. The
   # require also triggers a full 'composer install'.
-  - composer --working-dir=$DRUPAL_BUILD_DIR require youshido/graphql:~1.5
+  - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.11.5
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.

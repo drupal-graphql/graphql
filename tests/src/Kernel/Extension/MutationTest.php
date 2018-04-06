@@ -33,11 +33,11 @@ class MutationTest extends GraphQLTestBase {
     $this->container->set('graphql_test.garage', $prophecy->reveal());
 
     $query = $this->getQueryFromFile('buy_car.gql');
-    $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(0);
     $this->assertResults($query, ['car' => $car], [
-      'buyCar' => [],
-    ], $metadata);
+      'buyCar' => [
+        '__typename' => 'Car',
+      ],
+    ], $this->defaultMutationCacheMetaData());
   }
 
 }

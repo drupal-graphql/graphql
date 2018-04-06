@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql_core\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\graphql_core\Traits\RevisionsTestTrait;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\simpletest\NodeCreationTrait;
@@ -22,11 +23,21 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
+    'content_translation',
     'node',
     'field',
     'filter',
     'text',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defaultCacheTags() {
+    return array_merge([
+      'config:field.storage.node.body',
+    ], parent::defaultCacheTags());
+  }
 
   /**
    * {@inheritdoc}
@@ -55,20 +66,35 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
     $this->createContentType([
       'type' => 'test',
     ]);
+
+    $this->container->get('content_translation.manager')
+      ->setEnabled('node', 'test', TRUE);
   }
 
   /**
-   * {@inheritdoc}
+   * Mock a field that emits a test node.
+   *
+   * ```
+   * query {
+   *   node {
+   *     title
+   *   }
+   * }
+   * ```
+   *
+   * @param mixed $values
+   *   Additional node values.
+   * @param string $title
+   *   An optional title. Will default to "Test".
    */
-  protected function defaultCacheTags() {
-    // graphql_core adds the node body field to the schema, which means
-    // it's always part of the result cache tags, even if it has not been
-    // queried.
-    //
-    // https://github.com/drupal-graphql/graphql/issues/500
-    return array_merge(parent::defaultCacheTags(), [
-      'config:field.storage.node.body',
-    ]);
+  protected function mockNode($values, $title = 'Test') {
+    $this->mockField('node', [
+      'name' => 'node',
+      'type' => 'entity:node:test',
+    ], Node::create([
+      'title' => $title,
+      'type' => 'test',
+    ] + $values));
   }
 
   /**
@@ -81,12 +107,12 @@ class GraphQLContentTestBase extends GraphQLCoreTestBase {
    * @param string $label
    *   Label for the field.
    */
-  protected function addField($type, $fieldName, $label = 'Label', $bundle = 'test') {
+  protected function addField($type, $fieldName, $multi = TRUE, $label = 'Label', $bundle = 'test') {
     FieldStorageConfig::create([
       'field_name' => $fieldName,
       'entity_type' => 'node',
       'type' => $type,
-      'cardinality' => -1,
+      'cardinality' => $multi ? -1 : 1,
     ])->save();
 
     FieldConfig::create([

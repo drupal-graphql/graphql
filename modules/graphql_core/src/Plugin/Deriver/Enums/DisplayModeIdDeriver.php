@@ -47,7 +47,7 @@ class DisplayModeIdDeriver extends DeriverBase implements ContainerDeriverInterf
         'description' => $this->t("The available display modes for '@type' entities.", [
           '@type' => $this->entityTypeManager->getDefinition($targetType)->getLabel(),
         ]),
-        'values' => array_values($displayModes),
+        'values' => $displayModes,
       ] + $basePluginDefinition;
     }
 
@@ -66,8 +66,7 @@ class DisplayModeIdDeriver extends DeriverBase implements ContainerDeriverInterf
       $target = $current->getTargetType();
       list(, $id) = explode('.', $current->id());
 
-      $carry[$target][$id] = [
-        'name' => $id,
+      $carry[$target][strtoupper($id)] = [
         'value' => $id,
         'description' => $this->t("The '@label' display mode for '@type' entities.", [
           '@label' => $current->label(),

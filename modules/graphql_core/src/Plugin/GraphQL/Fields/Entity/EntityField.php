@@ -4,8 +4,9 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityFieldBase;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -20,7 +21,7 @@ class EntityField extends EntityFieldBase {
   /**
    * {@inheritdoc}
    */
-  public function resolveValues($value, array $args, ResolveInfo $info) {
+  public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof FieldableEntityInterface) {
       $definition = $this->getPluginDefinition();
       $name = $definition['field'];
@@ -32,7 +33,7 @@ class EntityField extends EntityFieldBase {
 
         if ($access->isAllowed()) {
           foreach ($items as $item) {
-            $output = !empty($definition['property']) ? $this->resolveItem($item, $args, $info) : $item;
+            $output = !empty($definition['property']) ? $this->resolveItem($item, $args, $context, $info) : $item;
 
             yield new CacheableValue($output, [$access]);
           }

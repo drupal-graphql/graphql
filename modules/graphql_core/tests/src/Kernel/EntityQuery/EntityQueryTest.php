@@ -53,9 +53,6 @@ class EntityQueryTest extends GraphQLContentTestBase {
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts(['user.node_grants:view']);
     $metadata->addCacheTags([
-      'entity_bundles',
-      'entity_field_info',
-      'entity_types',
       'node:' . $a->id(),
       'node:' . $b->id(),
       'node:' . $c->id(),

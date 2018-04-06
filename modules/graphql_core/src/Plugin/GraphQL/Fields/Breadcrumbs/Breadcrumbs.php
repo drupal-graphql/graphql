@@ -7,9 +7,11 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Retrieve the breadcrumbs.
@@ -92,17 +94,20 @@ class Breadcrumbs extends FieldPluginBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof Url) {
       $resolve = $this->subRequestBuffer->add($value, function () {
         $links = $this->breadcrumbManager->build($this->routeMatch)->getLinks();
         return $links;
       });
 
-      return function ($value, array $args, ResolveInfo $info) use ($resolve) {
-        $links = $resolve();
+      return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve) {
+        /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
+        $response = $resolve();
+        $links = $response->getValue();
+
         foreach ($links as $link) {
-          yield $link;
+          yield new CacheableValue($link, [$response]);
         }
       };
     }

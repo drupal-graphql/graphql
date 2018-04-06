@@ -2,9 +2,12 @@
 
 namespace Drupal\graphql\GraphQL\Buffers;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class SubRequestResponse extends Response {
+class SubRequestResponse extends Response implements RefinableCacheableDependencyInterface {
+  use RefinableCacheableDependencyTrait;
 
   /**
    * The request result.

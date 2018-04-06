@@ -30,11 +30,6 @@ class LanguageTest extends GraphQLCoreTestBase {
     $this->container->get('router.builder')->rebuild();
 
     ConfigurableLanguage::create([
-      'id' => 'fr',
-      'weight' => 1,
-    ])->save();
-
-    ConfigurableLanguage::create([
       'id' => 'es',
       'weight' => 2,
     ])->save();
@@ -106,12 +101,16 @@ class LanguageTest extends GraphQLCoreTestBase {
   public function testLanguageSwitchLinks() {
     // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->addCacheContexts(['languages:language_url']);
     $metadata->addCacheTags([
       'config:language.entity.en',
       'config:language.entity.es',
       'config:language.entity.fr',
       'config:language.entity.pt-br',
+    ]);
+
+    $metadata->addCacheContexts([
+      'languages:language_interface',
+      'languages:language_url',
     ]);
 
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
@@ -122,7 +121,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'en',
             ],
             'url' => [
-              'path' => '/en',
+              'path' => '/en/user/login',
             ],
             'title' => 'English',
             'active' => TRUE,
@@ -132,7 +131,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'fr',
             ],
             'url' => [
-              'path' => '/fr',
+              'path' => '/fr/user/login',
             ],
             'title' => NULL,
             'active' => FALSE,
@@ -142,7 +141,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'es',
             ],
             'url' => [
-              'path' => '/es',
+              'path' => '/es/user/login',
             ],
             'title' => NULL,
             'active' => FALSE,
@@ -152,7 +151,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'pt-br',
             ],
             'url' => [
-              'path' => '/',
+              'path' => '/user/login',
             ],
             'title' => NULL,
             'active' => FALSE,

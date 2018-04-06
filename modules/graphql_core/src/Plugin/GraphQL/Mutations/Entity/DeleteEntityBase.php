@@ -7,10 +7,11 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\GraphQL\EntityCrudOutputWrapper;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class DeleteEntityBase extends MutationPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
@@ -55,7 +56,7 @@ abstract class DeleteEntityBase extends MutationPluginBase implements ContainerF
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $entityTypeId = $this->pluginDefinition['entity_type'];
     $storage = $this->entityTypeManager->getStorage($entityTypeId);
 

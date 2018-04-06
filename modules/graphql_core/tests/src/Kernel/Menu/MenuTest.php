@@ -78,6 +78,11 @@ class MenuTest extends GraphQLCoreTestBase {
       'config:system.menu.test',
     ]);
 
+    $metadata->addCacheContexts([
+      "languages:language_interface",
+      "languages:language_url",
+    ]);
+
     $this->assertResults(
       $this->getQueryFromFile('menu.gql'),
       [],

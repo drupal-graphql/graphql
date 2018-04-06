@@ -3,107 +3,45 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use GraphQL\Executor\ExecutionResult;
 
-class QueryResult implements CacheableDependencyInterface {
-
-  /**
-   * The query result.
-   *
-   * @var mixed
-   */
-  protected $data;
-
-  /**
-   * Merged cache metadata from the response and the schema.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $metadata;
-
-  /**
-   * Cache metadata collected during query execution.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $responseMetadata;
-
-  /**
-   * Static response cache metadata from the schema.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $schemaResponseMetadata;
+class QueryResult extends ExecutionResult implements RefinableCacheableDependencyInterface {
+  use RefinableCacheableDependencyTrait;
 
   /**
    * QueryResult constructor.
    *
-   * @param $data
+   * @param array $data
    *   Result data.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $responseMetadata
+   * @param array $errors
+   *   Errors collected during execution.
+   * @param array $extensions
+   *   User specified array of extensions.
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
    *   The cache metadata collected during query execution.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $schemaResponseMetadata
-   *   The schema's response cache metadata.
    */
-  public function __construct($data, CacheableDependencyInterface $responseMetadata, CacheableDependencyInterface $schemaResponseMetadata) {
+  public function __construct(array $data = null, array $errors = [], array $extensions = [], CacheableDependencyInterface $metadata = NULL) {
     $this->data = $data;
-    $this->responseMetadata = $responseMetadata;
-    $this->schemaResponseMetadata = $schemaResponseMetadata;
+    $this->errors = $errors;
+    $this->extensions = $extensions;
 
-    $this->metadata = new CacheableMetadata();
-    $this->metadata->addCacheableDependency($responseMetadata);
-    $this->metadata->addCacheableDependency($schemaResponseMetadata);
+    // If no cache metadata was given, assume this result is not cacheable.
+    $this->addCacheableDependency($metadata);
   }
 
   /**
-   * Retrieve query result data.
+   * Don't serialize errors, since they might contain closures.
    *
-   * @return mixed
-   *   The result data object.
+   * @return string[]
+   *   The property names to serialize.
    */
-  public function getData() {
-    return $this->data;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts() {
-    return $this->metadata->getCacheContexts();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    return $this->metadata->getCacheTags();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge() {
-    return $this->metadata->getCacheMaxAge();
-  }
-
-  /**
-   * Gets the response cache metadata.
-   *
-   * @return \Drupal\Core\Cache\CacheableDependencyInterface
-   *   The response cache metadata.
-   */
-  public function getResponseMetadata() {
-    return $this->responseMetadata;
-  }
-
-  /**
-   * Gets the schema's response cache metadata.
-   *
-   * @return \Drupal\Core\Cache\CacheableDependencyInterface
-   *   The schema's response cache metadata.
-   */
-  public function getSchemaResponseMetadata() {
-    return $this->schemaResponseMetadata;
+  public function __sleep() {
+    // TODO: Find a better way to solve this.
+    return array_filter(array_keys(get_object_vars($this)), function ($prop) {
+      return $prop != 'errors';
+    });
   }
 
 }

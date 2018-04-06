@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -15,14 +15,14 @@ class QueryRoutes extends RouteSubscriberBase {
   /**
    * The graphql schema plugin manager.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $schemaManager;
 
   /**
    * QueryRoutes constructor.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $schemaManager
    *   The graphql schema plugin manager.
    */
   public function __construct(SchemaPluginManager $schemaManager) {
@@ -41,10 +41,8 @@ class QueryRoutes extends RouteSubscriberBase {
     foreach ($this->schemaManager->getDefinitions() as $key => $definition) {
       $routes->add("graphql.query.$key", new Route($definition['path'], [
         'schema' => $key,
-        '_graphql' => [
-          'single' => '\Drupal\graphql\Controller\RequestController::handleRequest',
-          'multiple' => '\Drupal\graphql\Controller\RequestController::handleBatchRequest',
-        ],
+        '_graphql' => TRUE,
+        '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
       ], [
         '_graphql_query_access' => 'TRUE',
       ]));

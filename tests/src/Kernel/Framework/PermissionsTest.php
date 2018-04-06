@@ -2,8 +2,9 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\graphql\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PhpParser\Node\Arg;
 use Prophecy\Argument;
 
 /**
@@ -34,11 +35,8 @@ class PermissionsTest extends GraphQLTestBase {
 
     // Set up a query map provider.
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
-    $queryProvider->getQuery(Argument::any())->willReturn(NULL);
-    $queryProvider->getQuery(Argument::allOf(
-        Argument::withEntry('id', 'persisted'),
-        Argument::withEntry('version', 'a')
-    ))->willReturn('{ root }');
+    $queryProvider->getQuery(Argument::any(), Argument::any())->willReturn(NULL);
+    $queryProvider->getQuery('persisted:a', Argument::any())->willReturn('{ root }');
 
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
   }
@@ -51,11 +49,11 @@ class PermissionsTest extends GraphQLTestBase {
 
     // Any query should fail.
     $this->assertEquals(403, $this->query('query')->getStatusCode());
-    $this->assertEquals(403, $this->persistedQuery('persisted', 'a')->getStatusCode());
+    $this->assertEquals(403, $this->persistedQuery('persisted:a')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
-      ['id' => 'persisted', 'version' => 'a'],
+      ['queryId' => 'persisted:a'],
     ]);
 
     // If all batched queries fail, 403 is returned.
@@ -73,21 +71,15 @@ class PermissionsTest extends GraphQLTestBase {
 
     // Only persisted queries should work.
     $this->assertEquals(403, $this->query('{ root }')->getStatusCode());
-    $this->assertEquals(200, $this->persistedQuery('persisted', 'a')->getStatusCode());
+    $this->assertEquals(200, $this->persistedQuery('persisted:a')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
-      ['id' => 'persisted', 'version' => 'a'],
+      ['queryId' => 'persisted:a'],
     ]);
 
-    // If some queries fail, 200 is returned.
-    $this->assertEquals(200, $batched->getStatusCode());
-    $data = [
-      'data' => [
-        'root' => 'test',
-      ],
-    ];
-    $this->assertEquals([NULL, $data], json_decode($batched->getContent(), TRUE));
+    // If some queries fail, 403 is returned.
+    $this->assertEquals(403, $batched->getStatusCode());
   }
 
   /**
@@ -101,11 +93,11 @@ class PermissionsTest extends GraphQLTestBase {
 
     // All queries should work.
     $this->assertEquals(200, $this->query('{ root }')->getStatusCode());
-    $this->assertEquals(200, $this->persistedQuery('persisted', 'a')->getStatusCode());
+    $this->assertEquals(200, $this->persistedQuery('persisted:a')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
-      ['id' => 'persisted', 'version' => 'a'],
+      ['queryId' => 'persisted:a'],
     ]);
 
     $this->assertEquals(200, $batched->getStatusCode());

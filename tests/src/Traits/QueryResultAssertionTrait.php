@@ -4,6 +4,8 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Execution\QueryResult;
+use GraphQL\Error\Error;
+use GraphQL\Server\OperationParams;
 
 /**
  * Trait for easier assertion on GraphQL query results.
@@ -68,6 +70,19 @@ trait QueryResultAssertionTrait {
   }
 
   /**
+   * The default mutation cache metadata object.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata
+   *   The cache metadata object.
+   */
+  protected function defaultMutationCacheMetaData() {
+    $metadata = new CacheableMetadata();
+    $metadata->setCacheMaxAge(0);
+    $metadata->setCacheTags($this->defaultCacheTags());
+    return $metadata;
+  }
+
+  /**
    * Assert a result for a graphql query and variables.
    *
    * @param string $query
@@ -82,8 +97,10 @@ trait QueryResultAssertionTrait {
   protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata) {
     $result = $this->graphQlProcessor()->processQuery(
       $this->getDefaultSchema(),
-      $query,
-      $variables
+      OperationParams::create([
+        'query' => $query,
+        'variables' => $variables,
+      ])
     );
 
     $this->assertResultErrors($result, []);
@@ -106,8 +123,10 @@ trait QueryResultAssertionTrait {
   protected function assertErrors($query, $variables, $expected, CacheableMetadata $metadata) {
     $result = $this->graphQlProcessor()->processQuery(
       $this->getDefaultSchema(),
-      $query,
-      $variables
+      OperationParams::create([
+        'query' => $query,
+        'variables' => $variables,
+      ])
     );
 
     $this->assertResultErrors($result, $expected);
@@ -125,7 +144,7 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultData(QueryResult $result, $expected) {
-    $data = $result->getData();
+    $data = $result->toArray();
     $this->assertArrayHasKey('data', $data, 'No result data.');
     $this->assertEquals($expected, $data['data'], 'Unexpected query result.');
   }
@@ -136,16 +155,49 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\graphql\GraphQL\Execution\QueryResult $result
    *   The query result object.
    * @param array $expected
-   *   The list of expected error messages.
+   *   The list of expected error messages. Also allows regular expressions.
    *
    * @internal
    */
   private function assertResultErrors(QueryResult $result, array $expected) {
-    $data = $result->getData();
-    $errors = array_map(function ($error) {
-      return $error['message'];
-    }, array_key_exists('errors', $data) ? $data['errors'] : []);
-    $this->assertEquals($expected, $errors, 'Invalid GraphQL query. Errors: ' . implode("\n* ", $errors));
+    // Retrieve the list of error strings.
+    $errors = array_map(function (Error $error) {
+      return $error->getMessage();
+    }, $result->errors);
+
+    // Initalize the status.
+    $unexpected = [];
+    $matchCount = array_map(function () {
+      return 0;
+    }, array_flip($expected));
+
+    // Iterate through error messages.
+    // Collect unmatched errors and count pattern hits.
+    while ($error = array_pop($errors)) {
+      $match = FALSE;
+      foreach ($expected as $pattern) {
+        if (@preg_match($pattern, NULL) === FALSE) {
+          $match = $match || $pattern == $error;
+          $matchCount[$pattern]++;
+        }
+        else {
+          $match = $match || preg_match($pattern, $error);
+          $matchCount[$pattern]++;
+        }
+      }
+
+      if (!$match) {
+        $unexpected[] = $error;
+      }
+    }
+
+    // Create a list of patterns that never matched.
+    $missing = array_keys(array_filter($matchCount, function ($count) {
+      return $count == 0;
+    }));
+
+    $this->assertEquals([], $missing, "Missing errors:\n* " . implode("\n* ", $missing));
+    $this->assertEquals([], $unexpected, "Unexpected errors:\n* " . implode("\n* ", $unexpected));
   }
 
   /**
@@ -159,9 +211,6 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultMetadata(QueryResult $result, CacheableMetadata $expected) {
-    if (!$expected) {
-      $expected = new CacheableMetadata();
-    }
     $this->assertEquals($expected->getCacheMaxAge(), $result->getCacheMaxAge(), 'Unexpected cache max age.');
 
     $missingContexts = array_diff($expected->getCacheContexts(), $result->getCacheContexts());
@@ -171,7 +220,7 @@ trait QueryResultAssertionTrait {
     $this->assertEmpty($unexpectedContexts, 'Unexpected cache contexts: ' . implode(', ', $unexpectedContexts));
 
     $missingTags = array_diff($expected->getCacheTags(), $result->getCacheTags());
-    $this->assertEmpty($missingTags, 'Missing cache tags: '  . implode(', ', $missingTags));
+    $this->assertEmpty($missingTags, 'Missing cache tags: ' . implode(', ', $missingTags));
 
     $unexpectedTags = array_diff($result->getCacheTags(), $expected->getCacheTags());
     $this->assertEmpty($unexpectedTags, 'Unexpected cache tags: ' . implode(', ', $unexpectedTags));

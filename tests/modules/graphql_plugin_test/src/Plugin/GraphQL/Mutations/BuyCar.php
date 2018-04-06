@@ -4,10 +4,11 @@ namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Mutations;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql_plugin_test\GarageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * A test mutation.
@@ -59,7 +60,7 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, array $args, ResolveInfo $info) {
+  public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     return $this->garage->insertVehicle($args['car']);
   }
 

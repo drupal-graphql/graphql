@@ -83,6 +83,10 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
           continue;
         }
 
+        $tags = array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']);
+        $contexts = $fieldDefinition->getCacheContexts();
+        $maxAge = $fieldDefinition->getCacheMaxAge();
+
         $fieldName = $fieldDefinition->getName();
         $derivative = [
           'parents' => [StringHelper::camelCase($targetTypeId)],
@@ -92,9 +96,12 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
           ]),
           'field' => $fieldName,
           'entity_type' => $entityTypeId,
-          'schema_cache_tags' => array_merge($fieldDefinition->getCacheTags(), ['entity_field_info']),
-          'schema_cache_contexts' => $fieldDefinition->getCacheContexts(),
-          'schema_cache_max_age' => $fieldDefinition->getCacheMaxAge(),
+          'schema_cache_tags' => $tags,
+          'schema_cache_contexts' => $contexts,
+          'schema_cache_max_age' => $maxAge,
+          'response_cache_tags' => $tags,
+          'response_cache_contexts' => $contexts,
+          'response_cache_max_age' => $maxAge,
         ] + $basePluginDefinition;
 
         /** @var \Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface $definition */

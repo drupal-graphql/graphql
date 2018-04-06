@@ -6,11 +6,13 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Execution\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @GraphQLField(
@@ -19,6 +21,7 @@ use Youshido\GraphQL\Execution\ResolveInfo;
  *   arguments = {
  *     "id" = "String!"
  *   },
+ *   contextual_arguments = {"language"},
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityByIdDeriver"
  * )
  */
@@ -93,9 +96,9 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
   /**
    * {@inheritdoc}
    */
-  protected function resolveValues($value, array $args, ResolveInfo $info) {
+  protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     $resolver = $this->entityBuffer->add($this->getPluginDefinition()['entity_type'], $args['id']);
-    return function ($value, array $args, ResolveInfo $info) use ($resolver) {
+    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolver) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
@@ -108,8 +111,8 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
         $access = $entity->access('view', NULL, TRUE);
 
         if ($access->isAllowed()) {
-          if (isset($args['language']) && $args['language'] != $entity->language()->getId()) {
-            $entity = $this->entityRepository->getTranslationFromContext($entity, $args['language']);
+          if (isset($args['language']) && $args['language'] != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            $entity = $entity->getTranslation($args['language']);
           }
 
           yield $entity->addCacheableDependency($access);
