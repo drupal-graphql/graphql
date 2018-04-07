@@ -6,7 +6,7 @@ Another common entity in Drupal and one that provides great benefits to the usag
 
 One common use case for taxonomies is to get a list of terms for a given vocabulary. Because we are using EntityQuery again the format will look very much like querying for nodes in the previous article. Here is what a query for terms of the vocabulary with **vid** "tags" looks like :
 
-```
+```graphql
 query {
   taxonomyTermQuery(limit: 10, offset: 0, filter: {conditions: [{operator: EQUAL, field: "vid", value: ["tags"]}]}) {
     entities {
@@ -18,7 +18,7 @@ query {
 
 This will fetch for a limit of 10 terms that belong to the vocabulary "tags". The result will once again be very much like what we asked for : 
 
-```
+```json
 {
   "data": {
     "taxonomyTermQuery": {
@@ -45,7 +45,7 @@ This will fetch for a limit of 10 terms that belong to the vocabulary "tags". Th
 
 Querying a single term can be done by taking advantage of the query **taxonomyTermById** which takes  as argument the id for the term we want to get.
 
-```
+```graphql
 query {
   taxonomyTermById(id: "3") {
     entityLabel
@@ -55,7 +55,7 @@ query {
 
 And the result of this query will be whatever we asked for, in this case the entityLabel alone : 
 
-```
+```json
 {
   "data": {
     "taxonomyTermById": {

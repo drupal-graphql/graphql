@@ -10,7 +10,7 @@ The way to make your query ready to use variables is to provide the variables as
 
 The old query looked like this :
 
-```
+```graphql
 query {
   nodeQuery(limit: 10, offset: 0, filter: {conditions: [{operator: EQUAL, field: "type", value: ["article"]}]}) {
     entities {
@@ -22,7 +22,7 @@ query {
 
 And we can now refactor it to look like this :
 
-```
+```graphql
 query getNodeType($type:String!, $limit:Int!, $offset:Int!) {
   nodeQuery(limit: $limit, offset: $offset, filter: {conditions: [{operator: EQUAL, field: "type", value: [$type]}]}) {
     entities {
@@ -38,7 +38,7 @@ Here we go, now we can use the same query to retrieve "Articles", "Clients" or w
 
 So get over to the GraphiQL by navigating to **graphql/explorer** and try out the query above, you will notice in the left bottom side there is a **variables** box, click on it and it will pop open and fill the variables there like so :
 
-```
+```json
 {
     "type": "article",
     "limit": 10,

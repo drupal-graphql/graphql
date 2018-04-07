@@ -4,7 +4,7 @@
 Graphql is a query language and so the first thing we will be going through is how can you start making queries to Drupal. One of the great benefits of GraphQL is how intuitive the query syntax and corresponsing responses look. Essentially, the query is a lot like how you want the response to look but without the values. Lets have a look at the example we saw in the introduction:
 
 
-```javascript
+```graphql
 query {
   user: currentUserContext{
     ...on User {
@@ -12,17 +12,14 @@ query {
     }
   }
 }
-
-You can run the the above query in your browser, via a GET request, after enabling the module. Note, if you are logged in already, the query should return a result. If you want the anonymous user to run the following query, you will need to enable the `Execute arbitrary GraphQL requests` permission. You can also run this query in the GraphiQL browser provided with the module at : `/graphql/explorer`
 ```
+You can run the the above query in your browser, via a GET request, after enabling the module. Note, if you are logged in already, the query should return a result. If you want the anonymous user to run the following query, you will need to enable the `Execute arbitrary GraphQL requests` permission. You can also run this query in the GraphiQL browser provided with the module at : `/graphql/explorer`
 [YOUR DOMAIN]/graphql?query=query{user:currentUserContext{...on%20User{name}}}
-``` 
+
 
 This would return a result similar to: 
-=======
-```
 
-```javascript
+```json
 {
   "data": {
     "user": {
@@ -49,7 +46,7 @@ This is important so that you know what to expect when searching for fields in q
 
 GraphQL has the potential to go and fetch fields from very different places without the need for extra requests, thats one of the benefits of using such a query language. Lets look at this example :
 
-```
+```graphql
 query {
   nodeById(id: "1", language: en) {
     entityId
@@ -73,9 +70,8 @@ The query above fetches information from 3 different places :
 
 If we paste the above query in GraphiQL we will get the following result :
 
-=======
 
-```
+```json
 {
   "data": {
     "nodeById": {

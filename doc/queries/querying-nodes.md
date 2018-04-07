@@ -6,7 +6,7 @@ One of the most fundamental entities in Drupal is the node entity. It is a build
 
 Here is a super simple example of how to list 10 nodes of type "Article" :
 
-```
+```graphql
 query {
   nodeQuery(limit: 10, offset: 0, filter: {conditions: [{operator: EQUAL, field: "type", value: ["article"]}]}) {
     entities {
@@ -20,7 +20,7 @@ Lets analyse this query a bit better. It performs a query to return 10 nodes of 
 
 The response to the above query is going to return exactly what we mentioned we wanted inside the entities item, the entityLabel.
 
-```
+```json
 {
   "data": {
     "nodeQuery": {
