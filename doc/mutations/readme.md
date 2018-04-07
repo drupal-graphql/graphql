@@ -14,7 +14,7 @@ https://github.com/drupal-graphql/graphql-examples
 
 A simple mutation to add an article content type (node entity / article bundle) might look the following: 
 
-```
+```graphql
 mutation{
   addArticle(input: {title: "Hey"}){
     errors
@@ -38,7 +38,7 @@ In the mutation above, we use the inline fragment  `... on NodeArticle { nid } t
 
 The result of the above mutation would look something like this: 
 
-```
+```json
 {
   "data": {
     "addArticle": {

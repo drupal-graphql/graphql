@@ -7,7 +7,7 @@ GraphQL Fragments, as the name implies, are pieces of a query. They mostly serve
 
 Lets look at the following query :
 
-```
+```graphql
 {
   nodeById(id: "1", language: en) {
     ... on NodeArticle {

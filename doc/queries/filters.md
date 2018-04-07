@@ -10,7 +10,7 @@ In GraphQL for Drupal you can have 3 parts to your filter
 
 Conditions is a list of filters that filter the query in a certain way for a given value on a given field. Lets look at an example of this
 
-```
+```graphql
 query {
   nodeQuery(filter: {conditions: [{operator: EQUAL, field: "type", value: ["article"]}]}) {
     entities {

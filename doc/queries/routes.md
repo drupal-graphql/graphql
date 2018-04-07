@@ -4,7 +4,7 @@ Another query type provided by default by the Drupal GraphQL module is the **rou
 
 ## Performing a basic route query
 
-```
+```graphql
 query {
   route(path: "/node/1") {
     alias
@@ -14,7 +14,7 @@ query {
 
 This will return information about the path we just provided :
 
-```
+```json
 {
   "data": {
     "route": {
@@ -28,7 +28,7 @@ This will return information about the path we just provided :
 
 But with a route query like we mentioned you can do much more, and fetch context associated with the route. Lets see how we can get information about the node associated with a route or language associated with a route.
 
-```
+```graphql
 {
   route(path: "/my-node-query-alias") {
     ... on EntityCanonicalUrl {
@@ -46,7 +46,7 @@ But with a route query like we mentioned you can do much more, and fetch context
 
 this query will return :
 
-```
+```json
 {
   "data": {
     "route": {

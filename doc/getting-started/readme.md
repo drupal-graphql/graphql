@@ -30,10 +30,10 @@ http://graphql.org/learn/
 
 4. **Read the comments** and then enter the following query in the left pane: 
 
-     ```javascript
+     ```graphql
      query {
        user: currentUserContext{
-         ...on UserUser {
+         ...on User {
            name
          }
        }
@@ -42,7 +42,7 @@ http://graphql.org/learn/
 
 5. Press `Ctrl-Space` and you should see something like the following display in the right pane: 
     
-    ```javascript
+    ```json
     {
       "data": {
         "user": {
@@ -58,7 +58,7 @@ http://graphql.org/learn/
 * The GraphiQL explorer, included with the module, is your friend, it’s amazing. You will most likely use the GraphiQL explorer to build and test more complicated queries. 
 * GraphQL is introspective, meaning that the entire schema (data model) is known up front. This is important as it allows tools like GraphiQL to implement autocompletion. 
 * You can use GraphiQL to explore your way through the data and configuration, once you know the basic GraphQL syntax. You can use the tab key in the explorer like you would with autocompletion or intellisense in modern IDEs.
-* The `... UserUser` in the query above is a fragment which exposes all of the fields on the UserUser entity to us. Inline fragments like this can be a very powerful way to explore the schema. 
+* The `... User` in the query above is a fragment which exposes all of the fields on the User entity to us. Inline fragments like this can be a very powerful way to explore the schema. 
 
 
 **Resources**
