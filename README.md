@@ -9,8 +9,7 @@ You can use this module as a foundation for building your own schema through
 custom code or you can use and extend the generated schema using the plugin
 architecture and the provided plugin implementations form the sub-module.
 
-For ease of development, it includes the [GraphiQL](https://github.com/graphql/graphiql/) interface at  
-`/graphql/explorer`.
+For ease of development, it includes the [GraphiQL](https://github.com/graphql/graphiql/) interface at`/graphql/explorer`.
 
 ## Example implementation
 
