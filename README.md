@@ -14,15 +14,15 @@ For ease of development, it includes the [GraphiQL](https://github.com/graphql/g
 
 ## Example implementation
 
-Check out [https://github.com/fubhy/drupal-decoupled-app](https://github.com/fubhy/drupal-decoupled-app) for a complete example  
-of a fully decoupled React and GraphQL application. Feel free to use that  
+Check out [https://github.com/fubhy/drupal-decoupled-app](https://github.com/fubhy/drupal-decoupled-app) for a complete example
+of a fully decoupled React and GraphQL application. Feel free to use that
 repository as a starting point for your own decoupled application.
 
 ## Documentation
 
 [Documentation](doc/SUMMARY.md) is heavily worked on, but still far from complete.
-This is due to the vast amount of improvements and additional features we've  
-added to the module recently. As we are finishing up the 3.x version of this  
+This is due to the vast amount of improvements and additional features we've
+added to the module recently. As we are finishing up the 3.x version of this
 module we will be re-doing the documentation and record a series of screencasts.
 
 These blog posts provide additional information on how to use and extend the module
