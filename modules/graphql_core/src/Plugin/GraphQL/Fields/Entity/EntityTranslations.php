@@ -3,7 +3,7 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
@@ -69,7 +69,7 @@ class EntityTranslations extends FieldPluginBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
-    if ($value instanceof ContentEntityInterface && $value instanceof TranslatableInterface && $value->isTranslatable()) {
+    if ($value instanceof EntityInterface && $value instanceof TranslatableInterface && $value->isTranslatable()) {
       $languages = $value->getTranslationLanguages();
       foreach ($languages as $language) {
         yield $value->getTranslation($language->getId());
