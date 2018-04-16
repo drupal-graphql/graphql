@@ -12,7 +12,8 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
  *     "field" = "String!",
  *     "value" = "[String]",
  *     "operator" = "QueryOperator",
- *     "language" = "LanguageId"
+ *     "language" = "LanguageId",
+ *     "skip" = false
  *   }
  * )
  */
