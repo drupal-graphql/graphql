@@ -13,7 +13,10 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
  *     "value" = "[String]",
  *     "operator" = "QueryOperator",
  *     "language" = "LanguageId",
- *     "enabled" = "Boolean"
+ *     "enabled" =  {
+ *        "default"  = TRUE,
+ *        "type" = "Boolean"
+ *      }
  *   }
  * )
  */
