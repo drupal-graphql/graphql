@@ -270,7 +270,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   protected function applyFilter(QueryInterface $query, $filter) {
     if (!empty($filter) && is_array($filter)) {
-      $query->condition($this->buildFilterConditions($query, $filter));
+      //Conditions can be disabled. Check we are not adding an empty condition group.
+      $filterConditions = $this->buildFilterConditions($query, $filter);
+      if (count($filterConditions->conditions())) {
+        $query->condition($filterConditions);
+      }      
     }
 
     return $query;
@@ -297,6 +301,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     // Apply filter conditions.
     $conditions = !empty($filter['conditions']) ? $filter['conditions'] : [];
     foreach ($conditions as $condition) {
+      // Check if we need to disable this condition.
+      if (!$condition['enabled']) {
+        continue;
+      }
+      
       $field = $condition['field'];
       $value = !empty($condition['value']) ? $condition['value'] : NULL;
       $operator = !empty($condition['operator']) ? $condition['operator'] : NULL;
@@ -343,7 +352,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $groups = !empty($filter['groups']) ? $filter['groups'] : [];
     foreach ($groups as $args) {
       // By default, we use AND condition groups.
-      $group->condition($this->buildFilterConditions($query, $args));
+      // Conditions can be disabled. Check we are not adding an empty condition group.
+      $filterConditions = $this->buildFilterConditions($query, $args);
+      if (count($filterConditions->conditions())) {
+        $group->condition($filterConditions);
+      }      
     }
 
     return $group;
