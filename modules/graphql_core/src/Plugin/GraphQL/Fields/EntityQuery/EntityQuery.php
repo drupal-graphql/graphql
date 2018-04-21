@@ -302,7 +302,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $conditions = !empty($filter['conditions']) ? $filter['conditions'] : [];
     foreach ($conditions as $condition) {
       // Check if we need to disable this condition.
-      if (empty($condition['enabled'])) {
+      if (isset($condition['enabled']) && empty($condition['enabled'])) {
         continue;
       }
       
