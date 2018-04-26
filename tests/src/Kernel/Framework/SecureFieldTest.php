@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
@@ -32,13 +34,13 @@ class SecureFieldTest extends GraphQLTestBase {
       'name' => 'secure',
       'type' => 'Boolean',
       'secure' => TRUE,
-    ], TRUE);
+    ], new CacheableValue(TRUE, [(new CacheableMetadata())->addCacheContexts(['user.permissions'])]));
 
     $this->mockField('insecure', [
       'name' => 'insecure',
       'type' => 'Boolean',
       'secure' => FALSE,
-    ], TRUE);
+    ], new CacheableValue(TRUE, [(new CacheableMetadata())->addCacheContexts(['user.permissions'])]));
   }
 
   /**
@@ -55,6 +57,7 @@ class SecureFieldTest extends GraphQLTestBase {
    */
   public function testInsecureField() {
     $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheContexts([]);
     $metadata->setCacheMaxAge(0);
     $this->assertErrors('{ insecure }', [], [
       'Unable to resolve insecure field \'insecure\'.',

@@ -7,7 +7,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\graphql\GraphQL\Visitors\CacheContextsCollector;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use GraphQL\Error\Error;
@@ -293,37 +292,24 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise|mixed
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
-    $schema = $config->getSchema();
+    $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document, new CacheableMetadata());
 
-    // Collect cache contexts from the query document.
-    $contexts = [];
-    $info = new TypeInfo($schema);
-    $visitor = (new CacheContextsCollector())->getVisitor($info, $contexts);
-    Visitor::visit($document, Visitor::visitWithTypeInfo($info, $visitor));
-
-    // Generate a cache identifier from the collected contexts.
-    $metadata = (new CacheableMetadata())->addCacheContexts($contexts);
-    $cid = $this->cacheIdentifier($params, $document, $metadata);
-    if (!$config->getDebug() && ($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
-      return $adapter->createFulfilled($result);
+    if (!$config->getDebug() && ($contextCache = $this->cacheBackend->get($contextCacheId)) && $contexts = $contextCache->data) {
+      $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contexts));
+      if (($cache = $this->cacheBackend->get($cacheId)) && $result = $cache->data) {
+        return $adapter->createFulfilled($result);
+      }
     }
 
     $result = $this->doExecuteOperation($adapter, $config, $params, $document);
-    return $result->then(function (QueryResult $result) use ($cid, $metadata) {
-      if ($missing = array_diff($result->getCacheContexts(), $metadata->getCacheContexts())) {
-        throw new \LogicException(sprintf(
-          'The query result yielded cache contexts (%s) that were not part of the static query analysis.',
-          implode(', ', $missing)
-        ));
-      }
 
-      // Add the statically collected cache contexts.
-      $result->addCacheableDependency($metadata);
+    return $result->then(function (QueryResult $result) use ($contextCacheId, $params, $document) {
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
-        $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
+        $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($result->getCacheContexts()));
+        $this->cacheBackend->set($contextCacheId, $result->getCacheContexts(), $result->getCacheMaxAge(), $result->getCacheTags());
+        $this->cacheBackend->set($cacheId, $result, $result->getCacheMaxAge(), $result->getCacheTags());
       }
-
       return $result;
     });
   }
@@ -373,8 +359,11 @@ class QueryProcessor {
     );
 
     return $promise->then(function (ExecutionResult $result) use ($context) {
-      // Add the collected cache metadata to the result.
-      $metadata = (new CacheableMetadata())->addCacheableDependency($context);
+
+      $metadata = (new CacheableMetadata())
+        ->addCacheContexts($this->filterCacheContexts($context->getCacheContexts()))
+        ->addCacheTags($context->getCacheTags())
+        ->setCacheMaxAge($context->getCacheMaxAge());
 
       // Do not cache in development mode or if there are any errors.
       if ($context->getGlobal('development') || !empty($result->errors)) {
@@ -536,9 +525,7 @@ class QueryProcessor {
    */
   protected function cacheIdentifier(OperationParams $params, DocumentNode $document, CacheableMetadata $metadata) {
     // Ignore language contexts since they are handled by graphql internally.
-    $contexts = array_filter($metadata->getCacheContexts(), function ($context) {
-      return strpos($context, 'languages:') !== 0;
-    });
+    $contexts = $this->filterCacheContexts($metadata->getCacheContexts());
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
 
     // Sorting the variables will cause fewer cache vectors.
@@ -552,5 +539,22 @@ class QueryProcessor {
     ]));
 
     return implode(':', array_values(array_merge([$hash], $keys)));
+  }
+
+  /**
+   * Filter unused contexts.
+   *
+   * Removes the language contexts from a list of context ids.
+   *
+   * @param string[] $contexts
+   *   The list of context id's.
+   *
+   * @return string[]
+   *   The filtered list of context id's.
+   */
+  protected function filterCacheContexts(array $contexts) {
+    return array_filter($contexts, function ($context) {
+      return strpos($context, 'languages:') !== 0;
+    });
   }
 }
