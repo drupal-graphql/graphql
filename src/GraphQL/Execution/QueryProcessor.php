@@ -292,10 +292,10 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise|mixed
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
-    $contextCacheId = $this->cacheIdentifier($params, $document, new CacheableMetadata());
+    $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document, new CacheableMetadata());
 
     if (!$config->getDebug() && ($contextCache = $this->cacheBackend->get($contextCacheId)) && $contexts = $contextCache->data) {
-      $cacheId = $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contexts));
+      $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contexts));
       if (($cache = $this->cacheBackend->get($cacheId)) && $result = $cache->data) {
         return $adapter->createFulfilled($result);
       }
@@ -306,7 +306,7 @@ class QueryProcessor {
     return $result->then(function (QueryResult $result) use ($contextCacheId, $params, $document) {
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
-        $cacheId = $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($result->getCacheContexts()));
+        $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($result->getCacheContexts()));
         $this->cacheBackend->set($contextCacheId, $result->getCacheContexts(), $result->getCacheMaxAge(), $result->getCacheTags());
         $this->cacheBackend->set($cacheId, $result, $result->getCacheMaxAge(), $result->getCacheTags());
       }
