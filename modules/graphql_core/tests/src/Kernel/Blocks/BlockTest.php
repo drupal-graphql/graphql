@@ -76,10 +76,6 @@ class BlockTest extends GraphQLCoreTestBase {
       'entity_field_info',
     ]);
 
-    $metadata->addCacheContexts([
-      'languages:language_interface',
-    ]);
-
     $this->assertResults($query, [], [
       'route' => [
         'content' => [

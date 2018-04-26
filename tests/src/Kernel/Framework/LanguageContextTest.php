@@ -137,7 +137,7 @@ query {
 GQL;
     $this->assertResults($query, [], [
       'language' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
-    ], $this->defaultCacheMetaData()->addCacheContexts(['languages:language_interface']));
+    ], $this->defaultCacheMetaData());
 
   }
 
@@ -157,7 +157,7 @@ GQL;
       'edge' => [
         'language' => 'fr',
       ],
-    ], $this->defaultCacheMetaData()->addCacheContexts(['languages:language_interface']));
+    ], $this->defaultCacheMetaData());
   }
 
   /**
@@ -182,7 +182,7 @@ GQL;
           'language' => 'en',
         ],
       ],
-    ], $this->defaultCacheMetaData()->addCacheContexts(['languages:language_interface']));
+    ], $this->defaultCacheMetaData());
   }
 
   /**
@@ -203,32 +203,6 @@ GQL;
     $this->assertResults($query, [], [
       'edge' => [
         'unaware' => 'en',
-      ],
-    ], $this->defaultCacheMetaData());
-  }
-
-  /**
-   * Test a field that is leaking cache contexts.
-   *
-   * If the field yields a cacheable result with language cache contexts but
-   * it doesn't declare them, this indicates an error where the field might
-   * not handle languages correctly.
-   *
-   * @expectedException \LogicException
-   */
-  public function testLeakingField() {
-    $query = <<<GQL
-query {
-  edge(language: "fr") {
-    leaking
-  }
-}
-GQL;
-
-    // We expect a logic exception to be thrown.
-    $this->assertResults($query, [], [
-      'edge' => [
-        'leaking' => 'leak',
       ],
     ], $this->defaultCacheMetaData());
   }

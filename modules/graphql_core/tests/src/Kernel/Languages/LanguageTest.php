@@ -108,11 +108,6 @@ class LanguageTest extends GraphQLCoreTestBase {
       'config:language.entity.pt-br',
     ]);
 
-    $metadata->addCacheContexts([
-      'languages:language_interface',
-      'languages:language_url',
-    ]);
-
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
       'route' => [
         'links' => [
