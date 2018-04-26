@@ -6,6 +6,8 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 
 /**
  * Handles GraphQL requests.
@@ -27,12 +29,20 @@ class RequestController implements ContainerInjectionInterface {
   protected $parameters;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('graphql.query_processor'),
-      $container->getParameter('graphql.config')
+      $container->getParameter('graphql.config'),
+      $container->get('renderer')
     );
   }
 
@@ -44,9 +54,10 @@ class RequestController implements ContainerInjectionInterface {
    * @param array $parameters
    *   The service configuration parameters.
    */
-  public function __construct(QueryProcessor $processor, array $parameters) {
+  public function __construct(QueryProcessor $processor, array $parameters, RendererInterface $renderer) {
     $this->processor = $processor;
     $this->parameters = $parameters;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -79,11 +90,17 @@ class RequestController implements ContainerInjectionInterface {
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    */
   protected function handleSingle($schema, $operations, $globals) {
-    $result = $this->processor->processQuery($schema, $operations, $globals);
+    /** @var \Drupal\graphql\GraphQL\Execution\QueryResult $result */
+    $result = [];
+    $context = new RenderContext();
+    $this->renderer->executeInRenderContext($context, function() use ($schema, $operations, $globals, &$result) {
+      $result = $this->processor->processQuery($schema, $operations, $globals);
+    });
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
     return $response;
   }
+
 
   /**
    * @param $schema
