@@ -64,12 +64,6 @@ class ImageFieldTest extends GraphQLContentTestBase {
       'node:1',
     ]);
 
-    $metadata->addCacheContexts([
-      'user.node_grants:view',
-      'languages:language_interface',
-      'languages:language_content',
-    ]);
-
     $this->assertResults($this->getQueryFromFile('image.gql'), [
       'path' => '/node/' . $a->id(),
     ], [
