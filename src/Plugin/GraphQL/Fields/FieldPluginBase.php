@@ -152,7 +152,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * {@inheritdoc}
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $result = $this->getRenderer()->executeInRenderContext(new RenderContext(), function () use ($callback, $value, $args, $context, $info, &$result) {
+    $result = $this->getRenderer()->executeInRenderContext(new RenderContext(), function () use ($callback, $value, $args, $context, $info) {
       return $callback($value, $args, $context, $info);
     });
 
