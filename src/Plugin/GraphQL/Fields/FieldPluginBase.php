@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
@@ -37,6 +38,13 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   protected $languageContext;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(SchemaBuilderInterface $builder, FieldPluginManager $manager, $definition, $id) {
@@ -64,6 +72,18 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       $this->languageContext = \Drupal::service('graphql.language_context');
     }
     return $this->languageContext;
+  }
+
+  /**
+   * Get the renderer service.
+   *
+   * @return \Drupal\Core\Render\RendererInterface
+   */
+  protected function getRenderer() {
+    if (!isset($this->renderer)) {
+      $this->renderer = \Drupal::service('renderer');
+    }
+    return $this->renderer;
   }
 
   /**
@@ -132,7 +152,9 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * {@inheritdoc}
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $result = $callback($value, $args, $context, $info);
+    $result = $this->getRenderer()->executeInRenderContext(new RenderContext(), function () use ($callback, $value, $args, $context, $info) {
+      return $callback($value, $args, $context, $info);
+    });
 
     if (is_callable($result)) {
       return new Deferred(function () use ($result, $value, $args, $context, $info) {
