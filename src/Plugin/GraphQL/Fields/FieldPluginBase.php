@@ -123,14 +123,22 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
     }
 
-    if ($this->isLanguageAwareField()) {
-      return $this->getLanguageContext()
-        ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
+    $renderContext = new RenderContext();
+    $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($value, $args, $context, $info) {
+      if ($this->isLanguageAwareField()) {
+        return $this->getLanguageContext()->executeInLanguageContext(function () use ($value, $args, $context, $info) {
           return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
         }, $context->getContext('language', $info));
-    }
-    else {
+      }
+
       return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+    }
+                                                      
+    // Collect leaked render cache metadata if this is a query.
+    if ($info->operation->operation === 'query') {
+      if (!$renderContext->isEmpty()) {
+        $context->addCacheableDependency($renderContext->pop());
+      }
     }
   }
 
@@ -152,33 +160,23 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * {@inheritdoc}
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {    
-    $renderContext = new RenderContext();
-    return $this->getRenderer()->executeInRenderContext($renderContext, function () use ($value, $args, $context, $info) {
-      $result = $callback($value, $args, $context, $info);
-      // Collect leaked render cache metadata if this is a query.
-      if ($info->operation->operation === 'query') {
-        if (!$renderContext->isEmpty()) {
-          $context->addCacheableDependency($renderContext->pop());
-        }
-      }
-      
-      if (is_callable($result)) {
-        return new Deferred(function () use ($result, $value, $args, $context, $info) {
-          return $this->resolveDeferred($result, $value, $args, $context, $info);
-        });
-      }
-
-      $result = iterator_to_array($result);
-      // Collect cache metadata from the result if this is a query.
-      if ($info->operation->operation === 'query') {
-        $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
-        foreach ($dependencies as $dependency) {
-          $context->addCacheableDependency($dependency);
-        }
-      }
-
-      return $this->unwrapResult($result, $info);
+    $result = $callback($value, $args, $context, $info);
+    if (is_callable($result)) {
+      return new Deferred(function () use ($result, $value, $args, $context, $info) {
+        return $this->resolveDeferred($result, $value, $args, $context, $info);
+      });
     }
+
+    $result = iterator_to_array($result);
+    // Collect cache metadata from the result if this is a query.
+    if ($info->operation->operation === 'query') {
+      $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
+      foreach ($dependencies as $dependency) {
+        $context->addCacheableDependency($dependency);
+      }
+    }
+
+    return $this->unwrapResult($result, $info);
   }
 
   /**
