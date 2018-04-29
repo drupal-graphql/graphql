@@ -258,4 +258,62 @@ class ResultCacheTest extends GraphQLTestBase {
     $this->persistedQuery('query:b', ['value' => 'test']);
   }
 
+  /**
+   * Test behavior in case of leaking cache metadata.
+   *
+   * Intentionally emit undeclared cache metadata as side effect of field
+   * resolvers. Should still be added to the processors result.
+   */
+  public function testLeakingCacheMetadata() {
+
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+
+    $this->mockField('leakA', [
+      'id' => 'leakA',
+      'name' => 'leakA',
+      'type' => 'String',
+    ], function () use ($renderer) {
+      $el = [
+        '#plain_text' => 'Leak A',
+        '#cache' => [
+          'tags' => ['a'],
+        ],
+      ];
+      yield $renderer->render($el)->__toString();
+    });
+
+    $this->mockField('leakB', [
+      'id' => 'leakB',
+      'name' => 'leakB',
+      'type' => 'String',
+    ], function () use ($renderer) {
+      $el = [
+        '#plain_text' => 'Leak B',
+        '#cache' => [
+          'tags' => ['b'],
+        ],
+      ];
+      yield $renderer->render($el)->__toString();
+    });
+
+    $query = <<<GQL
+query {
+  leakA
+  leakB
+}
+GQL;
+
+    $metadata = $this->defaultCacheMetaData()
+      ->addCacheTags(['a', 'b']);
+
+    $this->assertResults($query, [], [
+      'leakA' => 'Leak A',
+      'leakB' => 'Leak B',
+    ], $metadata);
+
+    $result = $this->query($query);
+    $this->assertEquals(200, $result->getStatusCode());
+  }
+
 }
