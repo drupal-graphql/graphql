@@ -152,9 +152,8 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * {@inheritdoc}
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $result = $this->getRenderer()->executeInRenderContext(new RenderContext(), function () use ($callback, $value, $args, $context, $info) {
-      return $callback($value, $args, $context, $info);
-    });
+    $renderContext = new RenderContext();
+    $result = $callback($value, $args, $context, $info);
 
     if (is_callable($result)) {
       return new Deferred(function () use ($result, $value, $args, $context, $info) {
@@ -162,7 +161,9 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       });
     }
 
-    $result = iterator_to_array($result);
+    $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($result) {
+      return iterator_to_array($result);
+    });
 
     // Only collect cache metadata if this is a query. All other operation types
     // are not cacheable anyways.
@@ -170,6 +171,9 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
       foreach ($dependencies as $dependency) {
         $context->addCacheableDependency($dependency);
+      }
+      if (!$renderContext->isEmpty()) {
+        $context->addCacheableDependency($renderContext->pop());
       }
     }
 
