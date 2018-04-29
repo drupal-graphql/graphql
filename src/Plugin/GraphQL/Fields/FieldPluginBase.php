@@ -151,33 +151,33 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   /**
    * {@inheritdoc}
    */
-  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $result = $callback($value, $args, $context, $info);
-
-    if (is_callable($result)) {
-      return new Deferred(function () use ($result, $value, $args, $context, $info) {
-        return $this->resolveDeferred($result, $value, $args, $context, $info);
-      });
-    }
-
+  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {    
     $renderContext = new RenderContext();
-    $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($result) {
-      return iterator_to_array($result);
-    });
+    return $this->getRenderer()->executeInRenderContext($renderContext, function () use ($value, $args, $context, $info) {
+      $result = $callback($value, $args, $context, $info);
 
-    // Only collect cache metadata if this is a query. All other operation types
-    // are not cacheable anyways.
-    if ($info->operation->operation === 'query') {
-      $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
-      foreach ($dependencies as $dependency) {
-        $context->addCacheableDependency($dependency);
+      if (is_callable($result)) {
+        return new Deferred(function () use ($result, $value, $args, $context, $info) {
+          return $this->resolveDeferred($result, $value, $args, $context, $info);
+        });
       }
-      if (!$renderContext->isEmpty()) {
-        $context->addCacheableDependency($renderContext->pop());
+
+      $result = iterator_to_array($result);
+
+      // Only collect cache metadata if this is a query. All other operation types
+      // are not cacheable anyways.
+      if ($info->operation->operation === 'query') {
+        $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
+        foreach ($dependencies as $dependency) {
+          $context->addCacheableDependency($dependency);
+        }
+        if (!$renderContext->isEmpty()) {
+          $context->addCacheableDependency($renderContext->pop());
+        }
       }
+
+      return $this->unwrapResult($result, $info);
     }
-
-    return $this->unwrapResult($result, $info);
   }
 
   /**
