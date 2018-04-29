@@ -152,7 +152,6 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * {@inheritdoc}
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $renderContext = new RenderContext();
     $result = $callback($value, $args, $context, $info);
 
     if (is_callable($result)) {
@@ -161,6 +160,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       });
     }
 
+    $renderContext = new RenderContext();
     $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($result) {
       return iterator_to_array($result);
     });
