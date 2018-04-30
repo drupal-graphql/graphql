@@ -294,7 +294,10 @@ class ResultCacheTest extends GraphQLTestBase {
           'tags' => ['b'],
         ],
       ];
-      yield $renderer->render($el)->__toString();
+      $value = $renderer->render($el)->__toString();
+      return function () use ($value) {
+        yield $value;
+      };
     });
 
     $query = <<<GQL
