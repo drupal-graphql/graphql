@@ -153,7 +153,18 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
     $renderContext = new RenderContext();
-    $result = $callback($value, $args, $context, $info);
+
+    $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($callback, $value, $args, $context, $info) {
+      $result = $callback($value, $args, $context, $info);
+      if ($result instanceof \Generator) {
+        $result = iterator_to_array($result);
+      }
+      return $result;
+    });
+
+    if (!$renderContext->isEmpty() && $info->operation->operation === 'query') {
+      $context->addCacheableDependency($renderContext->pop());
+    }
 
     if (is_callable($result)) {
       return new Deferred(function () use ($result, $value, $args, $context, $info) {
@@ -161,19 +172,12 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       });
     }
 
-    $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($result) {
-      return iterator_to_array($result);
-    });
-
     // Only collect cache metadata if this is a query. All other operation types
     // are not cacheable anyways.
     if ($info->operation->operation === 'query') {
       $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
       foreach ($dependencies as $dependency) {
         $context->addCacheableDependency($dependency);
-      }
-      if (!$renderContext->isEmpty()) {
-        $context->addCacheableDependency($renderContext->pop());
       }
     }
 
