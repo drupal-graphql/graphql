@@ -43,7 +43,7 @@ as well as other other contributed modules supporting it:
 ## Resources
 
 * Project homepage: [https://www.drupal.org/project/graphql](https://www.drupal.org/project/graphql)
-* Contributing: [https://github.com/fubhy/graphql-drupal](https://github.com/fubhy/graphql-drupal)
+* Contributing: [https://github.com/drupal-graphql/graphql](https://github.com/drupal-graphql/graphql)
 
 
 
