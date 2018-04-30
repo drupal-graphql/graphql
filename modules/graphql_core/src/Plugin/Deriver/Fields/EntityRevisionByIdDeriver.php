@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Utility\StringHelper;
+use Drupal\graphql_core\Plugin\Deriver\EntityTypeDeriverBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityRevisionByIdDeriver extends DeriverBase implements ContainerDeriverInterface {
@@ -43,7 +44,7 @@ class EntityRevisionByIdDeriver extends DeriverBase implements ContainerDeriverI
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
     foreach ($this->entityTypeManager->getDefinitions() as $id => $type) {
-      if ($type instanceof ContentEntityTypeInterface && $type->isRevisionable()) {
+      if ($type instanceof ContentEntityTypeInterface && $type->isRevisionable() && EntityTypeDeriverBase::isAccessibleEntityType($type)) {
         $derivative = [
           'name' => StringHelper::propCase($id, 'revision', 'by', 'id'),
           'type' => "entity:$id",
