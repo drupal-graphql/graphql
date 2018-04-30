@@ -132,7 +132,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
 
       return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-    });
+    }
                                                       
     // Collect leaked render cache metadata if this is a query.
     if ($info->operation->operation === 'query') {
