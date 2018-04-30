@@ -155,13 +155,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
     $renderContext = new RenderContext();
     return $this->getRenderer()->executeInRenderContext($renderContext, function () use ($value, $args, $context, $info) {
       $result = $callback($value, $args, $context, $info);
-      // Collect leaked render cache metadata if this is a query.
-      if ($info->operation->operation === 'query') {
-        if (!$renderContext->isEmpty()) {
-          $context->addCacheableDependency($renderContext->pop());
-        }
-      }
-      
+
       if (is_callable($result)) {
         return new Deferred(function () use ($result, $value, $args, $context, $info) {
           return $this->resolveDeferred($result, $value, $args, $context, $info);
@@ -169,11 +163,16 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       }
 
       $result = iterator_to_array($result);
-      // Collect cache metadata from the result if this is a query.
+
+      // Only collect cache metadata if this is a query. All other operation types
+      // are not cacheable anyways.
       if ($info->operation->operation === 'query') {
         $dependencies = $this->getCacheDependencies($result, $value, $args, $context, $info);
         foreach ($dependencies as $dependency) {
           $context->addCacheableDependency($dependency);
+        }
+        if (!$renderContext->isEmpty()) {
+          $context->addCacheableDependency($renderContext->pop());
         }
       }
 
