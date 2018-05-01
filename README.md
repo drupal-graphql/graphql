@@ -15,6 +15,13 @@ architecture and the provided plugin implementations form the sub-module.
 
 For ease of development, it includes the [GraphiQL](https://github.com/graphql/graphiql/) interface at`/graphql/explorer`.
 
+## Quickstart
+
+To get a quick overview from the __query__ part of GraphQL in action watch the following video's.
+
+[![Headless Drupal with GraphQL from scratch - part 01](https://img.youtube.com/vi/Fx1Gz-BVNx8/0.jpg)](https://www.youtube.com/watch?v=Fx1Gz-BVNx8)
+[![Headless Drupal with GraphQL from scratch - part 02](https://img.youtube.com/vi/Q0hTG5ASzx0/0.jpg)](https://www.youtube.com/watch?v=Q0hTG5ASzx0)
+
 ## Example implementation
 
 Check out [https://github.com/fubhy/drupal-decoupled-app](https://github.com/fubhy/drupal-decoupled-app) for a complete example
