@@ -40,7 +40,7 @@ http://graphql.org/learn/
      }
      ```
 
-5. Press `Ctrl-Space` and you should see something like the following display in the right pane: 
+5. Press `Ctrl-Space` or `Ctrl-Enter` (Mac) and you should see something like the following display in the right pane: 
     
     ```json
     {
