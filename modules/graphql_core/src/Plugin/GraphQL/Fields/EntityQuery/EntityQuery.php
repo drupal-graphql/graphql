@@ -228,6 +228,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       $query->allRevisions();
       $query->addTag('revisions');
     }
+    else if ($mode === 'latest') {
+      // Mark the query to only include latest revision and sort by revision id.
+      $query->latestRevision();
+      $query->addTag('revisions');
+    }
 
     return $query;
   }
