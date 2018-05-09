@@ -43,6 +43,13 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   protected $languageNegotiator;
 
   /**
+   * Current user account
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -51,7 +58,8 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('path.validator'),
-      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL
+      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL,
+      $container->get('current_user')
     );
   }
 
@@ -74,11 +82,13 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
-    $languageNegotiator
+    $languageNegotiator,
+    $currentUser
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
     $this->languageNegotiator = $languageNegotiator;
+    $this->currentUser = $currentUser;
   }
 
   /**
@@ -92,6 +102,8 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // For now we just take the "url" negotiator into account.
     if ($this->languageNegotiator) {
+      // Set current user, as required by getNegotiationMethodInstance
+      $this->languageNegotiator->setCurrentUser($this->currentUser);
       if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
         $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
       }
