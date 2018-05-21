@@ -140,6 +140,17 @@ services:
       - '\Drupal\graphql\Annotation\GraphQLMutation'
       - '%graphql.config%'
 
+  plugin.manager.graphql.subscription:
+    class: Drupal\graphql\Plugin\SubscriptionPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Subscriptions'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\SubscriptionPluginInterface'
+      - '\Drupal\graphql\Annotation\GraphQLSubscription'
+      - '%graphql.config%'
+
   # Plugin manager implementations for schema types.
   plugin.manager.graphql.union:
     class: Drupal\graphql\Plugin\TypePluginManager

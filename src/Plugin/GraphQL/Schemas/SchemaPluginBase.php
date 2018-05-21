@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
+use Drupal\graphql\Plugin\SubscriptionPluginManager;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
@@ -34,6 +35,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $mutationManager;
 
   /**
+   * The subscription plugin manager.
+   *
+   * @var \Drupal\graphql\Plugin\SubscriptionPluginManager
+   */
+  protected $subscriptionManager;
+
+  /**
    * The type manager aggregator service.
    *
    * @var \Drupal\graphql\Plugin\TypePluginManagerAggregator
@@ -55,6 +63,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $mutations = [];
 
   /**
+   * Static cache of subscription definitions.
+   *
+   * @var array
+   */
+  protected $subscriptions = [];
+
+  /**
    * Static cache of type instances.
    *
    * @var array
@@ -71,6 +86,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $plugin_definition,
       $container->get('plugin.manager.graphql.field'),
       $container->get('plugin.manager.graphql.mutation'),
+      $container->get('plugin.manager.graphql.subscription'),
       $container->get('graphql.type_manager_aggregator')
     );
   }
@@ -88,6 +104,8 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The field plugin manager.
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
    *   The mutation plugin manager.
+   * @param \Drupal\graphql\Plugin\SubscriptionPluginManager $subscriptionManager
+   *   The subscription plugin manager.
    * @param \Drupal\graphql\Plugin\TypePluginManagerAggregator $typeManagers
    *   The type manager aggregator service.
    */
@@ -97,11 +115,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $pluginDefinition,
     FieldPluginManager $fieldManager,
     MutationPluginManager $mutationManager,
+    SubscriptionPluginManager $subscriptionManager,
     TypePluginManagerAggregator $typeManagers
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
+    $this->subscriptionManager = $subscriptionManager;
     $this->typeManagers = $typeManagers;
   }
 
@@ -116,6 +136,15 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
         'name' => 'MutationRoot',
         'fields' => function () {
           return $this->getMutations();
+        },
+      ]));
+    }
+
+    if ($this->hasSubscriptions()) {
+      $config->setSubscription(new ObjectType([
+        'name' => 'SubscriptionRoot',
+        'fields' => function () {
+          return $this->getSubscriptions();
         },
       ]));
     }
@@ -155,6 +184,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
+  public function hasSubscriptions() {
+    return !empty($this->pluginDefinition['subscription_map']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function hasType($name) {
     return isset($this->pluginDefinition['type_map'][$name]);
   }
@@ -180,6 +216,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    */
   public function getMutations() {
     return $this->processMutations($this->pluginDefinition['mutation_map']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubscriptions() {
+    return $this->processSubscriptions($this->pluginDefinition['subscription_map']);
   }
 
   /**
@@ -245,6 +288,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    */
   public function processMutations($mutations) {
     return array_map([$this, 'buildMutation'], $mutations);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processSubscriptions($subscriptions) {
+    return array_map([$this, 'buildSubscription'], $subscriptions);
   }
 
   /**
@@ -329,6 +379,24 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     }
 
     return $this->mutations[$mutation['id']];
+  }
+
+  /**
+   * Retrieves the subscription definition for a given field reference.
+   *
+   * @param array $mutation
+   *   The subscription reference.
+   *
+   * @return array
+   *   The subscription definition.
+   */
+  protected function buildSubscription($subscription) {
+    if (!isset($this->subscriptions[$subscription['id']])) {
+      $creator = [$subscription['class'], 'createInstance'];
+      $this->subscriptions[$subscription['id']] = $creator($this, $this->subscriptionManager, $subscription['definition'], $subscription['id']);
+    }
+
+    return $this->subscriptions[$subscription['id']];
   }
 
   /**
