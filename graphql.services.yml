@@ -9,7 +9,7 @@ parameters:
     # disabled entirely.
     #
     # @default false
-    development: false
+    development: true
 
 services:
   # Check access for executing graphql queries.
@@ -112,7 +112,7 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
-      - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
+      - '\Drupal\graphql\Plugin\SchemaPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
       - '%graphql.config%'
 
