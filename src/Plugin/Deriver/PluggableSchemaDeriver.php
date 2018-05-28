@@ -443,8 +443,8 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
       $instance = $manager->getInstance(['id' => $id]);
 
       return [
-          'definition' => $instance->getDefinition(),
-        ] + $definition;
+        'definition' => $instance->getDefinition(),
+      ] + $definition;
     }, $subscriptions);
   }
 
