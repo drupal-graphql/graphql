@@ -280,8 +280,8 @@ trait MockGraphQLPluginTrait {
   protected function mockSchema($id, $builder = NULL) {
     $this->graphQLPlugins[SchemaPluginBase::class][$id] = [
       'definition' => $this->getSchemaDefinitions()[$id] + [
-          'mock_factory' => 'mockSchemaFactory',
-        ],
+        'mock_factory' => 'mockSchemaFactory',
+      ],
       'builder' => $builder,
     ];
   }
