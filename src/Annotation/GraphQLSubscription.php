@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Annotation;
 
 /**
- * Annotation for GraphQL mutation plugins.
+ * Annotation for GraphQL subscription plugins.
  *
  * @Annotation
  */
