@@ -23,6 +23,7 @@ use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Subscriptions\SubscriptionPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 
@@ -70,6 +71,7 @@ trait MockGraphQLPluginTrait {
     'plugin.manager.graphql.schema' => SchemaPluginBase::class,
     'plugin.manager.graphql.field' => FieldPluginBase::class,
     'plugin.manager.graphql.mutation' => MutationPluginBase::class,
+    'plugin.manager.graphql.subscription' => SubscriptionPluginBase::class,
     'plugin.manager.graphql.union' => UnionTypePluginBase::class,
     'plugin.manager.graphql.interface' => InterfacePluginBase::class,
     'plugin.manager.graphql.type' => TypePluginBase::class,
@@ -291,6 +293,7 @@ trait MockGraphQLPluginTrait {
       $definition,
       $this->container->get('plugin.manager.graphql.field'),
       $this->container->get('plugin.manager.graphql.mutation'),
+      $this->container->get('plugin.manager.graphql.subscription'),
       $this->container->get('graphql.type_manager_aggregator'),
     ]);
 

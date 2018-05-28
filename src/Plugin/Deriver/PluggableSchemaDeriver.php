@@ -10,6 +10,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
+use Drupal\graphql\Plugin\SubscriptionPluginManager;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -37,6 +38,13 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
   protected $mutationManager;
 
   /**
+   * The subscription manager service.
+   *
+   * @var \Drupal\graphql\Plugin\SubscriptionPluginManager
+   */
+  protected $subscriptionManager;
+
+  /**
    * The type manager aggregator service.
    *
    * @var \Drupal\graphql\Plugin\TypePluginManagerAggregator
@@ -51,6 +59,7 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
       $basePluginId,
       $container->get('plugin.manager.graphql.field'),
       $container->get('plugin.manager.graphql.mutation'),
+      $container->get('plugin.manager.graphql.subscription'),
       $container->get('graphql.type_manager_aggregator')
     );
   }
@@ -64,6 +73,8 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
    *   The field plugin manager.
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
    *   The mutation plugin manager.
+   * @param \Drupal\graphql\Plugin\SubscriptionPluginManager $subscriptionManager
+   *   The mutation plugin manager.
    * @param \Drupal\graphql\Plugin\TypePluginManagerAggregator $typeManagers
    *   The type manager aggregator service.
    */
@@ -71,11 +82,13 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
     $basePluginId,
     FieldPluginManager $fieldManager,
     MutationPluginManager $mutationManager,
+    SubscriptionPluginManager $subscriptionManager,
     TypePluginManagerAggregator $typeManagers
   ) {
     $this->basePluginId = $basePluginId;
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
+    $this->subscriptionManager = $subscriptionManager;
     $this->typeManagers = $typeManagers;
   }
 
@@ -90,8 +103,9 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
     $fieldAssocationMap = $this->buildFieldAssociationMap($this->fieldManager, $typeMap);
     $fieldMap = $this->buildFieldMap($this->fieldManager, $fieldAssocationMap);
     $mutationMap = $this->buildMutationMap($this->mutationManager);
+    $subscriptionMap = $this->buildSubscriptionMap($this->subscriptionManager);
 
-    $managers = array_merge([$this->fieldManager, $this->mutationManager], iterator_to_array($this->typeManagers));
+    $managers = array_merge([$this->fieldManager, $this->mutationManager, $this->subscriptionManager], iterator_to_array($this->typeManagers));
     $cacheTags = array_reduce($managers, function ($carry, CacheableDependencyInterface $current) {
       return Cache::mergeTags($carry, $current->getCacheTags());
     }, []);
@@ -111,6 +125,7 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
       'field_association_map' => $fieldAssocationMap,
       'field_map' => $fieldMap,
       'mutation_map' => $mutationMap,
+      'subscription_map' => $subscriptionMap,
       'schema_cache_tags' => $cacheTags,
       'schema_cache_contexts' => $cacheContexts,
       'schema_cache_max_age' => $cacheMaxAge,
@@ -395,6 +410,42 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
         'definition' => $instance->getDefinition(),
       ] + $definition;
     }, $mutations);
+  }
+
+  /**
+   * Builds an optimized representation of all registered subscriptions.
+   *
+   * @param \Drupal\graphql\Plugin\SubscriptionPluginManager $manager
+   *   The subscription plugin manager.
+   *
+   * @return array
+   *   The optimized list of all registered subscriptions.
+   */
+  protected function buildSubscriptionMap(SubscriptionPluginManager $manager) {
+    $definitions = $manager->getDefinitions();
+    $subscriptions = array_reduce(array_keys($definitions), function ($carry, $id) use ($definitions) {
+      $current = $definitions[$id];
+      $name = $current['name'];
+
+      if (empty($carry[$name]) || $carry[$name]['weight'] < $current['weight']) {
+        $carry[$name] = [
+          'id' => $id,
+          'class' => $current['class'],
+          'weight' => !empty($current['weight']) ? $current['weight'] : 0,
+        ];
+      }
+
+      return $carry;
+    }, []);
+
+    return array_map(function ($definition) use ($manager) {
+      $id = $definition['id'];
+      $instance = $manager->getInstance(['id' => $id]);
+
+      return [
+        'definition' => $instance->getDefinition(),
+      ] + $definition;
+    }, $subscriptions);
   }
 
 }
