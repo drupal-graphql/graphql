@@ -25,3 +25,7 @@
 
 * [Introduction](authentication/introduction.md)
 
+## Metatag / SEO
+
+* [Metatag support](metatag/readme.md)
+
