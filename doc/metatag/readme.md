@@ -87,3 +87,35 @@ This would return any information on this particular route, including the meta i
 ```
 
 for more information on routes check out the [routes documentation](queries/routes.md). Writting custom plugins you could also mutate fields of this type. You can learn more about these in the section [Creating mutation plugins](mutations/creating-mutation-plugins.md).
+
+### Known issues
+
+There is a currently an [issue](https://github.com/drupal-graphql/graphql/issues/609) opened for using the metatag module together with the GraphQL module : 
+
+*"If a module (e.g. metatag) introduces a new primitive data type, it is not part of the derived types, but any field using it will reference it. That results in a "Missing type metatag." exception."*
+
+So for now you need to include a custom Scalar as a workaround to avoid errors in GraphQL due to this missing type. Create a file inside a custom module of your own, named for example "MetatagScalar.php" where a custom scalar will be defined. In this example the module's name is graphql_custom as seen from the namespace bellow. Make sure to not conflict with existing namespaces when defining it. 
+
+```
+<?php
+
+namespace Drupal\graphql_custom\Plugin\GraphQL\Scalars;
+
+use Drupal\graphql\Plugin\GraphQL\Scalars\Internal\StringScalar;
+
+/**
+ * Metatag module dummy type.
+ *
+ * Metatag module defines a custom data type that essentially is a string, but
+ * not called string. And the GraphQL type system chokes on that.
+ *
+ * @GraphQLScalar(
+ *   id = "metatag",
+ *   name = "metatag",
+ *   type = "string"
+ * )
+ */
+class MetatagScalar extends StringScalar {
+
+}
+```
