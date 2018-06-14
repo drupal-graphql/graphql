@@ -19,3 +19,18 @@ function graphql_requirements($phase) {
     ],
   ];
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function graphql_uninstall() {
+  // Remove the config keys set in GraphQLConfigOverrides::loadOverrides().
+  /** @var \Drupal\Core\Config\ConfigFactoryInterface $configFactory */
+  $configFactory = \Drupal::getContainer()->get('config.factory');
+  $languageTypes = $configFactory->getEditable('language.types');
+  $negotiation = $languageTypes->get('negotiation');
+  foreach (array_keys($negotiation) as $type) {
+    unset($negotiation[$type]['enabled']['language-graphql']);
+  }
+  $languageTypes->set('negotiation', $negotiation)->save();
+}
