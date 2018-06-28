@@ -120,7 +120,7 @@ GQL;
         'fieldText' => [
           'value' => 'Foo',
           'processed' => "<p>Foo</p>\n",
-          'format' => 'null',
+          'format' => null,
         ],
       ],
     ], $metadata);
@@ -171,7 +171,7 @@ GQL;
         'body' => [
           'value' => 'http://www.drupal.org',
           'processed' => "<p><a href=\"http://www.drupal.org\">http://www.drupal.org</a></p>\n",
-          'summary' => 'null',
+          'summary' => null,
           'summaryProcessed' => '',
         ],
       ],
@@ -345,7 +345,7 @@ GQL;
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => 'null',
+        'format' => null,
       ],
       'fieldText' => [
         ['value' => 'a'],
