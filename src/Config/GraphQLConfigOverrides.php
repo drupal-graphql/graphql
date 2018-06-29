@@ -24,7 +24,7 @@ class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
   /**
    * The negotiator manager service.
    *
-   * @var \Drupal\language\LanguageNegotiationMethodManager
+   * @var \Drupal\language\LanguageNegotiationMethodManager|null
    */
   protected $negotiatorManager;
 
@@ -33,8 +33,9 @@ class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
    *
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The config storage service.
+   * @param \Drupal\language\LanguageNegotiationMethodManager|null $negotiatorManager
    */
-  public function __construct(StorageInterface $storage, LanguageNegotiationMethodManager $negotiatorManager) {
+  public function __construct(StorageInterface $storage, LanguageNegotiationMethodManager $negotiatorManager = NULL) {
     $this->baseStorage = $storage;
     $this->negotiatorManager = $negotiatorManager;
   }
@@ -44,6 +45,7 @@ class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
    */
   public function loadOverrides($names) {
     if (
+      $this->negotiatorManager &&
       in_array('language.types', $names)
       && $this->negotiatorManager->hasDefinition('language-graphql')
       && $config = $this->baseStorage->read('language.types')
