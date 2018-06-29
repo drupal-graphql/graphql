@@ -267,6 +267,6 @@ services:
 
   graphql.config_factory_override:
     class: Drupal\graphql\Config\GraphQLConfigOverrides
-    arguments: ['@config.storage', '@plugin.manager.language_negotiation_method']
+    arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
     tags:
       - { name: config.factory.override, priority: -253 }
