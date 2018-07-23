@@ -6,7 +6,7 @@
 
 This module lets you craft and expose a [GraphQL](http://graphql.org/) schema for [Drupal 8](https://www.drupal.org/8).
 
-It is is built around [https://github.com/webonyx/graphql-php](webonyx/graphql-php). As such, it supports
+It is is built around [https://github.com/webonyx/graphql-php](https://github.com/webonyx/graphql-php). As such, it supports
 the full official GraphQL specification with all its features.
 
 You can use this module as a foundation for building your own schema through
@@ -52,5 +52,15 @@ as well as other other contributed modules supporting it:
 * Project homepage: [https://www.drupal.org/project/graphql](https://www.drupal.org/project/graphql)
 * Contributing: [https://github.com/drupal-graphql/graphql](https://github.com/drupal-graphql/graphql)
 
+## Related projects
 
-
+* GraphQL APQ [https://github.com/lucasconstantino/drupal-graphql-apq](https://github.com/lucasconstantino/drupal-graphql-apq)
+  > Drupal module for Automatic Persisted Queries compatible with the apollo-link-persisted-queries project's proposed protocol.
+* GraphQL Metatag [https://github.com/drupal-graphql/graphql-metatag](https://github.com/drupal-graphql/graphql-metatag)
+  > Module that integrates the Metatag Drupal module with GraphQL.
+* GraphQL Redirect [https://www.drupal.org/project/graphql_redirect](https://www.drupal.org/project/graphql_redirect)
+  > Allow the GraphQL query to follow a redirected path and return the query result of the destination route.
+* GraphQL Twig [https://github.com/drupal-graphql/graphql-twig](https://github.com/drupal-graphql/graphql-twig)
+  > Allows you to inject data into Twig templates by simply adding a GraphQL query.
+* GraphQL Views [https://github.com/drupal-graphql/graphql-views](https://github.com/drupal-graphql/graphql-views)
+  > Adds support for views to GraphQL.
