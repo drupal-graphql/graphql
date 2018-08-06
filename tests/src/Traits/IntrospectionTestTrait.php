@@ -37,6 +37,11 @@ trait IntrospectionTestTrait {
     $schema = $this->introspect();
     foreach ($fields as list($parent, $name, $type)) {
       $this->assertArrayHasKey($parent, $schema['types'], "Type $parent not found.");
+      if ($invert) {
+        $this->assertArrayNotHasKey($name, $schema['types'][$parent]['fields'], "Field $name found on type $parent.");
+        continue;
+      }
+      $this->assertArrayHasKey($parent, $schema['types'], "Type $parent not found.");
       $this->assertArrayHasKey($name, $schema['types'][$parent]['fields'], "Field $name not found on type $parent.");
       $field = $schema['types'][$parent]['fields'][$name];
 
