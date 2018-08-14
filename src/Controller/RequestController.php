@@ -80,6 +80,9 @@ class RequestController implements ContainerInjectionInterface {
    */
   protected function handleSingle($schema, $operations, $globals) {
     $result = $this->processor->processQuery($schema, $operations, $globals);
+
+    $this->logErrors($result, $globals);
+
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
     return $response;
@@ -94,6 +97,9 @@ class RequestController implements ContainerInjectionInterface {
    */
   protected function handleBatch($schema, $operations, $globals) {
     $result = $this->processor->processQuery($schema, $operations, $globals);
+
+    $this->logErrors($result, $globals);
+
     $response = new CacheableJsonResponse($result);
 
     // In case of a batch request, the result is an array.
@@ -105,4 +111,12 @@ class RequestController implements ContainerInjectionInterface {
     return $response;
   }
 
+  protected function logErrors($result, $globals) {
+    if ($globals['development']) {
+      if (!empty($result->errors)) {
+        \Drupal::logger('graphql')->warning($result->errors[0]->message);
+      }
+    }
+  }
 }
+
