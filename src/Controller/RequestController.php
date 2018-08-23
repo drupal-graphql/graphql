@@ -77,6 +77,7 @@ class RequestController implements ContainerInjectionInterface {
    * @param array $globals
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   protected function handleSingle($schema, $operations, $globals) {
     $result = $this->processor->processQuery($schema, $operations, $globals);
@@ -91,6 +92,7 @@ class RequestController implements ContainerInjectionInterface {
    * @param array $globals
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   protected function handleBatch($schema, $operations, $globals) {
     $result = $this->processor->processQuery($schema, $operations, $globals);

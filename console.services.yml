@@ -1,6 +1,0 @@
-services:
-  graphql.graphql_persist:
-    class: Drupal\graphql\Command\PersistQueryMapCommand
-    arguments: ['@entity_type.manager']
-    tags:
-      - { name: drupal.command }
