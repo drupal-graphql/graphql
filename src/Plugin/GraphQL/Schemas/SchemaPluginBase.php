@@ -133,7 +133,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
 
     if ($this->hasMutations()) {
       $config->setMutation(new ObjectType([
-        'name' => 'MutationRoot',
+        'name' => 'Mutation',
         'fields' => function () {
           return $this->getMutations();
         },
@@ -142,7 +142,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
 
     if ($this->hasSubscriptions()) {
       $config->setSubscription(new ObjectType([
-        'name' => 'SubscriptionRoot',
+        'name' => 'Subscription',
         'fields' => function () {
           return $this->getSubscriptions();
         },
@@ -150,7 +150,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     }
 
     $config->setQuery(new ObjectType([
-      'name' => 'QueryRoot',
+      'name' => 'Query',
       'fields' => function () {
         return $this->getFields('Root');
       },
