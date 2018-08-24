@@ -100,8 +100,10 @@ class EntityRevisionById extends FieldPluginBase implements ContainerFactoryPlug
     }
     /** @var \Drupal\Core\Access\AccessResultInterface $access */
     else if (($access = $entity->access('view', NULL, TRUE)) && $access->isAllowed()) {
-      if ($entity instanceof TranslatableInterface && isset($args['language']) && $args['language'] != $entity->language()->getId()) {
-        $entity = $entity->getTranslation($args['language']);
+      if ($entity instanceof TranslatableInterface && isset($args['language']) && $args['language'] != $entity->language()->getId() && $entity->isTranslatable()) {
+        if ($entity->hasTranslation($args['language'])) {
+          $entity = $entity->getTranslation($args['language']);
+        }
       }
 
       yield new CacheableValue($entity, [$access]);

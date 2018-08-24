@@ -72,7 +72,9 @@ class EntityTranslations extends FieldPluginBase implements ContainerFactoryPlug
     if ($value instanceof EntityInterface && $value instanceof TranslatableInterface && $value->isTranslatable()) {
       $languages = $value->getTranslationLanguages();
       foreach ($languages as $language) {
-        yield $value->getTranslation($language->getId());
+        if ($value->hasTranslation($language->getId())) {
+          yield $value->getTranslation($language->getId());
+        }
       }
     }
   }
