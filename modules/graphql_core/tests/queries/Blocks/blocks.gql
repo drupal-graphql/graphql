@@ -1,0 +1,18 @@
+query {
+  route:route(path: "/user/login") {
+    ... on InternalUrl {
+      content:blocksByRegion(region: "content") {
+        __typename
+      }
+
+      sidebar:blocksByRegion(region: "sidebar_first") {
+        ... on BlockContentBasic {
+          __typename
+          body {
+            value
+          }
+        }
+      }
+    }
+  }
+}

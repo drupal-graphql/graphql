@@ -1,86 +1,99 @@
 query ($path: String!) {
   route:route(path: $path) {
-    entity {
-      ... on NodeTest {
-        nid {
-          value
-        }
-        vid {
-          value
-        }
-        langcode {
-          value
-        }
-        type {
-          targetId
-        }
-        title {
-          value
-        }
-        status {
-          value
-        }
-        promote {
-          value
-        }
-        sticky {
-          value
-        }
-        revisionTranslationAffected {
-          value
-        }
-        body {
-          summaryProcessed
-          summary
-          processed
-          format
-          value
-        }
-        fieldText {
-          value
-        }
-        fieldBoolean {
-          value
-        }
-        fieldLink {
+    ... on EntityCanonicalUrl {
+      entity {
+        ... on NodeTest {
+          nid
+          vid
+          langcode {
+            value
+          }
+          type {
+            targetId
+          }
+          uid {
+            targetId
+            entity {
+              name
+            }
+          }
           title
-          uri
-        }
-        fieldInteger {
-          value
-        }
-        fieldFloat {
-          value
-        }
-        fieldDecimal {
-          value
-        }
-        fieldDatetime {
-          value
-        }
-        fieldTimestamp {
-          value
-        }
-        fieldEmail {
-          value
-        }
-        fieldString {
-          value
-        }
-        fieldReference {
-          targetId
-        }
-        fieldFile {
-          targetId
-          display
-          description
-        }
-        fieldImage {
-          targetId
-          alt
-          title
-          width
-          height
+          status
+          promote
+          sticky
+          revisionTranslationAffected
+          body {
+            summaryProcessed
+            summary
+            processed
+            format
+            value
+          }
+          fieldText {
+            value
+          }
+          fieldBoolean
+          fieldLink {
+            title
+            uri
+            target:attribute(key: "_target")
+            url {
+              ... on EntityCanonicalUrl {
+                internal:path
+              }
+              ... on ExternalUrl {
+                external:path
+              }
+            }
+
+          }
+          fieldInteger
+          fieldFloat
+          fieldDecimal
+          fieldDatetime {
+            value
+          }
+          fieldTimestamp
+          fieldEmail
+          fieldString
+          fieldReference {
+            targetId
+            entity {
+              ... on NodeTest {
+                title
+                fieldReference {
+                  targetId
+                  entity {
+                    title
+                  }
+                }
+              }
+            }
+          }
+          fieldFile {
+            targetId
+            display
+            description
+            entity {
+              url
+#              uri {
+#                value
+#              }
+            }
+          }
+          fieldImage {
+            targetId
+            alt
+            title
+            width
+            height
+            entity {
+              url
+#              uri {
+#                value
+#              }
+            }
+          }
         }
       }
     }

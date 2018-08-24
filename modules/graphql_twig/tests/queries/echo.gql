@@ -1,3 +1,0 @@
-query($input: String!) {
-  echo(input: $input)
-}

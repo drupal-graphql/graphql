@@ -5,8 +5,7 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql\GraphQL\Schema\SchemaLoader;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SchemaOverviewController implements ContainerInjectionInterface {
@@ -16,7 +15,7 @@ class SchemaOverviewController implements ContainerInjectionInterface {
   /**
    * The schema plugin manager service.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $schemaManager;
 
@@ -28,19 +27,6 @@ class SchemaOverviewController implements ContainerInjectionInterface {
   protected $moduleHandler;
 
   /**
-   * Constructs a SchemaOverviewController object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler srevice.
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
-   *   The schema plugin manager service.
-   */
-  public function __construct(ModuleHandlerInterface $moduleHandler, SchemaPluginManager $schemaManager) {
-    $this->schemaManager = $schemaManager;
-    $this->moduleHandler = $moduleHandler;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -48,6 +34,19 @@ class SchemaOverviewController implements ContainerInjectionInterface {
       $container->get('module_handler'),
       $container->get('plugin.manager.graphql.schema')
     );
+  }
+
+  /**
+   * SchemaOverviewController constructor.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler srevice.
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $schemaManager
+   *   The schema plugin manager service.
+   */
+  public function __construct(ModuleHandlerInterface $moduleHandler, SchemaPluginManager $schemaManager) {
+    $this->schemaManager = $schemaManager;
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**

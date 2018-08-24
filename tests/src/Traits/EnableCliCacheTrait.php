@@ -10,11 +10,8 @@ use Prophecy\Argument;
  */
 trait EnableCliCacheTrait {
 
-
   /**
    * Enable caching in CLI environments.
-   *
-   * @before
    */
   protected function enableCliCache() {
     // Disable the cli deny policy because we actually want caching on cli

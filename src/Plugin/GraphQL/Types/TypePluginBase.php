@@ -2,84 +2,114 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Types;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Config\Object\ObjectTypeConfig;
-use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
-use Youshido\GraphQL\Type\Object\AbstractObjectType;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Base class for GraphQL type plugins.
- */
-abstract class TypePluginBase extends AbstractObjectType implements TypeSystemPluginInterface {
-  use PluginTrait;
+abstract class TypePluginBase extends PluginBase implements TypePluginInterface {
   use CacheablePluginTrait;
-  use NamedPluginTrait;
-  use FieldablePluginTrait;
+  use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-  }
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
+    return new ObjectType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'contexts' => $definition['contexts'],
+      'fields' => function () use ($builder, $definition) {
+        $fields = $builder->getFields($definition['name']);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
-    $this->config = new ObjectTypeConfig([
-      'name' => $this->buildName(),
-      'description' => $this->buildDescription(),
-      'interfaces' => $this->buildInterfaces($schemaManager),
-      'fields' => $this->buildFields($schemaManager),
+        if (!empty($definition['interfaces'])) {
+          $inherited = array_map(function ($name) use ($builder) {
+            return $builder->getFields($name);
+          }, $definition['interfaces']);
+
+          $inherited = call_user_func_array('array_merge', $inherited);
+          return array_merge($inherited, $fields);
+        }
+
+        return $fields;
+      },
+      'interfaces' => function () use ($builder, $definition) {
+        return array_filter(array_map(function ($name) use ($builder) {
+          return $builder->getType($name);
+        }, $definition['interfaces']), function ($type) {
+          return $type instanceof InterfaceType;
+        });
+      },
+      'isTypeOf' => function ($object, $context, ResolveInfo $info) use ($manager, $id) {
+        $instance = $manager->getInstance(['id' => $id]);
+        return $instance->applies($object, $context, $info);
+      },
     ]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build($config) {
-    // May be overridden, but not required any more.
-  }
-
-  /**
-   * Build the list of interfaces.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface $schemaManager
-   *   Instance of the schema manager to resolve dependencies.
-   *
-   * @return \Youshido\GraphQL\Type\AbstractInterfaceTypeInterface[]
-   *   The list of interfaces.
-   */
-  protected function buildInterfaces(PluggableSchemaManagerInterface $schemaManager) {
+  public function getDefinition() {
     $definition = $this->getPluginDefinition();
-    if ($definition['interfaces']) {
-      return array_filter($schemaManager->find(function($interface) use ($definition) {
-        return in_array($interface['name'], $definition['interfaces']);
-      }, [GRAPHQL_INTERFACE_PLUGIN]), function($interface) {
-        return $interface instanceof AbstractInterfaceType;
-      });
-    }
-    return [];
+
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'interfaces' => $this->buildInterfaces($definition),
+      'unions' => $this->buildUnions($definition),
+      'contexts' => $this->buildCacheContexts($definition),
+      'weight' => $definition['weight'],
+    ];
   }
 
   /**
-   * Check if a value conforms to this type.
+   * Builds the list of interfaces that this type implements.
    *
-   * @param mixed $value
-   *   The current value.
+   * @param array $definition
+   *   The plugin definition array.
    *
-   * @return boolean
-   *   TRUE if the type applies, else false.
+   * @return array
+   *   The list of interfaces implemented by this type.
    */
-  public function applies($value) {
-    return FALSE;
+  protected function buildInterfaces($definition) {
+    return array_unique($definition['interfaces']);
+  }
+
+  /**
+   * Builds the list of unions that this type belongs to.
+   *
+   * @param array $definition
+   *   The plugin definition array.
+   *
+   * @return array
+   *   The list of unions that this type belongs to.
+   */
+  protected function buildUnions($definition) {
+    return array_unique($definition['unions']);
+  }
+
+  /**
+   * Checks whether this type applies to a given object.
+   *
+   * @param mixed $object
+   *   The object to check against.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The resolve context.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
+   *
+   * @return null|bool
+   *   TRUE if this type applies to the given object or FALSE if it doesn't.
+   */
+  public function applies($object, ResolveContext $context, ResolveInfo $info) {
+    return NULL;
   }
 
 }

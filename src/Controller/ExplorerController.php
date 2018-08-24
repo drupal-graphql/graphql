@@ -7,7 +7,9 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\GraphQL\Schema\SchemaLoader;
 use Drupal\graphql\GraphQL\Utility\Introspection;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller for the GraphiQL query builder IDE.
@@ -30,27 +32,11 @@ class ExplorerController implements ContainerInjectionInterface {
   protected $introspection;
 
   /**
-   * The schema loader service.
+   * The schema plugin manager.
    *
-   * @var \Drupal\graphql\GraphQL\Schema\SchemaLoader
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
-  protected $schemaLoader;
-
-  /**
-   * Constructs a ExplorerController object.
-   *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
-   *   The url generator service.
-   * @param \Drupal\graphql\GraphQL\Utility\Introspection $introspection
-   *   The introspection service.
-   * @param \Drupal\graphql\GraphQL\Schema\SchemaLoader $schemaLoader
-   *   The schema loader service.
-   */
-  public function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaLoader $schemaLoader) {
-    $this->urlGenerator = $urlGenerator;
-    $this->introspection = $introspection;
-    $this->schemaLoader = $schemaLoader;
-  }
+  protected $pluginManager;
 
   /**
    * {@inheritdoc}
@@ -59,8 +45,24 @@ class ExplorerController implements ContainerInjectionInterface {
     return new static(
       $container->get('url_generator'),
       $container->get('graphql.introspection'),
-      $container->get('graphql.schema_loader')
+      $container->get('plugin.manager.graphql.schema')
     );
+  }
+
+  /**
+   * ExplorerController constructor.
+   *
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
+   *   The url generator service.
+   * @param \Drupal\graphql\GraphQL\Utility\Introspection $introspection
+   *   The introspection service.
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
+   *   The schema plugin manager.
+   */
+  public function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaPluginManager $pluginManager) {
+    $this->urlGenerator = $urlGenerator;
+    $this->introspection = $introspection;
+    $this->pluginManager = $pluginManager;
   }
 
   /**
@@ -68,11 +70,13 @@ class ExplorerController implements ContainerInjectionInterface {
    *
    * @param string $schema
    *   The name of the schema.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
    *
    * @return array The render array.
    *   The render array.
    */
-  public function viewExplorer($schema) {
+  public function viewExplorer($schema, Request $request) {
     $url = $this->urlGenerator->generate("graphql.query.$schema");
     $introspectionData = $this->introspection->introspect($schema);
 
@@ -84,6 +88,8 @@ class ExplorerController implements ContainerInjectionInterface {
         'drupalSettings' => [
           'graphqlRequestUrl' => $url,
           'graphqlIntrospectionData' => $introspectionData,
+          'graphqlQuery' => $request->get('query'),
+          'graphqlVariables' => $request->get('variables'),
         ],
       ],
     ];

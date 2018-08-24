@@ -1,0 +1,16 @@
+query {
+  route(path: "/") {
+    ... on InternalUrl {
+      links:languageSwitchLinks {
+        language {
+          id
+        }
+        title
+        active
+        url {
+          path
+        }
+      }
+    }
+  }
+}

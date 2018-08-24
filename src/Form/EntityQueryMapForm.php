@@ -13,13 +13,16 @@ class EntityQueryMapForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state = NULL) {
-    $form = parent::buildForm($form, $form_state);
+  public function buildForm(array $form, FormStateInterface $formState = NULL) {
+    $form = parent::buildForm($form, $formState);
     $form['#title'] = $this->t('Query map version %version', ['%version' => $this->entity->id()]);
 
-    foreach ($this->entity->queryMap as $i => $query) {
-      $form['queryMap'][$i] = [
-        '#title' => $this->t('ID %id', ['%id' => $i]),
+    /** @var \Drupal\graphql\Entity\QueryMapInterface $entity */
+    $entity = $this->entity;
+
+    foreach ($entity->get('map') as $id => $query) {
+      $form['map'][$id] = [
+        '#title' => $this->t('ID %id', ['%id' => $id]),
         '#type' => 'textarea',
         '#default_value' => $query,
         '#disabled' => TRUE,
@@ -31,7 +34,7 @@ class EntityQueryMapForm extends EntityForm {
       'delete' => [
         '#type' => 'link',
         '#title' => $this->t('Back'),
-        '#url' => $this->entity->toUrl('collection'),
+        '#url' => $entity->toUrl('collection'),
       ],
     ];
 

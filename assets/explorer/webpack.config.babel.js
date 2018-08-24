@@ -32,7 +32,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       { from: path.resolve(__dirname, 'node_modules/graphiql/graphiql.css') },
-      { from: path.resolve(__dirname, 'src/explorer.css') },
+      { from: path.resolve(__dirname, 'src/container.css') },
     ]),
   ]).concat(process.env.NODE_ENV === 'production' ? [
     new webpack.optimize.UglifyJsPlugin({

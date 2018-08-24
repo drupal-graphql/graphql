@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -15,14 +15,14 @@ class VoyagerRoutes extends RouteSubscriberBase {
   /**
    * The graphql schema plugin manager.
    *
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $schemaManager;
 
   /**
-   * Constructs a QueryRoutes object.
+   * VoyagerRoutes constructor.
    *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $schemaManager
    *   The graphql schema plugin manager.
    */
   public function __construct(SchemaPluginManager $schemaManager) {

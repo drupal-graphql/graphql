@@ -3,68 +3,45 @@
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use GraphQL\Executor\ExecutionResult;
 
-/**
- * A single graphql query result.
- */
-class QueryResult implements CacheableDependencyInterface {
-
-  /**
-   * The query result.
-   *
-   * @var mixed
-   */
-  protected $data;
-
-  /**
-   * Cache metadata collected during query execution.
-   *
-   * @var \Drupal\Core\Cache\CacheableDependencyInterface
-   */
-  protected $metadata;
+class QueryResult extends ExecutionResult implements RefinableCacheableDependencyInterface {
+  use RefinableCacheableDependencyTrait;
 
   /**
    * QueryResult constructor.
    *
-   * @param $data
+   * @param array $data
    *   Result data.
+   * @param array $errors
+   *   Errors collected during execution.
+   * @param array $extensions
+   *   User specified array of extensions.
    * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
-   *   Result metadata.
+   *   The cache metadata collected during query execution.
    */
-  public function __construct($data, CacheableDependencyInterface $metadata) {
+  public function __construct(array $data = null, array $errors = [], array $extensions = [], CacheableDependencyInterface $metadata = NULL) {
     $this->data = $data;
-    $this->metadata = $metadata;
+    $this->errors = $errors;
+    $this->extensions = $extensions;
+
+    // If no cache metadata was given, assume this result is not cacheable.
+    $this->addCacheableDependency($metadata);
   }
 
   /**
-   * Retrieve query result data.
+   * Don't serialize errors, since they might contain closures.
    *
-   * @return mixed
-   *   The result data object.
+   * @return string[]
+   *   The property names to serialize.
    */
-  public function getData() {
-    return $this->data;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts() {
-    return $this->metadata->getCacheContexts();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    return $this->metadata->getCacheTags();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge() {
-    return $this->metadata->getCacheMaxAge();
+  public function __sleep() {
+    // TODO: Find a better way to solve this.
+    return array_filter(array_keys(get_object_vars($this)), function ($prop) {
+      return $prop != 'errors';
+    });
   }
 
 }

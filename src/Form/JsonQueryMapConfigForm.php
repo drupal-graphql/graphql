@@ -21,7 +21,17 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
   protected $cacheBackend;
 
   /**
-   * Constructs a QueryMapConfigForm object.
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('cache.default')
+    );
+  }
+
+  /**
+   * QueryMapConfigForm constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The factory for configuration objects.
@@ -31,16 +41,6 @@ class JsonQueryMapConfigForm extends ConfigFormBase {
   public function __construct(ConfigFactoryInterface $configFactory, CacheBackendInterface $cacheBackend) {
     parent::__construct($configFactory);
     $this->cacheBackend = $cacheBackend;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('cache.default')
-    );
   }
 
   /**

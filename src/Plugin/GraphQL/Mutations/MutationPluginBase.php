@@ -2,62 +2,48 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Mutations;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\graphql\Plugin\MutationPluginInterface;
+use Drupal\graphql\Plugin\MutationPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Traits\ArgumentAwarePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Youshido\GraphQL\Config\Field\FieldConfig;
-use Youshido\GraphQL\Field\AbstractField;
+use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
 
-/**
- * Base class for graphql mutation plugins.
- */
-abstract class MutationPluginBase extends AbstractField implements TypeSystemPluginInterface {
-  use PluginTrait;
-  use CacheablePluginTrait;
-  use NamedPluginTrait;
+abstract class MutationPluginBase extends PluginBase implements MutationPluginInterface {
+  use TypedPluginTrait;
+  use DescribablePluginTrait;
   use ArgumentAwarePluginTrait;
+  use DeprecatablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
+  public static function createInstance(SchemaBuilderInterface $builder, MutationPluginManager $manager, $definition, $id) {
+    return [
+      'description' => $definition['description'],
+      'deprecationReason' => $definition['deprecationReason'],
+      'type' => $builder->processType($definition['type']),
+      'args' => $builder->processArguments($definition['args']),
+      'resolve' => function ($value, $args, $context, $info) use ($manager, $id) {
+        $instance = $manager->getInstance(['id' => $id]);
+        return call_user_func_array([$instance, 'resolve'], [$value, $args, $context, $info]);
+      },
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
-    $this->config = new FieldConfig([
-      'name' => $this->buildName(),
-      'type' => $this->buildType($schemaManager),
-      'args' => $this->buildArguments($schemaManager),
-    ]);
-  }
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
 
-  /**
-   * {@inheritdoc}
-   */
-  public function build(FieldConfig $config) {
-    // May be overridden, but not required any more.
+    return [
+      'type' => $this->buildType($definition),
+      'description' => $this->buildDescription($definition),
+      'args' => $this->buildArguments($definition),
+      'deprecationReason' => $this->buildDeprecationReason($definition),
+    ];
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getType() {
-    return $this->config->getType();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->buildName();
-  }
-
 }

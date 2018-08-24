@@ -21,4 +21,11 @@ class GraphQLInputType extends GraphQLAnnotationBase {
    */
   public $fields = [];
 
+  /**
+   * The typed data type of this type.
+   *
+   * @var string|null
+   */
+  public $type = NULL;
+
 }

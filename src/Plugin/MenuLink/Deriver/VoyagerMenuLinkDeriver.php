@@ -4,31 +4,33 @@ namespace Drupal\graphql\Plugin\MenuLink\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Drupal\graphql\Plugin\GraphQL\SchemaPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class VoyagerMenuLinkDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * @var \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager
+   * The schema plugin manager service.
+   *
+   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $schemaManager;
-
-  /**
-   * Constructs a ExplorerMenuLinkDeriver object.
-   *
-   * @param \Drupal\graphql\Plugin\GraphQL\SchemaPluginManager $schemaManager
-   *   The schema plugin manager service.
-   */
-  public function __construct(SchemaPluginManager $schemaManager) {
-    $this->schemaManager = $schemaManager;
-  }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static($container->get('plugin.manager.graphql.schema'));
+  }
+
+  /**
+   * VoyagerMenuLinkDeriver constructor.
+   *
+   * @param \Drupal\graphql\Plugin\SchemaPluginManager $schemaManager
+   *   The schema plugin manager service.
+   */
+  public function __construct(SchemaPluginManager $schemaManager) {
+    $this->schemaManager = $schemaManager;
   }
 
   /**

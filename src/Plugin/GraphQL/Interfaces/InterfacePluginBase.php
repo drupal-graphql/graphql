@@ -2,97 +2,85 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Interfaces;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\FieldablePluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\NamedPluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Traits\PluginTrait;
-use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
-use Drupal\graphql\Plugin\GraphQL\TypeSystemPluginInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Youshido\GraphQL\Config\Object\InterfaceTypeConfig;
-use Youshido\GraphQL\Type\InterfaceType\AbstractInterfaceType;
+use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
+use Drupal\graphql\Plugin\SchemaBuilderInterface;
+use Drupal\graphql\Plugin\TypePluginInterface;
+use Drupal\graphql\Plugin\TypePluginManager;
+use GraphQL\Type\Definition\InterfaceType;
 
-/**
- * Base class for GraphQL interface plugins.
- */
-abstract class InterfacePluginBase extends AbstractInterfaceType implements TypeSystemPluginInterface, ContainerFactoryPluginInterface {
-  use PluginTrait;
+abstract class InterfacePluginBase extends PluginBase implements TypePluginInterface {
   use CacheablePluginTrait;
-  use NamedPluginTrait;
-  use FieldablePluginTrait;
-  use DependencySerializationTrait;
-
-  /**
-   * The schema manager.
-   *
-   * @var \Drupal\graphql\Plugin\GraphQL\PluggableSchemaManagerInterface
-   */
-  protected $schemaManager;
+  use DescribablePluginTrait;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(
-    ContainerInterface $container,
-    array $configuration,
-    $plugin_id,
-    $plugin_definition
-  ) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('graphql.pluggable_schema_manager'));
-  }
+  public static function createInstance(SchemaBuilderInterface $builder, TypePluginManager $manager, $definition, $id) {
+    return new InterfaceType([
+      'name' => $definition['name'],
+      'description' => $definition['description'],
+      'contexts' => function () use ($builder, $definition) {
+        $types = $builder->getSubTypes($definition['name']);
 
+        return array_reduce($types, function ($carry, $current) use ($builder) {
+          $type = $builder->getType($current);
+          if (!empty($type->config['contexts'])) {
+            $contexts = $type->config['contexts'];
+            $contexts = is_callable($contexts) ? $contexts() : $contexts;
+            return Cache::mergeContexts($carry, $contexts);
+          }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, PluggableSchemaManagerInterface $schemaManager) {
-    $this->schemaManager = $schemaManager;
-    $this->constructPlugin($configuration, $pluginId, $pluginDefinition);
-  }
+          return $carry;
+        }, $definition['contexts']);
+      },
+      'fields' => function () use ($builder, $definition) {
+        $fields = $builder->getFields($definition['name']);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfig(PluggableSchemaManagerInterface $schemaManager) {
-    $this->config = new InterfaceTypeConfig([
-      'name' => $this->buildName(),
-      'description' => $this->buildDescription(),
-      'fields' => $this->buildFields($schemaManager),
+        if (!empty($definition['interfaces'])) {
+          $inherited = array_map(function ($name) use ($builder) {
+            return $builder->getFields($name);
+          }, $definition['interfaces']);
+
+          $inherited = call_user_func_array('array_merge', $inherited);
+          return array_merge($inherited, $fields);
+        }
+
+        return $fields;
+      },
+      'resolveType' => function ($value, $context, $info) use ($builder, $definition) {
+        return $builder->resolveType($definition['name'], $value, $context, $info);
+      },
     ]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build($config) {
-    // May be overridden, but not required any more.
+  public function getDefinition() {
+    $definition = $this->getPluginDefinition();
+
+    return [
+      'name' => $definition['name'],
+      'description' => $this->buildDescription($definition),
+      'interfaces' => $this->buildInterfaces($definition),
+      'contexts' => $this->buildCacheContexts($definition),
+    ];
   }
 
   /**
-   * Default implementation of "resolveType".
+   * Builds the list of interfaces inherited by this interface.
    *
-   * Checks all implementing types and returns the matching type with the
-   * highest weight.
+   * @param array $definition
+   *   The plugin definition array.
    *
-   * @param mixed $object
-   *   The current response tree value.
-   *
-   * @return \Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase
-   *   The type object.
+   * @return array
+   *   The list of interfaces that this interface inherits from.
    */
-  public function resolveType($object) {
-    $name = $this->getPluginDefinition()['name'];
-    $types = array_filter($this->schemaManager->find(function ($type) use ($name) {
-      return in_array($name, $type['interfaces']);
-    }, [GRAPHQL_TYPE_PLUGIN]), function (TypePluginBase $type) use ($object) {
-      return $type->applies($object);
-    });
-
-    return array_shift($types);
+  protected function buildInterfaces($definition) {
+    return $definition['interfaces'] ?: [];
   }
 
 }

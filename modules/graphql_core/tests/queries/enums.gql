@@ -1,6 +1,0 @@
-query {
-  number(number: ONE)
-  numbers(numbers: [ONE, TWO, THREE])
-  character(character: A)
-  characters (characters: [A, B, C])
-}

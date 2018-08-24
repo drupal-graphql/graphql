@@ -19,21 +19,10 @@ abstract class GraphQLAnnotationBase extends Plugin {
    * The type of component. Field, Interface, Type, Scalar ...
    *
    * @var string
+   *
    * @see graphql.module
    */
   public $pluginType = NULL;
-
-  /**
-   * {@inheritdoc}
-   *
-   * Enforce explicit id's on GraphQL plugin annotations.
-   */
-  public function __construct($values) {
-    if (!array_key_exists('id', $values) || !$values['id']) {
-      throw new AnnotationException('GraphQL plugin is missing an "id" property.');
-    }
-    parent::__construct($values);
-  }
 
   /**
    * The component name.
@@ -41,6 +30,13 @@ abstract class GraphQLAnnotationBase extends Plugin {
    * @var string
    */
   public $name;
+
+  /**
+   * The component description.
+   *
+   * @var string
+   */
+  public $description = '';
 
   /**
    * Weight for precedence calculations.
@@ -57,14 +53,14 @@ abstract class GraphQLAnnotationBase extends Plugin {
    *
    * @var array
    */
-  public $schema_cache_contexts = ['languages:language_interface'];
+  public $schema_cache_contexts = [];
 
   /**
    * The cache tags for caching the type system definition in the schema.
    *
    * @var array
    */
-  public $schema_cache_tags = ['graphql_schema'];
+  public $schema_cache_tags = [];
 
   /**
    * The cache max age for caching the type system definition in the schema.
@@ -78,14 +74,14 @@ abstract class GraphQLAnnotationBase extends Plugin {
    *
    * @var array
    */
-  public $response_cache_contexts = ['gql', 'user'];
+  public $response_cache_contexts = ['user.permissions'];
 
   /**
    * The cache tags for caching theresponse.
    *
    * @var array
    */
-  public $response_cache_tags = ['graphql_response'];
+  public $response_cache_tags = [];
 
   /**
    * The cache max age for caching the response.
@@ -93,5 +89,21 @@ abstract class GraphQLAnnotationBase extends Plugin {
    * @var array
    */
   public $response_cache_max_age = CacheBackendInterface::CACHE_PERMANENT;
+
+  /**
+   * GraphQLAnnotationBase constructor.
+   *
+   * @param $values
+   *   The plugin annotation values.
+   *
+   * @throws \Doctrine\Common\Annotations\AnnotationException
+   *   In case of missing required annotation values.
+   */
+  public function __construct($values) {
+    if (!array_key_exists('id', $values) || !$values['id']) {
+      throw new AnnotationException('GraphQL plugin is missing an "id" property.');
+    }
+    parent::__construct($values);
+  }
 
 }
