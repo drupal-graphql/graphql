@@ -5,17 +5,22 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
 use Drupal\graphql\Plugin\SubscriptionPluginManager;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Validator\DocumentValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
@@ -77,6 +82,27 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $types = [];
 
   /**
+   * The service parameters
+   *
+   * @var array
+   */
+  protected $parameters;
+
+  /**
+   * The query provider service.
+   *
+   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface
+   */
+  protected $queryProvider;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -87,7 +113,10 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $container->get('plugin.manager.graphql.field'),
       $container->get('plugin.manager.graphql.mutation'),
       $container->get('plugin.manager.graphql.subscription'),
-      $container->get('graphql.type_manager_aggregator')
+      $container->get('graphql.type_manager_aggregator'),
+      $container->get('graphql.query_provider'),
+      $container->get('current_user'),
+      $container->getParameter('graphql.config')
     );
   }
 
@@ -108,6 +137,11 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The subscription plugin manager.
    * @param \Drupal\graphql\Plugin\TypePluginManagerAggregator $typeManagers
    *   The type manager aggregator service.
+   * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider
+   *   The query provider service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+   *   The current user.
+   * @param array $parameters
    */
   public function __construct(
     $configuration,
@@ -116,13 +150,33 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     FieldPluginManager $fieldManager,
     MutationPluginManager $mutationManager,
     SubscriptionPluginManager $subscriptionManager,
-    TypePluginManagerAggregator $typeManagers
+    TypePluginManagerAggregator $typeManagers,
+    QueryProviderInterface $queryProvider,
+    AccountProxyInterface $currentUser,
+    array $parameters
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
     $this->subscriptionManager = $subscriptionManager;
     $this->typeManagers = $typeManagers;
+    $this->queryProvider = $queryProvider;
+    $this->currentUser = $currentUser;
+    $this->parameters = $parameters;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function allowsQueryBatching() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function inDebug() {
+    return !!$this->parameters['development'];
   }
 
   /**
@@ -165,6 +219,69 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     });
 
     return new Schema($config);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRootValue() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContext() {
+    // If the current user has appropriate permissions, allow to bypass
+    // the secure fields restriction.
+    $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
+
+    // Each document (e.g. in a batch query) gets its own resolve context. This
+    // allows us to collect the cache metadata and contextual values (e.g.
+    // inheritance for language) for each query separately.
+    return function ($params, $document, $operation) use ($globals) {
+      // Each document (e.g. in a batch query) gets its own resolve context. This
+      // allows us to collect the cache metadata and contextual values (e.g.
+      // inheritance for language) for each query separately.
+      $context = new ResolveContext($globals);
+      $context->addCacheTags(['graphql_response']);
+      if ($this instanceof CacheableDependencyInterface) {
+        $context->addCacheableDependency($this);
+      }
+
+      return $context;
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldResolver() {
+    return NULL;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getValidationRules() {
+    return function (OperationParams $params, DocumentNode $document, $operation) {
+      if (isset($params->queryId)) {
+        // Assume that pre-parsed documents are already validated. This allows
+        // us to store pre-validated query documents e.g. for persisted queries
+        // effectively improving performance by skipping run-time validation.
+        return [];
+      }
+
+      return array_values(DocumentValidator::defaultRules());
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPersistedQueryLoader() {
+    return [$this->queryProvider, 'getQuery'];
   }
 
   /**
