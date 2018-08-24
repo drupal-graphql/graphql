@@ -72,7 +72,8 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
     }
 
     if ($fieldDefinition instanceof FieldStorageConfigInterface) {
-      if ($fieldDefinition->getEntityType()->hasKey('bundle')) {
+      $targetType = $this->entityTypeManager->getDefinition($fieldDefinition->getTargetEntityTypeId());
+      if ($targetType->hasKey('bundle')) {
         return array_values(array_map(function ($bundleId) use ($entityTypeId) {
           return StringHelper::camelCase($entityTypeId, $bundleId);
         }, $fieldDefinition->getBundles()));
