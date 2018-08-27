@@ -211,6 +211,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
+  public function validateSchema() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getServer() {
     // If the current user has appropriate permissions, allow to bypass
     // the secure fields restriction.
