@@ -89,20 +89,7 @@ class QueryProcessor {
   public function processQuery($schema, $params) {
     // Load the plugin from the schema manager.
     $plugin = $this->pluginManager->createInstance($schema);
-
-    // Create the server config.
-    $config = ServerConfig::create();
-    $config->setContext($plugin->getContext());
-    $config->setValidationRules($plugin->getValidationRules());
-    $config->setPersistentQueryLoader($plugin->getPersistedQueryLoader());
-    $config->setRootValue($plugin->getRootValue());
-    $config->setQueryBatching($plugin->allowsQueryBatching());
-    $config->setDebug($plugin->inDebug());
-    $config->setSchema($plugin->getSchema());
-
-    if ($resolver = $plugin->getFieldResolver()) {
-      $config->setFieldResolver($resolver);
-    }
+    $config = $plugin->getServer();
 
     if (is_array($params)) {
       return $this->executeBatch($config, $params);

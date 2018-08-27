@@ -16,6 +16,7 @@ use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
+use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
@@ -168,20 +169,6 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function allowsQueryBatching() {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function inDebug() {
-    return !!$this->parameters['development'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getSchema() {
     $config = new SchemaConfig();
 
@@ -224,22 +211,18 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function getRootValue() {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContext() {
+  public function getServer() {
     // If the current user has appropriate permissions, allow to bypass
     // the secure fields restriction.
     $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
 
+    // Create the server config.
+    $config = ServerConfig::create();
+
     // Each document (e.g. in a batch query) gets its own resolve context. This
     // allows us to collect the cache metadata and contextual values (e.g.
     // inheritance for language) for each query separately.
-    return function ($params, $document, $operation) use ($globals) {
+    $config->setContext(function ($params, $document, $operation) use ($globals) {
       // Each document (e.g. in a batch query) gets its own resolve context. This
       // allows us to collect the cache metadata and contextual values (e.g.
       // inheritance for language) for each query separately.
@@ -250,22 +233,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       }
 
       return $context;
-    };
-  }
+    });
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldResolver() {
-    return NULL;
-  }
-
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getValidationRules() {
-    return function (OperationParams $params, DocumentNode $document, $operation) {
+    $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
       if (isset($params->queryId)) {
         // Assume that pre-parsed documents are already validated. This allows
         // us to store pre-validated query documents e.g. for persisted queries
@@ -274,16 +244,17 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       }
 
       return array_values(DocumentValidator::defaultRules());
-    };
+    });
+
+    $config->setPersistentQueryLoader([$this->queryProvider, 'getQuery']);
+    $config->setQueryBatching(TRUE);
+    $config->setDebug(!!$this->parameters['development']);
+    $config->setSchema($this->getSchema());
+
+    return $config;
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function getPersistedQueryLoader() {
-    return [$this->queryProvider, 'getQuery'];
-  }
-
   /**
    * {@inheritdoc}
    */
