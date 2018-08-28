@@ -381,28 +381,28 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function processMutations($mutations) {
+  public function processMutations(array $mutations) {
     return array_map([$this, 'buildMutation'], $mutations);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function processSubscriptions($subscriptions) {
+  public function processSubscriptions(array $subscriptions) {
     return array_map([$this, 'buildSubscription'], $subscriptions);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function processFields($fields) {
+  public function processFields(array $fields) {
     return array_map([$this, 'buildField'], $fields);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function processArguments($args) {
+  public function processArguments(array $args) {
     return array_map(function ($arg) {
       return [
         'type' => $this->processType($arg['type']),
@@ -413,7 +413,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function processType($type) {
+  public function processType(array $type) {
     list($type, $decorators) = $type;
 
     return array_reduce($decorators, function ($type, $decorator) {
