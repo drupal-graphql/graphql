@@ -37,7 +37,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     $schema = $this->introspect();
     $this->assertArraySubset([
       'types' => [
-        'QueryRoot' => [
+        'Query' => [
           'fields' => [
             'root' => [
               'name' => 'root',
@@ -66,11 +66,11 @@ class TestFrameworkTest extends GraphQLTestBase {
     $metadata->setCacheMaxAge(0);
 
     $this->assertErrors('{ root }', [], [
-      'Cannot query field "root" on type "QueryRoot".',
+      'Cannot query field "root" on type "Query".',
     ], $metadata);
 
     $this->assertErrors('{ root }', [], [
-      '/root.*QueryRoot/',
+      '/root.*Query/',
     ], $metadata);
   }
 
