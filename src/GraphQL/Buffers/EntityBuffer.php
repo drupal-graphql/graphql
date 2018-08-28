@@ -69,7 +69,13 @@ class EntityBuffer extends BufferBase {
 
     return array_map(function ($item) use ($entities) {
       if (is_array($item['id'])) {
-        return array_intersect_key($entities, array_flip($item['id']));
+        return array_reduce($item['id'], function ($carry, $current) use ($entities) {
+          if (!empty($entities[$current])) {
+            return $carry + [$current => $entities[$current]];
+          }
+
+          return $carry;
+        }, []);
       }
 
       return isset($entities[$item['id']]) ? $entities[$item['id']] : NULL;
