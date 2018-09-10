@@ -5,6 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Menu;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -22,8 +23,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   description = @Translation("Loads a menu by its machine-readable name."),
  *   type = "Menu",
  *   arguments = {
- *     "name" = "String!"
+ *     "name" = "String!",
+ *     "language" = "LanguageId"
  *   },
+ *   contextual_arguments = {"language"},
  *   response_cache_contexts = {"languages:language_interface"}
  * )
  */
@@ -68,6 +71,12 @@ class MenuByName extends FieldPluginBase implements ContainerFactoryPluginInterf
     $entity = $this->entityTypeManager->getStorage('menu')->load($args['name']);
 
     if ($entity instanceof MenuInterface) {
+      if (isset($args['language']) && $args['language'] != $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
+        if ($entity->hasTranslation($args['language'])) {
+          $entity = $entity->getTranslation($args['language']);
+        }
+      }
+
       yield $entity;
     }
   }
