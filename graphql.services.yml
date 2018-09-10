@@ -39,12 +39,9 @@ services:
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
-      - '@current_user'
       - '@cache_contexts_manager'
       - '@plugin.manager.graphql.schema'
-      - '@graphql.query_provider'
       - '@cache.graphql.results'
-      - '%graphql.config%'
 
   # Query map provider using the composite pattern.
   graphql.query_provider:
@@ -112,7 +109,7 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
-      - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
+      - '\Drupal\graphql\Plugin\SchemaPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
       - '%graphql.config%'
 

@@ -128,7 +128,7 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed mutation definitions.
    */
-  public function processMutations($mutations);
+  public function processMutations(array $mutations);
 
   /**
    * Processes a list of subscription definitions.
@@ -139,7 +139,7 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed subscription definitions.
    */
-  public function processSubscriptions($subscriptions);
+  public function processSubscriptions(array $subscriptions);
 
   /**
    * Processes a list of field definitions.
@@ -150,7 +150,7 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed field definitions.
    */
-  public function processFields($fields);
+  public function processFields(array $fields);
 
   /**
    * Processes a list of argument definitions.
@@ -161,7 +161,7 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed argument definitions.
    */
-  public function processArguments($args);
+  public function processArguments(array $args);
 
   /**
    * Processes a optimized type definition structure.
@@ -174,6 +174,6 @@ interface SchemaBuilderInterface {
    * @return \GraphQL\Type\Definition\Type
    *   The decorated type instance corresponding to the given type definition.
    */
-  public function processType($type);
+  public function processType(array $type);
 
 }

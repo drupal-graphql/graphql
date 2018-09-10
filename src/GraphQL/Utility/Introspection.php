@@ -33,7 +33,7 @@ class Introspection {
    *   The introspection result as an array.
    */
   public function introspect($schema) {
-    $query = IntrospectionType::getIntrospectionQuery(TRUE);
+    $query = IntrospectionType::getIntrospectionQuery(['descriptions' => TRUE]);
     $operation = OperationParams::create(['query' => $query]);
     $result = $this->queryProcessor->processQuery($schema, $operation);
     return $result->toArray();
