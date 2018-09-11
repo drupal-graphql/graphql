@@ -295,6 +295,9 @@ trait MockGraphQLPluginTrait {
       $this->container->get('plugin.manager.graphql.mutation'),
       $this->container->get('plugin.manager.graphql.subscription'),
       $this->container->get('graphql.type_manager_aggregator'),
+      $this->container->get('graphql.query_provider'),
+      $this->container->get('current_user'),
+      $this->container->getParameter('graphql.config')
     ]);
 
     if (is_callable($builder)) {

@@ -48,34 +48,6 @@ trait GraphQLFileTestTrait {
   }
 
   /**
-   * Submit a GraphQL query directly to the processor.
-   *
-   * @param string $queryFile
-   *   The query file name.
-   * @param mixed $variables
-   *   Variables to be passed to the query file.
-   * @param bool $assertNoErrors
-   *   Assert the absence of errors.
-   * @param bool $bypassSecurity
-   *   Bypass field security for this query.
-   *
-   * @return array
-   *   The GraphQL result object.
-   */
-  public function executeQueryFile($queryFile, $variables = [], $assertNoErrors = TRUE, $bypassSecurity = FALSE) {
-    /** @var \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor */
-    $processor = \Drupal::service('graphql.query_processor');
-    $result = $processor->processQuery('test', $this->getQuery($queryFile), $variables, $bypassSecurity);
-    $data = $result->getData();
-
-    if ($assertNoErrors) {
-      $this->assertNoErrors($data);
-    }
-
-    return $data;
-  }
-
-  /**
    * Run http subrequest with a specific query file.
    *
    * @param string $queryFile

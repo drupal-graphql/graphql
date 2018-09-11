@@ -46,7 +46,7 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
     $schema = $this->introspect();
     $this->assertArrayHasKey(
       'bar',
-      $schema['types']['QueryRoot']['fields'],
+      $schema['types']['Query']['fields'],
       'Schema does not contain the new field.'
     );
   }
@@ -77,7 +77,7 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
     $schema = $this->introspect();
     $this->assertArrayHasKey(
       'bar',
-      $schema['types']['QueryRoot']['fields'],
+      $schema['types']['Query']['fields'],
       'Schema does not contain the new field.'
     );
   }

@@ -33,25 +33,11 @@ use GraphQL\Validator\ValidationContext;
 class QueryProcessor {
 
   /**
-   * The current user account.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $currentUser;
-
-  /**
    * The schema plugin manager.
    *
    * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $pluginManager;
-
-  /**
-   * The query provider service.
-   *
-   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface
-   */
-  protected $queryProvider;
 
   /**
    * The cache backend for caching query results.
@@ -68,42 +54,23 @@ class QueryProcessor {
   protected $contextsManager;
 
   /**
-   * The configuration service parameter.
-   *
-   * @var array
-   */
-  protected $config;
-
-  /**
    * Processor constructor.
    *
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *   The current user.
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
-   * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider
-   *   The query provider service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for caching query results.
-   * @param array $config
-   *   The configuration service parameter.
    */
   public function __construct(
-    AccountProxyInterface $currentUser,
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
-    QueryProviderInterface $queryProvider,
-    CacheBackendInterface $cacheBackend,
-    array $config
+    CacheBackendInterface $cacheBackend
   ) {
-    $this->currentUser = $currentUser;
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
-    $this->queryProvider = $queryProvider;
     $this->cacheBackend = $cacheBackend;
-    $this->config = $config;
   }
 
   /**
@@ -113,58 +80,16 @@ class QueryProcessor {
    *   The plugin id of the schema to use.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $params
    *   The graphql operation(s) to execute.
-   * @param array $globals
-   *   The query context.
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
    *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function processQuery($schema, $params, array $globals = []) {
+  public function processQuery($schema, $params) {
     // Load the plugin from the schema manager.
     $plugin = $this->pluginManager->createInstance($schema);
-    $schema = $plugin->getSchema();
-
-    // If the current user has appropriate permissions, allow to bypass
-    // the secure fields restriction.
-    $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
-
-    // Create the server config.
-    $config = ServerConfig::create();
-    $config->setDebug(!empty($this->config['development']));
-    $config->setSchema($schema);
-    $config->setQueryBatching(TRUE);
-    $config->setContext(function () use ($globals, $plugin) {
-      // Each document (e.g. in a batch query) gets its own resolve context but
-      // the global parameters are shared. This allows us to collect the cache
-      // metadata and contextual values (e.g. inheritance for language) for each
-      // query separately.
-      $context = new ResolveContext($globals);
-      if ($plugin instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($plugin)->addCacheTags(['graphql_response']);
-      }
-
-      return $context;
-    });
-
-    $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
-      if (isset($params->queryId)) {
-        // Assume that pre-parsed documents are already validated. This allows
-        // us to store pre-validated query documents e.g. for persisted queries
-        // effectively improving performance by skipping run-time validation.
-        return [];
-      }
-
-      return array_values(DocumentValidator::defaultRules());
-    });
-
-    $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
-      if ($query = $this->queryProvider->getQuery($id, $params)) {
-        return $query;
-      }
-
-      throw new RequestError(sprintf("Failed to load query map for id '%s'.", $id));
-    });
+    $config = $plugin->getServer();
 
     if (is_array($params)) {
       return $this->executeBatch($config, $params);
@@ -392,6 +317,7 @@ class QueryProcessor {
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
    * @return \GraphQL\Error\Error[]
+   * @throws \Exception
    */
   protected function validateOperation(ServerConfig $config, OperationParams $params, DocumentNode $document) {
     $operation = $params->operation;
