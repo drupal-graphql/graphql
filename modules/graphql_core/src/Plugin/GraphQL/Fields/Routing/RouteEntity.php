@@ -159,8 +159,10 @@ class RouteEntity extends FieldPluginBase implements ContainerFactoryPluginInter
    * @return \Iterator
    */
   protected function resolveEntityTranslation(EntityInterface $entity, Url $url, array $args, ResolveInfo $info) {
-    if ($entity instanceof TranslatableInterface && isset($args['language'])) {
-      $entity = $entity->getTranslation($args['language']);
+    if ($entity instanceof TranslatableInterface && isset($args['language']) && $entity->isTranslatable()) {
+      if ($entity->hasTranslation($args['language'])) {
+        $entity = $entity->getTranslation($args['language']);
+      }
     }
     return $this->resolveEntity($entity, $url, $args, $info);
   }

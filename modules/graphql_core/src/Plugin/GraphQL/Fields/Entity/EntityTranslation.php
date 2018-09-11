@@ -68,7 +68,9 @@ class EntityTranslation extends FieldPluginBase implements ContainerFactoryPlugi
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof EntityInterface && $value instanceof TranslatableInterface && $value->isTranslatable()) {
-      yield $value->getTranslation($args['language']);
+      if ($value->hasTranslation($args['language'])) {
+        yield $value->getTranslation($args['language']);
+      }
     }
   }
 
