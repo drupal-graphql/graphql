@@ -108,6 +108,9 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
         $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
       }
+      else {
+        $context->setContext('language', $this->languageManager->getDefaultLanguage()->getId(), $info);
+      }
     }
 
     return parent::resolve($value, $args, $context, $info);
