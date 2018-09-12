@@ -19,6 +19,11 @@ services:
     tags:
       - { name: access_check, applies_to: _graphql_query_access }
 
+  # Logger channel for graphql related logging.
+  logger.channel.graphql:
+    parent: logger.channel_base
+    arguments: ['graphql']
+
   # Cache bin for graphql plugin definitions.
   cache.graphql.definitions:
     class: Drupal\Core\Cache\CacheBackendInterface
