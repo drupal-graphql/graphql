@@ -272,16 +272,15 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $config->setDebug(!!$this->parameters['development']);
     $config->setSchema($this->getSchema());
 
-    // Log errors in development mode.
-    if (!!$this->parameters['development']) {
-      $config->setErrorsHandler(function (array $errors, callable $formatter) {
-        foreach ($errors as $error) {
-          $this->logger->error($error->getMessage());
-        }
+    // Always log the errors.
+    $config->setErrorsHandler(function (array $errors, callable $formatter) {
+      /** @var \GraphQL\Error\Error $error */
+      foreach ($errors as $error) {
+        $this->logger->error($error->getMessage());
+      }
 
-        return array_map($formatter, $errors);
-      });
-    }
+      return array_map($formatter, $errors);
+    });
 
     return $config;
   }
