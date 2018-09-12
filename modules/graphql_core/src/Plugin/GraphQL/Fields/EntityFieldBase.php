@@ -35,7 +35,9 @@ class EntityFieldBase extends FieldPluginBase {
       }
 
       if ($result instanceof ContentEntityInterface && $result->isTranslatable() && $language = $context->getContext('language', $info)) {
-        $result = $result->getTranslation($language);
+        if ($result->hasTranslation($language)) {
+          $result = $result->getTranslation($language);
+        }
       }
 
       return $result;

@@ -1,7 +1,11 @@
 #graphql-explorer {
-  position: absolute;
-  top: 79px;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  height: calc(100vh);
+}
+
+.toolbar-fixed #graphql-explorer {
+  height: calc(100vh - 39px);
+}
+
+.toolbar-horizontal.toolbar-tray-open #graphql-explorer {
+  height: calc(100vh - 79px);
 }
