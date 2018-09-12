@@ -22,8 +22,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   description = @Translation("Loads a menu by its machine-readable name."),
  *   type = "Menu",
  *   arguments = {
- *     "name" = "String!"
+ *     "name" = "String!",
+ *     "language" = "LanguageId"
  *   },
+ *   contextual_arguments = {"language"},
  *   response_cache_contexts = {"languages:language_interface"}
  * )
  */
