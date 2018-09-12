@@ -6,13 +6,14 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeriverInterface {
+class EntityReferenceQueryDeriver extends DeriverBase implements ContainerDeriverInterface {
   use StringTranslationTrait;
 
   /**
@@ -86,15 +87,17 @@ class EntityReferenceReverseDeriver extends DeriverBase implements ContainerDeri
         $contexts = $fieldDefinition->getCacheContexts();
         $maxAge = $fieldDefinition->getCacheMaxAge();
 
+        $targetType = $this->entityTypeManager->getDefinition($targetTypeId);
         $fieldName = $fieldDefinition->getName();
         $derivative = [
-          'parents' => [StringHelper::camelCase($targetTypeId)],
-          'name' => StringHelper::propCase('reverse', $fieldName, $entityTypeId),
-          'description' => $this->t('Reverse reference: @description', [
+          'parents' => [StringHelper::camelCase($entityTypeId)],
+          'name' => StringHelper::propCase('query', $fieldName),
+          'description' => $this->t('Query reference: @description', [
             '@description' => $fieldDefinition->getDescription(),
           ]),
           'field' => $fieldName,
-          'entity_type' => $entityTypeId,
+          'entity_key' => $targetType->getKey('id'),
+          'entity_type' => $targetTypeId,
           'schema_cache_tags' => $tags,
           'schema_cache_contexts' => $contexts,
           'schema_cache_max_age' => $maxAge,

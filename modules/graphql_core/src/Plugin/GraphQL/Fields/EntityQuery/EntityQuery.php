@@ -18,7 +18,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  * @GraphQLField(
  *   id = "entity_query",
  *   secure = true,
- *   type = "EntityQueryResult!",
+ *   type = "EntityQueryResult",
  *   arguments = {
  *     "filter" = "EntityQueryFilterInput",
  *     "sort" = "[EntityQuerySortInput]",
@@ -138,11 +138,14 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return \Drupal\Core\Entity\Query\QueryInterface|null
    *   The entity query object.
    */
   protected function getQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $query = $this->getBaseQuery($value, $args, $context, $info);
+    if (!$query = $this->getBaseQuery($value, $args, $context, $info)) {
+      return NULL;
+    }
+
     $query->range($args['offset'], $args['limit']);
 
     if (array_key_exists('revisions', $args)) {
@@ -172,7 +175,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return \Drupal\Core\Entity\Query\QueryInterface|null
    *   The entity query object.
    */
   protected function getBaseQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
