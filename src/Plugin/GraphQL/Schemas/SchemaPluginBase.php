@@ -22,6 +22,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use GraphQL\Validator\DocumentValidator;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
@@ -104,6 +105,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $currentUser;
 
   /**
+   * The logger service.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -117,6 +125,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $container->get('graphql.type_manager_aggregator'),
       $container->get('graphql.query_provider'),
       $container->get('current_user'),
+      $container->get('logger.channel.graphql'),
       $container->getParameter('graphql.config')
     );
   }
@@ -142,7 +151,10 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The query provider service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger service.
    * @param array $parameters
+   *   The service parameters.
    */
   public function __construct(
     $configuration,
@@ -154,6 +166,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     TypePluginManagerAggregator $typeManagers,
     QueryProviderInterface $queryProvider,
     AccountProxyInterface $currentUser,
+    LoggerInterface $logger,
     array $parameters
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -164,6 +177,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $this->queryProvider = $queryProvider;
     $this->currentUser = $currentUser;
     $this->parameters = $parameters;
+    $this->logger = $logger;
   }
 
   /**
@@ -257,6 +271,17 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $config->setQueryBatching(TRUE);
     $config->setDebug(!!$this->parameters['development']);
     $config->setSchema($this->getSchema());
+
+    // Log errors in development mode.
+    if (!!$this->parameters['development']) {
+      $config->setErrorsHandler(function (array $errors, callable $formatter) {
+        foreach ($errors as $error) {
+          $this->logger->error($error->getMessage());
+        }
+
+        return array_map($formatter, $errors);
+      });
+    }
 
     return $config;
   }
