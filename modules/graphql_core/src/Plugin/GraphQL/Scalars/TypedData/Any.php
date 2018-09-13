@@ -8,7 +8,8 @@ use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
  * @GraphQLScalar(
  *   id = "any",
  *   name = "Any",
- *   type = "any"
+ *   type = "any",
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Scalars\TypedDataPrimitiveFallback"
  * )
  */
 class Any extends ScalarPluginBase {
