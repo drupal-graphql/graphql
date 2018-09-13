@@ -116,7 +116,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'en',
             ],
             'url' => [
-              'path' => '/en/user/login',
+              'path' => '/en',
             ],
             'title' => 'English',
             'active' => TRUE,
@@ -126,7 +126,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'fr',
             ],
             'url' => [
-              'path' => '/fr/user/login',
+              'path' => '/fr',
             ],
             'title' => NULL,
             'active' => FALSE,
@@ -136,7 +136,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'es',
             ],
             'url' => [
-              'path' => '/es/user/login',
+              'path' => '/es',
             ],
             'title' => NULL,
             'active' => FALSE,
@@ -146,7 +146,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'pt-br',
             ],
             'url' => [
-              'path' => '/user/login',
+              'path' => '/',
             ],
             'title' => NULL,
             'active' => FALSE,
