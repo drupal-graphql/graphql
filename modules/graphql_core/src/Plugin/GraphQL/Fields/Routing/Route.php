@@ -146,6 +146,7 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $currentLanguage = $this->languageManager->getCurrentLanguage()->getId();
       if ($redirect = $redirectRepository->findMatchingRedirect($args['path'], [], $currentLanguage)) {
         yield $redirect;
+        return;
       }
     }
 
