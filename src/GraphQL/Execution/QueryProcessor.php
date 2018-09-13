@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\ExecutionResult;
@@ -199,6 +200,11 @@ class QueryProcessor {
       }
 
       return $this->executeUncachableOperation($adapter, $config, $params, $document);
+    }
+    catch (CacheableRequestError $exception) {
+      return $adapter->createFulfilled(
+        new QueryResult(NULL, [Error::createLocatedError($exception)], [], $exception)
+      );
     }
     catch (RequestError $exception) {
       return $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
