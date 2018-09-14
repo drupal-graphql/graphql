@@ -1,7 +1,0 @@
-name: GraphQL Core
-type: module
-description: 'Provides type system plugins and derivers on behalf of core modules.'
-package: GraphQL
-core: 8.x
-dependencies:
-  - graphql

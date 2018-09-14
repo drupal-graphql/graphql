@@ -73,7 +73,6 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * @param $schema
    * @param $operations
-   * @param array $globals
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Drupal\Component\Plugin\Exception\PluginException
@@ -88,7 +87,6 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * @param $schema
    * @param $operations
-   * @param array $globals
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Drupal\Component\Plugin\Exception\PluginException

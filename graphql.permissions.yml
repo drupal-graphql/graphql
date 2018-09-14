@@ -6,18 +6,14 @@
   title: 'Execute persisted GraphQL requests'
   description: 'Allows users to execute persisted GraphQL requests.'
 
-'bypass graphql field security':
-  title: 'Bypass field security'
-  description: 'Allows the user to manually resolve insecure fields.'
-
 'use graphql explorer':
-  title: 'Use the GraphQL explorer'
+  title: 'Use GraphiQL'
   description: 'Allows users to use the GraphiQL interface.'
 
 'use graphql voyager':
-  title: 'Use the GraphQL Voyager'
+  title: 'Use GraphQL Voyager'
   description: 'Allows users to use the GraphQL Voyager interface.'
 
-'administer graphql query maps':
-  title: 'Administer query maps'
-  description: 'Allows users to import and edit query map configuration.'
+'administer graphql configuration':
+  title: 'Administer configuration'
+  description: 'Allows users to create, edit and delete server configurations.'

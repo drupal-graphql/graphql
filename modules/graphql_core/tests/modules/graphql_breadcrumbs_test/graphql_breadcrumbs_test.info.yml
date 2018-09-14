@@ -1,7 +1,0 @@
-name: GraphQL Breadcrumbs test
-type: module
-description: 'Test for breadcrumbs.'
-package: GraphQL
-core: 8.x
-dependencies:
-- graphql_breadcrumbs

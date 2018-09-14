@@ -4,68 +4,46 @@ graphql.config_page:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'GraphQL'
   requirements:
-    _permission: 'administer site configuration'
-
-graphql.query_maps:
-  path: '/admin/config/graphql/query-maps'
-  defaults:
-    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Query maps'
-  requirements:
-    _permission: 'administer site configuration'
-
-graphql.schema_overview:
-  path: '/admin/config/graphql/schemas'
-  defaults:
-    _controller: '\Drupal\graphql\Controller\SchemaOverviewController::listSchemas'
-    _title: 'Schemas'
-  requirements:
-    _permission: 'administer site configuration'
-
-graphql.query_map_json_config:
-  path: '/admin/config/graphql/query-maps/json'
-  defaults:
-    _form: 'Drupal\graphql\Form\JsonQueryMapConfigForm'
-    _title: 'File system discovery'
-  requirements:
-    _permission: 'administer site configuration'
+    _permission: 'administer graphql configuration'
   options:
     _admin_route: TRUE
 
-entity.graphql_query_map.collection:
-  path: '/admin/config/graphql/query-maps/config'
+entity.graphql_server.collection:
+  path: '/admin/config/graphql/servers'
   defaults:
-    _entity_list: 'graphql_query_map'
-    _title: 'Imported query maps'
+    _entity_list: 'graphql_server'
+    _title: 'Servers'
   requirements:
-    _permission: 'administer graphql query maps'
+    _permission: 'administer graphql configuration'
   options:
     _admin_route: TRUE
 
-entity.graphql_query_map.import_form:
-  path: '/admin/config/graphql/query-maps/config/import'
+entity.graphql_server.create_form:
+  path: '/admin/config/graphql/servers/create'
   defaults:
-    _entity_form: 'graphql_query_map.import'
-    _title: 'Import'
+    _entity_form: 'graphql_server.create'
+    _title: 'Create'
   requirements:
-    _permission: 'administer graphql query maps'
+    _permission: 'administer graphql configuration'
   options:
     _admin_route: TRUE
 
-entity.graphql_query_map.delete_form:
-  path: '/admin/config/graphql/query-maps/config/{graphql_query_map}/delete'
+entity.graphql_server.edit_form:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}'
   defaults:
-    _entity_form: 'graphql_query_map.delete'
+    _entity_form: 'graphql_server.edit'
+    _title: 'Edit'
+  requirements:
+    _permission: 'administer graphql configuration'
+  options:
+    _admin_route: TRUE
+
+entity.graphql_server.delete_form:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}/delete'
+  defaults:
+    _entity_form: 'graphql_server.delete'
     _title: 'Delete'
   requirements:
-    _permission: 'administer graphql query maps'
+    _permission: 'administer graphql configuration'
   options:
     _admin_route: TRUE
-
-entity.graphql_query_map.inspect_form:
-  path: '/admin/config/graphql/query-maps/config/{graphql_query_map}'
-  defaults:
-    _entity_form: 'graphql_query_map.inspect'
-    _title: 'Inspect'
-  requirements:
-    _permission: 'administer graphql query maps'

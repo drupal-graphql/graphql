@@ -65,10 +65,10 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
-   * Sets a contextual value for the current field and its decendents.
+   * Sets a contextual value for the current field and its descendants.
    *
    * Allows field resolvers to set contextual values which can be inherited by
-   * their descendents.
+   * their descendants.
    *
    * @param string $name
    *   The name of the context.

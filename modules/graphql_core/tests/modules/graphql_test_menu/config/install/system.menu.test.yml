@@ -1,7 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: test
-label: 'Test menu'
-description: 'Menu for testing GraphQL menu access.'
-locked: true

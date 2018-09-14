@@ -4,7 +4,6 @@ namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -114,7 +113,8 @@ class SubRequestBuffer extends BufferBase {
     }
 
     return array_map(function ($value) use ($response) {
-      return new CacheableValue($value, [$response]);
+      // TODO: Add cache metaddata of subrequest.
+      return $value;
     }, $response->getResult());
   }
 

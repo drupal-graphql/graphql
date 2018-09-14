@@ -1,8 +1,0 @@
-type: module
-name: GraphQL Context Test
-description: Test contexts in graphql schema.
-package: Testing
-core: 8.x
-hidden: TRUE
-dependencies:
-- graphql_core

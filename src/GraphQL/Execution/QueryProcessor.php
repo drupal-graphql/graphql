@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\graphql\Entity\Server;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
@@ -88,15 +89,13 @@ class QueryProcessor {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function processQuery($schema, $params) {
-    // Load the plugin from the schema manager.
-    $plugin = $this->pluginManager->createInstance($schema);
-    $config = $plugin->getServer();
+    $server = Server::load($schema);
 
     if (is_array($params)) {
-      return $this->executeBatch($config, $params);
+      return $this->executeBatch($server->configuration(), $params);
     }
 
-    return $this->executeSingle($config, $params);
+    return $this->executeSingle($server->configuration(), $params);
   }
 
   /**
@@ -241,6 +240,7 @@ class QueryProcessor {
         $this->cacheBackend->set($contextCacheId, $result->getCacheContexts(), $result->getCacheMaxAge(), $result->getCacheTags());
         $this->cacheBackend->set($cacheId, $result, $result->getCacheMaxAge(), $result->getCacheTags());
       }
+
       return $result;
     });
   }
@@ -290,7 +290,6 @@ class QueryProcessor {
     );
 
     return $promise->then(function (ExecutionResult $result) use ($context) {
-
       $metadata = (new CacheableMetadata())
         ->addCacheContexts($this->filterCacheContexts($context->getCacheContexts()))
         ->addCacheTags($context->getCacheTags())

@@ -1,5 +1,0 @@
-name: 'GraphQL Tests: Menu'
-type: module
-core: 8.x
-dependencies:
-  - system

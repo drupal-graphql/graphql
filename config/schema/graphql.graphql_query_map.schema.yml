@@ -1,12 +1,7 @@
-graphql.graphql_query_map.*:
+graphql.graphql_server.*:
   type: config_entity
-  label: 'GraphQL Query Map'
+  label: 'Server'
   mapping:
-    version:
+    name:
       type: string
-      label: 'Version'
-    map:
-      type: sequence
-      label: 'QueryMap'
-      sequence:
-        type: graphql.graphql_query_map.[%key]
+      label: 'Name'

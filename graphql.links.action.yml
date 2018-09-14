@@ -1,5 +1,5 @@
-entity.graphql_query_map.import_form:
-  route_name: 'entity.graphql_query_map.import_form'
-  title: 'Import query map'
+entity.graphql_server.create_form:
+  route_name: 'entity.graphql_server.create_form'
+  title: 'Create server'
   appears_on:
-    - entity.graphql_query_map.collection
+    - entity.graphql_server.collection
