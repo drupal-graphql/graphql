@@ -17,7 +17,7 @@ class QueryAccessCheck implements AccessInterface {
   protected $requestStack;
 
   /**
-   * Constructs a QueryAccessCheck object.
+   * QueryAccessCheck constructor.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
@@ -36,26 +36,29 @@ class QueryAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(AccountInterface $account) {
+    // If the user has the global permission to execute any query, let them.
+    if ($account->hasPermission('execute graphql requests')) {
+      return AccessResult::allowed();
+    }
+
     $request = $this->requestStack->getCurrentRequest();
-
-    // Batched requests can be a mixture of persisted or unpersisted queries.
-    // Since they are also getting access checked on each individual subrequest
-    // we will let the request through if one of the two permissions have been
-    // granted.
-    if ($request->attributes->get('type') === 'batch') {
-      return AccessResult::allowedIfHasPermissions($account, ['execute graphql requests', 'execute persisted graphql requests'], 'OR');
+    /** @var \GraphQL\Server\OperationParams[] $operations */
+    if (!$operations = $request->attributes->get('operations', [])) {
+      return AccessResult::forbidden();
     }
 
-    // Arbitrary queries may only be executed if the user has the global
-    // 'execute graphql requests' permission.
-    if (!$request->attributes->get('persisted', FALSE)) {
-      return AccessResult::allowedIfHasPermission($account, 'execute graphql requests');
+    $operations = is_array($operations) ? $operations : [$operations];
+    foreach ($operations as $operation) {
+      // If a query was provided by the user, this is an arbitrary query (it's
+      // not a persisted query). Hence, we only grant access if the user has the
+      // permission to execute any query.
+      if ($operation->getOriginalInput('query')) {
+        return AccessResult::allowedIfHasPermission($account, 'execute graphql requests');
+      }
     }
 
-    // This is a persisted query, grant access if the user has the global
-    // 'execute graphql requests' permission or the more specific one for
-    // persisted queries.
-    return AccessResult::allowedIfHasPermissions($account, ['execute graphql requests', 'execute persisted graphql requests'], 'OR');
+    // If we reach this point, this is a persisted query.
+    return AccessResult::allowedIfHasPermission($account, 'execute persisted graphql requests');
   }
 
 }

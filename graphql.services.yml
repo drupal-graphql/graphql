@@ -1,138 +1,274 @@
 parameters:
   graphql.config:
-    # GraphQL result cache:
-    #
-    # By default, the GraphQL results get cached. This can be disabled during development.
-    #
-    # @default true
-    result_cache: true
-
-    # GraphQL schema cache:
-    #
-    # By default, the GraphQL schema gets cached. This can be disabled during development.
-    #
-    # @default true
-    schema_cache: true
-
     # Development mode:
     #
-    # Disables field security. All fields can be resolved without restrictions.
+    # Enables debugging mode and disables field security and caching.
+    #
+    # When enabled, all fields can be resolved without restrictions
+    # and the caching strategy of the schema and query results is
+    # disabled entirely.
     #
     # @default false
     development: false
 
-    # GraphQL schema class to be used:
-    #
-    # By default, this uses the GraphQL schema provided by the module.
-    #
-    # @default \Drupal\graphql\Schema
-    schema_class: Drupal\graphql\GraphQL\Schema
-
 services:
+  # Check access for executing graphql queries.
   access_check.graphql.query:
     class: Drupal\graphql\Access\QueryAccessCheck
     arguments: ['@request_stack']
     tags:
       - { name: access_check, applies_to: _graphql_query_access }
-  cache.graphql_schema:
+
+  # Logger channel for graphql related logging.
+  logger.channel.graphql:
+    parent: logger.channel_base
+    arguments: ['graphql']
+
+  # Cache bin for graphql plugin definitions.
+  cache.graphql.definitions:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory: cache_factory:get
-    arguments: [graphql_schema]
-  cache.graphql_response:
+    arguments: [graphql_definitions]
+
+  # Cache bin for graphql query results.
+  cache.graphql.results:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
     factory: cache_factory:get
-    arguments: [graphql_response]
-  cache.graphql_response_metadata:
-    class: Drupal\Core\Cache\CacheBackendInterface
+    arguments: [graphql_results]
+
+  # Schema and processor factory.
+  graphql.query_processor:
+    class: Drupal\graphql\GraphQL\Execution\QueryProcessor
+    arguments:
+      - '@cache_contexts_manager'
+      - '@plugin.manager.graphql.schema'
+      - '@cache.graphql.results'
+
+  # Query map provider using the composite pattern.
+  graphql.query_provider:
+    class: Drupal\graphql\GraphQL\QueryProvider\QueryProvider
     tags:
-      - { name: cache.bin }
-    factory: cache_factory:get
-    arguments: [graphql_response_metadata]
-  cache_context.gql:
-    class: Drupal\graphql\Cache\Context\QueryCacheContext
-    arguments: ['@request_stack']
+        - { name: service_collector, tag: graphql_query_provider, call: addQueryProvider }
+  graphql.query_provider.query_map.entity:
+    class: Drupal\graphql\GraphQL\QueryProvider\EntityQueryMapQueryProvider
+    arguments: ['@entity_type.manager']
     tags:
-      - { name: cache.context }
-  graphql.schema:
-    class: Drupal\graphql\GraphQL\Schema
-    factory: ['@graphql.schema_factory', getSchema]
+        - { name: graphql_query_provider }
+  graphql.query_provider.query_map.json:
+    class: Drupal\graphql\GraphQL\QueryProvider\JsonQueryMapQueryProvider
+    arguments: ['@cache.default', '@config.factory']
     tags:
-      - { name: graphql_extra_cache_metadata }
-  graphql.schema_factory:
-    class: Drupal\graphql\SchemaFactory
-    arguments: ['@cache_contexts_manager', '@request_stack', '@graphql.schema_provider', '@cache.graphql_schema', '%graphql.config%']
+        - { name: graphql_query_provider }
+
+  graphql.query_routes:
+    class: Drupal\graphql\Routing\QueryRoutes
+    arguments: ['@plugin.manager.graphql.schema']
     tags:
-        - { name: service_collector, tag: graphql_extra_schema_cache_metadata, call: addExtraCacheMetadata }
-  graphql.extra_schema_cache_metadata:
-    class: Drupal\Core\Cache\CacheableMetadata
-    calls:
-      - { method: addCacheContexts, arguments: [['languages:language_interface']] }
-      - { method: addCacheTags, arguments: [['graphql_schema']] }
+      - { name: 'event_subscriber' }
+
+  # Deny caching in the dynamic page cache.
+  graphql.request_policy.deny_query:
+    class: Drupal\graphql\Cache\RequestPolicy\DenyQuery
     tags:
-      - { name: graphql_extra_schema_cache_metadata }
-  graphql.schema_provider:
-    class: Drupal\graphql\SchemaProvider\SchemaProvider
-    arguments: ['%graphql.config%']
-    tags:
-        - { name: service_collector, tag: graphql_schema_provider, call: addSchemaProvider }
-  graphql.query_map_provider:
-    class: Drupal\graphql\QueryMapProvider\QueryMapProvider
-    tags:
-        - { name: service_collector, tag: graphql_query_map_provider, call: addQueryMapProvider }
-  graphql.reducer_manager:
-    class: Drupal\graphql\Reducers\ReducerManager
-    arguments: ['@service_container', '%graphql.reducers%']
-  graphql.cache_subscriber:
-    class: Drupal\graphql\EventSubscriber\CacheSubscriber
-    arguments: ['@graphql.request_policy', '@graphql.response_policy', '@current_route_match', '@request_stack', '@cache.graphql_response', '@cache.graphql_response_metadata', '@cache_contexts_manager', '%graphql.config%']
-    tags:
-      - { name: service_collector, tag: graphql_extra_cache_metadata, call: addExtraCacheMetadata }
-      - { name: event_subscriber }
-  graphql.extra_cache_metadata:
-    class: Drupal\Core\Cache\CacheableMetadata
-    calls:
-      - { method: addCacheContexts, arguments: [['gql']] }
-      - { method: addCacheTags, arguments: [['graphql_response']] }
-    tags:
-      - { name: graphql_extra_cache_metadata }
-  graphql.request_policy:
-    class: Drupal\Core\PageCache\ChainRequestPolicy
-    tags:
-      - { name: service_collector, tag: graphql_request_policy, call: addPolicy }
-  graphql.response_policy:
-    class: Drupal\Core\PageCache\ChainResponsePolicy
-    tags:
-      - { name: service_collector, tag: graphql_response_policy, call: addPolicy }
-    lazy: true
-  graphql.request_policy.allow_no_session_open:
-    class: Drupal\Core\PageCache\RequestPolicy\NoSessionOpen
-    arguments: ['@session_configuration']
-    tags:
-      - { name: graphql_request_policy }
-  graphql.request_policy.deny_command_line:
-    class: Drupal\graphql\Cache\RequestPolicy\DenyCommandLine
-    tags:
-      - { name: graphql_request_policy }
-  graphql.request_policy.deny_unsafe_method_unless_query:
-    class: Drupal\graphql\Cache\RequestPolicy\DenyUnsafeMethodUnlessQuery
-    arguments: ['@path_processor_manager']
-    tags:
-      - { name: graphql_request_policy }
-  graphql.response_policy.deny_mutation:
-    class: Drupal\graphql\Cache\ResponsePolicy\DenyMutation
-    arguments: ['@current_route_match']
-    tags:
-      - { name: graphql_response_policy }
+      - { name: dynamic_page_cache_request_policy }
+
+  # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
-    arguments: ['@graphql.query_map_provider']
+    arguments: ['@graphql.query_provider']
     tags:
       - { name: route_enhancer }
-  graphql.introspection:
-    class: Drupal\graphql\Introspection
-    arguments: ['@service_container', '@graphql.reducer_manager', '@graphql.schema']
 
+  # Schema introspection service.
+  graphql.introspection:
+    class: Drupal\graphql\GraphQL\Utility\Introspection
+    arguments: ['@graphql.query_processor']
+
+  # Support for subrequests.
+  graphql.subrequest_subscriber:
+    class: Drupal\graphql\EventSubscriber\SubrequestSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  # Context repository for fetching contexts from sub-requests.
+  graphql.context_repository:
+    class: Drupal\graphql\GraphQL\Context\ContextRepository
+    tags:
+      - { name: service_collector, tag: context_provider, call: addContextProvider }
+
+  # Combines all type plugin managers.
+  graphql.type_manager_aggregator:
+    class: Drupal\graphql\Plugin\TypePluginManagerAggregator
+    tags:
+      - { name: service_collector, tag: graphql_type_manager, call: addTypeManager }
+
+  # Plugin manager for schemas
+  plugin.manager.graphql.schema:
+    class: Drupal\graphql\Plugin\SchemaPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Schemas'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\SchemaPluginInterface'
+      - '\Drupal\graphql\Annotation\GraphQLSchema'
+      - '%graphql.config%'
+
+  # Plugin manager for fields.
+  plugin.manager.graphql.field:
+    class: Drupal\graphql\Plugin\FieldPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Fields'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\FieldPluginInterface'
+      - '\Drupal\graphql\Annotation\GraphQLField'
+      - '%graphql.config%'
+
+  # Plugin manager for mutations.
+  plugin.manager.graphql.mutation:
+    class: Drupal\graphql\Plugin\MutationPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Mutations'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\MutationPluginInterface'
+      - '\Drupal\graphql\Annotation\GraphQLMutation'
+      - '%graphql.config%'
+
+  plugin.manager.graphql.subscription:
+    class: Drupal\graphql\Plugin\SubscriptionPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Subscriptions'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\SubscriptionPluginInterface'
+      - '\Drupal\graphql\Annotation\GraphQLSubscription'
+      - '%graphql.config%'
+
+  # Plugin manager implementations for schema types.
+  plugin.manager.graphql.union:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/UnionTypes'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLUnionType'
+      - 'union_types'
+      - '%graphql.config%'
+  plugin.manager.graphql.interface:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/Interfaces'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLInterface'
+      - 'interfaces'
+      - '%graphql.config%'
+  plugin.manager.graphql.type:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/Types'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLType'
+      - 'types'
+      - '%graphql.config%'
+  plugin.manager.graphql.input:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/InputTypes'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLInputType'
+      - 'input_types'
+      - '%graphql.config%'
+  plugin.manager.graphql.scalar:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/Scalars'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLScalar'
+      - 'scalars'
+      - '%graphql.config%'
+  plugin.manager.graphql.enum:
+    class: Drupal\graphql\Plugin\TypePluginManager
+    tags:
+      - { name: graphql_type_manager }
+    arguments:
+      - 'Plugin/GraphQL/Enums'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase'
+      - '\Drupal\graphql\Annotation\GraphQLEnum'
+      - 'enums'
+      - '%graphql.config%'
+
+  # Voyager.
+  graphql.voyager.page_display_variant_subscriber:
+    class: Drupal\graphql\EventSubscriber\VoyagerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }
+  graphql.voyager.routes:
+    class: Drupal\graphql\Routing\VoyagerRoutes
+    arguments: ['@plugin.manager.graphql.schema']
+    tags:
+      - { name: 'event_subscriber' }
+
+  # Explorer.
+  graphql.graphiql.page_display_variant_subscriber:
+    class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
+    tags:
+      - { name: event_subscriber }
+  graphql.graphiql.explorer_routes:
+    class: Drupal\graphql\Routing\ExplorerRoutes
+    arguments: ['@plugin.manager.graphql.schema']
+    tags:
+      - { name: 'event_subscriber' }
+
+  # Buffers.
+  graphql.buffer.entity:
+    class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
+    arguments: ['@entity_type.manager']
+  graphql.buffer.subrequest:
+    class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
+    arguments: ['@http_kernel', '@request_stack']
+
+  graphql.language_context:
+    class: Drupal\graphql\GraphQLLanguageContext
+    arguments: ['@language_manager']
+
+  graphql.config_factory_override:
+    class: Drupal\graphql\Config\GraphQLConfigOverrides
+    arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
+    tags:
+      - { name: config.factory.override, priority: -253 }

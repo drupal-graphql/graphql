@@ -1,5 +1,0 @@
-services:
-  graphql_test_custom_schema.schema_provider:
-    class: Drupal\graphql_test_custom_schema\SchemaProvider
-    tags:
-        - { name: graphql_schema_provider }

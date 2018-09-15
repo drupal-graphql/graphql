@@ -1,15 +1,19 @@
 query {
   ok:route(path: "/graphql-request/test/ok") {
-    request {
-      code
-      content
+    ... on InternalUrl {
+      request {
+        code
+        content
+      }
     }
   }
 
   redirect:route(path: "/graphql-request/test/redirect") {
-    request {
-      code
-      location:header(key: "location")
+    ... on InternalUrl {
+      request {
+        code
+        location:header(key: "location")
+      }
     }
   }
 }

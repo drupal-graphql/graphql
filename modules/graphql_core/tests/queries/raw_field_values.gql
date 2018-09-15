@@ -1,0 +1,101 @@
+query ($path: String!) {
+  route:route(path: $path) {
+    ... on EntityCanonicalUrl {
+      entity {
+        ... on NodeTest {
+          nid
+          vid
+          langcode {
+            value
+          }
+          type {
+            targetId
+          }
+          uid {
+            targetId
+            entity {
+              name
+            }
+          }
+          title
+          status
+          promote
+          sticky
+          revisionTranslationAffected
+          body {
+            summaryProcessed
+            summary
+            processed
+            format
+            value
+          }
+          fieldText {
+            value
+          }
+          fieldBoolean
+          fieldLink {
+            title
+            uri
+            target:attribute(key: "_target")
+            url {
+              ... on EntityCanonicalUrl {
+                internal:path
+              }
+              ... on ExternalUrl {
+                external:path
+              }
+            }
+
+          }
+          fieldInteger
+          fieldFloat
+          fieldDecimal
+          fieldDatetime {
+            value
+          }
+          fieldTimestamp
+          fieldEmail
+          fieldString
+          fieldReference {
+            targetId
+            entity {
+              ... on NodeTest {
+                title
+                fieldReference {
+                  targetId
+                  entity {
+                    title
+                  }
+                }
+              }
+            }
+          }
+          fieldFile {
+            targetId
+            display
+            description
+            entity {
+              url
+#              uri {
+#                value
+#              }
+            }
+          }
+          fieldImage {
+            targetId
+            alt
+            title
+            width
+            height
+            entity {
+              url
+#              uri {
+#                value
+#              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

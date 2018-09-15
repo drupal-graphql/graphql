@@ -1,8 +1,0 @@
-name: 'GraphQL content override test module'
-type: module
-description: 'Provides configuration for testing'
-package: Testing
-version: VERSION
-core: 8.x
-dependencies:
-- graphql_content_test

@@ -1,8 +1,0 @@
-name: GraphQL Image
-type: module
-description: 'Request specific image styles in GraphQL queries.'
-package: GraphQL
-core: 8.x
-dependencies:
-  - image
-  - graphql_file

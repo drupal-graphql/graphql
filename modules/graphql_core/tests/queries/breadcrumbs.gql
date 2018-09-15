@@ -1,0 +1,9 @@
+query($path: String!) {
+  route(path:$path) {
+    ... on InternalUrl {
+      breadcrumb {
+        text
+      }
+    }
+  }
+}

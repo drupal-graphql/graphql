@@ -1,7 +1,0 @@
-name: GraphQL XML
-type: module
-description: 'Query fields that contain XML data.'
-package: GraphQL
-core: 8.x
-dependencies:
-  - graphql_content

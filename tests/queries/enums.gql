@@ -1,0 +1,4 @@
+query {
+  number(number: ONE)
+  numbers(numbers: [ONE, TWO, THREE])
+}

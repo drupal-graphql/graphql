@@ -1,7 +1,0 @@
-name: GraphQL Explorer
-type: module
-description: 'Adds a page with the GraphiQL explorer (https://github.com/graphql/graphiql/).'
-package: GraphQL
-core: 8.x
-dependencies:
-  - graphql
