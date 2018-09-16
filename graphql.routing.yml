@@ -1,15 +1,5 @@
-graphql.config_page:
-  path: '/admin/config/graphql'
-  defaults:
-    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'GraphQL'
-  requirements:
-    _permission: 'administer graphql configuration'
-  options:
-    _admin_route: TRUE
-
 entity.graphql_server.collection:
-  path: '/admin/config/graphql/servers'
+  path: '/admin/config/graphql'
   defaults:
     _entity_list: 'graphql_server'
     _title: 'Servers'
@@ -38,6 +28,32 @@ entity.graphql_server.edit_form:
   options:
     _admin_route: TRUE
 
+graphql.explorer:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}/explorer'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\ExplorerController::viewExplorer'
+    _title: 'Explorer'
+  requirements:
+    _permission: 'use graphql explorer'
+  options:
+    _admin_route: TRUE
+    parameters:
+      graphql_server:
+        type: entity:graphql_server
+
+graphql.voyager:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}/voyager'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\VoyagerController::viewVoyager'
+    _title: 'Voyager'
+  requirements:
+    _permission: 'use graphql voyager'
+  options:
+    _admin_route: TRUE
+    parameters:
+      graphql_server:
+        type: entity:graphql_server
+
 entity.graphql_server.delete_form:
   path: '/admin/config/graphql/servers/manage/{graphql_server}/delete'
   defaults:
@@ -47,3 +63,6 @@ entity.graphql_server.delete_form:
     _permission: 'administer graphql configuration'
   options:
     _admin_route: TRUE
+
+route_callbacks:
+  - '\Drupal\graphql\Routing\QueryRoutes::routes'

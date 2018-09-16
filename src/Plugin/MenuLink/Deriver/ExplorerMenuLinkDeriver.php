@@ -16,6 +16,7 @@ class ExplorerMenuLinkDeriver extends DeriverBase {
     foreach ($servers as $id) {
       $this->derivatives[$id] = [
         'route_name' => "graphql.explorer.$id",
+        'parent' => 'entity.graphql_server.collection',
       ] + $basePluginDefinition;
     }
 

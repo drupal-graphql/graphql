@@ -16,6 +16,7 @@ class VoyagerMenuLinkDeriver extends DeriverBase {
     foreach ($servers as $id) {
       $this->derivatives[$id] = [
         'route_name' => "graphql.voyager.$id",
+        'parent' => 'entity.graphql_server.collection',
       ] + $basePluginDefinition;
     }
 

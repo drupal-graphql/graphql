@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
@@ -161,5 +162,21 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
       return array_values(DocumentValidator::defaultRules());
     };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    \Drupal::service('router.builder')->setRebuildNeeded();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage,$entities);
+    \Drupal::service('router.builder')->setRebuildNeeded();
   }
 }

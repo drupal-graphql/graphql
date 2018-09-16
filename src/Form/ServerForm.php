@@ -21,13 +21,6 @@ class ServerForm extends EntityForm {
   protected $requestContext;
 
   /**
-   * The route builder service.
-   *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
-   */
-  protected $routeBuilder;
-
-  /**
    * The schema plugin manager.
    *
    * @var \Drupal\graphql\Plugin\SchemaPluginManager
@@ -41,12 +34,9 @@ class ServerForm extends EntityForm {
    *   The schema plugin manager.
    * @param \Drupal\Core\Routing\RequestContext $requestContext
    *   The request context.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
-   *   The route builder service.
    */
-  public function __construct(SchemaPluginManager $schemaManager, RequestContext $requestContext, RouteBuilderInterface $routeBuilder) {
+  public function __construct(SchemaPluginManager $schemaManager, RequestContext $requestContext) {
     $this->requestContext = $requestContext;
-    $this->routeBuilder = $routeBuilder;
     $this->schemaManager = $schemaManager;
   }
 
@@ -56,8 +46,7 @@ class ServerForm extends EntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.graphql.schema'),
-      $container->get('router.request_context'),
-      $container->get('router.builder')
+      $container->get('router.request_context')
     );
   }
 
@@ -163,12 +152,6 @@ class ServerForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $formState) {
-    $storage = $this->entityTypeManager->getStorage('graphql_server');
-    $endpoint = $formState->getValue('endpoint');
-    if ($this->entity->isNew() || (($original = $storage->loadUnchanged($this->entity->id())) && $endpoint !== $original->get('endpoint'))) {
-      $this->routeBuilder->setRebuildNeeded();
-    }
-
     parent::save($form, $formState);
 
     drupal_set_message($this->t('Saved the %label server.', [
@@ -176,7 +159,6 @@ class ServerForm extends EntityForm {
     ]));
 
     $formState->setRedirect('entity.graphql_server.collection');
-    $this->routeBuilder->rebuildIfNeeded();
   }
 
 }

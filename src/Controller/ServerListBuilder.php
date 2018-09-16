@@ -37,7 +37,7 @@ class ServerListBuilder extends ConfigEntityListBuilder {
       $operations['explorer'] = [
         'title' => 'Explorer',
         'weight' => 10,
-        'url' => Url::fromRoute("graphql.explorer.$id"),
+        'url' => Url::fromRoute('graphql.explorer', ['graphql_server' => $id]),
       ];
     }
 
@@ -45,7 +45,7 @@ class ServerListBuilder extends ConfigEntityListBuilder {
       $operations['voyager'] = [
         'title' => 'Voyager',
         'weight' => 10,
-        'url' => Url::fromRoute("graphql.voyager.$id"),
+        'url' => Url::fromRoute('graphql.voyager', ['graphql_server' => $id]),
       ];
     }
 

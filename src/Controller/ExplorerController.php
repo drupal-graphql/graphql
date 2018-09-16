@@ -5,7 +5,7 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql\GraphQL\Schema\SchemaLoader;
+use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\GraphQL\Utility\Introspection;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -68,21 +68,22 @@ class ExplorerController implements ContainerInjectionInterface {
   /**
    * Controller for the GraphiQL query builder IDE.
    *
-   * @param string $schema
-   *   The name of the schema.
+   * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
+   *   The server.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
    *
    * @return array The render array.
    *   The render array.
    */
-  public function viewExplorer($schema, Request $request) {
-    $url = $this->urlGenerator->generate("graphql.query.$schema");
-    $introspectionData = $this->introspection->introspect($schema);
+  public function viewExplorer(ServerInterface $graphql_server, Request $request) {
+    $id = $graphql_server->id();
+    $url = $this->urlGenerator->generate("graphql.query.$id");
+    $introspectionData = $this->introspection->introspect($id);
 
     return [
-      '#type' => 'page',
-      '#theme' => 'page__graphql_explorer',
+      '#type' => 'markup',
+      '#markup' => '<div id="graphql-explorer"></div>',
       '#attached' => [
         'library' => ['graphql/explorer'],
         'drupalSettings' => [

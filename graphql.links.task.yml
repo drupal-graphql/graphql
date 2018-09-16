@@ -1,0 +1,25 @@
+entity.graphql_server.edit_form:
+  route_name: entity.graphql_server.edit_form
+  base_route: entity.graphql_server.edit_form
+  title: Edit
+
+entity.graphql_server.delete_form:
+  route_name: entity.graphql_server.delete_form
+  base_route: entity.graphql_server.edit_form
+  title: Delete
+  weight: 10
+
+graphql.explorer:
+  route_name: graphql.explorer
+  base_route: entity.graphql_server.edit_form
+  title: Explorer
+
+graphql.voyager:
+  route_name: graphql.voyager
+  base_route: entity.graphql_server.edit_form
+  title: Voyager
+
+entity.graphql_server.collection:
+  title: Servers
+  route_name: entity.graphql_server.collection
+  base_route: entity.graphql_server.collection

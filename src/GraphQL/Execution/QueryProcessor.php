@@ -81,11 +81,11 @@ class QueryProcessor {
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function processQuery($schema, $params) {
-    $server = Server::load($schema);
+    if (!$server = Server::load($schema)) {
+      throw new \InvalidArgumentException(sprintf('The requested schema %s could not be loaded.', $schema));
+    }
 
     if (is_array($params)) {
       return $this->executeBatch($server->configuration(), $params);

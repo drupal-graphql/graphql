@@ -6,13 +6,19 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Routing\EnhancerInterface;
 use Drupal\graphql\GraphQL\Utility\JsonHelper;
 use GraphQL\Server\Helper;
+use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
-   * {@inheritdoc}
+   * Returns whether the enhancer runs on the current route.
+   *
+   * @param \Symfony\Component\Routing\Route $route
+   *   The current route.
+   *
+   * @return bool
    */
   public function applies(Route $route) {
     return $route->hasDefault('_graphql');
@@ -22,6 +28,11 @@ class QueryRouteEnhancer implements EnhancerInterface {
    * {@inheritdoc}
    */
   public function enhance(array $defaults, Request $request) {
+    $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
+    if (!$this->applies($route)) {
+      return $defaults;
+    }
+
     $helper = new Helper();
     $method = $request->getMethod();
     $body = $this->extractBody($request);

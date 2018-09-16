@@ -56,13 +56,6 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
 
-  # Route subscriber for query routes.
-  graphql.query_routes:
-    class: Drupal\graphql\Routing\QueryRoutes
-    arguments: ['@plugin.manager.graphql.schema']
-    tags:
-      - { name: 'event_subscriber' }
-
   # Deny caching in the dynamic page cache.
   graphql.request_policy.deny_query:
     class: Drupal\graphql\Cache\RequestPolicy\DenyQuery
@@ -114,26 +107,6 @@ services:
       - '\Drupal\graphql\Plugin\DataProducerPluginInterface'
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
-
-  # Voyager.
-  graphql.voyager.page_display_variant_subscriber:
-    class: Drupal\graphql\EventSubscriber\VoyagerPageDisplayVariantSubscriber
-    tags:
-      - { name: event_subscriber }
-  graphql.voyager.routes:
-    class: Drupal\graphql\Routing\VoyagerRoutes
-    tags:
-      - { name: 'event_subscriber' }
-
-  # Explorer.
-  graphql.graphiql.page_display_variant_subscriber:
-    class: Drupal\graphql\EventSubscriber\ExplorerPageDisplayVariantSubscriber
-    tags:
-      - { name: event_subscriber }
-  graphql.graphiql.explorer_routes:
-    class: Drupal\graphql\Routing\ExplorerRoutes
-    tags:
-      - { name: 'event_subscriber' }
 
   # Buffers.
   graphql.buffer.entity:
