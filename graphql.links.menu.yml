@@ -1,0 +1,5 @@
+graphql.config:
+  title: 'GraphQL'
+  description: 'Configuration options for the GraphQL module.'
+  route_name: entity.graphql_server.collection
+  parent: system.admin_config_services
