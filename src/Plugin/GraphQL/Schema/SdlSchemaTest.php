@@ -5,11 +5,11 @@ namespace Drupal\graphql\Plugin\GraphQL\Schema;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
-use GraphQL\Deferred;
 
 /**
  * @Schema(
- *   id = "test"
+ *   id = "test",
+ *   name = "Test schema"
  * )
  */
 class SdlSchemaTest extends SdlSchemaPluginBase {
@@ -27,7 +27,6 @@ class SdlSchemaTest extends SdlSchemaPluginBase {
         article(id: Int!): Article
         page(id: Int!): Page
         node(id: Int!): NodeInterface
-        foo(id: Int!): String
       }
 
       type Article implements NodeInterface {
@@ -59,14 +58,6 @@ GQL;
       'Page' => ContextDefinition::create('entity:node')
         ->addConstraint('Bundle', 'page'),
     ]);
-
-    $registry->addFieldResolver('Query', 'foo', $builder->compose(function () {
-      return new Deferred(function () {
-        return 'asdasda';
-      });
-    }, function ($parent) {
-      return strtoupper($parent);
-    }));
 
     $registry->addFieldResolver('Query', 'node',
       $builder->produce('entity_load', ['mapping' => [

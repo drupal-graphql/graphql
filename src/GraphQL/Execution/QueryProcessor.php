@@ -2,14 +2,11 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\Plugin\SchemaPluginManager;
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
@@ -27,7 +24,6 @@ use GraphQL\Server\ServerConfig;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
-use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
 
@@ -158,6 +154,7 @@ class QueryProcessor {
    * @param bool $batching
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function executeOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     try {

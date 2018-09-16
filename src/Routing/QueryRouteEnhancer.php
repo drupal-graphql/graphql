@@ -3,14 +3,13 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
-use Drupal\graphql\Utility\JsonHelper;
+use Drupal\Core\Routing\EnhancerInterface;
+use Drupal\graphql\GraphQL\Utility\JsonHelper;
 use GraphQL\Server\Helper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
-class QueryRouteEnhancer implements RouteEnhancerInterface {
+class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
    * {@inheritdoc}
@@ -77,6 +76,11 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
   /**
    * Handles file uploads from multipart/form-data requests.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param $values
+   *   The request body values.
    *
    * @return array
    *   The query parameters with added file uploads.

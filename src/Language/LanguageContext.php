@@ -1,27 +1,27 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\Language;
 
 use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Simple service that stores the current GraphQL language state.
  */
-class GraphQLLanguageContext {
+class LanguageContext {
 
   /**
    * Indicates if the GraphQL context language is currently active.
    *
    * @var bool
    */
-  protected $isActive;
+  protected $isActive = FALSE;
 
   /**
    * The current language context.
    *
    * @var string
    */
-  protected $currentLanguage;
+  protected $currentLanguage = NULL;
 
   /**
    * The language manager service.
@@ -31,7 +31,7 @@ class GraphQLLanguageContext {
   protected $languageManager;
 
   /**
-   * GraphQLLanguageContext constructor.
+   * LanguageContext constructor.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
@@ -67,6 +67,9 @@ class GraphQLLanguageContext {
    *   Any exception caught while executing the callable.
    */
   public function executeInLanguageContext(callable $callable, $language) {
+    $languageBefore = $this->currentLanguage;
+    $activeBefore = $this->isActive;
+
     $this->currentLanguage = $language;
     $this->isActive = TRUE;
     $this->languageManager->reset();
@@ -74,13 +77,13 @@ class GraphQLLanguageContext {
     try {
       return call_user_func($callable);
     }
-    catch (\Exception $exc) {
-      throw $exc;
+    catch (\Exception $exception) {
+      throw $exception;
     }
     finally {
-      // In any case, set the language context back to null.
-      $this->currentLanguage = NULL;
-      $this->isActive = FALSE;
+      // In any case, set the language context back to its previous values.
+      $this->currentLanguage = $languageBefore;
+      $this->isActive = $activeBefore;
       $this->languageManager->reset();
     }
   }

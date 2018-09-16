@@ -1,7 +1,0 @@
-graphql.graphql_server.*:
-  type: config_entity
-  label: 'Server'
-  mapping:
-    name:
-      type: string
-      label: 'Name'

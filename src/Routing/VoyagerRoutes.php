@@ -4,13 +4,9 @@ namespace Drupal\graphql\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\graphql\Entity\Server;
-use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * Registers graphql voyager routes for all schemas.
- */
 class VoyagerRoutes extends RouteSubscriberBase {
 
   /**
@@ -25,7 +21,7 @@ class VoyagerRoutes extends RouteSubscriberBase {
     $servers = Server::loadMultiple();
 
     foreach ($servers as $id => $server) {
-      $path = $server->endpoint();
+      $path = $server->get('endpoint');
 
       $routes->add("graphql.voyager.$id", new Route("$path/voyager", [
         'schema' => $id,

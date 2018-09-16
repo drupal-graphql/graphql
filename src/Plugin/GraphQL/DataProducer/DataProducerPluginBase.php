@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\CacheableDataProducerPluginInterface;
-use Drupal\graphql\Utility\DeferredUtility;
+use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInterface, PluginFormInterface, CacheableDataProducerPluginInterface {

@@ -18,7 +18,7 @@ class ExplorerRoutes extends RouteSubscriberBase {
     $servers = Server::loadMultiple();
 
     foreach ($servers as $id => $server) {
-      $path = $server->endpoint();
+      $path = $server->get('endpoint');
 
       $routes->add("graphql.explorer.$id", new Route("$path/explorer", [
         'schema' => $id,

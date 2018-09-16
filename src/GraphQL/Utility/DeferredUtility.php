@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Utility;
+namespace Drupal\graphql\GraphQL\Utility;
 
 use GraphQL\Deferred;
 

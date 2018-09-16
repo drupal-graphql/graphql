@@ -49,46 +49,4 @@ class SchemaPluginManager extends DefaultPluginManager {
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($cacheBackend, 'schemas', ['graphql']);
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setCachedDefinitions($definitions) {
-    $this->definitions = $definitions;
-    $this->cacheSet($this->cacheKey, $definitions, $this->getCacheMaxAge(), $this->getCacheTags());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    $definitions = $this->getDefinitions();
-    return array_reduce($definitions, function ($carry, $current) {
-      if (!empty($current['schema_cache_tags'])) {
-        return Cache::mergeTags($carry, $current['schema_cache_tags']);
-      }
-
-      return $carry;
-    }, $this->cacheTags);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge() {
-    $definitions = $this->getDefinitions();
-    $age = Cache::PERMANENT;
-    foreach ($definitions as $definition) {
-      if (!isset($definition['schema_cache_max_age'])) {
-        continue;
-      }
-
-      // Bail out early if the cache max age is 0.
-      if (($age = Cache::mergeMaxAges($age, $definition['schema_cache_max_age'])) === 0) {
-        return $age;
-      }
-    }
-
-    return $age;
-  }
 }

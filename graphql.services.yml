@@ -56,6 +56,7 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
 
+  # Route subscriber for query routes.
   graphql.query_routes:
     class: Drupal\graphql\Routing\QueryRoutes
     arguments: ['@plugin.manager.graphql.schema']
@@ -142,12 +143,12 @@ services:
     class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
     arguments: ['@http_kernel', '@request_stack']
 
+  # Contextual language handling https://www.drupal.org/project/drupal/issues/2952789
   graphql.language_context:
-    class: Drupal\graphql\GraphQLLanguageContext
+    class: Drupal\graphql\Language\LanguageContext
     arguments: ['@language_manager']
-
   graphql.config_factory_override:
-    class: Drupal\graphql\Config\GraphQLConfigOverrides
+    class: Drupal\graphql\Language\ConfigOverrides
     arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
     tags:
       - { name: config.factory.override, priority: -253 }

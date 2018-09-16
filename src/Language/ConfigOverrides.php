@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Config;
+namespace Drupal\graphql\Language;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
@@ -8,11 +8,9 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\language\LanguageNegotiationMethodManager;
 
 /**
- * GraphQL config overrides.
- *
  * Enforce the GraphQL language negotiation always to be on top.
  */
-class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
+class ConfigOverrides implements ConfigFactoryOverrideInterface {
 
   /**
    * The config storage service.
@@ -29,11 +27,12 @@ class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
   protected $negotiatorManager;
 
   /**
-   * GraphQLConfigOverrides constructor.
+   * ConfigOverrides constructor.
    *
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The config storage service.
    * @param \Drupal\language\LanguageNegotiationMethodManager|null $negotiatorManager
+   *   The language negotiation manager service.
    */
   public function __construct(StorageInterface $storage, LanguageNegotiationMethodManager $negotiatorManager = NULL) {
     $this->baseStorage = $storage;
@@ -54,8 +53,10 @@ class GraphQLConfigOverrides implements ConfigFactoryOverrideInterface {
         $config['negotiation'][$type]['enabled']['language-graphql'] = -999;
         asort($config['negotiation'][$type]['enabled']);
       }
+
       return ['language.types' => $config];
     }
+
     return [];
   }
 

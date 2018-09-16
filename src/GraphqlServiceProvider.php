@@ -4,10 +4,8 @@ namespace Drupal\graphql;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
+use Drupal\graphql\Language\FixedLanguageNegotiator;
 
-/**
- * GraphQL service provider.
- */
 class GraphqlServiceProvider extends ServiceProviderBase {
 
   /**

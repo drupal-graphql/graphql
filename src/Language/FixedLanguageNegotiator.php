@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql;
+namespace Drupal\graphql\Language;
 
 use Drupal\language\LanguageNegotiator;
 

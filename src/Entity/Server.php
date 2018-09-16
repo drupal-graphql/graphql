@@ -30,7 +30,10 @@ use GraphQL\Validator\DocumentValidator;
  *   config_export = {
  *     "name",
  *     "label",
- *     "endpoint"
+ *     "schema",
+ *     "endpoint",
+ *     "debug",
+ *     "batching"
  *   },
  *   links = {
  *     "collection" = "/admin/config/graphql/servers",
@@ -87,23 +90,15 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * {@inheritdoc}
    */
-  public function endpoint() {
-    return $this->endpoint;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function configuration() {
     $manager = \Drupal::service('plugin.manager.graphql.schema');
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    // TODO: Make this configurable.
-    $plugin = $manager->createInstance('test');
+    $plugin = $manager->createInstance($this->get('schema'));
 
     // Create the server config.
     $config = ServerConfig::create();
-    $config->setDebug(!!$this->debug);
-    $config->setQueryBatching(!!$this->batching);
+    $config->setDebug(!!$this->get('debug'));
+    $config->setQueryBatching(!!$this->get('batching'));
     $config->setValidationRules($this->getValidationRules());
     $config->setPersistentQueryLoader($this->getPersistedQueryLoader());
     $config->setContext($plugin->getContext());

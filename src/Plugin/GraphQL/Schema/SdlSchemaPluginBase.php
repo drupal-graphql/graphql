@@ -78,9 +78,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * {@inheritdoc}
-   *
-   * @throws \GraphQL\Error\SyntaxError
-   *   If the schema is invalid.
    */
   public function getSchema() {
     return BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
@@ -180,8 +177,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed schema document.
-   *
-   * @throws \GraphQL\Error\SyntaxError
    */
   protected function getSchemaDocument() {
     // Only use caching of the parsed document if aren't in development mode.

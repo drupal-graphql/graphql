@@ -1,0 +1,22 @@
+graphql.graphql_server.*:
+  type: config_entity
+  label: 'Server'
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+    label:
+      type: string
+      label: 'Label'
+    endpoint:
+      type: string
+      label: 'Endpoint'
+    debug:
+      type: boolean
+      label: 'Debug'
+    schema:
+      type: string
+      label: 'Schema'
+    batching:
+      type: boolean
+      label: 'Batching'
