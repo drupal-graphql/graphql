@@ -27,6 +27,7 @@ class SdlSchemaTest extends SdlSchemaPluginBase {
         article(id: Int!): Article
         page(id: Int!): Page
         node(id: Int!): NodeInterface
+        label(id: Int!): String
       }
 
       type Article implements NodeInterface {
@@ -63,6 +64,16 @@ GQL;
       $builder->produce('entity_load', ['mapping' => [
         'entity_type' => $builder->fromValue('node'),
         'entity_id' => $builder->fromArgument('id'),
+      ]])
+    );
+
+    $registry->addFieldResolver('Query', 'label',
+      $builder->produce('entity_label', ['mapping' => [
+        'entity' => $builder->produce('entity_load', ['mapping' => [
+          'entity_type' => $builder->fromValue('node'),
+          'entity_bundle' => $builder->fromValue(['article']),
+          'entity_id' => $builder->fromArgument('id'),
+        ]])
       ]])
     );
 

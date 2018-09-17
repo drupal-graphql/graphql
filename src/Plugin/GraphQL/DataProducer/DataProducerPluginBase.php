@@ -30,7 +30,7 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
     }
 
     // Allow arguments to be resolved lazily too.
-    $values = $this->getConsumedValues($value, $args, $context, $info);
+    $values = DeferredUtility::waitAll($this->getConsumedValues($value, $args, $context, $info));
     return DeferredUtility::returnFinally($values, function ($values) use ($context) {
       // TODO: Read the cache entry if the resolver is cacheable.
       if ($this instanceof CacheableDataProducerPluginInterface) {
@@ -78,7 +78,7 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
-   * @return array
+   * @return array|\GraphQL\Deferred
    * @throws \Exception
    */
   protected function getConsumedValues($value, $args, ResolveContext $context, ResolveInfo $info) {
