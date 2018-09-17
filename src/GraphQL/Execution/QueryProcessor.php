@@ -219,16 +219,22 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise|mixed
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
+    $inDebug = !!$config->getDebug();
     $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document, new CacheableMetadata());
 
-    if (($contextCache = $this->cacheBackend->get($contextCacheId)) && isset($contextCache->data)) {
-      $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contextCache->data));
-      if (($cache = $this->cacheBackend->get($cacheId)) && $result = $cache->data) {
-        return $adapter->createFulfilled($result);
+    if (empty($inDebug)) {
+      if (($contextCache = $this->cacheBackend->get($contextCacheId)) && isset($contextCache->data)) {
+        $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contextCache->data));
+        if (($cache = $this->cacheBackend->get($cacheId)) && $result = $cache->data) {
+          return $adapter->createFulfilled($result);
+        }
       }
     }
 
     $result = $this->doExecuteOperation($adapter, $config, $params, $document);
+    if (!empty($inDebug)) {
+      return $result;
+    }
 
     return $result->then(function (QueryResult $result) use ($contextCacheId, $params, $document) {
       // Write this query into the cache if it is cacheable.
