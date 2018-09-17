@@ -18,13 +18,18 @@ class QueryRoutes {
     foreach ($servers as $id => $server) {
       $path = $server->get('endpoint');
 
-      $routes["graphql.query.$id"] = new Route($path, [
-        'schema' => $id,
-        '_graphql' => TRUE,
-        '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
-      ], [
-        '_graphql_query_access' => 'TRUE',
-      ]);
+      $routes["graphql.query.$id"] = (new Route($path))
+        ->addDefaults([
+          'schema' => $id,
+          '_graphql' => TRUE,
+          '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
+        ])
+        ->addRequirements([
+          '_graphql_query_access' => 'TRUE',
+        ])
+        ->addOptions([
+          'no_cache' => TRUE,
+        ]);
     }
 
     return $routes;
