@@ -27,7 +27,8 @@ class QueryResult extends ExecutionResult implements RefinableCacheableDependenc
     $this->errors = $errors;
     $this->extensions = $extensions;
 
-    // If no cache metadata was given, assume this result is not cacheable.
+    // Always add the user.permissions cache context.
+    $this->addCacheContexts(['user.permissions']);
     $this->addCacheableDependency($metadata);
   }
 

@@ -221,8 +221,8 @@ class QueryProcessor {
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
     $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document, new CacheableMetadata());
 
-    if (!$config->getDebug() && ($contextCache = $this->cacheBackend->get($contextCacheId)) && $contexts = $contextCache->data) {
-      $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contexts));
+    if (($contextCache = $this->cacheBackend->get($contextCacheId)) && isset($contextCache->data)) {
+      $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contextCache->data));
       if (($cache = $this->cacheBackend->get($cacheId)) && $result = $cache->data) {
         return $adapter->createFulfilled($result);
       }
