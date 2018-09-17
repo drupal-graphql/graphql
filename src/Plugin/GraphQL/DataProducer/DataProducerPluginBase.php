@@ -29,24 +29,24 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
       throw new \LogicException(sprintf('The plugin %s does not implement a resolve method.', $this->getPluginId()));
     }
 
+    // Allow arguments to be resolved lazily too.
     $values = $this->getConsumedValues($value, $args, $context, $info);
-
-    // TODO: Read the cache entry if the resolver is cacheable.
-    if ($this instanceof CacheableDataProducerPluginInterface) {
-      array_push($values, $metadata = new CacheableMetadata());
-    }
-
-    $output = call_user_func_array([$this, 'resolve'], $values);
-    return DeferredUtility::applyFinally($output, function ($value) use ($output, $context, &$metadata) {
-      if ($this instanceof CacheableDataProducerPluginInterface && isset($metadata)) {
-        $context->addCacheableDependency($metadata);
-
-        if ($value instanceof CacheableDependencyInterface) {
-          $context->addCacheableDependency($value);
-        }
+    return DeferredUtility::returnFinally($values, function ($values) use ($context) {
+      // TODO: Read the cache entry if the resolver is cacheable.
+      if ($this instanceof CacheableDataProducerPluginInterface) {
+        array_push($values, $metadata = new CacheableMetadata());
       }
 
+      $output = call_user_func_array([$this, 'resolve'], $values);
+      return DeferredUtility::applyFinally($output, function ($value) use ($output, $context, &$metadata) {
+        if ($this instanceof CacheableDataProducerPluginInterface && isset($metadata)) {
+          $context->addCacheableDependency($metadata);
 
+          if ($value instanceof CacheableDependencyInterface) {
+            $context->addCacheableDependency($value);
+          }
+        }
+      });
     });
   }
 
