@@ -3,9 +3,11 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use Drupal\redirect\RedirectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,6 +37,16 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   protected $pathValidator;
 
   /**
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * @var \Drupal\redirect\RedirectRepository|null
+   */
+  protected $redirectRepository;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -42,7 +54,9 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('path.validator')
+      $container->get('path.validator'),
+      $container->get('module_handler'),
+      $container->get('redirect.repository', ContainerInterface::NULL_ON_INVALID_REFERENCE)
     );
   }
 
@@ -57,15 +71,22 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    *   The plugin definition.
    * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\redirect\RedirectRepository|null $redirectRepository
    */
   public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
-    PathValidatorInterface $pathValidator
+    PathValidatorInterface $pathValidator,
+    ModuleHandlerInterface $moduleHandler,
+    RedirectRepository $redirectRepository = NULL
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
+    $this->moduleHandler = $moduleHandler;
+    $this->redirectRepository = $redirectRepository;
   }
 
   /**
@@ -75,6 +96,12 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @return \Drupal\Core\Url|null
    */
   public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
+    if ($this->moduleHandler->moduleExists('redirect')) {
+      if ($redirect = $this->redirectRepository->findMatchingRedirect($path, [])) {
+        return $redirect->getRedirectUrl();
+      }
+    }
+
     if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($path)) && $url->isRouted() && $url->access()) {
       return $url;
     }
