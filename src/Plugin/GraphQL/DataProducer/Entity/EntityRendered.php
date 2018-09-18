@@ -27,7 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity")
  *     ),
  *     "mode" = @ContextDefinition("string",
- *       label = @Translation("View mode")
+ *       label = @Translation("View mode"),
+ *       required = FALSE
  *     )
  *   }
  * )
