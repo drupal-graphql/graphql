@@ -9,6 +9,8 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\language\LanguageNegotiator;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\redirect\Entity\Redirect;
+use Drupal\Tests\views_ui\Functional\ReportFieldsTest;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -127,9 +129,27 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   }
 
   /**
+   * Get the redirect repository service.
+   *
+   * @return \Drupal\redirect\RedirectRepository
+   */
+  protected function getRedirectRepository() {
+    return \Drupal::service('redirect.repository');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    if (\Drupal::moduleHandler()->moduleExists('redirect')) {
+      $redirectRepository = $this->getRedirectRepository();
+      $currentLanguage = $this->languageManager->getCurrentLanguage()->getId();
+      if ($redirect = $redirectRepository->findMatchingRedirect($args['path'], [], $currentLanguage)) {
+        yield $redirect;
+        return;
+      }
+    }
+
     if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($args['path'])) && $url->access()) {
       yield $url;
     }
