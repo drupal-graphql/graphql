@@ -34,6 +34,7 @@ class SdlSchemaTest extends SdlSchemaPluginBase {
         id: Int!
         uid: String
         title: String!
+        render: String
       }
 
       type Page implements NodeInterface {
@@ -107,6 +108,13 @@ GQL;
         'string' => $builder->fromParent(),
       ]])
     ));
+
+    $registry->addFieldResolver('Article', 'render',
+      $builder->produce('entity_rendered', ['mapping' => [
+        'entity' => $builder->fromParent(),
+        'mode' => $builder->fromValue('full')
+      ]])
+    );
 
     $registry->addFieldResolver('Page', 'id',
       $builder->produce('entity_id', ['mapping' => [

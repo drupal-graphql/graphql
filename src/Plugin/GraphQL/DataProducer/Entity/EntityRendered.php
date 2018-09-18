@@ -9,7 +9,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,6 +25,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   consumes = {
  *     "entity" = @ContextDefinition("entity",
  *       label = @Translation("Entity")
+ *     ),
+ *     "mode" = @ContextDefinition("string",
+ *       label = @Translation("View mode")
  *     )
  *   }
  * )
@@ -106,6 +111,13 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
     }
 
     return (string) $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function shouldLookupEdgeCache(array $values, ResolveContext $context, ResolveInfo $info) {
+    return TRUE;
   }
 
 }
