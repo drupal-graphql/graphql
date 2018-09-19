@@ -164,9 +164,22 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
     }
 
     if (is_callable($result)) {
-      return new Deferred(function () use ($result, $value, $args, $context, $info) {
-        return $this->resolveDeferred($result, $value, $args, $context, $info);
-      });
+      return new Deferred(
+        function () use ($result, $value, $args, $context, $info) {
+          if ($this->isLanguageAwareField()) {
+            return $this->getLanguageContext()
+              ->executeInLanguageContext(
+                function () use ($result, $value, $args, $context, $info) {
+                  return $this->resolveDeferred($result, $value, $args, $context, $info);
+                },
+                $context->getContext('language', $info)
+              );
+          }
+          else {
+            return $this->resolveDeferred($result, $value, $args, $context, $info);
+          }
+        }
+      );
     }
 
     // Only collect cache metadata if this is a query. All other operation types

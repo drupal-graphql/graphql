@@ -24,6 +24,11 @@ class GraphQLLanguageContext {
   protected $currentLanguage;
 
   /**
+   * @var array
+   */
+  protected $languageStack = [];
+
+  /**
    * The language manager service.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
@@ -67,6 +72,7 @@ class GraphQLLanguageContext {
    *   Any exception caught while executing the callable.
    */
   public function executeInLanguageContext(callable $callable, $language) {
+    $this->languageStack[] = $this->currentLanguage;
     $this->currentLanguage = $language;
     $this->isActive = TRUE;
     $this->languageManager->reset();
@@ -79,7 +85,7 @@ class GraphQLLanguageContext {
     }
     finally {
       // In any case, set the language context back to null.
-      $this->currentLanguage = NULL;
+      $this->currentLanguage = array_pop($this->languageStack);
       $this->isActive = FALSE;
       $this->languageManager->reset();
     }
