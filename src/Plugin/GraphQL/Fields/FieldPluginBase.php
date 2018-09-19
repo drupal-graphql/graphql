@@ -16,7 +16,6 @@ use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
-use Drupal\graphql\Plugin\LanguageNegotiation\LanguageNegotiationGraphQL;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ListOfType;
@@ -125,7 +124,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       return $this->getLanguageContext()
         ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
           return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-        }, $context->getContext('language', $info));
+        }, $context->getContext('language', $info, $context->getGlobal('language')));
     }
     else {
       return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
