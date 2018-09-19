@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -26,6 +27,7 @@ use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 // TODO: Refactor this and clean it up.
 class QueryProcessor {
@@ -52,6 +54,13 @@ class QueryProcessor {
   protected $contextsManager;
 
   /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * Processor constructor.
    *
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
@@ -60,15 +69,19 @@ class QueryProcessor {
    *   The schema plugin manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for caching query results.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    */
   public function __construct(
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
-    CacheBackendInterface $cacheBackend
+    CacheBackendInterface $cacheBackend,
+    RequestStack $requestStack
   ) {
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
     $this->cacheBackend = $cacheBackend;
+    $this->requestStack = $requestStack;
   }
 
   /**
@@ -220,13 +233,14 @@ class QueryProcessor {
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
     $inDebug = !!$config->getDebug();
-    $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document, new CacheableMetadata());
+    $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document);
 
     if (empty($inDebug)) {
-      if (($contextCache = $this->cacheBackend->get($contextCacheId)) && isset($contextCache->data)) {
-        $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($contextCache->data));
-        if (($cache = $this->cacheBackend->get($cacheId)) && $result = $cache->data) {
-          return $adapter->createFulfilled($result);
+      if (($contextCache = $this->cacheBackend->get($contextCacheId))) {
+        $contexts = $contextCache->data ?? [];
+        $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
+        if (($cache = $this->cacheBackend->get($cid))) {
+          return $adapter->createFulfilled($cache->data);
         }
       }
     }
@@ -239,9 +253,12 @@ class QueryProcessor {
     return $result->then(function (QueryResult $result) use ($contextCacheId, $params, $document) {
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
-        $cacheId = 'cid:' . $this->cacheIdentifier($params, $document, (new CacheableMetadata())->addCacheContexts($result->getCacheContexts()));
-        $this->cacheBackend->set($contextCacheId, $result->getCacheContexts(), $result->getCacheMaxAge(), $result->getCacheTags());
-        $this->cacheBackend->set($cacheId, $result, $result->getCacheMaxAge(), $result->getCacheTags());
+        $contexts = $result->getCacheContexts();
+        $expire = $this->maxAgeToExpire($result->getCacheMaxAge());
+        $tags = $result->getCacheTags();
+        $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
+        $this->cacheBackend->set($contextCacheId, $contexts, $expire, $tags);
+        $this->cacheBackend->set($cid, $result, $expire, $tags);
       }
 
       return $result;
@@ -453,13 +470,13 @@ class QueryProcessor {
   /**
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   * @param array $contexts
    *
    * @return string
    */
-  protected function cacheIdentifier(OperationParams $params, DocumentNode $document, CacheableMetadata $metadata) {
+  protected function cacheIdentifier(OperationParams $params, DocumentNode $document, array $contexts = []) {
     // Ignore language contexts since they are handled by graphql internally.
-    $contexts = $this->filterCacheContexts($metadata->getCacheContexts());
+    $contexts = $this->filterCacheContexts($contexts);
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
 
     // Sorting the variables will cause fewer cache vectors.
@@ -490,5 +507,20 @@ class QueryProcessor {
     return array_filter($contexts, function ($context) {
       return strpos($context, 'languages:') !== 0;
     });
+  }
+
+  /**
+   * Maps a cache max age value to an "expire" value for the Cache API.
+   *
+   * @param int $maxAge
+   *
+   * @return int
+   *   A corresponding "expire" value.
+   *
+   * @see \Drupal\Core\Cache\CacheBackendInterface::set()
+   */
+  protected function maxAgeToExpire($maxAge) {
+    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
 }
