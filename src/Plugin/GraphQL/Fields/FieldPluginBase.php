@@ -44,6 +44,13 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   protected $renderer;
 
   /**
+   * Static cache for `isLanguageAwareField()`
+   *
+   * @var boolean
+   */
+  protected $isLanguageAware = NULL;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(SchemaBuilderInterface $builder, FieldPluginManager $manager, $definition, $id) {
@@ -140,9 +147,12 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    *   The fields language awareness status.
    */
   protected function isLanguageAwareField() {
-    return (boolean) count(array_filter($this->getPluginDefinition()['response_cache_contexts'], function ($context) {
-      return strpos($context, 'languages:') === 0;
-    }));
+    if (is_null($this->isLanguageAware)) {
+      $this->isLanguageAware = (boolean) count(array_filter($this->getPluginDefinition()['response_cache_contexts'], function ($context) {
+        return strpos($context, 'languages:') === 0;
+      }));
+    }
+    return $this->isLanguageAware;
   }
 
   /**
