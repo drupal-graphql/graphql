@@ -24,9 +24,9 @@ class GraphQLLanguageContext {
   protected $currentLanguage;
 
   /**
-   * @var array
+   * @var \SplStack
    */
-  protected $languageStack = [];
+  protected $languageStack;
 
   /**
    * The language manager service.
@@ -43,6 +43,7 @@ class GraphQLLanguageContext {
    */
   public function __construct(LanguageManagerInterface $languageManager) {
     $this->languageManager = $languageManager;
+    $this->languageStack = new \SplStack();
   }
 
   /**
@@ -72,7 +73,7 @@ class GraphQLLanguageContext {
    *   Any exception caught while executing the callable.
    */
   public function executeInLanguageContext(callable $callable, $language) {
-    $this->languageStack[] = $this->currentLanguage;
+    $this->languageStack->push($this->currentLanguage);
     $this->currentLanguage = $language;
     $this->isActive = TRUE;
     $this->languageManager->reset();
@@ -85,7 +86,7 @@ class GraphQLLanguageContext {
     }
     finally {
       // In any case, set the language context back to null.
-      $this->currentLanguage = array_pop($this->languageStack);
+      $this->currentLanguage = $this->languageStack->pop();
       $this->isActive = FALSE;
       $this->languageManager->reset();
     }
