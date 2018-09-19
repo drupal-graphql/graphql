@@ -267,6 +267,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
         'languages:language_url',
         'languages:language_interface',
         'languages:language_content',
+        'user.permissions',
       ]);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);
