@@ -118,9 +118,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       if (array_key_exists($argument, $args) && !is_null($args[$argument])) {
         $context->setContext($argument, $args[$argument], $info);
       }
-      else {
-        $args[$argument] = $context->getContext($argument, $info);
-      }
+      $args[$argument] = $context->getContext($argument, $info, $context->getGlobal($argument));
     }
 
     if ($this->isLanguageAwareField()) {

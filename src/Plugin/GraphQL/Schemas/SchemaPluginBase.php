@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -112,6 +113,11 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $logger;
 
   /**
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -126,6 +132,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $container->get('graphql.query_provider'),
       $container->get('current_user'),
       $container->get('logger.channel.graphql'),
+      $container->get('language_manager'),
       $container->getParameter('graphql.config')
     );
   }
@@ -167,6 +174,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     QueryProviderInterface $queryProvider,
     AccountProxyInterface $currentUser,
     LoggerInterface $logger,
+    LanguageManagerInterface $languageManager,
     array $parameters
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -178,6 +186,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $this->currentUser = $currentUser;
     $this->parameters = $parameters;
     $this->logger = $logger;
+    $this->languageManager = $languageManager;
   }
 
   /**
@@ -237,6 +246,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     // the secure fields restriction.
     $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
 
+    // Populate globals with the current language.
+    $globals['language'] = $this->languageManager->getCurrentLanguage()->getId();
+
     // Create the server config.
     $config = ServerConfig::create();
 
@@ -249,6 +261,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       // inheritance for language) for each query separately.
       $context = new ResolveContext($globals);
       $context->addCacheTags(['graphql_response']);
+
+      // Always add the language_url cache context.
+      $context->addCacheContexts([
+        'languages:language_url',
+        'languages:language_interface',
+        'languages:language_content',
+      ]);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);
       }
@@ -522,7 +541,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return [];
+    return [
+
+    ];
   }
 
   /**

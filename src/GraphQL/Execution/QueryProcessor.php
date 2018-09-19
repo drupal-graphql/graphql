@@ -478,6 +478,8 @@ class QueryProcessor {
    *
    * Removes the language contexts from a list of context ids.
    *
+   * @deprecated
+   *
    * @param string[] $contexts
    *   The list of context id's.
    *
@@ -485,8 +487,6 @@ class QueryProcessor {
    *   The filtered list of context id's.
    */
   protected function filterCacheContexts(array $contexts) {
-    return array_filter($contexts, function ($context) {
-      return strpos($context, 'languages:') !== 0;
-    });
+    return $contexts;
   }
 }
