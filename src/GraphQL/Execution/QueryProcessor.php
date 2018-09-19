@@ -232,16 +232,12 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise|mixed
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
-    $inDebug = !!$config->getDebug();
     $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document);
-
-    if (empty($inDebug)) {
-      if (($contextCache = $this->cacheBackend->get($contextCacheId))) {
-        $contexts = $contextCache->data ?? [];
-        $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
-        if (($cache = $this->cacheBackend->get($cid))) {
-          return $adapter->createFulfilled($cache->data);
-        }
+    if (($contextCache = $this->cacheBackend->get($contextCacheId))) {
+      $contexts = $contextCache->data ?? [];
+      $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
+      if (($cache = $this->cacheBackend->get($cid))) {
+        return $adapter->createFulfilled($cache->data);
       }
     }
 
@@ -256,6 +252,7 @@ class QueryProcessor {
         $this->cacheBackend->set($contextCacheId, $contexts, $expire, $tags);
         $this->cacheBackend->set($cid, $result, $expire, $tags);
       }
+
       return $result;
     });
   }
