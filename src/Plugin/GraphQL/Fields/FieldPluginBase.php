@@ -127,15 +127,15 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       $args[$argument] = $context->getContext($argument, $info);
     }
 
-    if ($this->isLanguageAwareField()) {
-      return $this->getLanguageContext()
-        ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
-          return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
+    $isLanguageAware = $this->isLanguageAwareField();
+    $languageContext = $this->getLanguageContext();
+
+    if ($isLanguageAware) {
+      return $languageContext->executeInLanguageContext(function () use ($value, $args, $context, $info, $isLanguageAware, $languageContext) {
+          return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info, $isLanguageAware, $languageContext);
         }, $context->getContext('language', $info));
     }
-    else {
-      return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-    }
+    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info, $isLanguageAware, $languageContext);
   }
 
   /**
@@ -158,7 +158,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   /**
    * {@inheritdoc}
    */
-  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
+  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info, $isLanguageAware, $languageContext) {
     $renderContext = new RenderContext();
 
     $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($callback, $value, $args, $context, $info) {
@@ -175,19 +175,17 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
 
     if (is_callable($result)) {
       return new Deferred(
-        function () use ($result, $value, $args, $context, $info) {
-          if ($this->isLanguageAwareField()) {
-            return $this->getLanguageContext()
+        function () use ($result, $value, $args, $context, $info, $isLanguageAware, $languageContext) {
+          if ($isLanguageAware) {
+            return $languageContext
               ->executeInLanguageContext(
-                function () use ($result, $value, $args, $context, $info) {
-                  return $this->resolveDeferred($result, $value, $args, $context, $info);
+                function () use ($result, $value, $args, $context, $info, $isLanguageAware, $languageContext) {
+                  return $this->resolveDeferred($result, $value, $args, $context, $info, $isLanguageAware, $languageContext);
                 },
                 $context->getContext('language', $info)
               );
           }
-          else {
-            return $this->resolveDeferred($result, $value, $args, $context, $info);
-          }
+          return $this->resolveDeferred($result, $value, $args, $context, $info, $isLanguageAware, $languageContext);
         }
       );
     }
