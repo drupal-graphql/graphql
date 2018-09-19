@@ -292,7 +292,7 @@ class QueryProcessor {
     return $promise->then(function (ExecutionResult $result) use ($context) {
 
       $metadata = (new CacheableMetadata())
-        ->addCacheContexts($this->filterCacheContexts($context->getCacheContexts()))
+        ->addCacheContexts($context->getCacheContexts())
         ->addCacheTags($context->getCacheTags())
         ->setCacheMaxAge($context->getCacheMaxAge());
 
@@ -457,7 +457,7 @@ class QueryProcessor {
    */
   protected function cacheIdentifier(OperationParams $params, DocumentNode $document, CacheableMetadata $metadata) {
     // Ignore language contexts since they are handled by graphql internally.
-    $contexts = $this->filterCacheContexts($metadata->getCacheContexts());
+    $contexts = $metadata->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
 
     // Sorting the variables will cause fewer cache vectors.
@@ -473,20 +473,4 @@ class QueryProcessor {
     return implode(':', array_values(array_merge([$hash], $keys)));
   }
 
-  /**
-   * Filter unused contexts.
-   *
-   * Removes the language contexts from a list of context ids.
-   *
-   * @deprecated
-   *
-   * @param string[] $contexts
-   *   The list of context id's.
-   *
-   * @return string[]
-   *   The filtered list of context id's.
-   */
-  protected function filterCacheContexts(array $contexts) {
-    return $contexts;
-  }
 }

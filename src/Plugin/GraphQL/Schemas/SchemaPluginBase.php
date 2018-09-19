@@ -541,9 +541,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return [
-
-    ];
+    return [];
   }
 
   /**
