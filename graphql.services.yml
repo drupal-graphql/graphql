@@ -55,6 +55,7 @@ services:
       - '@cache_contexts_manager'
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
+      - '@request_stack'
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
