@@ -124,14 +124,14 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       if (array_key_exists($argument, $args) && !is_null($args[$argument])) {
         $context->setContext($argument, $args[$argument], $info);
       }
-      $args[$argument] = $context->getContext($argument, $info, $context->getGlobal($argument));
+      $args[$argument] = $context->getContext($argument, $info);
     }
 
     if ($this->isLanguageAwareField()) {
       return $this->getLanguageContext()
         ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
           return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-        }, $context->getContext('language', $info, $context->getGlobal('language')));
+        }, $context->getContext('language', $info));
     }
     else {
       return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);

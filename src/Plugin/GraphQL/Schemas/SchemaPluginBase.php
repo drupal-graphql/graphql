@@ -246,9 +246,6 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     // the secure fields restriction.
     $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
 
-    // Populate globals with the current language.
-    $globals['language'] = $this->languageManager->getCurrentLanguage()->getId();
-
     // Create the server config.
     $config = ServerConfig::create();
 
@@ -259,7 +256,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       // Each document (e.g. in a batch query) gets its own resolve context. This
       // allows us to collect the cache metadata and contextual values (e.g.
       // inheritance for language) for each query separately.
-      $context = new ResolveContext($globals);
+      $context = new ResolveContext($globals, [
+        'language' => $this->languageManager->getCurrentLanguage()->getId(),
+      ]);
       $context->addCacheTags(['graphql_response']);
 
       // Always add the language_url cache context.
