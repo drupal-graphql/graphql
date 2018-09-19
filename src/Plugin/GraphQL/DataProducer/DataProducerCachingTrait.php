@@ -82,42 +82,69 @@ trait DataProducerCachingTrait {
       throw new \LogicException('Failed to generate cache prefix.');
     }
 
-    $backend = $this->getCacheBackend();
-    $manager = $this->getCacheContextsManager();
-    if ($cache = $backend->get("$prefix:context")) {
-      $keys = !empty($cache->data) ? $manager->convertTokensToKeys($cache->data)->getKeys() : '';
-
-      if (($cache = $backend->get("$prefix:result:$keys")) && $data = $cache->data) {
-        $metadata->addCacheableDependency($data['metadata']);
-        return $this->unserializeCache($data['value']);
-      }
+    if ($cache = $this->cacheRead($prefix)) {
+      $metadata->addCacheableDependency($cache['metadata']);
+      return $this->unserializeCache($cache['value']);
     }
 
     $output = $this->resolveUncached($values, $context, $info, $metadata);
-    return DeferredUtility::applyFinally($output, function ($value) use ($values, $context, $info, $metadata, $backend, $manager, $prefix) {
+    return DeferredUtility::applyFinally($output, function ($value) use ($values, $context, $info, $metadata, $prefix) {
       if ($metadata->getCacheMaxAge() === 0 || !$this->shouldWriteEdgeCache($value, $values, $context, $info)) {
         return;
       }
 
-      $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
-      $tags = $metadata->getCacheTags();
-      $tokens = $metadata->getCacheContexts();
-      $keys = !empty($tokens) ? $manager->convertTokensToKeys($tokens)->getKeys() : '';
-      $data = $this->serializeCache($value);
-
-      $backend->setMultiple([
-        "$prefix:context" => [
-          'data' => $tokens,
-          'expire' => $expire,
-          'tags' => $tags,
-        ],
-        "$prefix:result:$keys" => [
-          'data' => ['value' => $data, 'metadata' => $metadata],
-          'expire' => $expire,
-          'tags' => $tags,
-        ],
-      ]);
+      $this->cacheWrite($prefix, $value, $metadata);
     });
+  }
+
+  /**
+   * @param $prefix
+   *
+   * @return array|null
+   */
+  protected function cacheRead($prefix) {
+    $backend = $this->getCacheBackend();
+
+    if ($cache = $backend->get("$prefix:context")) {
+      $manager = $this->getCacheContextsManager();
+      $keys = !empty($cache->data) ? $manager->convertTokensToKeys($cache->data)->getKeys() : '';
+
+      if (($cache = $backend->get("$prefix:result:$keys")) && $data = $cache->data) {
+        return $data;
+      }
+    }
+
+    return NULL;
+  }
+
+  /**
+   * @param $prefix
+   *
+   * @param $value
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
+   */
+  protected function cacheWrite($prefix, $value, CacheableDependencyInterface $metadata) {
+    $manager = $this->getCacheContextsManager();
+    $backend = $this->getCacheBackend();
+
+    $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
+    $tags = $metadata->getCacheTags();
+    $tokens = $metadata->getCacheContexts();
+    $keys = !empty($tokens) ? $manager->convertTokensToKeys($tokens)->getKeys() : '';
+    $data = $this->serializeCache($value);
+
+    $backend->setMultiple([
+      "$prefix:context" => [
+        'data' => $tokens,
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
+      "$prefix:result:$keys" => [
+        'data' => ['value' => $data, 'metadata' => $metadata],
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
+    ]);
   }
 
   /**
