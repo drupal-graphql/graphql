@@ -45,6 +45,17 @@ class LanguageContextTest extends GraphQLTestBase {
       yield \Drupal::languageManager()->getCurrentLanguage()->getId();
     });
 
+    $this->mockField('deferred', [
+      'name' => 'deferred',
+      'parents' => ['Root', 'Node'],
+      'type' => 'String',
+      'response_cache_contexts' => ['languages:language_interface'],
+    ], function () {
+      return function () {
+        yield \Drupal::languageManager()->getCurrentLanguage()->getId();
+      };
+    });
+
     $this->mockField('unaware', [
       'name' => 'unaware',
       'parents' => ['Root', 'Node'],
@@ -156,6 +167,31 @@ GQL;
     $this->assertResults($query, [], [
       'edge' => [
         'language' => 'fr',
+      ],
+    ], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * Test deferred language resolvers.
+   */
+  public function testDeferredLanguage() {
+    $query = <<<GQL
+query {
+  edge(language: "fr") {
+    deferred
+    edge(language: "en") {
+      deferred
+    }
+  }
+}
+GQL;
+
+    $this->assertResults($query, [], [
+      'edge' => [
+        'deferred' => 'fr',
+        'edge' => [
+          'deferred' => 'en',
+        ],
       ],
     ], $this->defaultCacheMetaData());
   }
