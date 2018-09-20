@@ -144,7 +144,16 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
     if (\Drupal::moduleHandler()->moduleExists('redirect')) {
       $redirectRepository = $this->getRedirectRepository();
       $currentLanguage = $this->languageManager->getCurrentLanguage()->getId();
-      if ($redirect = $redirectRepository->findMatchingRedirect($args['path'], [], $currentLanguage)) {
+
+      // Remove language prefix from path to find matching redirects.
+      $path = trim($args['path'], '/');
+      $path_args = explode('/', $path);
+      $prefix = array_shift($path_args);
+      if ($prefix == $currentLanguage) {
+        $path = implode('/', $path_args);
+      }
+
+      if ($redirect = $redirectRepository->findMatchingRedirect($path, [], $currentLanguage)) {
         yield $redirect;
         return;
       }
