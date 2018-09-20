@@ -127,15 +127,7 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       $args[$argument] = $context->getContext($argument, $info);
     }
 
-    $isLanguageAware = $this->isLanguageAwareField();
-    $languageContext = $this->getLanguageContext();
-
-    if ($isLanguageAware) {
-      return $languageContext->executeInLanguageContext(function () use ($value, $args, $context, $info, $isLanguageAware, $languageContext) {
-          return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info, $isLanguageAware, $languageContext);
-        }, $context->getContext('language', $info));
-    }
-    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info, $isLanguageAware, $languageContext);
+    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
   }
 
   /**
@@ -158,16 +150,25 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
   /**
    * {@inheritdoc}
    */
-  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info, $isLanguageAware, $languageContext) {
+  protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
+    $isLanguageAware = $this->isLanguageAwareField();
+    $languageContext = $this->getLanguageContext();
+
     $renderContext = new RenderContext();
 
-    $result = $this->getRenderer()->executeInRenderContext($renderContext, function () use ($callback, $value, $args, $context, $info) {
-      $result = $callback($value, $args, $context, $info);
-      if ($result instanceof \Generator) {
-        $result = iterator_to_array($result);
-      }
-      return $result;
-    });
+    $executor = function () use ($callback, $renderContext, $value, $args, $context, $info) {
+      return $this->getRenderer()->executeInRenderContext($renderContext, function () use ($callback, $value, $args, $context, $info) {
+        $result = $callback($value, $args, $context, $info);
+        if ($result instanceof \Generator) {
+          $result = iterator_to_array($result);
+        }
+        return $result;
+      });
+    };
+
+    $result = $isLanguageAware
+      ? $languageContext->executeInLanguageContext($executor, $context->getContext('language', $info))
+      : $executor();
 
     if (!$renderContext->isEmpty() && $info->operation->operation === 'query') {
       $context->addCacheableDependency($renderContext->pop());
@@ -179,13 +180,13 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
           if ($isLanguageAware) {
             return $languageContext
               ->executeInLanguageContext(
-                function () use ($result, $value, $args, $context, $info, $isLanguageAware, $languageContext) {
-                  return $this->resolveDeferred($result, $value, $args, $context, $info, $isLanguageAware, $languageContext);
+                function () use ($result, $value, $args, $context, $info) {
+                  return $this->resolveDeferred($result, $value, $args, $context, $info);
                 },
                 $context->getContext('language', $info)
               );
           }
-          return $this->resolveDeferred($result, $value, $args, $context, $info, $isLanguageAware, $languageContext);
+          return $this->resolveDeferred($result, $value, $args, $context, $info);
         }
       );
     }
