@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -112,6 +113,11 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $logger;
 
   /**
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -126,6 +132,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $container->get('graphql.query_provider'),
       $container->get('current_user'),
       $container->get('logger.channel.graphql'),
+      $container->get('language_manager'),
       $container->getParameter('graphql.config')
     );
   }
@@ -167,6 +174,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     QueryProviderInterface $queryProvider,
     AccountProxyInterface $currentUser,
     LoggerInterface $logger,
+    LanguageManagerInterface $languageManager,
     array $parameters
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -178,6 +186,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $this->currentUser = $currentUser;
     $this->parameters = $parameters;
     $this->logger = $logger;
+    $this->languageManager = $languageManager;
   }
 
   /**
@@ -247,8 +256,18 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       // Each document (e.g. in a batch query) gets its own resolve context. This
       // allows us to collect the cache metadata and contextual values (e.g.
       // inheritance for language) for each query separately.
-      $context = new ResolveContext($globals);
+      $context = new ResolveContext($globals, [
+        'language' => $this->languageManager->getCurrentLanguage()->getId(),
+      ]);
       $context->addCacheTags(['graphql_response']);
+
+      // Always add the language_url cache context.
+      $context->addCacheContexts([
+        'languages:language_url',
+        'languages:language_interface',
+        'languages:language_content',
+        'user.permissions',
+      ]);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);
       }
