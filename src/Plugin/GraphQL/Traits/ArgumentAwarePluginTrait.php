@@ -18,6 +18,7 @@ trait ArgumentAwarePluginTrait {
   protected function buildArguments($definition) {
     return array_map(function ($argument) use ($definition) {
       return [
+        'optional' => !empty($argument['optional']),
         'type' => $this->buildArgumentType($argument, $definition),
         'description' => $this->buildArgumentDescription($argument, $definition),
         'defaultValue' => $this->buildArgumentDefault($argument, $definition),

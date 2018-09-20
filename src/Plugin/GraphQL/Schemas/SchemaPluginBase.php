@@ -446,11 +446,24 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function processArguments(array $args) {
-    return array_map(function ($arg) {
+    return array_filter(array_map(function ($arg) {
+      try {
+        $type = $this->processType($arg['type']);
+      }
+      catch (\Exception $e) {
+        // Allow optional arguments that are removed if the input type is
+        // not defined.
+        if (empty($arg['optional'])) {
+          throw $e;
+        }
+
+        return NULL;
+      }
+
       return [
-        'type' => $this->processType($arg['type']),
+        'type' => $type,
       ] + $arg;
-    }, $args);
+    }, $args));
   }
 
   /**
