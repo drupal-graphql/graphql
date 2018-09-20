@@ -8,6 +8,9 @@ use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\language\LanguageNegotiator;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\redirect\Entity\Redirect;
+use Drupal\Tests\views_ui\Functional\ReportFieldsTest;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +46,13 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   protected $languageNegotiator;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -51,7 +61,8 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('path.validator'),
-      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL
+      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL,
+      $container->get('language_manager')
     );
   }
 
@@ -68,17 +79,21 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The path validator service.
    * @param \Drupal\language\LanguageNegotiator|null $languageNegotiator
    *   The language negotiator.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
    */
   public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
-    $languageNegotiator
+    $languageNegotiator,
+    $languageManager
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
     $this->languageNegotiator = $languageNegotiator;
+    $this->languageManager = $languageManager;
   }
 
   /**
@@ -91,9 +106,12 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
    */
   public function resolve($value, array $args, ResolveContext $context, ResolveInfo $info) {
     // For now we just take the "url" negotiator into account.
-    if ($this->languageNegotiator) {
+    if ($this->languageManager->isMultilingual() && $this->languageNegotiator) {
       if ($negotiator = $this->languageNegotiator->getNegotiationMethodInstance('language-url')) {
         $context->setContext('language', $negotiator->getLangcode(Request::create($args['path'])), $info);
+      }
+      else {
+        $context->setContext('language', $this->languageManager->getDefaultLanguage()->getId(), $info);
       }
     }
 
@@ -111,9 +129,27 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   }
 
   /**
+   * Get the redirect repository service.
+   *
+   * @return \Drupal\redirect\RedirectRepository
+   */
+  protected function getRedirectRepository() {
+    return \Drupal::service('redirect.repository');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
+    if (\Drupal::moduleHandler()->moduleExists('redirect')) {
+      $redirectRepository = $this->getRedirectRepository();
+      $currentLanguage = $this->languageManager->getCurrentLanguage()->getId();
+      if ($redirect = $redirectRepository->findMatchingRedirect($args['path'], [], $currentLanguage)) {
+        yield $redirect;
+        return;
+      }
+    }
+
     if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($args['path'])) && $url->access()) {
       yield $url;
     }

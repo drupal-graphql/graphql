@@ -26,7 +26,7 @@ class ImageHeight extends FieldPluginBase {
    * {@inheritdoc}
    */
   protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
-    if ($value instanceof ImageItem && $value->entity->access('view')) {
+    if ($value instanceof ImageItem && $value->entity && $value->entity->access('view')) {
       yield (int) $value->height;
     }
   }

@@ -108,11 +108,6 @@ class LanguageTest extends GraphQLCoreTestBase {
       'config:language.entity.pt-br',
     ]);
 
-    $metadata->addCacheContexts([
-      'languages:language_interface',
-      'languages:language_url',
-    ]);
-
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
       'route' => [
         'links' => [
@@ -121,7 +116,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'en',
             ],
             'url' => [
-              'path' => '/en/user/login',
+              'path' => '/en',
             ],
             'title' => 'English',
             'active' => TRUE,
@@ -131,7 +126,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'fr',
             ],
             'url' => [
-              'path' => '/fr/user/login',
+              'path' => '/fr',
             ],
             'title' => NULL,
             'active' => FALSE,
@@ -141,7 +136,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'es',
             ],
             'url' => [
-              'path' => '/es/user/login',
+              'path' => '/es',
             ],
             'title' => NULL,
             'active' => FALSE,
@@ -151,7 +146,7 @@ class LanguageTest extends GraphQLCoreTestBase {
               'id' => 'pt-br',
             ],
             'url' => [
-              'path' => '/user/login',
+              'path' => '/',
             ],
             'title' => NULL,
             'active' => FALSE,

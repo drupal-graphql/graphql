@@ -27,6 +27,14 @@ interface SchemaBuilderInterface {
   public function hasMutations();
 
   /**
+   * Checks if the schema has any subscriptions.
+   *
+   * @return bool
+   *   TRUE if the schema has any subscriptions, FALSE otherwise.
+   */
+  public function hasSubscriptions();
+
+  /**
    * Checks if the schema contains the given type.
    *
    * @param string $name
@@ -55,6 +63,14 @@ interface SchemaBuilderInterface {
    *   The mutations for this schema.
    */
   public function getMutations();
+
+  /**
+   * Retrieves the subscriptions attached to the schema.
+   *
+   * @return array
+   *   The subscriptions for this schema.
+   */
+  public function getSubscriptions();
 
   /**
    * Retrieves all type instances from the schema.
@@ -112,7 +128,18 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed mutation definitions.
    */
-  public function processMutations($mutations);
+  public function processMutations(array $mutations);
+
+  /**
+   * Processes a list of subscription definitions.
+   *
+   * @param array $subscriptions
+   *   An array of subscription definitions.
+   *
+   * @return array
+   *   The processed subscription definitions.
+   */
+  public function processSubscriptions(array $subscriptions);
 
   /**
    * Processes a list of field definitions.
@@ -123,7 +150,7 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed field definitions.
    */
-  public function processFields($fields);
+  public function processFields(array $fields);
 
   /**
    * Processes a list of argument definitions.
@@ -134,7 +161,7 @@ interface SchemaBuilderInterface {
    * @return array
    *   The processed argument definitions.
    */
-  public function processArguments($args);
+  public function processArguments(array $args);
 
   /**
    * Processes a optimized type definition structure.
@@ -147,6 +174,6 @@ interface SchemaBuilderInterface {
    * @return \GraphQL\Type\Definition\Type
    *   The decorated type instance corresponding to the given type definition.
    */
-  public function processType($type);
+  public function processType(array $type);
 
 }

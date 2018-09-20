@@ -81,7 +81,12 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function defaultCacheContexts() {
-    return ['user.permissions'];
+    return [
+      'user.permissions',
+      'languages:language_url',
+      'languages:language_interface',
+      'languages:language_content',
+    ];
   }
 
   /**

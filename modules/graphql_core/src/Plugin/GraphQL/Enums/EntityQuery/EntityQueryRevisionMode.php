@@ -16,6 +16,10 @@ use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
  *     "ALL" = {
  *       "value" = "all",
  *       "description" = @Translation("Loads all revisions."),
+ *     },
+ *     "LATEST" = {
+ *       "value" = "latest",
+ *       "description" = @Translation("Loads latest revision."),
  *     }
  *   }
  * )

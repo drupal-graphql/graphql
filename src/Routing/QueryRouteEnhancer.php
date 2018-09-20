@@ -64,8 +64,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $values = [];
 
     // Extract the request content.
-    if ($content = $request->getContent()) {
-      $values = array_merge($values, JsonHelper::decodeParams(json_decode($content, TRUE)));
+    if ($content = json_decode($request->getContent(), TRUE)) {
+      $values = array_merge($values, JsonHelper::decodeParams($content));
     }
 
     if (stripos($request->headers->get('content-type'), 'multipart/form-data') !== FALSE) {

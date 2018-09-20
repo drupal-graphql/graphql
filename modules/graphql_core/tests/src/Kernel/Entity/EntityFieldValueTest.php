@@ -72,11 +72,6 @@ GQL;
       'entity_field_info',
     ]);
 
-    $metadata->addCacheContexts([
-      'user.node_grants:view',
-      'languages:language_interface',
-    ]);
-
     $this->assertResults($query, [], [
       'node' => [
         'fieldBoolean' => TRUE,
@@ -120,17 +115,12 @@ GQL;
       'entity_field_info',
     ]);
 
-    $metadata->addCacheContexts([
-      'user.node_grants:view',
-      'languages:language_interface',
-    ]);
-
     $this->assertResults($query, [], [
       'node' => [
         'fieldText' => [
           'value' => 'Foo',
           'processed' => "<p>Foo</p>\n",
-          'format' => 'null',
+          'format' => null,
         ],
       ],
     ], $metadata);
@@ -175,22 +165,39 @@ GQL;
       'config:field.storage.node.body',
       'entity_field_info',
     ]);
-    $metadata->addCacheContexts([
-      'languages:language_interface',
-    ]);
-
-    $metadata->addCacheContexts(['user.node_grants:view']);
 
     $this->assertResults($query, [], [
       'node' => [
         'body' => [
           'value' => 'http://www.drupal.org',
           'processed' => "<p><a href=\"http://www.drupal.org\">http://www.drupal.org</a></p>\n",
-          'summary' => 'null',
+          'summary' => null,
           'summaryProcessed' => '',
         ],
       ],
     ], $metadata);
+  }
+
+  /**
+   * Verify that fields are assigned correctly among bundles.
+   */
+  public function testFieldAssignment() {
+    $this->createContentType(['type' => 'a']);
+    $this->createContentType(['type' => 'b']);
+    $this->addField('boolean', 'field_a', FALSE, 'A', 'a');
+    $this->addField('boolean', 'field_b', FALSE, 'B', 'b');
+
+    // Verify that the fields for a given bundle are there.
+    $this->assertGraphQLFields([
+      ['NodeA', 'fieldA', 'Boolean'],
+      ['NodeB', 'fieldB', 'Boolean'],
+    ]);
+
+    // Verify that the fields of another bundle are *not* there.
+    $this->assertGraphQLFields([
+      ['NodeA', 'fieldB', 'Boolean'],
+      ['NodeB', 'fieldA', 'Boolean'],
+    ], TRUE);
   }
 
   /**
@@ -264,12 +271,6 @@ GQL;
       'node:1',
       'file:1',
       'file:2',
-    ]);
-
-    $metadata->addCacheContexts([
-      'languages:language_interface',
-      'languages:language_content',
-      'user.node_grants:view',
     ]);
 
     $this->assertResults($this->getQueryFromFile('raw_field_values.gql'), [
@@ -366,7 +367,7 @@ GQL;
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => 'null',
+        'format' => null,
       ],
       'fieldText' => [
         ['value' => 'a'],

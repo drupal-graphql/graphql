@@ -2,13 +2,10 @@
 
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -18,6 +15,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   name = "path",
  *   description = @Translation("The processed url path."),
  *   type = "String",
+ *   response_cache_contexts = {"languages:language_url"},
  *   parents = {"Url"}
  * )
  */

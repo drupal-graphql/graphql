@@ -15,4 +15,16 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
    */
   public function getSchema();
 
+  /**
+   * Validates the schema.
+   *
+   * @return null|array
+   */
+  public function validateSchema();
+
+  /**
+   * @return mixed
+   */
+  public function getServer();
+
 }

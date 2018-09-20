@@ -4,17 +4,26 @@ namespace Drupal\graphql\Plugin\GraphQL\Schemas;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
+use Drupal\graphql\Plugin\SubscriptionPluginManager;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Server\OperationParams;
+use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Validator\DocumentValidator;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
@@ -32,6 +41,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * @var \Drupal\graphql\Plugin\MutationPluginManager
    */
   protected $mutationManager;
+
+  /**
+   * The subscription plugin manager.
+   *
+   * @var \Drupal\graphql\Plugin\SubscriptionPluginManager
+   */
+  protected $subscriptionManager;
 
   /**
    * The type manager aggregator service.
@@ -55,11 +71,51 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $mutations = [];
 
   /**
+   * Static cache of subscription definitions.
+   *
+   * @var array
+   */
+  protected $subscriptions = [];
+
+  /**
    * Static cache of type instances.
    *
    * @var array
    */
   protected $types = [];
+
+  /**
+   * The service parameters
+   *
+   * @var array
+   */
+  protected $parameters;
+
+  /**
+   * The query provider service.
+   *
+   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface
+   */
+  protected $queryProvider;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
+   * The logger service.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
 
   /**
    * {@inheritdoc}
@@ -71,7 +127,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $plugin_definition,
       $container->get('plugin.manager.graphql.field'),
       $container->get('plugin.manager.graphql.mutation'),
-      $container->get('graphql.type_manager_aggregator')
+      $container->get('plugin.manager.graphql.subscription'),
+      $container->get('graphql.type_manager_aggregator'),
+      $container->get('graphql.query_provider'),
+      $container->get('current_user'),
+      $container->get('logger.channel.graphql'),
+      $container->get('language_manager'),
+      $container->getParameter('graphql.config')
     );
   }
 
@@ -88,8 +150,18 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The field plugin manager.
    * @param \Drupal\graphql\Plugin\MutationPluginManager $mutationManager
    *   The mutation plugin manager.
+   * @param \Drupal\graphql\Plugin\SubscriptionPluginManager $subscriptionManager
+   *   The subscription plugin manager.
    * @param \Drupal\graphql\Plugin\TypePluginManagerAggregator $typeManagers
    *   The type manager aggregator service.
+   * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider
+   *   The query provider service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+   *   The current user.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger service.
+   * @param array $parameters
+   *   The service parameters.
    */
   public function __construct(
     $configuration,
@@ -97,12 +169,24 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     $pluginDefinition,
     FieldPluginManager $fieldManager,
     MutationPluginManager $mutationManager,
-    TypePluginManagerAggregator $typeManagers
+    SubscriptionPluginManager $subscriptionManager,
+    TypePluginManagerAggregator $typeManagers,
+    QueryProviderInterface $queryProvider,
+    AccountProxyInterface $currentUser,
+    LoggerInterface $logger,
+    LanguageManagerInterface $languageManager,
+    array $parameters
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->fieldManager = $fieldManager;
     $this->mutationManager = $mutationManager;
+    $this->subscriptionManager = $subscriptionManager;
     $this->typeManagers = $typeManagers;
+    $this->queryProvider = $queryProvider;
+    $this->currentUser = $currentUser;
+    $this->parameters = $parameters;
+    $this->logger = $logger;
+    $this->languageManager = $languageManager;
   }
 
   /**
@@ -113,15 +197,24 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
 
     if ($this->hasMutations()) {
       $config->setMutation(new ObjectType([
-        'name' => 'MutationRoot',
+        'name' => 'Mutation',
         'fields' => function () {
           return $this->getMutations();
         },
       ]));
     }
 
+    if ($this->hasSubscriptions()) {
+      $config->setSubscription(new ObjectType([
+        'name' => 'Subscription',
+        'fields' => function () {
+          return $this->getSubscriptions();
+        },
+      ]));
+    }
+
     $config->setQuery(new ObjectType([
-      'name' => 'QueryRoot',
+      'name' => 'Query',
       'fields' => function () {
         return $this->getFields('Root');
       },
@@ -141,6 +234,80 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
+  public function validateSchema() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getServer() {
+    // If the current user has appropriate permissions, allow to bypass
+    // the secure fields restriction.
+    $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
+
+    // Create the server config.
+    $config = ServerConfig::create();
+
+    // Each document (e.g. in a batch query) gets its own resolve context. This
+    // allows us to collect the cache metadata and contextual values (e.g.
+    // inheritance for language) for each query separately.
+    $config->setContext(function ($params, $document, $operation) use ($globals) {
+      // Each document (e.g. in a batch query) gets its own resolve context. This
+      // allows us to collect the cache metadata and contextual values (e.g.
+      // inheritance for language) for each query separately.
+      $context = new ResolveContext($globals, [
+        'language' => $this->languageManager->getCurrentLanguage()->getId(),
+      ]);
+      $context->addCacheTags(['graphql_response']);
+
+      // Always add the language_url cache context.
+      $context->addCacheContexts([
+        'languages:language_url',
+        'languages:language_interface',
+        'languages:language_content',
+        'user.permissions',
+      ]);
+      if ($this instanceof CacheableDependencyInterface) {
+        $context->addCacheableDependency($this);
+      }
+
+      return $context;
+    });
+
+    $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
+      if (isset($params->queryId)) {
+        // Assume that pre-parsed documents are already validated. This allows
+        // us to store pre-validated query documents e.g. for persisted queries
+        // effectively improving performance by skipping run-time validation.
+        return [];
+      }
+
+      return array_values(DocumentValidator::defaultRules());
+    });
+
+    $config->setPersistentQueryLoader([$this->queryProvider, 'getQuery']);
+    $config->setQueryBatching(TRUE);
+    $config->setDebug(!!$this->parameters['development']);
+    $config->setSchema($this->getSchema());
+
+    // Always log the errors.
+    $config->setErrorsHandler(function (array $errors, callable $formatter) {
+      /** @var \GraphQL\Error\Error $error */
+      foreach ($errors as $error) {
+        $this->logger->error($error->getMessage());
+      }
+
+      return array_map($formatter, $errors);
+    });
+
+    return $config;
+  }
+
+  /**
+  /**
+   * {@inheritdoc}
+   */
   public function hasFields($type) {
     return isset($this->pluginDefinition['field_association_map'][$type]);
   }
@@ -150,6 +317,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    */
   public function hasMutations() {
     return !empty($this->pluginDefinition['mutation_map']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasSubscriptions() {
+    return !empty($this->pluginDefinition['subscription_map']);
   }
 
   /**
@@ -180,6 +354,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    */
   public function getMutations() {
     return $this->processMutations($this->pluginDefinition['mutation_map']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubscriptions() {
+    return $this->processSubscriptions($this->pluginDefinition['subscription_map']);
   }
 
   /**
@@ -243,21 +424,28 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function processMutations($mutations) {
+  public function processMutations(array $mutations) {
     return array_map([$this, 'buildMutation'], $mutations);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function processFields($fields) {
+  public function processSubscriptions(array $subscriptions) {
+    return array_map([$this, 'buildSubscription'], $subscriptions);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processFields(array $fields) {
     return array_map([$this, 'buildField'], $fields);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function processArguments($args) {
+  public function processArguments(array $args) {
     return array_map(function ($arg) {
       return [
         'type' => $this->processType($arg['type']),
@@ -268,7 +456,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   /**
    * {@inheritdoc}
    */
-  public function processType($type) {
+  public function processType(array $type) {
     list($type, $decorators) = $type;
 
     return array_reduce($decorators, function ($type, $decorator) {
@@ -329,6 +517,24 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     }
 
     return $this->mutations[$mutation['id']];
+  }
+
+  /**
+   * Retrieves the subscription definition for a given field reference.
+   *
+   * @param array $mutation
+   *   The subscription reference.
+   *
+   * @return array
+   *   The subscription definition.
+   */
+  protected function buildSubscription($subscription) {
+    if (!isset($this->subscriptions[$subscription['id']])) {
+      $creator = [$subscription['class'], 'createInstance'];
+      $this->subscriptions[$subscription['id']] = $creator($this, $this->subscriptionManager, $subscription['definition'], $subscription['id']);
+    }
+
+    return $this->subscriptions[$subscription['id']];
   }
 
   /**

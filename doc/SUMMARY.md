@@ -1,6 +1,6 @@
 # Summary
 
-* [Introduction](README.md)
+* [Introduction](../README.md)
 
 ## Getting started
 
@@ -24,4 +24,8 @@
 ## Authentication
 
 * [Introduction](authentication/introduction.md)
+
+## Metatag / SEO
+
+* [Metatag support](metatag/readme.md)
 

@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ValueWrapperInterface;
 use Drupal\graphql\Plugin\FieldPluginInterface;
@@ -15,7 +16,6 @@ use Drupal\graphql\Plugin\GraphQL\Traits\CacheablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DeprecatablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\DescribablePluginTrait;
 use Drupal\graphql\Plugin\GraphQL\Traits\TypedPluginTrait;
-use Drupal\graphql\Plugin\LanguageNegotiation\LanguageNegotiationGraphQL;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ListOfType;
@@ -35,6 +35,20 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    * @var \Drupal\graphql\GraphQLLanguageContext
    */
   protected $languageContext;
+
+  /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * Static cache for `isLanguageAwareField()`
+   *
+   * @var boolean
+   */
+  protected $isLanguageAware = NULL;
 
   /**
    * {@inheritdoc}
@@ -64,6 +78,18 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       $this->languageContext = \Drupal::service('graphql.language_context');
     }
     return $this->languageContext;
+  }
+
+  /**
+   * Get the renderer service.
+   *
+   * @return \Drupal\Core\Render\RendererInterface
+   */
+  protected function getRenderer() {
+    if (!isset($this->renderer)) {
+      $this->renderer = \Drupal::service('renderer');
+    }
+    return $this->renderer;
   }
 
   /**
@@ -98,20 +124,10 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
       if (array_key_exists($argument, $args) && !is_null($args[$argument])) {
         $context->setContext($argument, $args[$argument], $info);
       }
-      else {
-        $args[$argument] = $context->getContext($argument, $info);
-      }
+      $args[$argument] = $context->getContext($argument, $info);
     }
 
-    if ($this->isLanguageAwareField()) {
-      return $this->getLanguageContext()
-        ->executeInLanguageContext(function () use ($value, $args, $context, $info) {
-          return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-        }, $context->getContext('language', $info));
-    }
-    else {
-      return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
-    }
+    return $this->resolveDeferred([$this, 'resolveValues'], $value, $args, $context, $info);
   }
 
   /**
@@ -123,24 +139,57 @@ abstract class FieldPluginBase extends PluginBase implements FieldPluginInterfac
    *   The fields language awareness status.
    */
   protected function isLanguageAwareField() {
-    return (boolean) count(array_filter($this->getPluginDefinition()['response_cache_contexts'], function ($context) {
-      return strpos($context, 'languages:') === 0;
-    }));
+    if (is_null($this->isLanguageAware)) {
+      $this->isLanguageAware = (boolean) count(array_filter($this->getPluginDefinition()['response_cache_contexts'], function ($context) {
+        return strpos($context, 'languages:') === 0;
+      }));
+    }
+    return $this->isLanguageAware;
   }
 
   /**
    * {@inheritdoc}
    */
   protected function resolveDeferred(callable $callback, $value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $result = $callback($value, $args, $context, $info);
+    $isLanguageAware = $this->isLanguageAwareField();
+    $languageContext = $this->getLanguageContext();
 
-    if (is_callable($result)) {
-      return new Deferred(function () use ($result, $value, $args, $context, $info) {
-        return $this->resolveDeferred($result, $value, $args, $context, $info);
+    $renderContext = new RenderContext();
+
+    $executor = function () use ($callback, $renderContext, $value, $args, $context, $info) {
+      return $this->getRenderer()->executeInRenderContext($renderContext, function () use ($callback, $value, $args, $context, $info) {
+        $result = $callback($value, $args, $context, $info);
+        if ($result instanceof \Generator) {
+          $result = iterator_to_array($result);
+        }
+        return $result;
       });
+    };
+
+    $result = $isLanguageAware
+      ? $languageContext->executeInLanguageContext($executor, $context->getContext('language', $info))
+      : $executor();
+
+    if (!$renderContext->isEmpty() && $info->operation->operation === 'query') {
+      $context->addCacheableDependency($renderContext->pop());
     }
 
-    $result = iterator_to_array($result);
+    if (is_callable($result)) {
+      return new Deferred(
+        function () use ($result, $value, $args, $context, $info, $isLanguageAware, $languageContext) {
+          if ($isLanguageAware) {
+            return $languageContext
+              ->executeInLanguageContext(
+                function () use ($result, $value, $args, $context, $info) {
+                  return $this->resolveDeferred($result, $value, $args, $context, $info);
+                },
+                $context->getContext('language', $info)
+              );
+          }
+          return $this->resolveDeferred($result, $value, $args, $context, $info);
+        }
+      );
+    }
 
     // Only collect cache metadata if this is a query. All other operation types
     // are not cacheable anyways.

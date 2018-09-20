@@ -2,14 +2,12 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\graphql\GraphQL\Visitors\CacheContextsCollector;
 use Drupal\graphql\Plugin\SchemaPluginManager;
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\ExecutionResult;
@@ -26,19 +24,12 @@ use GraphQL\Server\ServerConfig;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
-use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 // TODO: Refactor this and clean it up.
 class QueryProcessor {
-
-  /**
-   * The current user account.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $currentUser;
 
   /**
    * The schema plugin manager.
@@ -46,13 +37,6 @@ class QueryProcessor {
    * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $pluginManager;
-
-  /**
-   * The query provider service.
-   *
-   * @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface
-   */
-  protected $queryProvider;
 
   /**
    * The cache backend for caching query results.
@@ -69,42 +53,34 @@ class QueryProcessor {
   protected $contextsManager;
 
   /**
-   * The configuration service parameter.
+   * The request stack.
    *
-   * @var array
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $config;
+  protected $requestStack;
 
   /**
    * Processor constructor.
    *
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *   The current user.
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
-   * @param \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider
-   *   The query provider service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for caching query results.
-   * @param array $config
-   *   The configuration service parameter.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    */
   public function __construct(
-    AccountProxyInterface $currentUser,
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
-    QueryProviderInterface $queryProvider,
     CacheBackendInterface $cacheBackend,
-    array $config
+    RequestStack $requestStack
   ) {
-    $this->currentUser = $currentUser;
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
-    $this->queryProvider = $queryProvider;
     $this->cacheBackend = $cacheBackend;
-    $this->config = $config;
+    $this->requestStack = $requestStack;
   }
 
   /**
@@ -114,58 +90,16 @@ class QueryProcessor {
    *   The plugin id of the schema to use.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $params
    *   The graphql operation(s) to execute.
-   * @param array $globals
-   *   The query context.
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
    *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function processQuery($schema, $params, array $globals = []) {
+  public function processQuery($schema, $params) {
     // Load the plugin from the schema manager.
     $plugin = $this->pluginManager->createInstance($schema);
-    $schema = $plugin->getSchema();
-
-    // If the current user has appropriate permissions, allow to bypass
-    // the secure fields restriction.
-    $globals['bypass field security'] = $this->currentUser->hasPermission('bypass graphql field security');
-
-    // Create the server config.
-    $config = ServerConfig::create();
-    $config->setDebug(!empty($this->config['development']));
-    $config->setSchema($schema);
-    $config->setQueryBatching(TRUE);
-    $config->setContext(function () use ($globals, $plugin) {
-      // Each document (e.g. in a batch query) gets its own resolve context but
-      // the global parameters are shared. This allows us to collect the cache
-      // metadata and contextual values (e.g. inheritance for language) for each
-      // query separately.
-      $context = new ResolveContext($globals);
-      if ($plugin instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($plugin)->addCacheTags(['graphql_response']);
-      }
-
-      return $context;
-    });
-
-    $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
-      if (isset($params->queryId)) {
-        // Assume that pre-parsed documents are already validated. This allows
-        // us to store pre-validated query documents e.g. for persisted queries
-        // effectively improving performance by skipping run-time validation.
-        return [];
-      }
-
-      return array_values(DocumentValidator::defaultRules());
-    });
-
-    $config->setPersistentQueryLoader(function ($id, OperationParams $params) {
-      if ($query = $this->queryProvider->getQuery($id, $params)) {
-        return $query;
-      }
-
-      throw new RequestError(sprintf("Failed to load query map for id '%s'.", $id));
-    });
+    $config = $plugin->getServer();
 
     if (is_array($params)) {
       return $this->executeBatch($config, $params);
@@ -276,6 +210,11 @@ class QueryProcessor {
 
       return $this->executeUncachableOperation($adapter, $config, $params, $document);
     }
+    catch (CacheableRequestError $exception) {
+      return $adapter->createFulfilled(
+        new QueryResult(NULL, [Error::createLocatedError($exception)], [], $exception)
+      );
+    }
     catch (RequestError $exception) {
       return $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
     }
@@ -293,35 +232,25 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise|mixed
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
-    $schema = $config->getSchema();
-
-    // Collect cache contexts from the query document.
-    $contexts = [];
-    $info = new TypeInfo($schema);
-    $visitor = (new CacheContextsCollector())->getVisitor($info, $contexts);
-    Visitor::visit($document, Visitor::visitWithTypeInfo($info, $visitor));
-
-    // Generate a cache identifier from the collected contexts.
-    $metadata = (new CacheableMetadata())->addCacheContexts($contexts);
-    $cid = $this->cacheIdentifier($params, $document, $metadata);
-    if (!$config->getDebug() && ($cache = $this->cacheBackend->get($cid)) && $result = $cache->data) {
-      return $adapter->createFulfilled($result);
+    $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document);
+    if (!$config->getDebug() && $contextCache = $this->cacheBackend->get($contextCacheId)) {
+      $contexts = $contextCache->data ?: [];
+      $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
+      if ($cache = $this->cacheBackend->get($cid)) {
+        return $adapter->createFulfilled($cache->data);
+      }
     }
 
     $result = $this->doExecuteOperation($adapter, $config, $params, $document);
-    return $result->then(function (QueryResult $result) use ($cid, $metadata) {
-      if ($missing = array_diff($result->getCacheContexts(), $metadata->getCacheContexts())) {
-        throw new \LogicException(sprintf(
-          'The query result yielded cache contexts (%s) that were not part of the static query analysis.',
-          implode(', ', $missing)
-        ));
-      }
-
-      // Add the statically collected cache contexts.
-      $result->addCacheableDependency($metadata);
+    return $result->then(function (QueryResult $result) use ($contextCacheId, $params, $document) {
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
-        $this->cacheBackend->set($cid, $result, $result->getCacheMaxAge(), $result->getCacheTags());
+        $contexts = $result->getCacheContexts();
+        $expire = $this->maxAgeToExpire($result->getCacheMaxAge());
+        $tags = $result->getCacheTags();
+        $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
+        $this->cacheBackend->set($contextCacheId, $contexts, $expire, $tags);
+        $this->cacheBackend->set($cid, $result, $expire, $tags);
       }
 
       return $result;
@@ -373,8 +302,10 @@ class QueryProcessor {
     );
 
     return $promise->then(function (ExecutionResult $result) use ($context) {
-      // Add the collected cache metadata to the result.
-      $metadata = (new CacheableMetadata())->addCacheableDependency($context);
+      $metadata = (new CacheableMetadata())
+        ->addCacheContexts($context->getCacheContexts())
+        ->addCacheTags($context->getCacheTags())
+        ->setCacheMaxAge($context->getCacheMaxAge());
 
       // Do not cache in development mode or if there are any errors.
       if ($context->getGlobal('development') || !empty($result->errors)) {
@@ -403,6 +334,7 @@ class QueryProcessor {
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
    * @return \GraphQL\Error\Error[]
+   * @throws \Exception
    */
   protected function validateOperation(ServerConfig $config, OperationParams $params, DocumentNode $document) {
     $operation = $params->operation;
@@ -530,15 +462,13 @@ class QueryProcessor {
   /**
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   * @param array $contexts
    *
    * @return string
    */
-  protected function cacheIdentifier(OperationParams $params, DocumentNode $document, CacheableMetadata $metadata) {
+  protected function cacheIdentifier(OperationParams $params, DocumentNode $document, array $contexts = []) {
     // Ignore language contexts since they are handled by graphql internally.
-    $contexts = array_filter($metadata->getCacheContexts(), function ($context) {
-      return strpos($context, 'languages:') !== 0;
-    });
+    $contexts = $contexts;
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
 
     // Sorting the variables will cause fewer cache vectors.
@@ -552,5 +482,37 @@ class QueryProcessor {
     ]));
 
     return implode(':', array_values(array_merge([$hash], $keys)));
+  }
+
+  /**
+   * Filter unused contexts.
+   *
+   * Removes the language contexts from a list of context ids.
+   *
+   * @param string[] $contexts
+   *   The list of context id's.
+   *
+   * @return string[]
+   *   The filtered list of context id's.
+   */
+  protected function filterCacheContexts(array $contexts) {
+    return array_filter($contexts, function ($context) {
+      return strpos($context, 'languages:') !== 0;
+    });
+  }
+
+  /**
+   * Maps a cache max age value to an "expire" value for the Cache API.
+   *
+   * @param int $maxAge
+   *
+   * @return int
+   *   A corresponding "expire" value.
+   *
+   * @see \Drupal\Core\Cache\CacheBackendInterface::set()
+   */
+  protected function maxAgeToExpire($maxAge) {
+    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
 }

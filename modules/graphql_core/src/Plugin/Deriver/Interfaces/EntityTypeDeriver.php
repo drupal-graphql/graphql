@@ -19,8 +19,10 @@ class EntityTypeDeriver extends EntityTypeDeriverBase {
         continue;
       }
 
+      $bundles = $this->entityTypeBundleInfo->getAllBundleInfo();
+
       // Only create a base interface for types that support bundles.
-      if (!$type->hasKey('bundle')) {
+      if (!$type->hasKey('bundle') && array_key_exists($typeId, $bundles) && count($bundles[$typeId])) {
         continue;
       }
 

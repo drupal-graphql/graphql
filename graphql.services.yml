@@ -19,6 +19,11 @@ services:
     tags:
       - { name: access_check, applies_to: _graphql_query_access }
 
+  # Logger channel for graphql related logging.
+  logger.channel.graphql:
+    parent: logger.channel_base
+    arguments: ['graphql']
+
   # Cache bin for graphql plugin definitions.
   cache.graphql.definitions:
     class: Drupal\Core\Cache\CacheBackendInterface
@@ -39,12 +44,10 @@ services:
   graphql.query_processor:
     class: Drupal\graphql\GraphQL\Execution\QueryProcessor
     arguments:
-      - '@current_user'
       - '@cache_contexts_manager'
       - '@plugin.manager.graphql.schema'
-      - '@graphql.query_provider'
       - '@cache.graphql.results'
-      - '%graphql.config%'
+      - '@request_stack'
 
   # Query map provider using the composite pattern.
   graphql.query_provider:
@@ -112,7 +115,7 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
-      - '\Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase'
+      - '\Drupal\graphql\Plugin\SchemaPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLSchema'
       - '%graphql.config%'
 
@@ -138,6 +141,17 @@ services:
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\MutationPluginInterface'
       - '\Drupal\graphql\Annotation\GraphQLMutation'
+      - '%graphql.config%'
+
+  plugin.manager.graphql.subscription:
+    class: Drupal\graphql\Plugin\SubscriptionPluginManager
+    arguments:
+      - 'Plugin/GraphQL/Subscriptions'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\SubscriptionPluginInterface'
+      - '\Drupal\graphql\Annotation\GraphQLSubscription'
       - '%graphql.config%'
 
   # Plugin manager implementations for schema types.
@@ -256,7 +270,6 @@ services:
 
   graphql.config_factory_override:
     class: Drupal\graphql\Config\GraphQLConfigOverrides
-    arguments: ['@config.storage']
+    arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
     tags:
       - { name: config.factory.override, priority: -253 }
-

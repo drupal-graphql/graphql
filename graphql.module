@@ -7,6 +7,7 @@ use Drupal\graphql\Utility\StringHelper;
 define('GRAPHQL_SCALAR_PLUGIN', 'scalar');
 define('GRAPHQL_FIELD_PLUGIN', 'field');
 define('GRAPHQL_MUTATION_PLUGIN', 'mutation');
+define('GRAPHQL_SUBSCRIPTION_PLUGIN', 'subscription');
 define('GRAPHQL_INTERFACE_PLUGIN', 'interface');
 define('GRAPHQL_UNION_TYPE_PLUGIN', 'union');
 define('GRAPHQL_INPUT_TYPE_PLUGIN', 'input');
@@ -124,6 +125,13 @@ function graphql_graphql_fields_alter(&$definitions) {
  * Implements hook_graphql_mutations_alter().
  */
 function graphql_graphql_mutations_alter(&$definitions) {
+  _graphql_decorate_deprecated_type($definitions);
+}
+
+/**
+ * Implements hook_graphql_mutations_alter().
+ */
+function graphql_graphql_subscriptions_alter(&$definitions) {
   _graphql_decorate_deprecated_type($definitions);
 }
 

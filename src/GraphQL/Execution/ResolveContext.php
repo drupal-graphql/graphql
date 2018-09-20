@@ -24,13 +24,23 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   protected $contexts = [];
 
   /**
+   * Root context values that will apply if no more specific context is there.
+   *
+   * @var array
+   */
+  protected $rootContext = [];
+
+  /**
    * ResolveContext constructor.
    *
    * @param array $globals
    *   List of global values to expose to field resolvers.
+   * @param array $rootContext
+   *   The root context values the query will be initialised with.
    */
-  public function __construct(array $globals = []) {
+  public function __construct(array $globals = [], $rootContext = []) {
     $this->globals = $globals;
+    $this->rootContext = $rootContext;
   }
 
   /**
@@ -55,11 +65,15 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
     do {
       $key = implode('.', $path);
-      if (isset($this->contexts[$operation][$key][$name])) {
+      if (isset($this->contexts[$operation][$key]) && array_key_exists($name, $this->contexts[$operation][$key])) {
         return $this->contexts[$operation][$key][$name];
       }
       array_pop($path);
     } while (count($path));
+
+    if (isset($this->rootContext[$name])) {
+      return $this->rootContext[$name];
+    }
 
     return $default;
   }

@@ -18,7 +18,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  * @GraphQLField(
  *   id = "entity_query",
  *   secure = true,
- *   type = "EntityQueryResult!",
+ *   type = "EntityQueryResult",
  *   arguments = {
  *     "filter" = "EntityQueryFilterInput",
  *     "sort" = "[EntityQuerySortInput]",
@@ -138,11 +138,14 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return \Drupal\Core\Entity\Query\QueryInterface|null
    *   The entity query object.
    */
   protected function getQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
-    $query = $this->getBaseQuery($value, $args, $context, $info);
+    if (!$query = $this->getBaseQuery($value, $args, $context, $info)) {
+      return NULL;
+    }
+
     $query->range($args['offset'], $args['limit']);
 
     if (array_key_exists('revisions', $args)) {
@@ -172,7 +175,7 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *   The resolve info object.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return \Drupal\Core\Entity\Query\QueryInterface|null
    *   The entity query object.
    */
   protected function getBaseQuery($value, array $args, ResolveContext $context, ResolveInfo $info) {
@@ -228,6 +231,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       $query->allRevisions();
       $query->addTag('revisions');
     }
+    else if ($mode === 'latest') {
+      // Mark the query to only include latest revision and sort by revision id.
+      $query->latestRevision();
+      $query->addTag('revisions');
+    }
 
     return $query;
   }
@@ -270,7 +278,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    */
   protected function applyFilter(QueryInterface $query, $filter) {
     if (!empty($filter) && is_array($filter)) {
-      $query->condition($this->buildFilterConditions($query, $filter));
+      //Conditions can be disabled. Check we are not adding an empty condition group.
+      $filterConditions = $this->buildFilterConditions($query, $filter);
+      if (count($filterConditions->conditions())) {
+        $query->condition($filterConditions);
+      }      
     }
 
     return $query;
@@ -297,6 +309,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     // Apply filter conditions.
     $conditions = !empty($filter['conditions']) ? $filter['conditions'] : [];
     foreach ($conditions as $condition) {
+      // Check if we need to disable this condition.
+      if (isset($condition['enabled']) && empty($condition['enabled'])) {
+        continue;
+      }
+      
       $field = $condition['field'];
       $value = !empty($condition['value']) ? $condition['value'] : NULL;
       $operator = !empty($condition['operator']) ? $condition['operator'] : NULL;
@@ -343,7 +360,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     $groups = !empty($filter['groups']) ? $filter['groups'] : [];
     foreach ($groups as $args) {
       // By default, we use AND condition groups.
-      $group->condition($this->buildFilterConditions($query, $args));
+      // Conditions can be disabled. Check we are not adding an empty condition group.
+      $filterConditions = $this->buildFilterConditions($query, $args);
+      if (count($filterConditions->conditions())) {
+        $group->condition($filterConditions);
+      }      
     }
 
     return $group;

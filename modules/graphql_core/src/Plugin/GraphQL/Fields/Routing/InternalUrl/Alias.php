@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   secure = true,
  *   name = "pathAlias",
  *   description = @Translation("The url's path alias if any."),
+ *   response_cache_contexts = {"languages:language_url"},
  *   type = "String",
  *   parents = {"InternalUrl"}
  * )

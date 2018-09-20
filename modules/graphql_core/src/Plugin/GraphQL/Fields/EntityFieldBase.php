@@ -31,11 +31,13 @@ class EntityFieldBase extends FieldPluginBase {
       $type = $info->returnType;
       $type = $type instanceof WrappingType ? $type->getWrappedType(TRUE) : $type;
       if ($type instanceof ScalarType) {
-        $result = $type->serialize($result);
+        $result = is_null($result) ? NULL : $type->serialize($result);
       }
 
       if ($result instanceof ContentEntityInterface && $result->isTranslatable() && $language = $context->getContext('language', $info)) {
-        $result = $result->getTranslation($language);
+        if ($result->hasTranslation($language)) {
+          $result = $result->getTranslation($language);
+        }
       }
 
       return $result;

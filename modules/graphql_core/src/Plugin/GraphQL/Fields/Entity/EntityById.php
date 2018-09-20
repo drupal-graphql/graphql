@@ -111,8 +111,10 @@ class EntityById extends FieldPluginBase implements ContainerFactoryPluginInterf
         $access = $entity->access('view', NULL, TRUE);
 
         if ($access->isAllowed()) {
-          if (isset($args['language']) && $args['language'] != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-            $entity = $entity->getTranslation($args['language']);
+          if (isset($args['language']) && $args['language'] != $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->isTranslatable()) {
+            if ($entity->hasTranslation($args['language'])) {
+              $entity = $entity->getTranslation($args['language']);
+            }
           }
 
           yield $entity->addCacheableDependency($access);
