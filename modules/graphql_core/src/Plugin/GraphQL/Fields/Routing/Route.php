@@ -3,14 +3,11 @@
 namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing;
 
 use Drupal\Core\Path\PathValidatorInterface;
+use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\language\LanguageNegotiator;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\redirect\Entity\Redirect;
-use Drupal\Tests\views_ui\Functional\ReportFieldsTest;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,6 +50,16 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   protected $languageManager;
 
   /**
+   * @var \Drupal\redirect\RedirectRepository
+   */
+  protected $redirectRepository;
+
+  /**
+   * @var InboundPathProcessorInterface
+   */
+  protected $pathProcessor;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -61,8 +68,10 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('path.validator'),
-      $container->has('language_negotiator') ? $container->get('language_negotiator') : NULL,
-      $container->get('language_manager')
+      $container->get('language_negotiator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+      $container->get('language_manager'),
+      $container->get('redirect.repository', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+      $container->get('path_processor_manager')
     );
   }
 
@@ -81,6 +90,10 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The language negotiator.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\redirect\RedirectRepository $redirectRepository
+   *   The redirect repository, if redirect module is active.
+   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface
+   *   An inbound path processor, to clean paths before redirect lookups.
    */
   public function __construct(
     array $configuration,
@@ -88,9 +101,13 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
     $languageNegotiator,
-    $languageManager
+    $languageManager,
+    $redirectRepository,
+    $pathProcessor
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->redirectRepository = $redirectRepository;
+    $this->pathProcessor = $pathProcessor;
     $this->pathValidator = $pathValidator;
     $this->languageNegotiator = $languageNegotiator;
     $this->languageManager = $languageManager;
@@ -129,35 +146,16 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   }
 
   /**
-   * Get the redirect repository service.
-   *
-   * @return \Drupal\redirect\RedirectRepository
-   */
-  protected function getRedirectRepository() {
-    return \Drupal::service('redirect.repository');
-  }
-
-  /**
-   * Get the path processor.
-   *
-   * @return \Drupal\Core\PathProcessor\InboundPathProcessorInterface
-   */
-  protected function getPathProcessor() {
-    return \Drupal::service('path_processor_manager');
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
-    if (\Drupal::moduleHandler()->moduleExists('redirect')) {
-      $redirectRepository = $this->getRedirectRepository();
+    if ($this->redirectRepository) {
       $currentLanguage = $this->languageManager->getCurrentLanguage()->getId();
 
-      $processedPath = $this->getPathProcessor()
+      $processedPath = $this->pathProcessor
         ->processInbound($args['path'], Request::create($args['path']));
 
-      if ($redirect = $redirectRepository->findMatchingRedirect($processedPath, [], $currentLanguage)) {
+      if ($redirect = $this->redirectRepository->findMatchingRedirect($processedPath, [], $currentLanguage)) {
         yield $redirect;
         return;
       }
