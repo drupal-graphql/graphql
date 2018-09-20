@@ -138,13 +138,26 @@ class Route extends FieldPluginBase implements ContainerFactoryPluginInterface {
   }
 
   /**
+   * Get the path processor.
+   *
+   * @return \Drupal\Core\PathProcessor\InboundPathProcessorInterface
+   */
+  protected function getPathProcessor() {
+    return \Drupal::service('path_processor_manager');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if (\Drupal::moduleHandler()->moduleExists('redirect')) {
       $redirectRepository = $this->getRedirectRepository();
       $currentLanguage = $this->languageManager->getCurrentLanguage()->getId();
-      if ($redirect = $redirectRepository->findMatchingRedirect($args['path'], [], $currentLanguage)) {
+
+      $processedPath = $this->getPathProcessor()
+        ->processInbound($args['path'], Request::create($args['path']));
+
+      if ($redirect = $redirectRepository->findMatchingRedirect($processedPath, [], $currentLanguage)) {
         yield $redirect;
         return;
       }
