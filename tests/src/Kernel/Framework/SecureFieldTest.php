@@ -57,7 +57,6 @@ class SecureFieldTest extends GraphQLTestBase {
    */
   public function testInsecureField() {
     $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheContexts([]);
     $metadata->setCacheMaxAge(0);
     $this->assertErrors('{ insecure }', [], [
       'Unable to resolve insecure field \'insecure\'.',

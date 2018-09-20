@@ -298,6 +298,7 @@ trait MockGraphQLPluginTrait {
       $this->container->get('graphql.query_provider'),
       $this->container->get('current_user'),
       $this->container->get('logger.channel.graphql'),
+      $this->container->get('language_manager'),
       $this->container->getParameter('graphql.config')
     ]);
 
