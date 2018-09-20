@@ -58,8 +58,6 @@ as well as other other contributed modules supporting it:
   > Drupal module for Automatic Persisted Queries compatible with the apollo-link-persisted-queries project's proposed protocol.
 * GraphQL Metatag [https://github.com/drupal-graphql/graphql-metatag](https://github.com/drupal-graphql/graphql-metatag)
   > Module that integrates the Metatag Drupal module with GraphQL.
-* GraphQL Redirect [https://www.drupal.org/project/graphql_redirect](https://www.drupal.org/project/graphql_redirect)
-  > Allow the GraphQL query to follow a redirected path and return the query result of the destination route.
 * GraphQL Twig [https://github.com/drupal-graphql/graphql-twig](https://github.com/drupal-graphql/graphql-twig)
   > Allows you to inject data into Twig templates by simply adding a GraphQL query.
 * GraphQL Views [https://github.com/drupal-graphql/graphql-views](https://github.com/drupal-graphql/graphql-views)
