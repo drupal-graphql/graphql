@@ -49,6 +49,14 @@ class EntityRenderedDeriver extends DeriverBase implements ContainerDeriverInter
           'entity_type' => $id,
         ] + $basePluginDefinition;
 
+        if (!isset($derivative['arguments']['mode'])) {
+          $derivative['arguments'] = isset($derivative['arguments']) ? $derivative['arguments'] : [];
+          $derivative['arguments']['mode'] = [
+            'type' => StringHelper::camelCase($id, 'display', 'mode', 'id'),
+            'optional' => TRUE,
+          ];
+        }
+
         $this->derivatives["entity:$id"] = $derivative;
       }
     }

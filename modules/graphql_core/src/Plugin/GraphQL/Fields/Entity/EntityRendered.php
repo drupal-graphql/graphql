@@ -23,7 +23,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityRenderedDeriver",
  * )
  */
-class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginInterface {
+class EntityRendered extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
@@ -78,28 +78,6 @@ class EntityRendered extends FieldPluginBase  implements ContainerFactoryPluginI
     $this->entityTypeManager = $entityTypeManager;
     $this->renderer = $renderer;
   }
-
-  // TODO: Fix this.
-//  /**
-//   * {@inheritdoc}
-//   */
-//  protected function buildArguments(SchemaBuilderInterface $builder) {
-//    $arguments = parent::buildArguments($builder);
-//
-//    if (empty($arguments['mode'])) {
-//      $definition = $this->getPluginDefinition();
-//      $type = StringHelper::camelCase($definition['entity_type'], 'display', 'mode', 'id');
-//
-//      if ($type = $builder->findByName($type, [GRAPHQL_ENUM_PLUGIN])) {
-//        $arguments['mode'] = new InputField([
-//          'name' => 'mode',
-//          'type' => $type->getDefinition($builder),
-//        ]);
-//      }
-//    }
-//
-//    return $arguments;
-//  }
 
   /**
    * {@inheritdoc}
