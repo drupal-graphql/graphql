@@ -15,6 +15,7 @@ env:
     - DRUPAL_CORE=8.3.x
     - DRUPAL_CORE=8.4.x
     - DRUPAL_CORE=8.5.x
+    - DRUPAL_CORE=8.6.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -22,14 +23,14 @@ matrix:
   include:
     - php: 7.1
       env:
-        - DRUPAL_CORE=8.4.x
+        - DRUPAL_CORE=8.6.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
   allow_failures:
     # Allow the code coverage report to fail.
     - php: 7.1
       env:
-        - DRUPAL_CORE=8.4.x
+        - DRUPAL_CORE=8.6.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
 
