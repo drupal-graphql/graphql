@@ -269,6 +269,7 @@ GQL;
       'config:field.storage.node.field_reference',
       'entity_field_info',
       'node:1',
+      'user:0',
       'file:1',
       'file:2',
     ]);
@@ -355,7 +356,9 @@ GQL;
       ],
       'uid' => [
         'targetId' => 0,
-        'entity' => NULL,
+        'entity' => [
+          'name' => '',
+        ],
       ],
       'title' => 'Test',
       'status' => TRUE,

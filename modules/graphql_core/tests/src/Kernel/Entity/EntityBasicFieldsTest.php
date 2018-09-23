@@ -83,7 +83,7 @@ class EntityBasicFieldsTest extends GraphQLContentTestBase {
     $metadata->addCacheTags([
       'node:1',
       'node_list',
-      'user:1',
+      'user:2',
     ]);
 
     $this->assertResults($query, ['nid' => (string) $node->id()], [
