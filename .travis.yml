@@ -93,6 +93,10 @@ install:
   # require also triggers a full 'composer install'.
   - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.12.5
 
+  - if [[ "$DRUPAL_CORE" != "8.3.x" && "$DRUPAL_CORE" != "8.4.x" ]];
+      then composer --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade;
+    fi
+
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
