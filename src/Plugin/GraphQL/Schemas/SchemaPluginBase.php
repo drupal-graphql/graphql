@@ -160,6 +160,8 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The current user.
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
    * @param array $parameters
    *   The service parameters.
    */

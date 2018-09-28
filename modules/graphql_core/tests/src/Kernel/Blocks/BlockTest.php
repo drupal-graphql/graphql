@@ -68,6 +68,8 @@ class BlockTest extends GraphQLCoreTestBase {
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
       'block_content:1',
+      // TODO: Check metatags. Is the config metatag required?
+      'config:image.style.thumbnail',
     ]);
 
     $this->assertResults($query, [], [

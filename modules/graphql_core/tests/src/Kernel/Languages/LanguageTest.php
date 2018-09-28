@@ -51,12 +51,7 @@ class LanguageTest extends GraphQLCoreTestBase {
    */
   public function testLanguageId() {
     $metadata = $this->defaultCacheMetaData();
-    $metadata->addCacheTags([
-      'config:language.entity.en',
-      'config:language.entity.es',
-      'config:language.entity.fr',
-      'config:language.entity.pt-br'
-    ]);
+    // TODO: Should this also contain the language config cache metadata?
 
     $this->assertResults($this->getQueryFromFile('languages.gql'), [], [
       'languages' => [
@@ -105,6 +100,12 @@ class LanguageTest extends GraphQLCoreTestBase {
    */
   public function testLanguageSwitchLinks() {
     $metadata = $this->defaultCacheMetaData();
+    $metadata->addCacheTags([
+      'config:language.entity.en',
+      'config:language.entity.es',
+      'config:language.entity.fr',
+      'config:language.entity.pt-br'
+    ]);
 
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
       'route' => [
