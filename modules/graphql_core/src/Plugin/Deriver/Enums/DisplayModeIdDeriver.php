@@ -66,7 +66,7 @@ class DisplayModeIdDeriver extends DeriverBase implements ContainerDeriverInterf
       $target = $current->getTargetType();
       list(, $id) = explode('.', $current->id());
 
-      $carry[$target][strtoupper($id)] = [
+      $carry[$target][StringHelper::upperCase($id)] = [
         'value' => $id,
         'description' => $this->t("The '@label' display mode for '@type' entities.", [
           '@label' => $current->label(),

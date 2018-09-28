@@ -15,7 +15,14 @@ class StringHelper {
    *   string representation for field or type names.
    */
   public static function camelCase() {
-    $components = func_get_args();
+    $components = array_map(function ($component) {
+      if ($component[0] && is_numeric($component[0])) {
+        $component = "_$component";
+      }
+
+      return str_replace('-', '_', $component);
+    }, func_get_args());
+
     $string = is_array($components) ? implode('_', $components) : $components;
     $filtered = preg_replace('/^[^_a-zA-Z]+/', '', $string);
     $components = array_filter(preg_split('/[^a-zA-Z0-9]/', $filtered));
@@ -25,6 +32,17 @@ class StringHelper {
     }
 
     return implode('', array_map('ucfirst', $components));
+  }
+
+  /**
+   * Turn a list of machine names into a upper-cased string.
+   *
+   * @return string
+   *   A upper-cased concatenation of the input components.
+   */
+  public static function upperCase() {
+    $result = call_user_func_array([static::class, 'camelCase'], func_get_args());
+    return strtoupper($result);
   }
 
   /**
