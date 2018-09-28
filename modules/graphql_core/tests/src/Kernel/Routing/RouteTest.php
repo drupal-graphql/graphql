@@ -47,9 +47,7 @@ class RouteTest extends GraphQLCoreTestBase {
    * Test if the schema is created properly.
    */
   public function testRoute() {
-    // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
     $metadata->addCacheTags([
       '4xx-response',
     ]);

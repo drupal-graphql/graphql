@@ -38,11 +38,8 @@ class ExternalRequestTest extends GraphQLCoreTestBase {
     ));
 
     $this->container->set('http_client', $client->reveal());
-
-    // TODO: Check cache metadata.
     // Add cache information from external response?
     $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($this->getQueryFromFile('external_requests.gql'), [], [
       'route' => [

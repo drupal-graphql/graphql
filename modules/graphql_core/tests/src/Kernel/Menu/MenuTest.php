@@ -72,11 +72,8 @@ class MenuTest extends GraphQLCoreTestBase {
    * Test menu tree data retrieval.
    */
   public function testMenuTree() {
-    // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->addCacheTags([
-      'config:system.menu.test',
-    ]);
+    $metadata->addCacheTags(['config:system.menu.test']);
 
     $this->assertResults(
       $this->getQueryFromFile('menu.gql'),

@@ -160,6 +160,8 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The current user.
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
    * @param array $parameters
    *   The service parameters.
    */
@@ -259,7 +261,8 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $context = new ResolveContext($globals, [
         'language' => $this->languageManager->getCurrentLanguage()->getId(),
       ]);
-      $context->addCacheTags(['graphql_response']);
+
+      $context->addCacheTags(['graphql']);
 
       // Always add the language_url cache context.
       $context->addCacheContexts([
@@ -268,9 +271,6 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
         'languages:language_content',
         'user.permissions',
       ]);
-      if ($this instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($this);
-      }
 
       return $context;
     });
