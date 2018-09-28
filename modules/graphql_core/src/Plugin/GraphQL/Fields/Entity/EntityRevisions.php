@@ -5,6 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Fields\EntityQuery\EntityQuery;
+use Drupal\graphql_core\Plugin\GraphQL\Interfaces\Entity\EntityRevisionable;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
