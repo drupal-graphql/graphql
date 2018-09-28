@@ -17,7 +17,7 @@ class StringHelper {
   public static function camelCase() {
     $args = func_get_args();
     $components = array_map(function ($component) {
-      return preg_replace('[^a-zA-Z0-9_]', '_', $component);
+      return preg_replace('/[^a-zA-Z0-9_]/', '_', $component);
     }, $args);
 
     $components = array_filter(explode('_', implode('_', $components)));
