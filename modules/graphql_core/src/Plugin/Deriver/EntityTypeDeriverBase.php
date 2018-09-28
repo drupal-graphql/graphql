@@ -70,6 +70,8 @@ abstract class EntityTypeDeriverBase extends DeriverBase implements ContainerDer
     ];
 
     $interfaces = isset($basePluginDefinition['interfaces']) ? $basePluginDefinition['interfaces'] : [];
+    $interfaces[] = 'Entity';
+
     foreach ($pairs as $dependency => $interface) {
       if ($type->entityClassImplements($dependency)) {
         $interfaces[] = $interface;
