@@ -85,6 +85,7 @@ class SchemaCacheTest extends GraphQLTestBase {
       'id' => 'foo',
       'name' => 'foo',
       'type' => 'String',
+      'schema_cache_tags' => ['foo'],
       'response_cache_tags' => ['foo'],
     ], 'foo');
 
