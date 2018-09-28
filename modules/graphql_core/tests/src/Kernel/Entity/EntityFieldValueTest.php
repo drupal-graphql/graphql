@@ -85,7 +85,7 @@ GQL;
     ]);
 
     $this->assertGraphQLFields([
-      ['NodeTest', 'fieldText', 'FieldNodeFieldText'],
+      ['NodeTest', 'fieldText', 'FieldNodeTestFieldText'],
       ['FieldNodeFieldText', 'value', 'String'],
       ['FieldNodeFieldText', 'processed', 'String'],
       ['FieldNodeFieldText', 'format', 'String'],
@@ -129,7 +129,7 @@ GQL;
     ]);
 
     $this->assertGraphQLFields([
-      ['NodeTest', 'body', 'FieldNodeBody'],
+      ['NodeTest', 'body', 'FieldNodeTestBody'],
       ['FieldNodeBody', 'format', 'String'],
       ['FieldNodeBody', 'value', 'String'],
       ['FieldNodeBody', 'processed', 'String'],
