@@ -17,7 +17,7 @@ class StringFormattingTest extends UnitTestCase {
    * @expectedExceptionMessageRegExp /Failed to create a specification compliant string representation for '.+'\./
    */
   public function testFailureOnInvalidInput() {
-    StringHelper::camelCase('123456', '^%!@#&');
+    StringHelper::camelCase('^%!@#&');
   }
 
   /**
@@ -43,9 +43,9 @@ class StringFormattingTest extends UnitTestCase {
   public function providerTestStringFormatting() {
     return [
       [['simple-name'], 'SimpleName'],
-      [['123-name-with*^&!@some-SPECIAL-chars'], 'NameWithSomeSPECIALChars'],
+      [['123-name-with*^&!@some-SPECIAL-chars'], '_123NameWithSomeSPECIALChars'],
       [['simple', 'name-of-string', 'components'], 'SimpleNameOfStringComponents'],
-      [['123', 'array', '%^!@&#*', 'of', 'STRING', '(*&', 'components', 'with', 'SPEcial', 'chars'], 'ArrayOfSTRINGComponentsWithSPEcialChars']
+      [['123', 'array', '%^!@&#*', 'of', 'STRING', '(*&', 'components', 'with', 'SPEcial', 'chars'], '_123ArrayOfSTRINGComponentsWithSPEcialChars']
     ];
   }
 

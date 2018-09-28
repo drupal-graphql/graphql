@@ -15,16 +15,30 @@ class StringHelper {
    *   string representation for field or type names.
    */
   public static function camelCase() {
-    $components = func_get_args();
-    $string = is_array($components) ? implode('_', $components) : $components;
-    $filtered = preg_replace('/^[^_a-zA-Z]+/', '', $string);
-    $components = array_filter(preg_split('/[^a-zA-Z0-9]/', $filtered));
+    $args = func_get_args();
+    $components = array_map(function ($component) {
+      return preg_replace('/[^a-zA-Z0-9_]/', '_', $component);
+    }, $args);
 
+    $components = array_filter(explode('_', implode('_', $components)));
     if (!count($components)) {
-      throw new \InvalidArgumentException(sprintf("Failed to create a specification compliant string representation for '%s'.", $string));
+      throw new \InvalidArgumentException(sprintf("Failed to create a specification compliant string representation for '%s'.", implode('', $args)));
     }
 
-    return implode('', array_map('ucfirst', $components));
+    $string = implode('', array_map('ucfirst', $components));
+    $string = $string && is_numeric($string[0]) ? "_$string" : $string;
+    return $string;
+  }
+
+  /**
+   * Turn a list of machine names into a upper-cased string.
+   *
+   * @return string
+   *   A upper-cased concatenation of the input components.
+   */
+  public static function upperCase() {
+    $result = call_user_func_array([static::class, 'camelCase'], func_get_args());
+    return strtoupper($result);
   }
 
   /**
