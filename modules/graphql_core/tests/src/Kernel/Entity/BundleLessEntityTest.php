@@ -42,7 +42,7 @@ class BundleLessEntityTest extends GraphQLContentTestBase {
    */
   public function testConfiguredField() {
     $this->assertGraphQLFields([
-      ['User', 'fieldTest', 'Boolean'],
+      ['UserUser', 'fieldTest', 'Boolean'],
     ]);
   }
 
