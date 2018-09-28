@@ -49,10 +49,7 @@ class BreadcrumbsTest extends GraphQLCoreTestBase {
    */
   public function testBreadcrumbs() {
     $query = $this->getQueryFromFile('breadcrumbs.gql');
-
-    // TODO: Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheTags(array_diff($metadata->getCacheTags(), ['entity_bundles']));
 
     $this->assertResults($query, ['path' => '/breadcrumbs-test'], [
       'route' => [

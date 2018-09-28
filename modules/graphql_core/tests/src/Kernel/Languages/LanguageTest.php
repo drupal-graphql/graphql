@@ -148,12 +148,4 @@ class LanguageTest extends GraphQLCoreTestBase {
       ],
     ], $metadata);
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheTags() {
-    $tags = parent::defaultCacheTags();
-    return array_diff($tags, ['entity_bundles']);
-  }
 }

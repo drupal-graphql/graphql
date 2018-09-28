@@ -260,7 +260,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
         'language' => $this->languageManager->getCurrentLanguage()->getId(),
       ]);
 
-      $context->addCacheTags(['graphql_response']);
+      $context->addCacheTags(['graphql']);
 
       // Always add the language_url cache context.
       $context->addCacheContexts([

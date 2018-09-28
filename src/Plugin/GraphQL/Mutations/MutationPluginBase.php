@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\Mutations;
+namespace Drupal\Drupal\graphql\GraphQL\Utility\Plugin\GraphQL\Mutations;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\Plugin\MutationPluginInterface;
