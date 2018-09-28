@@ -66,11 +66,8 @@ class BlockTest extends GraphQLCoreTestBase {
   public function testStaticBlocks() {
     $query = $this->getQueryFromFile('Blocks/blocks.gql');
     $metadata = $this->defaultCacheMetaData();
-
-    // TODO: Check cache metadata.
     $metadata->addCacheTags([
       'block_content:1',
-      'entity_field_info',
     ]);
 
     $this->assertResults($query, [], [

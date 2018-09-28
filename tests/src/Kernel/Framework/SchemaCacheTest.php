@@ -44,7 +44,7 @@ class SchemaCacheTest extends GraphQLTestBase {
   /**
    * Test an uncacheable schema.
    */
-  public function testUncacheableSchema() {
+  public function testCacheableSchemaWithInvalidation() {
     // Create a first field.
     $this->mockField('foo', [
       'id' => 'foo',
@@ -62,6 +62,9 @@ class SchemaCacheTest extends GraphQLTestBase {
       'name' => 'bar',
       'type' => 'String',
     ], 'bar');
+
+    // Clear the graphql cache tag.
+    $this->container->get('cache_tags.invalidator')->invalidateTags(['graphql']);
 
     // Run introspect again, the new field should appear immediately.
     $schema = $this->introspect();
@@ -82,7 +85,7 @@ class SchemaCacheTest extends GraphQLTestBase {
       'id' => 'foo',
       'name' => 'foo',
       'type' => 'String',
-      'schema_cache_tags' => ['foo'],
+      'response_cache_tags' => ['foo'],
     ], 'foo');
 
     // Run introspect to populate the schema cache.
