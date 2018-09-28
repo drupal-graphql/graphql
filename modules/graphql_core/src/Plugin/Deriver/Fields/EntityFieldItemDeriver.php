@@ -2,7 +2,8 @@
 
 namespace Drupal\graphql_core\Plugin\Deriver\Fields;
 
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\graphql\Utility\StringHelper;
@@ -13,8 +14,13 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
   /**
    * {@inheritdoc}
    */
-  protected function getDerivativeDefinitionsFromFieldDefinition($entityTypeId, FieldStorageDefinitionInterface $fieldDefinition, array $basePluginDefinition, $bundleId = NULL) {
-    if (!$propertyDefinitions = $fieldDefinition->getPropertyDefinitions()) {
+  protected function getDerivativeDefinitionsFromFieldDefinition(FieldDefinitionInterface $fieldDefinition, array $basePluginDefinition, $bundleId = NULL) {
+    $itemDefinition = $fieldDefinition->getItemDefinition();
+    if (!($itemDefinition instanceof ComplexDataDefinitionInterface) || !$propertyDefinitions = $itemDefinition->getPropertyDefinitions()) {
+      return [];
+    }
+
+    if (count($propertyDefinitions) <= 1) {
       return [];
     }
 
@@ -22,9 +28,12 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
     $contexts = $fieldDefinition->getCacheContexts();
     $maxAge = $fieldDefinition->getCacheMaxAge();
 
+    $entityTypeId = $fieldDefinition->getTargetEntityTypeId();
     $fieldName = $fieldDefinition->getName();
+    $fieldBundle = $fieldDefinition->getTargetBundle() ?: '';
+
     $commonDefinition = [
-      'parents' => [StringHelper::camelCase('field', $entityTypeId, $fieldName)],
+      'parents' => [StringHelper::camelCase('field', $entityTypeId, $fieldBundle, $fieldName)],
       'schema_cache_tags' => $tags,
       'schema_cache_contexts' => $contexts,
       'schema_cache_max_age' => $maxAge,
@@ -32,7 +41,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
 
     $derivatives = [];
     foreach ($propertyDefinitions as $property => $propertyDefinition) {
-      $derivatives["$entityTypeId-$fieldName-$property"] = [
+      $derivatives["$entityTypeId-$fieldName-$fieldBundle-$property"] = [
         'name' => StringHelper::propCase($property),
         'description' => $propertyDefinition->getDescription(),
         'property' => $property,

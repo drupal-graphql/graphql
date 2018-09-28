@@ -46,7 +46,7 @@ class EntityBundleDeriver extends EntityTypeDeriverBase {
           $derivative['response_cache_contexts'][] = 'user.node_grants:view';
         }
 
-        $this->derivatives[$typeId . '-' . $bundle] = $derivative;
+        $this->derivatives["$typeId-$bundle"] = $derivative;
       }
     }
 
