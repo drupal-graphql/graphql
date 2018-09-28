@@ -66,7 +66,6 @@ abstract class EntityTypeDeriverBase extends DeriverBase implements ContainerDer
     $pairs = [
       '\Drupal\Core\Entity\EntityDescriptionInterface' => 'EntityDescribable',
       '\Drupal\Core\Entity\EntityPublishedInterface' => 'EntityPublishable',
-      '\Drupal\Core\Entity\RevisionableInterface' => 'EntityRevisionable',
       '\Drupal\user\EntityOwnerInterface' => 'EntityOwnable',
     ];
 
@@ -75,6 +74,10 @@ abstract class EntityTypeDeriverBase extends DeriverBase implements ContainerDer
       if ($type->entityClassImplements($dependency)) {
         $interfaces[] = $interface;
       }
+    }
+
+    if ($type->isRevisionable()) {
+      $interfaces[] = 'EntityRevisionable';
     }
 
     return array_unique($interfaces);
