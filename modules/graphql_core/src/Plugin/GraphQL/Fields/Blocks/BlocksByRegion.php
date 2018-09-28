@@ -143,8 +143,6 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
       return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve) {
         /** @var \Drupal\graphql\GraphQL\Cache\CacheableValue $response */
         $response = $resolve();
-        $metadata = new CacheableMetadata();
-        $metadata->addCacheTags(['config:block_list']);
         $blocks = array_map(function (Block $block) {
           $plugin = $block->getPlugin();
           if ($plugin instanceof BlockContentBlock) {
@@ -156,7 +154,7 @@ class BlocksByRegion extends FieldPluginBase implements ContainerFactoryPluginIn
         }, $response->getValue());
 
         foreach ($blocks as $block) {
-          yield new CacheableValue($block, [$metadata, $response]);
+          yield new CacheableValue($block, [$response]);
         }
       };
     }

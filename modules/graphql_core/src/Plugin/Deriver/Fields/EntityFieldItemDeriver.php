@@ -28,9 +28,6 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
       'schema_cache_tags' => $tags,
       'schema_cache_contexts' => $contexts,
       'schema_cache_max_age' => $maxAge,
-      'response_cache_tags' => $tags,
-      'response_cache_contexts' => $contexts,
-      'response_cache_max_age' => $maxAge,
     ] + $basePluginDefinition;
 
     $derivatives = [];

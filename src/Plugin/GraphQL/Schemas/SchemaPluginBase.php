@@ -259,6 +259,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       $context = new ResolveContext($globals, [
         'language' => $this->languageManager->getCurrentLanguage()->getId(),
       ]);
+
       $context->addCacheTags(['graphql_response']);
 
       // Always add the language_url cache context.
@@ -268,9 +269,6 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
         'languages:language_content',
         'user.permissions',
       ]);
-      if ($this instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($this);
-      }
 
       return $context;
     });
