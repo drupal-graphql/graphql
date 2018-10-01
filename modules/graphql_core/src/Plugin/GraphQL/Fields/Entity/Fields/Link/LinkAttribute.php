@@ -31,7 +31,14 @@ class LinkAttribute extends FieldPluginBase {
   protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof LinkItemInterface) {
       $options = $value->getUrl()->getOptions();
-      yield NestedArray::getValue($options, ['attributes', $args['key']]);
+
+      // Certain attributes like class can be arrays. Check for that and implode them.
+      $attributeValue = NestedArray::getValue($options, ['attributes', $args['key']]);
+      if (is_array($attributeValue)) {
+        yield implode(' ', $attributeValue);
+      } else {
+        yield $attributeValue;
+      }
     }
   }
 
