@@ -35,7 +35,7 @@ class LinkAttribute extends FieldPluginBase {
       // Certain attributes like class can be arrays. Check for that and implode them.
       $attributeValue = NestedArray::getValue($options, ['attributes', $args['key']]);
       if (is_array($attributeValue)) {
-        yield implode(" ", $attributeValue);
+        yield implode(' ', $attributeValue);
       } else {
         yield $attributeValue;
       }
