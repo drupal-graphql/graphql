@@ -22,6 +22,7 @@ class LanguageContextTest extends GraphQLTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
+    $this->markTestSkipped('to rewrite');
     parent::setUp();
 
     $this->mockType('node', ['name' => 'Node']);

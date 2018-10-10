@@ -19,6 +19,7 @@ class RecursiveTypeTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testRecursiveType() {
+    $this->markTestSkipped('to rewrite');
     $vehicles = [
       [
         'type' => 'Car',

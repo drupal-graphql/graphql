@@ -20,6 +20,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * Check basic result caching.
    */
   public function testCacheableResult() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -45,6 +46,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * Verify that uncacheable results are not cached.
    */
   public function testUncacheableResult() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -72,6 +74,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * Verify that fields with uncacheable annotations are not cached.
    */
   public function testUncacheableResultAnnotation() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -98,6 +101,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * Test if caching properly handles variabels.
    */
   public function testVariables() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -125,6 +129,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * Test if changing test context's trigger re-evaluations.
    */
   public function testContext() {
+    $this->markTestSkipped('to rewrite');
     // Prepare a prophesied context manager.
     $contextManager = $this->prophesize(CacheContextsManager::class);
     $this->container->set('cache_contexts_manager', $contextManager->reveal());
@@ -181,6 +186,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * Test if results cache properly acts on cache tag clears.
    */
   public function testTags() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
@@ -218,6 +224,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * query.
    */
   public function testPersistedQuery() {
+    $this->markTestSkipped('to rewrite');
     $queryProvider = $this->prophesize(QueryProviderInterface::class);
     $this->container->set('graphql.query_provider', $queryProvider->reveal());
 
@@ -265,7 +272,7 @@ class ResultCacheTest extends GraphQLTestBase {
    * resolvers. Should still be added to the processors result.
    */
   public function testLeakingCacheMetadata() {
-
+    $this->markTestSkipped('to rewrite');
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 

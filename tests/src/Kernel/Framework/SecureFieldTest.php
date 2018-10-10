@@ -28,6 +28,7 @@ class SecureFieldTest extends GraphQLTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
+    $this->markTestSkipped('to rewrite');
     parent::setUp();
 
     $this->mockField('secure', [

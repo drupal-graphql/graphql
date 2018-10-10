@@ -28,6 +28,7 @@ class DisabledResultCacheTest extends GraphQLTestBase {
    * Test if disabling the result cache has the desired effect.
    */
   public function testDisabledCache() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',

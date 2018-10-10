@@ -19,6 +19,7 @@ class OverrideFieldTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testEcho() {
+    $this->markTestSkipped('to rewrite');
     $string = 'Hello Echo!';
     $query = $this->getQueryFromFile('echo.gql');
     $this->assertResults($query, ['input' => $string], [

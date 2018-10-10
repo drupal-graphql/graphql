@@ -17,6 +17,7 @@ class UploadMutationTest extends GraphQLTestBase {
    * Test a simple file upload.
    */
   public function testFileUpload() {
+    $this->markTestSkipped('to rewrite');
     // Create dummy file, since symfony will test if it exists..
     $file = file_directory_temp() . '/graphql_upload_test.txt';
     touch($file);

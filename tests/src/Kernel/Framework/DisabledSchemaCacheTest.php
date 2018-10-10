@@ -25,6 +25,7 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
    * Test disabled schema caching without cache metadata.
    */
   public function testDisabledCacheWithoutCacheMetadata() {
+    $this->markTestSkipped('to rewrite');
     // Create a first field.
     $this->mockField('foo', [
       'id' => 'foo',
@@ -55,6 +56,7 @@ class DisabledSchemaCacheTest extends GraphQLTestBase {
    * Test disabled schema caching with cache metadata.
    */
   public function testDisabledCacheWithCacheMetadata() {
+    $this->markTestSkipped('to rewrite');
     // Create a first field.
     $this->mockField('foo', [
       'id' => 'foo',

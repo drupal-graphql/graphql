@@ -20,6 +20,7 @@ class OverrideTypeTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testOverriddenTypes() {
+    $this->markTestSkipped('to rewrite');
     $vehicles = [
       ['type' => 'Car', 'wheels' => 4, 'engine' => 'fuel'],
       ['type' => 'Bike', 'wheels' => 2, 'gears' => 21],

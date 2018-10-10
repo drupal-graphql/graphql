@@ -19,6 +19,7 @@ class TypeTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testQuery() {
+    $this->markTestSkipped('to rewrite');
     $vehicles = [
       ['type' => 'Car', 'wheels' => 4, 'engine' => 'fuel'],
       ['type' => 'Car', 'wheels' => 4, 'engine' => 'diesel'],

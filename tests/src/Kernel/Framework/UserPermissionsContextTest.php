@@ -18,6 +18,7 @@ class UserPermissionsContextTest extends GraphQLTestBase {
    * Assert user.permissions tag on results.
    */
   public function testUserPermissionsContext() {
+    $this->markTestSkipped('to rewrite');
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',

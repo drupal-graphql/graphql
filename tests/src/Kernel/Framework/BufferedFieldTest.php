@@ -17,6 +17,7 @@ class BufferedFieldTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testBatchedFields() {
+    $this->markTestSkipped('to rewrite');
     $buffer = $this->getMockBuilder(BufferBase::class)
       ->setMethods(['resolveBufferArray'])
       ->getMock();

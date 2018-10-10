@@ -15,6 +15,7 @@ class ResolveContextTest extends GraphQLTestBase {
    * Test manual context handling.
    */
   public function testResolveContext() {
+    $this->markTestSkipped('to rewrite');
     $this->mockType('test', ['name' => 'Test']);
 
     $this->mockField('a', [
@@ -62,6 +63,7 @@ GQL;
    * Test manual context handling.
    */
   public function testContextualArguments() {
+    $this->markTestSkipped('to rewrite');
     $this->mockType('test', ['name' => 'Test']);
 
     $this->mockField('a', [

@@ -19,6 +19,7 @@ class MutationTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testMutationQuery() {
+    $this->markTestSkipped('to rewrite');
     $car = ['engine' => 'electric'];
 
     $prophecy = $this->prophesize(GarageInterface::class);

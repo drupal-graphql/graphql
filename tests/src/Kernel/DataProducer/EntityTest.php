@@ -2,26 +2,22 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\UserInterface;
+use Drupal\node\Entity\NodeType;
+use Drupal\node\Entity\Node;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Data producers test base class.
  *
  * @group graphql
  */
-class EntityTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'system',
-    'graphql',
-  ];
+class EntityTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
@@ -33,6 +29,9 @@ class EntityTest extends KernelTestBase {
       ->disableOriginalConstructor()
       ->getMock();
     $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->user = $this->getMockBuilder(UserInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
   }
@@ -155,18 +154,15 @@ class EntityTest extends KernelTestBase {
    * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityOwner::resolve
    */
   public function testResolveOwner() {
-    $user = $this->getMockBuilder(UserInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
     $this->entity->expects($this->once())
       ->method('getOwner')
-      ->willReturn($user);
+      ->willReturn($this->user);
 
     $plugin = $this->dataProducerManager->getInstance([
       'id' => 'entity_owner',
       'configuration' => []
     ]);
-    $this->assertEquals($user, $plugin->resolve($this->entity));
+    $this->assertEquals($this->user, $plugin->resolve($this->entity));
     $this->assertNull($plugin->resolve($this->entity_interface));
   }
 
@@ -199,6 +195,85 @@ class EntityTest extends KernelTestBase {
     ]);
     $this->assertEquals(TRUE, $plugin->resolve($this->entity));
     $this->assertNull($plugin->resolve($this->entity_interface));
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityAccess::resolve
+   */
+  public function testResolveAccess() {
+    $this->entity->expects($this->any())
+      ->method('access')
+      ->willReturn(FALSE);
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_access',
+      'configuration' => []
+    ]);
+    $this->assertFalse($plugin->resolve($this->entity, 'delete', $this->user));
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslation::resolve
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslations::resolve
+   */
+  public function testResolveTranslation() {
+    $content_type = NodeType::create([
+      'type' => 'lorem',
+      'name' => 'ipsum',
+      'translatable' => TRUE
+    ]);
+    $content_type->save();
+
+    \Drupal::service('content_translation.manager')->setEnabled('node', 'lorem', TRUE);
+
+    $node = Node::create([
+      'title' => 'Dolor',
+      'type' => 'lorem',
+    ]);
+    $node->save();
+
+    $translation_fr = $node->addTranslation('fr', ['title' => 'sit amet fr']);
+    $translation_fr->save();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_translation',
+      'configuration' => []
+    ]);
+
+    $translated = $plugin->resolve($node, 'fr');
+    $this->assertEquals('sit amet fr', $translated->label());
+
+    $translation_de = $node->addTranslation('de', ['title' => 'sit amet de']);
+    $translation_de->save();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_translations',
+      'configuration' => []
+    ]);
+
+    $translations = $plugin->resolve($node);
+    $this->assertEquals('Dolor', $translations['en']->label());
+    $this->assertEquals('sit amet fr', $translations['fr']->label());
+    $this->assertEquals('sit amet de', $translations['de']->label());
+  }
+
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
+   */
+  public function testResolveUrl() {
+    $url = $this->getMockBuilder(EntityInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->entity->expects($this->any())
+      ->method('access')
+      ->willReturn(FALSE);
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_access',
+      'configuration' => []
+    ]);
+    $this->assertFalse($plugin->resolve($this->entity, 'delete', $this->user));
   }
 
 }
