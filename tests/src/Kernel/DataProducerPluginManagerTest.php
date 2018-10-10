@@ -8,6 +8,8 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 /**
  * @coversDefaultClass \Drupal\graphql\Plugin\DataProducerPluginManager
  *
+ * @requires module typed_data
+ *
  * @group graphql
  */
 class DataProducerPluginManagerTest extends KernelTestBase {
@@ -16,7 +18,8 @@ class DataProducerPluginManagerTest extends KernelTestBase {
    * {@inheritdoc}
    */
   public static $modules = [
-    'graphql'
+    'graphql',
+    'typed_data'
   ];
 
   /**
