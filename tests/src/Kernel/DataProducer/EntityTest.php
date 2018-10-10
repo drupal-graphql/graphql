@@ -90,6 +90,11 @@ class EntityTest extends GraphQLTestBase {
     $entity = $this->getMockBuilder([EntityInterface::class, EntityDescriptionInterface::class])
       ->disableOriginalConstructor()
       ->getMock();
+
+    $entity->expects($this->any())
+      ->method('setDescription')
+      ->willReturn([]);
+
     $entity->expects($this->once())
       ->method('getDescription')
       ->willReturn('Dummy description');
