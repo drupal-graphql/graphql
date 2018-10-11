@@ -39,6 +39,10 @@ abstract class GraphQLTestBase extends KernelTestBase {
     'node',
     'graphql',
     'content_translation',
+    'entity_reference_test',
+    'field',
+    'menu_link_content',
+    'link',
   ];
 
   /**
@@ -106,11 +110,12 @@ abstract class GraphQLTestBase extends KernelTestBase {
     $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
-    // TODO: implements mockSchema.
     //$this->mockSchema('default');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installSchema('node', ['node_access']);
+
+    $this->installEntitySchema('graphql_server');
 
     $this->installEntitySchema('configurable_language');
     $this->installConfig(['language']);

@@ -27,6 +27,7 @@ use Drupal\graphql\Plugin\GraphQL\Subscriptions\SubscriptionPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -283,6 +284,26 @@ trait MockGraphQLPluginTrait {
       ->method('getSchemaDefinition')
       ->willReturn($gql_schema);
   }
+
+  /**
+   * Mock schema plugin manager.
+   */
+  protected function mockSchemaPluginManager($id) {
+    $this->schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+    $this->schemaPluginManager->expects($this->any())
+      ->method('getDefinitions')
+      ->will($this->returnValue([
+        $id => [
+          'id' => $id,
+          'name' => 'GraphQL test schema',
+          'provider' => 'graphql',
+          'class' => '\Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase'
+        ]
+      ]));
+  }
+
 
   protected function mockSchemaFactory($definition, $builder) {
     $schema = $this->getMockForAbstractClass(SchemaPluginBase::class, [
