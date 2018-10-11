@@ -13,13 +13,17 @@ use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
+use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 
 /**
- * Data producers test base class.
+ * Data producers Entity test class.
  *
  * @group graphql
  */
 class EntityTest extends GraphQLTestBase {
+
+  use QueryResultAssertionTrait;
 
   /**
    * {@inheritdoc}
@@ -301,23 +305,20 @@ class EntityTest extends GraphQLTestBase {
    * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveEntityLoad() {
-    // TODO: handle closure checks.
-    $metadata = $this->getMockBuilder(RefinableCacheableDependencyInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $metadata->expects($this->any())
-      ->method('addCacheTags')
-      ->willReturn([]);
-    $metadata->expects($this->any())
-      ->method('addCacheableDependency')
-      ->willReturn([]);
+    $metadata = $this->defaultCacheMetaData();
 
     $plugin = $this->dataProducerManager->getInstance([
       'id' => 'entity_load',
       'configuration' => []
     ]);
 
-    $loaded = $plugin->resolve($this->node->getEntityTypeId(), $this->node->id(), NULL, NULL, $metadata);
+    $deferred = $plugin->resolve($this->node->getEntityTypeId(), $this->node->id(), NULL, NULL, $metadata);
+
+    $adapter = new SyncPromiseAdapter();
+    $promise = $adapter->convertThenable($deferred);
+
+    $result = $adapter->wait($promise);
+    $this->assertEquals($this->node->id(), $result->id());
   }
 
 }
