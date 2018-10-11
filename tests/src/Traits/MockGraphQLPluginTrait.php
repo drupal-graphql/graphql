@@ -26,6 +26,7 @@ use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Subscriptions\SubscriptionPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -67,18 +68,7 @@ trait MockGraphQLPluginTrait {
    *
    * @var string[]
    */
-  protected $graphQLPluginClassMap = [
-    'plugin.manager.graphql.schema' => SchemaPluginBase::class,
-    'plugin.manager.graphql.field' => FieldPluginBase::class,
-    'plugin.manager.graphql.mutation' => MutationPluginBase::class,
-    'plugin.manager.graphql.subscription' => SubscriptionPluginBase::class,
-    'plugin.manager.graphql.union' => UnionTypePluginBase::class,
-    'plugin.manager.graphql.interface' => InterfacePluginBase::class,
-    'plugin.manager.graphql.type' => TypePluginBase::class,
-    'plugin.manager.graphql.input' => InputTypePluginBase::class,
-    'plugin.manager.graphql.scalar' => ScalarPluginBase::class,
-    'plugin.manager.graphql.enum' => EnumPluginBase::class,
-  ];
+  protected $graphQLPluginClassMap = [];
 
   /**
    * Register the mocked plugin managers during container build.
@@ -274,16 +264,24 @@ trait MockGraphQLPluginTrait {
    *
    * @param string $id
    *   The schema id.
-   * @param callable|null $builder
-   *   A builder callback to modify the mock instance.
+   * @param string $gql_schema
+   *   GraphQL schema.
    */
-  protected function mockSchema($id, $builder = NULL) {
-    $this->graphQLPlugins[SchemaPluginBase::class][$id] = [
-      'definition' => $this->getSchemaDefinitions()[$id] + [
-        'mock_factory' => 'mockSchemaFactory',
-      ],
-      'builder' => $builder,
-    ];
+  protected function mockSchema($id, $gql_schema) {
+    $this->schema = $this->getMockBuilder(SdlSchemaPluginBase::class)
+      ->setConstructorArgs([
+        [],
+        $id,
+        [],
+        $this->container->get('cache.graphql.ast'),
+        ['development' => true]
+      ])
+      ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
+      ->getMockForAbstractClass();
+
+    $this->schema->expects(static::any())
+      ->method('getSchemaDefinition')
+      ->willReturn($gql_schema);
   }
 
   protected function mockSchemaFactory($definition, $builder) {
