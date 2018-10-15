@@ -9,7 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  * TODO: Fix input context type.
  *
  * @DataProducer(
- *   id = "menu_link_attribute",
+ *   id = "menu_link_description",
  *   name = @Translation("Menu link description"),
  *   description = @Translation("Returns the description of a menu link."),
  *   produces = @ContextDefinition("string",
@@ -29,7 +29,7 @@ class MenuLinkDescription extends DataProducerPluginBase {
    *
    * @return mixed
    */
-  protected function resolve(MenuLinkInterface $link) {
+  public function resolve(MenuLinkInterface $link) {
     return $link->getDescription();
   }
 

@@ -31,7 +31,7 @@ class MenuTreeSubtree extends DataProducerPluginBase {
    *
    * @return mixed
    */
-  protected function resolve(MenuLinkTreeElement $element) {
+  public function resolve(MenuLinkTreeElement $element) {
     return array_filter($element->subtree, function(MenuLinkTreeElement $item) {
       if ($item->link instanceof MenuLinkInterface) {
         return $item->link->isEnabled();

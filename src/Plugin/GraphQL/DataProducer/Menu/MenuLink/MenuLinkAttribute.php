@@ -34,8 +34,9 @@ class MenuLinkAttribute extends DataProducerPluginBase {
    *
    * @return mixed
    */
-  protected function resolve(MenuLinkInterface $link, $attribute) {
-    return NestedArray::getValue( $link->getOptions(), ['attributes', $attribute]);
+  public function resolve(MenuLinkInterface $link, $attribute) {
+    $options = $link->getOptions();
+    return NestedArray::getValue($options, ['attributes', $attribute]);
   }
 
 }
