@@ -10,7 +10,6 @@ use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityId;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase;
-use Drupal\graphql\Entity\Server;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -56,11 +55,7 @@ GQL;
 
     $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
 
-    Server::create([
-      'schema' => 'graphql_test',
-      'name' => 'graphql_test',
-      'endpoint' => '/graphql_test'
-    ])->save();
+
   }
 
   /**
@@ -185,9 +180,9 @@ GQL;
     $registry = new ResolverRegistry([]);
 
     $typed_data_manager = $this->getMock(TypedDataManagerInterface::class);
-    $typed_data_manager->expects($this->any())
+    /*$typed_data_manager->expects($this->any())
       ->method('createDataDefinition')
-      ->willReturn($this->getMock('Drupal\Core\TypedData\DataDefinitionInterface'));
+      ->willReturn($this->getMock('Drupal\Core\TypedData\DataDefinitionInterface'));*/
 
     $typed_data_manager->expects($this->any())
       ->method('getDefinition')
@@ -239,6 +234,37 @@ GQL;
 GQL;
 
     $this->assertResults($query, [], ['tree' => ['uri' => '<front>']], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * @covers ::compose
+   */
+  public function testCompose() {
+    $builder = new ResolverBuilder();
+    $registry = new ResolverRegistry([]);
+
+    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
+
+    $registry->addFieldResolver('Tree', 'name', $builder->compose(
+      $builder->fromValue('Some tree name'),
+      $builder->produce('uppercase', ['mapping' => [
+        'string' => $builder->fromParent(),
+      ]])
+    ));
+
+    $this->schema->expects($this->any())
+      ->method('getResolverRegistry')
+      ->willReturn($registry);
+
+    $query = <<<GQL
+      query {
+        tree {
+          name
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['name' => 'SOME TREE NAME']], $this->defaultCacheMetaData());
   }
 
 

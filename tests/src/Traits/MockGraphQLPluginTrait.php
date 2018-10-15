@@ -28,6 +28,7 @@ use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use Drupal\graphql\Entity\Server;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -261,21 +262,37 @@ trait MockGraphQLPluginTrait {
   }
 
   /**
+   * Create test server.
+   */
+  protected function createTestServer($schema_id, $endpoint) {
+    $this->test_server = Server::create([
+      'schema' => $schema_id,
+      'name' => $schema_id,
+      'endpoint' => $endpoint,
+    ]);
+    $this->test_server->save();
+  }
+
+  /**
    * Mock a schema instance.
    *
    * @param string $id
    *   The schema id.
    * @param string $gql_schema
    *   GraphQL schema.
+   * @param \Drupal\graphql\GraphQL\ResolverRegistry|null $registry
+   *   Resolver registry.
+   * @param boolean $development
+   *   Schema development mode.
    */
-  protected function mockSchema($id, $gql_schema) {
+  protected function mockSchema($id, $gql_schema, $registry = NULL, $development = FALSE) {
     $this->schema = $this->getMockBuilder(SdlSchemaPluginBase::class)
       ->setConstructorArgs([
         [],
         $id,
         [],
         $this->container->get('cache.graphql.ast'),
-        ['development' => true]
+        ['development' => $development]
       ])
       ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
       ->getMockForAbstractClass();
@@ -283,6 +300,12 @@ trait MockGraphQLPluginTrait {
     $this->schema->expects(static::any())
       ->method('getSchemaDefinition')
       ->willReturn($gql_schema);
+
+    if (!empty($registry)) {
+      $this->schema->expects($this->any())
+      ->method('getResolverRegistry')
+      ->willReturn($registry);
+    }
   }
 
   /**
@@ -340,8 +363,12 @@ trait MockGraphQLPluginTrait {
    * @param callable|null $builder
    *   A builder callback to modify the mock instance.
    */
-  protected function mockField($id, $definition, $result = NULL, $builder = NULL) {
-    $definition = $this->getTypeSystemPluginDefinition(
+  protected function mockField($id, $type, $builder) {
+    $registry = new ResolverRegistry([]);
+    $registry->addFieldResolver($type, $id, $builder);
+    return $registry;
+
+    /*$definition = $this->getTypeSystemPluginDefinition(
       GraphQLField::class,
       $definition + [
         'secure' => TRUE,
@@ -355,7 +382,7 @@ trait MockGraphQLPluginTrait {
       'definition' => $definition,
       'result' => $result,
       'builder' => $builder,
-    ];
+    ];*/
   }
 
   protected function mockFieldFactory($definition, $result = NULL, $builder = NULL) {
