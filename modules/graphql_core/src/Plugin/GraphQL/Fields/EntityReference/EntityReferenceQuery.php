@@ -52,7 +52,8 @@ class EntityReferenceQuery extends EntityQuery {
         return NULL;
       }
 
-      $query->condition($key, $ids);
+      $operator = is_array($ids) ? 'IN' : '=';
+      $query->condition($key, $ids, $operator);
 
       return $query;
     }
