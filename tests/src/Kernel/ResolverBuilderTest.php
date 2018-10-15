@@ -48,14 +48,13 @@ class ResolverBuilderTest extends GraphQLTestBase {
 GQL;
     $this->mockSchema('graphql_test', $gql_schema);
     $this->mockSchemaPluginManager('graphql_test');
+    $this->createTestServer('graphql_test', '/graphql');
 
     $this->schemaPluginManager->method('createInstance')
       ->with($this->equalTo('graphql_test'))
       ->will($this->returnValue($this->schema));
 
     $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
-
-
   }
 
   /**
@@ -180,9 +179,6 @@ GQL;
     $registry = new ResolverRegistry([]);
 
     $typed_data_manager = $this->getMock(TypedDataManagerInterface::class);
-    /*$typed_data_manager->expects($this->any())
-      ->method('createDataDefinition')
-      ->willReturn($this->getMock('Drupal\Core\TypedData\DataDefinitionInterface'));*/
 
     $typed_data_manager->expects($this->any())
       ->method('getDefinition')
@@ -266,6 +262,5 @@ GQL;
 
     $this->assertResults($query, [], ['tree' => ['name' => 'SOME TREE NAME']], $this->defaultCacheMetaData());
   }
-
 
 }
