@@ -120,6 +120,7 @@ class EntityTest extends GraphQLTestBase {
 
     $entity->expects($this->any())
       ->method('setDescription')
+      ->with($this->anything())
       ->willReturn([]);
 
     $entity->expects($this->once())
