@@ -15,6 +15,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
+use Drupal\entity_test\Entity\EntityTestBundle;
 
 /**
  * Data producers Entity test class.
@@ -114,14 +115,9 @@ class EntityTest extends GraphQLTestBase {
    * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityDescription::resolve
    */
   public function testResolveDescription() {
-    $entity = $this->getMockBuilder([EntityInterface::class, EntityDescriptionInterface::class])
+    $entity = $this->getMockBuilder(EntityTestBundle::class)
       ->disableOriginalConstructor()
       ->getMock();
-
-    $entity->expects($this->any())
-      ->method('setDescription')
-      ->with($this->anything())
-      ->willReturn([]);
 
     $entity->expects($this->once())
       ->method('getDescription')
