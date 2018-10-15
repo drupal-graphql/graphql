@@ -28,7 +28,7 @@ class MenuTest extends GraphQLTestBase {
     $this->installEntitySchema('menu_link_content');
 
     $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
-    $this->menuLinkManager = \Drupal::service('plugin.manager.menu.link');
+    $this->menuLinkManager = $this->container->get('plugin.manager.menu.link');
 
     $this->menu = Menu::create([
       'id' => 'menu_test',
