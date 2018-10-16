@@ -44,7 +44,14 @@ class ResolverBuilderTest extends GraphQLTestBase {
         id(someArg: Int): Int
         name: String
         uri: String
+        language: Language
       }
+
+      type Language {
+        languageContext: String
+      }
+
+
 GQL;
     $this->mockSchema('graphql_test', $gql_schema);
     $this->mockSchemaPluginManager('graphql_test');
@@ -263,4 +270,37 @@ GQL;
     $this->assertResults($query, [], ['tree' => ['name' => 'SOME TREE NAME']], $this->defaultCacheMetaData());
   }
 
+  /**
+   * @covers ::context
+   * @covers ::fromContext
+   */
+  public function testFromContext() {
+    $builder = new ResolverBuilder();
+    $registry = new ResolverRegistry([]);
+
+    $registry->addFieldResolver('Query', 'tree', $builder->fromValue('some value'));
+
+    $registry->addFieldResolver('Tree', 'language', $builder->compose(
+      $builder->context('language_context', $builder->fromValue('language context value')),
+      $builder->fromValue('some language value')
+    ));
+
+    $registry->addFieldResolver('Language', 'languageContext', $builder->fromContext('language_context'));
+
+    $this->schema->expects($this->any())
+      ->method('getResolverRegistry')
+      ->willReturn($registry);
+
+    $query = <<<GQL
+      query {
+        tree {
+          language {
+            languageContext
+          }
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['language' => ['languageContext' => 'language context value']]], $this->defaultCacheMetaData());
+  }
 }
