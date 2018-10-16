@@ -79,6 +79,7 @@ trait QueryResultAssertionTrait {
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
     $metadata->setCacheTags($this->defaultCacheTags());
+    $metadata->setCacheContexts($this->defaultCacheContexts());
     return $metadata;
   }
 

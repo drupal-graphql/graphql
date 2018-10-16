@@ -133,86 +133,53 @@ GQL;
   }
 
   /**
-   * Test type mocking.
-   * TODO: check for removing.
+   * Test mutation mocking.
    */
-  public function testTypeMock() {
+  public function testMutationMock() {
     $gql_schema = <<<GQL
-    type Query {
-      root: Test
-    }
-    type Test {
-      value: String
-    }
+      schema {
+        query: Query
+        mutation: Mutation
+      }
+      type Query {
+        root: Boolean
+      }
+
+      type Mutation {
+        addUser(user: User!): Boolean
+      }
+
+      enum Gender {
+        Female
+        Male
+      }
+
+      input User {
+        name: String
+        age: Int
+        gender: Gender
+      }
 GQL;
     $this->setUpSchema($gql_schema, $this->getDefaultSchema());
     $builder = new ResolverBuilder();
 
-    $this->mockField('value', [
-      'name' => 'value',
-      'parent' => 'Test',
-      'type' => 'String',
-    ], $builder->compose(
-      $builder->fromParent(),
-      function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-        return $value['value'];
-      }
-    ));
-
-    /*$this->mockType('test', [
-      'name' => 'Test',
-    ]);*/
-
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'Test',
-      'parent' => 'Query',
-    ], $builder->fromValue(['value' => 'test'])
-    );
-
-    $this->assertResults('{ root { value } }', [], [
-      'root' => ['value' => 'test'],
-    ], $this->defaultCacheMetaData());
-  }
-
-  /**
-   * Test mutation mocking.
-   */
-  public function testMutationMock() {
-    $this->markTestSkipped('to rewrite');
-    // Fake at least a root field, or the schema will return an error.
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'Boolean',
-    ], TRUE);
+      'parent' => 'Query',
+    ], $builder->fromValue(TRUE));
 
-    $this->mockEnum('gender', [
-      'name' => 'Gender',
-    ], function () {
-      return [
-        'Female' => ['value' => 'f', 'description' => ''],
-        'Male' => ['value' => 'm', 'description' => ''],
-      ];
-    });
-
-    $this->mockInputType('user', [
-      'name' => 'User',
-      'fields' => [
-        'name' => 'String',
-        'age' => 'Int',
-        'gender' => 'Gender',
-      ],
-    ]);
-
-    $this->mockMutation('addUser', [
+    $this->mockField('addUser', [
       'name' => 'addUser',
       'type' => 'Boolean',
-      'arguments' => [
-        'user' => 'User',
-      ],
-    ], function ($value, $args) {
-      return $args['user']['age'] > 50 && $args['user']['gender'] == 'm';
-    });
+      'parent' => 'Mutation',
+    ], $builder->compose(
+        $builder->fromArgument('user'),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $args['user']['age'] > 50 && $args['user']['gender'] == 'Male';
+        }
+      )
+    );
 
     $metadata = $this->defaultMutationCacheMetaData();
     $this->assertResults('mutation ($user: User!) { addUser(user: $user) }', [
