@@ -9,6 +9,7 @@ use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\graphql\GraphQL\ResolverBuilder;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 
 /**
  * Test the test framework.
@@ -52,19 +53,37 @@ class TestFrameworkTest extends GraphQLTestBase {
 GQL;
     $this->setUpSchema($gql_schema, $this->getDefaultSchema());
 
+    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
+      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->getMock();
+    $cacheable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['my_tag']);
+    $cacheable->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(42);
+    $cacheable->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+
+
     $builder = new ResolverBuilder();
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
       'parent' => 'Query',
       'response_cache_tags' => ['my_tag'],
-    ], $builder->fromValue('test')
+    ], $builder->compose(
+        $builder->fromValue($cacheable),
+        $builder->fromValue('test')
+      )
     );
-    /*function () {
--      yield (new CacheableValue('test'))->mergeCacheMaxAge(42);
--    }*/
 
     $metadata = $this->defaultCacheMetaData();
+    $metadata->setCacheMaxAge(42);
+    $metadata->addCacheTags([
+      'my_tag',
+    ]);
 
     $schema = $this->introspect();
     $this->assertArraySubset([
@@ -99,7 +118,7 @@ GQL;
     }
 GQL;
     $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    // Errors are not cached at all.
+    // Errors are cacheable now.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
     $metadata->setCacheContexts($this->defaultCacheContexts());
@@ -207,6 +226,7 @@ GQL;
 
   /**
    * Test interface mocking.
+   * TODO
    */
   public function testInterfaceMock() {
     $this->markTestSkipped('to rewrite');
@@ -262,7 +282,7 @@ GQL;
 
   /**
    * Test union mocks.
-   *
+   * TODO
    * @todo Unions are identical to interfaces right now, but they should not be.
    */
   public function testUnionMock() {
