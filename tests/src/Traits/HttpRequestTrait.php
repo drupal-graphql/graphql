@@ -20,8 +20,8 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function query($query, array $variables = []) {
-    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
+  protected function query($query, $server, array $variables = []) {
+    return $this->container->get('http_kernel')->handle(Request::create($server->get('endpoint'), 'GET', [
       'query' => $query,
       'variables' => $variables,
     ]));

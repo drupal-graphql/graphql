@@ -50,18 +50,9 @@ class ResolverBuilderTest extends GraphQLTestBase {
       type Language {
         languageContext: String
       }
-
-
 GQL;
-    $this->mockSchema('graphql_test', $gql_schema);
-    $this->mockSchemaPluginManager('graphql_test');
-    $this->createTestServer('graphql_test', '/graphql');
 
-    $this->schemaPluginManager->method('createInstance')
-      ->with($this->equalTo('graphql_test'))
-      ->will($this->returnValue($this->schema));
-
-    $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
   }
 
   /**

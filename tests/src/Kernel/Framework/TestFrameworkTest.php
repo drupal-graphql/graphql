@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test the test framework.
@@ -17,23 +18,53 @@ use GraphQL\Type\Definition\ResolveInfo;
 class TestFrameworkTest extends GraphQLTestBase {
 
   /**
+   * Return the default schema for this test.
+   *
+   * @return string
+   *   The default schema id.
+   */
+  protected function getDefaultSchema() {
+    return 'graphql_test';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defaultCacheTags() {
+    return ['graphql_response'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defaultCacheContexts() {
+    return ['user.permissions'];
+  }
+
+  /**
    * Test mocked fields.
    */
   public function testFieldMock() {
-    $this->markTestSkipped('to rewrite');
+    $gql_schema = <<<GQL
+      type Query {
+        root: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+
+    $builder = new ResolverBuilder();
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
+      'parent' => 'Query',
       'response_cache_tags' => ['my_tag'],
-    ], function () {
-      yield (new CacheableValue('test'))->mergeCacheMaxAge(42);
-    });
+    ], $builder->fromValue('test')
+    );
+    /*function () {
+-      yield (new CacheableValue('test'))->mergeCacheMaxAge(42);
+-    }*/
 
     $metadata = $this->defaultCacheMetaData();
-    $metadata->setCacheMaxAge(42);
-    $metadata->addCacheTags([
-      'my_tag',
-    ]);
 
     $schema = $this->introspect();
     $this->assertArraySubset([
@@ -62,10 +93,16 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test result error assertions.
    */
   public function testErrorAssertion() {
-    $this->markTestSkipped('to rewrite');
+    $gql_schema = <<<GQL
+    type Query {
+      wrongname: String
+    }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
     // Errors are not cached at all.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
+    $metadata->setCacheContexts($this->defaultCacheContexts());
 
     $this->assertErrors('{ root }', [], [
       'Cannot query field "root" on type "Query".',
@@ -78,27 +115,41 @@ class TestFrameworkTest extends GraphQLTestBase {
 
   /**
    * Test type mocking.
+   * TODO: check for removing.
    */
   public function testTypeMock() {
-    $this->markTestSkipped('to rewrite');
+    $gql_schema = <<<GQL
+    type Query {
+      root: Test
+    }
+    type Test {
+      value: String
+    }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
     $this->mockField('value', [
       'name' => 'value',
-      'parents' => ['Test'],
+      'parent' => 'Test',
       'type' => 'String',
-    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
-      yield $value['value'];
-    });
+    ], $builder->compose(
+      $builder->fromParent(),
+      function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        return $value['value'];
+      }
+    ));
 
-    $this->mockType('test', [
+    /*$this->mockType('test', [
       'name' => 'Test',
-    ]);
+    ]);*/
 
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'Test',
-    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
-      yield ['value' => 'test'];
-    });
+      'parent' => 'Query',
+    ], $builder->fromValue(['value' => 'test'])
+    );
 
     $this->assertResults('{ root { value } }', [], [
       'root' => ['value' => 'test'],
