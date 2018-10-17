@@ -270,10 +270,10 @@ trait MockGraphQLPluginTrait {
    * @param string $schema_id
    *   Schema id.
    */
-  protected function setUpSchema($gql_schema, $schema_id) {
-    $this->mockSchema($schema_id, $gql_schema);
+  protected function setUpSchema($gql_schema, $schema_id, $development = FALSE) {
+    $this->mockSchema($schema_id, $gql_schema, $development);
     $this->mockSchemaPluginManager($schema_id);
-    $this->createTestServer($schema_id, '/graphql/' . $schema_id);
+    $this->createTestServer($schema_id, '/graphql/' . $schema_id, $development);
 
     $this->schemaPluginManager->method('createInstance')
       ->with($this->equalTo($schema_id))
@@ -285,11 +285,12 @@ trait MockGraphQLPluginTrait {
   /**
    * Create test server.
    */
-  protected function createTestServer($schema_id, $endpoint) {
+  protected function createTestServer($schema_id, $endpoint, $debug = FALSE) {
     $this->test_server = Server::create([
       'schema' => $schema_id,
       'name' => $schema_id,
       'endpoint' => $endpoint,
+      'debug' => $debug,
     ]);
     $this->test_server->save();
   }
@@ -306,7 +307,7 @@ trait MockGraphQLPluginTrait {
    * @param boolean $development
    *   Schema development mode.
    */
-  protected function mockSchema($id, $gql_schema, $registry = NULL, $development = FALSE) {
+  protected function mockSchema($id, $gql_schema, $development = FALSE) {
     $this->schema = $this->getMockBuilder(SdlSchemaPluginBase::class)
       ->setConstructorArgs([
         [],
