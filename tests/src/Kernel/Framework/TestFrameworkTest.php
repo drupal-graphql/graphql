@@ -19,30 +19,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 class TestFrameworkTest extends GraphQLTestBase {
 
   /**
-   * Return the default schema for this test.
-   *
-   * @return string
-   *   The default schema id.
-   */
-  protected function getDefaultSchema() {
-    return 'graphql_test';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheTags() {
-    return ['graphql_response'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheContexts() {
-    return ['user.permissions'];
-  }
-
-  /**
    * Test mocked fields.
    */
   public function testFieldMock() {

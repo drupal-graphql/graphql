@@ -56,23 +56,6 @@ GQL;
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheTags() {
-    return ['graphql_response'];
-  }
-
-  /**
-   * Return the default schema for this test.
-   *
-   * @return string
-   *   The default schema id.
-   */
-  protected function getDefaultSchema() {
-    return 'graphql_test';
-  }
-
-  /**
    * @covers ::produce
    *
    * @dataProvider testBuilderProducingProvider
