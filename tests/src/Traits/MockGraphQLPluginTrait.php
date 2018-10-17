@@ -349,11 +349,37 @@ trait MockGraphQLPluginTrait {
       ]));
   }
 
+  /**
+   * Mock data producer field.
+   * @param  string $type
+   *   Parent Type.
+   * @param  string $name
+   *   Field name.
+   * @param Closure $builder
+   *   Resolver.
+   */
   protected function mockDataProducer($type, $name, $builder) {
     if (empty($this->registry)) {
       $this->registry = new ResolverRegistry([]);
     }
     $this->registry->addFieldResolver($type, $name, $builder);
+    $this->schema->expects($this->any())
+        ->method('getResolverRegistry')
+        ->willReturn($this->registry);
+  }
+
+  /**
+   * Mock type resolver.
+   * @param  string $type
+   *   Parent Type.
+   * @param  Closure $resolver
+   *   Type resolver.
+   */
+  protected function mockTypeResolver($type, $resolver) {
+    if (empty($this->registry)) {
+      $this->registry = new ResolverRegistry([]);
+    }
+    $this->registry->addTypeResolver($type, $resolver);
     $this->schema->expects($this->any())
         ->method('getResolverRegistry')
         ->willReturn($this->registry);
@@ -374,22 +400,6 @@ trait MockGraphQLPluginTrait {
    */
   protected function mockField($id, $definition, $result = NULL, $builder = NULL) {
     $this->mockDataProducer($definition['parent'], $id, $result);
-
-    /*$definition = $this->getTypeSystemPluginDefinition(
-      GraphQLField::class,
-      $definition + [
-        'secure' => TRUE,
-        'id' => $id,
-        'class' => FieldPluginBase::class,
-        'mock_factory' => 'mockFieldFactory',
-      ]
-    );
-
-    $this->graphQLPlugins[FieldPluginBase::class][$id] = [
-      'definition' => $definition,
-      'result' => $result,
-      'builder' => $builder,
-    ];*/
   }
 
   /**

@@ -193,51 +193,69 @@ GQL;
 
   /**
    * Test interface mocking.
-   * TODO
    */
   public function testInterfaceMock() {
-    $this->markTestSkipped('to rewrite');
-    $this->mockInterface('token', [
-      'name' => 'Token',
-    ]);
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+      }
+      type Query {
+        root: [Token]
+      }
 
-    $this->mockType('number', [
-      'name' => 'Number',
-      'interfaces' => ['Token'],
-    ], function ($value) {
-      return is_int($value['value']);
+      interface Token {
+        id: Int
+      }
+
+      type Number implements Token {
+        value: Int
+      }
+
+      type Word implements Token {
+        value: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
+    $this->mockTypeResolver('Token', function ($value, $context, $info) {
+      return is_int($value['value']) ? 'Number' : 'Word';
     });
 
-    $this->mockType('word', [
-      'name' => 'Word',
-      'interfaces' => ['Token'],
-    ], function ($value) {
-      return is_string($value['value']);
-    });
-
-    $this->mockField('int_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'Int',
-      'parents' => ['Number'],
-    ], function ($value) {
-      yield $value['value'];
-    });
+      'parent' => 'Number',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
-    $this->mockField('string_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'String',
-      'parents' => ['Word'],
-    ], function ($value) {
-      yield $value['value'];
-    });
+      'parent' => 'Word',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
     $this->mockField('root', [
       'name' => 'root',
       'type' => '[Token]',
-    ], function () {
-      yield ['value' => 42];
-      yield ['value' => 'GraphQL'];
-    });
+      'parent' => 'Query',
+    ], $builder->fromValue(
+      [
+        ['value' => 42],
+        ['value' => 'GraphQL'],
+      ]
+    ));
 
     $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
       'root' => [
@@ -249,48 +267,68 @@ GQL;
 
   /**
    * Test union mocks.
-   * TODO
    * @todo Unions are identical to interfaces right now, but they should not be.
    */
   public function testUnionMock() {
-    $this->markTestSkipped('to rewrite');
-    $this->mockUnion('token', [
-      'name' => 'Token',
-      'types' => ['Word'],
-    ]);
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+      }
+      type Query {
+        root: [Token]
+      }
 
-    $this->mockType('number', [
-      'name' => 'Number',
-      'unions' => ['Token'],
-    ], function ($value) {
-      return is_int($value['value']);
+      union Token = Number | Word
+
+      type Number implements Token {
+        value: Int
+      }
+
+      type Word implements Token {
+        value: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
+    $this->mockTypeResolver('Token', function ($value, $context, $info) {
+      return is_int($value['value']) ? 'Number' : 'Word';
     });
 
-    $this->mockType('word', [
-      'name' => 'Word',
-    ], function ($value) {
-      return is_string($value['value']);
-    });
-
-    $this->mockField('int_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'Int',
-      'parents' => ['Number'],
-    ], function ($value) { yield $value['value']; });
+      'parent' => 'Number',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
-    $this->mockField('string_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'String',
-      'parents' => ['Word'],
-    ], function ($value) { yield $value['value']; });
+      'parent' => 'Word',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
     $this->mockField('root', [
       'name' => 'root',
       'type' => '[Token]',
-    ], function () {
-      yield ['value' => 42];
-      yield ['value' => 'GraphQL'];
-    });
+      'parent' => 'Query',
+    ], $builder->fromValue(
+      [
+        ['value' => 42],
+        ['value' => 'GraphQL'],
+      ]
+    ));
 
     $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
       'root' => [
