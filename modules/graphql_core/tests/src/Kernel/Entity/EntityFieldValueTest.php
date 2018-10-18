@@ -85,10 +85,10 @@ GQL;
     ]);
 
     $this->assertGraphQLFields([
-      ['NodeTest', 'fieldText', 'FieldNodeFieldText'],
-      ['FieldNodeFieldText', 'value', 'String'],
-      ['FieldNodeFieldText', 'processed', 'String'],
-      ['FieldNodeFieldText', 'format', 'String'],
+      ['NodeTest', 'fieldText', 'FieldNodeTestFieldText'],
+      ['FieldNodeTestFieldText', 'value', 'String'],
+      ['FieldNodeTestFieldText', 'processed', 'String'],
+      ['FieldNodeTestFieldText', 'format', 'String'],
     ]);
 
     $query = <<<GQL
@@ -129,12 +129,12 @@ GQL;
     ]);
 
     $this->assertGraphQLFields([
-      ['NodeTest', 'body', 'FieldNodeBody'],
-      ['FieldNodeBody', 'format', 'String'],
-      ['FieldNodeBody', 'value', 'String'],
-      ['FieldNodeBody', 'processed', 'String'],
-      ['FieldNodeBody', 'summary', 'String'],
-      ['FieldNodeBody', 'summaryProcessed', 'String'],
+      ['NodeTest', 'body', 'FieldNodeTestBody'],
+      ['FieldNodeTestBody', 'format', 'String'],
+      ['FieldNodeTestBody', 'value', 'String'],
+      ['FieldNodeTestBody', 'processed', 'String'],
+      ['FieldNodeTestBody', 'summary', 'String'],
+      ['FieldNodeTestBody', 'summaryProcessed', 'String'],
     ]);
 
     $query = <<<GQL
