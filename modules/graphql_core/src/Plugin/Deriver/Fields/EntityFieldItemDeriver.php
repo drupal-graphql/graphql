@@ -14,7 +14,7 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
   /**
    * {@inheritdoc}
    */
-  protected function getDerivativeDefinitionsFromFieldDefinition(FieldDefinitionInterface $fieldDefinition, array $basePluginDefinition, $bundleId = NULL) {
+  protected function getDerivativeDefinitionsFromFieldDefinition(FieldDefinitionInterface $fieldDefinition, array $basePluginDefinition) {
     $itemDefinition = $fieldDefinition->getItemDefinition();
     if (!($itemDefinition instanceof ComplexDataDefinitionInterface) || !$propertyDefinitions = $itemDefinition->getPropertyDefinitions()) {
       return [];
@@ -29,11 +29,13 @@ class EntityFieldItemDeriver extends EntityFieldDeriverBase {
     $maxAge = $fieldDefinition->getCacheMaxAge();
 
     $entityTypeId = $fieldDefinition->getTargetEntityTypeId();
+    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+    $supportsBundles = $entityType->hasKey('bundle');
     $fieldName = $fieldDefinition->getName();
     $fieldBundle = $fieldDefinition->getTargetBundle() ?: '';
 
     $commonDefinition = [
-      'parents' => [StringHelper::camelCase('field', $entityTypeId, $fieldBundle, $fieldName)],
+      'parents' => [StringHelper::camelCase('field', $entityTypeId, $supportsBundles ? $fieldBundle : '', $fieldName)],
       'schema_cache_tags' => $tags,
       'schema_cache_contexts' => $contexts,
       'schema_cache_max_age' => $maxAge,

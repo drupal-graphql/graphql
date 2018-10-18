@@ -24,11 +24,13 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
     $contexts = $fieldDefinition->getCacheContexts();
 
     $entityTypeId = $fieldDefinition->getTargetEntityTypeId();
+    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+    $supportsBundles = $entityType->hasKey('bundle');
     $fieldName = $fieldDefinition->getName();
     $fieldBundle = $fieldDefinition->getTargetBundle() ?: '';
 
     $derivative = [
-      'parents' => [StringHelper::camelCase($entityTypeId, $fieldBundle)],
+      'parents' => [StringHelper::camelCase($entityTypeId, $supportsBundles ? $fieldBundle : '')],
       'name' => StringHelper::propCase($fieldName),
       'description' => $fieldDefinition->getDescription(),
       'field' => $fieldName,
@@ -43,7 +45,7 @@ class EntityFieldDeriver extends EntityFieldDeriverBase {
       $derivative['property'] = key($propertyDefinitions);
     }
     else {
-      $derivative['type'] = StringHelper::camelCase('field', $entityTypeId, $fieldBundle, $fieldName);
+      $derivative['type'] = StringHelper::camelCase('field', $entityTypeId, $supportsBundles ? $fieldBundle : '', $fieldName);
     }
 
     // Fields are usually multi-value. Simplify them for the schema if they are

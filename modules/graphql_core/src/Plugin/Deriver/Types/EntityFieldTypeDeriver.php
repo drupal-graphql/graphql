@@ -27,10 +27,13 @@ class EntityFieldTypeDeriver extends EntityFieldDeriverBase {
     }
 
     $entityTypeId = $fieldDefinition->getTargetEntityTypeId();
+    $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+    $supportsBundles = $entityType->hasKey('bundle');
     $fieldName = $fieldDefinition->getName();
     $fieldBundle = $fieldDefinition->getTargetBundle() ?: '';
+
     return ["$entityTypeId-$fieldName-$fieldBundle" => [
-      'name' => StringHelper::camelCase('field', $entityTypeId, $fieldBundle, $fieldName),
+      'name' => StringHelper::camelCase('field', $entityTypeId, $supportsBundles ? $fieldBundle : '', $fieldName),
       'description' => $fieldDefinition->getDescription(),
       'entity_type' => $entityTypeId,
       'entity_bundle' => $fieldBundle ?: NULL,
