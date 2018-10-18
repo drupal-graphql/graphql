@@ -34,6 +34,7 @@ class ResultCacheTest extends GraphQLTestBase {
       }
 GQL;
     $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $this->builder = new ResolverBuilder();
   }
 
   /**
@@ -90,15 +91,13 @@ GQL;
       ->method('id')
       ->willReturn('test');
 
-    $builder = new ResolverBuilder();
-
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
       'parent' => 'Query',
-    ], $builder->compose(
-        $builder->fromValue($cacheable),
+    ], $this->builder->compose(
+        $this->builder->fromValue($cacheable),
         function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
         }
@@ -117,20 +116,39 @@ GQL;
    * Verify that fields with uncacheable annotations are not cached.
    */
   public function testUncacheableResultAnnotation() {
-    $this->markTestSkipped('to remove');
+    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
+      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->getMock();
+    $cacheable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn([]);
+    $cacheable->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(0);
+    $cacheable->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+
+    $dummy_object = $this->getMockBuilder(Server::class)
+      ->disableOriginalConstructor()
+      ->setMethods(['id'])
+      ->getMock();
+    $dummy_object->expects($this->exactly(2))
+      ->method('id')
+      ->willReturn('test');
+
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-      'response_cache_max_age' => 0,
-    ], NULL, function ($field) {
-      $field
-        ->expects(static::exactly(2))
-        ->method('resolveValues')
-        ->willReturnCallback(function () {
-          yield 'test';
-        });
-    });
+      'parent' => 'Query',
+    ], $this->builder->compose(
+        $this->builder->fromValue($cacheable),
+        function ($value, $args, $context, $info) use ($dummy_object) {
+          return $dummy_object->id();
+        }
+      )
+    );
 
 
     // The first request that is not supposed to be cached.
@@ -176,7 +194,27 @@ GQL;
    * Test if changing test context's trigger re-evaluations.
    */
   public function testContext() {
-    $this->markTestSkipped('to rewrite');
+    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
+      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->getMock();
+    $cacheable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn([]);
+    $cacheable->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(45);
+    $cacheable->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn(['context']);
+
+    $dummy_object = $this->getMockBuilder(Server::class)
+      ->disableOriginalConstructor()
+      ->setMethods(['id'])
+      ->getMock();
+    $dummy_object->expects($this->exactly(2))
+      ->method('id')
+      ->willReturn('test');
+
     // Prepare a prophesied context manager.
     $contextManager = $this->prophesize(CacheContextsManager::class);
     $this->container->set('cache_contexts_manager', $contextManager->reveal());
@@ -203,15 +241,14 @@ GQL;
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-      'response_cache_contexts' => ['context'],
-    ], NULL, function ($field) {
-      $field
-        ->expects(static::exactly(2))
-        ->method('resolveValues')
-        ->willReturnCallback(function () {
-          yield 'test';
-        });
-    });
+      'parent' => 'Query',
+    ], $this->builder->compose(
+        $this->builder->fromValue($cacheable),
+        function ($value, $args, $context, $info) use ($dummy_object) {
+          return $dummy_object->id();
+        }
+      )
+    );
 
     // Set the context value to 'a'/
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
@@ -233,20 +270,39 @@ GQL;
    * Test if results cache properly acts on cache tag clears.
    */
   public function testTags() {
-    $this->markTestSkipped('to rewrite');
+    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
+      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->getMock();
+    $cacheable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['a', 'b']);
+    $cacheable->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(45);
+    $cacheable->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+
+    $dummy_object = $this->getMockBuilder(Server::class)
+      ->disableOriginalConstructor()
+      ->setMethods(['id'])
+      ->getMock();
+    $dummy_object->expects($this->exactly(2))
+      ->method('id')
+      ->willReturn('test');
+
     $this->mockField('root', [
       'id' => 'root',
       'name' => 'root',
       'type' => 'String',
-      'response_cache_tags' => ['a', 'b'],
-    ], NULL, function ($field) {
-      $field
-        ->expects(static::exactly(2))
-        ->method('resolveValues')
-        ->willReturnCallback(function () {
-          yield 'test';
-        });
-    });
+      'parent' => 'Query',
+    ], $this->builder->compose(
+        $this->builder->fromValue($cacheable),
+        function ($value, $args, $context, $info) use ($dummy_object) {
+          return $dummy_object->id();
+        }
+      )
+    );
 
     // First call that will be cached.
     $this->query('{ root }');
