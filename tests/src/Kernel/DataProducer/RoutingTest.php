@@ -48,4 +48,18 @@ class RoutingTest extends GraphQLTestBase {
     $this->assertEquals('/user/login', $plugin->resolve($url, $metadata));
   }
 
+  /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\Url\UrlPath::resolve
+   */
+  public function testUrlNotFound() {
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'route_load',
+      'configuration' => []
+    ]);
+    $metadata = new CacheableMetadata();
+    $result = $plugin->resolve('/idontexist', $metadata);
+    $this->assertContains('4xx-response', $metadata->getCacheTags());
+    $this->assertNull($result);
+  }
+
 }
