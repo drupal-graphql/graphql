@@ -9,6 +9,7 @@ use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
+use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
@@ -109,6 +110,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return FALSE;
     }
     catch (InvariantViolation $error) {
+      $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
+      return FALSE;
+    }
+    catch (Error $error) {
       $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
       return FALSE;
     }
