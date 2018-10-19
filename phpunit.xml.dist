@@ -13,10 +13,6 @@
       <file>./tests/TestSuites/KernelTestSuite.php</file>
     </testsuite>
   </testsuites>
-  <listeners>
-    <listener class="\Drupal\Tests\Listeners\DrupalStandardsListener">
-    </listener>
-  </listeners>
   <filter>
     <whitelist>
       <directory suffix=".php">../modules/graphql</directory>
