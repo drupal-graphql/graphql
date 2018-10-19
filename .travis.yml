@@ -90,7 +90,7 @@ install:
 
   # Bring in the module dependencies without requiring a merge plugin. The
   # require also triggers a full 'composer install'.
-  - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.12.5
+  - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.12.5 drupal/typed_data:^1.0
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.

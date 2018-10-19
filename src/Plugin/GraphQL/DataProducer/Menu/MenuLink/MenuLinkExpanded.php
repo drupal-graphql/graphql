@@ -29,7 +29,7 @@ class MenuLinkExpanded extends DataProducerPluginBase {
    *
    * @return mixed
    */
-  protected function resolve(MenuLinkInterface $link) {
+  public function resolve(MenuLinkInterface $link) {
     return $link->isExpanded();
   }
 

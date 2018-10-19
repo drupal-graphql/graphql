@@ -20,27 +20,12 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function query($query, array $variables = []) {
-    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
+  protected function query($query, $server = NULL, array $variables = []) {
+    if (empty($server)) {
+      $server = $this->test_server;
+    }
+    return $this->container->get('http_kernel')->handle(Request::create($server->get('endpoint'), 'GET', [
       'query' => $query,
-      'variables' => $variables,
-    ]));
-  }
-
-  /**
-   * Issue a persisted query over http.
-   *
-   * @param $id
-   *   The query id.
-   * @param array $variables
-   *   Query variables.
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   *   The http response object.
-   */
-  protected function persistedQuery($id, array $variables = []) {
-    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'GET', [
-      'queryId' => $id,
       'variables' => $variables,
     ]));
   }
@@ -54,8 +39,11 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries($queries) {
-    return $this->container->get('http_kernel')->handle(Request::create('/graphql', 'POST', [], [], [], [], json_encode($queries)));
+  protected function batchedQueries($queries, $server = NULL) {
+    if (empty($server)) {
+      $server = $this->test_server;
+    }
+    return $this->container->get('http_kernel')->handle(Request::create($server->get('endpoint'), 'POST', [], [], [], [], json_encode($queries)));
   }
 
 }

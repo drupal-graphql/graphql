@@ -2,11 +2,11 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\graphql\FixedLanguageNegotiator;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\Language\FixedLanguageNegotiator;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Test contextual language negotiation.
@@ -19,51 +19,68 @@ class LanguageContextTest extends GraphQLTestBase {
   public static $modules = ['language'];
 
   /**
+   * @var \Drupal\graphql\Language\LanguageContext
+   */
+  protected $languageContext;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+    $gql_schema = <<<GQL
+    schema {
+      query: Query
+    }
 
-    $this->mockType('node', ['name' => 'Node']);
+    type Query {
+      edge(language: String): Node
+      language: String
+      unaware: String
+      leaking: String
+    }
 
-    $this->mockField('edge', [
-      'name' => 'edge',
-      'parents' => ['Root', 'Node'],
-      'type' => 'Node',
-      'arguments' => [
-        'language' => 'String',
-      ],
-      'contextual_arguments' => ['language'],
-    ], 'foo');
+    type Node {
+      edge(language: String): Node
+      language: String
+      unaware: String
+      leaking: String
+    }
+GQL;
 
-    $this->mockField('language', [
-      'name' => 'language',
-      'parents' => ['Root', 'Node'],
-      'type' => 'String',
-      'response_cache_contexts' => ['languages:language_interface'],
-    ], function () {
-      yield \Drupal::languageManager()->getCurrentLanguage()->getId();
-    });
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
 
-    $this->mockField('unaware', [
-      'name' => 'unaware',
-      'parents' => ['Root', 'Node'],
-      'type' => 'String',
-    ], function () {
-      yield \Drupal::languageManager()->getCurrentLanguage()->getId();
-    });
+    $this->languageContext = $this->container->get('graphql.language_context');
 
-    $this->mockField('leaking', [
-      'name' => 'leaking',
-      'parents' => ['Root', 'Node'],
-      'type' => 'String',
-    ], function () {
-      yield new CacheableValue('leak', [
-        (new CacheableMetadata())->addCacheContexts([
-          'languages:language_interface',
-        ]),
-      ]);
-    });
+    foreach (['Query', 'Node'] as $parent) {
+      $this->mockField('edge', [
+        'parent' => $parent,
+      ], function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $context->setContext('language', $args['language'], $info);
+        return 'foo';
+      });
+
+      $this->mockField('language', [
+        'parent' => $parent,
+      ], function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        return $this->languageContext->executeInLanguageContext(function () {
+          return \Drupal::languageManager()->getCurrentLanguage()->getId();
+        }, $context->getContext('language', $info));
+      });
+
+      $this->mockField('unaware', [
+        'parent' => $parent,
+      ], function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        return \Drupal::languageManager()->getCurrentLanguage()->getId();
+      });
+
+      $this->mockField('leaking', [
+        'parent' => $parent,
+      ], function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $context->addCacheContexts(['languages:language_interface']);
+        return 'leak';
+      });
+    }
 
     $this->container->get('router.builder')->rebuild();
   }

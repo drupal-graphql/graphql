@@ -36,7 +36,14 @@ abstract class GraphQLTestBase extends KernelTestBase {
     'system',
     'user',
     'language',
+    'node',
     'graphql',
+    'content_translation',
+    'entity_reference_test',
+    'field',
+    'menu_link_content',
+    'link',
+    'typed_data',
   ];
 
   /**
@@ -57,7 +64,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function getDefaultSchema() {
-    return 'default:default';
+    return 'graphql_test';
   }
 
   /**
@@ -73,7 +80,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
   protected function defaultCacheTags() {
     return [
       'graphql_response',
-      'graphql',
     ];
   }
 
@@ -96,14 +102,20 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->injectTypeSystemPluginManagers($this->container);
+    // TODO: rewrite injection.
+    //$this->injectTypeSystemPluginManagers($this->container);
 
     PHPUnit_Framework_Error_Warning::$enabled = FALSE;
 
     $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
-    $this->mockSchema('default');
+    //$this->mockSchema('default');
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
+    $this->installSchema('node', ['node_access']);
+
+    $this->installEntitySchema('graphql_server');
 
     $this->installEntitySchema('configurable_language');
     $this->installConfig(['language']);
@@ -113,6 +125,11 @@ abstract class GraphQLTestBase extends KernelTestBase {
     ConfigurableLanguage::create([
       'id' => 'fr',
       'weight' => 1,
+    ])->save();
+
+    ConfigurableLanguage::create([
+      'id' => 'de',
+      'weight' => 2,
     ])->save();
   }
 

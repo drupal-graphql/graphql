@@ -6,6 +6,7 @@ use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use PhpParser\Node\Arg;
 use Prophecy\Argument;
+use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test if query handling respects permissions properly.
@@ -27,18 +28,22 @@ class PermissionsTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+      }
+      type Query {
+        root: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
-      'secure' => TRUE,
-    ], 'test');
-
-    // Set up a query map provider.
-    $queryProvider = $this->prophesize(QueryProviderInterface::class);
-    $queryProvider->getQuery(Argument::any(), Argument::any())->willReturn(NULL);
-    $queryProvider->getQuery('persisted:a', Argument::any())->willReturn('{ root }');
-
-    $this->container->set('graphql.query_provider', $queryProvider->reveal());
+      'parent' => 'Query',
+    ], $builder->fromValue('test'));
   }
 
   /**
@@ -49,36 +54,13 @@ class PermissionsTest extends GraphQLTestBase {
 
     // Any query should fail.
     $this->assertEquals(403, $this->query('query')->getStatusCode());
-    $this->assertEquals(403, $this->persistedQuery('persisted:a')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
-      ['queryId' => 'persisted:a'],
+      ['query' => '{ root }'],
     ]);
 
     // If all batched queries fail, 403 is returned.
-    $this->assertEquals(403, $batched->getStatusCode());
-  }
-
-  /**
-   * Test access to persisted queries.
-   *
-   * The user is only allowed to access persisted queries, not arbitrary ones.
-   */
-  public function testPersistedQueryAccess() {
-    $this->accountProphecy->hasPermission(Argument::is('execute persisted graphql requests'))->willReturn(TRUE);
-    $this->accountProphecy->hasPermission(Argument::not('execute persisted graphql requests'))->willReturn(FALSE);
-
-    // Only persisted queries should work.
-    $this->assertEquals(403, $this->query('{ root }')->getStatusCode());
-    $this->assertEquals(200, $this->persistedQuery('persisted:a')->getStatusCode());
-
-    $batched = $this->batchedQueries([
-      ['query' => '{ root }'],
-      ['queryId' => 'persisted:a'],
-    ]);
-
-    // If some queries fail, 403 is returned.
     $this->assertEquals(403, $batched->getStatusCode());
   }
 
@@ -93,11 +75,10 @@ class PermissionsTest extends GraphQLTestBase {
 
     // All queries should work.
     $this->assertEquals(200, $this->query('{ root }')->getStatusCode());
-    $this->assertEquals(200, $this->persistedQuery('persisted:a')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
-      ['queryId' => 'persisted:a'],
+      ['query' => '{ root }'],
     ]);
 
     $this->assertEquals(200, $batched->getStatusCode());

@@ -1,4 +1,4 @@
-graphql.graphql_server.*:
+graphql.graphql_servers.*:
   type: config_entity
   label: 'Server'
   mapping:

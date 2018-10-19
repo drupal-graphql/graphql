@@ -6,6 +6,7 @@ use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Server\OperationParams;
 use Prophecy\Argument;
+use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test the whole query result pipeline.
@@ -19,10 +20,23 @@ class ResultTest extends GraphQLTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+      }
+      type Query {
+        root: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
-    ], 'test');
+      'parent' => 'Query'
+    ], $builder->fromValue('test'));
   }
 
   /**
@@ -39,37 +53,12 @@ class ResultTest extends GraphQLTestBase {
   }
 
   /**
-   * Test a persisted query result.
-   */
-  public function testPersistedQuery() {
-    $queryProvider = $this->prophesize(QueryProviderInterface::class);
-    $this->container->set('graphql.query_provider', $queryProvider->reveal());
-
-    $queryProvider->getQuery('a', Argument::any())->willReturn('query { root }');
-
-    $result = $this->persistedQuery('a');
-    $this->assertSame(200, $result->getStatusCode());
-    $this->assertSame([
-      'data' => [
-        'root' => 'test',
-      ],
-    ], json_decode($result->getContent(), TRUE));
-  }
-
-  /**
    * Test a batched query result.
    */
   public function testBatchedQueries() {
-    $queryProvider = $this->prophesize(QueryProviderInterface::class);
-    $this->container->set('graphql.query_provider', $queryProvider->reveal());
-
-    $queryProvider->getQuery(Argument::any())->willReturn(NULL);
-    $queryProvider->getQuery('a', Argument::any())
-      ->willReturn('query { root }');
-
     $result = $this->batchedQueries([
       ['query' => 'query { root } '],
-      ['queryId' => 'a'],
+      ['query' => 'query { root }'],
     ]);
 
     $this->assertSame(200, $result->getStatusCode());

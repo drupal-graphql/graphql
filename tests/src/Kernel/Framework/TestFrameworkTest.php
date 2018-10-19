@@ -8,6 +8,8 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\graphql\GraphQL\ResolverBuilder;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 
 /**
  * Test the test framework.
@@ -20,13 +22,38 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test mocked fields.
    */
   public function testFieldMock() {
+    $gql_schema = <<<GQL
+      type Query {
+        root: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+
+    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
+      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->getMock();
+    $cacheable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['my_tag']);
+    $cacheable->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(42);
+    $cacheable->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+
+
+    $builder = new ResolverBuilder();
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
+      'parent' => 'Query',
       'response_cache_tags' => ['my_tag'],
-    ], function () {
-      yield (new CacheableValue('test'))->mergeCacheMaxAge(42);
-    });
+    ], $builder->compose(
+        $builder->fromValue($cacheable),
+        $builder->fromValue('test')
+      )
+    );
 
     $metadata = $this->defaultCacheMetaData();
     $metadata->setCacheMaxAge(42);
@@ -61,9 +88,16 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test result error assertions.
    */
   public function testErrorAssertion() {
-    // Errors are not cached at all.
+    $gql_schema = <<<GQL
+    type Query {
+      wrongname: String
+    }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    // Errors are cacheable now.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
+    $metadata->setCacheContexts($this->defaultCacheContexts());
 
     $this->assertErrors('{ root }', [], [
       'Cannot query field "root" on type "Query".',
@@ -75,70 +109,53 @@ class TestFrameworkTest extends GraphQLTestBase {
   }
 
   /**
-   * Test type mocking.
-   */
-  public function testTypeMock() {
-    $this->mockField('value', [
-      'name' => 'value',
-      'parents' => ['Test'],
-      'type' => 'String',
-    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
-      yield $value['value'];
-    });
-
-    $this->mockType('test', [
-      'name' => 'Test',
-    ]);
-
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'Test',
-    ], function ($value, array $args, ResolveContext $context, ResolveInfo $info) {
-      yield ['value' => 'test'];
-    });
-
-    $this->assertResults('{ root { value } }', [], [
-      'root' => ['value' => 'test'],
-    ], $this->defaultCacheMetaData());
-  }
-
-  /**
    * Test mutation mocking.
    */
   public function testMutationMock() {
-    // Fake at least a root field, or the schema will return an error.
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+        mutation: Mutation
+      }
+      type Query {
+        root: Boolean
+      }
+
+      type Mutation {
+        addUser(user: User!): Boolean
+      }
+
+      enum Gender {
+        Female
+        Male
+      }
+
+      input User {
+        name: String
+        age: Int
+        gender: Gender
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'Boolean',
-    ], TRUE);
+      'parent' => 'Query',
+    ], $builder->fromValue(TRUE));
 
-    $this->mockEnum('gender', [
-      'name' => 'Gender',
-    ], function () {
-      return [
-        'Female' => ['value' => 'f', 'description' => ''],
-        'Male' => ['value' => 'm', 'description' => ''],
-      ];
-    });
-
-    $this->mockInputType('user', [
-      'name' => 'User',
-      'fields' => [
-        'name' => 'String',
-        'age' => 'Int',
-        'gender' => 'Gender',
-      ],
-    ]);
-
-    $this->mockMutation('addUser', [
+    $this->mockField('addUser', [
       'name' => 'addUser',
       'type' => 'Boolean',
-      'arguments' => [
-        'user' => 'User',
-      ],
-    ], function ($value, $args) {
-      return $args['user']['age'] > 50 && $args['user']['gender'] == 'm';
-    });
+      'parent' => 'Mutation',
+    ], $builder->compose(
+        $builder->fromArgument('user'),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $args['user']['age'] > 50 && $args['user']['gender'] == 'Male';
+        }
+      )
+    );
 
     $metadata = $this->defaultMutationCacheMetaData();
     $this->assertResults('mutation ($user: User!) { addUser(user: $user) }', [
@@ -154,47 +171,67 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test interface mocking.
    */
   public function testInterfaceMock() {
-    $this->mockInterface('token', [
-      'name' => 'Token',
-    ]);
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+      }
+      type Query {
+        root: [Token]
+      }
 
-    $this->mockType('number', [
-      'name' => 'Number',
-      'interfaces' => ['Token'],
-    ], function ($value) {
-      return is_int($value['value']);
+      interface Token {
+        id: Int
+      }
+
+      type Number implements Token {
+        value: Int
+      }
+
+      type Word implements Token {
+        value: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
+    $this->mockTypeResolver('Token', function ($value, $context, $info) {
+      return is_int($value['value']) ? 'Number' : 'Word';
     });
 
-    $this->mockType('word', [
-      'name' => 'Word',
-      'interfaces' => ['Token'],
-    ], function ($value) {
-      return is_string($value['value']);
-    });
-
-    $this->mockField('int_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'Int',
-      'parents' => ['Number'],
-    ], function ($value) {
-      yield $value['value'];
-    });
+      'parent' => 'Number',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
-    $this->mockField('string_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'String',
-      'parents' => ['Word'],
-    ], function ($value) {
-      yield $value['value'];
-    });
+      'parent' => 'Word',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
     $this->mockField('root', [
       'name' => 'root',
       'type' => '[Token]',
-    ], function () {
-      yield ['value' => 42];
-      yield ['value' => 'GraphQL'];
-    });
+      'parent' => 'Query',
+    ], $builder->fromValue(
+      [
+        ['value' => 42],
+        ['value' => 'GraphQL'],
+      ]
+    ));
 
     $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
       'root' => [
@@ -206,47 +243,68 @@ class TestFrameworkTest extends GraphQLTestBase {
 
   /**
    * Test union mocks.
-   *
    * @todo Unions are identical to interfaces right now, but they should not be.
    */
   public function testUnionMock() {
-    $this->mockUnion('token', [
-      'name' => 'Token',
-      'types' => ['Word'],
-    ]);
+    $gql_schema = <<<GQL
+      schema {
+        query: Query
+      }
+      type Query {
+        root: [Token]
+      }
 
-    $this->mockType('number', [
-      'name' => 'Number',
-      'unions' => ['Token'],
-    ], function ($value) {
-      return is_int($value['value']);
+      union Token = Number | Word
+
+      type Number implements Token {
+        value: Int
+      }
+
+      type Word implements Token {
+        value: String
+      }
+GQL;
+    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $builder = new ResolverBuilder();
+
+    $this->mockTypeResolver('Token', function ($value, $context, $info) {
+      return is_int($value['value']) ? 'Number' : 'Word';
     });
 
-    $this->mockType('word', [
-      'name' => 'Word',
-    ], function ($value) {
-      return is_string($value['value']);
-    });
-
-    $this->mockField('int_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'Int',
-      'parents' => ['Number'],
-    ], function ($value) { yield $value['value']; });
+      'parent' => 'Number',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
-    $this->mockField('string_value', [
+    $this->mockField('value', [
       'name' => 'value',
       'type' => 'String',
-      'parents' => ['Word'],
-    ], function ($value) { yield $value['value']; });
+      'parent' => 'Word',
+    ], $builder->compose(
+        $builder->fromParent(),
+        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+          return $value['value'];
+        }
+      )
+    );
 
     $this->mockField('root', [
       'name' => 'root',
       'type' => '[Token]',
-    ], function () {
-      yield ['value' => 42];
-      yield ['value' => 'GraphQL'];
-    });
+      'parent' => 'Query',
+    ], $builder->fromValue(
+      [
+        ['value' => 42],
+        ['value' => 'GraphQL'],
+      ]
+    ));
 
     $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
       'root' => [

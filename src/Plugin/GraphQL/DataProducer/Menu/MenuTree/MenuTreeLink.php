@@ -30,7 +30,7 @@ class MenuTreeLink extends DataProducerPluginBase {
    *
    * @return mixed
    */
-  protected function resolve(MenuLinkTreeElement $element) {
+  public function resolve(MenuLinkTreeElement $element) {
     return $element->link;
   }
 

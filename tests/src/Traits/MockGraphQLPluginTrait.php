@@ -26,6 +26,10 @@ use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Subscriptions\SubscriptionPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Unions\UnionTypePluginBase;
+use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
+use Drupal\graphql\Plugin\SchemaPluginManager;
+use Drupal\graphql\Entity\Server;
+use Drupal\graphql\GraphQL\ResolverRegistry;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -67,18 +71,7 @@ trait MockGraphQLPluginTrait {
    *
    * @var string[]
    */
-  protected $graphQLPluginClassMap = [
-    'plugin.manager.graphql.schema' => SchemaPluginBase::class,
-    'plugin.manager.graphql.field' => FieldPluginBase::class,
-    'plugin.manager.graphql.mutation' => MutationPluginBase::class,
-    'plugin.manager.graphql.subscription' => SubscriptionPluginBase::class,
-    'plugin.manager.graphql.union' => UnionTypePluginBase::class,
-    'plugin.manager.graphql.interface' => InterfacePluginBase::class,
-    'plugin.manager.graphql.type' => TypePluginBase::class,
-    'plugin.manager.graphql.input' => InputTypePluginBase::class,
-    'plugin.manager.graphql.scalar' => ScalarPluginBase::class,
-    'plugin.manager.graphql.enum' => EnumPluginBase::class,
-  ];
+  protected $graphQLPluginClassMap = [];
 
   /**
    * Register the mocked plugin managers during container build.
@@ -270,42 +263,127 @@ trait MockGraphQLPluginTrait {
   }
 
   /**
+   * Setup server with schema.
+   *
+   * @param string $gql_schema
+   *   GraphQL schema description.
+   * @param string $schema_id
+   *   Schema id.
+   */
+  protected function setUpSchema($gql_schema, $schema_id, $development = FALSE) {
+    $this->mockSchema($schema_id, $gql_schema, $development);
+    $this->mockSchemaPluginManager($schema_id);
+    $this->createTestServer($schema_id, '/graphql/' . $schema_id, $development);
+
+    $this->schemaPluginManager->method('createInstance')
+      ->with($this->equalTo($schema_id))
+      ->will($this->returnValue($this->schema));
+
+    $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
+  }
+
+  /**
+   * Create test server.
+   */
+  protected function createTestServer($schema_id, $endpoint, $debug = FALSE) {
+    $this->test_server = Server::create([
+      'schema' => $schema_id,
+      'name' => $schema_id,
+      'endpoint' => $endpoint,
+      'debug' => $debug,
+    ]);
+    $this->test_server->save();
+  }
+
+  /**
    * Mock a schema instance.
    *
    * @param string $id
    *   The schema id.
-   * @param callable|null $builder
-   *   A builder callback to modify the mock instance.
+   * @param string $gql_schema
+   *   GraphQL schema.
+   * @param \Drupal\graphql\GraphQL\ResolverRegistry|null $registry
+   *   Resolver registry.
+   * @param boolean $development
+   *   Schema development mode.
    */
-  protected function mockSchema($id, $builder = NULL) {
-    $this->graphQLPlugins[SchemaPluginBase::class][$id] = [
-      'definition' => $this->getSchemaDefinitions()[$id] + [
-        'mock_factory' => 'mockSchemaFactory',
-      ],
-      'builder' => $builder,
-    ];
+  protected function mockSchema($id, $gql_schema, $development = FALSE) {
+    $this->schema = $this->getMockBuilder(SdlSchemaPluginBase::class)
+      ->setConstructorArgs([
+        [],
+        $id,
+        [],
+        $this->container->get('cache.graphql.ast'),
+        ['development' => $development]
+      ])
+      ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
+      ->getMockForAbstractClass();
+
+    $this->schema->expects(static::any())
+      ->method('getSchemaDefinition')
+      ->willReturn($gql_schema);
+
+    if (!empty($registry)) {
+      $this->schema->expects($this->any())
+        ->method('getResolverRegistry')
+        ->willReturn($registry);
+      $this->registry = $registry;
+    }
   }
 
-  protected function mockSchemaFactory($definition, $builder) {
-    $schema = $this->getMockForAbstractClass(SchemaPluginBase::class, [
-      [],
-      $definition['id'],
-      $definition,
-      $this->container->get('plugin.manager.graphql.field'),
-      $this->container->get('plugin.manager.graphql.mutation'),
-      $this->container->get('plugin.manager.graphql.subscription'),
-      $this->container->get('graphql.type_manager_aggregator'),
-      $this->container->get('graphql.query_provider'),
-      $this->container->get('current_user'),
-      $this->container->get('logger.channel.graphql'),
-      $this->container->getParameter('graphql.config')
-    ]);
+  /**
+   * Mock schema plugin manager.
+   */
+  protected function mockSchemaPluginManager($id) {
+    $this->schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+    $this->schemaPluginManager->expects($this->any())
+      ->method('getDefinitions')
+      ->will($this->returnValue([
+        $id => [
+          'id' => $id,
+          'name' => 'GraphQL test schema',
+          'provider' => 'graphql',
+          'class' => '\Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase'
+        ]
+      ]));
+  }
 
-    if (is_callable($builder)) {
-      $builder($schema);
+  /**
+   * Mock data producer field.
+   * @param  string $type
+   *   Parent Type.
+   * @param  string $name
+   *   Field name.
+   * @param Closure $builder
+   *   Resolver.
+   */
+  protected function mockDataProducer($type, $name, $builder) {
+    if (empty($this->registry)) {
+      $this->registry = new ResolverRegistry([]);
     }
+    $this->registry->addFieldResolver($type, $name, $builder);
+    $this->schema->expects($this->any())
+        ->method('getResolverRegistry')
+        ->willReturn($this->registry);
+  }
 
-    return $schema;
+  /**
+   * Mock type resolver.
+   * @param  string $type
+   *   Parent Type.
+   * @param  Closure $resolver
+   *   Type resolver.
+   */
+  protected function mockTypeResolver($type, $resolver) {
+    if (empty($this->registry)) {
+      $this->registry = new ResolverRegistry([]);
+    }
+    $this->registry->addTypeResolver($type, $resolver);
+    $this->schema->expects($this->any())
+        ->method('getResolverRegistry')
+        ->willReturn($this->registry);
   }
 
   /**
@@ -322,43 +400,7 @@ trait MockGraphQLPluginTrait {
    *   A builder callback to modify the mock instance.
    */
   protected function mockField($id, $definition, $result = NULL, $builder = NULL) {
-    $definition = $this->getTypeSystemPluginDefinition(
-      GraphQLField::class,
-      $definition + [
-        'secure' => TRUE,
-        'id' => $id,
-        'class' => FieldPluginBase::class,
-        'mock_factory' => 'mockFieldFactory',
-      ]
-    );
-
-    $this->graphQLPlugins[FieldPluginBase::class][$id] = [
-      'definition' => $definition,
-      'result' => $result,
-      'builder' => $builder,
-    ];
-  }
-
-  protected function mockFieldFactory($definition, $result = NULL, $builder = NULL) {
-    $field = $this->getMockBuilder(FieldPluginBase::class)
-      ->setConstructorArgs([[], $definition['id'], $definition])
-      ->setMethods([
-        'resolveValues',
-      ])->getMock();
-
-    if (isset($result)) {
-      $field
-        ->expects(static::any())
-        ->method('resolveValues')
-        ->with(static::anything(), static::anything(), static::anything(), static::anything())
-        ->will($this->toBoundPromise($result, $field));
-    }
-
-    if (is_callable($builder)) {
-      $builder($field);
-    }
-
-    return $field;
+    $this->mockDataProducer($definition['parent'], $id, $result);
   }
 
   /**
