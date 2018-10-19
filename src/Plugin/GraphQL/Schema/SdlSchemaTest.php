@@ -11,6 +11,7 @@ use Drupal\graphql\GraphQL\ResolverRegistry;
  *   id = "test",
  *   name = "Test schema"
  * )
+ * @codeCoverageIgnore
  */
 class SdlSchemaTest extends SdlSchemaPluginBase {
 

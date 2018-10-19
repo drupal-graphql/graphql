@@ -69,6 +69,8 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
@@ -96,6 +98,8 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    *   The entity repository service.
    * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
    *   The entity buffer service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(
     $configuration,

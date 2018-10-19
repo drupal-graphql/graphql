@@ -34,6 +34,8 @@ class ServerForm extends EntityForm {
    *   The schema plugin manager.
    * @param \Drupal\Core\Routing\RequestContext $requestContext
    *   The request context.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(SchemaPluginManager $schemaManager, RequestContext $requestContext) {
     $this->requestContext = $requestContext;
@@ -42,6 +44,8 @@ class ServerForm extends EntityForm {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container) {
     return new static(

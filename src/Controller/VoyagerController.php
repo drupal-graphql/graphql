@@ -20,6 +20,8 @@ class VoyagerController implements ContainerInjectionInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container) {
     return new static($container->get('graphql.introspection'));
@@ -30,6 +32,8 @@ class VoyagerController implements ContainerInjectionInterface {
    *
    * @param \Drupal\graphql\GraphQL\Utility\Introspection $introspection
    *   The GraphQL introspection service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(Introspection $introspection) {
     $this->introspection = $introspection;

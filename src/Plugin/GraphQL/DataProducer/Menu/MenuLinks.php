@@ -42,6 +42,8 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
@@ -63,6 +65,8 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
    *   The plugin definition.
    * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
    *   The menu link tree service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, MenuLinkTreeInterface $menuLinkTree) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);

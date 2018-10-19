@@ -40,6 +40,8 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
@@ -61,6 +63,8 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
    *   The plugin definition.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);

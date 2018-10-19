@@ -28,6 +28,8 @@ class RequestController implements ContainerInjectionInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -43,6 +45,8 @@ class RequestController implements ContainerInjectionInterface {
    *   The query processor.
    * @param array $parameters
    *   The service configuration parameters.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(QueryProcessor $processor, array $parameters) {
     $this->processor = $processor;

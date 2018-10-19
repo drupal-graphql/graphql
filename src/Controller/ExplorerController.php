@@ -40,6 +40,8 @@ class ExplorerController implements ContainerInjectionInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -58,6 +60,8 @@ class ExplorerController implements ContainerInjectionInterface {
    *   The introspection service.
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaPluginManager $pluginManager) {
     $this->urlGenerator = $urlGenerator;

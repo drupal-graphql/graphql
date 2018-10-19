@@ -8,6 +8,7 @@ use Drupal\Component\Annotation\Plugin;
  * Annotation for GraphQL schema plugins.
  *
  * @Annotation
+ * @codeCoverageIgnore
  */
 class Schema extends Plugin {
 

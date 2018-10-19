@@ -38,6 +38,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
@@ -62,6 +64,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The cache bin for caching the parsed SDL.
    * @param $config
    *   The service configuration.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(
     $configuration,

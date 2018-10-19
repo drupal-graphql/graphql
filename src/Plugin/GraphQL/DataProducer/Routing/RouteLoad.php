@@ -48,6 +48,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
@@ -74,6 +76,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Drupal\redirect\RedirectRepository|null $redirectRepository
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,

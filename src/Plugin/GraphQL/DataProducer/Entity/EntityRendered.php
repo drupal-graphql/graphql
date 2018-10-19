@@ -52,6 +52,8 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
@@ -76,6 +78,8 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
    *   The entity type manager service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,

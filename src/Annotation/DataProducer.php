@@ -9,6 +9,7 @@ use Drupal\Component\Annotation\Plugin;
  * Annotation for data producer plugins.
  *
  * @Annotation
+ * @codeCoverageIgnore
  */
 class DataProducer extends Plugin {
 

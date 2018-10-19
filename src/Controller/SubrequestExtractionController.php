@@ -31,6 +31,8 @@ class SubrequestExtractionController extends ControllerBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -49,6 +51,8 @@ class SubrequestExtractionController extends ControllerBase {
    *   The language manager service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The rewnderer service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(RequestStack $requestStack, LanguageManagerInterface $languageManager, RendererInterface $renderer) {
     $this->requestStack = $requestStack;
