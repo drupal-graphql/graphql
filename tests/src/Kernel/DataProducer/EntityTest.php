@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityDescriptionInterface;
@@ -16,6 +18,7 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\entity_test\Entity\EntityTestBundle;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Data producers Entity test class.
@@ -45,7 +48,16 @@ class EntityTest extends GraphQLTestBase {
     $content_type = NodeType::create([
       'type' => 'lorem',
       'name' => 'ipsum',
-      'translatable' => TRUE
+      'translatable' => TRUE,
+      'display_submitted' => FALSE,
+    ]);
+    $content_type->save();
+
+    $content_type = NodeType::create([
+      'type' => 'otherbundle',
+      'name' => 'otherbundle',
+      'translatable' => TRUE,
+      'display_submitted' => FALSE,
     ]);
     $content_type->save();
 
@@ -316,6 +328,85 @@ class EntityTest extends GraphQLTestBase {
 
     $result = $adapter->wait($promise);
     $this->assertEquals($this->node->id(), $result->id());
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   */
+  public function testResolveUnknownEntityLoad() {
+    $metadata = $this->defaultCacheMetaData();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_load',
+      'configuration' => []
+    ]);
+
+    $deferred = $plugin->resolve($this->node->getEntityTypeId(), 0, NULL, NULL, $metadata);
+
+    $adapter = new SyncPromiseAdapter();
+    $promise = $adapter->convertThenable($deferred);
+
+    $result = $adapter->wait($promise);
+    $this->assertContains('node_list', $metadata->getCacheTags());
+    $this->assertNull($result);
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   */
+  public function testResolveMismatchEntityLoad() {
+    $metadata = $this->defaultCacheMetaData();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_load',
+      'configuration' => []
+    ]);
+
+    $deferred = $plugin->resolve('node', $this->node->id(), NULL, ['otherbundle'], $metadata);
+
+    $adapter = new SyncPromiseAdapter();
+    $promise = $adapter->convertThenable($deferred);
+
+    $result = $adapter->wait($promise);
+    $this->assertContains('node:1', $metadata->getCacheTags());
+    $this->assertNull($result);
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   */
+  public function testResolveTranslatedEntityLoad() {
+    $metadata = $this->defaultCacheMetaData();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_load',
+      'configuration' => []
+    ]);
+
+    $deferred = $plugin->resolve('node', $this->node->id(), 'fr', NULL, $metadata);
+
+    $adapter = new SyncPromiseAdapter();
+    $promise = $adapter->convertThenable($deferred);
+
+    $result = $adapter->wait($promise);
+    $this->assertEquals('fr', $result->language()->getId());
+    $this->assertEquals('sit amet fr', $result->getTitle());
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   */
+  public function testResolveEntityRendered() {
+    $metadata = $this->defaultCacheMetaData();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_rendered',
+      'configuration' => []
+    ]);
+
+    $result = $plugin->resolve($this->node, 'default', $metadata);
+    $this->assertContains('node:1', $metadata->getCacheTags());
+    $this->assertContains('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
   }
 
 }
