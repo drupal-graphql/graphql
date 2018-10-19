@@ -4,9 +4,12 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
+use Drupal\Core\Render\RenderContext;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use GraphQL\Type\Definition\ResolveInfo;
 use Prophecy\Argument;
 use Drupal\graphql\Entity\Server;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -335,14 +338,23 @@ GQL;
       'name' => 'leakA',
       'type' => 'String',
       'parent' => 'Query',
-    ], function ($value, $args, $context, $info) use ($renderer) {
+    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($renderer) {
         $el = [
           '#plain_text' => 'Leak A',
           '#cache' => [
             'tags' => ['a'],
           ],
         ];
-        return $renderer->renderPlain($el)->__toString();
+
+        $renderContext = new RenderContext();
+        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
+          return $renderer->render($el)->__toString();
+        });
+
+        if (!$renderContext->isEmpty()) {
+          $context->addCacheableDependency($renderContext->pop());
+        }
+        return $value;
       }
     );
 
@@ -351,14 +363,22 @@ GQL;
       'name' => 'leakB',
       'type' => 'String',
       'parent' => 'Query',
-    ], function ($value, $args, $context, $info) use ($renderer) {
+    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($renderer) {
         $el = [
           '#plain_text' => 'Leak B',
           '#cache' => [
             'tags' => ['b'],
           ],
         ];
-        $value = $renderer->renderPlain($el)->__toString();
+        $renderContext = new RenderContext();
+        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
+          return $renderer->render($el)->__toString();
+        });
+
+        if (!$renderContext->isEmpty()) {
+          $context->addCacheableDependency($renderContext->pop());
+        }
+
         return new Deferred(function () use ($value) {
           return $value;
         });
@@ -372,9 +392,8 @@ query {
 }
 GQL;
 
-    $metadata = $this->defaultCacheMetaData();
-    // TODO: check render caching.
-    //  ->addCacheTags(['a', 'b']);
+    $metadata = $this->defaultCacheMetaData()
+      ->addCacheTags(['a', 'b']);
 
     $this->assertResults($query, [], [
       'leakA' => 'Leak A',
