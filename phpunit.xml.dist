@@ -15,7 +15,7 @@
   </testsuites>
   <filter>
     <whitelist>
-      <directory suffix=".php">../modules/graphql</directory>
+      <directory suffix=".php">../modules/graphql/src</directory>
       <exclude>
         <directory suffix="Test.php">../modules/graphql</directory>
         <directory suffix="TestBase.php">../modules/graphql</directory>
