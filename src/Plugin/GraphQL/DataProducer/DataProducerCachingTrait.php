@@ -107,7 +107,7 @@ trait DataProducerCachingTrait {
 
     if ($cache = $backend->get("$prefix:context")) {
       $manager = $this->getCacheContextsManager();
-      $keys = !empty($cache->data) ? $manager->convertTokensToKeys($cache->data)->getKeys() : '';
+      $keys = serialize(!empty($cache->data) ? $manager->convertTokensToKeys($cache->data)->getKeys() : []);
 
       if (($cache = $backend->get("$prefix:result:$keys")) && $data = $cache->data) {
         return $data;
@@ -130,7 +130,7 @@ trait DataProducerCachingTrait {
     $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
     $tags = $metadata->getCacheTags();
     $tokens = $metadata->getCacheContexts();
-    $keys = !empty($tokens) ? $manager->convertTokensToKeys($tokens)->getKeys() : '';
+    $keys = serialize(!empty($tokens) ? $manager->convertTokensToKeys($tokens)->getKeys() : []);
     $data = $this->serializeCache($value);
 
     $backend->setMultiple([
@@ -170,7 +170,10 @@ trait DataProducerCachingTrait {
    * @return bool
    */
   protected function shouldLookupEdgeCache(array $values, ResolveContext $context, ResolveInfo $info) {
-    // TODO: Control this through plugin configuration.
+    if ($this instanceof DataProducerPluginBase) {
+      $configuration = $this->getConfiguration();
+      return array_key_exists('cache', $configuration) && $configuration['cache'];
+    }
     return FALSE;
   }
 
