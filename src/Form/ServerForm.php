@@ -11,6 +11,13 @@ use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class ServerForm
+ *
+ * @package Drupal\graphql\Form
+ *
+ * @codeCoverageIgnore
+ */
 class ServerForm extends EntityForm {
 
   /**

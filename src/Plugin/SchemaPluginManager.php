@@ -27,8 +27,6 @@ class SchemaPluginManager extends DefaultPluginManager {
    *   The name of the annotation that contains the plugin definition.
    * @param array $config
    *   The configuration service parameter.
-   *
-   * @codeCoverageIgnore
    */
   public function __construct(
     $pluginSubdirectory,

@@ -6,6 +6,13 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 
+/**
+ * Class ServerListBuilder
+ *
+ * @package Drupal\graphql\Controller
+ *
+ * @codeCoverageIgnore
+ */
 class ServerListBuilder extends ConfigEntityListBuilder {
 
   /**

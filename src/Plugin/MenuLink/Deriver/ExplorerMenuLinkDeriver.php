@@ -5,6 +5,13 @@ namespace Drupal\graphql\Plugin\MenuLink\Deriver;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\graphql\Entity\Server;
 
+/**
+ * Class ExplorerMenuLinkDeriver
+ *
+ * @package Drupal\graphql\Plugin\MenuLink\Deriver
+ *
+ * @codeCoverageIgnore
+ */
 class ExplorerMenuLinkDeriver extends DeriverBase {
 
   /**

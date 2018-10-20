@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller for the GraphiQL query builder IDE.
+ *
+ * @codeCoverageIgnore
  */
 class ExplorerController implements ContainerInjectionInterface {
   use StringTranslationTrait;

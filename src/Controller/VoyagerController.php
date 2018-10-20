@@ -9,6 +9,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller for the GraphQL Voyager visualisation API.
+ *
+ * @codeCoverageIgnore
  */
 class VoyagerController implements ContainerInjectionInterface {
   /**

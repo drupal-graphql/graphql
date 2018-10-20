@@ -166,6 +166,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
@@ -174,6 +176,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage,$entities);
