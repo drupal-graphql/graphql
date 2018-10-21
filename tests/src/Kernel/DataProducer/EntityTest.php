@@ -2,23 +2,16 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
-use Drupal\Core\Entity\TranslatableInterface;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Url;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\entity_test\Entity\EntityTestBundle;
-use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Data producers Entity test class.
