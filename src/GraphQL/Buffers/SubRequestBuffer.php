@@ -80,6 +80,8 @@ class SubRequestBuffer extends BufferBase {
     $url = reset($buffer)['url']->toString(TRUE);
 
     $currentRequest = $this->requestStack->getCurrentRequest();
+
+    // TODO: Optimize if the request equals the current one?
     $request = Request::create(
       $url->getGeneratedUrl(),
       'GET',

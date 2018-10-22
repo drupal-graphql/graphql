@@ -13,6 +13,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function defaultConfiguration() {
     return [];
@@ -20,6 +22,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function getConfiguration() {
     return $this->configuration;
@@ -27,6 +31,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function setConfiguration(array $configuration) {
     $this->configuration = $configuration + $this->defaultConfiguration();
@@ -34,6 +40,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function calculateDependencies() {
     return [];
@@ -41,6 +49,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     // TODO: Add configuration form for mappings.
@@ -49,6 +59,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     // TODO: Add configuration validation for mappings.
@@ -56,6 +68,8 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     // TODO: Save mappings.

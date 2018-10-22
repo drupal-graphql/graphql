@@ -112,9 +112,8 @@ class DataProducerBaseTest extends GraphQLTestBase {
       ->method('resolve')
       ->willReturn('foo');
 
-    for ($i = 0; $i < 2; $i++) {
-      call_user_func($mock, NULL, [], new ResolveContext(), new ResolveInfo([]));
-    }
+    call_user_func($mock, NULL, [], new ResolveContext(), new ResolveInfo([]));
+    call_user_func($mock, NULL, [], new ResolveContext(), new ResolveInfo([]));
   }
 
 
