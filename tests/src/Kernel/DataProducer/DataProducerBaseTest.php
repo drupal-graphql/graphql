@@ -12,7 +12,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 /**
  * Test the data producer base class.
  *
- * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase
  * @group graphql
  */
 class DataProducerBaseTest extends GraphQLTestBase {
