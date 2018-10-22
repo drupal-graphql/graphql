@@ -22,7 +22,6 @@ abstract class GraphQLFileTestBase extends KernelTestBase {
     'path',
     'user',
     'graphql',
-    'graphql_test',
   ];
 
   /**
