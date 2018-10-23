@@ -35,7 +35,12 @@ class Seek extends DataProducerPluginBase {
   public function resolve(array $input, $position) {
     $array_object = new \ArrayObject($input);
     $iterator = $array_object->getIterator();
-    $iterator->seek($position);
+    try {
+      $iterator->seek($position);
+    }
+    catch (\OutOfBoundsException $e) {
+      return NULL;
+    }
     return $iterator->current();
   }
 }

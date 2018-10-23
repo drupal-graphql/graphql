@@ -25,10 +25,9 @@ class XMLParse extends DataProducerPluginBase {
   /**
    * @param string $input
    *  The source input.
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\RefinableCacheableDependencyInterface $metadata
-   * @return string
+   * @return \DOMElement
    */
-  public function resolve($input, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($input) {
     $document = new \DOMDocument();
     libxml_use_internal_errors(TRUE);
     $document->loadHTML($input);

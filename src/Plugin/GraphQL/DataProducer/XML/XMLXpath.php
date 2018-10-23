@@ -31,10 +31,9 @@ class XMLXpath extends DataProducerPluginBase {
    *  The source (root) DOM element.
    * @param string $query
    *  The xpath query.
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\RefinableCacheableDependencyInterface $metadata
    * @return \DOMElement
    */
-  public function resolve($dom, $query, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($dom, $query) {
     $xpath = new \DOMXPath($dom->ownerDocument);
     return iterator_to_array($xpath->query($query, $dom));
   }

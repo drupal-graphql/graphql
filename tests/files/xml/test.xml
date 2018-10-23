@@ -1,0 +1,9 @@
+<div>
+    <h1 data-tag-type="some_header">Header</h1>
+    <div class="content">
+        <div>First div</div>
+        <div>Second div</div>
+        <div>Third div</div>
+        <span><p>This is one paragraph.</p><p>This is a second paragraph.</p></span>
+    </div>
+</div>

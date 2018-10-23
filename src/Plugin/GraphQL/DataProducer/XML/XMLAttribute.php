@@ -30,10 +30,9 @@ class XMLAttribute extends DataProducerPluginBase {
    *  The source (root) DOM element.
    * @param string $name
    *  The name of the attribute.
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\RefinableCacheableDependencyInterface $metadata
    * @return string
    */
-  public function resolve(\DOMElement $dom, $name, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(\DOMElement $dom, $name) {
     return $dom->getAttribute($name);
   }
 }
