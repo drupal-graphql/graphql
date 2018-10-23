@@ -5,7 +5,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
@@ -25,6 +25,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   consumes = {
  *     "url" = @ContextDefinition("any",
  *       label = @Translation("The URL")
+ *     ),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Language"),
+ *       required = FALSE
  *     )
  *   }
  * )
@@ -38,13 +42,6 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
 
 
   /**
@@ -63,7 +60,6 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
       $pluginId,
       $pluginDefinition,
       $container->get('entity_type.manager'),
-      $container->get('language_manager'),
       $container->get('graphql.buffer.entity')
     );
   }
@@ -78,8 +74,6 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
    * @param mixed $pluginDefinition
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    */
   public function __construct(
@@ -87,19 +81,17 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
     $pluginId,
     $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
-    LanguageManagerInterface $languageManager,
     EntityBuffer $entityBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
-    $this->languageManager = $languageManager;
     $this->entityBuffer = $entityBuffer;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolve($url, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($url, $language = NULL, RefinableCacheableDependencyInterface $metadata) {
     if ($url instanceof Url) {
       list(, $type) = explode('.', $url->getRouteName());
       $parameters = $url->getRouteParameters();
@@ -121,10 +113,9 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
         $access = $entity->access('view', NULL, TRUE);
         $metadata->addCacheableDependency($access);
         if ($access->isAllowed()) {
-          // @todo Add translation support.
-          /*if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+          if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
             $entity = $entity->getTranslation($language);
-          }*/
+          }
           return $entity;
         }
         return NULL;
