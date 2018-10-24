@@ -53,6 +53,8 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
@@ -75,6 +77,8 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The language manager service.
+   *
+   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,
