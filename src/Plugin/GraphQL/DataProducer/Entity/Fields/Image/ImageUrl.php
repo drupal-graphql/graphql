@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\file\FileInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
@@ -27,8 +28,10 @@ class ImageUrl extends DataProducerPluginBase {
    *
    * @return mixed
    */
-  public function resolve(FileInterface $entity) {
-    if ($entity->access('view')) {
+  public function resolve(FileInterface $entity, RefinableCacheableDependencyInterface $metadata) {
+    $access = $entity->access('view', NULL, TRUE);
+    $metadata->addCacheableDependency($access);
+    if ($access->isAllowed()) {
       return file_create_url($entity->getFileUri());
     }
   }

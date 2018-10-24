@@ -35,9 +35,6 @@ class XMLContent extends DataProducerPluginBase {
       elseif ($child instanceof \DOMElement) {
         return $child->ownerDocument->saveXML($child);
       }
-      else {
-        return '';
-      }
     }, iterator_to_array($dom->childNodes)));
   }
 }

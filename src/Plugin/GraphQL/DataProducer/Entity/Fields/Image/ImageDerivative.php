@@ -33,18 +33,20 @@ class ImageDerivative extends DataProducerPluginBase {
    * @return mixed
    */
   public function resolve(FileInterface $entity, $style, RefinableCacheableDependencyInterface $metadata) {
-    if ($entity->access('view') && $style = ImageStyle::load($style)) {
+    $access = $entity->access('view', NULL, TRUE);
+    $metadata->addCacheableDependency($access);
+    if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
       // Determine the dimensions of the styled image.
       $dimensions = [
         'width' => $entity->width,
         'height' => $entity->height,
       ];
 
-      $style->transformDimensions($dimensions, $entity->getFileUri());
-      $metadata->addCacheableDependency($style);
+      $image_style->transformDimensions($dimensions, $entity->getFileUri());
+      $metadata->addCacheableDependency($image_style);
 
       return [
-        'url' => $style->buildUrl($entity->getFileUri()),
+        'url' => $image_style->buildUrl($entity->getFileUri()),
         'width' => $dimensions['width'],
         'height' => $dimensions['height'],
       ];
