@@ -23,6 +23,11 @@ class EntityTest extends GraphQLTestBase {
   use QueryResultAssertionTrait;
 
   /**
+   * @var NodeInterface
+   */
+  protected $node;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
@@ -315,6 +320,26 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     $deferred = $plugin->resolve($this->node->getEntityTypeId(), $this->node->id(), NULL, NULL, $metadata);
+
+    $adapter = new SyncPromiseAdapter();
+    $promise = $adapter->convertThenable($deferred);
+
+    $result = $adapter->wait($promise);
+    $this->assertEquals($this->node->id(), $result->id());
+  }
+
+  /**
+   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadByUuid::resolve
+   */
+  public function testResolveEntityLoadByUuid() {
+    $metadata = $this->defaultCacheMetaData();
+
+    $plugin = $this->dataProducerManager->getInstance([
+      'id' => 'entity_load_by_uuid',
+      'configuration' => []
+    ]);
+
+    $deferred = $plugin->resolve($this->node->getEntityTypeId(), $this->node->uuid(), NULL, NULL, $metadata);
 
     $adapter = new SyncPromiseAdapter();
     $promise = $adapter->convertThenable($deferred);

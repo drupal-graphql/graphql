@@ -2,9 +2,11 @@
 
 namespace Drupal\graphql\GraphQL\Buffers;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
-class EntityBuffer extends BufferBase {
+class EntityUuidBuffer extends BufferBase {
 
   /**
    * The entity type manager service.
@@ -28,16 +30,16 @@ class EntityBuffer extends BufferBase {
    *
    * @param string $type
    *   The entity type of the given entity ids.
-   * @param array|int $id
-   *   The entity id(s) to load.
+   * @param array|string $uuid
+   *   The entity uuid(s) to load.
    *
    * @return \Closure
    *   The callback to invoke to load the result for this buffer item.
    */
-  public function add($type, $id) {
+  public function add($type, $uuid) {
     $item = new \ArrayObject([
       'type' => $type,
-      'id' => $id,
+      'uuid' => $uuid,
     ]);
 
     return $this->createBufferResolver($item);
@@ -55,21 +57,30 @@ class EntityBuffer extends BufferBase {
    */
   public function resolveBufferArray(array $buffer) {
     $type = reset($buffer)['type'];
-    $ids = array_map(function (\ArrayObject $item) {
-      return (array) $item['id'];
+
+    $entityType = $this->entityTypeManager->getDefinition($type);
+
+    if (!$uuid_key = $entityType->getKey('uuid')) {
+      throw new EntityStorageException("Entity type $type does not support UUIDs.");
+    }
+
+    $uuids = array_map(function (\ArrayObject $item) {
+      return (array) $item['uuid'];
     }, $buffer);
 
-    $ids = call_user_func_array('array_merge', $ids);
-    $ids = array_values(array_unique($ids));
+    $uuids = call_user_func_array('array_merge', $uuids);
+    $uuids = array_values(array_unique($uuids));
 
-    // Load the buffered entities.
     $entities = $this->entityTypeManager
-      ->getStorage($type)
-      ->loadMultiple($ids);
+      ->getStorage($type)->loadByProperties([$uuid_key => $uuids]);
+
+    $entities = array_reduce(array_map(function (EntityInterface $entity) {
+      return [$entity->uuid() => $entity];
+    }, $entities), 'array_merge', []);
 
     return array_map(function ($item) use ($entities) {
-      if (is_array($item['id'])) {
-        return array_reduce($item['id'], function ($carry, $current) use ($entities) {
+      if (is_array($item['uuid'])) {
+        return array_reduce($item['uuid'], function ($carry, $current) use ($entities) {
           if (!empty($entities[$current])) {
             return $carry + [$current => $entities[$current]];
           }
@@ -78,7 +89,7 @@ class EntityBuffer extends BufferBase {
         }, []);
       }
 
-      return isset($entities[$item['id']]) ? $entities[$item['id']] : NULL;
+      return isset($entities[$item['uuid']]) ? $entities[$item['uuid']] : NULL;
     }, $buffer);
   }
 

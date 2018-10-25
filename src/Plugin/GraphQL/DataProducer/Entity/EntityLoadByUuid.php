@@ -8,15 +8,16 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @DataProducer(
- *   id = "entity_load",
- *   name = @Translation("Load entity"),
- *   description = @Translation("Loads a single entity."),
+ *   id = "entity_load_by_uuid",
+ *   name = @Translation("Load entity by Uuid"),
+ *   description = @Translation("Loads a single entity by Uuid."),
  *   produces = @ContextDefinition("entity",
  *     label = @Translation("Entity")
  *   ),
@@ -24,8 +25,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "entity_type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "entity_id" = @ContextDefinition("string",
- *       label = @Translation("Identifier")
+ *     "entity_uuid" = @ContextDefinition("string",
+ *       label = @Translation("Unique identifier")
  *     ),
  *     "entity_language" = @ContextDefinition("string",
  *       label = @Translation("Entity languages(s)"),
@@ -40,7 +41,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.
@@ -59,7 +60,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   /**
    * The entity buffer service.
    *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
+   * @var \Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer
    */
   protected $entityBuffer;
 
@@ -75,7 +76,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('entity.repository'),
-      $container->get('graphql.buffer.entity')
+      $container->get('graphql.buffer.entity_uuid')
     );
   }
 
@@ -92,7 +93,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *   The entity type manager service.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository service.
-   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer $entityBuffer
    *   The entity buffer service.
    *
    * @codeCoverageIgnore
@@ -103,7 +104,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
     $pluginDefinition,
     EntityTypeManager $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
-    EntityBuffer $entityBuffer
+    EntityUuidBuffer $entityBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
@@ -113,17 +114,17 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
 
   /**
    * @param $type
-   * @param $id
-   * @param null $language
-   * @param null $bundles
+   * @param $uuid
+   * @param array|string $language
+   * @param array|string $bundles
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
-    $resolver = $this->entityBuffer->add($type, $id);
+  public function resolve($type, $uuid, $language, $bundles, RefinableCacheableDependencyInterface $metadata) {
+    $resolver = $this->entityBuffer->add($type, $uuid);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $metadata) {
+    return new Deferred(function () use ($type, $language, $bundles, $resolver, $metadata) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.

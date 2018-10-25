@@ -2,13 +2,14 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
+use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
-class EntityBufferTest extends GraphQLTestBase {
+class EntityUuidBufferTest extends GraphQLTestBase {
 
-  protected $nodeIds = [];
+  protected $nodeUuids = [];
 
   /**
    * @var \PHPUnit\Framework\MockObject\MockObject
@@ -23,15 +24,17 @@ class EntityBufferTest extends GraphQLTestBase {
     ])->save();
 
     foreach (range(1, 3) as $i) {
-      $this->nodeIds[] = Node::create([
+      $node = Node::create([
         'title' => 'Node ' . $i,
         'type' => 'test',
-      ])->save();
+      ]);
+      $node->save();
+      $this->nodeUuids[] = $node->uuid();
     }
 
     $schema = <<<GQL
     type Query {
-      node(id: String): Node
+      node(uuid: String): Node
     }
     type Node {
       title: String!
@@ -41,18 +44,18 @@ GQL;
     $this->setUpSchema($schema, $this->getDefaultSchema());
   }
 
-  public function testEntityBuffer() {
+  public function testEntityUuidBuffer() {
     $query = <<<GQL
     query {
-      a:node(id: "1") {
+      a:node(uuid: "{$this->nodeUuids[0]}") {
         title
       }
       
-      b:node(id: "2") {
+      b:node(uuid: "{$this->nodeUuids[1]}") {
         title
       }
       
-      c:node(id: "3") {
+      c:node(uuid: "{$this->nodeUuids[2]}") {
         title
       }
     }
@@ -61,9 +64,9 @@ GQL;
 
     $this->mockField('node', [
       'parent' => 'Query',
-    ], $builder->produce('entity_load', ['mapping' => [
+    ], $builder->produce('entity_load_by_uuid', ['mapping' => [
       'entity_type' => $builder->fromValue('node'),
-      'entity_id' => $builder->fromArgument('id'),
+      'entity_uuid' => $builder->fromArgument('uuid'),
     ]]));
 
     $this->mockField('title', [
