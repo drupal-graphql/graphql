@@ -12,6 +12,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityId;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
@@ -277,4 +278,95 @@ GQL;
 
     $this->assertResults($query, [], ['tree' => ['language' => ['languageContext' => 'language context value']]], $this->defaultCacheMetaData());
   }
+
+  /**
+   * @covers ::cond
+   */
+  public function testSimpleCond() {
+    $builder = new ResolverBuilder();
+    $registry = new ResolverRegistry([]);
+
+    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
+
+    $registry->addFieldResolver('Tree', 'name', $builder->cond([
+      [$builder->fromValue(FALSE), $builder->fromValue('This should not be in the result.')],
+      [$builder->fromValue(TRUE), $builder->fromValue('But this should.')],
+      [$builder->fromValue(TRUE), $builder->fromValue('And this not, event though its true.')],
+    ]));
+
+    $this->schema->expects($this->any())
+      ->method('getResolverRegistry')
+      ->willReturn($registry);
+
+    $query = <<<GQL
+      query {
+        tree {
+          name
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * @covers ::cond
+   */
+  public function testDeferredCond() {
+    $builder = new ResolverBuilder();
+    $registry = new ResolverRegistry([]);
+
+    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
+
+    $registry->addFieldResolver('Tree', 'name', $builder->cond([
+      [$builder->fromValue(FALSE), $builder->fromValue('This should not be in the result.')],
+      [function () { return new Deferred(function () { return TRUE; }); }, $builder->fromValue('But this should.')],
+      [$builder->fromValue(TRUE), $builder->fromValue('And this not, event though its true.')],
+    ]));
+
+    $this->schema->expects($this->any())
+      ->method('getResolverRegistry')
+      ->willReturn($registry);
+
+    $query = <<<GQL
+      query {
+        tree {
+          name
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']], $this->defaultCacheMetaData());
+  }
+
+  /**
+   * @covers ::cond
+   */
+  public function testParentCond() {
+    $builder = new ResolverBuilder();
+    $registry = new ResolverRegistry([]);
+
+    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
+
+    $registry->addFieldResolver('Tree', 'name', $builder->cond([
+      [$builder->fromValue(FALSE), $builder->fromValue('This should not be in the result.')],
+      [$builder->fromParent(), $builder->fromValue('But this should.')],
+      [$builder->fromValue(TRUE), $builder->fromValue('And this not, event though its true.')],
+    ]));
+
+    $this->schema->expects($this->any())
+      ->method('getResolverRegistry')
+      ->willReturn($registry);
+
+    $query = <<<GQL
+      query {
+        tree {
+          name
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']], $this->defaultCacheMetaData());
+  }
 }
+

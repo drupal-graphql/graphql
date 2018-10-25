@@ -68,6 +68,38 @@ class ResolverBuilder {
   }
 
   /**
+   * @param array $branches
+   *
+   * @return \Closure
+   */
+  public function cond(array $branches) {
+    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
+      while (list($condition, $resolver) = array_shift($branches)) {
+        if ($condition instanceof \Closure) {
+          if (($condition = $condition($value, $args, $context, $info)) === NULL) {
+            // Bail out early if a resolver returns NULL.
+            continue;
+          }
+        }
+
+        if ($condition instanceof Deferred) {
+          return DeferredUtility::returnFinally($condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info) {
+            array_unshift($branches, [$cond, $resolver]);
+            return $this->cond($branches)($value, $args, $context, $info);
+          });
+        }
+
+        if ((bool) $condition) {
+          return $resolver($value, $args, $context, $info);
+        }
+      }
+
+      // Functional languages throw exceptions here. Should we just return NULL?
+      return NULL;
+    };
+  }
+
+  /**
    * @param $id
    * @param $config
    *
