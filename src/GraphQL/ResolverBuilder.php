@@ -75,7 +75,7 @@ class ResolverBuilder {
   public function cond(array $branches) {
     return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
       while (list($condition, $resolver) = array_shift($branches)) {
-        if ($condition instanceof \Closure) {
+        if (is_callable($condition)) {
           if (($condition = $condition($value, $args, $context, $info)) === NULL) {
             // Bail out early if a resolver returns NULL.
             continue;
