@@ -63,4 +63,4 @@ http://graphql.org/learn/
 
 **Resources**
 * https://github.com/drupal-graphql/graphql
-* https://drupal.slack.org - The GraphQL Slack Channel is very active
+* https://drupal.slack.com - The GraphQL Slack Channel is very active
