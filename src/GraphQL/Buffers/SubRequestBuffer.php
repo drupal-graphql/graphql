@@ -89,6 +89,7 @@ class SubRequestBuffer extends BufferBase {
       $currentRequest->files->all(),
       $currentRequest->server->all()
     );
+    $request->setRequestFormat('_graphql_subrequest');
 
     $request->attributes->set('_graphql_subrequest', function () use ($buffer) {
       return array_map(function ($item) {
