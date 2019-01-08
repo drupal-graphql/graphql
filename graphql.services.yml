@@ -158,3 +158,9 @@ services:
     arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
     tags:
       - { name: config.factory.override, priority: -253 }
+
+  # Query map provider using the composite pattern.
+  graphql.query_provider:
+    class: Drupal\graphql\GraphQL\QueryProvider\QueryProvider
+    tags:
+    - { name: service_collector, tag: graphql_query_provider, call: addQueryProvider }

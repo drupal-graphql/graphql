@@ -21,7 +21,6 @@ use GraphQL\Executor\Executor;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\Helper;
-use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
 
@@ -346,7 +345,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getPersistedQueryLoader() {
     return function ($id, OperationParams $params) {
-      throw new RequestError('Persisted queries are currently not supported');
+      /* @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider */
+      $queryProvider = \Drupal::service('graphql.query_provider');
+      return $queryProvider->getQuery($id, $params);
     };
   }
 
