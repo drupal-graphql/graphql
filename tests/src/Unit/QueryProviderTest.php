@@ -37,6 +37,9 @@ class QueryProviderTest extends UnitTestCase {
     $queryProvider->addQueryProvider($queryProviderB->reveal(), 10);
     $query = $queryProvider->getQuery('', $operationParams);
     $this->assertEquals('query_A', $query);
+
+    $queryProvider = new QueryProvider();
+    $this->assertNull($queryProvider->getQuery('', $operationParams));
   }
 
 }
