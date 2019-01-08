@@ -3,3 +3,9 @@ graphql.config:
   description: 'Configuration options for the GraphQL module.'
   route_name: entity.graphql_server.collection
   parent: system.admin_config_services
+
+graphql.query_maps:
+  title: 'GraphQL Query maps'
+  description: 'Query map configuration.'
+  parent: system.admin_config_services
+  route_name: graphql.query_maps

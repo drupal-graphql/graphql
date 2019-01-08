@@ -64,5 +64,14 @@ entity.graphql_server.delete_form:
   options:
     _admin_route: TRUE
 
+graphql.query_maps:
+  path: '/admin/config/graphql-query-maps'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'GraphQL Query maps'
+  requirements:
+    _permission: 'administer site configuration'
+
+
 route_callbacks:
   - graphql.route_provider::routes
