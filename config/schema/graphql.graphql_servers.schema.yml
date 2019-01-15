@@ -1,3 +1,85 @@
+_graphql.arguments.array:
+  type: sequence
+  label: 'arguments'
+  sequence:
+    name:
+      type: string
+      label: 'name'
+    value:
+      type: mapping
+      label: 'value'
+      mapping:
+        id:
+          type: string
+          label: 'id'
+
+_graphql.arguments.string:
+  type: sequence
+  label: 'arguments'
+  sequence:
+    name:
+      type: string
+      label: 'name'
+    value:
+      type: string
+      label: 'value'
+
+_graphql.argument_value:
+  type: mapping
+  label: 'value'
+  mapping:
+    id:
+      type: string
+      label: 'id'
+    arguments:
+      type: _graphql.arguments.[type]
+
+
+_graphql.arguments:
+  type: sequence
+  label: 'arguments'
+  sequence:
+    name:
+      type: string
+      label: 'name'
+    value:
+      type: _graphql.argument_value
+
+_graphql.fields:
+  type: sequence
+  label: 'arguments'
+  sequence:
+    name:
+      type: string
+      label: 'name'
+    value:
+      type: _graphql.argument_value
+
+_graphql.config_type.types:
+  type: mapping
+  label: 'types'
+  nullable: true
+  mapping:
+    name:
+      type: string
+      label: 'name'
+    fields:
+      type: _graphql.fields
+
+_graphql.config_type.interfaces:
+  type: mapping
+  label: 'interfaces'
+  nullable: true
+  mapping:
+    name:
+      type: string
+      label: 'name'
+    id:
+      type: string
+      label: 'id'
+    arguments:
+      type: _graphql.arguments
+
 graphql.graphql_servers.*:
   type: config_entity
   label: 'Server'
@@ -20,3 +102,9 @@ graphql.graphql_servers.*:
     batching:
       type: boolean
       label: 'Batching'
+    schema_config:
+      type: sequence
+      label: 'Schema config'
+      sequence:
+        graphql_types:
+          type: _graphql.config_type.[type]
