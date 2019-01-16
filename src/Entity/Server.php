@@ -34,7 +34,8 @@ use GraphQL\Validator\DocumentValidator;
  *     "schema",
  *     "endpoint",
  *     "debug",
- *     "batching"
+ *     "batching",
+ *     "schema_config"
  *   },
  *   links = {
  *     "collection" = "/admin/config/graphql/servers",
@@ -80,6 +81,14 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var string
    */
   public $endpoint;
+
+
+  /**
+   * The server's schema.
+   *
+   * @var array
+   */
+  public $schemaConfig;
 
   /**
    * {@inheritdoc}
