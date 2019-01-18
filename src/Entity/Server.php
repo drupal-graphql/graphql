@@ -81,14 +81,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var string
    */
   public $endpoint;
-
-
+  
   /**
-   * The server's schema.
+   * The server's schema configuration.
    *
    * @var array
    */
-  public $schemaConfig;
+  public $schema_config;
 
   /**
    * {@inheritdoc}
