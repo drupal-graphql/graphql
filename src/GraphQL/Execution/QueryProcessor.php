@@ -197,12 +197,6 @@ class QueryProcessor {
         throw new RequestError('GET requests are only supported for query operations.');
       }
 
-      // If one of the validation rules found any problems, do not resolve the
-      // query and bail out early instead.
-      if ($errors = $this->validateOperation($config, $params, $document)) {
-        return $adapter->createFulfilled(new QueryResult(NULL, $errors));
-      }
-
       // Only queries can be cached (mutations and subscriptions can't).
       if ($type === 'query') {
         return $this->executeCacheableOperation($adapter, $config, $params, $document);
@@ -283,6 +277,12 @@ class QueryProcessor {
    * @return \GraphQL\Executor\Promise\Promise
    */
   protected function doExecuteOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document) {
+    // If one of the validation rules found any problems, do not resolve the
+    // query and bail out early instead.
+    if ($errors = $this->validateOperation($config, $params, $document)) {
+      return $adapter->createFulfilled(new QueryResult(NULL, $errors));
+    }
+
     $operation = $params->operation;
     $variables = $params->variables;
     $context = $this->resolveContextValue($config, $params, $document, $operation);
