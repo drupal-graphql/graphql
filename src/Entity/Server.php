@@ -102,7 +102,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public function configuration() {
     $manager = \Drupal::service('plugin.manager.graphql.schema');
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    $plugin = $manager->createInstance($this->get('schema'));
+    $plugin = $manager->createInstance($this->get('schema'), ['schema_config' => $this->schema_config]);
 
     // Create the server config.
     $config = ServerConfig::create();
