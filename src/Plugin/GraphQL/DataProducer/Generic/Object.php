@@ -60,4 +60,5 @@ class Object extends DataProducerPluginBase implements ContainerFactoryPluginInt
   public function resolve($value) {
     return $value;
   }
+
 }

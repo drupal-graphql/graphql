@@ -3,7 +3,9 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Generic;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -63,7 +65,10 @@ class Argument extends DataProducerPluginBase implements ContainerFactoryPluginI
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
-  public function resolve($value) {
-    return $value;
+  public function __invoke($value, $args, ResolveContext $context, ResolveInfo $info) {
+    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name) {
+      return $args[$name] ?? NULL;
+    };
   }
+
 }

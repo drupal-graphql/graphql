@@ -63,4 +63,5 @@ class Value extends DataProducerPluginBase implements ContainerFactoryPluginInte
   public function resolve($value) {
     return $value;
   }
+
 }

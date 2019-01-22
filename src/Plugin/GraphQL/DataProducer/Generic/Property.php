@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     multiple = TRUE
  *   ),
  *   consumes = {
- *     "value" = @ContextDefinition("value",
- *       label = @Translation("Value")
- *     ),
  *     "value" = @ContextDefinition("property",
  *       label = @Translation("Property")
  *     ),
@@ -63,7 +60,9 @@ class Property extends DataProducerPluginBase implements ContainerFactoryPluginI
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
-  public function resolve($value) {
+  public function resolve($value, $property) {
+    // Check then return prop from object.
     return $value;
   }
+
 }

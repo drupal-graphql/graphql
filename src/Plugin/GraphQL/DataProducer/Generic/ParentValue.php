@@ -2,8 +2,11 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Generic;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   )
  * )
  */
-class ParentObject extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class ParentValue extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
@@ -52,7 +55,11 @@ class ParentObject extends DataProducerPluginBase implements ContainerFactoryPlu
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
-  public function resolve($value) {
+  public function __invoke($value, $args, ResolveContext $context, ResolveInfo $info) {
+    if ($value instanceof CacheableDependencyInterface) {
+      $context->addCacheableDependency($value);
+    }
     return $value;
   }
+
 }
