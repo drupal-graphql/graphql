@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SubRequestBuffer extends BufferBase {
 
