@@ -98,7 +98,7 @@ GQL;
     foreach ($schema_config as $base_type => $config) {
       foreach ($config as $item) {
         if ($base_type == 'interfaces') {
-          $registry->addTypeResolver($item['name'], $this->buildTypeResolver($item));
+          $registry->addTypeResolver($item['name'], $this->buildTypeResolver($item['id'], $item['arguments']));
         }
         if ($base_type == 'types') {
           foreach ($item['fields'] as $field) {
@@ -108,6 +108,19 @@ GQL;
       }
     }
     return $registry;
+  }
+
+  /**
+   * @param $id
+   * @param $config_item
+   *
+   * @return callable
+   */
+  protected function buildTypeResolver($id, $config_item) {
+    $builder = $this->getBuilder();
+    return $builder->produce($id, [
+      'mapping' => $this->parseValueByArgs($id, $config_item['arguments'])
+    ]);
   }
 
   protected function buildFieldResolver(array $field_config) {
@@ -134,9 +147,9 @@ GQL;
     $builder = $this->getBuilder();
     $mapping = [];
     foreach ($arguments as $argument) {
-      if (is_array($argument['value'])) {
-        $mapping[$argument['name']] = $this->parseValueByArgs($argument['value']['id'], $argument['value']['arguments'] ?? []);
-      }
+//      if (is_array($argument['value'])) {
+//        $mapping[$argument['name']] = $this->parseValueByArgs($argument['value']['id'], $argument['value']['arguments'] ?? []);
+//      }
       if (is_string($argument['value'])) {
         if ($argument['name'] == 'parent') {
           $mapping[$argument['name']] = $builder->fromParent();
@@ -150,11 +163,6 @@ GQL;
       }
     }
     return $mapping;
-  }
-
-  protected function buildTypeResolver($config_item) {
-    return function () {
-    };
   }
 
   /**
