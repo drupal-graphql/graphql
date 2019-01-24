@@ -60,9 +60,17 @@ class Property extends DataProducerPluginBase implements ContainerFactoryPluginI
     parent::__construct($configuration, $pluginId, $pluginDefinition);
   }
 
-  public function resolve($value, $property) {
-    // Check then return prop from object.
-    return $value;
+  /**
+   * @param $object
+   * @param $property
+   *
+   * @return mixed|null
+   */
+  public function resolve($object, $property) {
+    if (!property_exists($object, $property)) {
+      return NULL;
+    }
+    return $object->{$property};
   }
 
 }
