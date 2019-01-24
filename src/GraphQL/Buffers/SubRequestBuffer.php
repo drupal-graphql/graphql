@@ -4,11 +4,12 @@ namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Routing\LocalRedirectResponse;
+use Drupal\graphql\GraphQL\Buffers\SubRequestResponse;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SubRequestBuffer extends BufferBase {
 
@@ -73,7 +74,20 @@ class SubRequestBuffer extends BufferBase {
       'age' => $url->getCacheMaxAge(),
     ]));
   }
-  
+
+  /**
+   * Create a sub-request for the given url.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $current
+   *   The current main request.
+   * @param string $url
+   *   The url to run the subrequest on.
+   * @param array $buffer
+   *   The buffer.
+   *
+   * @return \Symfony\Component\HttpFoundation\Request
+   *   The request object.
+   */
   protected function createRequest(Request $current, array $buffer, $url) {
     $request = Request::create(
       $url,
@@ -111,10 +125,14 @@ class SubRequestBuffer extends BufferBase {
     
     /** @var \Drupal\graphql\GraphQL\Buffers\SubRequestResponse $response */
     $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-    while ($response instanceof RedirectResponse) {
+    while ($response instanceof LocalRedirectResponse) {
       $target = $response->getTargetUrl();
       $request = $this->createRequest($current, $buffer, $target);
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+    }
+    
+    if (!($response instanceof SubRequestResponse)) {
+      return array_fill_keys(array_keys($buffer), NULL);
     }
 
     // TODO:
