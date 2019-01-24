@@ -1,0 +1,129 @@
+# These examples assume the existence of some generic data producer plugins:
+# - object: create an object with the provided arguments as properties
+# - prop: pluck a named property from an object
+# - argument: read an input argument value
+# - parent: provide the currently processed node value
+# - entity_load: load an entity by id and type
+# - value: provide a hard coded value
+
+# "Node" is an interface, therefore it has only one resolver, to determine its actual type.
+#
+# Schema:
+#    interface Node { ... }
+#    type Page implements Node { ... }
+#    type Article implements Node { ... }
+#
+# Functional representation:
+#    prop(object({article: 'Article', page: 'Page'}), prop(parent(), 'type'))
+#
+# Result:
+#    $registry->addTypeResolver('Node', $builder->produce('property', ['mapping' => [
+#      'object' => $builder->produce('object', ['mapping' => [
+#        'article' => $builder->produce('value', ['mapping' => [ 'value' => 'Article']]),
+#        'page' => $builder->produce('value', ['mapping' => [ 'value' => 'Page']]),
+#      ]]),
+#      'property' => $builder->produce('property', ['mapping' => [
+#        'object' => $builder->produce('parent', []),
+#        'property' => $builder->produce('value', ['mapping' => [ 'value' => 'type']]),
+#      ]]),
+#    ]]));
+interfaces:
+- name: Node
+  id: 'property'
+  arguments:
+    - name: object
+      value:
+        id: 'object'
+        arguments:
+          - { name: 'article', value: 'Article' }
+          - { name: 'page', value: 'Page' }
+    - name: property
+      value:
+        id: 'property'
+        arguments:
+          - name: object
+            value:
+              id: 'parent'
+          - name: property
+            value: 'type'
+
+# The root query type exposes one field called "page" which pipes the its id arguments along with a static value
+# for the type into the generic "entity_load" data producer.
+#
+# Schema:
+#    type Query {
+#      page(id: String!) : Node
+#    }
+#
+# Functional representation:
+#    entity_load(arg('id'), 'node')
+#
+# Result:
+#    $registry->addFieldResolver('Query', 'page', $builder->produce('entity_load', ['mapping' => [
+#      'entity_id' => $builder->produce('argument', ['mapping' => [
+#        'argument' => $builder->produce('value', ['mapping' => [ 'value' => 'id']]),
+#      ]]),
+#      'entity_type' => $builder->produce('value', ['mapping' => [ 'value' => 'type']]),
+#    ]]));
+types:
+- name: Query
+  fields:
+    - name: page
+      value:
+        id: 'entity_load'
+        arguments:
+          - name: entity_id
+            value:
+              id: 'argument'
+              arguments:
+                - name: 'argument'
+                  value: 'id'
+          - name: entity_type
+            value: 'node'
+
+# The Page type exposes a title and body field. The latter is nested within a complex typed data property.
+# This is an example of more complex nested resolvers.
+#
+# Schema:
+#    type Page implements Node {
+#      title: String!
+#      body: String
+#    }
+- name: Page
+  fields:
+    # Functional representation:
+    #    prop(parent(), 'entity_label')
+    # Result:
+    #    $registry->addFieldResolver('Page', 'title', $builder->produce('prop', ['mapping' => [
+    #      'object' => $builder->produce('parent', []),
+    #      'property' => $builder->produce('value', ['mapping' => [ 'value' => 'entityLabel']]),
+    #    ]]));
+    - name: title
+      value:
+        id: 'property'
+        arguments:
+          - name: object
+            value:
+              id: 'parent'
+          - name: property
+            value: 'entityLabel'
+    # Functional representation:
+    #    prop(prop(parent(), 'body'), 'processed')
+    # Result:
+    #
+    - name: body
+      value:
+        id: 'property'
+        arguments:
+          - name: object
+            value:
+              id: 'property'
+              arguments:
+                - name: object
+                  value:
+                    id: 'parent'
+                - name: property
+                  value: 'body'
+          - name: property
+            value: 'processed'
+
