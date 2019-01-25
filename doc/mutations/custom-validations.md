@@ -3,7 +3,7 @@ One aspect that is important to consider when creating mutations is providing go
 
 ## CreateEntitybase plugin access
 
-The "CreateEntityBase" plugin does a entity access check in its resolveOutput method, so it will validate if a user is trying to create an entity it does not have access to and fail if that happens with a message :  **"You do not have the necessary permissions to create entities of this type."**However you might have some other logic you want to perform, for example check that a user has done something else before he can peform this action, some kind of custom validation or a simpel field access check, so that maybe a user that has no access to a particular field give his role fails accordingly.
+The "CreateEntityBase" plugin does a entity access check in its resolveOutput method, so it will validate if a user is trying to create an entity it does not have access to and fail if that happens with a message : "You do not have the necessary permissions to create entities of this type." However you might have some other logic you want to perform, for example check that a user has done something else before he can peform this action, some kind of custom validation or a simpel field access check, so that maybe a user that has no access to a particular field give his role fails accordingly.
 
 You can make custom validations by implementing your own "resolveOutput" method inside your mutation. 
 
