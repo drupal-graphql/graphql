@@ -3,7 +3,9 @@ One aspect that is important to consider when creating mutations is providing go
 
 ## CreateEntitybase plugin access
 
-The "CreateEntityBase" plugin does a entity access check in its resolveOutput method, so it will validate if a user is trying to create an entity it does not have access to and fail if that happens with a message : "You do not have the necessary permissions to create entities of this type." However you might have some other logic you want to perform, for example check that a user has done something else before he can peform this action, some kind of custom validation or a simpel field access check, so that maybe a user that has no access to a particular field give his role fails accordingly.
+The **CreateEntityBase** plugin does a entity access check in it's resolveOutput method, so it will validate if a user is trying to create an entity it does not have access to and fail if that happens with a message :  **"You do not have the necessary permissions to create entities of this type."**
+
+However you might have some other logic you want to perform, for example check that a user has done something else before he can peform this action, some kind of custom validation or a simple field access check, so that maybe a user that has no access to a particular field give his role fails accordingly.
 
 You can make custom validations by implementing your own "resolveOutput" method inside your mutation. 
 
@@ -11,7 +13,7 @@ You can make custom validations by implementing your own "resolveOutput" method 
 
 Graphql mutations by default return 3 things : 
 
-*  data - The data that was returned by the mutation. what the consumer of the mutation asked for when running it (if sucessful)
+*  data - The data that was returned by the mutation. what the consumer of the mutation asked for when running it (if sucessfull)
 *  errors - If an error occured in Drupal (an exception) it will be added to the errors array.
 *  violations - Violations are a useful way to provide error messages to users, nothing "crashed" but something went wrong and the user can't do the operation. Maybe he has no access or something else.
 
@@ -61,4 +63,4 @@ See the following error for an example of a situation where a user tries updatin
 }
 ```
 
-In this case it was decided to fail creating the entity "Credit" because the user does not have accesss to fields he is trying to create, but instead of only providing the generic message : "You do not have the necessary permissions to create some fields for this entity." some extra information is added specifying which exact fields failed and why.
+In this case it was decided to fail creating the entity **Credit** because the user does not have accesss to fields he is trying to create, but instead of only providing the generic message : *"You do not have the necessary permissions to create some fields for this entity."* some extra information is added specifying which exact fields failed and why.

@@ -1,14 +1,14 @@
 # The MutationPluginBase plugin
 
-Not all mutations directly related to an entity, and often you might need to perform operations on a mutation that are not necessarily creating a new entity in Drupal. For these cases you can use the **MutationPluginBase** plugin and extend that instead of extending the **CreateEntityBase** we saw before.
+Not all mutations directly related to an entity, and often you might need to perform operations on a mutation that are not necessarily creating, updating or deleting an Entity in Drupal. For these cases you can use the **MutationPluginBase** plugin and extend that instead of extending the **CreateEntityBase** as we saw on *Creating mutations for Entities*.
 
 The mutation itself wouldn't be too different from what we did previously, you can see an example in the [Examples repo](https://github.com/drupal-graphql/graphql-examples/blob/master/src/Plugin/GraphQL/Mutations/FileUpload.php) of a file upload mutation. 
 
 ## Resolve method
 
-One important method of the MutationPluginBase is the resolve method where we similar to our "extractEntityInput" above we get access to the arguments passed to the mutation and we can then perform the operation we want on Drupal.
+One important method of the MutationPluginBase is the resolve method where we, similar to our "extractEntityInput" above,  get access to the arguments passed to the mutation and we can then perform the operation we want on Drupal.
 
-Lets look at an example that will perform an operation of buying a car, the operation itself exsits on a service so its not really important what it does but what is important is that in the resolve method we take the "car" from our arguments (defined in the anotation as seen above) and we call our "garage" service and pass it the car : 
+Lets look at an example that will perform an operation of buying a car. The operation itself exsits on a service so its not really important to look at the details of that operation, but what is important is that in the resolve method we take the **car** from our arguments (defined in the anotation as seen above) and we call our **garage** service and pass it the car : 
 
 ```
 <?php
