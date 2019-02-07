@@ -36,7 +36,7 @@ added to the module recently. As we are finishing up the 3.x version of this
 module we will be re-doing the documentation and record a series of screencasts.
 
 These blog posts provide additional information on how to use and extend the module
-as well as other other contributed modules supporting it:
+as well as other contributed modules supporting it:
 
 * [https://www.amazeelabs.com/en/blog/graphql-introduction](https://www.amazeelabs.com/en/blog/graphql-introduction)
 * [https://www.amazeelabs.com/en/blog/drupal-graphql-react-apollo](https://www.amazeelabs.com/en/blog/drupal-graphql-react-apollo)
