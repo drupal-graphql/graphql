@@ -11,7 +11,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  * @GraphQLField(
  *   id = "entity_reference_query",
  *   secure = true,
- *   type = "EntityQueryResult!",
+ *   type = "EntityQueryResult",
  *   arguments = {
  *     "filter" = "EntityQueryFilterInput",
  *     "sort" = "[EntityQuerySortInput]",
