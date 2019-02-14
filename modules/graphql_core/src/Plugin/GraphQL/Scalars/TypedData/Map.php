@@ -20,6 +20,9 @@ class Map extends ScalarPluginBase {
     if (is_array($value)) {
       return json_encode($value);
     }
+    if (is_string($value) && json_decode($value)) {
+      return $value;
+    }
 
     return NULL;
   }
