@@ -20,11 +20,13 @@ Let's look at what the code for this plugin looks like :
 
 ```
 <?php
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\Mutations;
 use Drupal\graphql\Annotation\GraphQLMutation;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\CreateEntityBase;
 use GraphQL\Type\Definition\ResolveInfo;
+
 /**
  * Simple mutation for creating a new article node.
  *
@@ -41,6 +43,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  * )
  */
 class CreateArticle extends CreateEntityBase {
+
   /**
    * {@inheritdoc}
    */
@@ -55,6 +58,7 @@ class CreateArticle extends CreateEntityBase {
       'body' => $args['input']['body'],
     ];
   }
+
 }
 ```
 
@@ -90,11 +94,13 @@ Let's continue with our article example. In this case we implement a mutation to
 
 ```
 <?php
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\Mutations;
 use Drupal\graphql\Annotation\GraphQLMutation;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\UpdateEntityBase;
 use GraphQL\Type\Definition\ResolveInfo;
+
 /**
  * Simple mutation for updating an existing article node.
  *
@@ -112,6 +118,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  * )
  */
 class UpdateArticle extends UpdateEntityBase {
+
   /**
    * {@inheritdoc}
    */
@@ -126,6 +133,7 @@ class UpdateArticle extends UpdateEntityBase {
       'body' => $args['input']['body'],
     ]);
   }
+
 }
 ```
 
@@ -138,8 +146,10 @@ The only thing left now is really to delete the entity right? This is the simple
 
 ```
 <?php
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\Mutations;
 use Drupal\graphql_core\Plugin\GraphQL\Mutations\Entity\DeleteEntityBase;
+
 /**
  * Simple mutation for deleting an article node.
  *
@@ -167,8 +177,10 @@ We know from the examples above that we need to define the arguments for mutatio
 
 ```
 <?php
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\InputTypes;
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
+
 /**
  * The input type for article mutations.
  *
