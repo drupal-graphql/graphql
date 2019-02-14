@@ -46,7 +46,9 @@ class PropertyPath extends DataProducerPluginBase {
    */
   public function resolve($path, $type, $value, RefinableCacheableDependencyInterface $metadata) {
     $bubbleable = new BubbleableMetadata();
-    $data = $this->getTypedDataManager()->create(DataDefinition::create($type), $value);
+    $manager = $this->getTypedDataManager();
+    $definition = $manager->createDataDefinition($type);
+    $data = $manager->create($definition, $value);
     $fetcher = $this->getDataFetcher();
 
     try {
