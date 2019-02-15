@@ -138,19 +138,11 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
    *   The deferred resolver.
    */
   protected function resolveFromEntityIds($type, $ids, $metadata, array $args, ResolveContext $context, ResolveInfo $info) {
-    $resolve = $this->entityBuffer->add($type, $ids);
-    $resolve_array = $resolve();
-
-    // If there are multiple ids, then we sort after the original sorting order.
     $entity_ids = $context->getContext('entity_ids', $info, FALSE);
-    if ($entity_ids && is_array($entity_ids)) {
-      uksort($resolve_array, function($a,$b) use ($entity_ids) {
-        return (array_search($a,$entity_ids) > array_search($b,$entity_ids));
-      });
-    }
-
-    return function($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve_array, $metadata) {
-      return $this->resolveEntities($resolve_array, $metadata, $args,  $context, $info);
+    $ids = ($entity_ids) ? $entity_ids : $ids;
+    $resolve = $this->entityBuffer->add($type, $ids);
+    return function($value, array $args, ResolveContext $context, ResolveInfo $info) use ($resolve, $metadata) {
+      return $this->resolveEntities($resolve(), $metadata, $args,  $context, $info);
     };
   }
 
