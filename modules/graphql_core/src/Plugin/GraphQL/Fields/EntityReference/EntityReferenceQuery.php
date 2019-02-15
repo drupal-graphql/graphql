@@ -55,6 +55,9 @@ class EntityReferenceQuery extends EntityQuery {
       $operator = is_array($ids) ? 'IN' : '=';
       $query->condition($key, $ids, $operator);
 
+      // Add the original sorting order to the context.
+      $context->setContext('entity_ids', $ids, $info);
+
       return $query;
     }
   }
