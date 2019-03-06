@@ -9,7 +9,6 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 
 class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInterface, PluginFormInterface, DataProducerPluginInterface {
-  use DataProducerTrait;
 
   /**
    * {@inheritdoc}

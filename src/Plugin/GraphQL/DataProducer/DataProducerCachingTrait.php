@@ -10,6 +10,7 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use GraphQL\Type\Definition\ResolveInfo;
 
+// TODO: Remove trait. Move to DataProducerPluginBase or DataProducerProxy.
 trait DataProducerCachingTrait {
 
   /**
