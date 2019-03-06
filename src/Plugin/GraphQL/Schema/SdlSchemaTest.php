@@ -81,9 +81,9 @@ GQL;
 
     $registry->addFieldResolver('Query', 'article',
       $builder->produce('entity_load', ['mapping' => [
-        'entity_type' => $builder->fromValue('node'),
-        'entity_bundle' => $builder->fromValue(['article']),
-        'entity_id' => $builder->fromArgument('id'),
+        'type' => $builder->fromValue('node'),
+        'bundles' => $builder->fromValue(['article']),
+        'id' => $builder->fromArgument('id'),
       ]])
     );
 

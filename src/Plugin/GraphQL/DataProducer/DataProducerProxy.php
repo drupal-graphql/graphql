@@ -14,6 +14,13 @@ use Drupal\graphql\Plugin\DataProducerPluginManager;
 class DataProducerProxy implements DataProducerInterface {
 
   /**
+   * Plugin manager.
+   *
+   * @var \Drupal\graphql\Plugin\DataProducerPluginManager
+   */
+  protected $manager;
+
+  /**
    * Construct DataProducerProxy object.
    * @param string $id      DataProducer plugin id.
    * @param array $config   Plugin configuration.
@@ -41,7 +48,8 @@ class DataProducerProxy implements DataProducerInterface {
    * @inheritdoc.
    */
   public function resolve($value, $args, $context, $info) {
-    $values = DeferredUtility::waitAll($this->getInputValues($value, $args, $context, $info));
+    $values = DeferredUtility::waitAll($this->getArguments($value, $args, $context, $info));
+
     return DeferredUtility::returnFinally($values, function ($values) use ($context, $info) {
       $metadata = new CacheableMetadata();
       $metadata->addCacheContexts(['user.permissions']);
@@ -171,43 +179,49 @@ class DataProducerProxy implements DataProducerInterface {
     ]);
   }
 
-  protected function getArguments() {
-    // TODO: implement instead of using getInputValues.
-  }
-
   /**
+   * Returns the arguments to pass to the plugin.
+   *
    * @param $value
    * @param $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
-   * @return array|\GraphQL\Deferred
+   * @return array Arguments to use.
    * @throws \Exception
    */
-  protected function getInputValues($value, $args, ResolveContext $context, ResolveInfo $info) {
+  protected function getArguments($value, $args, ResolveContext $context, ResolveInfo $info) {
+    $definition = $this->manager->getDefinition($this->id);
+    $class = $definition['class'];
+
+    // TODO: Use dynamic method name.
+    $r = new \ReflectionMethod('\\' . $class, 'resolve');
+    $params = $r->getParameters();
     $values = [];
 
-    $plugin = $this->getPlugin();
-    $definitions = $plugin->getPluginDefinition();
+    foreach ($params as $param) {
+      $key = $param->getName();
 
-    $consumes = isset($definitions['consumes']) ? $definitions['consumes'] : [];
-    foreach ($consumes as $key => $definition) {
-      if ($definition->isRequired() && !$this->hasInputMapper($key)) {
-        throw new \Exception(sprintf('Missing input data mapper for %s on field %s on type %s.', $key, $info->fieldName, $info->parentType->name));
+      // Do not process metadata argument.
+      if ($key == 'metadata') {
+        continue;
       }
-
+      if (!$param->isDefaultValueAvailable() && !$this->hasInputMapper($key)) {
+        throw new \Exception(sprintf('Missing input data mapper for argument %s.', $key));
+      }
       $mapper = $this->getInputMapper($key);
 
       if (isset($mapper) && !$mapper instanceof DataProducerCallable) {
-        throw new \Exception(sprintf('Invalid input mapper for %s on field %s on type %s. Input mappers need to be callable.', $key, $info->fieldName, $info->parentType->name));
+        throw new \Exception(sprintf('Invalid input mapper for argument %s.', $key));
       }
 
+      // Resolve argument value.
       $values[$key] = isset($mapper) ? $mapper->resolve($value, $args, $context, $info) : NULL;
-      if ($definition->isRequired() && !isset($values[$key])) {
-        throw new \Exception(sprintf('Missing input data for %s on field %s on type %s.', $key, $info->fieldName, $info->parentType->name));
+
+      if (!$param->isDefaultValueAvailable() && !isset($values[$key])) {
+        throw new \Exception(sprintf('Missing input data for argument %s on field %s on type %s.', $key));
       }
     }
-
     return $values;
   }
 
@@ -217,11 +231,7 @@ class DataProducerProxy implements DataProducerInterface {
    * @return boolean
    */
   protected function hasInputMapper($from) {
-    if (!($this->plugin instanceof ConfigurablePluginInterface)) {
-      return FALSE;
-    }
-
-    return isset($this->plugin->getConfiguration()['mapping'][$from]);
+    return isset($this->config['mapping'][$from]);
   }
 
   /**
@@ -230,7 +240,7 @@ class DataProducerProxy implements DataProducerInterface {
    * @return callable|null
    */
   protected function getInputMapper($from) {
-    return $this->plugin->getConfiguration()['mapping'][$from] ?? NULL;
+    return $this->config['mapping'][$from] ?? NULL;
   }
 
 }
