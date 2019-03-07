@@ -121,7 +121,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $uuid, $language, $bundles, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($type, $uuid, $language = NULL, $bundles = [], RefinableCacheableDependencyInterface $metadata) {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $metadata) {

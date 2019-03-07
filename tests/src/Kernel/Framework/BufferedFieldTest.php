@@ -9,6 +9,7 @@ use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\graphql\GraphQL\ResolverBuilder;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
 
 /**
  * Test batched field resolving.
@@ -89,9 +90,9 @@ GQL;
       'parent' => 'User',
     ], $builder->compose(
         $builder->fromParent(),
-        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['name'];
-        }
+        })
       )
     );
 

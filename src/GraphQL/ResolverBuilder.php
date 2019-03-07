@@ -35,11 +35,11 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function tap(callable $callback) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($callback) {
-      $callback($value, $args, $context, $info);
+  public function tap(DataProducerInterface $callback) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($callback) {
+      $callback->resolve($value, $args, $context, $info);
       return $value;
-    };
+    });
   }
 
   /**
@@ -48,12 +48,12 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function context($name, callable $source = NULL) {
-    return $this->tap(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $source) {
+  public function context($name, DataProducerInterface $source = NULL) {
+    return $this->tap(new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $source) {
       $source = $source ?? $this->fromParent();
-      $value = $source($value, $args, $context, $info);
+      $value = $source->resolve($value, $args, $context, $info);
       $context->setContext($name, $value, $info);
-    });
+    }));
   }
 
   /**
@@ -62,10 +62,10 @@ class ResolverBuilder {
    * @return \Closure
    */
   public function cond(array $branches) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
       while (list($condition, $resolver) = array_pad(array_shift($branches), 2, NULL)) {
-        if (is_callable($condition)) {
-          if (($condition = $condition($value, $args, $context, $info)) === NULL) {
+        if ($condition instanceof DataProducerInterface) {
+          if (($condition = $condition->resolve($value, $args, $context, $info)) === NULL) {
             // Bail out early if a resolver returns NULL.
             continue;
           }
@@ -79,13 +79,13 @@ class ResolverBuilder {
         }
 
         if ((bool) $condition) {
-          return $resolver ? $resolver($value, $args, $context, $info) : $condition;
+          return $resolver ? $resolver->resolve($value, $args, $context, $info) : $condition;
         }
       }
 
       // Functional languages throw exceptions here. Should we just return NULL?
       return NULL;
-    };
+    });
   }
 
   /**
@@ -107,10 +107,10 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function fromPath($type, $path, callable $value = NULL) {
-    return function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($type, $path, $value) {
+  public function fromPath($type, $path, DataProducerInterface $value = NULL) {
+    return new DataProducerCallable(function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($type, $path, $value) {
       $value = $value ?? $this->fromParent();
-      $value = $value($parent, $args, $context, $info);
+      $value = $value->resolve($parent, $args, $context, $info);
       $metadata = new BubbleableMetadata();
 
       $type = $type instanceof DataDefinitionInterface ? $type : DataDefinition::create($type);
@@ -123,7 +123,7 @@ class ResolverBuilder {
       }
 
       return $output;
-    };
+    });
   }
 
   /**
