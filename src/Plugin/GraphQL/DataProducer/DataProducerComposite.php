@@ -4,11 +4,17 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Data producers composition.
+ */
 class DataProducerComposite implements DataProducerInterface {
 
   /**
    * DataProducerProxy objects.
+   *
    * @var array
    */
   private $resolvers = [];
@@ -16,15 +22,18 @@ class DataProducerComposite implements DataProducerInterface {
   /**
    * Construct DataProducerComposit object.
    *
-   * @param array $resolvers Array of Data Producers.
+   * @param array $resolvers
+   *   Array of Data Producers.
    */
-  public function __construct($resolvers) {
+  public function __construct(array $resolvers) {
     $this->resolvers = $resolvers;
   }
 
   /**
    * Add one more producer.
-   * @param DataProducerProxy $resolver DataProducerProxy object.
+   *
+   * @param DataProducerProxy $resolver
+   *   DataProducerProxy object.
    */
   public function add(DataProducerProxy $resolver) {
     $this->resolvers[] = $resolver;
@@ -33,7 +42,7 @@ class DataProducerComposite implements DataProducerInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, $context, $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
     $resolvers = $this->resolvers;
     while ($resolver = array_shift($resolvers)) {
       $value = $resolver->resolve($value, $args, $context, $info);

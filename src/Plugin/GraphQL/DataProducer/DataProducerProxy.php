@@ -11,6 +11,9 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
 
+/**
+ * Data producers proxy class.
+ */
 class DataProducerProxy implements DataProducerInterface {
 
   /**
@@ -22,20 +25,24 @@ class DataProducerProxy implements DataProducerInterface {
 
   /**
    * Construct DataProducerProxy object.
-   * @param string $id      DataProducer plugin id.
-   * @param array $config   Plugin configuration.
-   * @param \Drupal\graphql\Plugin\DataProducerPluginManager $manager DataProducer manager.
+   *
+   * @param string $id
+   *   DataProducer plugin id.
+   * @param array $config
+   *   Plugin configuration.
+   * @param \Drupal\graphql\Plugin\DataProducerPluginManager $manager
+   *   DataProducer manager.
    */
-  public function __construct($id, $config, DataProducerPluginManager $manager) {
+  public function __construct($id, array $config, DataProducerPluginManager $manager) {
     $this->id = $id;
     $this->config = $config;
     $this->manager = $manager;
   }
 
   /**
-   * @inheritdoc.
+   * {@inheritdoc}
    */
-  public function resolve($value, $args, $context, $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
     $values = DeferredUtility::waitAll($this->getArguments($value, $args, $context, $info));
     return DeferredUtility::returnFinally($values, function ($values) use ($context, $info) {
       $metadata = new CacheableMetadata();
@@ -58,7 +65,9 @@ class DataProducerProxy implements DataProducerInterface {
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
-   * @return array Arguments to use.
+   * @return array
+   *   Arguments to use.
+   *
    * @throws \Exception
    */
   protected function getArguments($value, $args, ResolveContext $context, ResolveInfo $info) {
