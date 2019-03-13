@@ -12,6 +12,10 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerComposite;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
 
 class ResolverBuilder {
   use TypedDataTrait;
@@ -22,20 +26,8 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function compose(callable ...$resolvers) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($resolvers) {
-      while ($resolver = array_shift($resolvers)) {
-        $value = $resolver($value, $args, $context, $info);
-
-        if ($value instanceof Deferred) {
-          return DeferredUtility::returnFinally($value, function ($value) use ($resolvers, $args, $context, $info) {
-            return isset($value) ? $this->compose(...$resolvers)($value, $args, $context, $info) : NULL;
-          });
-        }
-      }
-
-      return $value;
-    };
+  public function compose(DataProducerInterface ...$resolvers) {
+    return new DataProducerComposite($resolvers);
   }
 
   /**
@@ -43,11 +35,11 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function tap(callable $callback) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($callback) {
-      $callback($value, $args, $context, $info);
+  public function tap(DataProducerInterface $callback) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($callback) {
+      $callback->resolve($value, $args, $context, $info);
       return $value;
-    };
+    });
   }
 
   /**
@@ -56,12 +48,12 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function context($name, callable $source = NULL) {
-    return $this->tap(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $source) {
+  public function context($name, DataProducerInterface $source = NULL) {
+    return $this->tap(new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $source) {
       $source = $source ?? $this->fromParent();
-      $value = $source($value, $args, $context, $info);
+      $value = $source->resolve($value, $args, $context, $info);
       $context->setContext($name, $value, $info);
-    });
+    }));
   }
 
   /**
@@ -70,10 +62,10 @@ class ResolverBuilder {
    * @return \Closure
    */
   public function cond(array $branches) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
       while (list($condition, $resolver) = array_pad(array_shift($branches), 2, NULL)) {
-        if (is_callable($condition)) {
-          if (($condition = $condition($value, $args, $context, $info)) === NULL) {
+        if ($condition instanceof DataProducerInterface) {
+          if (($condition = $condition->resolve($value, $args, $context, $info)) === NULL) {
             // Bail out early if a resolver returns NULL.
             continue;
           }
@@ -87,31 +79,25 @@ class ResolverBuilder {
         }
 
         if ((bool) $condition) {
-          return $resolver ? $resolver($value, $args, $context, $info) : $condition;
+          return $resolver ? $resolver->resolve($value, $args, $context, $info) : $condition;
         }
       }
 
       // Functional languages throw exceptions here. Should we just return NULL?
       return NULL;
-    };
+    });
   }
 
   /**
    * @param $id
    * @param $config
    *
-   * @return callable
+   * @return DataProducerProxy
    */
   public function produce($id, $config = []) {
     // TODO: Properly inject this.
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
-    $plugin = $manager->getInstance(['id' => $id, 'configuration' => $config]);
-
-    if (!is_callable($plugin)) {
-      throw new \LogicException(sprintf('Plugin %s is not callable.', $id));
-    }
-
-    return $plugin;
+    return new DataProducerProxy($id, $config, $manager);
   }
 
   /**
@@ -121,10 +107,10 @@ class ResolverBuilder {
    *
    * @return \Closure
    */
-  public function fromPath($type, $path, callable $value = NULL) {
-    return function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($type, $path, $value) {
+  public function fromPath($type, $path, DataProducerInterface $value = NULL) {
+    return new DataProducerCallable(function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($type, $path, $value) {
       $value = $value ?? $this->fromParent();
-      $value = $value($parent, $args, $context, $info);
+      $value = $value->resolve($parent, $args, $context, $info);
       $metadata = new BubbleableMetadata();
 
       $type = $type instanceof DataDefinitionInterface ? $type : DataDefinition::create($type);
@@ -137,7 +123,7 @@ class ResolverBuilder {
       }
 
       return $output;
-    };
+    });
   }
 
   /**
@@ -146,13 +132,13 @@ class ResolverBuilder {
    * @return \Closure
    */
   public function fromValue($value) {
-    return function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($value) {
+    return new DataProducerCallable(function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($value) {
       if ($value instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($value);
       }
 
       return $value;
-    };
+    });
   }
 
   /**
@@ -161,22 +147,22 @@ class ResolverBuilder {
    * @return \Closure
    */
   public function fromArgument($name) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name) {
       return $args[$name] ?? NULL;
-    };
+    });
   }
 
   /**
    * @return \Closure
    */
   public function fromParent() {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
       if ($value instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($value);
       }
 
       return $value;
-    };
+    });
   }
 
   /**
@@ -186,14 +172,14 @@ class ResolverBuilder {
    * @return \Closure
    */
   public function fromContext($name, $default = NULL) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $default) {
+    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $default) {
       $output = $context->getContext($name, $info, $default);
       if ($output instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($output);
       }
 
       return $output;
-    };
+    });
   }
 
 }

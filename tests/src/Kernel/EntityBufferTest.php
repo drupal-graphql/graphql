@@ -47,11 +47,11 @@ GQL;
       a:node(id: "1") {
         title
       }
-      
+
       b:node(id: "2") {
         title
       }
-      
+
       c:node(id: "3") {
         title
       }
@@ -62,8 +62,8 @@ GQL;
     $this->mockField('node', [
       'parent' => 'Query',
     ], $builder->produce('entity_load', ['mapping' => [
-      'entity_type' => $builder->fromValue('node'),
-      'entity_id' => $builder->fromArgument('id'),
+      'type' => $builder->fromValue('node'),
+      'id' => $builder->fromArgument('id'),
     ]]));
 
     $this->mockField('title', [

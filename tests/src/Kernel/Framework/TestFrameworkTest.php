@@ -151,9 +151,9 @@ GQL;
       'parent' => 'Mutation',
     ], $builder->compose(
         $builder->fromArgument('user'),
-        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $args['user']['age'] > 50 && $args['user']['gender'] == 'Male';
-        }
+        })
       )
     );
 
@@ -204,9 +204,9 @@ GQL;
       'parent' => 'Number',
     ], $builder->compose(
         $builder->fromParent(),
-        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
-        }
+        })
       )
     );
 
@@ -216,9 +216,9 @@ GQL;
       'parent' => 'Word',
     ], $builder->compose(
         $builder->fromParent(),
-        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
-        }
+        })
       )
     );
 
@@ -277,9 +277,9 @@ GQL;
       'parent' => 'Number',
     ], $builder->compose(
         $builder->fromParent(),
-        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
-        }
+        })
       )
     );
 
@@ -289,9 +289,9 @@ GQL;
       'parent' => 'Word',
     ], $builder->compose(
         $builder->fromParent(),
-        function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
-        }
+        })
       )
     );
 
