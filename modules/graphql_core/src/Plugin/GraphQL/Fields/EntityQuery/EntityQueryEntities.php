@@ -112,7 +112,7 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
       if (isset($metadata['ids']) && $sorting = $metadata['ids']) {
         $sorting = array_flip(array_values($sorting));
         uasort($result, function ($a, $b) use ($sorting) {
-          return $sorting[$b] - $sorting[$a];
+          return $sorting[$a] - $sorting[$b];
         });
       }
 
