@@ -19,6 +19,7 @@ class GraphqlServiceProvider extends ServiceProviderBase {
       $container->getDefinition('language_negotiator')
         ->setClass(FixedLanguageNegotiator::class);
     }
+    $container->setDefinition('context.repository', $container->getDefinition('graphql.context_repository'));
   }
 
 }

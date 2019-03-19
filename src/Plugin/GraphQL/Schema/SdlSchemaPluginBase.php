@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Context\QueryContextInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
@@ -38,6 +39,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected $inDevelopment;
 
   /**
+   * @var \Drupal\graphql\GraphQL\Context\QueryContextInterface
+   */
+  protected $contextRepository;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -48,6 +54,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('cache.graphql.ast'),
+      $container->get('context.repository'),
       $container->getParameter('graphql.config')
     );
   }
@@ -63,6 +70,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The plugin definition array.
    * @param \Drupal\Core\Cache\CacheBackendInterface $astCache
    *   The cache bin for caching the parsed SDL.
+   * @param \Drupal\graphql\GraphQL\Context\QueryContextInterface $contextRepository
    * @param $config
    *   The service configuration.
    *
@@ -73,12 +81,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $pluginId,
     $pluginDefinition,
     CacheBackendInterface $astCache,
+    QueryContextInterface $contextRepository,
     $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-
     $this->inDevelopment = !empty($config['development']);
     $this->astCache = $astCache;
+    $this->contextRepository = $contextRepository;
   }
 
   /**
@@ -147,7 +156,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // allows us to collect the cache metadata and contextual values (e.g.
     // inheritance for language) for each query separately.
     return function ($params, $document, $operation) use ($registry) {
-      $context = new ResolveContext(['registry' => $registry]);
+      $context = new ResolveContext($this->contextRepository, $registry);
       $context->addCacheTags(['graphql_response']);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);
@@ -162,7 +171,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   public function getFieldResolver() {
     return function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-      return $context->getGlobal('registry')->resolveField($value, $args, $context, $info);
+      return $context->getRegistry()->resolveField($value, $args, $context, $info);
     };
   }
 
@@ -177,7 +186,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getTypeResolver(TypeDefinitionNode $type) {
     return function ($value, ResolveContext $context, ResolveInfo $info) {
-      return $context->getGlobal('registry')->resolveType($value, $context, $info);
+      return $context->getRegistry()->resolveType($value, $context, $info);
     };
   }
 

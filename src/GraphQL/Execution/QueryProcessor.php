@@ -303,7 +303,7 @@ class QueryProcessor {
     $schema = $config->getSchema();
 
     $promise = Executor::promiseToExecute(
-      $adapter,
+      new ContextualizedPromiseAdapter($context),
       $schema,
       $document,
       $root,
@@ -320,7 +320,7 @@ class QueryProcessor {
         ->setCacheMaxAge($context->getCacheMaxAge());
 
       // Do not cache in development mode or if there are any errors.
-      if ($context->getGlobal('development') || !empty($result->errors)) {
+      if (!empty($result->errors)) {
         $metadata->setCacheMaxAge(0);
       }
 

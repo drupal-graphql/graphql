@@ -124,7 +124,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    *
    * @return \GraphQL\Deferred|null
    */
-  public function resolve(EntityInterface $entity, $field, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(EntityInterface $entity, $field, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata, callable $defer) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -142,7 +142,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       }, $values->getValue());
 
       $resolver = $this->entityBuffer->add($type, $ids);
-      return new Deferred(function () use ($type, $language, $bundles, $resolver, $metadata) {
+      return $defer(function () use ($type, $language, $bundles, $resolver, $metadata) {
         $entities = $resolver() ?: [];
         $entities = isset($bundles) ? array_filter($entities, function (EntityInterface $entity) use ($bundles) {
           if (!in_array($entity->bundle(), $bundles)) {

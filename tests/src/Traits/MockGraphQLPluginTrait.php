@@ -315,6 +315,7 @@ trait MockGraphQLPluginTrait {
         $id,
         [],
         $this->container->get('cache.graphql.ast'),
+        $this->container->get('context.repository'),
         ['development' => $development]
       ])
       ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])

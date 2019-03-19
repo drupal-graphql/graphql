@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
@@ -104,12 +105,21 @@ class FieldExecutor {
   protected function resolveUncached($values, ResolveContext $context, ResolveInfo $info, RefinableCacheableDependencyInterface $metadata) {
     $plugin = $this->getPlugin();
 
-    $output = call_user_func_array([$plugin, 'resolve'], array_merge($values, [$metadata]));
-    return DeferredUtility::applyFinally($output, function ($value) use ($metadata) {
-      if ($value instanceof CacheableDependencyInterface) {
-        $metadata->addCacheableDependency($value);
-      }
-    });
+    return $context->executeInContext(function () use ($info, $values, $metadata, $plugin, $context) {
+      $output = call_user_func_array(
+        [$plugin, 'resolve'],
+        array_merge($values, [$metadata, function(callable $callback) use ($context, $info) {
+        return new Deferred(function () use ($callback, $context, $info) {
+          return $context->executeInContext($callback, $info);
+        });
+      }]));
+
+      return DeferredUtility::applyFinally($output, function ($value) use ($metadata) {
+        if ($value instanceof CacheableDependencyInterface) {
+          $metadata->addCacheableDependency($value);
+        }
+      });
+    }, $info);
   }
 
   /**

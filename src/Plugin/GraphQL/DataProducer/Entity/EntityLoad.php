@@ -120,10 +120,10 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($type, $id, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata, callable $defer) {
     $resolver = $this->entityBuffer->add($type, $id);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $metadata) {
+    return $defer(function () use ($type, $id, $language, $bundles, $resolver, $metadata) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
