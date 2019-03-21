@@ -13,7 +13,8 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
  *     "direction" = {
  *       "type" = "SortOrder",
  *       "default" = "DESC"
- *     }
+ *     },
+ *     "language" = "LanguageId"
  *   }
  * )
  */
