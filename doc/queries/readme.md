@@ -65,7 +65,7 @@ query {
 The query above fetches information from 3 different places :
 
 * **entityId** and **entityCreated** come from the Entity Interface. These fields are available for all entity objects. nodeById query returns a Node Interface which extends Entity Interface.
-* title and status are defined in the Node Interface and are available for all nodes, regardless of their content type.
+* **title** and **status** are defined in the Node Interface and are available for all nodes, regardless of their content type.
 * **fieldSubtitle** is a field \(**field\_subtitle** in Drupal\) that has been added to the Article content type. It's not a part of neither Node nor Entity Interfaces, it is only available in the NodeArticle Type. **nodebyId** can return any node, not just Article, so we need to wrap the fieldSubtitle in a [GraphQL Fragment](http://graphql.org/learn/queries/#fragments).
 
 If we paste the above query in GraphiQL we will get the following result :
