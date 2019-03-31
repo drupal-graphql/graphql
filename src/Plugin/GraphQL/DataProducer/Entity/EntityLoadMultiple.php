@@ -131,20 +131,27 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
         $metadata->addCacheTags($tags);
-        return NULL;
+        return [];
       }
 
       foreach ($entities as $id => $entity) {
         if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
           // If the entity is not among the allowed bundles, don't return it.
           $metadata->addCacheableDependency($entities[$id]);
-          return NULL;
+          unset($entities[$id]);
         }
 
         if (isset($language) && $language != $entities[$id]->language()
             ->getId() && $entities[$id] instanceof TranslatableInterface) {
           $entities[$id] = $entities[$id]->getTranslation($language);
         }
+
+        $access = $entity->access('view', NULL, TRUE);
+        if (!$access->isAllowed()) {
+          // Do not return the entity if access is denied.
+          unset($entities[$id]);
+        }
+
       }
 
       return $entities;
