@@ -25,7 +25,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity type")
  *     ),
  *     "entity_id" = @ContextDefinition("string",
- *       label = @Translation("Identifier")
+ *       label = @Translation("Identifier"),
+ *       required = FALSE
  *     ),
  *     "entity_language" = @ContextDefinition("string",
  *       label = @Translation("Entity languages(s)"),
@@ -120,7 +121,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
     $resolver = $this->entityBuffer->add($type, $id);
 
     return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $metadata) {
