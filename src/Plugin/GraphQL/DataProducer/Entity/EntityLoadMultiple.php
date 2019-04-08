@@ -112,15 +112,15 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
-   * @param $type
-   * @param $ids
-   * @param null $language
-   * @param null $bundles
+   * @param string $type
+   * @param int[] $ids
+   * @param string $language
+   * @param string[] $bundles
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $ids, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(string $type, array $ids, string $language = NULL, array $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $metadata) {
@@ -149,6 +149,8 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
         $access = $entity->access('view', NULL, TRUE);
         if (!$access->isAllowed()) {
           // Do not return the entity if access is denied.
+          $metadata->addCacheableDependency($entities[$id]);
+          $metadata->addCacheableDependency($access);
           unset($entities[$id]);
         }
 
