@@ -74,6 +74,33 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
   public function getContext();
 
   /**
+   * Returns the error formatter.
+   *
+   * Allows to replace the default error formatter with a custom one. It is
+   * essential when there is a need to adjust error format, for instance
+   * to add an additional fields or remove some of the default ones.
+   *
+   * @see \GraphQL\Error\FormattedError::prepareFormatter
+   *
+   * @return mixed|callable
+   *   The error formatter.
+   */
+  public function getErrorFormatter();
+
+  /**
+   * Returns the error handler.
+   *
+   * Allows to replace the default error handler with a custom one. For example
+   * when there is a need to handle specific errors differently.
+   *
+   * @see \GraphQL\Executor\ExecutionResult::toArray
+   *
+   * @return mixed|callable
+   *   The error handler.
+   */
+  public function getErrorHandler();
+
+  /**
    * Returns the default field resolver.
    *
    * Fields that don't explicitly declare a field resolver will use this one
