@@ -44,7 +44,7 @@ class ArgumentsResolver {
       }
       $mapper = $this->getInputMapper($key);
 
-      if (isset($mapper) && !$mapper instanceof DataProducerCallable) {
+      if (isset($mapper) && !$mapper instanceof DataProducerInterface) {
         throw new \Exception(sprintf('Invalid input mapper for argument %s.', $key));
       }
 
