@@ -104,7 +104,7 @@ class FieldExecutor {
   protected function resolveUncached($values, ResolveContext $context, ResolveInfo $info, RefinableCacheableDependencyInterface $metadata) {
     $plugin = $this->getPlugin();
 
-    $output = call_user_func_array([$plugin, 'resolve'], array_merge($values, [$metadata]));
+    $output = call_user_func_array([$plugin, 'resolve'], array_merge($values, [$metadata, $context, $info]));
     return DeferredUtility::applyFinally($output, function ($value) use ($metadata) {
       if ($value instanceof CacheableDependencyInterface) {
         $metadata->addCacheableDependency($value);

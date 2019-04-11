@@ -35,8 +35,8 @@ class ArgumentsResolver {
     foreach ($params as $param) {
       $key = $param->getName();
 
-      // Do not process metadata argument.
-      if ($key == 'metadata') {
+      // Do not process special metadata, context and resolve info arguments.
+      if ($key == 'metadata' || $key == 'context' || $key == 'info') {
         continue;
       }
       if (!$param->isDefaultValueAvailable() && !$this->hasInputMapper($key)) {
