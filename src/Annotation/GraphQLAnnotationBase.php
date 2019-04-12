@@ -77,7 +77,7 @@ abstract class GraphQLAnnotationBase extends Plugin {
   public $response_cache_contexts = ['user.permissions'];
 
   /**
-   * The cache tags for caching theresponse.
+   * The cache tags for caching the response.
    *
    * @var array
    */
