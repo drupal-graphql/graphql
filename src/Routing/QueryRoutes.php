@@ -45,6 +45,8 @@ class QueryRoutes extends RouteSubscriberBase {
         '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
       ], [
         '_graphql_query_access' => 'TRUE',
+      ], [
+        '_auth' => ['basic_auth', 'cookie'],
       ]));
     }
 
