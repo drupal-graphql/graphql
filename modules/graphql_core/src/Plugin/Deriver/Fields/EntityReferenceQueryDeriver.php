@@ -72,6 +72,8 @@ class EntityReferenceQueryDeriver extends DeriverBase implements ContainerDerive
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($basePluginDefinition) {
+    $fieldMap = $this->entityFieldManager->getFieldMap();
+
     foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $entityType) {
       $interfaces = class_implements($entityType->getClass());
       if (!array_key_exists(FieldableEntityInterface::class, $interfaces)) {
@@ -89,8 +91,18 @@ class EntityReferenceQueryDeriver extends DeriverBase implements ContainerDerive
 
         $targetType = $this->entityTypeManager->getDefinition($targetTypeId);
         $fieldName = $fieldDefinition->getName();
+
+        if ($fieldDefinition instanceof BaseFieldDefinition || !$entityType->hasKey('bundle')) {
+          $parents = [StringHelper::camelCase($entityTypeId)];
+        }
+        else {
+          $parents = [];
+          foreach ($fieldMap[$entityTypeId][$fieldName]['bundles'] as $bundle) {
+            $parents[] = StringHelper::camelCase($entityTypeId . '_' . $bundle);
+          }
+        }
         $derivative = [
-          'parents' => [StringHelper::camelCase($entityTypeId)],
+          'parents' => $parents,
           'name' => StringHelper::propCase('query', $fieldName),
           'description' => $this->t('Query reference: @description', [
             '@description' => $fieldDefinition->getDescription(),
