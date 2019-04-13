@@ -70,15 +70,6 @@ class EntityMultipleTest extends GraphQLTestBase {
       'type' => 'lorem',
     ]);
     $this->node2->save();
-
-    $this->translation_fr = $this->node1->addTranslation('fr', ['title' => 'sit amet fr']);
-    $this->translation_fr->save();
-
-    $this->translation_de = $this->node1->addTranslation('de', ['title' => 'sit amet de']);
-    $this->translation_de->save();
-
-    \Drupal::service('content_translation.manager')
-      ->setEnabled('node', 'lorem', TRUE);
   }
 
   /**
