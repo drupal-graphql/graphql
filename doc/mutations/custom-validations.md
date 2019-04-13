@@ -14,15 +14,15 @@ You can make custom validations by implementing your own `resolveOutput` method 
 
 Graphql mutations by default return 3 things :
 
-* data - The data that was returned by the mutation. what the consumer of the mutation asked for when running it \(if successful\)
-* errors - If an error occurred in Drupal \(an exception\) it will be added to the errors array.
-* violations - Violations are a useful way to provide error messages to users, nothing "crashed" but something went wrong and the user can't do the operation. Maybe he has no access or something else.
+- data - The data that was returned by the mutation. what the consumer of the mutation asked for when running it \(if successful\)
+- errors - If an error occurred in Drupal \(an exception\) it will be added to the errors array.
+- violations - Violations are a useful way to provide error messages to users, nothing "crashed" but something went wrong and the user can't do the operation. Maybe he has no access or something else.
 
 ### Adding custom information to errors
 
 To add things to the errors for example when creating an entity you can return a new `EntityCrudOutputWrapper`, e.g. :
 
-```text
+```php
 if (!$entity->access('create')) {
      return new EntityCrudOutputWrapper(NULL, NULL, [
        $this->t('You do not have the necessary permissions to create entities of this type.'),
@@ -38,31 +38,30 @@ To add violations the process is very similar, you need to return a new `EntityC
 
 There are a couple imporant pieces in ContrainstViolations you can use that are output by the graphql module to the user in the `violations` array :
 
-* code - Can indicate the type of violation
-* message - a clear message for the user of what went wrong
-* path - The path \(field or other part\) where the violation occurred
+- code - Can indicate the type of violation
+- message - a clear message for the user of what went wrong
+- path - The path \(field or other part\) where the violation occurred
 
 See the following error for an example of a situation where a user tries updating an entity which he has access to but not a particular field :
 
-```text
+```json
 {
- "data": {
-   "addCredit": {
-     "entity": null,
-     "violations": [
-       {
-         "code": "403",
-         "message": "Access denied",
-         "path": "field_credit_status"
-       }
-     ],
-     "errors": [
-       "You do not have the necessary permissions to create some fields for this entity."
-     ]
-   }
- }
+  "data": {
+    "addCredit": {
+      "entity": null,
+      "violations": [
+        {
+          "code": "403",
+          "message": "Access denied",
+          "path": "field_credit_status"
+        }
+      ],
+      "errors": [
+        "You do not have the necessary permissions to create some fields for this entity."
+      ]
+    }
+  }
 }
 ```
 
 In this case it was decided to fail creating the entity `Credit` because the user does not have access to fields he is trying to create, but instead of only providing the generic message : _"You do not have the necessary permissions to create some fields for this entity."_ some extra information is added specifying which exact fields failed and why.
-

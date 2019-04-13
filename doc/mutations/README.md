@@ -36,7 +36,7 @@ In the mutation above, we use the inline fragment `... on NodeArticle { nid } to
 
 The result of the above mutation would look something like this:
 
-```javascript
+```json
 {
   "data": {
     "addArticle": {

@@ -16,7 +16,7 @@ You can run the the above query in your browser, via a GET request, after enabli
 
 This would return a result similar to:
 
-```javascript
+```json
 {
   "data": {
     "user": {
@@ -67,7 +67,7 @@ The query above fetches information from 3 different places :
 
 If we paste the above query in GraphiQL we will get the following result :
 
-```javascript
+```json
 {
   "data": {
     "nodeById": {

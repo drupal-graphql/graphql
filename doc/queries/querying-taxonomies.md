@@ -8,7 +8,11 @@ One common use case for taxonomies is to get a list of terms for a given vocabul
 
 ```graphql
 query {
-  taxonomyTermQuery(limit: 10, offset: 0, filter: {conditions: [{operator: EQUAL, field: "vid", value: ["tags"]}]}) {
+  taxonomyTermQuery(
+    limit: 10
+    offset: 0
+    filter: { conditions: [{ operator: EQUAL, field: "vid", value: ["tags"] }] }
+  ) {
     entities {
       entityLabel
     }
@@ -18,7 +22,7 @@ query {
 
 This will fetch for a limit of 10 terms that belong to the vocabulary "tags". The result will once again be very much like what we asked for :
 
-```javascript
+```json
 {
   "data": {
     "taxonomyTermQuery": {
@@ -55,7 +59,7 @@ query {
 
 And the result of this query will be whatever we asked for, in this case the entityLabel alone :
 
-```javascript
+```json
 {
   "data": {
     "taxonomyTermById": {
@@ -66,4 +70,3 @@ And the result of this query will be whatever we asked for, in this case the ent
 ```
 
 Once again, you can query multiple things inside this query so make sure to try GraphiQL and explore what items can be fetched.
-

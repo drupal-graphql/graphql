@@ -6,7 +6,7 @@ The easiest way to use the Metatag module together with GraphQL is to use the [G
 
 ## Metatag Queries
 
-```text
+```graphql
 {
   nodeById(id: "1") {
     entityId
@@ -23,7 +23,7 @@ The easiest way to use the Metatag module together with GraphQL is to use the [G
 
 This will give you something like this as a response :
 
-```text
+```json
 {
   "data": {
     "nodeById": {
@@ -37,7 +37,7 @@ This will give you something like this as a response :
           "key": "canonical",
           "value": "https://websiteurl.com/node/1"
         }
-      ],
+      ]
     }
   }
 }
@@ -47,7 +47,7 @@ This way you can easily manipulate SEO information in the Node in Drupal but sti
 
 You can of course use this in any kind of query that would return the entity that holds the metatag information. As an example querying a route and getting from that entity the metatag information would look something like this :
 
-```text
+```graphql
 {
   route(path: "/article-name") {
     ... on EntityCanonicalUrl {
@@ -65,7 +65,7 @@ You can of course use this in any kind of query that would return the entity tha
 
 This would return any information on this particular route, including the meta information requested.
 
-```text
+```json
 {
   "data": {
     "route": {
@@ -97,7 +97,7 @@ _"If a module \(e.g. metatag\) introduces a new primitive data type, it is not p
 
 So for now you need to include a custom Scalar as a workaround to avoid errors in GraphQL due to this missing type. Create a file inside a custom module of your own, named for example "MetatagScalar.php" where a custom scalar will be defined. In this example the module's name is graphql_custom as seen from the namespace bellow. Make sure to not conflict with existing namespaces when defining it.
 
-```text
+```php
 <?php
 
 namespace Drupal\graphql_custom\Plugin\GraphQL\Scalars;
