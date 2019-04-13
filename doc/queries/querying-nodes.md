@@ -20,7 +20,7 @@ Lets analyse this query a bit better. It performs a query to return 10 nodes of 
 
 The response to the above query is going to return exactly what we mentioned we wanted inside the entities item, the entityLabel.
 
-```json
+```javascript
 {
   "data": {
     "nodeQuery": {
@@ -49,7 +49,7 @@ Another common scenario is needing to fetch a single node by its id. In the Grap
 
 Here is a simple example returning the node with id : 1
 
-```
+```text
 query {
   nodeById(id: "1") {
     entityLabel
@@ -60,7 +60,7 @@ query {
 
 Simple right? Now what we get in response its again what we asked for in the query fields, in this case the entityLabel and the entityBundle :
 
-```
+```text
 {
   "data": {
     "nodeById": {

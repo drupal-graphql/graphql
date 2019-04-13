@@ -1,14 +1,15 @@
-# Summary
+# Table of contents
 
-* [Introduction](../README.md)
+* [Introduction](README.md)
+* [Introduction](...md)
 
 ## Getting started
 
-* [Getting started](getting-started/readme.md)
+* [Getting started](getting-started/getting-started.md)
 
 ## Queries
 
-* [Introduction](queries/readme.md)
+* [Introduction](queries/queries.md)
 * [Querying nodes](queries/querying-nodes.md)
 * [Querying taxonomies](queries/querying-taxonomies.md)
 * [Querying routes](queries/routes.md)
@@ -18,7 +19,7 @@
 
 ## Mutations
 
-* [Introduction](mutations/readme.md)
+* [Introduction](mutations/mutations.md)
 * [Creating mutation plugins](mutations/creating-mutation-plugins.md)
 
 ## Authentication
@@ -27,5 +28,5 @@
 
 ## Metatag / SEO
 
-* [Metatag support](metatag/readme.md)
+* [Metatag support](metatag-seo/metatag.md)
 
