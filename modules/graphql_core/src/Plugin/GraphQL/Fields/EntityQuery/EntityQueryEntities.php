@@ -109,11 +109,18 @@ class EntityQueryEntities extends FieldPluginBase implements ContainerFactoryPlu
       $result = $value->execute();
       $metadata = $value->getMetaData('graphql_context');
 
+      if (isset($metadata['ids']) && $sorting = $metadata['ids']) {
+        $sorting = array_flip(array_values($sorting));
+        uasort($result, function ($a, $b) use ($sorting) {
+          return $sorting[$a] - $sorting[$b];
+        });
+      }
+
       if ($value->hasTag('revisions')) {
+        // If this is a revision query, the version ids are the array keys.
         return $this->resolveFromRevisionIds($type, array_keys($result), $metadata, $args, $context, $info);
       }
 
-      // If this is a revision query, the version ids are the array keys.
       return $this->resolveFromEntityIds($type, array_values($result), $metadata, $args, $context, $info);
     }
   }

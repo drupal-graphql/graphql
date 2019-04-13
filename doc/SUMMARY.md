@@ -20,6 +20,8 @@
 
 * [Introduction](mutations/readme.md)
 * [Creating mutation plugins](mutations/creating-mutation-plugins.md)
+* [Writing custom mutations](mutations/custom-mutations.md)
+* [Writing custom validations](mutations/custom-validations.md)
 
 ## Authentication
 

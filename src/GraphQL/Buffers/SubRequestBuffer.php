@@ -4,6 +4,8 @@ namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Routing\LocalRedirectResponse;
+use Drupal\graphql\GraphQL\Buffers\SubRequestResponse;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -74,20 +76,26 @@ class SubRequestBuffer extends BufferBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Create a sub-request for the given url.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $current
+   *   The current main request.
+   * @param string $url
+   *   The url to run the subrequest on.
+   * @param array $buffer
+   *   The buffer.
+   *
+   * @return \Symfony\Component\HttpFoundation\Request
+   *   The request object.
    */
-  public function resolveBufferArray(array $buffer) {
-    /** @var \Drupal\Core\GeneratedUrl $url */
-    $url = reset($buffer)['url']->toString(TRUE);
-
-    $currentRequest = $this->requestStack->getCurrentRequest();
+  protected function createRequest(Request $current, array $buffer, $url) {
     $request = Request::create(
-      $url->getGeneratedUrl(),
+      $url,
       'GET',
-      $currentRequest->query->all(),
-      $currentRequest->cookies->all(),
-      $currentRequest->files->all(),
-      $currentRequest->server->all()
+      $current->query->all(),
+      $current->cookies->all(),
+      $current->files->all(),
+      $current->server->all()
     );
 
     $request->attributes->set('_graphql_subrequest', function () use ($buffer) {
@@ -96,23 +104,48 @@ class SubRequestBuffer extends BufferBase {
       }, $buffer);
     });
 
-    if ($session = $currentRequest->getSession()) {
+    $request->setRequestFormat('_graphql_subrequest');
+    if ($session = $current->getSession()) {
       $request->setSession($session);
     }
+    
+    return $request;
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function resolveBufferArray(array $buffer) {
+    /** @var \Drupal\Core\GeneratedUrl $url */
+    $url = reset($buffer)['url']->toString(TRUE);
+
+    $current = $this->requestStack->getCurrentRequest();
+    $target = $url->getGeneratedUrl();
+    $request = $this->createRequest($current, $buffer, $target);
+    
     /** @var \Drupal\graphql\GraphQL\Buffers\SubRequestResponse $response */
     $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-    if ($url instanceof CacheableDependencyInterface) {
-      $response->addCacheableDependency($url);
+    while ($response instanceof LocalRedirectResponse) {
+      $target = $response->getTargetUrl();
+      $request = $this->createRequest($current, $buffer, $target);
+      $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+    }
+    
+    if (!($response instanceof SubRequestResponse)) {
+      return array_fill_keys(array_keys($buffer), NULL);
     }
 
     // TODO:
     // Remove the request stack manipulation once the core issue described at
     // https://www.drupal.org/node/2613044 is resolved.
-    while ($this->requestStack->getCurrentRequest() === $request) {
+    while ($this->requestStack->getCurrentRequest() !== $current) {
       $this->requestStack->pop();
     }
 
+    if ($url instanceof CacheableDependencyInterface) {
+      $response->addCacheableDependency($url);
+    }
+    
     return array_map(function ($value) use ($response) {
       return new CacheableValue($value, [$response]);
     }, $response->getResult());
