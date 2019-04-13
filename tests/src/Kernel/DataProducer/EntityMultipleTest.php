@@ -83,7 +83,7 @@ class EntityMultipleTest extends GraphQLTestBase {
       'configuration' => [],
     ]);
 
-    $deferred = $plugin->resolve($this->node->getEntityTypeId(), [
+    $deferred = $plugin->resolve($this->node1->getEntityTypeId(), [
       $this->node1->id(),
       $this->node2->id(),
     ], NULL, NULL, $metadata);
