@@ -1,4 +1,4 @@
-# Query variables
+# Variables
 
 Until now we have looked at queries, but they are all static. We have been passing the values directly in the query to whatever we want to fetch. So how can we do the same but provide those values in a dynamic fashion? With variables.
 
@@ -38,10 +38,11 @@ Here we go, now we can use the same query to retrieve "Articles", "Clients" or w
 
 So get over to the GraphiQL by navigating to **graphql/explorer** and try out the query above, you will notice in the left bottom side there is a **variables** box, click on it and it will pop open and fill the variables there like so :
 
-```json
+```javascript
 {
     "type": "article",
     "limit": 10,
     "offset": 0
 }
 ```
+

@@ -1,4 +1,4 @@
-# Fragments
+# Query Fragments
 
 GraphQL Fragments, as the name implies, are pieces of a query. They mostly serve two purposes:
 
