@@ -135,10 +135,13 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
       }
 
       foreach ($entities as $id => $entity) {
+
+        $metadata->addCacheableDependency($entities[$id]);
+
         if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
           // If the entity is not among the allowed bundles, don't return it.
-          $metadata->addCacheableDependency($entities[$id]);
           unset($entities[$id]);
+          continue;
         }
 
         if (isset($language) && $language != $entities[$id]->language()
@@ -147,11 +150,12 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
         }
 
         $access = $entity->access('view', NULL, TRUE);
+        $metadata->addCacheableDependency($access);
+
         if (!$access->isAllowed()) {
           // Do not return the entity if access is denied.
-          $metadata->addCacheableDependency($entities[$id]);
-          $metadata->addCacheableDependency($access);
           unset($entities[$id]);
+          continue;
         }
 
       }
