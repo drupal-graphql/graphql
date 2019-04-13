@@ -1,4 +1,4 @@
-# Metatag support
+# Metatags
 
 ## Metatag
 
@@ -95,7 +95,7 @@ There is a currently an [issue](https://github.com/drupal-graphql/graphql/issues
 
 _"If a module \(e.g. metatag\) introduces a new primitive data type, it is not part of the derived types, but any field using it will reference it. That results in a "Missing type metatag." exception."_
 
-So for now you need to include a custom Scalar as a workaround to avoid errors in GraphQL due to this missing type. Create a file inside a custom module of your own, named for example "MetatagScalar.php" where a custom scalar will be defined. In this example the module's name is graphql\_custom as seen from the namespace bellow. Make sure to not conflict with existing namespaces when defining it.
+So for now you need to include a custom Scalar as a workaround to avoid errors in GraphQL due to this missing type. Create a file inside a custom module of your own, named for example "MetatagScalar.php" where a custom scalar will be defined. In this example the module's name is graphql_custom as seen from the namespace bellow. Make sure to not conflict with existing namespaces when defining it.
 
 ```text
 <?php
@@ -120,4 +120,3 @@ class MetatagScalar extends StringScalar {
 
 }
 ```
-

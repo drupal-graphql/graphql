@@ -1,4 +1,4 @@
-# Introduction
+# Mutations
 
 In GraphQL, a mutation is the terminology used whenever you want to add, modify, or delete data stored on the server, in this case Drupal.
 
@@ -13,15 +13,15 @@ The corresponding example code for creating, deleting, updating, and fileuploads
 A simple mutation to add an article content type \(node entity / article bundle\) might look the following:
 
 ```graphql
-mutation{
-  addArticle(input: {title: "Hey"}){
+mutation {
+  addArticle(input: { title: "Hey" }) {
     errors
     violations {
       message
       code
       path
-    },
-    article: entity{
+    }
+    article: entity {
       ... on NodeArticle {
         nid
       }
@@ -52,6 +52,5 @@ The result of the above mutation would look something like this:
 
 External Resources:
 
-* [http://graphql.org/learn/queries/\#mutations](http://graphql.org/learn/queries/#mutations)
-* [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)
-
+- [http://graphql.org/learn/queries/\#mutations](http://graphql.org/learn/queries/#mutations)
+- [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)
