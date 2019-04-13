@@ -119,13 +119,13 @@ We can easily filter by this field just by providing its field name and value, t
 
 ## Filtering for entity reference fields
 
-Yet another common scenario is we need to filter for a field, but this field is a entity reference meaning that we should provide the key of the entity to be referenced in the value property. In this example lets imagine we have a entity reference in the "Article" entity to a "Client". This field is an entity reference of type node. The way we filter for this field is as followed :
+Yet another common scenario is we need to filter for a field, but this field is a entity reference meaning that we should provide the key of the entity to be referenced in the value property. In this example lets imagine we have a entity reference in the "Article" entity to a "Client", via the `field_client` field. This field is an entity reference of type node. The way we filter for this field is as followed :
 
 ```
 query {
   nodeQuery(filter: {conditions: [
     {operator: EQUAL, field: "type", value: ["article"]},
-    {operator: EQUAL, field: "client.entity.nid", value: ["13"]}
+    {operator: EQUAL, field: "field_client.entity.nid", value: ["13"]}
   ]}) {
     entities {
       entityLabel
@@ -134,5 +134,5 @@ query {
 }
 ```
 
-If the entity we are filtering is for example of type "Term reference" then the ``` client.entity.nid ``` should become ``` client.entity.tid ``` as it now should reference a term id and not a node id.
+If the entity we are filtering is for example of type "Term reference" then the ``` field_client.entity.nid ``` should become ``` field_client.entity.tid ``` as it now should reference a term id and not a node id.
 

@@ -15,6 +15,10 @@ architecture and the provided plugin implementations form the sub-module.
 
 For ease of development, it includes the [GraphiQL](https://github.com/graphql/graphiql/) interface at`/graphql/explorer`.
 
+## Installation
+
+This module requires composer for installation. To install, simply run ``composer require drupal/graphql``.
+
 ## Quickstart
 
 To get a quick overview from the __query__ part of GraphQL in action watch the following video's.
