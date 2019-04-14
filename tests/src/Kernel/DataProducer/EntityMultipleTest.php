@@ -31,6 +31,11 @@ class EntityMultipleTest extends GraphQLTestBase {
   protected $node2;
 
   /**
+   * @var \Drupal\node\NodeInterface
+   */
+  protected $node3;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
@@ -67,6 +72,13 @@ class EntityMultipleTest extends GraphQLTestBase {
       'status' => NodeInterface::PUBLISHED,
     ]);
     $this->node2->save();
+
+    $this->node3 = Node::create([
+      'title' => 'Dolor',
+      'type' => 'lorem',
+      'status' => NodeInterface::NOT_PUBLISHED,
+    ]);
+    $this->node3->save();
   }
 
   /**
@@ -92,6 +104,7 @@ class EntityMultipleTest extends GraphQLTestBase {
     $deferred = $plugin->resolve($this->node1->getEntityTypeId(), [
       $this->node1->id(),
       $this->node2->id(),
+      $this->node3->id(),
     ], NULL, [$this->node1->bundle(), $this->node2->bundle()], $metadata);
 
     $adapter = new SyncPromiseAdapter();
@@ -104,12 +117,13 @@ class EntityMultipleTest extends GraphQLTestBase {
       $nids[] = $item->id();
     }
 
-    $expected = [];
-    $expected[] = $this->node1->id();
-    $expected[] = $this->node2->id();
-
     // All entity is loaded through entity load should match the initial values.
-    $this->assertEquals($expected, $nids);
+    // Hidden entity (node 3) is not include
+    // because access checking will not return it.
+    $this->assertEquals([
+      $this->node1->id(),
+      $this->node2->id(),
+    ], $nids);
   }
 
 }
