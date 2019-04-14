@@ -4,8 +4,8 @@ When it comes to authentication the Drupal GraphQL module is very much independe
 
 Drupal has some modules for doing decoupled authentiation using tokens :
 
-- [Simple oauth](https://www.drupal.org/project/simple_oauth)
-- [JWT](https://www.drupal.org/project/jwt)
+* [Simple oauth](https://www.drupal.org/project/simple_oauth)
+* [JWT](https://www.drupal.org/project/jwt)
 
 ## Bearer token
 

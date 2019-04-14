@@ -52,5 +52,5 @@ The result of the above mutation would look something like this:
 
 External Resources:
 
-- [http://graphql.org/learn/queries/\#mutations](http://graphql.org/learn/queries/#mutations)
-- [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)
+* [http://graphql.org/learn/queries/\#mutations](http://graphql.org/learn/queries/#mutations)
+* [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)

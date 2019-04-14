@@ -8,13 +8,7 @@ Here is a super simple example of how to list 10 nodes of type "Article" :
 
 ```graphql
 query {
-  nodeQuery(
-    limit: 10
-    offset: 0
-    filter: {
-      conditions: [{ operator: EQUAL, field: "type", value: ["article"] }]
-    }
-  ) {
+  nodeQuery(limit: 10, offset: 0, filter: {conditions: [{operator: EQUAL, field: "type", value: ["article"]}]}) {
     entities {
       entityLabel
     }
@@ -26,7 +20,7 @@ Lets analyse this query a bit better. It performs a query to return 10 nodes of 
 
 The response to the above query is going to return exactly what we mentioned we wanted inside the entities item, the entityLabel.
 
-```json
+```javascript
 {
   "data": {
     "nodeQuery": {
@@ -66,7 +60,7 @@ query {
 
 Simple right? Now what we get in response its again what we asked for in the query fields, in this case the entityLabel and the entityBundle :
 
-```json
+```graphql
 {
   "data": {
     "nodeById": {
@@ -78,3 +72,4 @@ Simple right? Now what we get in response its again what we asked for in the que
 ```
 
 As you can see you can exactly map the response to what was asked in the query making it very intuitive to ask for new things and now what to expect in the resulting format.
+

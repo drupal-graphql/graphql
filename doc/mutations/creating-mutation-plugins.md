@@ -8,7 +8,7 @@ In [this article](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mu
 
 ## Mutations to create Drupal Entities
 
-One of the most common things you will want to do when with mutations is to create, update and delete entities. These CRUD operations on entities were made as simple as possible to implement and only require you to extend some generic classes provided by the graphql_core module.
+One of the most common things you will want to do when with mutations is to create, update and delete entities. These CRUD operations on entities were made as simple as possible to implement and only require you to extend some generic classes provided by the graphql\_core module.
 
 So let's have a look at how you can create a mutation from scratch to generate a new entity of type node, and in this case a new article. You can refer to the [Examples](https://github.com/drupal-graphql/graphql-examples) repository to look at some other examples as well for how to create other kinds of mutations.
 
@@ -74,13 +74,13 @@ Make sure that this plugin lives inside `{{module_name}}//src/Plugin/GraphQL`
 
 The graphql module uses anotations for classes in order to have some information define the mutation in a simple way, things like :
 
-- id - The id of the mutation.
-- entity_type - The type of entity that is going to be created from this mutation \(only important for when extending CreateEntityBase mutations\)
-- entity_bundle - The bundle of the entity that is going to be created
-- secure - Fields that are not marked secure are automatically blocked in untrusted environments. For example there is a field that allows to fetch content from a remote url, which would basically turn your website into a proxy for anybody. This field will only work with a certain user permission or in persisted queries, where we are in control of what they do. The other way around, a field that is marked as secure doesn't allow any operations drupal itself wouldn't.
-- name - The name for the mutation. This name is what you will use when calling the mutation.
-- type - the "type" is the returned type by the mutation. In the example above the mutation returns a "EntityCrudOutput" type which is provided by the graphql module itself.
-- arguments - The arguments passed to the mutation. These are the fields for the entity you want to create, in the case above we are passing one argument called "Input" of type "ArticleInput". We will look at InputTypes afterwards. But essentially since graphql is strictly typed we want to provide information for types for each field we pass to the mutation we can do that using "InputTypes".
+* id - The id of the mutation.
+* entity\_type - The type of entity that is going to be created from this mutation \(only important for when extending CreateEntityBase mutations\)
+* entity\_bundle - The bundle of the entity that is going to be created
+* secure - Fields that are not marked secure are automatically blocked in untrusted environments. For example there is a field that allows to fetch content from a remote url, which would basically turn your website into a proxy for anybody. This field will only work with a certain user permission or in persisted queries, where we are in control of what they do. The other way around, a field that is marked as secure doesn't allow any operations drupal itself wouldn't.
+* name - The name for the mutation. This name is what you will use when calling the mutation.
+* type - the "type" is the returned type by the mutation. In the example above the mutation returns a "EntityCrudOutput" type which is provided by the graphql module itself.
+* arguments - The arguments passed to the mutation. These are the fields for the entity you want to create, in the case above we are passing one argument called "Input" of type "ArticleInput". We will look at InputTypes afterwards. But essentially since graphql is strictly typed we want to provide information for types for each field we pass to the mutation we can do that using "InputTypes".
 
 ### extractEntityInput method
 
