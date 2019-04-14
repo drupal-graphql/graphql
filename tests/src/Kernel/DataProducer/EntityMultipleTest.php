@@ -8,10 +8,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
-use Drupal\Core\Url;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
-use Drupal\entity_test\Entity\EntityTestBundle;
 
 /**
  * Data producers Entity multiple test class.
@@ -23,9 +21,14 @@ class EntityMultipleTest extends GraphQLTestBase {
   use QueryResultAssertionTrait;
 
   /**
-   * @var NodeInterface
+   * @var \Drupal\node\NodeInterface
    */
-  protected $node;
+  protected $node1;
+
+  /**
+   * @var \Drupal\node\NodeInterface
+   */
+  protected $node2;
 
   /**
    * {@inheritdoc}
@@ -51,25 +54,28 @@ class EntityMultipleTest extends GraphQLTestBase {
     ]);
     $content_type->save();
 
-    $content_type = NodeType::create([
-      'type' => 'otherbundle',
-      'name' => 'otherbundle',
-      'translatable' => TRUE,
-      'display_submitted' => FALSE,
-    ]);
-    $content_type->save();
-
     $this->node1 = Node::create([
       'title' => 'Dolor',
       'type' => 'lorem',
+      'status' => NodeInterface::PUBLISHED,
     ]);
     $this->node1->save();
 
     $this->node2 = Node::create([
       'title' => 'Dolor',
       'type' => 'lorem',
+      'status' => NodeInterface::PUBLISHED,
     ]);
     $this->node2->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function userPermissions() {
+    $permissions = parent::userPermissions();
+    $permissions[] = 'access content';
+    return $permissions;
   }
 
   /**
@@ -86,7 +92,7 @@ class EntityMultipleTest extends GraphQLTestBase {
     $deferred = $plugin->resolve($this->node1->getEntityTypeId(), [
       $this->node1->id(),
       $this->node2->id(),
-    ], NULL, NULL, $metadata);
+    ], NULL, [$this->node1->bundle(), $this->node2->bundle()], $metadata);
 
     $adapter = new SyncPromiseAdapter();
     $promise = $adapter->convertThenable($deferred);
@@ -98,8 +104,12 @@ class EntityMultipleTest extends GraphQLTestBase {
       $nids[] = $item->id();
     }
 
+    $expected = [];
+    $expected[] = $this->node1->id();
+    $expected[] = $this->node2->id();
+
     // All entity is loaded through entity load should match the initial values.
-    $this->assertEquals($this->node->id(), $nids);
+    $this->assertEquals($expected, $nids);
   }
 
 }
