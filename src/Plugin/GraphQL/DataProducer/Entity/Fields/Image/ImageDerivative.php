@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\file\FileInterface;
@@ -28,7 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class ImageDerivative extends DataProducerPluginBase {
+class ImageDerivative extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The renderer service.
