@@ -36,21 +36,39 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
     return new static(
       $configuration,
-      $plugin_id,
-      $plugin_definition,
+      $pluginId,
+      $pluginDefinition,
       $container->get('renderer')
     );
   }
 
   /**
-   * Constructor.
+   * EntityRendered constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   *
+   * @codeCoverageIgnore
    */
-  public function __construct(array $configuration, string $plugin_id, array $plugin_definition, RendererInterface $renderer) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    RendererInterface $renderer
+  ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->renderer = $renderer;
   }
 
