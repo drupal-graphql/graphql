@@ -3,9 +3,12 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\file\FileInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\image\Entity\ImageStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @DataProducer(
@@ -28,9 +31,59 @@ use Drupal\image\Entity\ImageStyle;
 class ImageDerivative extends DataProducerPluginBase {
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('renderer')
+    );
+  }
+
+  /**
+   * EntityRendered constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   *
+   * @codeCoverageIgnore
+   */
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    RendererInterface $renderer
+  ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->renderer = $renderer;
+  }
+
+  /**
+   * @param \Drupal\file\FileInterface $entity
+   *   The file entity received.
+   *
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *   The metadata object to add caching to objects.
    *
    * @return mixed
+   *   The image url and dimensions for the image style .
    */
   public function resolve(FileInterface $entity, $style, RefinableCacheableDependencyInterface $metadata) {
     $access = $entity->access('view', NULL, TRUE);
@@ -45,12 +98,15 @@ class ImageDerivative extends DataProducerPluginBase {
       $image_style->transformDimensions($dimensions, $entity->getFileUri());
       $metadata->addCacheableDependency($image_style);
 
-      return [
-        'url' => $image_style->buildUrl($entity->getFileUri()),
-        'width' => $dimensions['width'],
-        'height' => $dimensions['height'],
-      ];
+      $context = new RenderContext();
+      $image = $this->renderer->executeInRenderContext($context, function () use ($entity, $image_style, $dimensions) {
+        return [
+          'url' => $image_style->buildUrl($entity->getFileUri()),
+          'width' => $dimensions['width'],
+          'height' => $dimensions['height'],
+        ];
+      });
+      return $image;
     }
   }
-
 }
