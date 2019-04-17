@@ -82,13 +82,14 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
   public function resolve(FileInterface $entity, RefinableCacheableDependencyInterface $metadata) {
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
+    $file_url = NULL;
     if ($access->isAllowed()) {
       $context = new RenderContext();
-      $file_url = $this->renderer->executeInRenderContext($context, function () use ($entity, $image_style, $dimensions) {
+      $file_url = $this->renderer->executeInRenderContext($context, function () use ($entity) {
         return file_create_url($entity->getFileUri());
       });
-      return $file_url;
     }
+    return $file_url;
   }
 
 }
