@@ -21,19 +21,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     label = @Translation("Entity")
  *   ),
  *   consumes = {
- *     "entity_type" = @ContextDefinition("string",
+ *     "type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "entity_id" = @ContextDefinition("string",
+ *     "id" = @ContextDefinition("string",
  *       label = @Translation("Identifier"),
  *       required = FALSE
  *     ),
- *     "entity_language" = @ContextDefinition("string",
+ *     "language" = @ContextDefinition("string",
  *       label = @Translation("Entity languages(s)"),
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "entity_bundle" = @ContextDefinition("string",
+ *     "bundles" = @ContextDefinition("string",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
