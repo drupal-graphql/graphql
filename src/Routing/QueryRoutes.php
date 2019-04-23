@@ -46,8 +46,6 @@ class QueryRoutes extends RouteSubscriberBase {
         '_disable_route_normalizer' => 'TRUE',
       ], [
         '_graphql_query_access' => 'TRUE',
-      ], [
-        '_auth' => ['basic_auth', 'cookie'],
       ]));
     }
 
