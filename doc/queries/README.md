@@ -80,4 +80,3 @@ If we paste the above query in GraphiQL we will get the following result :
   }
 }
 ```
-

@@ -22,7 +22,7 @@ Graphql mutations by default return 3 things :
 
 To add things to the errors for example when creating an entity you can return a new `EntityCrudOutputWrapper`, e.g. :
 
-```text
+```php
 if (!$entity->access('create')) {
      return new EntityCrudOutputWrapper(NULL, NULL, [
        $this->t('You do not have the necessary permissions to create entities of this type.'),
@@ -44,7 +44,7 @@ There are a couple imporant pieces in ContrainstViolations you can use that are 
 
 See the following error for an example of a situation where a user tries updating an entity which he has access to but not a particular field :
 
-```text
+```json
 {
  "data": {
    "addCredit": {
@@ -65,4 +65,3 @@ See the following error for an example of a situation where a user tries updatin
 ```
 
 In this case it was decided to fail creating the entity `Credit` because the user does not have access to fields he is trying to create, but instead of only providing the generic message : _"You do not have the necessary permissions to create some fields for this entity."_ some extra information is added specifying which exact fields failed and why.
-

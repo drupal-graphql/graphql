@@ -10,7 +10,7 @@ One important method of the MutationPluginBase is the resolve method where we, s
 
 Let's look at an example that will perform an operation of buying a car. The operation itself exists on a service so it's not really important to look at the details of that operation, but what is important is that in the resolve method we take the `car` from our arguments \(defined in the annotation as seen above\) and we call our `garage` service and pass it the car :
 
-```text
+```php
 <?php
 
 namespace Drupal\graphql_plugin_test\Plugin\GraphQL\Mutations;
@@ -79,4 +79,3 @@ class BuyCar extends MutationPluginBase implements ContainerFactoryPluginInterfa
 ```
 
 This example was taken from the [a test](https://github.com/drupal-graphql/graphql/blob/188be525a007f385a3d3c4f8d2900b62a0150a5f/tests/modules/graphql_plugin_test/src/Plugin/GraphQL/Mutations/BuyCar.php) inside the graphql repository. Inside the resolve method it could be doing other things.
-
