@@ -67,7 +67,7 @@ services:
 
   graphql.query_routes:
     class: Drupal\graphql\Routing\QueryRoutes
-    arguments: ['@plugin.manager.graphql.schema']
+    arguments: ['@plugin.manager.graphql.schema', '@authentication_collector']
     tags:
       - { name: 'event_subscriber' }
 
