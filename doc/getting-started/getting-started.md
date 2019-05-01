@@ -61,5 +61,5 @@ A few examples of where the GraphQL module could be used:
 **Resources**
 
 * [https://github.com/drupal-graphql/graphql](https://github.com/drupal-graphql/graphql)
-* [https://drupal.slack.org](https://drupal.slack.org) - The GraphQL Slack Channel is very active
+* [https://drupal.slack.com/archives/graphql](https://drupal.slack.com/archives/graphql) - The Drupal GraphQL Slack Channel is very active
 
