@@ -18,7 +18,7 @@ The first step to create a mutation is to make the plugin. The graphql module pr
 
 Let's look at what the code for this plugin looks like :
 
-```text
+```php
 <?php
 
 namespace Drupal\graphql_examples\Plugin\GraphQL\Mutations;
@@ -92,7 +92,7 @@ We can see we are assigning the `title` that we are passing in the input \(we wi
 
 Let's continue with our article example. In this case we implement a mutation to update a given article. Because we are updating a particular entity and we need to know which entity it is, we will need to provide the plugin annotation with something extra, an Id for the entity.
 
-```text
+```php
 <?php
 
 namespace Drupal\graphql_examples\Plugin\GraphQL\Mutations;
@@ -143,7 +143,7 @@ The first thing we noticed is we are now using `UpdateEntityBase` instead of "Cr
 
 The only thing left now is really to delete the entity right? This is the simplest type of operation out of the 3, because we only need to give graphql the `id`, it will check if we can access that type of operation and if so delete the entity with the id we give to it. So let's look at how the plugin looks like
 
-```text
+```php
 <?php
 
 namespace Drupal\graphql_examples\Plugin\GraphQL\Mutations;
@@ -174,7 +174,7 @@ We extend the `DeleteEntityBase` class and only require one argument: the id of 
 
 We know from the examples above that we need to define the arguments for mutations. Similar to how a function, mutations receive arguments that can be used to do whatever the mutation needs to do to work. In order for graphql to know information about the arguments we create an `InputType`. The ArticleInput that we used above looks like this :
 
-```text
+```php
 <?php
 
 namespace Drupal\graphql_examples\Plugin\GraphQL\InputTypes;
@@ -202,4 +202,3 @@ class ArticleInput extends InputTypePluginBase {
 We can see again that we namespace this plugin to our module name, in this case `graphql_examples` should be replaced by your own module name. This file should live inside `{{module_name}}/src/Plugin/GraphQL/InputTypes/ArticleInput.php`
 
 We can also see above that we only use annotations here to define the arguments inside the `fields` property. So we know that it receives a `title` and that's a "String" and we also receive a `body` which is also a `String`.
-
