@@ -47,7 +47,7 @@ class QueryRoutes extends RouteSubscriberBase {
       ], [
         '_graphql_query_access' => 'TRUE',
       ], [
-        '_auth' => ['basic_auth', 'cookie'],
+        '_auth' => ['jwt_auth', 'basic_auth', 'cookie'],
       ]));
     }
 
