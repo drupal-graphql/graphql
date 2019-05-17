@@ -35,7 +35,7 @@ These blog posts provide additional information on how to use and extend the mod
 * [https://www.amazeelabs.com/en/journal/introduction-graphql](https://www.amazeelabs.com/en/journal/introduction-graphql)
 * [https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo](https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo)
 * [https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included](https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included)
-* [https://www.amazeelabs.com/en/journal/extending-graphql-part1-fields](https://www.amazeelabs.com/en/journal/extending-graphql-part1-fields)
+* [https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields](https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields)
 * [https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces](https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces)
 * [https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields](https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields)
 * [https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations)
