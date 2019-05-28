@@ -6,6 +6,14 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use GraphQL\Language\Parser;
 use GraphQL\Utils\SchemaExtender;
 
+/**
+ * Allows to extend the GraphQL schema.
+ *
+ * When GraphQL schema is distributed across multiple files it might be useful
+ * to allow extension of certain types. This schema plugin allows that. See an
+ * example of code to extend the schema with using webonyx/graphql-php library:
+ * https://github.com/webonyx/graphql-php/issues/180#issuecomment-444407411
+ */
 abstract class SdlExtendedSchemaPluginBase extends SdlSchemaPluginBase {
 
   /**
