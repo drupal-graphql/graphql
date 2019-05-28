@@ -23,7 +23,7 @@ abstract class SdlExtendedSchemaPluginBase extends SdlSchemaPluginBase {
    *   The parsed extended schema document.
    */
   protected function getExtendedSchemaDocument() {
-    // Only use caching of the parsed document if aren't in development mode.
+    // Only use caching of the parsed document if we aren't in development mode.
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
       return $cache->data;
     }
