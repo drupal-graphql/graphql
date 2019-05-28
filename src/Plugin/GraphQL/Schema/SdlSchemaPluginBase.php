@@ -189,7 +189,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The parsed schema document.
    */
   protected function getSchemaDocument() {
-    // Only use caching of the parsed document if aren't in development mode.
+    // Only use caching of the parsed document if we aren't in development mode.
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
       return $cache->data;
     }
