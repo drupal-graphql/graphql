@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
@@ -36,12 +37,6 @@ class TypedDataTest extends GraphQLTestBase {
 
     $typed_data_manager = $this->getMock(TypedDataManagerInterface::class);
 
-    $typed_data_manager->expects($this->any())
-      ->method('getDefinition')
-      ->will($this->returnValueMap([
-        'tree' => ['class' => '\Drupal\Core\TypedData\ComplexDataInterface'],
-      ]));
-
     $uri = $this->prophesize(TypedDataInterface::class);
     $uri->getValue()
       ->willReturn('<front>');
@@ -65,25 +60,29 @@ class TypedDataTest extends GraphQLTestBase {
       ->willReturn([]);
 
     $typed_data_manager->expects($this->any())
+      ->method('createDataDefinition')
+      ->willReturn(DataDefinition::create('tree'));
+
+    $typed_data_manager->expects($this->any())
       ->method('create')
       ->willReturn($tree_type->reveal());
 
     $this->container->set('typed_data_manager', $typed_data_manager);
     $metadata = new CacheableMetadata();
 
-    $this->assertEquals('<front>', $plugin->resolve('path.uri', 'tree', [
+    $this->assertEquals('<front>', $plugin->resolve('path.uri', [
       'path' => [
         'uri' => '<front>',
         'path_name' => 'Front page',
       ]
-    ], $metadata));
+    ], 'tree', $metadata));
 
-    $this->assertEquals('Front page', $plugin->resolve('path.path_name', 'tree', [
+    $this->assertEquals('Front page', $plugin->resolve('path.path_name', [
       'path' => [
         'uri' => '<front>',
         'path_name' => 'Front page',
       ]
-    ], $metadata));
+    ], 'tree', $metadata));
   }
 
 }
