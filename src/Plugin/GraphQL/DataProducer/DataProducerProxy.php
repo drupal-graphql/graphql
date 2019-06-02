@@ -3,18 +3,16 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
 
 /**
  * Data producers proxy class.
  */
-class DataProducerProxy implements DataProducerInterface {
+class DataProducerProxy implements ResolverInterface {
 
   /**
    * Plugin manager.
@@ -22,6 +20,20 @@ class DataProducerProxy implements DataProducerInterface {
    * @var \Drupal\graphql\Plugin\DataProducerPluginManager
    */
   protected $manager;
+
+  /**
+   * The plugin config.
+   *
+   * @var array
+   */
+  protected $config;
+
+  /**
+   * The plugin id.
+   *
+   * @var string
+   */
+  protected $id;
 
   /**
    * Construct DataProducerProxy object.
@@ -48,8 +60,8 @@ class DataProducerProxy implements DataProducerInterface {
       $metadata = new CacheableMetadata();
       $metadata->addCacheContexts(['user.permissions']);
 
-      $this->fieldExecutor = new FieldExecutor($this->id, $this->config, $this->manager);
-      $output = $this->fieldExecutor->resolve($values, $context, $info, $metadata);
+      $executor = new FieldExecutor($this->id, $this->config, $this->manager);
+      $output = $executor->resolve($values, $context, $info, $metadata);
 
       return DeferredUtility::applyFinally($output, function () use ($context, $metadata) {
         $context->addCacheableDependency($metadata);

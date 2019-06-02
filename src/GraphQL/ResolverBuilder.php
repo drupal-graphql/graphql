@@ -3,8 +3,8 @@
 namespace Drupal\graphql\GraphQL;
 
 use Drupal\Core\TypedData\TypedDataTrait;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\Argument;
+use Drupal\graphql\GraphQL\Resolver\Composite;
 use Drupal\graphql\GraphQL\Resolver\Condition;
 use Drupal\graphql\GraphQL\Resolver\Context;
 use Drupal\graphql\GraphQL\Resolver\ParentValue;
@@ -12,44 +12,39 @@ use Drupal\graphql\GraphQL\Resolver\Path;
 use Drupal\graphql\GraphQL\Resolver\SourceContext;
 use Drupal\graphql\GraphQL\Resolver\Tap;
 use Drupal\graphql\GraphQL\Resolver\Value;
-use Drupal\graphql\GraphQL\Utility\DeferredUtility;
-use Drupal\typed_data\DataFetcherTrait;
-use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerComposite;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
+use Drupal\typed_data\DataFetcherTrait;
+use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 class ResolverBuilder {
   use TypedDataTrait;
   use DataFetcherTrait;
 
   /**
-   * @param callable|callable[] ...$resolvers
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[] $resolvers
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Composite
    */
-  public function compose(DataProducerInterface ...$resolvers) {
-    return new DataProducerComposite($resolvers);
+  public function compose(ResolverInterface ...$resolvers) {
+    return new Composite($resolvers);
   }
 
   /**
-   * @param DataProducerInterface $callback
+   * @param ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
    */
-  public function tap(DataProducerInterface $callback) {
+  public function tap(ResolverInterface $callback) {
     return new Tap($callback);
   }
 
   /**
    * @param $name
-   * @param callable|null $source
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $source
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
    */
-  public function context($name, DataProducerInterface $source = NULL) {
+  public function context($name, ResolverInterface $source = NULL) {
     $callback = new SourceContext($name, $source);
     return $this->tap($callback);
   }
@@ -67,7 +62,7 @@ class ResolverBuilder {
    * @param $id
    * @param $config
    *
-   * @return DataProducerProxy
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
   public function produce($id, $config = []) {
     // TODO: Properly inject this.
@@ -78,11 +73,11 @@ class ResolverBuilder {
   /**
    * @param $type
    * @param $path
-   * @param callable|NULL $value
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Path
    */
-  public function fromPath($type, $path, DataProducerInterface $value = NULL) {
+  public function fromPath($type, $path, ResolverInterface $value = NULL) {
     return new Path($type, $path, $value);
   }
 
