@@ -17,7 +17,8 @@ use Drupal\image\Entity\ImageStyle;
  *   ),
  *   consumes = {
  *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
+ *       label = @Translation("Entity"),
+ *       required = FALSE
  *     ),
  *     "style" = @ContextDefinition("string",
  *       label = @Translation("Image style")
@@ -28,11 +29,17 @@ use Drupal\image\Entity\ImageStyle;
 class ImageDerivative extends DataProducerPluginBase {
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\file\FileInterface $entity
    *
    * @return mixed
    */
-  public function resolve(FileInterface $entity, $style, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
+
+    // Return if we dont have an entity.
+    if (!$entity) {
+      return NULL;
+    }
+
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
