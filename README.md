@@ -32,14 +32,14 @@ Check out [https://github.com/fubhy/drupal-decoupled-app](https://github.com/fub
 
 These blog posts provide additional information on how to use and extend the module as well as other other contributed modules supporting it:
 
-* [https://www.amazeelabs.com/en/blog/graphql-introduction](https://www.amazeelabs.com/en/blog/graphql-introduction)
-* [https://www.amazeelabs.com/en/blog/drupal-graphql-react-apollo](https://www.amazeelabs.com/en/blog/drupal-graphql-react-apollo)
-* [https://www.amazeelabs.com/en/blog/drupal-graphql-batteries-included](https://www.amazeelabs.com/en/blog/drupal-graphql-batteries-included)
-* [https://www.amazeelabs.com/en/blog/extending-graphql-part1-fields](https://www.amazeelabs.com/en/blog/extending-graphql-part1-fields)
-* [https://www.amazeelabs.com/en/blog/extending-graphql-part-2](https://www.amazeelabs.com/en/blog/extending-graphql-part-2)
-* [https://www.amazeelabs.com/en/blog/graphql-for-drupalers-fields](https://www.amazeelabs.com/en/blog/graphql-for-drupalers-fields)
-* [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)
-* [https://www.amazeelabs.com/en/blog/dont-push-it-using-graphql-twig](https://www.amazeelabs.com/en/blog/dont-push-it-using-graphql-twig)
+* [https://www.amazeelabs.com/en/journal/introduction-graphql](https://www.amazeelabs.com/en/journal/introduction-graphql)
+* [https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo](https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo)
+* [https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included](https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included)
+* [https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields](https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields)
+* [https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces](https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces)
+* [https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields](https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields)
+* [https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations)
+* [https://www.amazeelabs.com/en/journal/dont-push-it-using-graphql-twig](https://www.amazeelabs.com/en/journal/dont-push-it-using-graphql-twig)
 
 ### Resources
 
