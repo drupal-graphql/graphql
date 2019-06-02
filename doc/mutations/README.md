@@ -4,9 +4,9 @@ In GraphQL, a mutation is the terminology used whenever you want to add, modify,
 
 Unfortunately, the module does not include a way to peform common mutations out of the box due to some technical requirements of graphql. You can read more about this at the amazeelabs blog post below.
 
-Mutations must be created in a custom module. In many cases you will extend existing provided classes for adding, updating, or deleting an entity. Specifically CreatEntityBase, DeleteEntityBase, or UpdateEntityBase.
+Mutations must be created in a custom module. In many cases you will extend existing provided classes for adding, updating, or deleting an entity. Specifically CreateEntityBase, DeleteEntityBase, or UpdateEntityBase.
 
-A fantastic resource for implementing mutations can be found at [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)
+A fantastic resource for implementing mutations can be found at [https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations)
 
 The corresponding example code for creating, deleting, updating, and fileuploads, can be found here: [https://github.com/drupal-graphql/graphql-examples](https://github.com/drupal-graphql/graphql-examples)
 
@@ -53,4 +53,4 @@ The result of the above mutation would look something like this:
 External Resources:
 
 * [http://graphql.org/learn/queries/\#mutations](http://graphql.org/learn/queries/#mutations)
-* [https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations)
+* [https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations)

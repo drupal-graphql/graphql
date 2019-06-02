@@ -4,7 +4,7 @@ The graphql module uses the [Drupal plugin system](https://www.drupal.org/docs/8
 
 ## Why the automatic mutations were removed.
 
-In [this article](https://www.amazeelabs.com/en/blog/extending-graphql-part-3-mutations) it's well explained why automatic mutations were removed. But this, as stated in the article, does not mean that creating mutations is complicated. In fact, it's a simple task and one that might even provide with the extra flexibility you know and love from Drupal.
+In [this article](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations) it's well explained why automatic mutations were removed. But this, as stated in the article, does not mean that creating mutations is complicated. In fact, it's a simple task and one that might even provide with the extra flexibility you know and love from Drupal.
 
 ## Mutations to create Drupal Entities
 
