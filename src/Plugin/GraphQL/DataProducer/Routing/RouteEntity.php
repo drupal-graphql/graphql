@@ -77,6 +77,8 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The language manager service.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   *   The entity buffer service.
    *
    * @codeCoverageIgnore
    */

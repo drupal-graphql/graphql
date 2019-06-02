@@ -6,7 +6,6 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
 
 /**
  * Conditional resolver.
@@ -14,7 +13,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
  * From given set of conditions and their respective resolvers it resolves the
  * one whose condition is evaluated with non empty value.
  */
-class Condition implements DataProducerInterface {
+class Condition implements ResolverInterface {
 
   /**
    * List of condition and their corresponding resolvers.
@@ -39,7 +38,7 @@ class Condition implements DataProducerInterface {
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
     $branches = $this->branches;
     while (list($condition, $resolver) = array_pad(array_shift($branches), 2, NULL)) {
-      if ($condition instanceof DataProducerInterface) {
+      if ($condition instanceof ResolverInterface) {
         if (($condition = $condition->resolve($value, $args, $context, $info)) === NULL) {
           // Bail out early if a resolver returns NULL.
           continue;
@@ -54,7 +53,7 @@ class Condition implements DataProducerInterface {
       }
 
       if ((bool) $condition) {
-        /** @var \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface $resolver */
+        /** @var \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver */
         return $resolver ? $resolver->resolve($value, $args, $context, $info) : $condition;
       }
     }

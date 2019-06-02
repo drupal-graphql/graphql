@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -8,7 +8,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 /**
  * An interface defining a data producer.
  */
-interface DataProducerInterface {
+interface ResolverInterface {
 
   /**
    * Resolve values for the fields.

@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\Plugin\DataProducerPluginManager;
 use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
@@ -13,14 +14,19 @@ use Drupal\Core\Entity\EntityInterface;
 
 class FieldExecutor {
 
+  protected $id;
+  protected $config;
+  protected $manager;
+  protected $plugin;
+
   /**
    * Construct FieldExecutor object.
    *
-   * @param [type] $id      [description]
-   * @param [type] $config  [description]
-   * @param [type] $manager [description]
+   * @param string $id
+   * @param array $config
+   * @param \Drupal\graphql\Plugin\DataProducerPluginManager $manager
    */
-  public function __construct($id, $config, $manager) {
+  public function __construct($id, $config, DataProducerPluginManager $manager) {
     $this->id = $id;
     $this->config = $config;
     $this->manager = $manager;
@@ -29,22 +35,30 @@ class FieldExecutor {
 
   /**
    * Resolve field value.
+   *
+   * @param $values
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   *
+   * @return mixed
    */
   public function resolve($values, ResolveContext $context, ResolveInfo $info, CacheableMetadata $metadata) {
     $output = $this->shouldLookupEdgeCache($values, $context, $info) ?
       $this->resolveCached($values, $context, $info, $metadata) :
       $this->resolveUncached($values, $context, $info, $metadata);
+
     return $output;
   }
 
   /**
-   * Return DataProducerPlugin.
-   * @return \Drupal\graphql\Plugin\GraphQL\DataProducerInterface DataProducer object.
+   * @return \Drupal\graphql\Plugin\DataProducerPluginInterface
    */
   public function getPlugin() {
     if (!$this->plugin) {
       $this->plugin = $this->manager->getInstance(['id' => $this->id, 'configuration' => $this->config]);
     }
+
     return $this->plugin;
   }
 

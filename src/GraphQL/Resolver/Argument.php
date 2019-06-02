@@ -4,12 +4,11 @@ namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
 
 /**
  * Resolves an argument.
  */
-class Argument implements DataProducerInterface {
+class Argument implements ResolverInterface {
 
   /**
    * Name of the argument.

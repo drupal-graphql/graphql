@@ -5,12 +5,11 @@ namespace Drupal\graphql\GraphQL\Resolver;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
 
 /**
  * Resolves a value.
  */
-class Value implements DataProducerInterface {
+class Value implements ResolverInterface {
 
   /**
    * Value to be resolved.
