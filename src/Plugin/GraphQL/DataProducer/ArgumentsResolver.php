@@ -2,11 +2,31 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
+use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
+
 class ArgumentsResolver {
 
   /**
+   * The plugin definition.
+   *
+   * @var array
+   */
+  protected $definition;
+
+  /**
+   * The plugin config.
+   *
+   * @var array
+   */
+  protected $config;
+
+  /**
    * Construct ArgumentResolver object.
-   * @param array $definition Plugin definition.
+   *
+   * @param array $definition
+   *   The plugin definition.
+   * @param array $config
+   *   The plugin config.
    */
   public function __construct($definition, $config) {
     $this->definition = $definition;
@@ -44,7 +64,7 @@ class ArgumentsResolver {
       }
       $mapper = $this->getInputMapper($key);
 
-      if (isset($mapper) && !$mapper instanceof DataProducerInterface) {
+      if (isset($mapper) && !$mapper instanceof ResolverInterface) {
         throw new \Exception(sprintf('Invalid input mapper for argument %s.', $key));
       }
 

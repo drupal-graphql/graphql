@@ -16,6 +16,7 @@ use Drupal\graphql\Annotation\GraphQLInterface;
 use Drupal\graphql\Annotation\GraphQLMutation;
 use Drupal\graphql\Annotation\GraphQLType;
 use Drupal\graphql\Annotation\GraphQLUnionType;
+use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
@@ -30,7 +31,6 @@ use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -364,9 +364,11 @@ trait MockGraphQLPluginTrait {
     if (empty($this->registry)) {
       $this->registry = new ResolverRegistry([]);
     }
+
     if (is_callable($builder)) {
-      $builder = new DataProducerCallable($builder);
+      $builder = new Callback($builder);
     }
+
     $this->registry->addFieldResolver($type, $name, $builder);
     $this->schema->expects($this->any())
         ->method('getResolverRegistry')
@@ -384,6 +386,7 @@ trait MockGraphQLPluginTrait {
     if (empty($this->registry)) {
       $this->registry = new ResolverRegistry([]);
     }
+
     $this->registry->addTypeResolver($type, $resolver);
     $this->schema->expects($this->any())
         ->method('getResolverRegistry')
@@ -411,7 +414,7 @@ trait MockGraphQLPluginTrait {
    * Return callable DataProducer.
    */
   protected function mockCallable($callback) {
-    return new DataProducerCallable($callback);
+    return new Callback($callback);
   }
 
   /**

@@ -10,12 +10,11 @@ use Drupal\Core\TypedData\TypedDataTrait;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
 
 /**
  * Resolves a path.
  */
-class Path implements DataProducerInterface {
+class Path implements ResolverInterface {
 
   use TypedDataTrait;
   use DataFetcherTrait;
@@ -48,10 +47,10 @@ class Path implements DataProducerInterface {
    *   Entity type.
    * @param string $path
    *   Path to get value.
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface $value
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *   Resolver.
    */
-  public function __construct($type, $path, DataProducerInterface $value = NULL) {
+  public function __construct($type, $path, ResolverInterface $value = NULL) {
     $this->type = $type;
     $this->path = $path;
     $this->value = $value;

@@ -4,12 +4,11 @@ namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
 
 /**
  * Taps a resolver.
  */
-class Tap implements DataProducerInterface {
+class Tap implements ResolverInterface {
 
   /**
    * Resolver to tap.

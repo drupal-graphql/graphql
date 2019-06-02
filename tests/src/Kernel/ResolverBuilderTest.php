@@ -17,7 +17,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
+use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 /**
  * @coversDefaultClass \Drupal\graphql\GraphQL\ResolverBuilder
@@ -73,9 +73,9 @@ GQL;
 
   public function testBuilderProducingProvider() {
     return [
-      ['entity_load', DataProducerInterface::class],
-      ['entity_id', DataProducerInterface::class],
-      ['uppercase', DataProducerInterface::class],
+      ['entity_load', ResolverInterface::class],
+      ['entity_id', ResolverInterface::class],
+      ['uppercase', ResolverInterface::class],
     ];
   }
 
