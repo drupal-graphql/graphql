@@ -14,26 +14,25 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @DataProducer(
- *   id = "entity_load",
- *   name = @Translation("Load entity"),
- *   description = @Translation("Loads a single entity."),
- *   produces = @ContextDefinition("entity",
- *     label = @Translation("Entity")
+ *   id = "entity_load_multiple",
+ *   name = @Translation("Load multiple entities"),
+ *   description = @Translation("Loads multiple entities."),
+ *   produces = @ContextDefinition("entities",
+ *     label = @Translation("Entities")
  *   ),
  *   consumes = {
- *     "type" = @ContextDefinition("string",
+ *     "entity_type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "id" = @ContextDefinition("string",
- *       label = @Translation("Identifier"),
- *       required = FALSE
+ *     "entity_ids" = @ContextDefinition("array",
+ *       label = @Translation("Identifier")
  *     ),
- *     "language" = @ContextDefinition("string",
+ *     "entity_language" = @ContextDefinition("string",
  *       label = @Translation("Entity languages(s)"),
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "bundles" = @ContextDefinition("string",
+ *     "entity_bundle" = @ContextDefinition("string",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
@@ -41,7 +40,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.
@@ -113,39 +112,55 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   }
 
   /**
-   * @param $type
-   * @param $id
-   * @param null $language
-   * @param null $bundles
+   * @param string $type
+   * @param int[] $ids
+   * @param string $language
+   * @param string[] $bundles
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
-    $resolver = $this->entityBuffer->add($type, $id);
+  public function resolve(string $type, array $ids, string $language = NULL, array $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+    $resolver = $this->entityBuffer->add($type, $ids);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $metadata) {
-      if (!$entity = $resolver()) {
+    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $metadata) {
+      if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
         $metadata->addCacheTags($tags);
-        return NULL;
+        return [];
       }
 
-      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
-        // If the entity is not among the allowed bundles, don't return it.
-        $metadata->addCacheableDependency($entity);
-        return NULL;
+      foreach ($entities as $id => $entity) {
+
+        $metadata->addCacheableDependency($entities[$id]);
+
+        if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
+          // If the entity is not among the allowed bundles, don't return it.
+          unset($entities[$id]);
+          continue;
+        }
+
+        if (isset($language) && $language != $entities[$id]->language()
+            ->getId() && $entities[$id] instanceof TranslatableInterface) {
+          $entities[$id] = $entities[$id]->getTranslation($language);
+        }
+
+        $access = $entity->access('view', NULL, TRUE);
+        $metadata->addCacheableDependency($access);
+
+        if (!$access->isAllowed()) {
+          // Do not return the entity if access is denied.
+          unset($entities[$id]);
+          continue;
+        }
+
       }
 
-      if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-        $entity = $entity->getTranslation($language);
-      }
-
-      return $entity;
+      return $entities;
     });
   }
 }

@@ -101,12 +101,11 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
-        }
+        })
       )
     );
-
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');
@@ -147,12 +146,11 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
-        }
+        })
       )
     );
-
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');
@@ -247,9 +245,9 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
-        }
+        })
       )
     );
 
@@ -301,9 +299,9 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
-        }
+        })
       )
     );
 

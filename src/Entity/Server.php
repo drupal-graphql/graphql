@@ -105,6 +105,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
     $config->setContext($plugin->getContext());
     $config->setRootValue($plugin->getRootValue());
     $config->setSchema($plugin->getSchema());
+    $config->setErrorFormatter($plugin->getErrorFormatter());
+    $config->setErrorsHandler($plugin->getErrorHandler());
 
     if ($resolver = $plugin->getFieldResolver()) {
       $config->setFieldResolver($resolver);

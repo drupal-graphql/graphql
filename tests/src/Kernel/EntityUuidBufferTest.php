@@ -50,11 +50,11 @@ GQL;
       a:node(uuid: "{$this->nodeUuids[0]}") {
         title
       }
-      
+
       b:node(uuid: "{$this->nodeUuids[1]}") {
         title
       }
-      
+
       c:node(uuid: "{$this->nodeUuids[2]}") {
         title
       }
@@ -65,8 +65,8 @@ GQL;
     $this->mockField('node', [
       'parent' => 'Query',
     ], $builder->produce('entity_load_by_uuid', ['mapping' => [
-      'entity_type' => $builder->fromValue('node'),
-      'entity_uuid' => $builder->fromArgument('uuid'),
+      'type' => $builder->fromValue('node'),
+      'uuid' => $builder->fromArgument('uuid'),
     ]]));
 
     $this->mockField('title', [

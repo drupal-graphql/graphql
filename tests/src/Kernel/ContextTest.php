@@ -40,11 +40,11 @@ class ContextTest extends GraphQLTestBase {
     schema {
       query: Query
     }
-    
+
     type Query {
       route(path: String!): Url
     }
-    
+
     type Url {
       name: String!
     }
@@ -58,7 +58,7 @@ GQL;
 
     $this->mockField('name', ['parent' => 'Url'], $builder->produce('context', ['mapping' => [
       'url' => $builder->fromParent(),
-      'context' => $builder->fromValue('route_name'),
+      'id' => $builder->fromValue('route_name'),
     ]]));
 
     $query = <<<GQL

@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
+use GraphQL\Error\FormattedError;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
@@ -188,7 +189,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The parsed schema document.
    */
   protected function getSchemaDocument() {
-    // Only use caching of the parsed document if aren't in development mode.
+    // Only use caching of the parsed document if we aren't in development mode.
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
       return $cache->data;
     }
@@ -199,6 +200,42 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     return $ast;
+  }
+
+  /**
+   * Retrieves the error formatter.
+   *
+   * By default uses the graphql error formatter.
+   *
+   * @see \GraphQL\Error\FormattedError::prepareFormatter
+   *
+   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
+   *
+   * @return \Closure
+   *   Error formatter.
+   */
+  public function getErrorFormatter() {
+    return function (Error $error) {
+      return FormattedError::createFromException($error);
+    };
+  }
+
+  /**
+   * Retrieves the error handler.
+   *
+   * By default uses the default graphql error handler.
+   *
+   * @see \GraphQL\Executor\ExecutionResult::toArray
+   *
+   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
+   *
+   * @return \Closure
+   *   Error handler.
+   */
+  public function getErrorHandler() {
+    return function (array $errors, callable $formatter) {
+      return array_map($formatter, $errors);
+    };
   }
 
   /**

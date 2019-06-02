@@ -30,6 +30,7 @@ use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -363,6 +364,9 @@ trait MockGraphQLPluginTrait {
     if (empty($this->registry)) {
       $this->registry = new ResolverRegistry([]);
     }
+    if (is_callable($builder)) {
+      $builder = new DataProducerCallable($builder);
+    }
     $this->registry->addFieldResolver($type, $name, $builder);
     $this->schema->expects($this->any())
         ->method('getResolverRegistry')
@@ -401,6 +405,13 @@ trait MockGraphQLPluginTrait {
    */
   protected function mockField($id, $definition, $result = NULL, $builder = NULL) {
     $this->mockDataProducer($definition['parent'], $id, $result);
+  }
+
+  /**
+   * Return callable DataProducer.
+   */
+  protected function mockCallable($callback) {
+    return new DataProducerCallable($callback);
   }
 
   /**

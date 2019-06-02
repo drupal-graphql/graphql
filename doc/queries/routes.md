@@ -1,4 +1,4 @@
-# Querying Routes
+# Querying routes
 
 Another query type provided by default by the Drupal GraphQL module is the **route**. Querying for routes is simple, you provide a path as an argument and the query will return a Url which contains fields for every defined context in Drupal. This way it’s possible to pull the content language, current user or node for a given path. Any context provided by a contrib module will also be picked up automatically.
 
@@ -14,7 +14,7 @@ query {
 
 This will return information about the path we just provided :
 
-```json
+```javascript
 {
   "data": {
     "route": {
@@ -46,7 +46,7 @@ But with a route query like we mentioned you can do much more, and fetch context
 
 this query will return :
 
-```json
+```javascript
 {
   "data": {
     "route": {
@@ -63,3 +63,4 @@ this query will return :
 ```
 
 This is a very powerfull way of getting related information with the route you are querying. Get over to GraphiQL and start experimenting with route queries, you can get information on alias, language, user, node entity etc..
+
