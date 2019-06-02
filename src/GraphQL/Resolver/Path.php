@@ -11,9 +11,6 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Resolves a path.
- */
 class Path implements ResolverInterface {
 
   use TypedDataTrait;

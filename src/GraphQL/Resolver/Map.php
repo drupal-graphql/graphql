@@ -5,7 +5,7 @@ namespace Drupal\graphql\GraphQL\Resolver;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-class Tap implements ResolverInterface {
+class Map implements ResolverInterface {
 
   /**
    * Resolver to tap.
@@ -28,8 +28,14 @@ class Tap implements ResolverInterface {
    * {@inheritdoc}
    */
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
-    $this->resolver->resolve($value, $args, $context, $info);
-    return $value;
+    if (!is_iterable($value)) {
+      return NULL;
+    }
+
+    $array = is_array($value) ? $value : iterator_to_array($value);
+    return array_map(function ($item) use ($args, $context, $info) {
+      return $this->resolver->resolve($item, $args, $context, $info);
+    }, $array);
   }
 
 }

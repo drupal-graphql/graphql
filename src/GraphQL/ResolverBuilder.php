@@ -4,9 +4,11 @@ namespace Drupal\graphql\GraphQL;
 
 use Drupal\Core\TypedData\TypedDataTrait;
 use Drupal\graphql\GraphQL\Resolver\Argument;
+use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\GraphQL\Resolver\Composite;
 use Drupal\graphql\GraphQL\Resolver\Condition;
 use Drupal\graphql\GraphQL\Resolver\Context;
+use Drupal\graphql\GraphQL\Resolver\Map;
 use Drupal\graphql\GraphQL\Resolver\ParentValue;
 use Drupal\graphql\GraphQL\Resolver\Path;
 use Drupal\graphql\GraphQL\Resolver\SourceContext;
@@ -36,6 +38,24 @@ class ResolverBuilder {
    */
   public function tap(ResolverInterface $callback) {
     return new Tap($callback);
+  }
+
+  /**
+   * @param ResolverInterface $callback
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\Map
+   */
+  public function map(ResolverInterface $callback) {
+    return new Map($callback);
+  }
+
+  /**
+   * @param callable $callback
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\Callback
+   */
+  public function callback(callable $callback) {
+    return new Callback($callback);
   }
 
   /**

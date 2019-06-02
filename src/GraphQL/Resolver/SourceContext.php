@@ -5,9 +5,6 @@ namespace Drupal\graphql\GraphQL\Resolver;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Resolves a source and sets context.
- */
 class SourceContext implements ResolverInterface {
 
   /**

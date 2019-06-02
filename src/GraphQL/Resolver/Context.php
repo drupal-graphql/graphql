@@ -6,9 +6,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Resolves a context.
- */
 class Context implements ResolverInterface {
 
   /**

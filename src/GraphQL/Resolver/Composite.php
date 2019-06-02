@@ -7,9 +7,6 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Data producers composition.
- */
 class Composite implements ResolverInterface {
 
   /**
