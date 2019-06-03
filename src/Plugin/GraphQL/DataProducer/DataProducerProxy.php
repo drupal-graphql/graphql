@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
@@ -13,6 +14,8 @@ use Drupal\graphql\Plugin\DataProducerPluginManager;
  * Data producers proxy class.
  */
 class DataProducerProxy implements ResolverInterface {
+
+  use DependencySerializationTrait;
 
   /**
    * Plugin manager.
