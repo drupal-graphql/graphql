@@ -103,6 +103,17 @@ services:
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
 
+  plugin.manager.graphql.resolver_map:
+    class: Drupal\graphql\Plugin\ResolverMapPluginManager
+    arguments:
+      - 'Plugin/GraphQL/ResolverMap'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\ResolverMapPluginInterface'
+      - '\Drupal\graphql\Annotation\ResolverMap'
+      - '%graphql.config%'
+
   # Buffers.
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
