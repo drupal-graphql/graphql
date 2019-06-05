@@ -14,6 +14,7 @@ use Drupal\Tests\graphql\Traits\MockSchemaTrait;
 use Drupal\Tests\graphql\Traits\MockGraphQLPluginTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
+use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 use PHPUnit_Framework_Error_Notice;
 use PHPUnit_Framework_Error_Warning;
 
@@ -28,6 +29,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use QueryResultAssertionTrait;
   use IntrospectionTestTrait;
   use QueryFileTrait;
+  use SchemaPrinterTrait;
 
   /**
    * {@inheritdoc}
