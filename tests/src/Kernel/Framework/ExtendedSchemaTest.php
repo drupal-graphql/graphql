@@ -110,7 +110,7 @@ GQL;
 
     $this->mockField('bar', [
       'name' => 'bar',
-      'type' => '[BarInput]',
+      'type' => '[Content]',
       'parent' => 'Query',
     ], $builder->fromValue(
       [
