@@ -43,7 +43,7 @@ class ResolverMap extends Plugin {
    */
   public function __construct($values) {
     if (!array_key_exists('schema', $values) || !$values['schema']) {
-      throw new AnnotationException('The plugin is missing an "schema" property.');
+      throw new AnnotationException('The plugin is missing a "schema" property.');
     }
 
     parent::__construct($values);
