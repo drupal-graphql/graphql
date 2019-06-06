@@ -1,6 +1,6 @@
 'execute graphql requests':
   title: 'Execute arbitrary GraphQL requests'
-  description: 'Allows users to execute abritrary GraphQL requests.'
+  description: 'Allows users to execute arbitrary GraphQL requests.'
 
 'execute persisted graphql requests':
   title: 'Execute persisted GraphQL requests'
