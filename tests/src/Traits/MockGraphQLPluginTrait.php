@@ -23,6 +23,7 @@ use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Schema\SdlExtendedSchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Subscriptions\SubscriptionPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
@@ -284,6 +285,28 @@ trait MockGraphQLPluginTrait {
   }
 
   /**
+   * Setup server with extended schema.
+   *
+   * @param string $gql_schema
+   *   GraphQL schema description.
+   * @param string $gql_extended_schema
+   *   GraphQL extended schema description.
+   * @param string $schema_id
+   *   Schema id.
+   */
+  protected function setUpExtendedSchema($gql_schema, $gql_extended_schema, $schema_id, $development = FALSE) {
+    $this->mockExtendedSchema($schema_id, $gql_schema, $gql_extended_schema, $development);
+    $this->mockSchemaPluginManager($schema_id);
+    $this->createTestServer($schema_id, '/graphql/' . $schema_id, $development);
+
+    $this->schemaPluginManager->method('createInstance')
+      ->with($this->equalTo($schema_id))
+      ->will($this->returnValue($this->schema));
+
+    $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
+  }
+
+  /**
    * Create test server.
    */
   protected function createTestServer($schema_id, $endpoint, $debug = FALSE) {
@@ -323,6 +346,48 @@ trait MockGraphQLPluginTrait {
     $this->schema->expects(static::any())
       ->method('getSchemaDefinition')
       ->willReturn($gql_schema);
+
+    if (!empty($registry)) {
+      $this->schema->expects($this->any())
+        ->method('getResolverRegistry')
+        ->willReturn($registry);
+      $this->registry = $registry;
+    }
+  }
+
+  /**
+   * Mock an extended schema instance.
+   *
+   * @param string $id
+   *   The schema id.
+   * @param string $gql_schema
+   *   GraphQL schema.
+   * @param string $gql_extended_schema
+   *   GraphQL extended schema.
+   * @param \Drupal\graphql\GraphQL\ResolverRegistry|null $registry
+   *   Resolver registry.
+   * @param boolean $development
+   *   Schema development mode.
+   */
+  protected function mockExtendedSchema($id, $gql_schema, $gql_extended_schema, $development = FALSE) {
+    $this->schema = $this->getMockBuilder(SdlExtendedSchemaPluginBase::class)
+      ->setConstructorArgs([
+        [],
+        $id,
+        [],
+        $this->container->get('cache.graphql.ast'),
+        ['development' => $development]
+      ])
+      ->setMethods(['getSchemaDefinition', 'getExtendedSchemaDefinition', 'getResolverRegistry'])
+      ->getMockForAbstractClass();
+
+    $this->schema->expects(static::any())
+      ->method('getSchemaDefinition')
+      ->willReturn($gql_schema);
+
+    $this->schema->expects(static::any())
+      ->method('getExtendedSchemaDefinition')
+      ->willReturn($gql_extended_schema);
 
     if (!empty($registry)) {
       $this->schema->expects($this->any())
