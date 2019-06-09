@@ -276,7 +276,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     });
 
     $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
-      if (isset($params->queryId) && empty($params->getOriginalInput('query')) {
+      if (isset($params->queryId) && empty($params->getOriginalInput('query'))) {
         // Assume that pre-parsed documents are already validated. This allows
         // us to store pre-validated query documents e.g. for persisted queries
         // effectively improving performance by skipping run-time validation.
