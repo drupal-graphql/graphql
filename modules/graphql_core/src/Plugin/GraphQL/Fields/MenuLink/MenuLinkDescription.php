@@ -15,7 +15,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   secure = true,
  *   name = "description",
  *   type = "String",
- *   parents = {"MenuLink"}
+ *   parents = {"MenuLink"},
+ *   response_cache_contexts = {"languages:language_interface"}
  * )
  */
 class MenuLinkDescription extends FieldPluginBase {
