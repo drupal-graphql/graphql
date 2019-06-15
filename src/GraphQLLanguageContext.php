@@ -2,7 +2,9 @@
 
 namespace Drupal\graphql;
 
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\StringTranslation\TranslationManager;
 
 /**
  * Simple service that stores the current GraphQL language state.
@@ -36,13 +38,21 @@ class GraphQLLanguageContext {
   protected $languageManager;
 
   /**
+   * The string translation service
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationManager
+   */
+  protected $translationManager;
+
+  /**
    * GraphQLLanguageContext constructor.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    */
-  public function __construct(LanguageManagerInterface $languageManager) {
+  public function __construct(LanguageManagerInterface $languageManager, TranslationManager $translationManager) {
     $this->languageManager = $languageManager;
+    $this->translationManager = $translationManager;
     $this->languageStack = new \SplStack();
   }
 
@@ -77,6 +87,16 @@ class GraphQLLanguageContext {
     $this->currentLanguage = $language;
     $this->isActive = TRUE;
     $this->languageManager->reset();
+    // This is needed to be able to use the string translation with the
+    // requested language.
+    $this->translationManager->setDefaultLangcode($language);
+    // Override the configuration language so that config entities (like menus)
+    // are loaded using the proper translation.
+    $currentConfigLanguage = $this->languageManager->getConfigOverrideLanguage();
+    if ($currentConfigLanguage->getId() !== $language) {
+      $configLanguage = $this->languageManager->getLanguage($language);
+      $this->languageManager->setConfigOverrideLanguage($configLanguage);
+    }
     // Extract the result array.
     try {
       return call_user_func($callable);
@@ -89,6 +109,12 @@ class GraphQLLanguageContext {
       $this->currentLanguage = $this->languageStack->pop();
       $this->isActive = FALSE;
       $this->languageManager->reset();
+      // Restore the languages for the translation and language managers.
+      $defaultLangcode = !empty($this->currentLanguage)
+        ? $this->currentLanguage
+        : $this->languageManager->getDefaultLanguage()->getId();
+      $this->translationManager->setDefaultLangcode($defaultLangcode);
+      $this->languageManager->setConfigOverrideLanguage($currentConfigLanguage);
     }
   }
 
