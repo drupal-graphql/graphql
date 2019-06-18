@@ -4,7 +4,7 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
-use Drupal\graphql\GraphQL\Context\QueryContextInterface;
+use Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -12,7 +12,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
-   * @var \Drupal\graphql\GraphQL\Context\QueryContextInterface
+   * @var \Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface
    */
   protected $contextRepository;
 
@@ -24,10 +24,10 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   /**
    * ResolveContext constructor.
    *
-   * @param \Drupal\graphql\GraphQL\Context\QueryContextInterface $contextRepository
+   * @param \Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface $contextRepository
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $resolverRegistry
    */
-  public function __construct(QueryContextInterface $contextRepository, ResolverRegistryInterface $resolverRegistry) {
+  public function __construct(QueryContextRepositoryInterface $contextRepository, ResolverRegistryInterface $resolverRegistry) {
     $this->contextRepository = $contextRepository;
     $this->resolverRegistry = $resolverRegistry;
   }
@@ -39,28 +39,21 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
     return $this->resolverRegistry;
   }
 
-  public function executeInContext(callable $callable, ResolveInfo $info) {
-    $this->contextRepository->executeInContext($this, $info->path, $callable);
+  /**
+   * @return \Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface
+   */
+  public function getContextRepository() {
+    return $this->contextRepository;
   }
 
   /**
-   * Sets a contextual value for the current field and its descendants.
-   *
-   * Allows field resolvers to set contextual values which can be inherited by
-   * their descendants.
-   *
-   * @param string $name
-   *   The name of the context.
-   * @param $value
-   *   The value of the context.
+   * @param callable $callable
    * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *   The resolve info object.
    *
-   * @return $this
+   * @return mixed
    */
-  public function setContext($name, $value, ResolveInfo $info) {
-    $this->contextRepository->overrideContext($this, $info->path, $name, $value);
-    return $this;
+  public function executeInContext(callable $callable, ResolveInfo $info) {
+    return $this->contextRepository->executeInContext($this, $info->path, $callable);
   }
 
 }

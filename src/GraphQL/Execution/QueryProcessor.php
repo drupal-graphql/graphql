@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
 use GraphQL\Error\Error;
@@ -142,6 +143,7 @@ class QueryProcessor {
    * @param bool $batching
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function executeOperationWithReporting(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     $result = $this->executeOperation($adapter, $config, $params, $batching);
@@ -218,15 +220,16 @@ class QueryProcessor {
     }
   }
 
-    /**
-     * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-     * @param \GraphQL\Server\ServerConfig $config
-     * @param \GraphQL\Server\OperationParams $params
-     * @param \GraphQL\Language\AST\DocumentNode $document
-     * @param bool $validate
-     *
-     * @return \GraphQL\Executor\Promise\Promise|mixed
-     */
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \GraphQL\Server\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   * @param bool $validate
+   *
+   * @return \GraphQL\Executor\Promise\Promise|mixed
+   * @throws \Exception
+   */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     $inDebug = !!$config->getDebug();
     $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document);
@@ -269,6 +272,7 @@ class QueryProcessor {
    * @param bool $validate
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function executeUncachableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     $result = $this->doExecuteOperation($adapter, $config, $params, $document, $validate);
@@ -287,6 +291,7 @@ class QueryProcessor {
    * @param bool $validate
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function doExecuteOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     // If one of the validation rules found any problems, do not resolve the
@@ -303,7 +308,7 @@ class QueryProcessor {
     $schema = $config->getSchema();
 
     $promise = Executor::promiseToExecute(
-      new ContextualizedPromiseAdapter($context),
+      DeferredUtility::promiseAdapter(),
       $schema,
       $document,
       $root,

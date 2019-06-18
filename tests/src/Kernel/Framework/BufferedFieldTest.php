@@ -3,13 +3,13 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\Buffers\BufferBase;
+use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Zend\Stdlib\ArrayObject;
 use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\graphql\GraphQL\ResolverBuilder;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
 
 /**
  * Test batched field resolving.
@@ -90,7 +90,7 @@ GQL;
       'parent' => 'User',
     ], $builder->compose(
         $builder->fromParent(),
-        new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+        new Callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['name'];
         })
       )

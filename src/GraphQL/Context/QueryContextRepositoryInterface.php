@@ -2,17 +2,18 @@
 
 namespace Drupal\graphql\GraphQL\Context;
 
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 
 /**
  * Execute logic in context specific to a given query path.
  */
-interface QueryContextInterface {
+interface QueryContextRepositoryInterface extends ContextRepositoryInterface {
 
   /**
    * Override a context value for a given query path.
    *
-   * @param \Drupal\graphql\GraphQL\Context\ResolveContext $context
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param array $path
    *   The field path as an array.
    * @param $id
@@ -21,7 +22,21 @@ interface QueryContextInterface {
    *
    * @return void
    */
-  public function overrideContext(ResolveContext $context, array $path, $id, $value);
+  public function setContextValue(ResolveContext $context, array $path, $id, $value);
+
+  /**
+   * Retrieves a context value for a given query path.
+   *
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   * @param array $path
+   *   The field path as an array.
+   * @param $id
+   * @param $default
+   *   The default value.
+   *
+   * @return mixed
+   */
+  public function getContextValue(ResolveContext $context, array $path, $id, $default);
 
   /**
    * Execute a callable in the context registered for a given path.

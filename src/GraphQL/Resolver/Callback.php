@@ -1,14 +1,19 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql\GraphQL\Resolver;
 
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Class handles callable data producers.
- */
-class DataProducerCallable implements DataProducerInterface {
+class Callback implements ResolverInterface {
+
+  /**
+   * The callback.
+   *
+   * @var callable
+   */
+  protected $callback;
 
   /**
    * Construct DataProducerCallable object.
@@ -23,7 +28,7 @@ class DataProducerCallable implements DataProducerInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $result = ($this->callback)($value, $args, $context, $info);
     return $result;
   }

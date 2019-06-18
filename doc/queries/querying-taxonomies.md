@@ -1,4 +1,4 @@
-# Query Taxonomies
+# Querying taxonomies
 
 Another common entity in Drupal and one that provides great benefits to the usage of Drupal is taxonomy. Taxonomies can also be queried using GraphQL and the structure is very similar to how you query a node. For taxonomies the query **taxonomyTermQuery** and **taxonomyTermById** can be used to perform queries for a list of taxonomies terms or a single taxonomy term.
 
@@ -16,9 +16,9 @@ query {
 }
 ```
 
-This will fetch for a limit of 10 terms that belong to the vocabulary "tags". The result will once again be very much like what we asked for : 
+This will fetch for a limit of 10 terms that belong to the vocabulary "tags". The result will once again be very much like what we asked for :
 
-```json
+```javascript
 {
   "data": {
     "taxonomyTermQuery": {
@@ -43,7 +43,7 @@ This will fetch for a limit of 10 terms that belong to the vocabulary "tags". Th
 
 ## Querying a single term by its id
 
-Querying a single term can be done by taking advantage of the query **taxonomyTermById** which takes  as argument the id for the term we want to get.
+Querying a single term can be done by taking advantage of the query **taxonomyTermById** which takes as argument the id for the term we want to get.
 
 ```graphql
 query {
@@ -53,9 +53,9 @@ query {
 }
 ```
 
-And the result of this query will be whatever we asked for, in this case the entityLabel alone : 
+And the result of this query will be whatever we asked for, in this case the entityLabel alone :
 
-```json
+```javascript
 {
   "data": {
     "taxonomyTermById": {

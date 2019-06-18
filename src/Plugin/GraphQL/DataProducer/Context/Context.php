@@ -124,6 +124,7 @@ class Context extends DataProducerPluginBase implements ContainerFactoryPluginIn
     if ($value instanceof CacheableDependencyInterface) {
       $metadata->addCacheableDependency($value);
     }
+
     return $value;
   }
 
