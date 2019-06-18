@@ -2,14 +2,13 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
-use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -116,27 +115,26 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    * @param int[] $ids
    * @param string $language
    * @param string[] $bundles
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve(string $type, array $ids, string $language = NULL, array $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($type, array $ids, $language = NULL, array $bundles = NULL, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
-    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $metadata) {
+    return $context->deferInContext(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
-        $metadata->addCacheTags($tags);
+        $context->addCacheTags($tags);
         return [];
       }
 
       foreach ($entities as $id => $entity) {
-
-        $metadata->addCacheableDependency($entities[$id]);
+        $context->addCacheableDependency($entities[$id]);
 
         if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
           // If the entity is not among the allowed bundles, don't return it.
@@ -150,7 +148,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
         }
 
         $access = $entity->access('view', NULL, TRUE);
-        $metadata->addCacheableDependency($access);
+        $context->addCacheableDependency($access);
 
         if (!$access->isAllowed()) {
           // Do not return the entity if access is denied.

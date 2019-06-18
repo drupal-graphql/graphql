@@ -3,12 +3,11 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -39,14 +38,14 @@ class FieldExecutor {
    * @param $values
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
    */
-  public function resolve($values, ResolveContext $context, ResolveInfo $info, CacheableMetadata $metadata) {
+  public function resolve($values, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $output = $this->shouldLookupEdgeCache($values, $context, $info) ?
-      $this->resolveCached($values, $context, $info, $metadata) :
-      $this->resolveUncached($values, $context, $info, $metadata);
+      $this->resolveCached($values, $context, $info, $field) :
+      $this->resolveUncached($values, $context, $info, $field);
 
     return $output;
   }
@@ -111,17 +110,17 @@ class FieldExecutor {
    * @param $values
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
    */
-  protected function resolveUncached($values, ResolveContext $context, ResolveInfo $info, RefinableCacheableDependencyInterface $metadata) {
+  protected function resolveUncached($values, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $plugin = $this->getPlugin();
+    $output = call_user_func_array([$plugin, 'resolve'], array_merge($values, [$field]));
 
-    $output = call_user_func_array([$plugin, 'resolve'], array_merge($values, [$metadata]));
-    return DeferredUtility::applyFinally($output, function ($value) use ($metadata) {
+    return DeferredUtility::applyFinally($field, $output, function ($value) use ($field) {
       if ($value instanceof CacheableDependencyInterface) {
-        $metadata->addCacheableDependency($value);
+        $field->addCacheableDependency($value);
       }
     });
   }
@@ -134,26 +133,27 @@ class FieldExecutor {
    * @param $values
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
    */
-  protected function resolveCached($values, ResolveContext $context, ResolveInfo $info, RefinableCacheableDependencyInterface $metadata) {
-    if (!$prefix = $this->getCachePrefix($values, $context, $info)) {
+  protected function resolveCached($values, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+    if (!$prefix = $this->getCachePrefix($values, $context, $info, $field)) {
       throw new \LogicException('Failed to generate cache prefix.');
     }
 
     if ($cache = $this->cacheRead($prefix)) {
-      $metadata->addCacheableDependency($cache['metadata']);
+      $field->addCacheableDependency($cache['metadata']);
       return $this->unserializeCache($cache['value']);
     }
-    $output = $this->resolveUncached($values, $context, $info, $metadata);
-    return DeferredUtility::applyFinally($output, function ($value) use ($values, $context, $info, $metadata, $prefix) {
-      if ($metadata->getCacheMaxAge() === 0 || !$this->shouldWriteEdgeCache($value, $values, $context, $info)) {
+
+    $output = $this->resolveUncached($values, $context, $info, $field);
+    return DeferredUtility::applyFinally($field, $output, function ($value) use ($values, $context, $info, $field, $prefix) {
+      if ($field->getCacheMaxAge() === 0 || !$this->shouldWriteEdgeCache($value, $values, $context, $info, $field)) {
         return;
       }
 
-      $this->cacheWrite($prefix, $value, $metadata);
+      $this->cacheWrite($prefix, $value, $field);
     });
   }
 
@@ -209,11 +209,16 @@ class FieldExecutor {
   }
 
   /**
+   * @param $result
    * @param array $values
+   *
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return bool
    */
-  protected function shouldWriteEdgeCache($result, array $values, ResolveContext $context, ResolveInfo $info) {
+  protected function shouldWriteEdgeCache($result, array $values, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     // This function is only ever called if we are in a cached lookup. Hence, we
     // default to always returning TRUE. This results in any failed cache lookup
     // to always also write to the cache after resolving the result from
@@ -225,10 +230,11 @@ class FieldExecutor {
    * @param array $values
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return string
    */
-  protected function getCachePrefix(array $values, ResolveContext $context, ResolveInfo $info) {
+  protected function getCachePrefix(array $values, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $vectors = json_encode($this->getCacheVectors($values, $context, $info));
     $plugin = $this->id;
     return md5("$plugin:$vectors");
@@ -239,9 +245,11 @@ class FieldExecutor {
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
+   *
    * @return string
    */
-  protected function getCacheVectors(array $values, ResolveContext $context, ResolveInfo $info) {
+  protected function getCacheVectors(array $values, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     // TODO: Also serialize the configuration array.
     return array_map(function ($value) {
       if (is_scalar($value) || !isset($value)) {

@@ -7,6 +7,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataTrait;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -56,9 +57,9 @@ class Path implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($parent, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $value = $this->value ?? new ParentValue();
-    $value = $value->resolve($parent, $args, $context, $info);
+    $value = $value->resolve($value, $args, $context, $info, $field);
     $metadata = new BubbleableMetadata();
 
     $type = $this->type instanceof DataDefinitionInterface ? $this->type : DataDefinition::create($this->type);

@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Resolver;
 
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use GraphQL\Deferred;
@@ -35,26 +36,26 @@ class Condition implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $branches = $this->branches;
     while (list($condition, $resolver) = array_pad(array_shift($branches), 2, NULL)) {
       if ($condition instanceof ResolverInterface) {
-        if (($condition = $condition->resolve($value, $args, $context, $info)) === NULL) {
+        if (($condition = $condition->resolve($value, $args, $context, $info, $field)) === NULL) {
           // Bail out early if a resolver returns NULL.
           continue;
         }
       }
 
       if ($condition instanceof Deferred) {
-        return DeferredUtility::returnFinally($condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info) {
+        return DeferredUtility::returnFinally($field, $condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info, $field) {
           array_unshift($branches, [$cond, $resolver]);
-          return (new Condition($branches))->resolve($value, $args, $context, $info);
+          return (new Condition($branches))->resolve($value, $args, $context, $info, $field);
         });
       }
 
       if ((bool) $condition) {
         /** @var \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver */
-        return $resolver ? $resolver->resolve($value, $args, $context, $info) : $condition;
+        return $resolver ? $resolver->resolve($value, $args, $context, $info, $field) : $condition;
       }
     }
 

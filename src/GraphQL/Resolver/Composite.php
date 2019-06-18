@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Resolver;
 
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -29,24 +30,24 @@ class Composite implements ResolverInterface {
   /**
    * Add one more producer.
    *
-   * @param ResolverProxy $resolver
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    *   DataProducerProxy object.
    */
-  public function add(ResolverProxy $resolver) {
+  public function add(ResolverInterface $resolver) {
     $this->resolvers[] = $resolver;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $resolvers = $this->resolvers;
     while ($resolver = array_shift($resolvers)) {
       $value = $resolver->resolve($value, $args, $context, $info);
 
       if ($value instanceof Deferred) {
-        return DeferredUtility::returnFinally($value, function ($value) use ($resolvers, $args, $context, $info) {
-          return isset($value) ? (new Composite($resolvers))->resolve($value, $args, $context, $info) : NULL;
+        return DeferredUtility::returnFinally($field, $value, function ($value) use ($resolvers, $args, $context, $info, $field) {
+          return isset($value) ? (new Composite($resolvers))->resolve($value, $args, $context, $info, $field) : NULL;
         });
       }
     }

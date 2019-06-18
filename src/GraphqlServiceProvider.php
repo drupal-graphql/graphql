@@ -16,9 +16,12 @@ class GraphqlServiceProvider extends ServiceProviderBase {
     // Can be removed if this is fixed.
     // https://www.drupal.org/project/drupal/issues/2952789
     if ($container->hasDefinition('language_negotiator')) {
-      $container->getDefinition('language_negotiator')
+      $container
+        ->getDefinition('language_negotiator')
         ->setClass(FixedLanguageNegotiator::class);
     }
+
+    $container->setDefinition('context.repository', $container->getDefinition('graphql.context_repository'));
   }
 
 }

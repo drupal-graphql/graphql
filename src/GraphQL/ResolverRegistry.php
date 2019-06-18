@@ -2,9 +2,8 @@
 
 namespace Drupal\graphql\GraphQL;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Executor\Executor;
@@ -159,12 +158,12 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * @param string $type
    * @param string $field
-   * @param callable $resolver
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    *
    * @return $this
    */
-  public function addFieldResolver($type, $field, ResolverInterface $proxy_resolver) {
-    $this->fieldResolvers[$type][$field] = $proxy_resolver;
+  public function addFieldResolver($type, $field, ResolverInterface $resolver) {
+    $this->fieldResolvers[$type][$field] = $resolver;
     return $this;
   }
 
@@ -194,15 +193,19 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * {@inheritdoc}
    */
   public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info) {
-    // First, check if there is a resolver registered for this field.
-    if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
-      if (!$resolver instanceof ResolverInterface) {
-        throw new \LogicException(sprintf('Field resolver for field %s on type %s is not callable.', $info->fieldName, $info->parentType->name));
-      }
-      return $resolver->resolve($value, $args, $context, $info);
-    }
+    $field = new FieldContext($context, $info);
+    return $field->executeInContext(function () use ($value, $args, $context, $info, $field) {
+      // First, check if there is a resolver registered for this field.
+      if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
+        if (!$resolver instanceof ResolverInterface) {
+          throw new \LogicException(sprintf('Field resolver for field %s on type %s is not callable.', $info->fieldName, $info->parentType->name));
+        }
 
-    return call_user_func($this->defaultFieldResolver, $value, $args, $context, $info);
+        return $resolver->resolve($value, $args, $context, $info, $field);
+      }
+
+      return call_user_func($this->defaultFieldResolver, $value, $args, $context, $info, $field);
+    });
   }
 
   /**
@@ -211,9 +214,11 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
+   *
    * @return mixed|null
    */
-  public function resolveFieldDefault($value, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolveFieldDefault($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     return Executor::defaultFieldResolver($value, $args, $context, $info);
   }
 

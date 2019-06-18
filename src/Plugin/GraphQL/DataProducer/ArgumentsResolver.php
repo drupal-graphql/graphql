@@ -2,7 +2,10 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
+use Drupal\graphql\GraphQL\Execution\FieldContext;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
+use GraphQL\Type\Definition\ResolveInfo;
 
 class ArgumentsResolver {
 
@@ -40,11 +43,13 @@ class ArgumentsResolver {
    * @param $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return array Arguments to use.
+   * @throws \ReflectionException
    * @throws \Exception
    */
-  public function getArguments($value, $args, $context, $info) {
+  public function getArguments($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $class = $this->definition['class'];
 
     // TODO: Use dynamic method name.
@@ -69,12 +74,13 @@ class ArgumentsResolver {
       }
 
       // Resolve argument value.
-      $values[$key] = isset($mapper) ? $mapper->resolve($value, $args, $context, $info) : NULL;
+      $values[$key] = isset($mapper) ? $mapper->resolve($value, $args, $context, $info, $field) : NULL;
 
       if (!$param->isDefaultValueAvailable() && !isset($values[$key])) {
         throw new \Exception(sprintf('Missing input data for argument %s on field %s on type %s.', $key));
       }
     }
+
     return $values;
   }
 

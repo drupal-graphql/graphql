@@ -94,9 +94,11 @@ class Context extends DataProducerPluginBase implements ContainerFactoryPluginIn
    * @param string $id
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
+   * @param callable $defer
+   *
    * @return string
    */
-  public function resolve(Url $url, $id, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(Url $url, $id, RefinableCacheableDependencyInterface $metadata, callable $defer) {
     if (is_null($url)) {
       return $this->resolveContext($id, $metadata);
     }
@@ -105,7 +107,7 @@ class Context extends DataProducerPluginBase implements ContainerFactoryPluginIn
       return $this->resolveContext($id, $metadata);
     });
 
-    return new Deferred(function () use ($resolver) {
+    return $defer(function () use ($resolver) {
       return $resolver();
     });
   }
@@ -122,6 +124,7 @@ class Context extends DataProducerPluginBase implements ContainerFactoryPluginIn
     if ($value instanceof CacheableDependencyInterface) {
       $metadata->addCacheableDependency($value);
     }
+
     return $value;
   }
 
