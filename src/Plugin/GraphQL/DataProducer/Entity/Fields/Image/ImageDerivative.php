@@ -31,6 +31,9 @@ class ImageDerivative extends DataProducerPluginBase {
   /**
    * @param \Drupal\file\FileInterface $entity
    *
+   * @param $style
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *
    * @return mixed
    */
   public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {

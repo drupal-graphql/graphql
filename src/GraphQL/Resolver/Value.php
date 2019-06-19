@@ -17,10 +17,9 @@ class Value implements ResolverInterface {
   protected $value;
 
   /**
-   * Constructor.
+   * Value constructor.
    *
-   * @param mixed $value
-   *   Value.
+   * @param $value
    */
   public function __construct($value) {
     $this->value = $value;

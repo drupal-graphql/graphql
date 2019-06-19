@@ -16,10 +16,9 @@ class Callback implements ResolverInterface {
   protected $callback;
 
   /**
-   * Construct DataProducerCallable object.
+   * Callback constructor.
    *
    * @param callable $callback
-   *   Callback.
    */
   public function __construct(callable $callback) {
     $this->callback = $callback;

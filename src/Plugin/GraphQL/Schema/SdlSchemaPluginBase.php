@@ -7,7 +7,6 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
@@ -39,11 +38,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected $inDevelopment;
 
   /**
-   * @var \Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface
-   */
-  protected $contextRepository;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -54,7 +48,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('cache.graphql.ast'),
-      $container->get('context.repository'),
       $container->getParameter('graphql.config')
     );
   }

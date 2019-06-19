@@ -17,14 +17,4 @@ interface DataProducerPluginInterface extends ContextAwarePluginInterface, Cache
    */
   public function resolveInContext(FieldContext $field);
 
-  /**
-   * @return boolean
-   */
-  public function useEdgeCache();
-
-  /**
-   * @return string|null
-   */
-  public function edgeCachePrefix();
-
 }

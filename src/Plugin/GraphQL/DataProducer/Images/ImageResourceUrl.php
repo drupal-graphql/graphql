@@ -22,7 +22,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class ImageResourceUrl extends DataProducerPluginBase {
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param $derivative
    *
    * @return mixed
    */

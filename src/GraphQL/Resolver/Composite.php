@@ -18,10 +18,9 @@ class Composite implements ResolverInterface {
   protected $resolvers = [];
 
   /**
-   * Construct DataProducerComposit object.
+   * Composite constructor.
    *
    * @param array $resolvers
-   *   Array of Data Producers.
    */
   public function __construct(array $resolvers) {
     $this->resolvers = $resolvers;

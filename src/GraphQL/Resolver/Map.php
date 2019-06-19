@@ -16,10 +16,9 @@ class Map implements ResolverInterface {
   protected $resolver;
 
   /**
-   * Constructor.
+   * Map constructor.
    *
-   * @param mixed $resolver
-   *   Resolver to tap.
+   * @param $resolver
    */
   public function __construct($resolver) {
     $this->resolver = $resolver;

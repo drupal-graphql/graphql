@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\Annotation\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -91,22 +92,20 @@ class Context extends DataProducerPluginBase implements ContainerFactoryPluginIn
   /**
    * @param \Drupal\Core\Url $url
    * @param string $id
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *
-   * @param callable $defer
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return string
    */
-  public function resolve(Url $url, $id, RefinableCacheableDependencyInterface $metadata, callable $defer) {
+  public function resolve(Url $url, $id, FieldContext $context) {
     if (is_null($url)) {
-      return $this->resolveContext($id, $metadata);
+      return $this->resolveContext($id, $context);
     }
 
-    $resolver = $this->subRequestBuffer->add($url, function () use ($metadata, $id) {
-      return $this->resolveContext($id, $metadata);
+    $resolver = $this->subRequestBuffer->add($url, function () use ($context, $id) {
+      return $this->resolveContext($id, $context);
     });
 
-    return $defer(function () use ($resolver) {
+    return $context->deferInContext(function () use ($resolver) {
       return $resolver();
     });
   }

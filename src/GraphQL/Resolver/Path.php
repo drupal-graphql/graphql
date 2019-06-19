@@ -39,14 +39,11 @@ class Path implements ResolverInterface {
   protected $value;
 
   /**
-   * Constructor.
+   * Path constructor.
    *
-   * @param string $type
-   *   Entity type.
-   * @param string $path
-   *   Path to get value.
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
-   *   Resolver.
+   * @param $type
+   * @param $path
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|NULL $value
    */
   public function __construct($type, $path, ResolverInterface $value = NULL) {
     $this->type = $type;

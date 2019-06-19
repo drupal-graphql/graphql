@@ -6,12 +6,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\graphql\GraphQL\Execution\FieldContext;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
-use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
-use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class DataProducerPluginManager extends DefaultPluginManager {
@@ -87,7 +82,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
    *
    * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
-  public function proxy($id, array $config = []) {
+  public function proxy($id, array $config = NULL) {
     return new DataProducerProxy(
       $id,
       $config,

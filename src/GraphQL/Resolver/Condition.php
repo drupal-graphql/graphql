@@ -24,10 +24,9 @@ class Condition implements ResolverInterface {
   protected $branches;
 
   /**
-   * Constructor.
+   * Condition constructor.
    *
    * @param array $branches
-   *   List of condition and their corresponding resolvers.
    */
   public function __construct(array $branches) {
     $this->branches = $branches;

@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 
 abstract class DataProducerPluginBase extends ContextAwarePluginBase implements DataProducerPluginInterface {
+  use DataProducerPluginCachingTrait;
 
   /**
    * {@inheritdoc}
@@ -62,27 +63,13 @@ abstract class DataProducerPluginBase extends ContextAwarePluginBase implements 
    * {@inheritdoc}
    */
   public function resolveInContext(FieldContext $field) {
-    // TODO: Re-add edge caching logic.
     if (!method_exists($this, 'resolve')) {
       throw new \LogicException('Missing data producer resolve method.');
     }
 
+    // TODO: The field context should probably be the first argument.
     $context = $this->getContextValues();
     return call_user_func_array([$this, 'resolve'], array_merge($context, [$field]));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function useEdgeCache() {
-    return !empty($this->configuration['cache']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function edgeCachePrefix() {
-    return md5(serialize($this->getContextValues()));
   }
 
 }

@@ -16,10 +16,9 @@ class Tap implements ResolverInterface {
   protected $resolver;
 
   /**
-   * Constructor.
+   * Tap constructor.
    *
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
-   *   Resolver to tap.
    */
   public function __construct(ResolverInterface $resolver) {
     $this->resolver = $resolver;

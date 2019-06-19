@@ -6,9 +6,6 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * An interface defining a data producer.
- */
 interface ResolverInterface {
 
   /**

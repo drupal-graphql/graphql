@@ -10,6 +10,7 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
+use Drupal\graphql\Plugin\DataProducerPluginCachingInterface;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -57,6 +58,16 @@ class DataProducerProxy implements ResolverInterface {
   protected $cacheBackend;
 
   /**
+   * @var array
+   */
+  protected $mapping = [];
+
+  /**
+   * @var boolean
+   */
+  protected $cached = FALSE;
+
+  /**
    * Construct DataProducerProxy object.
    *
    * @param string $id
@@ -90,7 +101,7 @@ class DataProducerProxy implements ResolverInterface {
    *
    * @return mixed
    */
-  public static function create($id, array $config = []) {
+  public static function create($id, array $config = NULL) {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
     return $manager->proxy($id, $config);
   }
@@ -102,7 +113,7 @@ class DataProducerProxy implements ResolverInterface {
    * @return $this
    */
   public function map($name, ResolverInterface $mapping) {
-    $this->config['mapping'][$name] = $mapping;
+    $this->mapping[$name] = $mapping;
     return $this;
   }
 
@@ -112,7 +123,7 @@ class DataProducerProxy implements ResolverInterface {
    * @return $this
    */
   public function cached($cached = TRUE) {
-    $this->config['cache'] = $cached;
+    $this->cached = $cached;
     return $this;
   }
 
@@ -132,7 +143,7 @@ class DataProducerProxy implements ResolverInterface {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
     return DeferredUtility::returnFinally($field, $plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
-      return $plugin->useEdgeCache() ?
+      return $this->cached && $plugin instanceof DataProducerPluginCachingInterface ?
         $this->resolveCached($plugin, $context, $field) :
         $this->resolveUncached($plugin, $context, $field);
     });
@@ -153,11 +164,10 @@ class DataProducerProxy implements ResolverInterface {
   protected function prepare($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     /** @var DataProducerPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($this->id, $this->config);
-    $config = $plugin->getConfiguration();
     $contexts = [];
 
     foreach ($plugin->getContextDefinitions() as $name => $definition) {
-      $mapper = $config['mapping'][$name] ?? NULL;
+      $mapper = $this->mapping[$name] ?? NULL;
       if (isset($mapper)) {
         if (!$mapper instanceof ResolverInterface) {
           throw new \Exception(sprintf('Invalid input mapper for argument %s.', $name));
@@ -193,13 +203,13 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin
+   * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
    */
-  protected function resolveCached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field) {
+  protected function resolveCached(DataProducerPluginCachingInterface $plugin, ResolveContext $context, FieldContext $field) {
     $prefix = $this->edgeCachePrefix($plugin);
     if ($cache = $this->cacheRead($prefix)) {
       list($value, $metadata) = $cache;
@@ -218,11 +228,11 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin
+   * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
    *
    * @return string
    */
-  protected function edgeCachePrefix(DataProducerPluginInterface $plugin) {
+  protected function edgeCachePrefix(DataProducerPluginCachingInterface $plugin) {
     $id = $plugin->getPluginId();
     $keys = $this->contextsManager->convertTokensToKeys($plugin->getCacheContexts())->getKeys();
 
