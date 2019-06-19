@@ -10,7 +10,6 @@ use Drupal\Core\Url;
 use Drupal\graphql\Annotation\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\SubRequestBuffer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
-use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -103,7 +102,7 @@ class Context extends DataProducerPluginBase implements ContainerFactoryPluginIn
       return $this->resolveContext($id, $metadata);
     }
 
-    $resolver =  $this->subRequestBuffer->add($url, function () use ($metadata, $id) {
+    $resolver = $this->subRequestBuffer->add($url, function () use ($metadata, $id) {
       return $this->resolveContext($id, $metadata);
     });
 

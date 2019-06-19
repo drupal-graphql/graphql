@@ -74,12 +74,6 @@ services:
     tags:
       - { name: event_subscriber }
 
-  # Context repository for fetching contexts from sub-requests.
-  graphql.context_repository:
-    class: Drupal\graphql\GraphQL\Context\ContextRepository
-    tags:
-      - { name: service_collector, tag: context_provider, call: addContextProvider }
-
   # Plugin manager for schemas
   plugin.manager.graphql.schema:
     class: Drupal\graphql\Plugin\SchemaPluginManager
@@ -99,6 +93,9 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
+      - '@request_stack'
+      - '@cache_contexts_manager'
+      - '@cache.graphql.results'
       - '\Drupal\graphql\Plugin\DataProducerPluginInterface'
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
@@ -115,8 +112,8 @@ services:
     arguments: ['@http_kernel', '@request_stack']
 
   # Contextual language handling https://www.drupal.org/project/drupal/issues/2952789
-  graphql.language_context:
-    class: Drupal\graphql\Language\LanguageContext
+  graphql.context.language:
+    class: Drupal\graphql\GraphQL\Context\Handlers\LanguageContextHandler
     arguments: ['@language_manager']
   graphql.config_factory_override:
     class: Drupal\graphql\Language\ConfigOverrides

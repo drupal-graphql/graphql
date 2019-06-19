@@ -26,6 +26,8 @@ class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GraphQL\Server\RequestError
    */
   public function enhance(array $defaults, Request $request) {
     $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];

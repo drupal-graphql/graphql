@@ -194,6 +194,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    */
   public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info) {
     $field = new FieldContext($context, $info);
+
     return $field->executeInContext(function () use ($value, $args, $context, $info, $field) {
       // First, check if there is a resolver registered for this field.
       if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
@@ -284,7 +285,6 @@ class ResolverRegistry implements ResolverRegistryInterface {
 
     foreach ($types as $type) {
       $name = $type->name;
-
       // TODO: Warn about performance impact of generic type resolution?
       if (isset($this->dataTypes[$name]) && $definition = $this->dataTypes[$name]) {
         if ($definition->isSatisfiedBy(new Context($definition, $value))) {

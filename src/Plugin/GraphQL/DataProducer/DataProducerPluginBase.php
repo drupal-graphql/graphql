@@ -2,13 +2,12 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\PluginBase;
-use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Component\Plugin\Exception\ContextException;
+use Drupal\Core\Plugin\ContextAwarePluginBase;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 
-class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInterface, PluginFormInterface, DataProducerPluginInterface {
+abstract class DataProducerPluginBase extends ContextAwarePluginBase implements DataProducerPluginInterface {
 
   /**
    * {@inheritdoc}
@@ -39,38 +38,51 @@ class DataProducerPluginBase extends PluginBase implements ConfigurablePluginInt
 
   /**
    * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
    */
-  public function calculateDependencies() {
-    return [];
+  public function getContextDefinitions() {
+    $definition = $this->getPluginDefinition();
+    return !empty($definition['consumes']) ? $definition['consumes'] : [];
   }
 
   /**
    * {@inheritdoc}
    *
-   * @codeCoverageIgnore
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    // TODO: Add configuration form for mappings.
-    return $form;
+  public function getContextDefinition($name) {
+    $definitions = $this->getContextDefinitions();
+    if (!empty($definitions[$name])) {
+      return $definitions[$name];
+    }
+
+    throw new ContextException(sprintf("The %s context is not a valid context.", $name));
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Add configuration validation for mappings.
+  public function resolveInContext(FieldContext $field) {
+    // TODO: Re-add edge caching logic.
+    if (!method_exists($this, 'resolve')) {
+      throw new \LogicException('Missing data producer resolve method.');
+    }
+
+    $context = $this->getContextValues();
+    return call_user_func_array([$this, 'resolve'], array_merge($context, [$field]));
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Save mappings.
+  public function useEdgeCache() {
+    return !empty($this->configuration['cache']);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function edgeCachePrefix() {
+    return md5(serialize($this->getContextValues()));
+  }
+
 }

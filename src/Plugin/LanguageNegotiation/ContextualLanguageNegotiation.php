@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\LanguageNegotiation;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Context\Handlers\LanguageContextHandler;
 use Drupal\graphql\Language\LanguageContext;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,38 +22,35 @@ use Symfony\Component\HttpFoundation\Request;
 class ContextualLanguageNegotiation extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The language negotiation method id.
+   */
+  const METHOD_ID = 'language-graphql';
+
+  /**
    * The graphql language context.
    *
-   * @var \Drupal\graphql\Language\LanguageContext
+   * @var \Drupal\graphql\GraphQL\Context\Handlers\LanguageContextHandler
    */
   protected $languageContext;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(
-    ContainerInterface $container,
-    array $configuration,
-    $plugin_id,
-    $plugin_definition
-  ) {
-    return new static($container->get('graphql.language_context'));
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $container->get('graphql.context.language')
+    );
   }
 
   /**
-   * LanguageNegotiationGraphQL constructor.
+   * ContextualLanguageNegotiation constructor.
    *
-   * @param \Drupal\graphql\Language\LanguageContext $languageContext
+   * @param \Drupal\graphql\GraphQL\Context\Handlers\LanguageContextHandler $languageContext
    *   Instance of the graphql language context.
    */
-  public function __construct(LanguageContext $languageContext) {
+  public function __construct(LanguageContextHandler $languageContext) {
     $this->languageContext = $languageContext;
   }
-
-  /**
-   * The language negotiation method id.
-   */
-  const METHOD_ID = 'language-graphql';
 
   /**
    * {@inheritdoc}

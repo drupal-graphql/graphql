@@ -32,6 +32,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    */
   public function __construct(ResolveContext $context, ResolveInfo $info) {
+    $this->addCacheContexts(['user.permissions']);
+
     $this->context = $context;
     $this->info = $info;
   }
@@ -42,8 +44,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @return mixed
    */
   public function executeInContext(callable $callable) {
-    $repository = $this->context->getContextRepository();
-    return $repository->executeInContext($this->context, $this->info->path, $callable);
+    return $callable();
   }
 
   /**
@@ -71,8 +72,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @return $this
    */
   public function setContextValue($name, $value) {
-    $repository = $this->context->getContextRepository();
-    $repository->setContextValue($this->context, $this->info->path, $name, $value);
+    // TODO: Set context value in context bag (path based).
     return $this;
   }
 
@@ -83,7 +83,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @return mixed
    */
   public function getContextValue($name, $default) {
-    $repository = $this->context->getContextRepository();
-    return $repository->getContextValue($this->context, $this->info->path, $name, $default);
+    // TODO: Get context value from context bag (path based).
+    return NULL;
   }
 }

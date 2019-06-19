@@ -13,7 +13,6 @@ use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Error\InvariantViolation;
-use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
@@ -71,7 +70,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The plugin definition array.
    * @param \Drupal\Core\Cache\CacheBackendInterface $astCache
    *   The cache bin for caching the parsed SDL.
-   * @param \Drupal\graphql\GraphQL\Context\QueryContextRepositoryInterface $contextRepository
    * @param $config
    *   The service configuration.
    *
@@ -82,13 +80,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $pluginId,
     $pluginDefinition,
     CacheBackendInterface $astCache,
-    QueryContextRepositoryInterface $contextRepository,
     $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->inDevelopment = !empty($config['development']);
     $this->astCache = $astCache;
-    $this->contextRepository = $contextRepository;
   }
 
   /**
@@ -108,6 +104,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GraphQL\Error\SyntaxError
    */
   public function validateSchema() {
     /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */
@@ -151,7 +149,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // allows us to collect the cache metadata and contextual values (e.g.
     // inheritance for language) for each query separately.
     return function ($params, $document, $operation) use ($registry) {
-      $context = new ResolveContext($this->contextRepository, $registry);
+      $context = new ResolveContext($registry);
       $context->addCacheTags(['graphql_response']);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);

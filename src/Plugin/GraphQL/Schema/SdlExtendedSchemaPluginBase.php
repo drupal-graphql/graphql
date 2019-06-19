@@ -21,6 +21,8 @@ abstract class SdlExtendedSchemaPluginBase extends SdlSchemaPluginBase {
    *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed extended schema document.
+   *
+   * @throws \GraphQL\Error\SyntaxError
    */
   protected function getExtendedSchemaDocument() {
     // Only use caching of the parsed document if we aren't in development mode.
@@ -38,6 +40,8 @@ abstract class SdlExtendedSchemaPluginBase extends SdlSchemaPluginBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GraphQL\Error\Error
    */
   public function getSchema() {
     return SchemaExtender::extend(parent::getSchema(), $this->getExtendedSchemaDocument());

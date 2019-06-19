@@ -62,7 +62,7 @@ class QueryProcessor {
   protected $requestStack;
 
   /**
-   * Processor constructor.
+   * QueryProcessor constructor.
    *
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
@@ -95,6 +95,8 @@ class QueryProcessor {
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
+   *
+   * @throws \Exception
    */
   public function processQuery($schema, $params) {
     if (!$server = Server::load($schema)) {
@@ -113,6 +115,8 @@ class QueryProcessor {
    * @param \GraphQL\Server\OperationParams $params
    *
    * @return mixed
+   *
+   * @throws \Exception
    */
   public function executeSingle(ServerConfig $config, OperationParams $params) {
     $adapter = new SyncPromiseAdapter();

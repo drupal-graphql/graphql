@@ -50,7 +50,7 @@ GQL;
 
     $this->setUpSchema($gql_schema, $this->getDefaultSchema());
 
-    $this->languageContext = $this->container->get('graphql.language_context');
+    $this->languageContext = $this->container->get('graphql.context.language');
 
     foreach (['Query', 'Node'] as $parent) {
       $this->mockField('edge', [
@@ -89,7 +89,7 @@ GQL;
    * Test if the language negotiator is injected properly.
    */
   public function testNegotiatorInjection() {
-    $context = $this->container->get('graphql.language_context');
+    $context = $this->container->get('graphql.context.language');
     $negotiator = $this->container->get('language_negotiator');
 
     $this->assertInstanceOf(FixedLanguageNegotiator::class, $negotiator);
@@ -125,10 +125,10 @@ GQL;
    * Test the language context service.
    */
   public function testLanguageContext() {
-    $context = $this->container->get('graphql.language_context');
+    $context = $this->container->get('graphql.context.language');
 
     $this->assertEquals('fr', $context->executeInLanguageContext(function () {
-      return \Drupal::service('graphql.language_context')->getCurrentLanguage();
+      return \Drupal::service('graphql.context.language')->getCurrentLanguage();
     }, 'fr'), 'Unexpected language context result.');
   }
 
@@ -136,7 +136,7 @@ GQL;
    * Test the language negotiation within a context.
    */
   public function testLanguageNegotiation() {
-    $context = $this->container->get('graphql.language_context');
+    $context = $this->container->get('graphql.context.language');
 
     $this->assertEquals('fr', $context->executeInLanguageContext(function () {
       return \Drupal::service('language_manager')->getCurrentLanguage()->getId();
