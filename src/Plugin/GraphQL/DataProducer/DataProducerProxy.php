@@ -266,7 +266,6 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * @param $prefix
-   *
    * @param $value
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    */

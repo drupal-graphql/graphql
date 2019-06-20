@@ -10,6 +10,7 @@ use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\ExecutionResult;
@@ -103,11 +104,23 @@ class QueryProcessor {
       throw new \InvalidArgumentException(sprintf('The requested schema %s could not be loaded.', $schema));
     }
 
-    if (is_array($params)) {
-      return $this->executeBatch($server->configuration(), $params);
+    // TODO: Properly initialize all contexts.
+    $manager = \Drupal::languageManager();
+    if ($manager instanceof ConfigurableLanguageManagerInterface) {
+      $negotiator = $manager->getNegotiator();
+      $manager->setNegotiator(\Drupal::service('graphql.language_negotiator'));
     }
 
-    return $this->executeSingle($server->configuration(), $params);
+    $output = is_array($params) ?
+      $this->executeBatch($server->configuration(), $params) :
+      $this->executeSingle($server->configuration(), $params);
+
+    // TODO: Properly reset all contexts.
+    if ($manager instanceof ConfigurableLanguageManagerInterface && isset($negotiator)) {
+      $manager->setNegotiator($negotiator);
+    }
+
+    return $output;
   }
 
   /**
@@ -118,7 +131,7 @@ class QueryProcessor {
    *
    * @throws \Exception
    */
-  public function executeSingle(ServerConfig $config, OperationParams $params) {
+  protected function executeSingle(ServerConfig $config, OperationParams $params) {
     $adapter = new SyncPromiseAdapter();
     $result = $this->executeOperationWithReporting($adapter, $config, $params, FALSE);
     return $adapter->wait($result);
@@ -130,7 +143,7 @@ class QueryProcessor {
    *
    * @return mixed
    */
-  public function executeBatch(ServerConfig $config, array $params) {
+  protected function executeBatch(ServerConfig $config, array $params) {
     $adapter = new SyncPromiseAdapter();
     $result = array_map(function ($params) use ($adapter, $config) {
       return $this->executeOperationWithReporting($adapter, $config, $params, TRUE);
@@ -153,7 +166,7 @@ class QueryProcessor {
     $result = $this->executeOperation($adapter, $config, $params, $batching);
 
     // Format and print errors.
-    return $result->then(function(QueryResult $result) use ($config) {
+    return $result->then(function (QueryResult $result) use ($config) {
       if ($config->getErrorsHandler()) {
         $result->setErrorsHandler($config->getErrorsHandler());
       }

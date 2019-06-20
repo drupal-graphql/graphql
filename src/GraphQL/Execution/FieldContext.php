@@ -4,6 +4,7 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -19,11 +20,6 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @var \GraphQL\Type\Definition\ResolveInfo
    */
   protected $info;
-
-  /**
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
-   */
-  protected $repository;
 
   /**
    * FieldContext constructor.
@@ -44,6 +40,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @return mixed
    */
   public function executeInContext(callable $callable) {
+    // TODO: Decorate with current contexts based on path.
     return $callable();
   }
 

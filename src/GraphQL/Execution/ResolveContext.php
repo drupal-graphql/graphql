@@ -6,8 +6,10 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 
+// TODO: Add path based context bag.
 class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
+
   /**
    * @var \Drupal\graphql\GraphQL\ResolverRegistryInterface
    */

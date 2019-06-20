@@ -31,6 +31,8 @@ class Introspection {
    *
    * @return array The introspection result as an array.
    *   The introspection result as an array.
+   *
+   * @throws \Exception
    */
   public function introspect($schema) {
     $query = IntrospectionType::getIntrospectionQuery(['descriptions' => TRUE]);
