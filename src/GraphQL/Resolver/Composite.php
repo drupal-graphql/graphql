@@ -42,7 +42,7 @@ class Composite implements ResolverInterface {
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $resolvers = $this->resolvers;
     while ($resolver = array_shift($resolvers)) {
-      $value = $resolver->resolve($value, $args, $context, $info);
+      $value = $resolver->resolve($value, $args, $context, $info, $field);
 
       if ($value instanceof Deferred) {
         return DeferredUtility::returnFinally($field, $value, function ($value) use ($resolvers, $args, $context, $info, $field) {
