@@ -8,7 +8,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  * @DataProducer(
  *   id = "seek",
  *   name = @Translation("Seek"),
- *   description = @Translation("Seeks an array positiom."),
+ *   description = @Translation("Seeks an array position."),
  *   produces = @ContextDefinition("any",
  *     label = @Translation("Element")
  *   ),

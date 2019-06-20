@@ -81,6 +81,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
+   * TODO: Remove the ability to override this.
+   *
    * {@inheritdoc}
    *
    * @throws \GraphQL\Error\SyntaxError
@@ -133,6 +135,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
+   * TODO: Remove the ability to override this.
+   *
    * {@inheritdoc}
    */
   public function getContext() {
@@ -153,6 +157,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
+   * TODO: Remove the ability to override this.
+   *
    * {@inheritdoc}
    */
   public function getFieldResolver() {
@@ -162,6 +168,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
+   * TODO: Remove the ability to override this.
+   *
    * Resolves the name of concrete type at run-time.
    *
    * @param \GraphQL\Language\AST\TypeDefinitionNode $type
@@ -181,6 +189,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed schema document.
+   *
    * @throws \GraphQL\Error\SyntaxError
    */
   protected function getSchemaDocument() {

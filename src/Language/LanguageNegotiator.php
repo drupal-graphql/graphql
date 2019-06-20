@@ -43,24 +43,27 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    */
   public function initializeType($type) {
     $languages = $this->manager->getLanguages();
-    $langcode = $this->context->getLangcode();
-    $language = isset($languages[$langcode]) ? $languages[$langcode] : NULL;
+    $language = $this->context->getLangcode();
 
-    if (!empty($language)) {
-      $this->context->persist($language);
-      return [LanguageContextHandler::METHOD_ID => $language];
+    if (isset($languages[$language])) {
+      $this->context->persist($languages[$language]);
+
+      $method = LanguageContextHandler::METHOD_ID;
+      return [$method => $languages[$language]];
     }
 
-    return [LanguageNegotiatorInterface::METHOD_ID => $this->manager->getDefaultLanguage()];
+    $method = LanguageNegotiatorInterface::METHOD_ID;
+    return [$method => $this->manager->getDefaultLanguage()];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getNegotiationMethods($type = NULL) {
-    return [LanguageContextHandler::METHOD_ID => [
-      'class' => LanguageContextHandler::class,
-    ]];
+    $method = LanguageContextHandler::METHOD_ID;
+    $class = LanguageContextHandler::class;
+
+    return [$method => ['class' => $class]];
   }
 
   /**
@@ -89,7 +92,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
       return TRUE;
     }
 
-    return FALSE;
+    throw new \LogicException('Invalid language negotiation method.');
   }
 
   /**
