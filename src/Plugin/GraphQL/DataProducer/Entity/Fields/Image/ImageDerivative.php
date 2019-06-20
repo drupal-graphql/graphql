@@ -37,7 +37,6 @@ class ImageDerivative extends DataProducerPluginBase {
    * @return mixed
    */
   public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
-
     // Return if we dont have an entity.
     if (!$entity) {
       return NULL;
@@ -61,6 +60,8 @@ class ImageDerivative extends DataProducerPluginBase {
         'height' => $dimensions['height'],
       ];
     }
+
+    return NULL;
   }
 
 }
