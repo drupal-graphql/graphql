@@ -28,7 +28,7 @@ This trade-off does come with costs mostly around ease of use, where in the 3.x 
    [http://graphql.org/learn/](http://graphql.org/learn/)
 
 2. Install the module and enable GraphQL.
-3. Login and navigate to `/admin/config/graphql` create a new server. You can use the Test schemam that comes with the module to try out using GraphQL for the first time before making your own schema. Create the server and specify and endpoint such as `/graphql`. After creating the server click on `explorer` and this should bring you to the Graphiql explorer.
+3. Login and navigate to `/admin/config/graphql` create a new server. You can use the Test schema that comes with the module to try out using GraphQL for the first time before making your own schema. Create the server and specify and endpoint such as `/graphql`. After creating the server click on `explorer` and this should bring you to the Graphiql explorer.
 
 For a query to work first you need to make an Article node. Create one with the title "Hello GraphQL" and save it.
 

@@ -14,6 +14,8 @@
 ## Queries
 
 * [Queries](queries/README.md)
+* [Nodes](queries/nodes.md)
+* [Entity references](queries/references.md)
 
 ## Mutations
 
