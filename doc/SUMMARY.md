@@ -10,12 +10,14 @@
 * [Data Producers](producers/README.md)
 * [Built-in producers](producers/built-in.md)
 * [Custom producers](producers/custom.md)
+* [Composing producers](producers/composing.md)
 
 ## Queries
 
 * [Queries](queries/README.md)
 * [Nodes](queries/nodes.md)
 * [Entity references](queries/references.md)
+* [Menus](queries/menus.md)
 
 ## Mutations
 

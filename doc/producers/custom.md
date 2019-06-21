@@ -113,7 +113,7 @@ $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
 ));
 ```
 
-Notice how we combine our custom data producer with a built-in `entity_load` to make querying more performance and standardized across.
+Notice how we combine our custom data producer with a built-in `entity_load` to make querying more performance and standardized across. We will look at `compose` in more detail in the next section.
 
 In the end when we do a query like this : 
 
