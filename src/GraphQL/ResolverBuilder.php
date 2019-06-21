@@ -2,97 +2,87 @@
 
 namespace Drupal\graphql\GraphQL;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataTrait;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\GraphQL\Utility\DeferredUtility;
-use Drupal\typed_data\DataFetcherTrait;
-use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
+use Drupal\graphql\GraphQL\Resolver\Argument;
+use Drupal\graphql\GraphQL\Resolver\Callback;
+use Drupal\graphql\GraphQL\Resolver\Composite;
+use Drupal\graphql\GraphQL\Resolver\Condition;
+use Drupal\graphql\GraphQL\Resolver\Context;
+use Drupal\graphql\GraphQL\Resolver\Map;
+use Drupal\graphql\GraphQL\Resolver\ParentValue;
+use Drupal\graphql\GraphQL\Resolver\Path;
+use Drupal\graphql\GraphQL\Resolver\SourceContext;
+use Drupal\graphql\GraphQL\Resolver\Tap;
+use Drupal\graphql\GraphQL\Resolver\Value;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerComposite;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
+use Drupal\typed_data\DataFetcherTrait;
+use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 class ResolverBuilder {
   use TypedDataTrait;
   use DataFetcherTrait;
 
   /**
-   * @param callable|callable[] ...$resolvers
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[] $resolvers
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Composite
    */
-  public function compose(DataProducerInterface ...$resolvers) {
-    return new DataProducerComposite($resolvers);
+  public function compose(ResolverInterface ...$resolvers) {
+    return new Composite($resolvers);
+  }
+
+  /**
+   * @param ResolverInterface $callback
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\Tap
+   */
+  public function tap(ResolverInterface $callback) {
+    return new Tap($callback);
+  }
+
+  /**
+   * @param ResolverInterface $callback
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\Map
+   */
+  public function map(ResolverInterface $callback) {
+    return new Map($callback);
   }
 
   /**
    * @param callable $callback
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Callback
    */
-  public function tap(DataProducerInterface $callback) {
-    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($callback) {
-      $callback->resolve($value, $args, $context, $info);
-      return $value;
-    });
+  public function callback(callable $callback) {
+    return new Callback($callback);
   }
 
   /**
    * @param $name
-   * @param callable|null $source
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $source
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Tap
    */
-  public function context($name, DataProducerInterface $source = NULL) {
-    return $this->tap(new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $source) {
-      $source = $source ?? $this->fromParent();
-      $value = $source->resolve($value, $args, $context, $info);
-      $context->setContext($name, $value, $info);
-    }));
+  public function context($name, ResolverInterface $source = NULL) {
+    $callback = new SourceContext($name, $source);
+    return $this->tap($callback);
   }
 
   /**
    * @param array $branches
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Condition
    */
   public function cond(array $branches) {
-    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($branches) {
-      while (list($condition, $resolver) = array_pad(array_shift($branches), 2, NULL)) {
-        if ($condition instanceof DataProducerInterface) {
-          if (($condition = $condition->resolve($value, $args, $context, $info)) === NULL) {
-            // Bail out early if a resolver returns NULL.
-            continue;
-          }
-        }
-
-        if ($condition instanceof Deferred) {
-          return DeferredUtility::returnFinally($condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info) {
-            array_unshift($branches, [$cond, $resolver]);
-            return $this->cond($branches)($value, $args, $context, $info);
-          });
-        }
-
-        if ((bool) $condition) {
-          return $resolver ? $resolver->resolve($value, $args, $context, $info) : $condition;
-        }
-      }
-
-      // Functional languages throw exceptions here. Should we just return NULL?
-      return NULL;
-    });
+    return new Condition($branches);
   }
 
   /**
    * @param $id
    * @param $config
    *
-   * @return DataProducerProxy
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
   public function produce($id, $config = []) {
     // TODO: Properly inject this.
@@ -103,83 +93,47 @@ class ResolverBuilder {
   /**
    * @param $type
    * @param $path
-   * @param callable|NULL $value
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Path
    */
-  public function fromPath($type, $path, DataProducerInterface $value = NULL) {
-    return new DataProducerCallable(function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($type, $path, $value) {
-      $value = $value ?? $this->fromParent();
-      $value = $value->resolve($parent, $args, $context, $info);
-      $metadata = new BubbleableMetadata();
-
-      $type = $type instanceof DataDefinitionInterface ? $type : DataDefinition::create($type);
-      $data = $this->getTypedDataManager()->create($type, $value);
-      $output = $this->getDataFetcher()->fetchDataByPropertyPath($data, $path, $metadata)->getValue();
-
-      $context->addCacheableDependency($metadata);
-      if ($output instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($output);
-      }
-
-      return $output;
-    });
+  public function fromPath($type, $path, ResolverInterface $value = NULL) {
+    return new Path($type, $path, $value);
   }
 
   /**
    * @param $value
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Value
    */
   public function fromValue($value) {
-    return new DataProducerCallable(function ($parent, $args, ResolveContext $context, ResolveInfo $info) use ($value) {
-      if ($value instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($value);
-      }
-
-      return $value;
-    });
+    return new Value($value);
   }
 
   /**
    * @param $name
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Argument
    */
   public function fromArgument($name) {
-    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name) {
-      return $args[$name] ?? NULL;
-    });
+    return new Argument($name);
   }
 
   /**
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\ParentValue
    */
   public function fromParent() {
-    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-      if ($value instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($value);
-      }
-
-      return $value;
-    });
+    return new ParentValue();
   }
 
   /**
    * @param $name
    * @param callable|null $default
    *
-   * @return \Closure
+   * @return \Drupal\graphql\GraphQL\Resolver\Context
    */
   public function fromContext($name, $default = NULL) {
-    return new DataProducerCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($name, $default) {
-      $output = $context->getContext($name, $info, $default);
-      if ($output instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($output);
-      }
-
-      return $output;
-    });
+    return new Context($name, $default);
   }
 
 }

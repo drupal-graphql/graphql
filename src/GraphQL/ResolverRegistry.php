@@ -14,7 +14,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerInterface;
+use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 class ResolverRegistry implements ResolverRegistryInterface {
 
@@ -163,7 +163,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    *
    * @return $this
    */
-  public function addFieldResolver($type, $field, DataProducerInterface $proxy_resolver) {
+  public function addFieldResolver($type, $field, ResolverInterface $proxy_resolver) {
     $this->fieldResolvers[$type][$field] = $proxy_resolver;
     return $this;
   }
@@ -196,7 +196,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info) {
     // First, check if there is a resolver registered for this field.
     if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
-      if (!$resolver instanceof DataProducerInterface) {
+      if (!$resolver instanceof ResolverInterface) {
         throw new \LogicException(sprintf('Field resolver for field %s on type %s is not callable.', $info->fieldName, $info->parentType->name));
       }
       return $resolver->resolve($value, $args, $context, $info);

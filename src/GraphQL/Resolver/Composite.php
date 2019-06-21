@@ -1,23 +1,20 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql\GraphQL\Resolver;
 
 use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
-/**
- * Data producers composition.
- */
-class DataProducerComposite implements DataProducerInterface {
+class Composite implements ResolverInterface {
 
   /**
    * DataProducerProxy objects.
    *
    * @var array
    */
-  private $resolvers = [];
+  protected $resolvers = [];
 
   /**
    * Construct DataProducerComposit object.
@@ -32,10 +29,10 @@ class DataProducerComposite implements DataProducerInterface {
   /**
    * Add one more producer.
    *
-   * @param DataProducerProxy $resolver
+   * @param ResolverProxy $resolver
    *   DataProducerProxy object.
    */
-  public function add(DataProducerProxy $resolver) {
+  public function add(ResolverProxy $resolver) {
     $this->resolvers[] = $resolver;
   }
 
@@ -49,10 +46,11 @@ class DataProducerComposite implements DataProducerInterface {
 
       if ($value instanceof Deferred) {
         return DeferredUtility::returnFinally($value, function ($value) use ($resolvers, $args, $context, $info) {
-          return isset($value) ? (new DataProducerComposite($resolvers))->resolve($value, $args, $context, $info) : NULL;
+          return isset($value) ? (new Composite($resolvers))->resolve($value, $args, $context, $info) : NULL;
         });
       }
     }
+
     return $value;
   }
 

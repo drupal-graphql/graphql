@@ -16,12 +16,14 @@ use Drupal\graphql\Annotation\GraphQLInterface;
 use Drupal\graphql\Annotation\GraphQLMutation;
 use Drupal\graphql\Annotation\GraphQLType;
 use Drupal\graphql\Annotation\GraphQLUnionType;
+use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\Plugin\GraphQL\Enums\EnumPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
 use Drupal\graphql\Plugin\GraphQL\InputTypes\InputTypePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Interfaces\InterfacePluginBase;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Scalars\ScalarPluginBase;
+use Drupal\graphql\Plugin\GraphQL\Schema\SdlExtendedSchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schemas\SchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Subscriptions\SubscriptionPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Types\TypePluginBase;
@@ -30,7 +32,6 @@ use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerCallable;
 
 /**
  * Trait for mocking GraphQL type system plugins.
@@ -284,6 +285,28 @@ trait MockGraphQLPluginTrait {
   }
 
   /**
+   * Setup server with extended schema.
+   *
+   * @param string $gql_schema
+   *   GraphQL schema description.
+   * @param string $gql_extended_schema
+   *   GraphQL extended schema description.
+   * @param string $schema_id
+   *   Schema id.
+   */
+  protected function setUpExtendedSchema($gql_schema, $gql_extended_schema, $schema_id, $development = FALSE) {
+    $this->mockExtendedSchema($schema_id, $gql_schema, $gql_extended_schema, $development);
+    $this->mockSchemaPluginManager($schema_id);
+    $this->createTestServer($schema_id, '/graphql/' . $schema_id, $development);
+
+    $this->schemaPluginManager->method('createInstance')
+      ->with($this->equalTo($schema_id))
+      ->will($this->returnValue($this->schema));
+
+    $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
+  }
+
+  /**
    * Create test server.
    */
   protected function createTestServer($schema_id, $endpoint, $debug = FALSE) {
@@ -333,6 +356,48 @@ trait MockGraphQLPluginTrait {
   }
 
   /**
+   * Mock an extended schema instance.
+   *
+   * @param string $id
+   *   The schema id.
+   * @param string $gql_schema
+   *   GraphQL schema.
+   * @param string $gql_extended_schema
+   *   GraphQL extended schema.
+   * @param \Drupal\graphql\GraphQL\ResolverRegistry|null $registry
+   *   Resolver registry.
+   * @param boolean $development
+   *   Schema development mode.
+   */
+  protected function mockExtendedSchema($id, $gql_schema, $gql_extended_schema, $development = FALSE) {
+    $this->schema = $this->getMockBuilder(SdlExtendedSchemaPluginBase::class)
+      ->setConstructorArgs([
+        [],
+        $id,
+        [],
+        $this->container->get('cache.graphql.ast'),
+        ['development' => $development]
+      ])
+      ->setMethods(['getSchemaDefinition', 'getExtendedSchemaDefinition', 'getResolverRegistry'])
+      ->getMockForAbstractClass();
+
+    $this->schema->expects(static::any())
+      ->method('getSchemaDefinition')
+      ->willReturn($gql_schema);
+
+    $this->schema->expects(static::any())
+      ->method('getExtendedSchemaDefinition')
+      ->willReturn($gql_extended_schema);
+
+    if (!empty($registry)) {
+      $this->schema->expects($this->any())
+        ->method('getResolverRegistry')
+        ->willReturn($registry);
+      $this->registry = $registry;
+    }
+  }
+
+  /**
    * Mock schema plugin manager.
    */
   protected function mockSchemaPluginManager($id) {
@@ -364,9 +429,11 @@ trait MockGraphQLPluginTrait {
     if (empty($this->registry)) {
       $this->registry = new ResolverRegistry([]);
     }
+
     if (is_callable($builder)) {
-      $builder = new DataProducerCallable($builder);
+      $builder = new Callback($builder);
     }
+
     $this->registry->addFieldResolver($type, $name, $builder);
     $this->schema->expects($this->any())
         ->method('getResolverRegistry')
@@ -384,6 +451,7 @@ trait MockGraphQLPluginTrait {
     if (empty($this->registry)) {
       $this->registry = new ResolverRegistry([]);
     }
+
     $this->registry->addTypeResolver($type, $resolver);
     $this->schema->expects($this->any())
         ->method('getResolverRegistry')
@@ -411,7 +479,7 @@ trait MockGraphQLPluginTrait {
    * Return callable DataProducer.
    */
   protected function mockCallable($callback) {
-    return new DataProducerCallable($callback);
+    return new Callback($callback);
   }
 
   /**

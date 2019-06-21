@@ -21,7 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   ),
  *   consumes = {
  *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
+ *       label = @Translation("Entity"),
+ *       required = FALSE
  *     ),
  *     "style" = @ContextDefinition("string",
  *       label = @Translation("Image style")
@@ -79,14 +80,19 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
   /**
    * @param \Drupal\file\FileInterface $entity
    *   The file entity received.
-   *
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *   The metadata object to add caching to objects.
    *
    * @return mixed
    *   The image url and dimensions for the image style .
    */
-  public function resolve(FileInterface $entity, $style, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
+
+    // Return if we dont have an entity.
+    if (!$entity) {
+      return NULL;
+    }
+
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
