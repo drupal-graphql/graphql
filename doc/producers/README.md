@@ -22,7 +22,7 @@ We are telling the schema we have a new field on "Article" called creator, this 
 
 ## Add the resolver
 
-For some more complex scenario (and provide some insight on one of the usefulness of the 4.x module) lets imagine our field has a name like `field_arcile_creator`. In the 3.x version of the module we would have an API that matches this name so someone would call it like `fieldArticleCreator`, this is a little verbose and simply calling it with `creator` seems a little cleaner and more logical. 
+For some more complex scenario (and provide some insight on one of the usefulness of the 4.x module) lets imagine our field has a name like `field_article_creator`. In the 3.x version of the module we would have an API that matches this name so someone would call it like `fieldArticleCreator`, this is a little verbose and simply calling it with `creator` seems a little cleaner and more logical. 
 
 ```php 
     $registry->addFieldResolver('Article', 'creator',
@@ -30,7 +30,7 @@ For some more complex scenario (and provide some insight on one of the usefulnes
         'mapping' => [
           'type' => $builder->fromValue('entity:node'),
           'value' => $builder->fromParent(),
-          'path' => $builder->fromValue('field_arcile_creator.value'),
+          'path' => $builder->fromValue('field_article_creator.value'),
         ],
       ])
     );
