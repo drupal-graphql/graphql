@@ -1,6 +1,6 @@
 # Querying routes
 
-A very powerful feature of drupal is the ability to manage paths in entities and using path alias to manage clean URL's. We can leverage Data producers provided by the GraphQL module to get that data out of drupal.
+A very powerful feature of Drupal is the ability to manage paths in entities and using path alias to manage clean URL's. We can leverage Data producers provided by the GraphQL module to get that data out of Drupal.
 
 In this section we will look at how we can load a node from it's URL.
 
@@ -29,7 +29,7 @@ interface NodeInterface {
 
 ```
 
-In this schema we can see that we can query a node by its route, that takes a parameter called "path". We also (similar to the test schema that comes with the module) have a NodeInterface and a Article type that implmements that interface. That means our "Article" will be available inside a fragment in the NodeInterface type.
+In this schema we can see that we can query a node by its route, that takes a parameter called "path". We also (similar to the test schema that comes with the module) have a NodeInterface and a Article type that implements that interface. That means our "Article" will be available inside a fragment in the NodeInterface type.
 
 ## Adding resolvers
 

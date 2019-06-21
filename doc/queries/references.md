@@ -26,7 +26,7 @@ type CategoryTerm {
 ...
 
 ```
-Now we have an article that also has a custom entity reference field to a taxonomy category (the field name in drupal is `field_article_category`) and we make a new type `CategoryTerm` that has the necessary information about this term.
+Now we have an article that also has a custom entity reference field to a taxonomy category (the field name in Drupal is `field_article_category`) and we make a new type `CategoryTerm` that has the necessary information about this term.
 
 We will need to resolve not only the `category` field but also the `id` and `name` of the term. 
 

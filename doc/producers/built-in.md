@@ -1,6 +1,6 @@
 # Built in Data Producers
 
-The Drupal GraphQL module comes with many built in data producers to help acommodate typical scenarios you might need to support in your API. In this section we will explain briefly each one of them and how it can be used.
+The Drupal GraphQL module comes with many built in data producers to help solve typical scenarios you might need to support in your API. In this section we will explain briefly each one of them and how it can be used.
 
 As the module is developed more data producers can be added to the core module. Its also important to note that many useful data producers can live in "user land" as contrib modules can add support for GraphQL by adding custom data producers (e.g. a Metatag data producer that lets you resolve metatags using the [Metatag module](https://www.drupal.org/project/metatag) or a Search API integration as seen in [GraphQL Search API](https://github.com/drupal-graphql/graphql-search-api))
 
@@ -10,7 +10,7 @@ This list includes all available data producers inside GraphQL to this day and b
 
 ### Context data producers
 
-* Context (context) : Request arbitrary drupal context objects with GraphQL. 
+* Context (context) : Request arbitrary Drupal context objects with GraphQL. 
 
 ### Entity data producers
 
@@ -47,7 +47,7 @@ This list includes all available data producers inside GraphQL to this day and b
 ### Menu Data producers
 
 * Menu Links (menu_links) : Returns the menu links of a menu, given a menu entity (entity:menu).
-* Menu Link url (menu_link_url) : Returns the url of a menu link given a mene link.
+* Menu Link url (menu_link_url) : Returns the url of a menu link given a menu link.
 * Menu Link label (menu_link_label) : Returns the label of a menu link.
 * Menu Link expanded (menu_link_expanded) : Returns whether a menu link is expanded.
 * Menu Link description (menu_link_description) : Returns the description of a menu link.
@@ -67,6 +67,6 @@ This list includes all available data producers inside GraphQL to this day and b
 
 ## How to use the producers
 
-This is no doubt a very long list of supported properties byt iself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations. 
+This is no doubt a very long list of supported properties byt itself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations. 
 
 We will look how to use the data producers together in the section "Queries" where we will do many common query scenarios like querying nodes or taxonomies, menus, custom fields, entity reference fields etc..

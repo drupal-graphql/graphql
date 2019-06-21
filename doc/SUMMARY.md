@@ -18,6 +18,7 @@
 * [Nodes](queries/nodes.md)
 * [Entity references](queries/references.md)
 * [Menus](queries/menus.md)
+* [Routes](queries/routes.md)
 
 ## Mutations
 

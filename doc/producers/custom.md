@@ -1,10 +1,10 @@
 # Custom data producers
 
-Sometimes you have a niche scneario that requires some custom code to resolve. Either because using some contrib module that has no direct GraphQL support, or its just a very custom coded part that needs some massaging in order to get the exact data you want.
+Sometimes you have a niche scenario that requires some custom code to resolve. Either because using some contrib module that has no direct GraphQL support, or its just a very custom coded part that needs some massaging in order to get the exact data you want.
 
 Custom data producers allow you essentially hook into any data of Drupal, because its a class and you can use services, request any kind of data.
 
-Lets look at a custom Data produer that loads the current user (similar to the 3.x version of currentUser query).
+Lets look at a custom Data producer that loads the current user (similar to the 3.x version of currentUser query).
 
 The first step as seen before  is to add our query to the schema : 
 
@@ -97,7 +97,7 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
 
 ```
 
-We are defininig a custom data producer `current_user` that we can now use to reolve our query that we previously added to the schema.  Notice that our data producer returns only the user id and not the actual user object. However we can combine it with an entity_load which is already made very efficient with in the module (taking advantage of caching strategies using buffering) so we dont have to actually load the user here.
+We are defining a custom data producer `current_user` that we can now use to resolve our query that we previously added to the schema.  Notice that our data producer returns only the user id and not the actual user object. However we can combine it with an entity_load which is already made very efficient with in the module (taking advantage of caching strategies using buffering) so we don't have to actually load the user here.
 
 Lets see how we can consume our newly created data producer : 
 
