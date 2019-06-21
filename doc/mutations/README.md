@@ -43,7 +43,7 @@ We now need to implement the actual mutation :
 ```php
 <?php
 
-namespace Drupal\custom4x\Plugin\GraphQL\DataProducer;
+namespace Drupal\mydrupalgraphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;

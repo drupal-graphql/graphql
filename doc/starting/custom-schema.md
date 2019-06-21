@@ -4,25 +4,25 @@ The best way to start making a new schema is to take the test schema provided by
 
 ## Clone the SdlSchemaTest
 
-Head to the graphql module folder and copy `src/Plugin/GraphQL/Schema/SdlSchemaTest.php` to your own module which we will call `custom4x`. First make sure you have a .info file inside the module to make sure drupal will know about this module (for more info see [Custom modules in drupal](https://www.drupal.org/docs/8/creating-custom-modules)) Inside `modules/custom4x` create a similar file for your custom schema `src/Plugin/GraphQL/Schema/SdlSchemaCustom4x.php`. Make sure to adapt the namespaces on the top of the file, in the end should look something like this (some parts of the schema are marked with `...` for simplicity here. Just copy the whole thing in your own module): 
+Head to the graphql module folder and copy `src/Plugin/GraphQL/Schema/SdlSchemaTest.php` to your own module which we will call `mydrupalgql`. First make sure you have a .info file inside the module to make sure drupal will know about this module (for more info see [Custom modules in drupal](https://www.drupal.org/docs/8/creating-custom-modules)) Inside `modules/mydrupalgql` create a similar file for your custom schema `src/Plugin/GraphQL/Schema/SdlSchemaMyDrupalGql.php`. Make sure to adapt the namespaces on the top of the file, in the end should look something like this (some parts of the schema are marked with `...` for simplicity here. Just copy the whole thing in your own module): 
 
 ```php 
-<?php
 
-namespace Drupal\custom4x\Plugin\GraphQL\Schema;
+namespace Drupal\mydrupalgql\Plugin\GraphQL\Schema;
 
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 
 /**
  * @Schema(
- *   id = "custom4x",
- *   name = "Custom4x schema"
+ *   id = "mydrupalgql",
+ *   name = "My Drupal Graphql schema"
  * )
  * @codeCoverageIgnore
  */
-class SdlSchemaCustom4x extends SdlSchemaPluginBase {
+class SdlSchemaMyDrupalGql extends SdlSchemaPluginBase {
 
   /**
    * {@inheritdoc}
@@ -76,5 +76,5 @@ GQL;
 
 ## Enable the custom schema
 
-Go again to the server page in `/admin/config/graphql` to create a new server now for the newly created schema. When creating the server choose the "Custom4x schema" as the schema. After saving click "Explorer" and this should take you to the "Graphiql" page, but now already for you own custom schema.
+Go again to the server page in `/admin/config/graphql` to create a new server now for the newly created schema. When creating the server choose the "My Drupal Graphql schema" as the schema. After saving click "Explorer" and this should take you to the "Graphiql" page, but now already for you own custom schema.
 

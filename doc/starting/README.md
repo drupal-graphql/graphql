@@ -9,7 +9,7 @@ The module requires installation via `composer`in order to pull in the dependenc
 
 ## Dependencies
 
-By installing the module with composer you will install also the necessary libraries [webonyx/graphql-php library](https://github.com/webonyx/graphql-php) and also the [Typed Data module](https://www.drupal.org/project/typed_data).
+By installing the module with composer you will install also the necessary libraries [webonyx/graphql-php library](https://github.com/webonyx/graphql-php) and the [Typed Data module](https://www.drupal.org/project/typed_data).
 
 ## Permissions
 
