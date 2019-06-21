@@ -46,3 +46,27 @@ This list includes all available data producers inside GraphQL to this day and b
 
 ### Menu Data producers
 
+* Menu Links (menu_links) : Returns the menu links of a menu, given a menu entity (entity:menu).
+* Menu Link url (menu_link_url) : Returns the url of a menu link given a mene link.
+* Menu Link label (menu_link_label) : Returns the label of a menu link.
+* Menu Link expanded (menu_link_expanded) : Returns whether a menu link is expanded.
+* Menu Link description (menu_link_description) : Returns the description of a menu link.
+* Menu Link attribute (menu_link_attribute) : Returns an attribute of a menu link given a menu link and an attribute name.
+* Menu tree subtree (menu_tree_subtree) : Returns the subtree of a menu tree element.
+* Menu tree link (menu_tree_link) : Returns the link of a menu tree element.
+
+### Routing
+
+* Route load (route_load) : Loads a route given a path, returning a `\Drupal\Core\Url`
+* Route entity (route_entity) : The entity belonging to the current url, given a url and a language (optional).
+* URL Path (url_path) : The processed url path. Given a `\Drupal\Core\Url` returns the string value for the path.
+
+### Typed data
+
+* Property path (property_path) : Resolves a typed data value at a given property path. Takes as arguments a path, value and type (optional).
+
+## How to use the producers
+
+This is no doubt a very long list of supported properties byt iself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations. 
+
+We will look how to use the data producers together in the section "Queries" where we will do many common query scenarios like querying nodes or taxonomies, menus, custom fields, entity reference fields etc..
