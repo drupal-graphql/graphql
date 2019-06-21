@@ -17,7 +17,7 @@ A few examples of where the GraphQL module could be used:
 
 ### Drupal GraphQL 4x
 
-This documentation refers to the 8.x-4.x version of the module which uses a schema first approach, where you will need to specify the schema in a DSL format. The documentation will guide you through the process of doing that. The benefits over the 3.x version is that the end resulting schema is a lot cleaner and includes only what you explicitely include in the schema, and not the whole of drupal (as it is in the 3.x version of the module).
+This documentation refers to the 8.x-4.x version of the module which uses a schema first approach, where you will need to specify the schema in a DSL format. The documentation will guide you through the process of doing that. The benefits over the 3.x version is that the end resulting schema is a lot cleaner and includes only what you explicitly include in the schema, and not the whole of Drupal (as it is in the 3.x version of the module).
 
 This trade-off does come with costs mostly around ease of use, where in the 3.x version it is a lot quicker to get up and running, in 4.x you will need to specify more in the schema and in code in order to get more out of the module.
 
