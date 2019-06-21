@@ -5,6 +5,8 @@ namespace Drupal\graphql\Plugin\GraphQL\Schema;
 use Drupal\graphql\Discovery\GqlExtendedDiscovery;
 use Drupal\graphql\Discovery\GqlDiscovery;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Allows modules to define MODULE_NAME.gql schema files.
