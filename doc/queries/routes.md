@@ -67,10 +67,10 @@ In this example our query could look like this :
 
 ```graphql
 {
-  query route(path: "/hello-graphql") {
+  route(path: "/node/1") {
     ... on Article {
-        id
-        title
+      id
+      title
     }
   }
 }
@@ -83,7 +83,7 @@ and the response :
   "data": {
     "route": {
       "id": 1,
-      "name": "Hello GraphQl"
+      "title": "Hello GraphQL"
     }
   }
 }
