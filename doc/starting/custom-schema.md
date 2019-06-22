@@ -2,6 +2,8 @@
 
 The best way to start making a new schema is to take the test schema provided by the GraphQL module in `src/Plugin/GraphQL/Schema/SdlSchemaTest.php` and add it to a custom module of your own. By doing this you can then start adapting the schema to your needs including your own Content types and making them available in the schema.
 
+ The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).s
+
 ## Clone the SdlSchemaTest
 
 Head to the graphql module folder and copy `src/Plugin/GraphQL/Schema/SdlSchemaTest.php` to your own module which we will call `mydrupalgql`. First make sure you have a .info file inside the module to make sure drupal will know about this module (for more info see [Custom modules in drupal](https://www.drupal.org/docs/8/creating-custom-modules)) Inside `modules/mydrupalgql` create a similar file for your custom schema `src/Plugin/GraphQL/Schema/SdlSchemaMyDrupalGql.php`. Make sure to adapt the namespaces on the top of the file, in the end should look something like this (some parts of the schema are marked with `...` for simplicity here. Just copy the whole thing in your own module): 

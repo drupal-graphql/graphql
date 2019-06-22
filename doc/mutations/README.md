@@ -6,6 +6,8 @@ Lets create a mutation that creates a new article. In this case it takes a data 
 
 Similar to queries we can start by adding the necessary schema information, not only to register our new mutation but also provide type safety on all parameters as well. This mutation will return the newly created "Article".
 
+ The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
+
 ## Add the schema declaration
 
 ```
