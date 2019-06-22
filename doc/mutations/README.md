@@ -38,12 +38,12 @@ We can now see we have a Mutation called `createArticle` which takes a data para
 
 ## Implement the custom data producer (mutation)
 
-We now need to implement the actual mutation :
+We now need to implement the actual mutation, in the file `src/Plugin/GraphQL/DataProducer` we include the following file `CreateArticle.php` :
 
 ```php
 <?php
 
-namespace Drupal\mydrupalgraphql\Plugin\GraphQL\DataProducer;
+namespace Drupal\mydrupalgql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -159,4 +159,30 @@ To add the resolvers we go to our schema implementation and call the created dat
 
     return $registry;
   }
+```
+
+This mutation can now be called like this :
+ 
+```graphql
+mutation {
+  createArticle(data: {title: "Hello GraphQl 2"}) {
+    ... on Article {
+      id
+      title
+    }
+  }
+}
+```
+
+and should return something like : 
+
+```json
+{
+  "data": {
+    "createArticle": {
+      "id": 2,
+      "title": "Hello GraphQl 2"
+    }
+  }
+}
 ```

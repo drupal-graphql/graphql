@@ -26,7 +26,7 @@ Now that we have this we need to make a resolver that actually loads this user, 
 ```php
 <?php
 
-namespace Drupal\mydrupalgraphql\Plugin\GraphQL\DataProducer;
+namespace Drupal\mydrupalgql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
