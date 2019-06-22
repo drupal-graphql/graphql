@@ -2,7 +2,7 @@
 
 The best way to start making a new schema is to take the test schema provided by the GraphQL module in `src/Plugin/GraphQL/Schema/SdlSchemaTest.php` and add it to a custom module of your own. By doing this you can then start adapting the schema to your needs including your own Content types and making them available in the schema.
 
- The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).s
+ The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
 
 ## Clone the SdlSchemaTest
 
