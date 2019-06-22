@@ -25,6 +25,10 @@ type MenuItem {
   children: [MenuItem]
 }
 
+type Url {
+  path: String
+}
+
 ...
 
 ```
@@ -102,6 +106,14 @@ To add the resolvers we go to our schema implementation and call the appropriate
               'element' => $builder->fromParent(),
             ],
           ]),
+        ],
+      ])
+    );
+
+    $registry->addFieldResolver('Url', 'path',
+      $builder->produce('url_path', [
+        'mapping' => [
+          'url' => $builder->fromParent(),
         ],
       ])
     );

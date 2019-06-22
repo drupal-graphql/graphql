@@ -15,20 +15,20 @@ type Article implements NodeInterface {
     id: Int!
     title: String!
     creator: String
-    category: CategoryTerm
+    tags: [TagTerm]
 }
 
-type CategoryTerm {
+type TagTerm {
     id: Int
     name: String
-} 
+}
 
 ...
 
 ```
-Now we have an article that also has a custom entity reference field to a taxonomy category (the field name in Drupal is `field_article_category`) and we make a new type `CategoryTerm` that has the necessary information about this term.
+Now we have an article that also has a custom entity reference field to a taxonomy category (the field name in Drupal is `field_tags`) and we make a new type `TagTerm` that has the necessary information about this term.
 
-We will need to resolve not only the `category` field but also the `id` and `name` of the term. 
+We will need to resolve not only the `tags` field but also the `id` and `name` of the term. 
 
 ## Adding resolvers
 
@@ -42,22 +42,22 @@ Again inside the `getResolverRegistry` method :
     
     ...
     
-    $registry->addFieldResolver('Article', 'category',
+    $registry->addFieldResolver('Article', 'tags',
       $builder->produce('entity_reference', [
         'mapping' => [
           'entity' => $builder->fromParent(),
-          'field' => $builder->fromValue('field_article_category'),
+          'field' => $builder->fromValue('field_tags'),
         ],
       ])
     );
 
-    $registry->addFieldResolver('CategoryTerm', 'id',
+    $registry->addFieldResolver('TagTerm', 'id',
       $builder->produce('entity_id', ['mapping' => [
         'entity' => $builder->fromParent(),
       ]])
     );
 
-    $registry->addFieldResolver('CategoryTerm', 'name',
+    $registry->addFieldResolver('TagTerm', 'name',
       $builder->produce('entity_label', ['mapping' => [
         'entity' => $builder->fromParent(),
       ]])
