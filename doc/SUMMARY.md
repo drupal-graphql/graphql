@@ -1,32 +1,30 @@
 # Table of contents
 
-* [Introduction](README.md)
-* [Introduction](...md)
-
 ## Getting started
 
-* [Getting started](getting-started/getting-started.md)
+* [Installation](starting/README.md)
+* [Custom schemas](starting/custom-schema.md)
+
+## Data Producers
+
+* [Data Producers](producers/README.md)
+* [Built-in producers](producers/built-in.md)
+* [Custom producers](producers/custom.md)
+* [Composing producers](producers/composing.md)
 
 ## Queries
 
-* [Introduction](queries/queries.md)
-* [Querying nodes](queries/querying-nodes.md)
-* [Querying taxonomies](queries/querying-taxonomies.md)
-* [Querying routes](queries/routes.md)
-* [Query Fragments](queries/query-fragments.md)
-* [Variables](queries/variables.md)
-* [Filters](queries/filters.md)
+* [Queries](queries/README.md)
+* [Nodes](queries/nodes.md)
+* [Entity references](queries/references.md)
+* [Menus](queries/menus.md)
+* [Routes](queries/routes.md)
 
 ## Mutations
 
-* [Introduction](mutations/mutations.md)
-* [Creating mutation plugins](mutations/creating-mutation-plugins.md)
+* [Mutations](mutations/README.md)
 
-## Authentication
+## Advanced
 
-* [Introduction](authentication/introduction.md)
-
-## Metatag / SEO
-
-* [Metatag support](metatag-seo/metatag.md)
+* [Split up schema](advanced/split-schema.md)
 
