@@ -58,7 +58,7 @@ class FileUpload {
   protected $fileSystem;
 
   /**
-   * Jobiqo graphql logger channel.
+   * GraphQL logger channel.
    *
    * @var \Drupal\Core\Logger\LoggerChannelInterface
    */

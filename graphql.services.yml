@@ -103,6 +103,11 @@ services:
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
 
+  # File upload.
+  jobiqo_graphql.file_upload:
+    class: Drupal\jobiqo_graphql\GraphQL\FileUpload
+    arguments: ['@entity_type.manager', '@current_user', '@file.mime_type.guesser', '@file_system', '@logger.channel.graphql']
+
   # Buffers.
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
