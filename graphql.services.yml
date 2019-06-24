@@ -104,8 +104,8 @@ services:
       - '%graphql.config%'
 
   # File upload.
-  jobiqo_graphql.file_upload:
-    class: Drupal\jobiqo_graphql\GraphQL\FileUpload
+  graphql.file_upload:
+    class: Drupal\graphql\GraphQL\Utility\FileUpload
     arguments: ['@entity_type.manager', '@current_user', '@file.mime_type.guesser', '@file_system', '@logger.channel.graphql']
 
   # Buffers.
