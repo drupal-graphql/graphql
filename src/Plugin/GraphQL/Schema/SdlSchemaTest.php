@@ -63,64 +63,57 @@ GQL;
     ]);
 
     $registry->addFieldResolver('Query', 'node',
-      $builder->produce('entity_load', ['mapping' => [
-        'entity_type' => $builder->fromValue('node'),
-        'entity_id' => $builder->fromArgument('id'),
-      ]])
+      $builder->produce('entity_load')
+        ->map('type', $builder->fromValue('node'))
+        ->map('id', $builder->fromArgument('id'))
     );
 
     $registry->addFieldResolver('Query', 'label',
-      $builder->produce('entity_label', ['mapping' => [
-        'entity' => $builder->produce('entity_load', ['mapping' => [
-          'entity_type' => $builder->fromValue('node'),
-          'entity_bundle' => $builder->fromValue(['article']),
-          'entity_id' => $builder->fromArgument('id'),
-        ]])
-      ]])
+      $builder->produce('entity_label')
+        ->map('entity', $builder->produce('entity_load')
+          ->map('type', $builder->fromValue('node'))
+          ->map('bundles', $builder->fromValue(['article']))
+          ->map('id', $builder->fromArgument('id'))
+        )
     );
 
     $registry->addFieldResolver('Query', 'article',
-      $builder->produce('entity_load', ['mapping' => [
-        'type' => $builder->fromValue('node'),
-        'bundles' => $builder->fromValue(['article']),
-        'id' => $builder->fromArgument('id'),
-      ]])
+      $builder->produce('entity_load')
+        ->map('type', $builder->fromValue('node'))
+        ->map('bundles', $builder->fromValue(['article']))
+        ->map('id', $builder->fromArgument('id'))
     );
 
     $registry->addFieldResolver('Query', 'page',
-      $builder->produce('entity_load', ['mapping' => [
-        'entity_type' => $builder->fromValue('node'),
-        'entity_bundle' => $builder->fromValue(['page']),
-        'entity_id' => $builder->fromArgument('id'),
-      ]])
+      $builder->produce('entity_load')
+        ->map('type', $builder->fromValue('node'))
+        ->map('bundles', $builder->fromValue(['page']))
+        ->map('id', $builder->fromArgument('id'))
     );
 
     $registry->addFieldResolver('Article', 'id',
-      $builder->produce('entity_id', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]])
+      $builder->produce('entity_id')
+        ->map('entity', $builder->fromParent())
     );
 
-    $registry->addFieldResolver('Article', 'title', $builder->compose(
-      $builder->produce('entity_label', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]]),
-      $builder->produce('uppercase', ['mapping' => [
-        'string' => $builder->fromParent(),
-      ]])
-    ));
+    $registry->addFieldResolver('Article', 'title',
+      $builder->compose(
+        $builder->produce('entity_label')
+          ->map('entity', $builder->fromParent()),
+        $builder->produce('uppercase')
+          ->map('string', $builder->fromParent())
+      )
+    );
 
     $registry->addFieldResolver('Article', 'render',
-      $builder->produce('entity_rendered', ['mapping' => [
-        'entity' => $builder->fromParent(),
-        'mode' => $builder->fromValue('full')
-      ]])
+      $builder->produce('entity_rendered')
+        ->map('entity', $builder->fromParent())
+        ->map('mode', $builder->fromValue('full'))
     );
 
-    $registry->addFieldResolver('Page', 'id',
-      $builder->produce('entity_id', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]])
+    $registry->addFieldResolver('Article', 'id',
+      $builder->produce('entity_id')
+        ->map('entity', $builder->fromParent())
     );
 
     return $registry;
