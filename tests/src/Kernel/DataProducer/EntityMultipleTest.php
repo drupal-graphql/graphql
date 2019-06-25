@@ -18,8 +18,6 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
  */
 class EntityMultipleTest extends GraphQLTestBase {
 
-  use QueryResultAssertionTrait;
-
   /**
    * @var \Drupal\node\NodeInterface
    */
@@ -91,11 +89,9 @@ class EntityMultipleTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadMultiple::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadMultiple::resolve
    */
   public function testResolveEntityLoadMultiple() {
-    $metadata = $this->defaultCacheMetaData();
-
     $plugin = $this->dataProducerManager->getInstance([
       'id' => 'entity_load_multiple',
       'configuration' => [],

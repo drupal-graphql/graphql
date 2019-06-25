@@ -2,11 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use GraphQL\Server\OperationParams;
-use Prophecy\Argument;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test the whole query result pipeline.
@@ -21,7 +17,7 @@ class ResultTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -29,14 +25,12 @@ class ResultTest extends GraphQLTestBase {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-
+    $this->setUpSchema($schema);
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
       'parent' => 'Query'
-    ], $builder->fromValue('test'));
+    ], $this->builder->fromValue('test'));
   }
 
   /**

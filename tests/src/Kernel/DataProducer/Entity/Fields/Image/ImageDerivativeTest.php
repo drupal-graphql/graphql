@@ -10,6 +10,8 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test class for the ImageDerivative data producer.
+ *
+ * @group graphql
  */
 class ImageDerivativeTest extends GraphQLTestBase {
 

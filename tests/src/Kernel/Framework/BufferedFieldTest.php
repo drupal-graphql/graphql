@@ -9,7 +9,6 @@ use Zend\Stdlib\ArrayObject;
 use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test batched field resolving.
@@ -22,7 +21,7 @@ class BufferedFieldTest extends GraphQLTestBase {
    * Test if the schema is created properly.
    */
   public function testBatchedFields() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -36,9 +35,8 @@ class BufferedFieldTest extends GraphQLTestBase {
         foe: User
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
 
+    $this->setUpSchema($schema);
     $buffer = $this->getMockBuilder(BufferBase::class)
       ->setMethods(['resolveBufferArray'])
       ->getMock();
@@ -88,8 +86,8 @@ GQL;
       'name' => 'name',
       'type' => 'String',
       'parent' => 'User',
-    ], $builder->compose(
-        $builder->fromParent(),
+    ], $this->builder->compose(
+        $this->builder->fromParent(),
         new Callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['name'];
         })

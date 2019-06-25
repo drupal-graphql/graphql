@@ -29,15 +29,14 @@ class ResultCacheTest extends GraphQLTestBase {
   public function setUp() {
     parent::setUp();
 
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       type Query {
         root: String
         leakA: String
         leakB: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $this->builder = new ResolverBuilder();
+    $this->setUpSchema($schema);
   }
 
   /**
@@ -101,7 +100,7 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->builder->callback(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
         })
       )
@@ -146,7 +145,7 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->builder->callback(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
         })
       )
@@ -245,7 +244,7 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->builder->callback(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
         })
       )
@@ -299,7 +298,7 @@ GQL;
       'parent' => 'Query',
     ], $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
+        $this->builder->callback(function ($value, $args, $context, $info) use ($dummy_object) {
           return $dummy_object->id();
         })
       )

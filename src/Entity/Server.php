@@ -63,6 +63,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $label;
 
   /**
+   * The server's schema.
+   *
+   * @var string
+   */
+  public $schema;
+
+  /**
    * Whether the server is in debug mode.
    *
    * @var string

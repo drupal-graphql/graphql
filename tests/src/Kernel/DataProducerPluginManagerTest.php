@@ -30,36 +30,44 @@ class DataProducerPluginManagerTest extends KernelTestBase {
   protected $dataProducerManager;
 
   /**
+   * @var \Drupal\graphql\GraphQL\ResolverBuilder
+   */
+  protected $builder;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
+
     $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
+    $this->builder = new ResolverBuilder();
   }
 
   /**
    * @covers ::getInstance
    */
   public function testGetInstance() {
-    $builder = new ResolverBuilder();
     $instance = $this->dataProducerManager->getInstance([
       'id' => 'entity_load',
       'configuration' => [
         'mapping' => [
-          'entity_type' => $builder->fromValue('node'),
-          'entity_id' => $builder->fromArgument('id'),
-        ]
-      ]
+          'entity_type' => $this->builder->fromValue('node'),
+          'entity_id' => $this->builder->fromArgument('id'),
+        ],
+      ],
     ]);
+
     $this->assertEquals('entity_load', $instance->getPluginId());
     $instance = $this->dataProducerManager->getInstance([
       'id' => 'uppercase',
       'configuration' => [
         'mapping' => [
-          'string' => $builder->fromParent(),
-        ]
-      ]
+          'string' => $this->builder->fromParent(),
+        ],
+      ],
     ]);
+
     $this->assertEquals('uppercase', $instance->getPluginId());
   }
 

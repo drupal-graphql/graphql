@@ -3,12 +3,9 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 
 /**
@@ -22,12 +19,13 @@ class TestFrameworkTest extends GraphQLTestBase {
    * Test mocked fields.
    */
   public function testFieldMock() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       type Query {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+
+    $this->setUpSchema($schema);
 
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
@@ -42,16 +40,14 @@ GQL;
       ->method('getCacheContexts')
       ->willReturn([]);
 
-
-    $builder = new ResolverBuilder();
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
       'parent' => 'Query',
       'response_cache_tags' => ['my_tag'],
-    ], $builder->compose(
-        $builder->fromValue($cacheable),
-        $builder->fromValue('test')
+    ], $this->builder->compose(
+        $this->builder->fromValue($cacheable),
+        $this->builder->fromValue('test')
       )
     );
 
@@ -81,19 +77,19 @@ GQL;
     $this->assertResults('{ root }', [], [
       'root' => 'test',
     ], $metadata);
-
   }
 
   /**
    * Test result error assertions.
    */
   public function testErrorAssertion() {
-    $gql_schema = <<<GQL
-    type Query {
-      wrongname: String
-    }
+    $schema = <<<GQL
+      type Query {
+        wrongname: String
+      }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+
+    $this->setUpSchema($schema);
     // Errors are cacheable now.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
@@ -112,7 +108,7 @@ GQL;
    * Test mutation mocking.
    */
   public function testMutationMock() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
         mutation: Mutation
@@ -136,22 +132,22 @@ GQL;
         gender: Gender
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
+
+    $this->setUpSchema($schema);
 
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'Boolean',
       'parent' => 'Query',
-    ], $builder->fromValue(TRUE));
+    ], $this->builder->fromValue(TRUE));
 
     $this->mockField('addUser', [
       'name' => 'addUser',
       'type' => 'Boolean',
       'parent' => 'Mutation',
-    ], $builder->compose(
-        $builder->fromArgument('user'),
-        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+        $this->builder->fromArgument('user'),
+        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $args['user']['age'] > 50 && $args['user']['gender'] == 'Male';
         })
       )
@@ -171,7 +167,7 @@ GQL;
    * Test interface mocking.
    */
   public function testInterfaceMock() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -191,9 +187,8 @@ GQL;
         value: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
 
+    $this->setUpSchema($schema);
     $this->mockTypeResolver('Token', function ($value, $context, $info) {
       return is_int($value['value']) ? 'Number' : 'Word';
     });
@@ -202,9 +197,9 @@ GQL;
       'name' => 'value',
       'type' => 'Int',
       'parent' => 'Number',
-    ], $builder->compose(
-        $builder->fromParent(),
-        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+        $this->builder->fromParent(),
+        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
         })
       )
@@ -214,9 +209,9 @@ GQL;
       'name' => 'value',
       'type' => 'String',
       'parent' => 'Word',
-    ], $builder->compose(
-        $builder->fromParent(),
-        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+        $this->builder->fromParent(),
+        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
         })
       )
@@ -226,7 +221,7 @@ GQL;
       'name' => 'root',
       'type' => '[Token]',
       'parent' => 'Query',
-    ], $builder->fromValue(
+    ], $this->builder->fromValue(
       [
         ['value' => 42],
         ['value' => 'GraphQL'],
@@ -246,7 +241,7 @@ GQL;
    * @todo Unions are identical to interfaces right now, but they should not be.
    */
   public function testUnionMock() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -264,9 +259,7 @@ GQL;
         value: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-
+    $this->setUpSchema($schema);
     $this->mockTypeResolver('Token', function ($value, $context, $info) {
       return is_int($value['value']) ? 'Number' : 'Word';
     });
@@ -275,9 +268,9 @@ GQL;
       'name' => 'value',
       'type' => 'Int',
       'parent' => 'Number',
-    ], $builder->compose(
-        $builder->fromParent(),
-        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+        $this->builder->fromParent(),
+        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
         })
       )
@@ -287,9 +280,9 @@ GQL;
       'name' => 'value',
       'type' => 'String',
       'parent' => 'Word',
-    ], $builder->compose(
-        $builder->fromParent(),
-        $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+        $this->builder->fromParent(),
+        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
           return $value['value'];
         })
       )
@@ -299,7 +292,7 @@ GQL;
       'name' => 'root',
       'type' => '[Token]',
       'parent' => 'Query',
-    ], $builder->fromValue(
+    ], $this->builder->fromValue(
       [
         ['value' => 42],
         ['value' => 'GraphQL'],

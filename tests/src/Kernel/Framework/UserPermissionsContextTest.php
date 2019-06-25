@@ -19,7 +19,7 @@ class UserPermissionsContextTest extends GraphQLTestBase {
    * Assert user.permissions tag on results.
    */
   public function testUserPermissionsContext() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -27,13 +27,13 @@ class UserPermissionsContextTest extends GraphQLTestBase {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
+
+    $this->setUpSchema($schema);
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
       'parent' => 'Query',
-    ], $builder->fromValue('test'));
+    ], $this->builder->fromValue('test'));
 
     $result = $this->query('query { root }');
     $this->assertContains('user.permissions', $result->getCacheableMetadata()->getCacheContexts());

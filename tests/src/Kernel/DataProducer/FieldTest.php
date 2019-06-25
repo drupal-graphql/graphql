@@ -70,7 +70,7 @@ class FieldTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Field\EntityReference::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Field\EntityReference::resolve
    */
   public function testResolveEntityReference() {
     $plugin = $this->dataProducerManager->getInstance([

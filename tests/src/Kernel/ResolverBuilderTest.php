@@ -2,18 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
-use Drupal\Core\Plugin\Context\ContextDefinition;
-use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityId;
-use Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase;
-use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -28,15 +18,13 @@ use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
  */
 class ResolverBuilderTest extends GraphQLTestBase {
 
-  use QueryResultAssertionTrait;
-
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
 
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       type Query {
         me: String
         tree(id: Int): Tree
@@ -54,7 +42,7 @@ class ResolverBuilderTest extends GraphQLTestBase {
       }
 GQL;
 
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
+    $this->setUpSchema($schema);
   }
 
   /**
@@ -66,8 +54,7 @@ GQL;
    * @param $expected
    */
   public function testBuilderProducing($input, $expected) {
-    $builder = new ResolverBuilder();
-    $plugin = $builder->produce($input, []);
+    $plugin = $this->builder->produce($input, []);
     $this->assertInstanceOf($expected, $plugin);
   }
 
@@ -83,10 +70,8 @@ GQL;
    * @covers ::fromValue
    */
   public function testFromValue() {
-    $builder = new ResolverBuilder();
-
     $registry = new ResolverRegistry([]);
-    $registry->addFieldResolver('Query', 'me', $builder->fromValue('some me'));
+    $registry->addFieldResolver('Query', 'me', $this->builder->fromValue('some me'));
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
       ->willReturn($registry);
@@ -104,13 +89,9 @@ GQL;
    * @covers ::fromParent
    */
   public function testFromParent() {
-    $builder = new ResolverBuilder();
-
     $registry = new ResolverRegistry([]);
-
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue('Some string value'));
-
-    $registry->addFieldResolver('Tree', 'name', $builder->fromParent());
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue('Some string value'));
+    $registry->addFieldResolver('Tree', 'name', $this->builder->fromParent());
 
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
@@ -131,13 +112,9 @@ GQL;
    * @covers ::fromArgument
    */
   public function testFromArgument() {
-    $builder = new ResolverBuilder();
-
     $registry = new ResolverRegistry([]);
-
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
-
-    $registry->addFieldResolver('Tree', 'id', $builder->fromArgument('someArg'));
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $registry->addFieldResolver('Tree', 'id', $this->builder->fromArgument('someArg'));
 
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
@@ -158,9 +135,7 @@ GQL;
    * @covers ::fromPath
    */
   public function testFromPath() {
-    $builder = new ResolverBuilder();
     $registry = new ResolverRegistry([]);
-
     $typed_data_manager = $this->getMock(TypedDataManagerInterface::class);
 
     $typed_data_manager->expects($this->any())
@@ -191,14 +166,14 @@ GQL;
 
     $this->container->set('typed_data_manager', $typed_data_manager);
 
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue([
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue([
       'path' => [
         'uri' => '<front>',
         'path_name' => 'Front page',
       ]
     ]));
 
-    $registry->addFieldResolver('Tree', 'uri', $builder->fromPath('tree', 'path.uri'));
+    $registry->addFieldResolver('Tree', 'uri', $this->builder->fromPath('tree', 'path.uri'));
 
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
@@ -219,15 +194,13 @@ GQL;
    * @covers ::compose
    */
   public function testCompose() {
-    $builder = new ResolverBuilder();
     $registry = new ResolverRegistry([]);
 
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
-
-    $registry->addFieldResolver('Tree', 'name', $builder->compose(
-      $builder->fromValue('Some tree name'),
-      $builder->produce('uppercase', ['mapping' => [
-        'string' => $builder->fromParent(),
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $registry->addFieldResolver('Tree', 'name', $this->builder->compose(
+      $this->builder->fromValue('Some tree name'),
+      $this->builder->produce('uppercase', ['mapping' => [
+        'string' => $this->builder->fromParent(),
       ]])
     ));
 
@@ -251,17 +224,16 @@ GQL;
    * @covers ::fromContext
    */
   public function testFromContext() {
-    $builder = new ResolverBuilder();
     $registry = new ResolverRegistry([]);
 
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue('some value'));
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue('some value'));
 
-    $registry->addFieldResolver('Tree', 'language', $builder->compose(
-      $builder->context('language_context', $builder->fromValue('language context value')),
-      $builder->fromValue('some language value')
+    $registry->addFieldResolver('Tree', 'language', $this->builder->compose(
+      $this->builder->context('language_context', $this->builder->fromValue('language context value')),
+      $this->builder->fromValue('some language value')
     ));
 
-    $registry->addFieldResolver('Language', 'languageContext', $builder->fromContext('language_context'));
+    $registry->addFieldResolver('Language', 'languageContext', $this->builder->fromContext('language_context'));
 
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
@@ -284,15 +256,13 @@ GQL;
    * @covers ::cond
    */
   public function testSimpleCond() {
-    $builder = new ResolverBuilder();
     $registry = new ResolverRegistry([]);
 
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
-
-    $registry->addFieldResolver('Tree', 'name', $builder->cond([
-      [$builder->fromValue(FALSE), $builder->fromValue('This should not be in the result.')],
-      [$builder->fromValue(TRUE), $builder->fromValue('But this should.')],
-      [$builder->fromValue(TRUE), $builder->fromValue('And this not, event though its true.')],
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $registry->addFieldResolver('Tree', 'name', $this->builder->cond([
+      [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
+      [$this->builder->fromValue(TRUE), $this->builder->fromValue('But this should.')],
+      [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
 
     $this->schema->expects($this->any())
@@ -314,15 +284,13 @@ GQL;
    * @covers ::cond
    */
   public function testDeferredCond() {
-    $builder = new ResolverBuilder();
     $registry = new ResolverRegistry([]);
 
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
-
-    $registry->addFieldResolver('Tree', 'name', $builder->cond([
-      [$builder->fromValue(FALSE), $builder->fromValue('This should not be in the result.')],
-      [function () { return new Deferred(function () { return TRUE; }); }, $builder->fromValue('But this should.')],
-      [$builder->fromValue(TRUE), $builder->fromValue('And this not, event though its true.')],
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $registry->addFieldResolver('Tree', 'name', $this->builder->cond([
+      [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
+      [function () { return new Deferred(function () { return TRUE; }); }, $this->builder->fromValue('But this should.')],
+      [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
 
     $this->schema->expects($this->any())
@@ -344,15 +312,13 @@ GQL;
    * @covers ::cond
    */
   public function testParentCond() {
-    $builder = new ResolverBuilder();
     $registry = new ResolverRegistry([]);
 
-    $registry->addFieldResolver('Query', 'tree', $builder->fromValue(['name' => 'some tree', 'id' => 5]));
-
-    $registry->addFieldResolver('Tree', 'name', $builder->cond([
-      [$builder->fromValue(FALSE), $builder->fromValue('This should not be in the result.')],
-      [$builder->fromParent(), $builder->fromValue('But this should.')],
-      [$builder->fromValue(TRUE), $builder->fromValue('And this not, event though its true.')],
+    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $registry->addFieldResolver('Tree', 'name', $this->builder->cond([
+      [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
+      [$this->builder->fromParent(), $this->builder->fromValue('But this should.')],
+      [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
 
     $this->schema->expects($this->any())

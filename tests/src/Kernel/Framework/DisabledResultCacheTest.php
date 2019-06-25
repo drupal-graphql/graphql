@@ -20,12 +20,12 @@ class DisabledResultCacheTest extends GraphQLTestBase {
    * Test if disabling the result cache has the desired effect.
    */
   public function testDisabledCache() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       type Query {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema(), TRUE);
+    $this->setUpSchema($schema);
 
     $dummy_object = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()

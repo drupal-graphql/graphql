@@ -11,6 +11,8 @@ use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 
 /**
  * Test class for the RouteEntity data producer.
+ *
+ * @group graphql
  */
 class RouteEntityTest extends GraphQLTestBase {
 
@@ -68,7 +70,7 @@ class RouteEntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteEntity::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteEntity::resolve
    */
   public function testRouteEntity() {
     $url = Url::fromRoute('entity.node.canonical', ['node' => $this->published_node->id()]);

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test schema validation.
@@ -13,7 +12,7 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 class SchemaValidationTest extends GraphQLTestBase {
 
   public function testValidSchema() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -21,15 +20,15 @@ class SchemaValidationTest extends GraphQLTestBase {
         foo: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-    $this->mockField('foo', ['parent' => 'Query' ], $builder->fromValue('bar'));
+
+    $this->setUpSchema($schema);
+    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue('bar'));
 
     $this->assertTrue($this->schema->validateSchema());
   }
 
   public function testSyntaxError() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -38,9 +37,9 @@ GQL;
       }
       error
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-    $this->mockField('foo', ['parent' => 'Query' ], $builder->fromValue('bar'));
+
+    $this->setUpSchema($schema);
+    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue('bar'));
 
     $this->assertFalse($this->schema->validateSchema());
 
@@ -52,7 +51,7 @@ GQL;
   }
 
   public function testMissingFieldError() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -60,9 +59,9 @@ GQL;
         bar: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-    $this->mockField('foo', ['parent' => 'Query' ], $builder->fromValue('bar'));
+
+    $this->setUpSchema($schema);
+    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue('bar'));
 
     $this->assertFalse($this->schema->validateSchema());
 
@@ -74,7 +73,7 @@ GQL;
   }
 
   public function testMissingTypeError() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -82,9 +81,9 @@ GQL;
         foo: Foo
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-    $this->mockField('foo', ['parent' => 'Query' ], $builder->fromValue(NULL));
+
+    $this->setUpSchema($schema);
+    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue(NULL));
 
     $this->assertFalse($this->schema->validateSchema());
 

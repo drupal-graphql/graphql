@@ -15,7 +15,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 class ExtendedSchemaTest extends GraphQLTestBase {
 
   public function testExtendedSchemaDefinition() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -63,10 +63,8 @@ type Recipe {
 
 GQL;
 
-    $this->setUpExtendedSchema($gql_schema, $extended_schema, $this->getDefaultSchema());
+    $this->setUpExtendedSchema($schema, $extended_schema, $this->getDefaultSchema());
     $this->assertEquals($this->getPrintedSchema($this->getDefaultSchema()), $expected_printed_schema);
-
-    $builder = new ResolverBuilder();
 
     $this->mockTypeResolver('Content', function ($value, $context, $info) {
       return $value['id'] < 10 ? 'Article' : 'Recipe';
@@ -76,9 +74,9 @@ GQL;
       'name' => 'title',
       'type' => 'String',
       'parent' => 'Article',
-    ], $builder->compose(
-      $builder->fromParent(),
-      $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+      $this->builder->fromParent(),
+      $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
         return $value['title'];
       })
     )
@@ -88,9 +86,9 @@ GQL;
       'name' => 'title',
       'type' => 'String',
       'parent' => 'Recipe',
-    ], $builder->compose(
-      $builder->fromParent(),
-      $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+      $this->builder->fromParent(),
+      $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
         return $value['title'];
       })
     )
@@ -100,9 +98,9 @@ GQL;
       'name' => 'steps',
       'type' => '[String]',
       'parent' => 'Recipe',
-    ], $builder->compose(
-      $builder->fromParent(),
-      $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
+    ], $this->builder->compose(
+      $this->builder->fromParent(),
+      $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
         return $value['steps'];
       })
     )
@@ -112,7 +110,7 @@ GQL;
       'name' => 'bar',
       'type' => '[Content]',
       'parent' => 'Query',
-    ], $builder->fromValue(
+    ], $this->builder->fromValue(
       [
         ['id' => 8, 'title' => 'Article test'],
         [

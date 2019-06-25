@@ -146,7 +146,7 @@ class MenuTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkAttribute::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkAttribute::resolve
    */
   public function testMenuLinkAttribute() {
     $plugin = $this->dataProducerManager->getInstance([
@@ -167,7 +167,7 @@ class MenuTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkDescription::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkDescription::resolve
    */
   public function testMenuLinkDescription() {
     $plugin = $this->dataProducerManager->getInstance([
@@ -181,7 +181,7 @@ class MenuTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkExpanded::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkExpanded::resolve
    */
   public function testMenuLinkExpanded() {
     $plugin = $this->dataProducerManager->getInstance([
@@ -195,7 +195,7 @@ class MenuTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkLabel::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkLabel::resolve
    */
   public function testMenuLinkLabel() {
     $plugin = $this->dataProducerManager->getInstance([
@@ -209,7 +209,7 @@ class MenuTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkUrl::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkUrl::resolve
    */
   public function testMenuLinkUrl() {
     $plugin = $this->dataProducerManager->getInstance([

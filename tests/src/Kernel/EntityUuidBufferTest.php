@@ -2,11 +2,12 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
+/**
+ * @group graphql
+ */
 class EntityUuidBufferTest extends GraphQLTestBase {
 
   protected $nodeUuids = [];
@@ -18,6 +19,7 @@ class EntityUuidBufferTest extends GraphQLTestBase {
 
   protected function setUp() {
     parent::setUp();
+
     NodeType::create([
       'type' => 'test',
       'name' => 'Test',
@@ -28,51 +30,51 @@ class EntityUuidBufferTest extends GraphQLTestBase {
         'title' => 'Node ' . $i,
         'type' => 'test',
       ]);
+
       $node->save();
       $this->nodeUuids[] = $node->uuid();
     }
 
     $schema = <<<GQL
-    type Query {
-      node(uuid: String): Node
-    }
-    type Node {
-      title: String!
-    }
+      type Query {
+        node(uuid: String): Node
+      }
+      type Node {
+        title: String!
+      }
 GQL;
 
-    $this->setUpSchema($schema, $this->getDefaultSchema());
+    $this->setUpSchema($schema);
   }
 
   public function testEntityUuidBuffer() {
     $query = <<<GQL
-    query {
-      a:node(uuid: "{$this->nodeUuids[0]}") {
-        title
+      query {
+        a:node(uuid: "{$this->nodeUuids[0]}") {
+          title
+        }
+  
+        b:node(uuid: "{$this->nodeUuids[1]}") {
+          title
+        }
+  
+        c:node(uuid: "{$this->nodeUuids[2]}") {
+          title
+        }
       }
-
-      b:node(uuid: "{$this->nodeUuids[1]}") {
-        title
-      }
-
-      c:node(uuid: "{$this->nodeUuids[2]}") {
-        title
-      }
-    }
 GQL;
-    $builder = new ResolverBuilder();
 
     $this->mockField('node', [
       'parent' => 'Query',
-    ], $builder->produce('entity_load_by_uuid', ['mapping' => [
-      'type' => $builder->fromValue('node'),
-      'uuid' => $builder->fromArgument('uuid'),
+    ], $this->builder->produce('entity_load_by_uuid', ['mapping' => [
+      'type' => $this->builder->fromValue('node'),
+      'uuid' => $this->builder->fromArgument('uuid'),
     ]]));
 
     $this->mockField('title', [
       'parent' => 'Node',
-    ], $builder->produce('entity_label', ['mapping' => [
-      'entity' => $builder->fromParent(),
+    ], $this->builder->produce('entity_label', ['mapping' => [
+      'entity' => $this->builder->fromParent(),
     ]]));
 
     $metadata = $this->defaultCacheMetaData();
@@ -82,7 +84,6 @@ GQL;
       'b' => ['title' => 'Node 2'],
       'c' => ['title' => 'Node 3'],
     ], $metadata);
-
   }
 
 }

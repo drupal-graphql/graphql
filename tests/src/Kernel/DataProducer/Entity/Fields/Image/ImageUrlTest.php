@@ -9,6 +9,8 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test class for the ImageUrl data producer.
+ *
+ * @group graphql
  */
 class ImageUrlTest extends GraphQLTestBase {
 

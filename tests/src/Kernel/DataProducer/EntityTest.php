@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -10,7 +11,6 @@ use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Url;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
-use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\entity_test\Entity\EntityTestBundle;
 
 /**
@@ -19,8 +19,6 @@ use Drupal\entity_test\Entity\EntityTestBundle;
  * @group graphql
  */
 class EntityTest extends GraphQLTestBase {
-
-  use QueryResultAssertionTrait;
 
   /**
    * @var NodeInterface
@@ -75,7 +73,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityBundle::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityBundle::resolve
    */
   public function testResolveBundle() {
     $this->entity->expects($this->once())
@@ -90,7 +88,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityChanged::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityChanged::resolve
    */
   public function testResolveChanged() {
     $this->entity->expects($this->once())
@@ -106,7 +104,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityCreated::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityCreated::resolve
    */
   public function testResolveCreated() {
     $this->entity->expects($this->once())
@@ -122,7 +120,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityDescription::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityDescription::resolve
    */
   public function testResolveDescription() {
     $entity = $this->getMockBuilder(EntityTestBundle::class)
@@ -141,7 +139,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityId::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityId::resolve
    */
   public function testResolveId() {
     $this->entity->expects($this->once())
@@ -157,7 +155,7 @@ class EntityTest extends GraphQLTestBase {
 
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLabel::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLabel::resolve
    */
   public function testResolveLabel() {
     $this->entity->expects($this->once())
@@ -172,7 +170,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLanguage::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLanguage::resolve
    */
   public function testResolveLanguage() {
     $language = $this->getMockBuilder(LanguageInterface::class)
@@ -190,7 +188,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityOwner::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityOwner::resolve
    */
   public function testResolveOwner() {
     $this->entity->expects($this->once())
@@ -206,7 +204,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityType::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityType::resolve
    */
   public function testResolveEntityTypeId() {
     $this->entity->expects($this->once())
@@ -221,7 +219,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityPublished::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityPublished::resolve
    */
   public function testResolvePublished() {
     $this->entity->expects($this->once())
@@ -237,7 +235,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityAccess::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityAccess::resolve
    */
   public function testResolveAccess() {
     $this->entity->expects($this->any())
@@ -252,8 +250,8 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslation::resolve
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslations::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslation::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslations::resolve
    */
   public function testResolveTranslation() {
     $plugin = $this->dataProducerManager->getInstance([
@@ -276,7 +274,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
    */
   public function testResolveUrl() {
     $url = $this->getMockBuilder(Url::class)
@@ -294,7 +292,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUuid::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUuid::resolve
    */
   public function testResolveUuid() {
     $this->entity->expects($this->once())
@@ -309,7 +307,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveEntityLoad() {
     $metadata = $this->defaultCacheMetaData();
@@ -329,7 +327,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadByUuid::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadByUuid::resolve
    */
   public function testResolveEntityLoadByUuid() {
     $metadata = $this->defaultCacheMetaData();
@@ -349,7 +347,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveUnknownEntityLoad() {
     $metadata = $this->defaultCacheMetaData();
@@ -370,7 +368,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveMismatchEntityLoad() {
     $metadata = $this->defaultCacheMetaData();
@@ -391,7 +389,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveTranslatedEntityLoad() {
     $metadata = $this->defaultCacheMetaData();
@@ -412,7 +410,7 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveEntityRendered() {
     $metadata = $this->defaultCacheMetaData();

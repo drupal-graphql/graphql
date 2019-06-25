@@ -28,7 +28,7 @@ class PermissionsTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
@@ -36,14 +36,12 @@ class PermissionsTest extends GraphQLTestBase {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
-
+    $this->setUpSchema($schema);
     $this->mockField('root', [
       'name' => 'root',
       'type' => 'String',
       'parent' => 'Query',
-    ], $builder->fromValue('test'));
+    ], $this->builder->fromValue('test'));
   }
 
   /**

@@ -2,10 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test file uploads with graphql.
@@ -18,7 +16,7 @@ class UploadMutationTest extends GraphQLTestBase {
    * Test a simple file upload.
    */
   public function testFileUpload() {
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         mutation: Mutation
       }
@@ -29,8 +27,7 @@ class UploadMutationTest extends GraphQLTestBase {
       scalar Upload
 GQL;
 
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
+    $this->setUpSchema($schema);
 
     // Create dummy file, since symfony will test if it exists..
     $file = file_directory_temp() . '/graphql_upload_test.txt';
