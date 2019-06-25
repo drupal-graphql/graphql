@@ -195,18 +195,16 @@ class ResolverRegistry implements ResolverRegistryInterface {
   public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info) {
     $field = new FieldContext($context, $info);
 
-    return $field->executeInContext(function () use ($value, $args, $context, $info, $field) {
-      // First, check if there is a resolver registered for this field.
-      if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
-        if (!$resolver instanceof ResolverInterface) {
-          throw new \LogicException(sprintf('Field resolver for field %s on type %s is not callable.', $info->fieldName, $info->parentType->name));
-        }
-
-        return $resolver->resolve($value, $args, $context, $info, $field);
+    // First, check if there is a resolver registered for this field.
+    if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
+      if (!$resolver instanceof ResolverInterface) {
+        throw new \LogicException(sprintf('Field resolver for field %s on type %s is not callable.', $info->fieldName, $info->parentType->name));
       }
 
-      return call_user_func($this->defaultFieldResolver, $value, $args, $context, $info, $field);
-    });
+      return $resolver->resolve($value, $args, $context, $info, $field);
+    }
+
+    return call_user_func($this->defaultFieldResolver, $value, $args, $context, $info, $field);
   }
 
   /**

@@ -8,7 +8,7 @@ trait DataProducerPluginCachingTrait {
    * {@inheritdoc}
    */
   public function edgeCachePrefix() {
-    return md5(serialize($this->getContextValues()));
+    return hash('sha256', serialize($this->getContextValues()));
   }
 
   /**

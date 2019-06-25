@@ -3,11 +3,12 @@
 namespace Drupal\graphql\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\graphql\GraphQL\Execution\ServerConfig;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
-use GraphQL\Server\ServerConfig;
 use GraphQL\Validator\DocumentValidator;
 
 /**
@@ -45,6 +46,7 @@ use GraphQL\Validator\DocumentValidator;
  * )
  */
 class Server extends ConfigEntityBase implements ServerInterface {
+  use DependencySerializationTrait;
 
   /**
    * The server's machine-readable name.
@@ -89,24 +91,25 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
+   * @return \Drupal\graphql\Plugin\SchemaPluginInterface
+   */
+  protected function schema() {
+    $manager = \Drupal::service('plugin.manager.graphql.schema');
+    return $manager->createInstance($this->get('schema'));
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function configuration() {
-    $manager = \Drupal::service('plugin.manager.graphql.schema');
-    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    $plugin = $manager->createInstance($this->get('schema'));
+    $plugin = $this->schema();
 
     // Create the server config.
-    $config = ServerConfig::create();
+    $config = ServerConfig::createForSchema($plugin);
     $config->setDebug(!!$this->get('debug'));
     $config->setQueryBatching(!!$this->get('batching'));
     $config->setValidationRules($this->getValidationRules());
     $config->setPersistentQueryLoader($this->getPersistedQueryLoader());
-    $config->setContext($plugin->getContext());
-    $config->setRootValue($plugin->getRootValue());
-    $config->setSchema($plugin->getSchema());
-    $config->setErrorFormatter($plugin->getErrorFormatter());
-    $config->setErrorsHandler($plugin->getErrorHandler());
 
     if ($resolver = $plugin->getFieldResolver()) {
       $config->setFieldResolver($resolver);

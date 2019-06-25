@@ -16,6 +16,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\BuildSchema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -81,8 +82,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * TODO: Remove the ability to override this.
-   *
    * {@inheritdoc}
    *
    * @throws \GraphQL\Error\SyntaxError
@@ -135,8 +134,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * TODO: Remove the ability to override this.
-   *
    * {@inheritdoc}
    */
   public function getContext() {
@@ -157,8 +154,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * TODO: Remove the ability to override this.
-   *
    * {@inheritdoc}
    */
   public function getFieldResolver() {
@@ -168,8 +163,33 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * TODO: Remove the ability to override this.
-   *
+   * {@inheritdoc}
+   */
+  public function getErrorFormatter() {
+    return function (Error $error) {
+      return FormattedError::createFromException($error);
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getErrorHandler() {
+    return function (array $errors, callable $formatter) {
+      return array_map($formatter, $errors);
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperationLanguage(OperationParams $params) {
+    // Do not negotiate a language by default. Override this method to negotiate
+    // the query's language based on passed variables, etc. ...
+    return NULL;
+  }
+
+  /**
    * Resolves the name of concrete type at run-time.
    *
    * @param \GraphQL\Language\AST\TypeDefinitionNode $type
@@ -207,42 +227,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * Retrieves the error formatter.
-   *
-   * By default uses the graphql error formatter.
-   *
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
-   *
-   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
-   *
-   * @return \Closure
-   *   Error formatter.
-   */
-  public function getErrorFormatter() {
-    return function (Error $error) {
-      return FormattedError::createFromException($error);
-    };
-  }
-
-  /**
-   * Retrieves the error handler.
-   *
-   * By default uses the default graphql error handler.
-   *
-   * @see \GraphQL\Executor\ExecutionResult::toArray
-   *
-   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
-   *
-   * @return \Closure
-   *   Error handler.
-   */
-  public function getErrorHandler() {
-    return function (array $errors, callable $formatter) {
-      return array_map($formatter, $errors);
-    };
-  }
-
-  /**
    * Retrieves the resolver registry.
    *
    * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
@@ -257,5 +241,4 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The schema definition.
    */
   abstract protected function getSchemaDefinition();
-
 }

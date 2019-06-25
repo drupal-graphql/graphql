@@ -12,6 +12,9 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * @TODO: Delete this resolver. This is a plugin already.
+ */
 class Path implements ResolverInterface {
 
   use TypedDataTrait;

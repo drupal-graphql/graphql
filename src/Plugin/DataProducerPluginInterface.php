@@ -8,13 +8,13 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
-interface DataProducerPluginInterface extends ContextAwarePluginInterface, CacheableDependencyInterface, ConfigurableInterface, DerivativeInspectionInterface {
+interface DataProducerPluginInterface extends ContextAwarePluginInterface, CacheableDependencyInterface, DerivativeInspectionInterface {
 
   /**
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return \GraphQL\Deferred|mixed
    */
-  public function resolveInContext(FieldContext $field);
+  public function resolveField(FieldContext $field);
 
 }

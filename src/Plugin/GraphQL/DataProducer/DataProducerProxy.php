@@ -142,7 +142,7 @@ class DataProducerProxy implements ResolverInterface {
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
-    return DeferredUtility::returnFinally($field, $plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
+    return DeferredUtility::returnFinally($plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
       return $this->cached && $plugin instanceof DataProducerPluginCachingInterface ?
         $this->resolveCached($plugin, $context, $field) :
         $this->resolveUncached($plugin, $context, $field);
@@ -177,8 +177,8 @@ class DataProducerProxy implements ResolverInterface {
       }
     }
 
-    $contexts = DeferredUtility::waitAll($field, $contexts);
-    return DeferredUtility::returnFinally($field, $contexts, function ($contexts) use ($plugin) {
+    $contexts = DeferredUtility::waitAll($contexts);
+    return DeferredUtility::returnFinally($contexts, function ($contexts) use ($plugin) {
       foreach ($contexts as $name => $context) {
         $plugin->setContextValue($name, $context);
       }
@@ -195,8 +195,8 @@ class DataProducerProxy implements ResolverInterface {
    * @return mixed
    */
   protected function resolveUncached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field) {
-    $output = $plugin->resolveInContext($field);
-    return DeferredUtility::applyFinally($field, $output, function () use ($context, $plugin, $field) {
+    $output = $plugin->resolveField($field);
+    return DeferredUtility::applyFinally($output, function () use ($context, $plugin, $field) {
       $field->addCacheableDependency($plugin);
       $context->addCacheableDependency($field);
     });
@@ -218,7 +218,7 @@ class DataProducerProxy implements ResolverInterface {
     }
 
     $output = $this->resolveUncached($plugin, $context, $field);
-    return DeferredUtility::applyFinally($field, $output, function ($value) use ($context, $field, $prefix) {
+    return DeferredUtility::applyFinally($output, function ($value) use ($context, $field, $prefix) {
       if ($field->getCacheMaxAge() === 0) {
         return;
       }

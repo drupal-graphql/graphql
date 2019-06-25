@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -122,7 +123,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   public function resolve($type, array $ids, $language = NULL, array $bundles = NULL, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
-    return $context->deferInContext(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
+    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.

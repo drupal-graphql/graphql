@@ -38,7 +38,11 @@ class Context implements ResolverInterface {
    * {@inheritdoc}
    */
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
-    $output = $field->getContextValue($this->name, $this->default);
+    $output = $field->getContextValue($this->name);
+    if (!isset($output) && !$field->hasContextValue($this->name)) {
+      $output = $this->default;
+    }
+
     if ($output instanceof CacheableDependencyInterface) {
       $context->addCacheableDependency($output);
     }

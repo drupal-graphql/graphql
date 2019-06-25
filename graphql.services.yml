@@ -56,10 +56,12 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
       - '@request_stack'
+      - '@http_kernel'
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
+    arguments: ['@request_stack']
     tags:
       - { name: route_enhancer }
 
@@ -71,6 +73,7 @@ services:
   # Support for subrequests.
   graphql.subrequest_subscriber:
     class: Drupal\graphql\EventSubscriber\SubrequestSubscriber
+    arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
     tags:
       - { name: event_subscriber }
 
@@ -110,16 +113,3 @@ services:
   graphql.buffer.subrequest:
     class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
     arguments: ['@http_kernel', '@request_stack']
-
-  # Contextual language handling
-  graphql.context.language:
-    class: Drupal\graphql\GraphQL\Context\Handlers\LanguageContextHandler
-    arguments: ['@language_manager']
-    calls:
-      - [setNegotiator, ['@graphql.language_negotiator']]
-
-  graphql.language_negotiator:
-    class: Drupal\graphql\Language\LanguageNegotiator
-    arguments: ['@language_manager']
-    calls:
-      - [setContext, ['@graphql.context.language']]

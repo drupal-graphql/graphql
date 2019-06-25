@@ -45,7 +45,7 @@ class Composite implements ResolverInterface {
       $value = $resolver->resolve($value, $args, $context, $info, $field);
 
       if ($value instanceof Deferred) {
-        return DeferredUtility::returnFinally($field, $value, function ($value) use ($resolvers, $args, $context, $info, $field) {
+        return DeferredUtility::returnFinally($value, function ($value) use ($resolvers, $args, $context, $info, $field) {
           return isset($value) ? (new Composite($resolvers))->resolve($value, $args, $context, $info, $field) : NULL;
         });
       }

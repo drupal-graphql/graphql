@@ -46,7 +46,7 @@ class Condition implements ResolverInterface {
       }
 
       if ($condition instanceof Deferred) {
-        return DeferredUtility::returnFinally($field, $condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info, $field) {
+        return DeferredUtility::returnFinally($condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info, $field) {
           array_unshift($branches, [$cond, $resolver]);
           return (new Condition($branches))->resolve($value, $args, $context, $info, $field);
         });

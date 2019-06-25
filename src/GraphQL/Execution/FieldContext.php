@@ -4,8 +4,6 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
-use Drupal\language\ConfigurableLanguageManagerInterface;
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class FieldContext implements RefinableCacheableDependencyInterface {
@@ -29,30 +27,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    */
   public function __construct(ResolveContext $context, ResolveInfo $info) {
     $this->addCacheContexts(['user.permissions']);
-
     $this->context = $context;
     $this->info = $info;
-  }
-
-  /**
-   * @param callable $callable
-   *
-   * @return mixed
-   */
-  public function executeInContext(callable $callable) {
-    // TODO: Decorate with current contexts based on path.
-    return $callable();
-  }
-
-  /**
-   * @param callable $callable
-   *
-   * @return \GraphQL\Deferred
-   */
-  public function deferInContext(callable $callable) {
-    return new Deferred(function () use ($callable) {
-      return $this->executeInContext($callable);
-    });
   }
 
   /**
@@ -69,18 +45,38 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @return $this
    */
   public function setContextValue($name, $value) {
-    // TODO: Set context value in context bag (path based).
+    $this->context->setContextValue($this->info, $name, $value);
     return $this;
   }
 
   /**
-   * @param $name
-   * @param $default
+   * Get a contextual value for the current field.
+   *
+   * Allows field resolvers to inherit contextual values from their ancestors.
+   *
+   * @param string $name
+   *   The name of the context.
    *
    * @return mixed
+   *   The current value of the given context or the given default value if the
+   *   context wasn't set.
    */
-  public function getContextValue($name, $default) {
-    // TODO: Get context value from context bag (path based).
-    return NULL;
+  public function getContextValue($name) {
+    return $this->context->getContextValue($this->info, $name);
+  }
+
+  /**
+   * Checks whether contextual value for the current field exists.
+   *
+   * Also checks ancestors of the field.
+   *
+   * @param string $name
+   *   The name of the context.
+   *
+   * @return boolean
+   *   TRUE if the context exists, FALSE Otherwise.
+   */
+  public function hasContextValue($name) {
+    return $this->context->hasContextValue($this->info, $name);
   }
 }

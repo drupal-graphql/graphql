@@ -7,9 +7,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\GraphQL\Execution\QueryProcessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Handles GraphQL requests.
- */
 class RequestController implements ContainerInjectionInterface {
 
   /**
@@ -56,47 +53,47 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * Handles graphql requests.
    *
-   * @param string $schema
-   *   The name of the schema.
+   * @param string $server
+   *   The name of the server.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   The JSON formatted response.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Exception
    */
-  public function handleRequest($schema, $operations) {
+  public function handleRequest($server, $operations) {
     if (is_array($operations)) {
-      return $this->handleBatch($schema, $operations);
+      return $this->handleBatch($server, $operations);
     }
 
-    return $this->handleSingle($schema, $operations);
+    return $this->handleSingle($server, $operations);
   }
 
   /**
-   * @param $schema
+   * @param $server
    * @param $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Exception
    */
-  protected function handleSingle($schema, $operations) {
-    $result = $this->processor->processQuery($schema, $operations);
+  protected function handleSingle($server, $operations) {
+    $result = $this->processor->processQuery($server, $operations);
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
     return $response;
   }
 
   /**
-   * @param $schema
+   * @param $server
    * @param $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Exception
    */
-  protected function handleBatch($schema, $operations) {
-    $result = $this->processor->processQuery($schema, $operations);
+  protected function handleBatch($server, $operations) {
+    $result = $this->processor->processQuery($server, $operations);
     $response = new CacheableJsonResponse($result);
 
     // In case of a batch request, the result is an array.

@@ -12,33 +12,6 @@ abstract class DataProducerPluginBase extends ContextAwarePluginBase implements 
 
   /**
    * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function defaultConfiguration() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function getConfiguration() {
-    return $this->configuration;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function setConfiguration(array $configuration) {
-    $this->configuration = $configuration + $this->defaultConfiguration();
-  }
-
-  /**
-   * {@inheritdoc}
    */
   public function getContextDefinitions() {
     $definition = $this->getPluginDefinition();
@@ -62,7 +35,7 @@ abstract class DataProducerPluginBase extends ContextAwarePluginBase implements 
   /**
    * {@inheritdoc}
    */
-  public function resolveInContext(FieldContext $field) {
+  public function resolveField(FieldContext $field) {
     if (!method_exists($this, 'resolve')) {
       throw new \LogicException('Missing data producer resolve method.');
     }

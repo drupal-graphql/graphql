@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\GraphQL\Utility;
 
-use Drupal\graphql\GraphQL\Execution\FieldContext;
 use GraphQL\Deferred;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 
@@ -30,17 +29,16 @@ class DeferredUtility {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    * @param mixed $value
    * @param callable $callback
    *
    * @return mixed
    */
-  public static function applyFinally(FieldContext $field, $value, callable $callback) {
+  public static function applyFinally($value, callable $callback) {
     if ($value instanceof Deferred) {
       // Recursively apply this function to deferred results.
-      $value->then(function ($inner) use ($callback, $field) {
-        return static::applyFinally($field, $inner, $callback);
+      $value->then(function ($inner) use ($callback) {
+        return static::applyFinally($inner, $callback);
       });
     }
     else {
@@ -51,16 +49,14 @@ class DeferredUtility {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    * @param mixed $value
    * @param callable $callback
    *
    * @return \GraphQL\Deferred|mixed
    */
-  public static function returnFinally(FieldContext $field, $value, callable $callback) {
+  public static function returnFinally($value, callable $callback) {
     if ($value instanceof Deferred) {
-      // Recursively apply this function to deferred results.
-      return $field->deferInContext(function () use ($value, $callback) {
+      return new Deferred(function () use ($value, $callback) {
         return $value->then(function ($value) use ($callback) {
           return $callback($value);
         });
@@ -77,7 +73,6 @@ class DeferredUtility {
    * values. If it does not contain any promises at all, it will simply return
    * the original array unchanged.
    *
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    * @param array $values
    *   An array of promises and arbitrary values.
    *
@@ -85,9 +80,9 @@ class DeferredUtility {
    *   The deferred result or the unchanged input array if it does not contain
    *   any promises.
    */
-  public static function waitAll(FieldContext $field, array $values) {
+  public static function waitAll(array $values) {
     if (static::containsDeferred($values)) {
-      return $field->deferInContext(function () use ($values) {
+      return new Deferred(function () use ($values) {
         $adapter = static::promiseAdapter();
         return $adapter->all(array_map(function ($value) use ($adapter) {
           if ($value instanceof Deferred) {

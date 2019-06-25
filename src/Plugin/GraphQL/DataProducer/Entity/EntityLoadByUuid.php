@@ -125,7 +125,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
   public function resolve($type, $uuid, $language = NULL, $bundles = [], FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
-    return $context->deferInContext(function () use ($type, $language, $bundles, $resolver, $context) {
+    return new Deferred(function () use ($type, $language, $bundles, $resolver, $context) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.

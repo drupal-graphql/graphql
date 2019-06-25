@@ -20,7 +20,7 @@ class QueryRoutes {
 
       $routes["graphql.query.$id"] = (new Route($path))
         ->addDefaults([
-          'schema' => $id,
+          'server' => $id,
           '_graphql' => TRUE,
           '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
         ])
