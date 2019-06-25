@@ -1,12 +1,12 @@
 # Querying entity references
 
-Continuing on our previous example lets add a new field that in this case is an entity reference for example for a taxonomy term.
+Continuing on our previous example let's add a new field that is an entity reference for a taxonomy term.
 
-Again we need to do similar steps to add the field to the schema and add its resolver.
+We again need to do similar steps to add the field to the schema and add its resolver.
 
 ## Add the schema declaration
 
-The first step as seen in the introduction is to add the types and fields in the schema. We can do this directly in the schema string in your own schema implementation.
+The first step as seen in the introduction is to add the types and fields in the schema. We can do this directly in the schema string in your own schema implementation (`src/Plugin/GraphQL/Schema/SdlSchemaMyDrupalGql.php`).
 
 ```
 ...
@@ -26,9 +26,9 @@ type TagTerm {
 ...
 
 ```
-Now we have an article that also has a custom entity reference field to a taxonomy category (the field name in Drupal is `field_tags`) and we make a new type `TagTerm` that has the necessary information about this term.
+Now we have an article that also has a custom entity reference field to a taxonomy term (the field name in Drupal is `field_tags`) and we make a new type `TagTerm` that has the necessary information about this term.
 
-We will need to resolve not only the `tags` field but also the `id` and `name` of the term. 
+We will need to resolve not only the `tags` field but also the `id` and `name` of the term.
 
 ## Adding resolvers
 
@@ -39,9 +39,9 @@ Again inside the `getResolverRegistry` method :
    * {@inheritdoc}
    */
   protected function getResolverRegistry() {
-    
+
     ...
-    
+
     $registry->addFieldResolver('Article', 'tags',
       $builder->produce('entity_reference', [
         'mapping' => [
@@ -69,4 +69,4 @@ Again inside the `getResolverRegistry` method :
   }
 ```
 
-Notice how again we are using common Data producers provided by the module like `entity_id`, `entity_label` and also `entity_reference` in this case.
+Notice how again we are using common data producers provided by the module like `entity_id`, `entity_label` and also `entity_reference` in this case.

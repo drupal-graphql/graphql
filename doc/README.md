@@ -30,7 +30,7 @@ This trade-off does come with costs mostly around ease of use, where in the 3.x 
 2. Install the module and enable GraphQL.
 3. Login and navigate to `/admin/config/graphql` create a new server. You can use the Test schema that comes with the module to try out using GraphQL for the first time before making your own schema. Create the server and specify and endpoint such as `/graphql`. After creating the server click on `explorer` and this should bring you to the Graphiql explorer.
 
-For a query to work first you need to make an Article node. Create one with the title "Hello GraphQL" and save it.
+To be able to query something you first have to create an Article in the Drupal backend.
 
 4. **Read the comments** and then enter the following query in the left pane:
 

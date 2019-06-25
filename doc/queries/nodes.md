@@ -1,12 +1,12 @@
 # Querying nodes
 
-One common scenarios you will run into is to query a node together with certain fields. We have seen already a couple of things that can give a good overview on how to do this, but lets take an example again of the "Article" type and get some fields out of it like the `id` and `label` but also a custom field `creator` which is just a normal text field in this content type.
+A common scenario into which you will run often is to query a node together with certain field. We have already seen a couple of things that can give a good overview on how to do this. Let's take our example of the "Article" type again and query some fields like the `id`, the `label` but also the custom field `creator` which is just a normal text field.
 
-Before this make sure to read the introduction and how to add you own custom schema, only after that you can start adding resolvers and extending your DSL with your own types.
+Before you start, make sure to read the introduction and how to add a custom schema, only after that you should start adding resolvers and extending your schema with your own types.
 
 ## Add the schema declaration
 
-The first step as seen in the introduction is to add the types and fields in the schema. We can do this directly in the schema string in your own schema implementation.
+The first step, as seen in the introduction, is to add the types and fields in the schema. You can add this directly into schema string in your own schema implementation (`src/Plugin/GraphQL/Schema/SdlSchemaMyDrupalGql.php`).
 
 ```
 schema {
@@ -31,7 +31,8 @@ interface NodeInterface {
     id: Int!
 }
 ```
-Now we have an article in the schema with 3 fields `id`, `label` and our custom field `creator`. We can start adding resolvers for each of them.
+
+Now we have an "Article" type in the schema with three fields `id`, `label` and our custom field `creator`. The next step is to add resolvers for each of them.
 
 ## Adding resolvers
 

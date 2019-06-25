@@ -38,7 +38,7 @@ The following code is an example of how a data producer for a creator field on t
 
 Essentially this is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
 
-This particular resolver uses the `property_path` data producer that comes with the GraphQL module. It's one of the most common ones and you will find yourself using often to resolve any kind of property on an entity. The module includes a lot more which we will see in the "Built in Data Producers" section.
+This particular resolver uses the `property_path` data producer that comes with the GraphQL module. It's one of the most common ones and you will find yourself using it often to resolve any kind of property on an entity. The module includes a lot more which we will see in the "Built in Data Producers" section.
 
 ## Notes
 
