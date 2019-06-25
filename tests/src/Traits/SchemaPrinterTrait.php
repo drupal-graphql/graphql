@@ -18,10 +18,8 @@ trait SchemaPrinterTrait {
    *
    * @return string
    *   The printed version of the schema.
-   *
-   * @internal
    */
-  protected function getPrintedSchema($schema) {
+  protected function getPrintedSchema($schema = 'test') {
     $server = Server::load($schema);
     /** @var \GraphQL\Server\ServerConfig $config */
     $config = $server->configuration();

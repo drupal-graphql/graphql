@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 
@@ -15,27 +16,29 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
  */
 class UserPermissionsContextTest extends GraphQLTestBase {
 
-  /**
-   * Assert user.permissions tag on results.
-   */
-  public function testUserPermissionsContext() {
+  protected function setUp() {
+    parent::setUp();
+
     $schema = <<<GQL
       schema {
         query: Query
       }
+      
       type Query {
         root: String
       }
 GQL;
 
     $this->setUpSchema($schema);
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $this->builder->fromValue('test'));
+  }
 
-    $result = $this->query('query { root }');
-    $this->assertContains('user.permissions', $result->getCacheableMetadata()->getCacheContexts());
+  /**
+   * Assert user.permissions tag on results.
+   */
+  public function testUserPermissionsContext() {
+    $this->mockResolver('Query', 'root', 'test');
+
+    $metadata = (new CacheableMetadata())->addCacheContexts(['user.permissions']);
+    $this->assertResults('{ root }', [], ['root' => 'test'], $metadata);
   }
 }

@@ -21,7 +21,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\BuildSchema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
+abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**

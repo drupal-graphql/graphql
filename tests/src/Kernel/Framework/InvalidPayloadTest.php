@@ -12,14 +12,21 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class InvalidPayloadTest extends GraphQLTestBase {
 
-  public function testEmptyPayload() {
+  protected function setUp() {
+    parent::setUp();
+
     $schema = <<<GQL
       type Query {
         root: String
       }
 GQL;
+
     $this->setUpSchema($schema);
-    $this->container->get('http_kernel')->handle(Request::create('/graphql/graphql_test', 'POST', [], [], [], [], '{ invalid'));
+  }
+
+  public function testEmptyPayload() {
+    $request = Request::create('/graphql/test', 'POST', [], [], [], [], '{ invalid');
+    $this->container->get('http_kernel')->handle($request);
   }
 
 }

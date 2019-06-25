@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -13,7 +12,6 @@ use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
-use PHPUnit_Framework_Error_Warning;
 
 abstract class GraphQLTestBase extends KernelTestBase {
   use ProphesizePermissionsTrait;
@@ -48,13 +46,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
-    parent::register($container);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp() {
     parent::setUp();
 
@@ -85,7 +76,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
 
     $this->builder = new ResolverBuilder();
   }
-
 
   /**
    * {@inheritdoc}

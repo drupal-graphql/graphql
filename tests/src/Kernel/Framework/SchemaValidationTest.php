@@ -16,13 +16,14 @@ class SchemaValidationTest extends GraphQLTestBase {
       schema {
         query: Query
       }
+      
       type Query {
         foo: String
       }
 GQL;
 
     $this->setUpSchema($schema);
-    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue('bar'));
+    $this->mockResolver('Query', 'foo', 'bar');
 
     $this->assertTrue($this->schema->validateSchema());
   }
@@ -32,14 +33,16 @@ GQL;
       schema {
         query: Query
       }
+      
       type Query {
         foo: String
       }
+      
       error
 GQL;
 
     $this->setUpSchema($schema);
-    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue('bar'));
+    $this->mockResolver('Query', 'foo', 'bar');
 
     $this->assertFalse($this->schema->validateSchema());
 
@@ -55,13 +58,14 @@ GQL;
       schema {
         query: Query
       }
+      
       type Query {
         bar: String
       }
 GQL;
 
     $this->setUpSchema($schema);
-    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue('bar'));
+    $this->mockResolver('Query', 'foo', 'bar');
 
     $this->assertFalse($this->schema->validateSchema());
 
@@ -77,13 +81,14 @@ GQL;
       schema {
         query: Query
       }
+      
       type Query {
         foo: Foo
       }
 GQL;
 
     $this->setUpSchema($schema);
-    $this->mockField('foo', ['parent' => 'Query' ], $this->builder->fromValue(NULL));
+    $this->mockResolver('Query', 'foo', NULL);
 
     $this->assertFalse($this->schema->validateSchema());
 

@@ -30,22 +30,21 @@ GQL;
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
+
     $cacheable->expects($this->any())
       ->method('getCacheTags')
       ->willReturn(['my_tag']);
+
     $cacheable->expects($this->any())
       ->method('getCacheMaxAge')
       ->willReturn(42);
+
     $cacheable->expects($this->any())
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-      'response_cache_tags' => ['my_tag'],
-    ], $this->builder->compose(
+    $this->mockResolver('Query', 'root',
+      $this->builder->compose(
         $this->builder->fromValue($cacheable),
         $this->builder->fromValue('test')
       )
@@ -90,6 +89,7 @@ GQL;
 GQL;
 
     $this->setUpSchema($schema);
+
     // Errors are cacheable now.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
@@ -113,6 +113,7 @@ GQL;
         query: Query
         mutation: Mutation
       }
+      
       type Query {
         root: Boolean
       }
@@ -135,22 +136,12 @@ GQL;
 
     $this->setUpSchema($schema);
 
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'Boolean',
-      'parent' => 'Query',
-    ], $this->builder->fromValue(TRUE));
+    $this->mockResolver('Query', 'root', TRUE);
 
-    $this->mockField('addUser', [
-      'name' => 'addUser',
-      'type' => 'Boolean',
-      'parent' => 'Mutation',
-    ], $this->builder->compose(
-        $this->builder->fromArgument('user'),
-        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-          return $args['user']['age'] > 50 && $args['user']['gender'] == 'Male';
-        })
-      )
+    $this->mockResolver('Mutation', 'addUser',
+      function ($parent, $args) {
+        return $args['user']['age'] > 50 && $args['user']['gender'] === 'Male';
+      }
     );
 
     $metadata = $this->defaultMutationCacheMetaData();
@@ -171,6 +162,7 @@ GQL;
       schema {
         query: Query
       }
+      
       type Query {
         root: [Token]
       }
@@ -180,71 +172,58 @@ GQL;
       }
 
       type Number implements Token {
+        id: Int
         value: Int
       }
 
       type Word implements Token {
+        id: Int
         value: String
       }
 GQL;
 
     $this->setUpSchema($schema);
-    $this->mockTypeResolver('Token', function ($value, $context, $info) {
+
+    $this->mockTypeResolver('Token', function ($value) {
       return is_int($value['value']) ? 'Number' : 'Word';
     });
 
-    $this->mockField('value', [
-      'name' => 'value',
-      'type' => 'Int',
-      'parent' => 'Number',
-    ], $this->builder->compose(
-        $this->builder->fromParent(),
-        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-          return $value['value'];
-        })
-      )
-    );
+    $this->mockResolver('Query', 'root', [
+      ['value' => 42],
+      ['value' => 'GraphQL'],
+    ]);
 
-    $this->mockField('value', [
-      'name' => 'value',
-      'type' => 'String',
-      'parent' => 'Word',
-    ], $this->builder->compose(
-        $this->builder->fromParent(),
-        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-          return $value['value'];
-        })
-      )
-    );
+    $query = <<<GQL
+      query {
+        root {
+          ... on Number {
+            number: value
+          }
+          
+          ... on Word {
+            word:value
+          }
+        }
+      }
+GQL;
 
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => '[Token]',
-      'parent' => 'Query',
-    ], $this->builder->fromValue(
-      [
-        ['value' => 42],
-        ['value' => 'GraphQL'],
-      ]
-    ));
-
-    $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
+    $this->assertResults($query, [], [
       'root' => [
         0 => ['number' => 42],
         1 => ['word' => 'GraphQL'],
       ],
-    ], $this->defaultCacheMetaData());
+    ]);
   }
 
   /**
    * Test union mocks.
-   * @todo Unions are identical to interfaces right now, but they should not be.
    */
   public function testUnionMock() {
     $schema = <<<GQL
       schema {
         query: Query
       }
+      
       type Query {
         root: [Token]
       }
@@ -259,52 +238,24 @@ GQL;
         value: String
       }
 GQL;
+
     $this->setUpSchema($schema);
-    $this->mockTypeResolver('Token', function ($value, $context, $info) {
+
+    $this->mockTypeResolver('Token', function ($value) {
       return is_int($value['value']) ? 'Number' : 'Word';
     });
 
-    $this->mockField('value', [
-      'name' => 'value',
-      'type' => 'Int',
-      'parent' => 'Number',
-    ], $this->builder->compose(
-        $this->builder->fromParent(),
-        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-          return $value['value'];
-        })
-      )
-    );
-
-    $this->mockField('value', [
-      'name' => 'value',
-      'type' => 'String',
-      'parent' => 'Word',
-    ], $this->builder->compose(
-        $this->builder->fromParent(),
-        $this->builder->callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-          return $value['value'];
-        })
-      )
-    );
-
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => '[Token]',
-      'parent' => 'Query',
-    ], $this->builder->fromValue(
-      [
-        ['value' => 42],
-        ['value' => 'GraphQL'],
-      ]
-    ));
+    $this->mockResolver('Query', 'root', [
+      ['value' => 42],
+      ['value' => 'GraphQL'],
+    ]);
 
     $this->assertResults('{ root { ... on Number { number:value } ... on Word { word:value }  } }', [], [
       'root' => [
         0 => ['number' => 42],
         1 => ['word' => 'GraphQL'],
       ],
-    ], $this->defaultCacheMetaData());
+    ]);
   }
 
 }

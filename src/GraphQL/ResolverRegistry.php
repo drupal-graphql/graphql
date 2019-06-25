@@ -63,11 +63,11 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * ResolverRegistry constructor.
    *
-   * @param $dataTypes
+   * @param array $dataTypes
    * @param callable|null $defaultFieldResolver
    * @param callable|null $defaultTypeResolver
    */
-  public function __construct($dataTypes, callable $defaultFieldResolver = NULL, callable $defaultTypeResolver = NULL) {
+  public function __construct($dataTypes = [], callable $defaultFieldResolver = NULL, callable $defaultTypeResolver = NULL) {
     $this->dataTypes = $dataTypes;
     $this->defaultFieldResolver = $defaultFieldResolver ?: [$this, 'resolveFieldDefault'];
     $this->defaultTypeResolver = $defaultTypeResolver ?: [$this, 'resolveTypeDefault'];

@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\graphql\GraphQL\ResolverRegistry;
 use GraphQL\Deferred;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
@@ -37,8 +36,8 @@ class ResolverBuilderTest extends GraphQLTestBase {
         language: Language
       }
 
-      type Language {
-        languageContext: String
+      type Context {
+        myContext: String
       }
 GQL;
 
@@ -58,6 +57,9 @@ GQL;
     $this->assertInstanceOf($expected, $plugin);
   }
 
+  /**
+   * @return array
+   */
   public function testBuilderProducingProvider() {
     return [
       ['entity_load', ResolverInterface::class],
@@ -70,11 +72,7 @@ GQL;
    * @covers ::fromValue
    */
   public function testFromValue() {
-    $registry = new ResolverRegistry([]);
-    $registry->addFieldResolver('Query', 'me', $this->builder->fromValue('some me'));
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
+    $this->mockResolver('Query', 'me', $this->builder->fromValue('some me'));
 
     $query = <<<GQL
       query {
@@ -82,20 +80,15 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['me' => 'some me'], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['me' => 'some me']);
   }
 
   /**
    * @covers ::fromParent
    */
   public function testFromParent() {
-    $registry = new ResolverRegistry([]);
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue('Some string value'));
-    $registry->addFieldResolver('Tree', 'name', $this->builder->fromParent());
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
+    $this->mockResolver('Query', 'tree',$this->builder->fromValue('Some string value'));
+    $this->mockResolver('Tree', 'name', $this->builder->fromParent());
 
     $query = <<<GQL
       query {
@@ -105,20 +98,15 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['name' => 'Some string value']], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['name' => 'Some string value']]);
   }
 
   /**
    * @covers ::fromArgument
    */
   public function testFromArgument() {
-    $registry = new ResolverRegistry([]);
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
-    $registry->addFieldResolver('Tree', 'id', $this->builder->fromArgument('someArg'));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Tree', 'id', $this->builder->fromArgument('someArg'));
 
     $query = <<<GQL
       query {
@@ -128,56 +116,45 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['id' => 234]], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['id' => 234]]);
   }
 
   /**
    * @covers ::fromPath
    */
   public function testFromPath() {
-    $registry = new ResolverRegistry([]);
-    $typed_data_manager = $this->getMock(TypedDataManagerInterface::class);
-
-    $typed_data_manager->expects($this->any())
+    $manager = $this->createMock(TypedDataManagerInterface::class);
+    $manager->expects($this->any())
       ->method('getDefinition')
       ->will($this->returnValueMap([
         'tree' => ['class' => '\Drupal\Core\TypedData\ComplexDataInterface'],
       ]));
 
+    $this->container->set('typed_data_manager', $manager);
+
     $uri = $this->prophesize(TypedDataInterface::class);
-    $uri->getValue()
-      ->willReturn('<front>');
+    $uri->getValue()->willReturn('<front>');
 
     $path = $this->prophesize(ComplexDataInterface::class);
-    $path->get('uri')
-      ->willReturn($uri);
-    $path->getValue()
-      ->willReturn([]);
+    $path->get('uri')->willReturn($uri);
+    $path->getValue()->willReturn([]);
 
-    $tree_type = $this->prophesize(ComplexDataInterface::class);
-    $tree_type->get('path')
-      ->willReturn($path);
-    $tree_type->getValue()
-      ->willReturn([]);
+    $tree = $this->prophesize(ComplexDataInterface::class);
+    $tree->get('path')->willReturn($path);
+    $tree->getValue()->willReturn([]);
 
-    $typed_data_manager->expects($this->any())
+    $manager->expects($this->any())
       ->method('create')
-      ->willReturn($tree_type->reveal());
+      ->willReturn($tree->reveal());
 
-    $this->container->set('typed_data_manager', $typed_data_manager);
-
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue([
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
       'path' => [
         'uri' => '<front>',
         'path_name' => 'Front page',
-      ]
+      ],
     ]));
 
-    $registry->addFieldResolver('Tree', 'uri', $this->builder->fromPath('tree', 'path.uri'));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
+    $this->mockResolver('Tree', 'uri', $this->builder->fromPath('tree', 'path.uri'));
 
     $query = <<<GQL
       query {
@@ -187,26 +164,20 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['uri' => '<front>']], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['uri' => '<front>']]);
   }
 
   /**
    * @covers ::compose
    */
   public function testCompose() {
-    $registry = new ResolverRegistry([]);
-
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
-    $registry->addFieldResolver('Tree', 'name', $this->builder->compose(
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Tree', 'name', $this->builder->compose(
       $this->builder->fromValue('Some tree name'),
       $this->builder->produce('uppercase', ['mapping' => [
         'string' => $this->builder->fromParent(),
       ]])
     ));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
 
     $query = <<<GQL
       query {
@@ -216,7 +187,7 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['name' => 'SOME TREE NAME']], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['name' => 'SOME TREE NAME']]);
   }
 
   /**
@@ -224,50 +195,38 @@ GQL;
    * @covers ::fromContext
    */
   public function testFromContext() {
-    $registry = new ResolverRegistry([]);
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue('some value'));
 
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue('some value'));
-
-    $registry->addFieldResolver('Tree', 'language', $this->builder->compose(
-      $this->builder->context('language_context', $this->builder->fromValue('language context value')),
+    $this->mockResolver('Tree', 'context', $this->builder->compose(
+      $this->builder->context('my context', $this->builder->fromValue('my context value')),
       $this->builder->fromValue('some language value')
     ));
 
-    $registry->addFieldResolver('Language', 'languageContext', $this->builder->fromContext('language_context'));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
+    $this->mockResolver('Context', 'myContext', $this->builder->fromContext('my context'));
 
     $query = <<<GQL
       query {
         tree {
-          language {
-            languageContext
+          context {
+            myContext
           }
         }
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['language' => ['languageContext' => 'language context value']]], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['context' => ['myContext' => 'my context value']]]);
   }
 
   /**
    * @covers ::cond
    */
   public function testSimpleCond() {
-    $registry = new ResolverRegistry([]);
-
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
-    $registry->addFieldResolver('Tree', 'name', $this->builder->cond([
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Tree', 'name', $this->builder->cond([
       [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('But this should.')],
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
 
     $query = <<<GQL
       query {
@@ -277,25 +236,19 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']]);
   }
 
   /**
    * @covers ::cond
    */
   public function testDeferredCond() {
-    $registry = new ResolverRegistry([]);
-
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
-    $registry->addFieldResolver('Tree', 'name', $this->builder->cond([
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Tree', 'name', $this->builder->cond([
       [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
       [function () { return new Deferred(function () { return TRUE; }); }, $this->builder->fromValue('But this should.')],
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
 
     $query = <<<GQL
       query {
@@ -305,25 +258,19 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']]);
   }
 
   /**
    * @covers ::cond
    */
   public function testParentCond() {
-    $registry = new ResolverRegistry([]);
-
-    $registry->addFieldResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
-    $registry->addFieldResolver('Tree', 'name', $this->builder->cond([
+    $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
+    $this->mockResolver('Tree', 'name', $this->builder->cond([
       [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
       [$this->builder->fromParent(), $this->builder->fromValue('But this should.')],
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
-
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
 
     $query = <<<GQL
       query {
@@ -333,7 +280,7 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']], $this->defaultCacheMetaData());
+    $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']]);
   }
 }
 

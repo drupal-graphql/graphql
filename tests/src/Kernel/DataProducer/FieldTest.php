@@ -4,14 +4,11 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 

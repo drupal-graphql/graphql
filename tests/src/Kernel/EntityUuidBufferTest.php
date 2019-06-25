@@ -10,6 +10,9 @@ use Drupal\node\Entity\NodeType;
  */
 class EntityUuidBufferTest extends GraphQLTestBase {
 
+  /**
+   * @var array
+   */
   protected $nodeUuids = [];
 
   /**
@@ -25,15 +28,16 @@ class EntityUuidBufferTest extends GraphQLTestBase {
       'name' => 'Test',
     ])->save();
 
-    foreach (range(1, 3) as $i) {
+    $this->nodeUuids = array_map(function ($i) {
       $node = Node::create([
         'title' => 'Node ' . $i,
         'type' => 'test',
       ]);
 
       $node->save();
-      $this->nodeUuids[] = $node->uuid();
-    }
+
+      return $node->uuid();
+    }, range(1, 3));
 
     $schema = <<<GQL
       type Query {
@@ -64,18 +68,18 @@ GQL;
       }
 GQL;
 
-    $this->mockField('node', [
-      'parent' => 'Query',
-    ], $this->builder->produce('entity_load_by_uuid', ['mapping' => [
-      'type' => $this->builder->fromValue('node'),
-      'uuid' => $this->builder->fromArgument('uuid'),
-    ]]));
+    $this->mockResolver('Query', 'node',
+      $this->builder->produce('entity_load_by_uuid', ['mapping' => [
+        'type' => $this->builder->fromValue('node'),
+        'uuid' => $this->builder->fromArgument('uuid'),
+      ]])
+    );
 
-    $this->mockField('title', [
-      'parent' => 'Node',
-    ], $this->builder->produce('entity_label', ['mapping' => [
-      'entity' => $this->builder->fromParent(),
-    ]]));
+    $this->mockResolver('Node', 'title',
+      $this->builder->produce('entity_label', ['mapping' => [
+        'entity' => $this->builder->fromParent(),
+      ]])
+    );
 
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags(['node:1', 'node:2', 'node:3']);

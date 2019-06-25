@@ -25,12 +25,10 @@ class ResultTest extends GraphQLTestBase {
         root: String
       }
 GQL;
+
     $this->setUpSchema($schema);
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query'
-    ], $this->builder->fromValue('test'));
+
+    $this->mockResolver('Query', 'root', 'test');
   }
 
   /**
@@ -38,6 +36,7 @@ GQL;
    */
   public function testQuery() {
     $result = $this->query('query { root }');
+
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame([
       'data' => [

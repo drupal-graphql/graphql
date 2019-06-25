@@ -32,16 +32,15 @@ class PermissionsTest extends GraphQLTestBase {
       schema {
         query: Query
       }
+      
       type Query {
         root: String
       }
 GQL;
+
     $this->setUpSchema($schema);
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $this->builder->fromValue('test'));
+
+    $this->mockResolver('Query', 'root', 'test');
   }
 
   /**
@@ -80,11 +79,13 @@ GQL;
     ]);
 
     $this->assertEquals(200, $batched->getStatusCode());
+
     $data = [
       'data' => [
         'root' => 'test',
       ],
     ];
+
     $this->assertEquals([$data, $data], json_decode($batched->getContent(), TRUE));
   }
 

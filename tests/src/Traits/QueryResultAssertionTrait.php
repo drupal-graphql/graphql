@@ -91,12 +91,10 @@ trait QueryResultAssertionTrait {
    *   The query variables.
    * @param array $expected
    *   The expected result.
-   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   * @param \Drupal\Core\Cache\CacheableMetadata|null $metadata
    *   The expected cache metadata object.
-   *
-   * @throws \Exception
    */
-  protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata) {
+  protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata = NULL) {
     $result = $this->queryProcessor()->processQuery(
       $this->getDefaultSchema(),
       OperationParams::create([
@@ -107,7 +105,7 @@ trait QueryResultAssertionTrait {
 
     $this->assertResultErrors($result, []);
     $this->assertResultData($result, $expected);
-    $this->assertResultMetadata($result, $metadata);
+    $this->assertResultMetadata($result, $metadata ?: $this->defaultCacheMetaData());
   }
 
   /**
@@ -121,8 +119,6 @@ trait QueryResultAssertionTrait {
    *   The expected error messages.
    * @param \Drupal\Core\Cache\CacheableMetadata $metadata
    *   The expected cache metadata object.
-   *
-   * @throws \Exception
    */
   protected function assertErrors($query, $variables, $expected, CacheableMetadata $metadata) {
     $result = $this->queryProcessor()->processQuery(

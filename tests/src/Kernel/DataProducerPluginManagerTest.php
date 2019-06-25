@@ -8,8 +8,6 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 /**
  * @coversDefaultClass \Drupal\graphql\Plugin\DataProducerPluginManager
  *
- * @requires module typed_data
- *
  * @group graphql
  */
 class DataProducerPluginManagerTest extends KernelTestBase {
@@ -48,23 +46,17 @@ class DataProducerPluginManagerTest extends KernelTestBase {
    * @covers ::getInstance
    */
   public function testGetInstance() {
-    $instance = $this->dataProducerManager->getInstance([
-      'id' => 'entity_load',
-      'configuration' => [
-        'mapping' => [
-          'entity_type' => $this->builder->fromValue('node'),
-          'entity_id' => $this->builder->fromArgument('id'),
-        ],
+    $instance = $this->dataProducerManager->createInstance('entity_load', [
+      'mapping' => [
+        'entity_type' => $this->builder->fromValue('node'),
+        'entity_id' => $this->builder->fromArgument('id'),
       ],
     ]);
 
     $this->assertEquals('entity_load', $instance->getPluginId());
-    $instance = $this->dataProducerManager->getInstance([
-      'id' => 'uppercase',
-      'configuration' => [
-        'mapping' => [
-          'string' => $this->builder->fromParent(),
-        ],
+    $instance = $this->dataProducerManager->createInstance('uppercase', [
+      'mapping' => [
+        'string' => $this->builder->fromParent(),
       ],
     ]);
 

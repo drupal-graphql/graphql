@@ -20,6 +20,7 @@ class UploadMutationTest extends GraphQLTestBase {
       schema {
         mutation: Mutation
       }
+  
       type Mutation {
         store(file: Upload!): String
       }
@@ -35,18 +36,14 @@ GQL;
 
     // Mock a mutation that accepts the upload input and just returns
     // the client filename.
-    $this->mockField('store', [
-      'name' => 'store',
-      'type' => 'String',
-      'parent' => 'Mutation',
-    ], function ($value, $args, $context, $info) {
-        $file = $args['file'];
-        return $file->getClientOriginalName();
+    $this->mockResolver('Mutation', 'store',
+      function ($parent, $args) {
+        return $args['file']->getClientOriginalName();
       }
     );
 
     // Create a post request with file contents.
-    $uploadRequest = Request::create('/graphql/graphql_test', 'POST', [
+    $uploadRequest = Request::create('/graphql/test', 'POST', [
       'query' => 'mutation($upload: Upload!) { store(file: $upload) }',
       // The variable has to be declared null.
       'variables' => ['upload' => NULL],

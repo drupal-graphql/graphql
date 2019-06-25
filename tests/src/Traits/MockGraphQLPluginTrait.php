@@ -11,9 +11,6 @@ use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 
-/**
- * Trait for mocking GraphQL type system plugins.
- */
 trait MockGraphQLPluginTrait {
 
   /**
@@ -22,22 +19,22 @@ trait MockGraphQLPluginTrait {
   protected $server;
 
   /**
-   * @var \Drupal\graphql\Plugin\SchemaPluginInterface
-   */
-  protected $schema;
-
-  /**
    * @var \Drupal\graphql\GraphQL\ResolverRegistry
    */
   protected $registry;
 
   /**
-   * @var \Drupal\graphql\Plugin\SchemaPluginManager
+   * @var \PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $schema;
+
+  /**
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
   protected $schemaPluginManager;
 
   /**
-   * @var \Drupal\graphql\Plugin\DataProducerPluginManager
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
   protected $dataProducerPluginManager;
 
@@ -101,8 +98,9 @@ trait MockGraphQLPluginTrait {
    *   Schema extension.
    * @param string $id
    *   Schema id.
+   * @param bool $development
    */
-  protected function setUpExtendedSchema($schema, $schemaExtension, $id, $development = FALSE) {
+  protected function setUpExtendedSchema($schema, $schemaExtension, $id = 'test', $development = FALSE) {
     $this->mockExtendedSchema($id, $schema, $schemaExtension, $development);
     $this->mockSchemaPluginManager($id);
     $this->createTestServer($id, '/graphql/' . $id, $development);
@@ -151,7 +149,6 @@ trait MockGraphQLPluginTrait {
         $id,
         [],
         $this->container->get('cache.graphql.ast'),
-        $this->container->get('context.repository'),
         ['development' => $development]
       ])
       ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
@@ -199,7 +196,7 @@ trait MockGraphQLPluginTrait {
       ->method('getExtendedSchemaDefinition')
       ->willReturn($schemaExtension);
 
-    $this->registry = new ResolverRegistry([]);
+    $this->registry = new ResolverRegistry();
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
       ->willReturn($this->registry);
@@ -232,21 +229,21 @@ trait MockGraphQLPluginTrait {
    *
    * @param string $type
    *   Parent Type.
-   * @param string $name
+   * @param string $field
    *   Field name.
-   * @param callable|\Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
+   * @param mixed|\Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    *   Resolver.
    */
-  protected function mockDataProducer($type, $name, $resolver) {
+  protected function mockResolver($type, $field, $resolver = NULL) {
     if (is_callable($resolver)) {
       $resolver = new Callback($resolver);
     }
 
     if (!($resolver instanceof ResolverInterface)) {
-      throw new \LogicException('Invalid resolver.');
+      $resolver = new Value($resolver);
     }
 
-    $this->registry->addFieldResolver($type, $name, $resolver);
+    $this->registry->addFieldResolver($type, $field, $resolver);
   }
 
   /**
@@ -259,36 +256,6 @@ trait MockGraphQLPluginTrait {
    */
   protected function mockTypeResolver($type, callable $resolver) {
     $this->registry->addTypeResolver($type, $resolver);
-  }
-
-  /**
-   * Mock a GraphQL field.
-   *
-   * @param string $id
-   *   The field id.
-   * @param array $definition
-   *   The plugin definition. Will be merged with the field defaults.
-   * @param mixed|null $result
-   *   A result for this field. Can be a value or a callback. If omitted, no
-   *   resolve method mock will be attached.
-   */
-  protected function mockField($id, $definition, $result = NULL) {
-    if (!($result instanceof ResolverInterface)) {
-      $result = new Value($result);
-    }
-
-    $this->mockDataProducer($definition['parent'], $id, $result);
-  }
-
-  /**
-   * Return callable DataProducer.
-   *
-   * @param callable $callback
-   *
-   * @return \Drupal\graphql\GraphQL\Resolver\Callback
-   */
-  protected function mockCallable(callable $callback) {
-    return new Callback($callback);
   }
 
 }

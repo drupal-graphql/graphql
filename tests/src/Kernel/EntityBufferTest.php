@@ -62,18 +62,18 @@ GQL;
       }
 GQL;
 
-    $this->mockField('node', [
-      'parent' => 'Query',
-    ], $this->builder->produce('entity_load', ['mapping' => [
-      'type' => $this->builder->fromValue('node'),
-      'id' => $this->builder->fromArgument('id'),
-    ]]));
+    $this->mockResolver('Query', 'node',
+      $this->builder->produce('entity_load', ['mapping' => [
+        'type' => $this->builder->fromValue('node'),
+        'id' => $this->builder->fromArgument('id'),
+      ]])
+    );
 
-    $this->mockField('title', [
-      'parent' => 'Node',
-    ], $this->builder->produce('entity_label', ['mapping' => [
-      'entity' => $this->builder->fromParent(),
-    ]]));
+    $this->mockResolver('Node', 'title',
+      $this->builder->produce('entity_label', ['mapping' => [
+        'entity' => $this->builder->fromParent(),
+      ]])
+    );
 
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags(['node:1', 'node:2', 'node:3']);
