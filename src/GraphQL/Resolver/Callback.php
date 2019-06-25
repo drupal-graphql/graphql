@@ -28,7 +28,7 @@ class Callback implements ResolverInterface {
    * {@inheritdoc}
    */
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
-    $result = ($this->callback)($value, $args, $context, $info);
+    $result = ($this->callback)($value, $args, $context, $info, $field);
     return $result;
   }
 

@@ -87,13 +87,15 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \GraphQL\Error\SyntaxError
    */
   public function getSchema() {
-    return BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
+    $schema = BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $this->getTypeResolver($type);
       }
 
       return $config;
     });
+
+    return $schema;
   }
 
   /**

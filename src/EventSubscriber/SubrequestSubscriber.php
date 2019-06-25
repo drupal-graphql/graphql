@@ -7,7 +7,6 @@ use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -50,9 +49,9 @@ class SubrequestSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * Resets the global language context across different services.
    */
-  protected function resetLanguageContext(Request $request) {
+  protected function resetLanguageContext() {
     if (!isset($this->languageNegotiator)) {
       return;
     }

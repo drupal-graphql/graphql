@@ -154,12 +154,12 @@ class QueryProcessor {
    * @param \GraphQL\Server\OperationParams $params
    * @param bool $batching
    *
-   * @return mixed
+   * @return \GraphQL\Executor\Promise\Promise
    * @throws \Exception
    */
   protected function executeOperationInSubrequest(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     $current = $this->requestStack->getCurrentRequest();
-    $request = Request::create('/', 'GET',
+    $request = Request::create($current->getPathInfo(), 'GET',
       $current->query->all(),
       $current->cookies->all(),
       $current->files->all(),
@@ -178,15 +178,19 @@ class QueryProcessor {
 
     /** @var \Drupal\graphql\SubRequestResponse $response */
     $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
+    /** @var \GraphQL\Executor\Promise\Promise $result */
+    $result = $response->getResult();
 
-    // TODO:
-    // Remove the request stack manipulation once the core issue described at
-    // https://www.drupal.org/node/2613044 is resolved.
-    while ($this->requestStack->getCurrentRequest() === $request) {
-      $this->requestStack->pop();
-    }
+    return $result->then(function ($result) use ($request) {
+      // TODO:
+      // Remove the request stack manipulation once the core issue described at
+      // https://www.drupal.org/node/2613044 is resolved.
+      while ($this->requestStack->getCurrentRequest() === $request) {
+        $this->requestStack->pop();
+      }
 
-    return $response->getResult();
+      return $result;
+    });
   }
 
   /**
