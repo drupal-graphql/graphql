@@ -7,7 +7,6 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Data producers TypedData test class.
@@ -22,12 +21,7 @@ class TypedDataTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\TypedData\PropertyPath::resolve
    */
   public function testPropertyPath() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'property_path',
-      'configuration' => []
-    ]);
-
-    $typed_data_manager = $this->getMock(TypedDataManagerInterface::class);
+    $manager = $this->createMock(TypedDataManagerInterface::class);
 
     $uri = $this->prophesize(TypedDataInterface::class);
     $uri->getValue()
@@ -51,30 +45,34 @@ class TypedDataTest extends GraphQLTestBase {
     $tree_type->getValue()
       ->willReturn([]);
 
-    $typed_data_manager->expects($this->any())
+    $manager->expects($this->any())
       ->method('createDataDefinition')
       ->willReturn(DataDefinition::create('tree'));
 
-    $typed_data_manager->expects($this->any())
+    $manager->expects($this->any())
       ->method('create')
       ->willReturn($tree_type->reveal());
 
-    $this->container->set('typed_data_manager', $typed_data_manager);
-    $metadata = new CacheableMetadata();
+    $this->container->set('typed_data_manager', $manager);
 
-    $this->assertEquals('<front>', $plugin->resolve('path.uri', [
+    $value = [
       'path' => [
         'uri' => '<front>',
         'path_name' => 'Front page',
-      ]
-    ], 'tree', $metadata));
+      ],
+    ];
 
-    $this->assertEquals('Front page', $plugin->resolve('path.path_name', [
-      'path' => [
-        'uri' => '<front>',
-        'path_name' => 'Front page',
-      ]
-    ], 'tree', $metadata));
+    $this->assertEquals('<front>', $this->executeDataProducer('property_path', [
+      'path' => 'path.uri',
+      'type' => 'tree',
+      'value' => $value,
+    ]));
+
+    $this->assertEquals('Front page', $this->executeDataProducer('property_path', [
+      'path' => 'path.path_name',
+      'type' => 'tree',
+      'value' => $value,
+    ]));
   }
 
 }

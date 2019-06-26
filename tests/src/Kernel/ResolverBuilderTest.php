@@ -33,7 +33,7 @@ class ResolverBuilderTest extends GraphQLTestBase {
         id(someArg: Int): Int
         name: String
         uri: String
-        language: Context
+        context: Context
       }
 
       type Context {

@@ -24,8 +24,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "entity_type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "entity_ids" = @ContextDefinition("array",
- *       label = @Translation("Identifier")
+ *     "entity_ids" = @ContextDefinition("string",
+ *       label = @Translation("Identifier"),
+ *       multiple = TRUE
  *     ),
  *     "entity_language" = @ContextDefinition("string",
  *       label = @Translation("Entity languages(s)"),

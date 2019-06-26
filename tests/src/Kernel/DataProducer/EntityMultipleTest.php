@@ -101,13 +101,13 @@ class EntityMultipleTest extends GraphQLTestBase {
   public function testResolveEntityLoadMultiple() {
     $result = $this->executeDataProducer('entity_load_multiple', [
       'entity_type' => $this->node1->getEntityTypeId(),
-      'entity_bundle' => [$this->node1->bundle(), $this->node2->bundle(), $this->node3->bundle()],
+      'entity_bundle' => [$this->node1->bundle(), $this->node2->bundle()],
       'entity_ids' => [$this->node1->id(), $this->node2->id(), $this->node3->id()],
     ]);
 
-    $nids = array_map(function (NodeInterface $item) {
+    $nids = array_values(array_map(function (NodeInterface $item) {
       return $item->id();
-    }, $result);
+    }, $result));
 
     // All entity is loaded through entity load should match the initial values.
     // Hidden entity (node 3) is not include
