@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\Language;
 
-use Drupal\language\LanguageNegotiator;
+use Drupal\language\LanguageNegotiator as CoreLanguageNegotiator;
 
 /**
  * Fixed language negotiator.
@@ -11,7 +11,7 @@ use Drupal\language\LanguageNegotiator;
  *
  * @see https://www.drupal.org/project/drupal/issues/2952789
  */
-class FixedLanguageNegotiator extends LanguageNegotiator {
+class LanguageNegotiator extends CoreLanguageNegotiator {
 
   /**
    * {@inheritdoc}

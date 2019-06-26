@@ -4,19 +4,18 @@ namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
+use Drupal\graphql\Event\OperationEvent;
+use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 
-class SubrequestSubscriber implements EventSubscriberInterface {
+class OperationSubscriber implements EventSubscriberInterface {
 
   use CurrentLanguageResetTrait;
 
   /**
-   * Constructs a SubrequestSubscriber object.
+   * Constructs a OperationSubscriber object.
    *
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
    * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
@@ -31,31 +30,38 @@ class SubrequestSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Handle kernel request events.
+   * Handle operation start events.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Drupal\graphql\Event\OperationEvent $event
    *   The kernel event object.
    */
-  public function onKernelRequest(GetResponseEvent $event) {
-    $request = $event->getRequest();
-    if (!$request->attributes->has('_graphql_subrequest')) {
-      return;
+  public function onBeforeOperation(OperationEvent $event) {
+    if (!empty($this->languageNegotiator)) {
+      $method = OperationLanguageNegotiation::METHOD_ID;
+      $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
+
+      if ($instance instanceof OperationLanguageNegotiation) {
+        $instance::setContext($event->getParams(), $event->getConfig());
+      }
     }
 
-    $request->attributes->set('_controller', '\Drupal\graphql\Controller\SubrequestExtractionController:extract');
     $this->resetLanguageContext();
   }
 
   /**
-   * Handle kernel request finished events.
+   * Handle operation end events.
    *
-   * @param \Symfony\Component\HttpKernel\Event\FinishRequestEvent $event
+   * @param \Drupal\graphql\Event\OperationEvent $event
    *   The kernel event object.
    */
-  public function onKernelRequestFinished(FinishRequestEvent $event) {
-    $request = $event->getRequest();
-    if (!$request->attributes->has('_graphql_subrequest')) {
-      return;
+  public function onAfterOperation(OperationEvent $event) {
+    if (!empty($this->languageNegotiator)) {
+      $method = OperationLanguageNegotiation::METHOD_ID;
+      $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
+
+      if ($instance instanceof OperationLanguageNegotiation) {
+        $instance::resetContext();
+      }
     }
 
     $this->resetLanguageContext();
@@ -66,8 +72,8 @@ class SubrequestSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      KernelEvents::REQUEST => 'onKernelRequest',
-      KernelEvents::FINISH_REQUEST => 'onKernelRequestFinished',
+      OperationEvent::GRAPHQL_OPERATION_BEFORE => 'onBeforeOperation',
+      OperationEvent::GRAPHQL_OPERATION_AFTER=> 'onAfterOperation',
     ];
   }
 

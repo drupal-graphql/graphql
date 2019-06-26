@@ -11,6 +11,7 @@ use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -120,11 +121,12 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @param $field
    * @param null $language
    * @param null $bundles
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred|null
    */
-  public function resolve(EntityInterface $entity, $field, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(EntityInterface $entity, $field, $language = NULL, $bundles = NULL, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -137,7 +139,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       }, $values->getValue());
 
       $resolver = $this->entityBuffer->add($type, $ids);
-      return new Deferred(function () use ($type, $language, $bundles, $resolver, $metadata) {
+      return new Deferred(function () use ($type, $language, $bundles, $resolver, $context) {
         $entities = $resolver() ?: [];
         $entities = isset($bundles) ? array_filter($entities, function (EntityInterface $entity) use ($bundles) {
           if (!in_array($entity->bundle(), $bundles)) {
@@ -151,7 +153,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
           $type = $this->entityTypeManager->getDefinition($type);
           /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
           $tags = $type->getListCacheTags();
-          $metadata->addCacheTags($tags);
+          $context->addCacheTags($tags);
           return NULL;
         }
 

@@ -3,10 +3,28 @@
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DataProducerPluginManager extends DefaultPluginManager {
+
+  /**
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager
+   */
+  protected $contextsManager;
+
+  /**
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $resultCacheBackend;
 
   /**
    * DataProducerPluginManager constructor.
@@ -16,10 +34,12 @@ class DataProducerPluginManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   * @param \Drupal\Core\Cache\CacheBackendInterface $resultCacheBackend
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
    * @param string|null $pluginInterface
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
@@ -31,7 +51,10 @@ class DataProducerPluginManager extends DefaultPluginManager {
     $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
-    CacheBackendInterface $cacheBackend,
+    CacheBackendInterface $definitionCacheBackend,
+    RequestStack $requestStack,
+    CacheContextsManager $contextsManager,
+    CacheBackendInterface $resultCacheBackend,
     $pluginInterface,
     $pluginAnnotationName,
     array $config
@@ -46,13 +69,30 @@ class DataProducerPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_field_resolver');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, 'field_resolver', ['graphql']);
+    $this->setCacheBackend($definitionCacheBackend, 'field_resolver', ['graphql']);
+
+    $this->requestStack = $requestStack;
+    $this->contextsManager = $contextsManager;
+    $this->resultCacheBackend = $resultCacheBackend;
   }
 
   /**
-   * {@inheritdoc}
+   * @param $id
+   * @param array $mapping
+   * @param array $config
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
-  public function getInstance(array $options) {
-    return $this->createInstance($options['id'], $options['configuration']);
+  public function proxy($id, array $mapping = [], array $config = []) {
+    return new DataProducerProxy(
+      $id,
+      $mapping,
+      $config,
+      $this,
+      $this->requestStack,
+      $this->contextsManager,
+      $this->resultCacheBackend
+    );
   }
+
 }

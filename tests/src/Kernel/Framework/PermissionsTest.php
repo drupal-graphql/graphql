@@ -2,11 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use PhpParser\Node\Arg;
 use Prophecy\Argument;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test if query handling respects permissions properly.
@@ -28,22 +25,19 @@ class PermissionsTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       schema {
         query: Query
       }
+      
       type Query {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
 
-    $this->mockField('root', [
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $builder->fromValue('test'));
+    $this->setUpSchema($schema);
+
+    $this->mockResolver('Query', 'root', 'test');
   }
 
   /**
@@ -82,11 +76,13 @@ GQL;
     ]);
 
     $this->assertEquals(200, $batched->getStatusCode());
+
     $data = [
       'data' => [
         'root' => 'test',
       ],
     ];
+
     $this->assertEquals([$data, $data], json_decode($batched->getContent(), TRUE));
   }
 

@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
+use GraphQL\Server\OperationParams;
 
 interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
 
@@ -110,5 +111,12 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
    *   The default field resolver.
    */
   public function getFieldResolver();
+
+  /**
+   * @param \GraphQL\Server\OperationParams $params
+   *
+   * @return string|null
+   */
+  public function getOperationLanguage(OperationParams $params);
 
 }

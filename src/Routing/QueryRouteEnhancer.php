@@ -26,6 +26,8 @@ class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GraphQL\Server\RequestError
    */
   public function enhance(array $defaults, Request $request) {
     $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
@@ -38,14 +40,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
     $body = $this->extractBody($request);
     $query = $this->extractQuery($request);
     $operations = $helper->parseRequestParams($method, $body, $query);
-
-    // By default we assume a 'single' request. This is going to fail in the
-    // graphql processor due to a missing query string but at least provides
-    // the right format for the client to act upon.
-    return $defaults + [
-      '_controller' => $defaults['_graphql']['single'],
-      'operations' => $operations,
-    ];
+    return $defaults + ['operations' => $operations];
   }
 
   /**

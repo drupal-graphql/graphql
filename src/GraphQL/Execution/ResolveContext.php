@@ -4,64 +4,55 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
-   * Read-only list of global values.
-   *
-   * @var array
+   * @var \Drupal\graphql\GraphQL\ResolverRegistryInterface
    */
-  protected $globals;
+  protected $registry;
 
   /**
-   * The context stack.
-   *
    * @var array
    */
-  protected $contexts = [];
+  protected $contexts;
+
+  /**
+   * @var
+   */
+  protected $operation;
+
+  /**
+   * @var bool
+   */
+  protected $caching;
 
   /**
    * ResolveContext constructor.
    *
-   * @param array $globals
-   *   List of global values to expose to field resolvers.
+   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
+   * @param bool $caching
    */
-  public function __construct(array $globals = []) {
-    $this->globals = $globals;
+  public function __construct(ResolverRegistryInterface $registry, $caching = TRUE) {
+    $this->registry = $registry;
+    $this->caching = $caching;
   }
 
   /**
-   * Get a contextual value for the current field.
-   *
-   * Allows field resolvers to inherit contextual values from their ancestors.
-   *
-   * @param string $name
-   *   The name of the context.
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *   The resolve info object.
-   * @param mixed $default
-   *   An arbitrary default value in case the context is not set.
-   *
-   * @return mixed
-   *   The current value of the given context or the given default value if the
-   *   context wasn't set.
+   * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
    */
-  public function getContext($name, ResolveInfo $info, $default = NULL) {
-    $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
-    $path = $info->path;
+  public function getRegistry() {
+    return $this->registry;
+  }
 
-    do {
-      $key = implode('.', $path);
-      if (isset($this->contexts[$operation][$key]) && array_key_exists($name, $this->contexts[$operation][$key])) {
-        return $this->contexts[$operation][$key][$name];
-      }
-      array_pop($path);
-    } while (count($path));
-
-    return $default;
+  /**
+   * @return bool
+   */
+  public function useCaching() {
+    return $this->caching;
   }
 
   /**
@@ -70,41 +61,75 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * Allows field resolvers to set contextual values which can be inherited by
    * their descendants.
    *
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
    * @param string $name
    *   The name of the context.
    * @param $value
    *   The value of the context.
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *   The resolve info object.
    *
    * @return $this
    */
-  public function setContext($name, $value, ResolveInfo $info) {
-    $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
+  public function setContextValue(ResolveInfo $info, $name, $value) {
     $key = implode('.', $info->path);
-    $this->contexts[$operation][$key][$name] = $value;
+    $this->contexts[$key][$name] = $value;
 
     return $this;
   }
 
   /**
-   * Retrieve a global/static parameter value.
+   * Get a contextual value for the current field.
    *
+   * Allows field resolvers to inherit contextual values from their ancestors.
+   *
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
    * @param string $name
-   *   The name of the global parameter.
-   * @param mixed $default
-   *   An arbitrary default value in case the context is not set.
+   *   The name of the context.
    *
-   * @return mixed|null
-   *   The requested global parameter value or the given default value if the
-   *   parameter is not set.
+   * @return mixed
+   *   The current value of the given context or NULL if it's not set.
    */
-  public function getGlobal($name, $default = NULL) {
-    if (isset($this->globals[$name])) {
-      return $this->globals[$name];
-    }
+  public function getContextValue(ResolveInfo $info, $name) {
+    $path = $info->path;
 
-    return $default;
+    do {
+      $key = implode('.', $path);
+      if (isset($this->contexts[$key]) && array_key_exists($name, $this->contexts[$key])) {
+        return $this->contexts[$key][$name];
+      }
+
+      array_pop($path);
+    } while (count($path));
+
+    return NULL;
   }
 
+  /**
+   * Checks whether contextual value for the current field exists.
+   *
+   * Also checks ancestors of the field.
+   *
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
+   * @param string $name
+   *   The name of the context.
+   *
+   * @return boolean
+   *   TRUE if the context exists, FALSE Otherwise.
+   */
+  public function hasContextValue(ResolveInfo $info, $name) {
+    $path = $info->path;
+
+    do {
+      $key = implode('.', $path);
+      if (isset($this->contexts[$key]) && array_key_exists($name, $this->contexts[$key])) {
+        return TRUE;
+      }
+
+      array_pop($path);
+    } while (count($path));
+
+    return FALSE;
+  }
 }

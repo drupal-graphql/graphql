@@ -14,18 +14,22 @@ use GraphQL\Type\Definition\ResolveInfo;
  */
 class ExtendedSchemaTest extends GraphQLTestBase {
 
-  public function testExtendedSchemaDefinition() {
-    $gql_schema = <<<GQL
+  protected function setUp() {
+    parent::setUp();
+
+    $base = <<<GQL
       schema {
         query: Query
       }
+      
       type Query {
         foo: String
       }
+      
       union Content
 GQL;
 
-    $extended_schema = <<<GQL
+    $extended = <<<GQL
       extend type Query {
         bar: [Content]
       }
@@ -44,7 +48,11 @@ GQL;
       extend union Content = Recipe
 GQL;
 
-    $expected_printed_schema = <<<GQL
+    $this->setUpExtendedSchema($base, $extended);
+  }
+
+  public function testExtendedSchemaDefinition() {
+    $expected = <<<GQL
 type Article {
   title: String!
 }
@@ -63,72 +71,48 @@ type Recipe {
 
 GQL;
 
-    $this->setUpExtendedSchema($gql_schema, $extended_schema, $this->getDefaultSchema());
-    $this->assertEquals($this->getPrintedSchema($this->getDefaultSchema()), $expected_printed_schema);
+    $this->assertEquals($this->getPrintedSchema(), $expected);
+  }
 
-    $builder = new ResolverBuilder();
 
-    $this->mockTypeResolver('Content', function ($value, $context, $info) {
-      return $value['id'] < 10 ? 'Article' : 'Recipe';
+  public function testExtendedSchemaFields() {
+    $this->mockTypeResolver('Content', function ($value) {
+      return $value['type'];
     });
 
-    $this->mockField('title', [
-      'name' => 'title',
-      'type' => 'String',
-      'parent' => 'Article',
-    ], $builder->compose(
-      $builder->fromParent(),
-      $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-        return $value['title'];
-      })
-    )
-    );
-
-    $this->mockField('title', [
-      'name' => 'title',
-      'type' => 'String',
-      'parent' => 'Recipe',
-    ], $builder->compose(
-      $builder->fromParent(),
-      $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-        return $value['title'];
-      })
-    )
-    );
-
-    $this->mockField('steps', [
-      'name' => 'steps',
-      'type' => '[String]',
-      'parent' => 'Recipe',
-    ], $builder->compose(
-      $builder->fromParent(),
-      $this->mockCallable(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-        return $value['steps'];
-      })
-    )
-    );
-
-    $this->mockField('bar', [
-      'name' => 'bar',
-      'type' => '[Content]',
-      'parent' => 'Query',
-    ], $builder->fromValue(
+    $this->mockResolver('Query', 'bar', [
       [
-        ['id' => 8, 'title' => 'Article test'],
-        [
-          'id' => 11,
-          'title' => 'Recipe test',
-          'steps' => ['Get ingredients', 'Mix them', 'Serve'],
-        ],
-      ]
-    ));
+        'type' => 'Article',
+        'title' => 'Article test',
+      ],
+      [
+        'type' => 'Recipe',
+        'title' => 'Recipe test',
+        'steps' => ['Get ingredients', 'Mix them', 'Serve'],
+      ],
+    ]);
 
-    $this->assertResults('{ bar { ... on Article { title } ... on Recipe { title steps }  } }', [], [
+    $query = <<<GQL
+      query {
+        bar {
+          ... on Article {
+            title
+          }
+          
+          ... on Recipe {
+            title
+            steps
+          }
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], [
       'bar' => [
         0 => ['title' => 'Article test'],
         1 => ['title' => 'Recipe test', 'steps' => ['Get ingredients', 'Mix them', 'Serve']],
       ],
-    ], $this->defaultCacheMetaData());
+    ]);
   }
 
 }

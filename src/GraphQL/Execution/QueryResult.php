@@ -41,7 +41,7 @@ class QueryResult extends ExecutionResult implements RefinableCacheableDependenc
   public function __sleep() {
     // TODO: Find a better way to solve this.
     return array_filter(array_keys(get_object_vars($this)), function ($prop) {
-      return $prop != 'errors';
+      return $prop !== 'errors';
     });
   }
 

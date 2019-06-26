@@ -23,6 +23,16 @@ class ResolverBuilder {
   use DataFetcherTrait;
 
   /**
+   * @param $id
+   * @param $config
+   *
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
+   */
+  public function produce($id, $config = []) {
+    return DataProducerProxy::create($id, $config);
+  }
+
+  /**
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[] $resolvers
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Composite
@@ -76,18 +86,6 @@ class ResolverBuilder {
    */
   public function cond(array $branches) {
     return new Condition($branches);
-  }
-
-  /**
-   * @param $id
-   * @param $config
-   *
-   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
-   */
-  public function produce($id, $config = []) {
-    // TODO: Properly inject this.
-    $manager = \Drupal::service('plugin.manager.graphql.data_producer');
-    return new DataProducerProxy($id, $config, $manager);
   }
 
   /**

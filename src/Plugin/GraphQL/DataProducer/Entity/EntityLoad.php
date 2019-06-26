@@ -2,12 +2,12 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,8 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       required = FALSE
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity languages(s)"),
- *       multiple = TRUE,
+ *       label = @Translation("Entity languages"),
  *       required = FALSE
  *     ),
  *     "bundles" = @ContextDefinition("string",
@@ -117,27 +116,27 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @param $id
    * @param null $language
    * @param null $bundles
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $metadata) {
+    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
-        $metadata->addCacheTags($tags);
+        $context->addCacheTags($tags);
         return NULL;
       }
 
       if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
         // If the entity is not among the allowed bundles, don't return it.
-        $metadata->addCacheableDependency($entity);
+        $context->addCacheableDependency($entity);
         return NULL;
       }
 

@@ -56,10 +56,12 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
       - '@request_stack'
+      - '@event_dispatcher'
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
+    arguments: ['@request_stack']
     tags:
       - { name: route_enhancer }
 
@@ -68,17 +70,19 @@ services:
     class: Drupal\graphql\GraphQL\Utility\Introspection
     arguments: ['@graphql.query_processor']
 
-  # Support for subrequests.
+  # Reset the current language during sub-requests.
   graphql.subrequest_subscriber:
     class: Drupal\graphql\EventSubscriber\SubrequestSubscriber
+    arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
     tags:
       - { name: event_subscriber }
 
-  # Context repository for fetching contexts from sub-requests.
-  graphql.context_repository:
-    class: Drupal\graphql\GraphQL\Context\ContextRepository
+  # Reset the current language during operations.
+  graphql.operation_subscriber:
+    class: Drupal\graphql\EventSubscriber\OperationSubscriber
+    arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
     tags:
-      - { name: service_collector, tag: context_provider, call: addContextProvider }
+      - { name: event_subscriber }
 
   # Plugin manager for schemas
   plugin.manager.graphql.schema:
@@ -99,6 +103,9 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@cache.graphql.definitions'
+      - '@request_stack'
+      - '@cache_contexts_manager'
+      - '@cache.graphql.results'
       - '\Drupal\graphql\Plugin\DataProducerPluginInterface'
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
@@ -113,13 +120,3 @@ services:
   graphql.buffer.subrequest:
     class: Drupal\graphql\GraphQL\Buffers\SubRequestBuffer
     arguments: ['@http_kernel', '@request_stack']
-
-  # Contextual language handling https://www.drupal.org/project/drupal/issues/2952789
-  graphql.language_context:
-    class: Drupal\graphql\Language\LanguageContext
-    arguments: ['@language_manager']
-  graphql.config_factory_override:
-    class: Drupal\graphql\Language\ConfigOverrides
-    arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
-    tags:
-      - { name: config.factory.override, priority: -253 }

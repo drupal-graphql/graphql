@@ -44,14 +44,13 @@ trait QueryResultAssertionTrait {
    */
   abstract protected function defaultCacheContexts();
 
-
   /**
    * Retrieve the graphql processor.
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryProcessor
    *   The graphql processor service.
    */
-  protected function graphQlProcessor() {
+  protected function queryProcessor() {
     return $this->container->get('graphql.query_processor');
   }
 
@@ -92,11 +91,11 @@ trait QueryResultAssertionTrait {
    *   The query variables.
    * @param array $expected
    *   The expected result.
-   * @param \Drupal\Core\Cache\CacheableMetadata $metadata
+   * @param \Drupal\Core\Cache\CacheableMetadata|null $metadata
    *   The expected cache metadata object.
    */
-  protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata) {
-    $result = $this->graphQlProcessor()->processQuery(
+  protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata = NULL) {
+    $result = $this->queryProcessor()->processQuery(
       $this->getDefaultSchema(),
       OperationParams::create([
         'query' => $query,
@@ -106,7 +105,7 @@ trait QueryResultAssertionTrait {
 
     $this->assertResultErrors($result, []);
     $this->assertResultData($result, $expected);
-    $this->assertResultMetadata($result, $metadata);
+    $this->assertResultMetadata($result, $metadata ?: $this->defaultCacheMetaData());
   }
 
   /**
@@ -122,7 +121,7 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertErrors($query, $variables, $expected, CacheableMetadata $metadata) {
-    $result = $this->graphQlProcessor()->processQuery(
+    $result = $this->queryProcessor()->processQuery(
       $this->getDefaultSchema(),
       OperationParams::create([
         'query' => $query,

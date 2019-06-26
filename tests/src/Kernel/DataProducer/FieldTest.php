@@ -2,17 +2,14 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
+use Drupal\user\UserInterface;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 
 /**
@@ -21,7 +18,6 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
  * @group graphql
  */
 class FieldTest extends GraphQLTestBase {
-
   use EntityReferenceTestTrait;
   use QueryResultAssertionTrait;
 
@@ -30,13 +26,15 @@ class FieldTest extends GraphQLTestBase {
    */
   public function setUp() {
     parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
+
     $this->entity = $this->getMockBuilder(NodeInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
+
     $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
+
     $this->user = $this->getMockBuilder(UserInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -70,23 +68,15 @@ class FieldTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Field\EntityReference::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Field\EntityReference::resolve
    */
   public function testResolveEntityReference() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'entity_reference',
-      'configuration' => []
+    $result = $this->executeDataProducer('entity_reference', [
+      'entity' => $this->node,
+      'field' => 'field_test1_to_test2',
     ]);
-    $metadata = $this->defaultCacheMetaData();
 
-    $deferred = $plugin->resolve($this->node, 'field_test1_to_test2', NULL, NULL, $metadata);
-
-    $adapter = new SyncPromiseAdapter();
-    $promise = $adapter->convertThenable($deferred);
-
-    $result = $adapter->wait($promise);
-    $referenced_node = array_shift($result);
-    $this->assertEquals($this->referenced_node->id(), $referenced_node->id());
+    $this->assertEquals($this->referenced_node->id(), reset($result)->id());
   }
 
 }

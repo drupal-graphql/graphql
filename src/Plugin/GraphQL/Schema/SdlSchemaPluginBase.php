@@ -7,7 +7,9 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
@@ -17,6 +19,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\BuildSchema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,6 +40,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @var bool
    */
   protected $inDevelopment;
+
+  /**
+   * @var $
+   */
+  protected $useCaching;
 
   /**
    * {@inheritdoc}
@@ -77,22 +85,25 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-
     $this->inDevelopment = !empty($config['development']);
     $this->astCache = $astCache;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GraphQL\Error\SyntaxError
    */
   public function getSchema() {
-    return BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
+    $schema = BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $this->getTypeResolver($type);
       }
 
       return $config;
     });
+
+    return $schema;
   }
 
   /**
@@ -110,11 +121,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $messenger->addError(sprintf('Syntax error in schema: %s', $error->getMessage()));
       return FALSE;
     }
-    catch (InvariantViolation $error) {
+    catch (Error $error) {
       $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
       return FALSE;
     }
-    catch (Error $error) {
+    catch (InvariantViolation $error) {
       $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
       return FALSE;
     }
@@ -147,8 +158,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Each document (e.g. in a batch query) gets its own resolve context. This
     // allows us to collect the cache metadata and contextual values (e.g.
     // inheritance for language) for each query separately.
-    return function ($params, $document, $operation) use ($registry) {
-      $context = new ResolveContext(['registry' => $registry]);
+    return function ($params, $document, $operation, $caching) use ($registry) {
+      $context = new ResolveContext($registry, $caching);
       $context->addCacheTags(['graphql_response']);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);
@@ -163,8 +174,39 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   public function getFieldResolver() {
     return function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-      return $context->getGlobal('registry')->resolveField($value, $args, $context, $info);
+      $field = new FieldContext($context, $info);
+      $result = $context->getRegistry()->resolveField($value, $args, $context, $info, $field);
+      return DeferredUtility::applyFinally($result, function () use ($field, $context) {
+        $context->addCacheableDependency($field);
+      });
     };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getErrorFormatter() {
+    return function (Error $error) {
+      return FormattedError::createFromException($error);
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getErrorHandler() {
+    return function (array $errors, callable $formatter) {
+      return array_map($formatter, $errors);
+    };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperationLanguage(OperationParams $params) {
+    // Do not negotiate a language by default. Override this method to negotiate
+    // the query's language based on passed variables, etc. ...
+    return NULL;
   }
 
   /**
@@ -178,7 +220,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getTypeResolver(TypeDefinitionNode $type) {
     return function ($value, ResolveContext $context, ResolveInfo $info) {
-      return $context->getGlobal('registry')->resolveType($value, $context, $info);
+      return $context->getRegistry()->resolveType($value, $context, $info);
     };
   }
 
@@ -187,6 +229,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed schema document.
+   *
+   * @throws \GraphQL\Error\SyntaxError
    */
   protected function getSchemaDocument() {
     // Only use caching of the parsed document if we aren't in development mode.
@@ -200,42 +244,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     return $ast;
-  }
-
-  /**
-   * Retrieves the error formatter.
-   *
-   * By default uses the graphql error formatter.
-   *
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
-   *
-   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
-   *
-   * @return \Closure
-   *   Error formatter.
-   */
-  public function getErrorFormatter() {
-    return function (Error $error) {
-      return FormattedError::createFromException($error);
-    };
-  }
-
-  /**
-   * Retrieves the error handler.
-   *
-   * By default uses the default graphql error handler.
-   *
-   * @see \GraphQL\Executor\ExecutionResult::toArray
-   *
-   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
-   *
-   * @return \Closure
-   *   Error handler.
-   */
-  public function getErrorHandler() {
-    return function (array $errors, callable $formatter) {
-      return array_map($formatter, $errors);
-    };
   }
 
   /**
@@ -253,5 +261,4 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The schema definition.
    */
   abstract protected function getSchemaDefinition();
-
 }

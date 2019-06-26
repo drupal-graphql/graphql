@@ -7,8 +7,9 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\Event\OperationEvent;
+use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\SchemaPluginManager;
-use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\ExecutionResult;
@@ -21,12 +22,12 @@ use GraphQL\Language\Visitor;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
-use GraphQL\Server\ServerConfig;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 // TODO: Refactor this and clean it up.
@@ -61,7 +62,12 @@ class QueryProcessor {
   protected $requestStack;
 
   /**
-   * Processor constructor.
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $dispatcher;
+
+  /**
+   * QueryProcessor constructor.
    *
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    *   The cache contexts manager service.
@@ -71,83 +77,116 @@ class QueryProcessor {
    *   The cache backend for caching query results.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    */
   public function __construct(
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
     CacheBackendInterface $cacheBackend,
-    RequestStack $requestStack
+    RequestStack $requestStack,
+    EventDispatcherInterface $dispatcher
   ) {
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
     $this->cacheBackend = $cacheBackend;
     $this->requestStack = $requestStack;
+    $this->dispatcher = $dispatcher;
   }
 
   /**
    * Processes one or multiple graphql operations.
    *
-   * @param string $schema
-   *   The plugin id of the schema to use.
+   * @param string $server
+   *   The id of the server instance to use.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $params
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\graphql\GraphQL\Execution\QueryResult|\Drupal\graphql\GraphQL\Execution\QueryResult[]
    *   The query result.
+   *
+   * @throws \Exception
    */
-  public function processQuery($schema, $params) {
-    if (!$server = Server::load($schema)) {
-      throw new \InvalidArgumentException(sprintf('The requested schema %s could not be loaded.', $schema));
+  public function processQuery($server, $params) {
+    if (!$server = Server::load($server)) {
+      throw new \InvalidArgumentException(sprintf('The requested schema %s could not be loaded.', $server));
     }
 
-    if (is_array($params)) {
-      return $this->executeBatch($server->configuration(), $params);
-    }
+    $config = $server->configuration();
+    return is_array($params) ? $this->executeBatch($config, $params) : $this->executeSingle($config, $params);
+  }
 
-    return $this->executeSingle($server->configuration(), $params);
+  public function currentOperation() {
+
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    *
    * @return mixed
+   *
+   * @throws \Exception
    */
-  public function executeSingle(ServerConfig $config, OperationParams $params) {
+  protected function executeSingle(ServerConfig $config, OperationParams $params) {
     $adapter = new SyncPromiseAdapter();
-    $result = $this->executeOperationWithReporting($adapter, $config, $params, FALSE);
+    $result = $this->executeOperationWithContext($adapter, $config, $params, FALSE);
     return $adapter->wait($result);
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param array $params
    *
    * @return mixed
    */
-  public function executeBatch(ServerConfig $config, array $params) {
+  protected function executeBatch(ServerConfig $config, array $params) {
     $adapter = new SyncPromiseAdapter();
-    $result = array_map(function ($params) use ($adapter, $config) {
-      return $this->executeOperationWithReporting($adapter, $config, $params, TRUE);
-    }, $params);
 
-    $result = $adapter->all($result);
-    return $adapter->wait($result);
+    // We do not support parallel execution of batched queries because of the
+    // limitations of Drupal's context system. Each query needs to be executed
+    // in it's own sub-request.
+    return array_map(function ($params) use ($adapter, $config) {
+      $result = $this->executeOperationWithContext($adapter, $config, $params, TRUE);
+      return $adapter->wait($result);
+    }, $params);
   }
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param bool $batching
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
+   */
+  protected function executeOperationWithContext(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
+    $event = new OperationEvent(clone $params, clone $config);
+    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
+
+    $result = $this->executeOperationWithReporting($adapter, $config, $params, $batching);
+    return $result->then(function ($result) use ($params, $config) {
+      $event = new OperationEvent(clone $params, clone $config, $result);
+      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
+
+      return $result;
+    });
+  }
+
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param bool $batching
+   *
+   * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function executeOperationWithReporting(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     $result = $this->executeOperation($adapter, $config, $params, $batching);
 
     // Format and print errors.
-    return $result->then(function(QueryResult $result) use ($config) {
+    return $result->then(function (QueryResult $result) use ($config) {
       if ($config->getErrorsHandler()) {
         $result->setErrorsHandler($config->getErrorsHandler());
       }
@@ -162,7 +201,7 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param bool $batching
    *
@@ -172,7 +211,7 @@ class QueryProcessor {
   protected function executeOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     try {
       if (!$config->getSchema()) {
-        throw new \LogicException('Missing schema for query execution.');
+        throw new Error('Missing schema for query execution.');
       }
 
       if ($batching && !$config->getQueryBatching()) {
@@ -199,16 +238,11 @@ class QueryProcessor {
       }
 
       // Only queries can be cached (mutations and subscriptions can't).
-      if ($type === 'query') {
+      if ($type === 'query' && $config->getCaching()) {
         return $this->executeCacheableOperation($adapter, $config, $params, $document, !$persisted);
       }
 
       return $this->executeUncachableOperation($adapter, $config, $params, $document, !$persisted);
-    }
-    catch (CacheableRequestError $exception) {
-      return $adapter->createFulfilled(
-        new QueryResult(NULL, [Error::createLocatedError($exception)], [], $exception)
-      );
     }
     catch (RequestError $exception) {
       return $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
@@ -218,24 +252,25 @@ class QueryProcessor {
     }
   }
 
-    /**
-     * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-     * @param \GraphQL\Server\ServerConfig $config
-     * @param \GraphQL\Server\OperationParams $params
-     * @param \GraphQL\Language\AST\DocumentNode $document
-     * @param bool $validate
-     *
-     * @return \GraphQL\Executor\Promise\Promise|mixed
-     */
+  /**
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
+   * @param \GraphQL\Server\OperationParams $params
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   * @param bool $validate
+   *
+   * @return \GraphQL\Executor\Promise\Promise|mixed
+   * @throws \Exception
+   */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     $inDebug = !!$config->getDebug();
-    $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document);
+    $ccid = $this->cacheIdentifier($params, $document);
 
     if (empty($inDebug)) {
-      if (($contextCache = $this->cacheBackend->get($contextCacheId))) {
+      if (($contextCache = $this->cacheBackend->get("ccid:$ccid"))) {
         $contexts = $contextCache->data ?? [];
-        $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
-        if (($cache = $this->cacheBackend->get($cid))) {
+        $cid = $this->cacheIdentifier($params, $document, $contexts);
+        if (($cache = $this->cacheBackend->get("cid:$cid"))) {
           return $adapter->createFulfilled($cache->data);
         }
       }
@@ -246,15 +281,15 @@ class QueryProcessor {
       return $result;
     }
 
-    return $result->then(function (QueryResult $result) use ($contextCacheId, $params, $document) {
+    return $result->then(function (QueryResult $result) use ($ccid, $params, $document) {
       // Write this query into the cache if it is cacheable.
       if ($result->getCacheMaxAge() !== 0) {
         $contexts = $result->getCacheContexts();
         $expire = $this->maxAgeToExpire($result->getCacheMaxAge());
         $tags = $result->getCacheTags();
-        $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
-        $this->cacheBackend->set($contextCacheId, $contexts, $expire, $tags);
-        $this->cacheBackend->set($cid, $result, $expire, $tags);
+        $cid = $this->cacheIdentifier($params, $document, $contexts);
+        $this->cacheBackend->set("ccid:$ccid", $contexts, $expire, $tags);
+        $this->cacheBackend->set("cid:$cid", $result, $expire, $tags);
       }
 
       return $result;
@@ -263,12 +298,13 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param bool $validate
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function executeUncachableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     $result = $this->doExecuteOperation($adapter, $config, $params, $document, $validate);
@@ -281,12 +317,13 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param bool $validate
    *
    * @return \GraphQL\Executor\Promise\Promise
+   * @throws \Exception
    */
   protected function doExecuteOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     // If one of the validation rules found any problems, do not resolve the
@@ -303,7 +340,7 @@ class QueryProcessor {
     $schema = $config->getSchema();
 
     $promise = Executor::promiseToExecute(
-      $adapter,
+      DeferredUtility::promiseAdapter(),
       $schema,
       $document,
       $root,
@@ -320,7 +357,7 @@ class QueryProcessor {
         ->setCacheMaxAge($context->getCacheMaxAge());
 
       // Do not cache in development mode or if there are any errors.
-      if ($context->getGlobal('development') || !empty($result->errors)) {
+      if (!empty($result->errors)) {
         $metadata->setCacheMaxAge(0);
       }
 
@@ -341,7 +378,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
@@ -371,7 +408,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
@@ -388,24 +425,24 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
    *
-   * @return mixed
+   * @return \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
   protected function resolveContextValue(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
     $context = $config->getContext();
     if (is_callable($context)) {
-      $context = $context($params, $document, $operation);
+      $context = $context($params, $document, $operation, $config->getCaching());
     }
 
     return $context;
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
@@ -426,7 +463,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    *
    * @return mixed
@@ -486,11 +523,14 @@ class QueryProcessor {
     // Sorting the variables will cause fewer cache vectors.
     $variables = $params->variables ?: [];
     ksort($variables);
+    $extensions = $params->extensions ?: [];
+    ksort($extensions);
 
     // Prepend the hash of the serialized document to the cache contexts.
-    $hash = hash('sha256', json_encode([
+    $hash = hash('sha256', serialize([
       'query' => $this->serializeDocument($document),
       'variables' => $variables,
+      'extensions' => $extensions,
     ]));
 
     return implode(':', array_values(array_merge([$hash], $keys)));

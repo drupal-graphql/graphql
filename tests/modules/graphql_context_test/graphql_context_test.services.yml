@@ -1,6 +1,0 @@
-services:
-  graphql_test.route_name.context:
-    class: Drupal\graphql_context_test\ContextProvider\RouteNameContext
-    arguments: ['@current_route_match']
-    tags:
-      - { name: 'context_provider' }
