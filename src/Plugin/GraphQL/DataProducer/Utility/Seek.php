@@ -14,9 +14,10 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  *   ),
  *   consumes = {
  *     "input" = @ContextDefinition("any",
- *       label = @Translation("Input array")
+ *       label = @Translation("Input array"),
+ *       required = FALSE
  *     ),
- *     "position" = @ContextDefinition("number",
+ *     "position" = @ContextDefinition("integer",
  *       label = @Translation("Seek position")
  *     )
  *   }

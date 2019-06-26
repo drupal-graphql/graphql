@@ -19,14 +19,6 @@ use Drupal\Core\Cache\CacheableMetadata;
 class TypedDataTest extends GraphQLTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public function setUp() {
-    parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
-  }
-
-  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\TypedData\PropertyPath::resolve
    */
   public function testPropertyPath() {

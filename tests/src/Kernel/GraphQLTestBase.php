@@ -6,7 +6,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\graphql\Traits\MockGraphQLPluginTrait;
+use Drupal\Tests\graphql\Traits\DataProducerExecutionTrait;
+use Drupal\Tests\graphql\Traits\MockingTrait;
 use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
@@ -15,11 +16,12 @@ use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 
 abstract class GraphQLTestBase extends KernelTestBase {
   use ProphesizePermissionsTrait;
+  use DataProducerExecutionTrait;
   use HttpRequestTrait;
   use QueryFileTrait;
   use QueryResultAssertionTrait;
   use SchemaPrinterTrait;
-  use MockGraphQLPluginTrait;
+  use MockingTrait;
 
   /**
    * {@inheritdoc}
@@ -49,7 +51,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    PHPUnit_Framework_Error_Warning::$enabled = FALSE;
+    \PHPUnit_Framework_Error_Warning::$enabled = FALSE;
 
     $this->injectAccount();
     $this->installConfig('system');

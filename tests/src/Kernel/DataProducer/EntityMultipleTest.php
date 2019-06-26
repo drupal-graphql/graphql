@@ -19,6 +19,11 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 class EntityMultipleTest extends GraphQLTestBase {
 
   /**
+   * @var \Drupal\graphql\Plugin\DataProducerPluginManager
+   */
+  protected $dataProducerManager;
+
+  /**
    * @var \Drupal\node\NodeInterface
    */
   protected $node1;
@@ -38,13 +43,15 @@ class EntityMultipleTest extends GraphQLTestBase {
    */
   public function setUp() {
     parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
+
     $this->entity = $this->getMockBuilder(NodeInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
+
     $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
+
     $this->user = $this->getMockBuilder(UserInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -92,26 +99,15 @@ class EntityMultipleTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadMultiple::resolve
    */
   public function testResolveEntityLoadMultiple() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'entity_load_multiple',
-      'configuration' => [],
+    $result = $this->executeDataProducer('entity_load_multiple', [
+      'entity_type' => $this->node1->getEntityTypeId(),
+      'entity_bundle' => [$this->node1->bundle(), $this->node2->bundle(), $this->node3->bundle()],
+      'entity_ids' => [$this->node1->id(), $this->node2->id(), $this->node3->id()],
     ]);
 
-    $deferred = $plugin->resolve($this->node1->getEntityTypeId(), [
-      $this->node1->id(),
-      $this->node2->id(),
-      $this->node3->id(),
-    ], NULL, [$this->node1->bundle(), $this->node2->bundle()], $metadata);
-
-    $adapter = new SyncPromiseAdapter();
-    $promise = $adapter->convertThenable($deferred);
-
-    $result = $adapter->wait($promise);
-
-    $nids = [];
-    foreach ($result as $item) {
-      $nids[] = $item->id();
-    }
+    $nids = array_map(function (NodeInterface $item) {
+      return $item->id();
+    }, $result);
 
     // All entity is loaded through entity load should match the initial values.
     // Hidden entity (node 3) is not include

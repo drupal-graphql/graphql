@@ -11,7 +11,7 @@ use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 
-trait MockGraphQLPluginTrait {
+trait MockingTrait {
 
   /**
    * @var \Drupal\graphql\Entity\Server

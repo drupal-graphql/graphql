@@ -2,11 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use PhpParser\Node\Arg;
 use Prophecy\Argument;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test if query handling respects permissions properly.
