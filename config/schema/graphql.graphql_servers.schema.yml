@@ -17,6 +17,9 @@ graphql.graphql_servers.*:
     schema:
       type: string
       label: 'Schema'
+    caching:
+      type: boolean
+      label: 'Caching'
     batching:
       type: boolean
       label: 'Batching'

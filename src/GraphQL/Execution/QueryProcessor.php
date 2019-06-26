@@ -238,7 +238,7 @@ class QueryProcessor {
       }
 
       // Only queries can be cached (mutations and subscriptions can't).
-      if ($type === 'query') {
+      if ($type === 'query' && $config->getCaching()) {
         return $this->executeCacheableOperation($adapter, $config, $params, $document, !$persisted);
       }
 
@@ -435,7 +435,7 @@ class QueryProcessor {
   protected function resolveContextValue(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
     $context = $config->getContext();
     if (is_callable($context)) {
-      $context = $context($params, $document, $operation);
+      $context = $context($params, $document, $operation, $config->getCaching());
     }
 
     return $context;

@@ -21,12 +21,24 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   protected $contexts;
 
   /**
+   * @var
+   */
+  protected $operation;
+
+  /**
+   * @var bool
+   */
+  protected $caching;
+
+  /**
    * ResolveContext constructor.
    *
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
+   * @param bool $caching
    */
-  public function __construct(ResolverRegistryInterface $registry) {
+  public function __construct(ResolverRegistryInterface $registry, $caching = TRUE) {
     $this->registry = $registry;
+    $this->caching = $caching;
   }
 
   /**
@@ -34,6 +46,13 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    */
   public function getRegistry() {
     return $this->registry;
+  }
+
+  /**
+   * @return bool
+   */
+  public function useCaching() {
+    return $this->caching;
   }
 
   /**

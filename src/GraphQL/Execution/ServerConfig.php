@@ -12,6 +12,11 @@ class ServerConfig extends \GraphQL\Server\ServerConfig {
   protected $plugin;
 
   /**
+   * @var boolean
+   */
+  protected $caching = FALSE;
+
+  /**
    * @param \Drupal\graphql\Plugin\SchemaPluginInterface $schema
    *
    * @return \Drupal\graphql\GraphQL\Execution\ServerConfig
@@ -34,6 +39,23 @@ class ServerConfig extends \GraphQL\Server\ServerConfig {
    */
   public function getPlugin() {
     return $this->plugin;
+  }
+
+  /**
+   * @param boolean $enabled
+   *
+   * @return \Drupal\graphql\GraphQL\Execution\ServerConfig
+   */
+  public function setCaching($enabled = TRUE) {
+    $this->caching = $enabled;
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getCaching() {
+    return $this->caching;
   }
 
 }

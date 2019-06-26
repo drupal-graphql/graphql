@@ -22,7 +22,7 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
   /**
    * The language negotiation method id.
    */
-  const METHOD_ID = 'language-graphql-query';
+  const METHOD_ID = 'language-graphql-operation';
 
   /**
    * The request stack.

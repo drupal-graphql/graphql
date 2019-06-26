@@ -72,14 +72,21 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Whether the server is in debug mode.
    *
-   * @var string
+   * @var boolean
    */
   public $debug = FALSE;
 
   /**
+   * Whether the server should cache its results.
+   *
+   * @var boolean
+   */
+  public $caching = TRUE;
+
+  /**
    * Whether the server allows query batching.
    *
-   * @var string
+   * @var boolean
    */
   public $batching = TRUE;
 
@@ -110,10 +117,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public function configuration() {
     $plugin = $this->schema();
+    $params = \Drupal::getContainer()->getParameter('graphql.config');
 
     // Create the server config.
     $config = ServerConfig::createForSchema($plugin);
     $config->setDebug(!!$this->get('debug'));
+    $config->setCaching(!!$this->get('caching') && !$params['development']);
     $config->setQueryBatching(!!$this->get('batching'));
     $config->setValidationRules($this->getValidationRules());
     $config->setPersistentQueryLoader($this->getPersistedQueryLoader());

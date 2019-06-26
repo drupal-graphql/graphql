@@ -7,7 +7,9 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
@@ -22,7 +24,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\BuildSchema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
+abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
@@ -38,6 +40,11 @@ abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginIn
    * @var bool
    */
   protected $inDevelopment;
+
+  /**
+   * @var $
+   */
+  protected $useCaching;
 
   /**
    * {@inheritdoc}
@@ -151,8 +158,8 @@ abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginIn
     // Each document (e.g. in a batch query) gets its own resolve context. This
     // allows us to collect the cache metadata and contextual values (e.g.
     // inheritance for language) for each query separately.
-    return function ($params, $document, $operation) use ($registry) {
-      $context = new ResolveContext($registry);
+    return function ($params, $document, $operation, $caching) use ($registry) {
+      $context = new ResolveContext($registry, $caching);
       $context->addCacheTags(['graphql_response']);
       if ($this instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($this);
@@ -167,7 +174,11 @@ abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginIn
    */
   public function getFieldResolver() {
     return function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-      return $context->getRegistry()->resolveField($value, $args, $context, $info);
+      $field = new FieldContext($context, $info);
+      $result = $context->getRegistry()->resolveField($value, $args, $context, $info, $field);
+      return DeferredUtility::applyFinally($result, function () use ($field, $context) {
+        $context->addCacheableDependency($field);
+      });
     };
   }
 

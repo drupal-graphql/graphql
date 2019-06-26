@@ -5,7 +5,7 @@ namespace Drupal\graphql\EventSubscriber;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 use Drupal\graphql\Event\OperationEvent;
-use Drupal\graphql\Plugin\LanguageNegotiation\QueryLanguageNegotiation;
+use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -37,10 +37,10 @@ class OperationSubscriber implements EventSubscriberInterface {
    */
   public function onBeforeOperation(OperationEvent $event) {
     if (!empty($this->languageNegotiator)) {
-      $method = QueryLanguageNegotiation::METHOD_ID;
+      $method = OperationLanguageNegotiation::METHOD_ID;
       $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
 
-      if ($instance instanceof QueryLanguageNegotiation) {
+      if ($instance instanceof OperationLanguageNegotiation) {
         $instance::setContext($event->getParams(), $event->getConfig());
       }
     }
@@ -56,10 +56,10 @@ class OperationSubscriber implements EventSubscriberInterface {
    */
   public function onAfterOperation(OperationEvent $event) {
     if (!empty($this->languageNegotiator)) {
-      $method = QueryLanguageNegotiation::METHOD_ID;
+      $method = OperationLanguageNegotiation::METHOD_ID;
       $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
 
-      if ($instance instanceof QueryLanguageNegotiation) {
+      if ($instance instanceof OperationLanguageNegotiation) {
         $instance::resetContext();
       }
     }

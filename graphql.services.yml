@@ -110,7 +110,6 @@ services:
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
 
-
   # Buffers.
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\Entity\Server;
 
@@ -25,6 +26,17 @@ class DisabledResultCacheTest extends GraphQLTestBase {
 GQL;
 
     $this->setUpSchema($schema);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container) {
+    parent::register($container);
+    // Set the development parameter to TRUE.
+    $parameters = $container->getParameter('graphql.config');
+    $parameters['development'] = TRUE;
+    $container->setParameter('graphql.config', $parameters);
   }
 
   /**

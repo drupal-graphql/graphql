@@ -147,7 +147,7 @@ class DataProducerProxy implements ResolverInterface {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
     return DeferredUtility::returnFinally($plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
-      return $this->cached && $plugin instanceof DataProducerPluginCachingInterface ?
+      return $this->cached && $plugin instanceof DataProducerPluginCachingInterface && $context->useCaching() ?
         $this->resolveCached($plugin, $context, $field) :
         $this->resolveUncached($plugin, $context, $field);
     });
@@ -202,7 +202,6 @@ class DataProducerProxy implements ResolverInterface {
     $output = $plugin->resolveField($field);
     return DeferredUtility::applyFinally($output, function () use ($context, $plugin, $field) {
       $field->addCacheableDependency($plugin);
-      $context->addCacheableDependency($field);
     });
   }
 

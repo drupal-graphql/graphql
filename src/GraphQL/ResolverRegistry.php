@@ -192,9 +192,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info) {
-    $field = new FieldContext($context, $info);
-
+  public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     // First, check if there is a resolver registered for this field.
     if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
       if (!$resolver instanceof ResolverInterface) {
