@@ -27,6 +27,7 @@ class QueryRoutes {
         ])
         ->addRequirements([
           '_graphql_query_access' => 'TRUE',
+          '_format' => 'json',
         ])
         ->addOptions([
           'no_cache' => TRUE,
