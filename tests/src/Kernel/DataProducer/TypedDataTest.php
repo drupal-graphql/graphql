@@ -42,7 +42,12 @@ class TypedDataTest extends GraphQLTestBase {
     $tree_type = $this->prophesize(ComplexDataInterface::class);
     $tree_type->get('path')
       ->willReturn($path);
+
     $tree_type->getValue()
+      ->willReturn([]);
+
+    $manager->expects($this->any())
+      ->method('getDefaultConstraints')
       ->willReturn([]);
 
     $manager->expects($this->any())

@@ -56,7 +56,7 @@ services:
       - '@plugin.manager.graphql.schema'
       - '@cache.graphql.results'
       - '@request_stack'
-      - '@http_kernel'
+      - '@event_dispatcher'
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
@@ -70,9 +70,16 @@ services:
     class: Drupal\graphql\GraphQL\Utility\Introspection
     arguments: ['@graphql.query_processor']
 
-  # Support for subrequests.
+  # Reset the current language during sub-requests.
   graphql.subrequest_subscriber:
     class: Drupal\graphql\EventSubscriber\SubrequestSubscriber
+    arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
+    tags:
+      - { name: event_subscriber }
+
+  # Reset the current language during operations.
+  graphql.operation_subscriber:
+    class: Drupal\graphql\EventSubscriber\OperationSubscriber
     arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
     tags:
       - { name: event_subscriber }
@@ -102,6 +109,7 @@ services:
       - '\Drupal\graphql\Plugin\DataProducerPluginInterface'
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
+
 
   # Buffers.
   graphql.buffer.entity:

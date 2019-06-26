@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\Event\OperationEvent;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Error\Error;
@@ -21,15 +22,13 @@ use GraphQL\Language\Visitor;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
-use GraphQL\Server\ServerConfig;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 // TODO: Refactor this and clean it up.
 class QueryProcessor {
@@ -63,9 +62,9 @@ class QueryProcessor {
   protected $requestStack;
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
-  protected $httpKernel;
+  protected $dispatcher;
 
   /**
    * QueryProcessor constructor.
@@ -78,20 +77,20 @@ class QueryProcessor {
    *   The cache backend for caching query results.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    */
   public function __construct(
     CacheContextsManager $contextsManager,
     SchemaPluginManager $pluginManager,
     CacheBackendInterface $cacheBackend,
     RequestStack $requestStack,
-    HttpKernelInterface $httpKernel
+    EventDispatcherInterface $dispatcher
   ) {
     $this->contextsManager = $contextsManager;
     $this->pluginManager = $pluginManager;
     $this->cacheBackend = $cacheBackend;
     $this->requestStack = $requestStack;
-    $this->httpKernel = $httpKernel;
+    $this->dispatcher = $dispatcher;
   }
 
   /**
@@ -116,8 +115,12 @@ class QueryProcessor {
     return is_array($params) ? $this->executeBatch($config, $params) : $this->executeSingle($config, $params);
   }
 
+  public function currentOperation() {
+
+  }
+
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    *
    * @return mixed
@@ -126,12 +129,12 @@ class QueryProcessor {
    */
   protected function executeSingle(ServerConfig $config, OperationParams $params) {
     $adapter = new SyncPromiseAdapter();
-    $result = $this->executeOperationInSubrequest($adapter, $config, $params, FALSE);
+    $result = $this->executeOperationWithContext($adapter, $config, $params, FALSE);
     return $adapter->wait($result);
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param array $params
    *
    * @return mixed
@@ -143,51 +146,28 @@ class QueryProcessor {
     // limitations of Drupal's context system. Each query needs to be executed
     // in it's own sub-request.
     return array_map(function ($params) use ($adapter, $config) {
-      $result = $this->executeOperationInSubrequest($adapter, $config, $params, TRUE);
+      $result = $this->executeOperationWithContext($adapter, $config, $params, TRUE);
       return $adapter->wait($result);
     }, $params);
   }
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param bool $batching
    *
    * @return \GraphQL\Executor\Promise\Promise
    * @throws \Exception
    */
-  protected function executeOperationInSubrequest(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
-    $current = $this->requestStack->getCurrentRequest();
-    $request = Request::create($current->getPathInfo(), 'GET',
-      $current->query->all(),
-      $current->cookies->all(),
-      $current->files->all(),
-      $current->server->all()
-    );
+  protected function executeOperationWithContext(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
+    $event = new OperationEvent(clone $params, clone $config);
+    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
 
-    if ($session = $request->getSession()) {
-      $request->setSession($session);
-    }
-
-    $request->attributes->set('_graphql_operation', $params);
-    $request->attributes->set('_graphql_server', $config);
-    $request->attributes->set('_graphql_subrequest', function () use ($adapter, $config, $params, $batching) {
-      return $this->executeOperationWithReporting($adapter, $config, $params, $batching);
-    });
-
-    /** @var \Drupal\graphql\SubRequestResponse $response */
-    $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
-    /** @var \GraphQL\Executor\Promise\Promise $result */
-    $result = $response->getResult();
-
-    return $result->then(function ($result) use ($request) {
-      // TODO:
-      // Remove the request stack manipulation once the core issue described at
-      // https://www.drupal.org/node/2613044 is resolved.
-      while ($this->requestStack->getCurrentRequest() === $request) {
-        $this->requestStack->pop();
-      }
+    $result = $this->executeOperationWithReporting($adapter, $config, $params, $batching);
+    return $result->then(function ($result) use ($params, $config) {
+      $event = new OperationEvent(clone $params, clone $config, $result);
+      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
 
       return $result;
     });
@@ -195,7 +175,7 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param bool $batching
    *
@@ -221,7 +201,7 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param bool $batching
    *
@@ -274,7 +254,7 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param bool $validate
@@ -318,7 +298,7 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param bool $validate
@@ -337,7 +317,7 @@ class QueryProcessor {
 
   /**
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param bool $validate
@@ -398,7 +378,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
@@ -428,7 +408,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
@@ -445,7 +425,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
@@ -462,7 +442,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param $operation
@@ -483,7 +463,7 @@ class QueryProcessor {
   }
 
   /**
-   * @param \GraphQL\Server\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
    * @param \GraphQL\Server\OperationParams $params
    *
    * @return mixed

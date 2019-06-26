@@ -11,11 +11,17 @@ use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 /**
  * @coversDefaultClass \Drupal\graphql\GraphQL\ResolverBuilder
  *
- * @requires module typed_data
- *
  * @group graphql
  */
 class ResolverBuilderTest extends GraphQLTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'graphql',
+    'typed_data',
+  ];
 
   /**
    * {@inheritdoc}
@@ -127,7 +133,7 @@ GQL;
     $manager->expects($this->any())
       ->method('getDefinition')
       ->will($this->returnValueMap([
-        'tree' => ['class' => '\Drupal\Core\TypedData\ComplexDataInterface'],
+        'tree_mock' => ['class' => '\Drupal\Core\TypedData\ComplexDataInterface'],
       ]));
 
     $this->container->set('typed_data_manager', $manager);

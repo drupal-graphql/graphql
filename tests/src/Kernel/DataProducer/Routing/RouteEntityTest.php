@@ -7,7 +7,6 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 
 /**
  * Test class for the RouteEntity data producer.
