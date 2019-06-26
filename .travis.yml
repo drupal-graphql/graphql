@@ -11,8 +11,8 @@ env:
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
     - TRAVIS=true
   matrix:
-    - DRUPAL_CORE=8.5.x
     - DRUPAL_CORE=8.6.x
+    - DRUPAL_CORE=8.7.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -20,14 +20,14 @@ matrix:
   include:
     - php: 7.2
       env:
-        - DRUPAL_CORE=8.6.x
+        - DRUPAL_CORE=8.7.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
   allow_failures:
     # Allow the code coverage report to fail.
     - php: 7.2
       env:
-        - DRUPAL_CORE=8.6.x
+        - DRUPAL_CORE=8.7.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
 
