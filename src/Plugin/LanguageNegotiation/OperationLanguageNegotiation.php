@@ -11,13 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
  * Class for identifying language based on a graphql query.
  *
  * @LanguageNegotiation(
- *   id = Drupal\graphql\Plugin\LanguageNegotiation\QueryLanguageNegotiation::METHOD_ID,
+ *   id = Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation::METHOD_ID,
  *   weight = -999,
- *   name = @Translation("GraphQL query context"),
- *   description = @Translation("Determines the language of a GraphQL query.")
+ *   name = @Translation("GraphQL operation context"),
+ *   description = @Translation("Determines the language in the context of an operation.")
  * )
  */
-class QueryLanguageNegotiation extends LanguageNegotiationMethodBase {
+class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
 
   /**
    * The language negotiation method id.
