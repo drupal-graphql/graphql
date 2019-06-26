@@ -41,7 +41,7 @@ class OperationSubscriber implements EventSubscriberInterface {
       $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
 
       if ($instance instanceof OperationLanguageNegotiation) {
-        $instance::setContext($event->getParams(), $event->getConfig());
+        $instance::setContext($event->getContext());
       }
     }
 
@@ -60,7 +60,7 @@ class OperationSubscriber implements EventSubscriberInterface {
       $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
 
       if ($instance instanceof OperationLanguageNegotiation) {
-        $instance::resetContext();
+        $instance::setContext();
       }
     }
 

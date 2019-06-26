@@ -27,8 +27,26 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    */
   public function __construct(ResolveContext $context, ResolveInfo $info) {
     $this->addCacheContexts(['user.permissions']);
+
     $this->context = $context;
     $this->info = $info;
+  }
+
+  /**
+   * @return string
+   */
+  public function getContextLanguage() {
+    return $this->context->getContextLanguage();
+  }
+
+  /**
+   * @param $language
+   *
+   * @return $this
+   */
+  public function setContextLanguage($language) {
+    $this->context->setContextLanguage($language);
+    return $this;
   }
 
   /**

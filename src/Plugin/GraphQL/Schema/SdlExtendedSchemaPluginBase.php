@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use GraphQL\Language\Parser;
 use GraphQL\Utils\SchemaExtender;
 
@@ -43,8 +44,8 @@ abstract class SdlExtendedSchemaPluginBase extends SdlSchemaPluginBase {
    *
    * @throws \GraphQL\Error\Error
    */
-  public function getSchema() {
-    return SchemaExtender::extend(parent::getSchema(), $this->getExtendedSchemaDocument());
+  public function getSchema(ResolverRegistryInterface $registry) {
+    return SchemaExtender::extend(parent::getSchema($registry), $this->getExtendedSchemaDocument());
   }
 
   /**

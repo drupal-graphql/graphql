@@ -10,18 +10,6 @@ use GraphQL\Type\Schema;
 interface ResolverRegistryInterface {
 
   /**
-   * Validate compliance with the provided schema.
-   *
-   * @param \GraphQL\Type\Schema $schema
-   *   The schema to perform validation against.
-   *
-   * @return null|array
-   *   An array of compliance violations or NULL if the registry fully complies
-   *   with the schema.
-   */
-  public function validateCompliance(Schema $schema);
-
-  /**
    * @param $value
    * @param $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context

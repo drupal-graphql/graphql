@@ -40,6 +40,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
     $body = $this->extractBody($request);
     $query = $this->extractQuery($request);
     $operations = $helper->parseRequestParams($method, $body, $query);
+
     return $defaults + ['operations' => $operations];
   }
 

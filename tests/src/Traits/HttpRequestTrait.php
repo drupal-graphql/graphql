@@ -55,15 +55,11 @@ trait HttpRequestTrait {
    *   A set of queries to be executed in one go.
    * @param \Drupal\graphql\Entity\Server $server
    *   The server instance.
-   * @param array $variables
-   *   Query variables.
-   * @param array|null $extensions
-   *   The query extensions.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries(array $queries, $server = NULL, array $variables = [], array $extensions = NULL) {
+  protected function batchedQueries(array $queries, $server = NULL) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');

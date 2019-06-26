@@ -8,8 +8,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
-use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
-use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 
 /**
  * Data producers Entity multiple test class.
@@ -84,15 +82,6 @@ class EntityMultipleTest extends GraphQLTestBase {
       'status' => NodeInterface::NOT_PUBLISHED,
     ]);
     $this->node3->save();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function userPermissions() {
-    $permissions = parent::userPermissions();
-    $permissions[] = 'access content';
-    return $permissions;
   }
 
   /**

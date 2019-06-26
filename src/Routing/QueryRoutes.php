@@ -32,6 +32,7 @@ class QueryRoutes {
         ->addOptions([
           'no_cache' => TRUE,
           'default_url_options' => ['path_processing' => FALSE],
+          'parameters' => ['server' => ['type' => 'entity:graphql_server']]
         ]);
     }
 

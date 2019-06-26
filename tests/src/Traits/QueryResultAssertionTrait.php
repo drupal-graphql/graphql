@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\Execution\QueryResult;
+use Drupal\graphql\GraphQL\Execution\ExecutionResult;
 use GraphQL\Error\Error;
 use GraphQL\Server\OperationParams;
 
@@ -13,12 +13,9 @@ use GraphQL\Server\OperationParams;
 trait QueryResultAssertionTrait {
 
   /**
-   * Return the default schema for this test.
-   *
-   * @return string
-   *   The default schema id.
+   * @var \Drupal\graphql\Entity\ServerInterface
    */
-  abstract protected function getDefaultSchema();
+  protected $server;
 
   /**
    * Return the default cache max age for this test case.
@@ -43,16 +40,6 @@ trait QueryResultAssertionTrait {
    *   The default cache contexts.
    */
   abstract protected function defaultCacheContexts();
-
-  /**
-   * Retrieve the graphql processor.
-   *
-   * @return \Drupal\graphql\GraphQL\Execution\QueryProcessor
-   *   The graphql processor service.
-   */
-  protected function queryProcessor() {
-    return $this->container->get('graphql.query_processor');
-  }
 
   /**
    * The default cache metadata object.
@@ -95,8 +82,7 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata = NULL) {
-    $result = $this->queryProcessor()->processQuery(
-      $this->getDefaultSchema(),
+    $result = $this->server->executeOperation(
       OperationParams::create([
         'query' => $query,
         'variables' => $variables,
@@ -121,8 +107,7 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertErrors($query, $variables, $expected, CacheableMetadata $metadata) {
-    $result = $this->queryProcessor()->processQuery(
-      $this->getDefaultSchema(),
+    $result = $this->server->executeOperation(
       OperationParams::create([
         'query' => $query,
         'variables' => $variables,
@@ -136,14 +121,14 @@ trait QueryResultAssertionTrait {
   /**
    * Assert a certain result data set on a query result.
    *
-   * @param \Drupal\graphql\GraphQL\Execution\QueryResult $result
+   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    *   The query result object.
    * @param mixed $expected
    *   The expected result data set.
    *
    * @internal
    */
-  private function assertResultData(QueryResult $result, $expected) {
+  private function assertResultData(ExecutionResult $result, $expected) {
     $data = $result->toArray();
     $this->assertArrayHasKey('data', $data, 'No result data.');
     $this->assertEquals($expected, $data['data'], 'Unexpected query result.');
@@ -152,14 +137,14 @@ trait QueryResultAssertionTrait {
   /**
    * Assert that the result contains contains a certain set of errors.
    *
-   * @param \Drupal\graphql\GraphQL\Execution\QueryResult $result
+   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    *   The query result object.
    * @param array $expected
    *   The list of expected error messages. Also allows regular expressions.
    *
    * @internal
    */
-  private function assertResultErrors(QueryResult $result, array $expected) {
+  private function assertResultErrors(ExecutionResult $result, array $expected) {
     // Retrieve the list of error strings.
     $errors = array_map(function (Error $error) {
       return $error->getMessage();
@@ -203,14 +188,14 @@ trait QueryResultAssertionTrait {
   /**
    * Assert a certain set of result metadata on a query result.
    *
-   * @param \Drupal\graphql\GraphQL\Execution\QueryResult $result
+   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    *   The query result object.
    * @param \Drupal\Core\Cache\CacheableMetadata $expected
    *   The expected metadata object.
    *
    * @internal
    */
-  private function assertResultMetadata(QueryResult $result, CacheableMetadata $expected) {
+  private function assertResultMetadata(ExecutionResult $result, CacheableMetadata $expected) {
     $this->assertEquals($expected->getCacheMaxAge(), $result->getCacheMaxAge(), 'Unexpected cache max age.');
 
     $missingContexts = array_diff($expected->getCacheContexts(), $result->getCacheContexts());
