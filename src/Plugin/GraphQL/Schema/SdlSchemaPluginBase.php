@@ -12,6 +12,7 @@ use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
@@ -100,8 +101,6 @@ abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginIn
 
   /**
    * {@inheritdoc}
-   *
-   * @throws \GraphQL\Error\SyntaxError
    */
   public function validateSchema() {
     /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */
@@ -110,6 +109,14 @@ abstract class  SdlSchemaPluginBase extends PluginBase implements SchemaPluginIn
     try {
       $schema = $this->getSchema();
       $schema->assertValid();
+    }
+    catch (SyntaxError $error) {
+      $messenger->addError(sprintf('Syntax error in schema: %s', $error->getMessage()));
+      return FALSE;
+    }
+    catch (Error $error) {
+      $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
+      return FALSE;
     }
     catch (InvariantViolation $error) {
       $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
