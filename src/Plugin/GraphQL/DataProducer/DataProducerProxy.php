@@ -72,6 +72,7 @@ class DataProducerProxy implements ResolverInterface {
    *
    * @param string $id
    *   DataProducer plugin id.
+   * @param array $mapping
    * @param array $config
    *   Plugin configuration.
    * @param \Drupal\graphql\Plugin\DataProducerPluginManager $pluginManager
@@ -81,6 +82,7 @@ class DataProducerProxy implements ResolverInterface {
    */
   public function __construct(
     $id,
+    array $mapping,
     array $config,
     DataProducerPluginManager $pluginManager,
     RequestStack $requestStack,
@@ -88,6 +90,7 @@ class DataProducerProxy implements ResolverInterface {
     CacheBackendInterface $cacheBackend
   ) {
     $this->id = $id;
+    $this->mapping = $mapping;
     $this->config = $config;
     $this->pluginManager = $pluginManager;
     $this->requestStack = $requestStack;
@@ -97,13 +100,14 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * @param $id
+   * @param array $mapping
    * @param array $config
    *
    * @return mixed
    */
-  public static function create($id, array $config = NULL) {
+  public static function create($id, array $mapping = [], array $config = []) {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
-    return $manager->proxy($id, $config);
+    return $manager->proxy($id, $mapping, $config);
   }
 
   /**

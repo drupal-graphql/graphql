@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Verify that all queries declare the user.permissions cache context.
@@ -38,7 +37,10 @@ GQL;
   public function testUserPermissionsContext() {
     $this->mockResolver('Query', 'root', 'test');
 
-    $metadata = (new CacheableMetadata())->addCacheContexts(['user.permissions']);
+    $metadata = (new CacheableMetadata())
+      ->addCacheContexts(['user.permissions'])
+      ->addCacheTags(['graphql_response']);
+
     $this->assertResults('{ root }', [], ['root' => 'test'], $metadata);
   }
 }

@@ -63,16 +63,14 @@ GQL;
 GQL;
 
     $this->mockResolver('Query', 'node',
-      $this->builder->produce('entity_load', ['mapping' => [
-        'type' => $this->builder->fromValue('node'),
-        'id' => $this->builder->fromArgument('id'),
-      ]])
+      $this->builder->produce('entity_load')
+        ->map('type', $this->builder->fromValue('node'))
+        ->map('id', $this->builder->fromArgument('id'))
     );
 
     $this->mockResolver('Node', 'title',
-      $this->builder->produce('entity_label', ['mapping' => [
-        'entity' => $this->builder->fromParent(),
-      ]])
+      $this->builder->produce('entity_label')
+        ->map('entity', $this->builder->fromParent())
     );
 
     $metadata = $this->defaultCacheMetaData();
@@ -82,7 +80,6 @@ GQL;
       'b' => ['title' => 'Node 2'],
       'c' => ['title' => 'Node 3'],
     ], $metadata);
-
   }
 
 }

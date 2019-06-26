@@ -60,15 +60,12 @@ class ImageDerivativeTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image\ImageDerivative::resolve
    */
   public function testImageDerivative() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'image_derivative',
-      'configuration' => []
-    ]);
-
     // Test that we get the proper style and dimensions if we have access to the
     // file.
-    $metadata = $this->defaultCacheMetaData();
-    $output = $plugin->resolve($this->file, 'test_style', $metadata);
+    $result = $this->executeDataProducer('image_derivative', [
+      'entity' => $this->file,
+      'style' => 'test_style',
+    ]);
 
     $this->assertEquals(
       [
@@ -76,7 +73,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
         'width' => 300,
         'height' => 200,
       ],
-      $output
+      $result
     );
 
     // TODO: Add cache checks.
@@ -85,9 +82,12 @@ class ImageDerivativeTest extends GraphQLTestBase {
 
     // Test that we don't get the derivative if we don't have access to the
     // original file, but we still get the access result cache tags.
-    $metadata = $this->defaultCacheMetaData();
-    $output = $plugin->resolve($this->file_not_accessible, 'test_style', $metadata);
-    $this->assertNull($output);
+    $result = $this->executeDataProducer('image_derivative', [
+      'entity' => $this->file_not_accessible,
+      'style' => 'test_style',
+    ]);
+
+    $this->assertNull($result);
 
     // TODO: Add cache checks.
 //    $this->assertContains('test_tag_forbidden', $metadata->getCacheTags());

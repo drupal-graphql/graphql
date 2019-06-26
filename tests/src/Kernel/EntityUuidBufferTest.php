@@ -69,16 +69,14 @@ GQL;
 GQL;
 
     $this->mockResolver('Query', 'node',
-      $this->builder->produce('entity_load_by_uuid', ['mapping' => [
-        'type' => $this->builder->fromValue('node'),
-        'uuid' => $this->builder->fromArgument('uuid'),
-      ]])
+      $this->builder->produce('entity_load_by_uuid')
+        ->map('type', $this->builder->fromValue('node'))
+        ->map('uuid', $this->builder->fromArgument('uuid'))
     );
 
     $this->mockResolver('Node', 'title',
-      $this->builder->produce('entity_label', ['mapping' => [
-        'entity' => $this->builder->fromParent(),
-      ]])
+      $this->builder->produce('entity_label')
+        ->map('entity', $this->builder->fromParent())
     );
 
     $metadata = $this->defaultCacheMetaData();

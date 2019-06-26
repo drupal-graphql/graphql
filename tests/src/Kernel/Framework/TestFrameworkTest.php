@@ -3,9 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use GraphQL\Type\Definition\ResolveInfo;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 
 /**
@@ -55,23 +53,6 @@ GQL;
     $metadata->addCacheTags([
       'my_tag',
     ]);
-
-    $schema = $this->introspect();
-    $this->assertArraySubset([
-      'types' => [
-        'Query' => [
-          'fields' => [
-            'root' => [
-              'name' => 'root',
-              'type' => [
-                'kind' => 'SCALAR',
-                'name' => 'String',
-              ],
-            ],
-          ],
-        ],
-      ],
-    ], $schema);
 
     $this->assertResults('{ root }', [], [
       'root' => 'test',

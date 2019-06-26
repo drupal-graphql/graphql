@@ -33,7 +33,7 @@ class ResolverBuilderTest extends GraphQLTestBase {
         id(someArg: Int): Int
         name: String
         uri: String
-        language: Language
+        language: Context
       }
 
       type Context {
@@ -174,9 +174,8 @@ GQL;
     $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
     $this->mockResolver('Tree', 'name', $this->builder->compose(
       $this->builder->fromValue('Some tree name'),
-      $this->builder->produce('uppercase', ['mapping' => [
-        'string' => $this->builder->fromParent(),
-      ]])
+      $this->builder->produce('uppercase')
+        ->map('string', $this->builder->fromParent())
     ));
 
     $query = <<<GQL
