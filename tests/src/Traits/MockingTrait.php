@@ -10,11 +10,13 @@ use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\Tests\RandomGeneratorTrait;
 
 trait MockingTrait {
+  use RandomGeneratorTrait;
 
   /**
-   * @var \Drupal\graphql\Entity\Server
+   * @var \Drupal\graphql\Entity\ServerInterface
    */
   protected $server;
 
@@ -24,17 +26,17 @@ trait MockingTrait {
   protected $registry;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\graphql\Plugin\SchemaPluginInterface
    */
   protected $schema;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\graphql\Plugin\SchemaPluginManager
    */
   protected $schemaPluginManager;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\graphql\Plugin\DataProducerPluginManager
    */
   protected $dataProducerPluginManager;
 
@@ -118,11 +120,13 @@ trait MockingTrait {
    * @param $schema
    * @param $endpoint
    * @param array $values
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function createTestServer($schema, $endpoint, $values = []) {
     $this->server = Server::create([
       'schema' => $schema,
-      'name' => $schema,
+      'name' => $this->randomGenerator->name(),
       'endpoint' => $endpoint,
     ] + $values);
 
