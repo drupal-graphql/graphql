@@ -74,7 +74,6 @@ GQL;
     $this->assertEquals($this->getPrintedSchema(), $expected);
   }
 
-
   public function testExtendedSchemaFields() {
     $this->mockTypeResolver('Content', function ($value) {
       return $value['type'];
