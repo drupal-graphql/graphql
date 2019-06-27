@@ -17,11 +17,11 @@ class RoutingTest extends GraphQLTestBase {
    */
   public function testRouteLoad() {
     $result = $this->executeDataProducer('route_load', [
-      'path' => '/user/login',
+      'path' => '/user/logout',
     ]);
 
     $this->assertNotNull($result);
-    $this->assertEquals('user.login', $result->getRouteName());
+    $this->assertEquals('user.logout', $result->getRouteName());
   }
 
   /**
@@ -29,13 +29,13 @@ class RoutingTest extends GraphQLTestBase {
    */
   public function testUrlPath() {
     $this->pathValidator = $this->container->get('path.validator');
-    $url = $this->pathValidator->getUrlIfValidWithoutAccessCheck('/user/login');
+    $url = $this->pathValidator->getUrlIfValidWithoutAccessCheck('/user/logout');
 
     $result = $this->executeDataProducer('url_path', [
       'url' => $url,
     ]);
 
-    $this->assertEquals('/user/login', $result);
+    $this->assertEquals('/user/logout', $result);
   }
 
   /**

@@ -36,6 +36,8 @@ class OperationSubscriber implements EventSubscriberInterface {
    *   The kernel event object.
    */
   public function onBeforeOperation(OperationEvent $event) {
+    $this->resetLanguageContext();
+
     if (!empty($this->languageNegotiator)) {
       $method = OperationLanguageNegotiation::METHOD_ID;
       $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
@@ -44,8 +46,6 @@ class OperationSubscriber implements EventSubscriberInterface {
         $instance::setContext($event->getContext());
       }
     }
-
-    $this->resetLanguageContext();
   }
 
   /**
@@ -55,6 +55,8 @@ class OperationSubscriber implements EventSubscriberInterface {
    *   The kernel event object.
    */
   public function onAfterOperation(OperationEvent $event) {
+    $this->resetLanguageContext();
+
     if (!empty($this->languageNegotiator)) {
       $method = OperationLanguageNegotiation::METHOD_ID;
       $instance = $this->languageNegotiator->getNegotiationMethodInstance($method);
@@ -63,8 +65,6 @@ class OperationSubscriber implements EventSubscriberInterface {
         $instance::setContext();
       }
     }
-
-    $this->resetLanguageContext();
   }
 
   /**
