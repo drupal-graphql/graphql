@@ -101,10 +101,12 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function defaultCacheTags() {
-    return [
-      'graphql_response',
-      'config:graphql.graphql_servers.test',
-    ];
+    $tags = ['graphql_response'];
+    if (isset($this->server)) {
+      array_push($tags, "config:graphql.graphql_servers.{$this->server->id()}");
+    }
+
+    return $tags;
   }
 
   /**
