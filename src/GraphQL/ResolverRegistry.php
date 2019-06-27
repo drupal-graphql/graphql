@@ -93,11 +93,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param string $type
-   * @param string $field
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
-   *
-   * @return $this
+   * {@inheritdoc}
    */
   public function addFieldResolver($type, $field, ResolverInterface $resolver) {
     $this->fieldResolvers[$type][$field] = $resolver;
@@ -105,20 +101,14 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param string $type
-   * @param string $field
-   *
-   * @return callable|null
+   * {@inheritdoc}
    */
   public function getFieldResolver($type, $field) {
     return $this->fieldResolvers[$type][$field] ?? NULL;
   }
 
   /**
-   * @param $abstract
-   * @param callable $resolver
-   *
-   * @return $this
+   * {@inheritdoc}
    */
   public function addTypeResolver($abstract, callable $resolver) {
     $this->typeResolvers[$abstract] = $resolver;
@@ -126,9 +116,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param string $type
-   *
-   * @return callable|null
+   * {@inheritdoc}
    */
   public function getTypeResolver($type) {
     return $this->typeResolvers[$type] ?? NULL;

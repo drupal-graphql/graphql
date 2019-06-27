@@ -90,6 +90,18 @@ services:
       - '\Drupal\graphql\Annotation\Schema'
       - '%graphql.config%'
 
+  # Plugin manager for schemas
+  plugin.manager.graphql.schema_extension:
+    class: Drupal\graphql\Plugin\SchemaExtensionPluginManager
+    arguments:
+      - 'Plugin/GraphQL/SchemaExtension'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\SchemaExtensionPluginInterface'
+      - '\Drupal\graphql\Annotation\SchemaExtension'
+      - '%graphql.config%'
+
   plugin.manager.graphql.data_producer:
     class: Drupal\graphql\Plugin\DataProducerPluginManager
     arguments:
