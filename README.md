@@ -8,19 +8,12 @@ This module lets you craft and expose a [GraphQL](http://graphql.org/) schema fo
 
 It is is built around [https://github.com/webonyx/graphql-php](https://github.com/webonyx/graphql-php). As such, it supports the full official GraphQL specification with all its features.
 
-You can use this module as a foundation for building your own schema through custom code or you can use and extend the generated schema using the plugin architecture and the provided plugin implementations form the sub-module.
-
-For ease of development, it includes the [GraphiQL](https://github.com/graphql/graphiql/) interface at`/graphql/explorer`.
-
 ### Installation
 
 This module requires composer for installation. To install, simply run `composer require drupal/graphql`.
 
-### Documentation
-
-[Documentation](https://drupal-graphql.gitbook.io/graphql/v/8.x-4.x/ is hosted on [gitbook.io](http://www.gitbook.io).
-
 ### Resources
 
+* Documentation: [https://drupal-graphql.gitbook.io/graphql/v/8.x-4.x](https://drupal-graphql.gitbook.io/graphql/v/8.x-4.x)
 * Project homepage: [https://www.drupal.org/project/graphql](https://www.drupal.org/project/graphql)
 * Contributing: [https://github.com/drupal-graphql/graphql](https://github.com/drupal-graphql/graphql)
