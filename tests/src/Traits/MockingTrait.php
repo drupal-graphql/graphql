@@ -7,6 +7,7 @@ use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Resolver\Value;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlExtendedSchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
+use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
@@ -92,29 +93,6 @@ trait MockingTrait {
   }
 
   /**
-   * Setup server with extended schema.
-   *
-   * @param string $schema
-   *   Base schema.
-   * @param string $schemaExtension
-   *   Schema extension.
-   * @param string $id
-   *   Schema id.
-   * @param array $values
-   */
-  protected function setUpExtendedSchema($schema, $schemaExtension, $id = 'test', $values = []) {
-    $this->mockExtendedSchema($id, $schema, $schemaExtension);
-    $this->mockSchemaPluginManager($id);
-    $this->createTestServer($id, '/graphql/' . $id, $values);
-
-    $this->schemaPluginManager->method('createInstance')
-      ->with($this->equalTo($id))
-      ->will($this->returnValue($this->schema));
-
-    $this->container->set('plugin.manager.graphql.schema', $this->schemaPluginManager);
-  }
-
-  /**
    * Create test server.
    *
    * @param $schema
@@ -139,15 +117,29 @@ trait MockingTrait {
    * @param string $id
    *   The schema id.
    * @param string $schema
-   *   GraphQL schema.
+   *   The schema.
+   * @param \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[] $extensions
+   *   An array of schema extension plugins.
    */
-  protected function mockSchema($id, $schema) {
+  protected function mockSchema($id, $schema, $extensions = []) {
+    /** @var \PHPUnit\Framework\MockObject\MockObject $extensionManager */
+    $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
+      ->disableOriginalConstructor()
+      ->setMethods(['getExtensions'])
+      ->getMock();
+
+    $extensionManager->expects(static::any())
+      ->method('getExtensions')
+      ->willReturn($extensions);
+
     $this->schema = $this->getMockBuilder(SdlSchemaPluginBase::class)
       ->setConstructorArgs([
         [],
         $id,
         [],
         $this->container->get('cache.graphql.ast'),
+        $this->container->get('module_handler'),
+        $extensionManager,
         ['development' => FALSE]
       ])
       ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
@@ -156,42 +148,6 @@ trait MockingTrait {
     $this->schema->expects(static::any())
       ->method('getSchemaDefinition')
       ->willReturn($schema);
-
-    $this->registry = new ResolverRegistry();
-    $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
-      ->willReturn($this->registry);
-  }
-
-  /**
-   * Mock an extended schema instance.
-   *
-   * @param string $id
-   *   The schema id.
-   * @param string $schema
-   *   GraphQL schema.
-   * @param string $schemaExtension
-   *   GraphQL extended schema.
-   */
-  protected function mockExtendedSchema($id, $schema, $schemaExtension) {
-    $this->schema = $this->getMockBuilder(SdlExtendedSchemaPluginBase::class)
-      ->setConstructorArgs([
-        [],
-        $id,
-        [],
-        $this->container->get('cache.graphql.ast'),
-        ['development' => FALSE]
-      ])
-      ->setMethods(['getSchemaDefinition', 'getExtendedSchemaDefinition', 'getResolverRegistry'])
-      ->getMockForAbstractClass();
-
-    $this->schema->expects(static::any())
-      ->method('getSchemaDefinition')
-      ->willReturn($schema);
-
-    $this->schema->expects(static::any())
-      ->method('getExtendedSchemaDefinition')
-      ->willReturn($schemaExtension);
 
     $this->registry = new ResolverRegistry();
     $this->schema->expects($this->any())
