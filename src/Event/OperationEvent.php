@@ -2,9 +2,8 @@
 
 namespace Drupal\graphql\Event;
 
-use Drupal\graphql\GraphQL\Execution\QueryResult;
-use Drupal\graphql\GraphQL\Execution\ServerConfig;
-use GraphQL\Server\OperationParams;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\EventDispatcher\Event;
 
 class OperationEvent extends Event {
@@ -24,51 +23,38 @@ class OperationEvent extends Event {
   const GRAPHQL_OPERATION_AFTER = 'graphql.operation.after';
 
   /**
-   * @var \GraphQL\Server\OperationParams
-   */
-  protected $params;
-
-  /**
-   * @var \Drupal\graphql\GraphQL\Execution\ServerConfig
-   */
-  protected $config;
-
-  /**
-   * @var \Drupal\graphql\GraphQL\Execution\QueryResult
+   * @var \GraphQL\Executor\ExecutionResult
    */
   protected $result;
 
   /**
+   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
+   */
+  protected $context;
+
+  /**
    * OperationEvent constructor.
    *
-   * @param \GraphQL\Server\OperationParams $params
-   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
-   * @param \Drupal\graphql\GraphQL\Execution\QueryResult $result
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   * @param \GraphQL\Executor\ExecutionResult $result
    */
-  public function __construct(OperationParams $params, ServerConfig $config, QueryResult $result = NULL) {
-    $this->params = $params;
-    $this->config = $config;
+  public function __construct(ResolveContext $context, ExecutionResult $result = NULL) {
+    $this->context = $context;
     $this->result = $result;
   }
 
   /**
-   * @return \Drupal\graphql\GraphQL\Execution\QueryResult
+   * @return \GraphQL\Executor\ExecutionResult
    */
   public function getResult() {
     return $this->result;
   }
 
   /**
-   * @return \Drupal\graphql\GraphQL\Execution\ServerConfig
+   * @return \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
-  public function getConfig() {
-    return $this->config;
+  public function getContext() {
+    return $this->context;
   }
 
-  /**
-   * @return \GraphQL\Server\OperationParams
-   */
-  public function getParams() {
-    return $this->params;
-  }
 }

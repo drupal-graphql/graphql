@@ -83,9 +83,8 @@ class ExplorerController implements ContainerInjectionInterface {
    *   The render array.
    */
   public function viewExplorer(ServerInterface $graphql_server, Request $request) {
-    $id = $graphql_server->id();
-    $url = $this->urlGenerator->generate("graphql.query.$id");
-    $introspectionData = $this->introspection->introspect($id);
+    $url = $this->urlGenerator->generate("graphql.query.{$graphql_server->id()}");
+    $introspectionData = $this->introspection->introspect($graphql_server);
 
     return [
       '#type' => 'markup',

@@ -7,20 +7,12 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Execution\FieldContext;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\GraphQL\Utility\DeferredUtility;
+use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
-use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use GraphQL\Server\OperationParams;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\BuildSchema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -40,11 +32,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @var bool
    */
   protected $inDevelopment;
-
-  /**
-   * @var $
-   */
-  protected $useCaching;
 
   /**
    * {@inheritdoc}
@@ -94,134 +81,15 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *
    * @throws \GraphQL\Error\SyntaxError
    */
-  public function getSchema() {
-    $schema = BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
+  public function getSchema(ResolverRegistryInterface $registry) {
+    $resolver = [$registry, 'resolveType'];
+    return BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) use ($resolver) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
-        $config['resolveType'] = $this->getTypeResolver($type);
+        $config['resolveType'] = $resolver;
       }
 
       return $config;
     });
-
-    return $schema;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateSchema() {
-    /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */
-    $messenger = \Drupal::service('messenger');
-
-    try {
-      $schema = $this->getSchema();
-      $schema->assertValid();
-    }
-    catch (SyntaxError $error) {
-      $messenger->addError(sprintf('Syntax error in schema: %s', $error->getMessage()));
-      return FALSE;
-    }
-    catch (Error $error) {
-      $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
-      return FALSE;
-    }
-    catch (InvariantViolation $error) {
-      $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
-      return FALSE;
-    }
-
-    $registry = $this->getResolverRegistry();
-    if ($messages = $registry->validateCompliance($schema)) {
-      foreach ($messages as $message) {
-        $messenger->addError($message);
-      }
-
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRootValue() {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContext() {
-    $registry = $this->getResolverRegistry();
-
-    // Each document (e.g. in a batch query) gets its own resolve context. This
-    // allows us to collect the cache metadata and contextual values (e.g.
-    // inheritance for language) for each query separately.
-    return function ($params, $document, $operation, $caching) use ($registry) {
-      $context = new ResolveContext($registry, $caching);
-      $context->addCacheTags(['graphql_response']);
-      if ($this instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($this);
-      }
-
-      return $context;
-    };
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldResolver() {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-      $field = new FieldContext($context, $info);
-      $result = $context->getRegistry()->resolveField($value, $args, $context, $info, $field);
-      return DeferredUtility::applyFinally($result, function () use ($field, $context) {
-        $context->addCacheableDependency($field);
-      });
-    };
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getErrorFormatter() {
-    return function (Error $error) {
-      return FormattedError::createFromException($error);
-    };
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getErrorHandler() {
-    return function (array $errors, callable $formatter) {
-      return array_map($formatter, $errors);
-    };
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOperationLanguage(OperationParams $params) {
-    // Do not negotiate a language by default. Override this method to negotiate
-    // the query's language based on passed variables, etc. ...
-    return NULL;
-  }
-
-  /**
-   * Resolves the name of concrete type at run-time.
-   *
-   * @param \GraphQL\Language\AST\TypeDefinitionNode $type
-   *   An abstract type to resolve the concrete type for.
-   *
-   * @return \Closure
-   *   The run-time type resolver.
-   */
-  protected function getTypeResolver(TypeDefinitionNode $type) {
-    return function ($value, ResolveContext $context, ResolveInfo $info) {
-      return $context->getRegistry()->resolveType($value, $context, $info);
-    };
   }
 
   /**
@@ -234,25 +102,18 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getSchemaDocument() {
     // Only use caching of the parsed document if we aren't in development mode.
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
+    $cid = "schema:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
 
     $ast = Parser::parse($this->getSchemaDefinition());
-    if (!empty($this->inDevelopment)) {
-      $this->astCache->set($this->getPluginId(), $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    if (empty($this->inDevelopment)) {
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
 
     return $ast;
   }
-
-  /**
-   * Retrieves the resolver registry.
-   *
-   * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
-   *   The resolver registry.
-   */
-  abstract protected function getResolverRegistry();
 
   /**
    * Retrieves the raw schema definition string.

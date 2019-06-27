@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 
@@ -53,14 +52,9 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  protected function getResolverRegistry() {
+  public function getResolverRegistry() {
     $builder = new ResolverBuilder();
-    $registry = new ResolverRegistry([
-      'Article' => ContextDefinition::create('entity:node')
-        ->addConstraint('Bundle', 'article'),
-      'Page' => ContextDefinition::create('entity:node')
-        ->addConstraint('Bundle', 'page'),
-    ]);
+    $registry = new ResolverRegistry();
 
     $registry->addFieldResolver('Query', 'node',
       $builder->produce('entity_load')

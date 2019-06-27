@@ -43,6 +43,10 @@ GQL;
    * Test if disabling the result cache has the desired effect.
    */
   public function testDisabledCache() {
+    $this->createTestServer('test', '/graphql/uncached', [
+      'caching' => FALSE,
+    ]);
+
     $object = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])

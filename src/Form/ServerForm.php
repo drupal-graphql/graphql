@@ -7,13 +7,10 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RequestContext;
-use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class ServerForm
- *
  * @package Drupal\graphql\Form
  *
  * @codeCoverageIgnore
@@ -123,6 +120,13 @@ class ServerForm extends EntityForm {
       '#description' => t('Whether batched queries are allowed.'),
     ];
 
+    $form['caching'] = [
+      '#title' => t('Enable caching'),
+      '#type' => 'checkbox',
+      '#default_value' => !!$server->get('caching'),
+      '#description' => t('Whether caching of queries and partial results is enabled.'),
+    ];
+
     $form['debug'] = [
       '#title' => t('Enable debugging'),
       '#type' => 'checkbox',
@@ -165,7 +169,7 @@ class ServerForm extends EntityForm {
   public function save(array $form, FormStateInterface $formState) {
     parent::save($form, $formState);
 
-    drupal_set_message($this->t('Saved the %label server.', [
+    $this->messenger()->addMessage($this->t('Saved the %label server.', [
       '%label' => $this->entity->label(),
     ]));
 

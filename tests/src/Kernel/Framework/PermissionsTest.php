@@ -15,13 +15,6 @@ class PermissionsTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function userPermissions() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp() {
     parent::setUp();
 
@@ -44,7 +37,7 @@ GQL;
    * Test if a user without permissions doesn't have access to any query.
    */
   public function testNoPermissions() {
-    $this->accountProphecy->hasPermission(Argument::any())->willReturn(FALSE);
+    $this->setUpCurrentUser();
 
     // Any query should fail.
     $this->assertEquals(403, $this->query('query')->getStatusCode());
@@ -64,8 +57,7 @@ GQL;
    * The user is allowed to post any queries.
    */
   public function testFullQueryAccess() {
-    $this->accountProphecy->hasPermission(Argument::is('execute graphql requests'))->willReturn(TRUE);
-    $this->accountProphecy->hasPermission(Argument::not('execute graphql requests'))->willReturn(FALSE);
+    $this->setUpCurrentUser([], ['execute graphql requests']);
 
     // All queries should work.
     $this->assertEquals(200, $this->query('{ root }')->getStatusCode());

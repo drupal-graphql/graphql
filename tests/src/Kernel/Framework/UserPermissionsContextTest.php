@@ -36,11 +36,6 @@ GQL;
    */
   public function testUserPermissionsContext() {
     $this->mockResolver('Query', 'root', 'test');
-
-    $metadata = (new CacheableMetadata())
-      ->addCacheContexts(['user.permissions'])
-      ->addCacheTags(['graphql_response']);
-
-    $this->assertResults('{ root }', [], ['root' => 'test'], $metadata);
+    $this->assertResults('{ root }', [], ['root' => 'test']);
   }
 }

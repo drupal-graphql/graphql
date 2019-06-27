@@ -4,16 +4,23 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
-use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use Drupal\graphql\Entity\ServerInterface;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
-   * @var \Drupal\graphql\GraphQL\ResolverRegistryInterface
+   * @var \Drupal\graphql\Entity\ServerInterface
    */
-  protected $registry;
+  protected $server;
+
+  /**
+   * @var array
+   */
+  protected $config;
 
   /**
    * @var array
@@ -21,38 +28,93 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   protected $contexts;
 
   /**
-   * @var
+   * @var \GraphQL\Server\OperationParams
    */
   protected $operation;
 
   /**
-   * @var bool
+   * @var \GraphQL\Language\AST\DocumentNode
    */
-  protected $caching;
+  protected $document;
+
+  /**
+   * @var string
+   */
+  protected $type;
+
+  /**
+   * @var string
+   */
+  protected $language;
 
   /**
    * ResolveContext constructor.
    *
-   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
-   * @param bool $caching
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   * @param \GraphQL\Server\OperationParams $operation
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   * @param $type
+   * @param array $config
    */
-  public function __construct(ResolverRegistryInterface $registry, $caching = TRUE) {
-    $this->registry = $registry;
-    $this->caching = $caching;
+  public function __construct(
+    ServerInterface $server,
+    OperationParams $operation,
+    DocumentNode $document,
+    $type,
+    array $config
+  ) {
+    $this->addCacheContexts(['user.permissions']);
+
+    $this->server = $server;
+    $this->config = $config;
+    $this->operation = $operation;
+    $this->document = $document;
+    $this->type = $type;
   }
 
   /**
-   * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
+   * @return \Drupal\graphql\Entity\ServerInterface
    */
-  public function getRegistry() {
-    return $this->registry;
+  public function getServer() {
+    return $this->server;
   }
 
   /**
-   * @return bool
+   * @return \GraphQL\Server\OperationParams
    */
-  public function useCaching() {
-    return $this->caching;
+  public function getOperation() {
+    return $this->operation;
+  }
+
+  /**
+   * @return \GraphQL\Language\AST\DocumentNode
+   */
+  public function getDocument() {
+    return $this->document;
+  }
+
+  /**
+   * @return string
+   */
+  public function getType(): string {
+    return $this->type;
+  }
+
+  /**
+   * @return string
+   */
+  public function getContextLanguage() {
+    return $this->language;
+  }
+
+  /**
+   * @param $language
+   *
+   * @return string
+   */
+  public function setContextLanguage($language) {
+    $this->language = $language;
+    return $this;
   }
 
   /**

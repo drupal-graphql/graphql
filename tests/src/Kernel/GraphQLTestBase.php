@@ -8,20 +8,20 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql\Traits\DataProducerExecutionTrait;
 use Drupal\Tests\graphql\Traits\MockingTrait;
-use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 
 abstract class GraphQLTestBase extends KernelTestBase {
-  use ProphesizePermissionsTrait;
   use DataProducerExecutionTrait;
   use HttpRequestTrait;
   use QueryFileTrait;
   use QueryResultAssertionTrait;
   use SchemaPrinterTrait;
   use MockingTrait;
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -51,20 +51,17 @@ abstract class GraphQLTestBase extends KernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    \PHPUnit_Framework_Error_Warning::$enabled = FALSE;
-
-    $this->injectAccount();
     $this->installConfig('system');
     $this->installConfig('graphql');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installSchema('node', ['node_access']);
+    $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('graphql_server');
     $this->installEntitySchema('configurable_language');
     $this->installConfig(['language']);
 
-    $this->container->get('language_negotiator')
-      ->setCurrentUser($this->accountProphecy->reveal());
+    $this->setUpCurrentUser([], $this->userPermissions());
 
     ConfigurableLanguage::create([
       'id' => 'fr',
@@ -96,13 +93,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultSchema() {
-    return 'test';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function defaultCacheMaxAge() {
     return Cache::PERMANENT;
   }
@@ -111,9 +101,12 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function defaultCacheTags() {
-    return [
-      'graphql_response',
-    ];
+    $tags = ['graphql_response'];
+    if (isset($this->server)) {
+      array_push($tags, "config:graphql.graphql_servers.{$this->server->id()}");
+    }
+
+    return $tags;
   }
 
   /**
@@ -121,6 +114,13 @@ abstract class GraphQLTestBase extends KernelTestBase {
    */
   protected function defaultCacheContexts() {
     return ['user.permissions'];
+  }
+
+  /**
+   * @return array
+   */
+  protected function userPermissions() {
+    return ['access content', 'execute graphql requests'];
   }
 
 }

@@ -2,9 +2,8 @@
 
 namespace Drupal\graphql\Plugin\LanguageNegotiation;
 
-use Drupal\graphql\GraphQL\Execution\ServerConfig;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\language\LanguageNegotiationMethodBase;
-use GraphQL\Server\OperationParams;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -32,41 +31,27 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
   protected $requestStack;
 
   /**
-   * The current operation.
+   * The current execution context.
    *
-   * @var \GraphQL\Server\OperationParams
+   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
-  protected static $operation = NULL;
-
-  /**
-   * The current server.
-   *
-   * @var \Drupal\graphql\GraphQL\Execution\ServerConfig
-   */
-  protected static $server = NULL;
+  protected static $context = NULL;
 
   /**
    * {@inheritdoc}
    */
   public function getLangcode(Request $request = NULL) {
-    if (!empty(static::$operation) && !empty(static::$server)) {
-      return static::$server->getPlugin()->getOperationLanguage(static::$operation);
+    if (!empty(static::$context)) {
+      return static::$context->getContextLanguage();
     }
 
     return NULL;
   }
 
   /**
-   * @param \GraphQL\Server\OperationParams $params
-   * @param \Drupal\graphql\GraphQL\Execution\ServerConfig $config
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    */
-  public static function setContext(OperationParams $params, ServerConfig $config) {
-    static::$operation = $params;
-    static::$server = $config;
-  }
-
-  public static function resetContext() {
-    static::$operation = NULL;
-    static::$server = NULL;
+  public static function setContext(ResolveContext $context = NULL) {
+    static::$context = $context;
   }
 }

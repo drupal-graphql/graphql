@@ -71,10 +71,8 @@ GQL;
 
     $this->setUpSchema($schema);
 
-    // Errors are cacheable now.
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
-    $metadata->setCacheContexts($this->defaultCacheContexts());
 
     $this->assertErrors('{ root }', [], [
       'Cannot query field "root" on type "Query".',

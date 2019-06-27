@@ -51,7 +51,7 @@ class VoyagerController implements ContainerInjectionInterface {
    *   The render array.
    */
   public function viewVoyager(ServerInterface $graphql_server) {
-    $introspectionData = $this->introspection->introspect($graphql_server->id());
+    $introspectionData = $this->introspection->introspect($graphql_server);
 
     return [
       '#type' => 'markup',

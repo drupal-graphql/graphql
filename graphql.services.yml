@@ -48,15 +48,10 @@ services:
     factory: cache_factory:get
     arguments: [graphql_results]
 
-  # Schema and processor factory.
-  graphql.query_processor:
-    class: Drupal\graphql\GraphQL\Execution\QueryProcessor
-    arguments:
-      - '@cache_contexts_manager'
-      - '@plugin.manager.graphql.schema'
-      - '@cache.graphql.results'
-      - '@request_stack'
-      - '@event_dispatcher'
+  # Executor factory.
+  graphql.executor:
+    class: Drupal\graphql\GraphQL\Execution\ExecutorFactory
+    arguments: ['@service_container']
 
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
@@ -68,7 +63,6 @@ services:
   # Schema introspection service.
   graphql.introspection:
     class: Drupal\graphql\GraphQL\Utility\Introspection
-    arguments: ['@graphql.query_processor']
 
   # Reset the current language during sub-requests.
   graphql.subrequest_subscriber:

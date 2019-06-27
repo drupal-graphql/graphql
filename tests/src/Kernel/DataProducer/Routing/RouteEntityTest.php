@@ -59,15 +59,6 @@ class RouteEntityTest extends GraphQLTestBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function userPermissions() {
-    $permissions = parent::userPermissions();
-    $permissions[] = 'access content';
-    return $permissions;
-  }
-
-  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteEntity::resolve
    */
   public function testRouteEntity() {
