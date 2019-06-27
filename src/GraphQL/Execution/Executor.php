@@ -192,9 +192,8 @@ class Executor implements ExecutorImplementation {
    */
   public function doExecute(): Promise {
     $server = $this->context->getServer();
-    $caching = $server->get('caching');
     $type = AST::getOperation($this->document, $this->operation);
-    if ($type === 'query' && !!$caching) {
+    if ($type === 'query' && !!$server->get('caching')) {
       return $this->doExecuteCached($this->cachePrefix());
     }
 
@@ -321,15 +320,18 @@ class Executor implements ExecutorImplementation {
     $tags = $result->getCacheTags();
     $suffix = $this->cacheSuffix($contexts);
 
-    $result = [
+    $metadata = new CacheableMetadata();
+    $metadata->addCacheableDependency($result);
+
+    $cache = [
       'data' => $result->data,
       'extensions' => $result->extensions,
-      'metadata' => (new CacheableMetadata())->addCacheableDependency($result),
+      'metadata' => $metadata,
     ];
 
     $this->cacheBackend->setMultiple([
       "contexts:$prefix"       => ['data' => $contexts, 'expire' => $expire, 'tags' => $tags],
-      "result:$prefix:$suffix" => ['data' => $result,   'expire' => $expire, 'tags' => $tags],
+      "result:$prefix:$suffix" => ['data' => $cache,   'expire' => $expire, 'tags' => $tags],
     ]);
 
     return $this;
