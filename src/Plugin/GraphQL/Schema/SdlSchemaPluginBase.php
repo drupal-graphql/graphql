@@ -2,18 +2,23 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
+use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Utils\BuildSchema;
+use GraphQL\Utils\SchemaExtender;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
@@ -34,6 +39,20 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected $inDevelopment;
 
   /**
+   * The schema extension plugin manager.
+   *
+   * @var \Drupal\graphql\Plugin\SchemaExtensionPluginManager
+   */
+  protected $extensionManager;
+
+  /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -44,6 +63,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('cache.graphql.ast'),
+      $container->get('module_handler'),
+      $container->get('plugin.manager.graphql.schema_extension'),
       $container->getParameter('graphql.config')
     );
   }
@@ -59,6 +80,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The plugin definition array.
    * @param \Drupal\Core\Cache\CacheBackendInterface $astCache
    *   The cache bin for caching the parsed SDL.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler service.
+   * @param \Drupal\graphql\Plugin\SchemaExtensionPluginManager $extensionManager
+   *   The schema extension plugin manager.
    * @param $config
    *   The service configuration.
    *
@@ -69,45 +94,104 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $pluginId,
     $pluginDefinition,
     CacheBackendInterface $astCache,
+    ModuleHandlerInterface $moduleHandler,
+    SchemaExtensionPluginManager $extensionManager,
     $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->inDevelopment = !empty($config['development']);
     $this->astCache = $astCache;
+    $this->extensionManager = $extensionManager;
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
    * {@inheritdoc}
    *
    * @throws \GraphQL\Error\SyntaxError
+   * @throws \GraphQL\Error\Error
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   public function getSchema(ResolverRegistryInterface $registry) {
+    $extensions = $this->extensionManager->getExtensions($this->getPluginId());
     $resolver = [$registry, 'resolveType'];
-    return BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) use ($resolver) {
+    $document = $this->getSchemaDocument($extensions);
+    $schema = BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $resolver;
       }
 
       return $config;
     });
+
+    if (empty($extensions)) {
+      return $schema;
+    }
+
+    foreach ($extensions as $extension) {
+      $extension->registerResolvers($registry);
+    }
+
+    return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
   }
 
   /**
    * Retrieves the parsed AST of the schema definition.
    *
+   * @param array $extensions
+   *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed schema document.
    *
    * @throws \GraphQL\Error\SyntaxError
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getSchemaDocument() {
+  protected function getSchemaDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "schema:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
 
-    $ast = Parser::parse($this->getSchemaDefinition());
+    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
+      return $extension->getBaseDefinition();
+    }, $extensions), function ($definition) {
+      return !empty($definition);
+    });
+
+    $schema = array_merge([$this->getSchemaDefinition()], $extensions);
+    $ast = Parser::parse(implode("\n\n", $schema));
+    if (empty($this->inDevelopment)) {
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    }
+
+    return $ast;
+  }
+
+  /**
+   * Retrieves the parsed AST of the schema extension definitions.
+   *
+   * @param array $extensions
+   *
+   * @return \GraphQL\Language\AST\DocumentNode|null
+   *   The parsed schema document.
+   *
+   * @throws \GraphQL\Error\SyntaxError
+   */
+  protected function getExtensionDocument(array $extensions = []) {
+    // Only use caching of the parsed document if we aren't in development mode.
+    $cid = "extension:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
+      return $cache->data;
+    }
+
+    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
+      return $extension->getExtensionDefinition();
+    }, $extensions), function ($definition) {
+      return !empty($definition);
+    });
+
+    $ast = Parser::parse(implode("\n\n", $extensions));
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
@@ -120,6 +204,20 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *
    * @return string
    *   The schema definition.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  abstract protected function getSchemaDefinition();
+  protected function getSchemaDefinition() {
+    $id = $this->getPluginId();
+    $definition = $this->getPluginDefinition();
+    $module = $this->moduleHandler->getModule($definition['provider']);
+    $file = "{$module->getPath()}/graphql/{$id}.graphqls";
+
+    if (!file_exists($file)) {
+      throw new InvalidPluginDefinitionException(sprintf("Missing schema definition file at %s.", $file));
+    }
+
+    return file_get_contents($file) ?: NULL;
+  }
+
 }
