@@ -102,13 +102,14 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getSchemaDocument() {
     // Only use caching of the parsed document if we aren't in development mode.
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
+    $cid = "schema:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
 
     $ast = Parser::parse($this->getSchemaDefinition());
     if (empty($this->inDevelopment)) {
-      $this->astCache->set($this->getPluginId(), $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
 
     return $ast;

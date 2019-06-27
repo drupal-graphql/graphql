@@ -27,13 +27,14 @@ abstract class SdlExtendedSchemaPluginBase extends SdlSchemaPluginBase {
    */
   protected function getExtendedSchemaDocument() {
     // Only use caching of the parsed document if we aren't in development mode.
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
+    $cid = "extension:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
 
     $ast = Parser::parse($this->getExtendedSchemaDefinition());
-    if (!empty($this->inDevelopment)) {
-      $this->astCache->set($this->getPluginId(), $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    if (empty($this->inDevelopment)) {
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
 
     return $ast;

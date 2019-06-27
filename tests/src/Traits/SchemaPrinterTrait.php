@@ -13,14 +13,14 @@ trait SchemaPrinterTrait {
   /**
    * Gets printed version of the schema.
    *
-   * @param string $schema
-   *   The schema id.
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   *   The server id.
    *
    * @return string
    *   The printed version of the schema.
    */
-  protected function getPrintedSchema($schema = 'test') {
-    $server = Server::load($schema);
+  protected function getPrintedSchema($server = NULL) {
+    $server = $server ?? $this->server;
     /** @var \GraphQL\Server\ServerConfig $config */
     $config = $server->configuration();
     $schema = $config->getSchema();
