@@ -113,7 +113,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   public function getSchema(ResolverRegistryInterface $registry) {
-    $extensions = $this->extensionManager->getExtensions($this->getPluginId());
+    $extensions = $this->getExtensions();
     $resolver = [$registry, 'resolveType'];
     $document = $this->getSchemaDocument($extensions);
     $schema = BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
@@ -133,6 +133,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
+  }
+
+  /**
+   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   */
+  protected function getExtensions() {
+    return $this->extensionManager->getExtensions($this->getPluginId());
   }
 
   /**
