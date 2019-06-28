@@ -46,6 +46,7 @@ use GraphQL\Validator\DocumentValidator;
  *     "name",
  *     "label",
  *     "schema",
+ *    "schema_configuration",
  *     "endpoint",
  *     "debug",
  *     "caching",
@@ -82,6 +83,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var string
    */
   public $schema;
+
+  /**
+   * Schema configuration.
+   *
+   * @var array
+   */
+  public $schema_configuration;
 
   /**
    * Whether the server is in debug mode.

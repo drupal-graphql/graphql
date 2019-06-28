@@ -101,6 +101,7 @@ class ConfigurableExampleSchema extends SdlSchemaPluginBase implements Configura
       '#type' => 'textfield',
       '#required' => FALSE,
       '#title' => t('Plugins test'),
+      '#default_value' => $this->configuration['plugins'] ?? NULL,
     );
 
     return $form;
@@ -110,7 +111,7 @@ class ConfigurableExampleSchema extends SdlSchemaPluginBase implements Configura
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-
+    $form_state->setErrorByName('plugins', 'test validation');
   }
 
   /**

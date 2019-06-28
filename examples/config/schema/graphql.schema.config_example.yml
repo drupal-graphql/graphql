@@ -1,0 +1,7 @@
+graphql.schema.config_example:
+  type: mapping
+  label: 'Config example schema'
+  mapping:
+    plugins:
+      type: string
+      label: 'Plugins'
