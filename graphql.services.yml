@@ -24,6 +24,13 @@ services:
     parent: logger.channel_base
     arguments: ['graphql']
 
+  # Allows to statically define cache contexts.
+  # TODO: This seems to be a missing feature in core.
+  cache_context.static:
+    class: Drupal\graphql\Cache\Context\StaticCacheContext
+    tags:
+      - { name: cache.context }
+
   # Cache bin for the parsed sdl ast.
   cache.graphql.ast:
     class: Drupal\Core\Cache\CacheBackendInterface

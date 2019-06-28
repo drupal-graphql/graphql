@@ -27,7 +27,6 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    */
   public function __construct(ResolveContext $context, ResolveInfo $info) {
     $this->addCacheContexts(['user.permissions']);
-
     $this->context = $context;
     $this->info = $info;
   }
