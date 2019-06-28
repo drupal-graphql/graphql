@@ -23,3 +23,9 @@ graphql.graphql_servers.*:
     batching:
       type: boolean
       label: 'Batching'
+    schema_configuration:
+      type: 'graphql.schema.[%schema.id]'
+
+graphql.schema.*:
+  type: mapping
+  label: 'Schema settings'
