@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -226,10 +227,6 @@ class DataProducerProxy implements ResolverInterface {
 
     $output = $this->resolveUncached($plugin, $context, $field);
     return DeferredUtility::applyFinally($output, function ($value) use ($context, $field, $prefix) {
-      if ($field->getCacheMaxAge() === 0) {
-        return;
-      }
-
       $this->cacheWrite($prefix, $value, $field);
     });
   }
@@ -276,15 +273,31 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    */
   protected function cacheWrite($prefix, $value, FieldContext $field) {
-    $expire = $this->maxAgeToExpire($field->getCacheMaxAge());
-    $tags = $field->getCacheTags();
-    $tokens = $field->getCacheContexts();
-
-    $keys = !empty($tokens) ? $this->contextsManager->convertTokensToKeys($tokens)->getKeys() : [];
-    $keys = serialize($keys);
+    // Bail out early if the field context is already uncacheable.
+    if ($field->getCacheMaxAge() === 0) {
+      return;
+    }
 
     $metadata = new CacheableMetadata();
     $metadata->addCacheableDependency($field);
+
+    // Do not add the cache contexts from the result value because they are not
+    // known at fetch time and would render the written cache unusable.
+    if ($value instanceof CacheableDependencyInterface) {
+      $metadata->addCacheTags($value->getCacheTags());
+      $metadata->mergeCacheMaxAge($value->getCacheMaxAge());
+    }
+
+    if ($metadata->getCacheMaxAge() === 0) {
+      return;
+    }
+
+    $expire = $this->maxAgeToExpire($metadata->getCacheMaxAge());
+    $tags = $metadata->getCacheTags();
+    $tokens = $metadata->getCacheContexts();
+
+    $keys = !empty($tokens) ? $this->contextsManager->convertTokensToKeys($tokens)->getKeys() : [];
+    $keys = serialize($keys);
 
     $this->cacheBackend->setMultiple([
       "$prefix:context" => [

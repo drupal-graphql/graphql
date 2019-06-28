@@ -273,7 +273,11 @@ class Server extends ConfigEntityBase implements ServerInterface {
     return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($registry) {
       $field = new FieldContext($context, $info);
       $result = $registry->resolveField($value, $args, $context, $info, $field);
-      return DeferredUtility::applyFinally($result, function () use ($field, $context) {
+      return DeferredUtility::applyFinally($result, function ($result) use ($field, $context) {
+        if ($result instanceof CacheableDependencyInterface) {
+          $field->addCacheableDependency($result);
+        }
+
         $context->addCacheableDependency($field);
       });
     };
