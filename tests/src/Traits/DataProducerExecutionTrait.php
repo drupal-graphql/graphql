@@ -30,7 +30,6 @@ trait DataProducerExecutionTrait {
     $context->addCacheContexts(Argument::any())->willReturn($context->reveal());
     $context->addCacheTags(Argument::any())->willReturn($context->reveal());
     $context->mergeCacheMaxAge(Argument::any())->willReturn($context->reveal());
-
     $context->getContextValue(Argument::any(), Argument::any())->willReturn(NULL);
     $context->setContextValue(Argument::any(), Argument::any())->willReturn(FALSE);
     $context->hasContextValue(Argument::any())->willReturn(FALSE);
