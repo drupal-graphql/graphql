@@ -6,3 +6,4 @@ configure: graphql.config_page
 core: 8.x
 dependencies:
   - typed_data:typed_data
+  - drupal:language
