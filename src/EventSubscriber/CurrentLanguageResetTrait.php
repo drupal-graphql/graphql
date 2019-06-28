@@ -7,7 +7,7 @@ use Drupal\language\ConfigurableLanguageManagerInterface;
 trait CurrentLanguageResetTrait {
 
   /**
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
