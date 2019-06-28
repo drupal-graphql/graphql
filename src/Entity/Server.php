@@ -46,7 +46,7 @@ use GraphQL\Validator\DocumentValidator;
  *     "name",
  *     "label",
  *     "schema",
- *    "schema_configuration",
+ *     "schema_configuration",
  *     "endpoint",
  *     "debug",
  *     "caching",

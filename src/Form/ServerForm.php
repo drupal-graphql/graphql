@@ -75,7 +75,6 @@ class ServerForm extends EntityForm {
    */
   public function ajaxSchemaConfigurationForm(array $form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
-
     $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration'][$form_state->getValue('schema')]));
 
     return $response;
