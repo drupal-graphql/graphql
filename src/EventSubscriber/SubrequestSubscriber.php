@@ -2,9 +2,9 @@
 
 namespace Drupal\graphql\EventSubscriber;
 
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
-use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
@@ -18,12 +18,12 @@ class SubrequestSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a SubrequestSubscriber object.
    *
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    * @param \Drupal\language\LanguageNegotiatorInterface $languageNegotiator
    */
-  public function __construct(ConfigurableLanguageManagerInterface $languageManager, TranslatorInterface $translator, AccountInterface $currentUser, LanguageNegotiatorInterface $languageNegotiator = NULL) {
+  public function __construct(LanguageManagerInterface $languageManager, TranslatorInterface $translator, AccountInterface $currentUser, LanguageNegotiatorInterface $languageNegotiator = NULL) {
     $this->languageManager = $languageManager;
     $this->translator = $translator;
     $this->currentUser = $currentUser;
