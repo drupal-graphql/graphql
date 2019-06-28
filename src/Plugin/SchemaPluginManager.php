@@ -55,5 +55,6 @@ class SchemaPluginManager extends DefaultPluginManager {
     $this->alterInfo('graphql_schema');
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($cacheBackend, 'schemas', ['graphql']);
+    $this->factory = new ContainerFactory($this->getDiscovery());
   }
 }
