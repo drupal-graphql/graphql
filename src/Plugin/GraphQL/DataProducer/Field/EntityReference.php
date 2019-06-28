@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManager;
@@ -160,7 +159,9 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
         if (isset($language)) {
           $entities = array_map(function (EntityInterface $entity) use ($language) {
             if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-              return $entity->getTranslation($language);
+              $entity = $entity->getTranslation($language);
+              $entity->addCacheContexts(["static:language:{$language}"]);
+              return $entity;
             }
 
             return $entity;

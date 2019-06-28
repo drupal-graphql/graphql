@@ -125,6 +125,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
+      /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
@@ -137,16 +138,15 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
       foreach ($entities as $id => $entity) {
         $context->addCacheableDependency($entities[$id]);
-
         if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
           // If the entity is not among the allowed bundles, don't return it.
           unset($entities[$id]);
           continue;
         }
 
-        if (isset($language) && $language != $entities[$id]->language()
-            ->getId() && $entities[$id] instanceof TranslatableInterface) {
+        if (isset($language) && $language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
           $entities[$id] = $entities[$id]->getTranslation($language);
+          $entities[$id]->addCacheContexts(["static:language:{$language}"]);
         }
 
         $access = $entity->access('view', NULL, TRUE);
