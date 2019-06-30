@@ -131,7 +131,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public function executeOperation(OperationParams $operation) {
     $previous = Executor::getImplementationFactory();
-    Executor::setImplementationFactory([\Drupal::service('graphql.executor'), 'create']);
+    Executor::setImplementationFactory([
+      \Drupal::service('graphql.executor'),
+      'create'
+    ]);
 
     try {
       $config = $this->configuration();
@@ -143,8 +146,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
         $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
         $result->mergeCacheMaxAge(0);
       }
-    }
-    finally {
+    } finally {
       Executor::setImplementationFactory($previous);
     }
 
@@ -170,7 +172,11 @@ class Server extends ConfigEntityBase implements ServerInterface {
     $manager = \Drupal::service('plugin.manager.graphql.schema');
 
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    $plugin = $manager->createInstance($this->get('schema'));
+    $plugin_configuration = [];
+    if (!empty($this->get('schema_configuration')) && !empty($this->get('schema_configuration')[$this->get('schema')])) {
+      $plugin_configuration = $this->get('schema_configuration')[$this->get('schema')];
+    }
+    $plugin = $manager->createInstance($this->get('schema'), $plugin_configuration);
     $registry = $plugin->getResolverRegistry();
 
     // Create the server config.
@@ -298,10 +304,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * essential when there is a need to adjust error format, for instance
    * to add an additional fields or remove some of the default ones.
    *
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
-   *
    * @return mixed|callable
    *   The error formatter.
+   * @see \GraphQL\Error\FormattedError::prepareFormatter
+   *
    */
   protected function getErrorFormatter() {
     return function (Error $error) {
@@ -317,10 +323,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * Allows to replace the default error handler with a custom one. For example
    * when there is a need to handle specific errors differently.
    *
-   * @see \GraphQL\Executor\ExecutionResult::toArray
-   *
    * @return mixed|callable
    *   The error handler.
+   * @see \GraphQL\Executor\ExecutionResult::toArray
+   *
    */
   protected function getErrorHandler() {
     return function (array $errors, callable $formatter) {

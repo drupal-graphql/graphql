@@ -97,11 +97,18 @@ class ConfigurableExampleSchema extends SdlSchemaPluginBase implements Configura
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['plugins'] = array(
-      '#type' => 'textfield',
+    $extensions = $this->extensionManager->getDefinitions();
+    $extension_options = [];
+    foreach ($extensions as $key => $extension) {
+      $extension_options[$key] = $extension['id'];
+    }
+
+    $form['extensions'] = array(
+      '#type' => 'checkboxes',
       '#required' => FALSE,
-      '#title' => t('Plugins test'),
-      '#default_value' => $this->configuration['plugins'] ?? NULL,
+      '#options' => $extension_options,
+      '#title' => t('Enabled extensions.'),
+      '#default_value' => $this->configuration['extensions'] ?? [],
     );
 
     return $form;

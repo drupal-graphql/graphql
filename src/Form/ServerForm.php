@@ -154,6 +154,9 @@ class ServerForm extends EntityForm {
       if ($instance instanceof PluginFormInterface) {
         $form['schema_configuration'][$instance->getPluginId()] += $instance->buildConfigurationForm([], $formState);
       }
+      else {
+        $form['schema_configuration'][$instance->getPluginId()] += ['#markup' => $this->t("This schema doesn't have a configuration form.")];
+      }
     }
 
     $form['endpoint'] = [
