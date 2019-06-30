@@ -81,7 +81,7 @@ services:
   # Reset the current language during operations.
   graphql.operation_subscriber:
     class: Drupal\graphql\EventSubscriber\OperationSubscriber
-    arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
+    arguments: ['@module_handler', '@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
     tags:
       - { name: event_subscriber }
 
