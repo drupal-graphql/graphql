@@ -24,7 +24,9 @@ class ExampleSchema extends SdlSchemaPluginBase {
 
     $this->addQueryFields($registry, $builder);
     $this->addArticleFields($registry, $builder);
-    $this->addArticleConnectionFields($registry, $builder);
+
+    // Re-usable connection type fields.
+    $this->addConnectionFields('ArticleConnection', $registry, $builder);
 
     return $registry;
   }
@@ -78,17 +80,18 @@ class ExampleSchema extends SdlSchemaPluginBase {
   }
 
   /**
+   * @param string $type
    * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
    * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
    */
-  protected function addArticleConnectionFields(ResolverRegistry $registry, ResolverBuilder $builder) {
-    $registry->addFieldResolver('ArticleConnection', 'total',
+  protected function addConnectionFields($type, ResolverRegistry $registry, ResolverBuilder $builder) {
+    $registry->addFieldResolver($type, 'total',
       $builder->callback(function (QueryConnection $connection) {
         return $connection->total();
       })
     );
 
-    $registry->addFieldResolver('ArticleConnection', 'items',
+    $registry->addFieldResolver($type, 'items',
       $builder->callback(function (QueryConnection $connection) {
         return $connection->items();
       })
