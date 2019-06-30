@@ -67,6 +67,11 @@ services:
     tags:
       - { name: route_enhancer }
 
+  # Handles the dynamic creation of routes (see graphql.routing.yml).
+  graphql.route_provider:
+    class: Drupal\graphql\Routing\QueryRouteProvider
+    arguments: ['@authentication_collector']
+
   # Schema introspection service.
   graphql.introspection:
     class: Drupal\graphql\GraphQL\Utility\Introspection
