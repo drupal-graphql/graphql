@@ -4,6 +4,7 @@ namespace Drupal\graphql\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Drupal\Component\Annotation\Plugin;
+
 /**
  * Annotation for GraphQL schema plugins.
  *
@@ -11,6 +12,13 @@ use Drupal\Component\Annotation\Plugin;
  * @codeCoverageIgnore
  */
 class Schema extends Plugin {
+
+  /**
+   * The plugin ID.
+   *
+   * @var string
+   */
+  public $id;
 
   /**
    * The schema name.

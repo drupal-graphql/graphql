@@ -10,31 +10,21 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer\XML;
 class XMLContentTest extends XMLTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public function setUp() {
-    parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
-  }
-
-  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLContent::resolve
    */
   public function testXMLContent() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'xml_content',
-      'configuration' => []
-    ]);
-
     $document = $this->loadDocument();
     $xpath = new \DOMXPath($document->ownerDocument);
     $h1 = iterator_to_array($xpath->query('//div/h1', $document));
     $span = iterator_to_array($xpath->query('//div/div/span', $document));
 
-    $h1_output = $plugin->resolve($h1[0]);
-    $this->assertEquals('Header', $h1_output);
+    $this->assertEquals('Header', $this->executeDataProducer('xml_content', [
+      'dom' => $h1[0],
+    ]));
 
-    $span_output = $plugin->resolve($span[0]);
-    $this->assertEquals('<p>This is one paragraph.</p><p>This is a second paragraph.</p>', $span_output);
+    $content = '<p>This is one paragraph.</p><p>This is a second paragraph.</p>';
+    $this->assertEquals($content, $this->executeDataProducer('xml_content', [
+      'dom' => $span[0],
+    ]));
   }
 }

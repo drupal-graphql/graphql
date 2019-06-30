@@ -4,7 +4,6 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\TypedData;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataTrait;

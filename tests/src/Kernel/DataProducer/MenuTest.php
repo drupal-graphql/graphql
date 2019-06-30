@@ -21,13 +21,17 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 class MenuTest extends GraphQLTestBase {
 
   /**
+   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   */
+  protected $menuLinkManager;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-    $this->installEntitySchema('menu_link_content');
 
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
+    $this->installEntitySchema('menu_link_content');
     $this->menuLinkManager = $this->container->get('plugin.manager.menu.link');
 
     $this->menu = Menu::create([
@@ -35,6 +39,7 @@ class MenuTest extends GraphQLTestBase {
       'label' => 'Test menu',
       'description' => 'Description text',
     ]);
+
     $this->menu->save();
 
     $base_options = [
@@ -99,16 +104,16 @@ class MenuTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLinks::resolve
    */
   public function testMenuLinks() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_links',
-      'configuration' => []
+    $result = $this->executeDataProducer('menu_links', [
+      'menu' => $this->menu,
     ]);
-    $result = $plugin->resolve($this->menu);
+
     $count = 0;
     foreach ($result as $link_tree) {
       $this->assertInstanceOf(MenuLinkTreeElement::class, $link_tree);
       $count += $link_tree->count();
     }
+
     $this->assertEquals(5, $count);
   }
 
@@ -116,14 +121,12 @@ class MenuTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree\MenuTreeLink::resolve
    */
   public function testMenuTreeLink() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_tree_link',
-      'configuration' => []
-    ]);
-
     foreach ($this->linkTree as $link_tree) {
-      $link = $plugin->resolve($link_tree);
-      $this->assertEquals($link, $link_tree->link);
+      $result = $this->executeDataProducer('menu_tree_link', [
+        'element' => $link_tree,
+      ]);
+
+      $this->assertEquals($link_tree->link, $result);
     }
   }
 
@@ -132,93 +135,81 @@ class MenuTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree\MenuTreeSubtree::resolve
    */
   public function testMenuTreeSubtree() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_tree_subtree',
-      'configuration' => []
-    ]);
-
     foreach ($this->linkTree as $link_tree) {
-      $subtree = $plugin->resolve($link_tree);
-      if (!empty($link_tree->subtree)) {
-        $this->assertEquals($link_tree->subtree, $subtree);
-      }
+      $result = $this->executeDataProducer('menu_tree_subtree', [
+        'element' => $link_tree,
+      ]);
+
+      $this->assertEquals($link_tree->subtree, $result);
     }
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkAttribute::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkAttribute::resolve
    */
   public function testMenuLinkAttribute() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_link_attribute',
-      'configuration' => []
-    ]);
-
     $attribute = 'target';
-
     foreach ($this->linkTree as $link_tree) {
-      $options = $link_tree->link->getOptions();
-      $link = $link_tree->link;
       if (!empty($options['attributes'][$attribute])) {
-        $result = $plugin->resolve($link, $attribute);
+        $result = $this->executeDataProducer('menu_link_attribute', [
+          'link' => $link_tree->link,
+          'attribute' => 'target',
+        ]);
+
         $this->assertEquals($options['attributes'][$attribute], $result);
       }
     }
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkDescription::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkDescription::resolve
    */
   public function testMenuLinkDescription() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_link_description',
-      'configuration' => []
-    ]);
     foreach ($this->linkTree as $link_tree) {
-      $link = $link_tree->link;
-      $this->assertEquals($link->getDescription(), $plugin->resolve($link));
+      $result = $this->executeDataProducer('menu_link_description', [
+        'link' => $link_tree->link,
+      ]);
+
+      $this->assertEquals($link_tree->link->getDescription(), $result);
     }
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkExpanded::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkExpanded::resolve
    */
   public function testMenuLinkExpanded() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_link_expanded',
-      'configuration' => []
-    ]);
     foreach ($this->linkTree as $link_tree) {
-      $link = $link_tree->link;
-      $this->assertEquals($link->isExpanded(), $plugin->resolve($link));
+      $result = $this->executeDataProducer('menu_link_expanded', [
+        'link' => $link_tree->link,
+      ]);
+
+      $this->assertEquals($link_tree->link->isExpanded(), $result);
     }
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkLabel::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkLabel::resolve
    */
   public function testMenuLinkLabel() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_link_label',
-      'configuration' => []
-    ]);
     foreach ($this->linkTree as $link_tree) {
-      $link = $link_tree->link;
-      $this->assertEquals($link->getTitle(), $plugin->resolve($link));
+      $result = $this->executeDataProducer('menu_link_label', [
+        'link' => $link_tree->link,
+      ]);
+
+      $this->assertEquals($link_tree->link->getTitle(), $result);
     }
   }
 
   /**
-   * @covers Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkUrl::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkUrl::resolve
    */
   public function testMenuLinkUrl() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'menu_link_url',
-      'configuration' => []
-    ]);
     foreach ($this->linkTree as $link_tree) {
-      $link = $link_tree->link;
-      $this->assertEquals($link->getUrlObject(), $plugin->resolve($link));
+      $result = $this->executeDataProducer('menu_link_url', [
+        'link' => $link_tree->link,
+      ]);
+
+      $this->assertEquals($link_tree->link->getUrlObject(), $result);
     }
   }
 

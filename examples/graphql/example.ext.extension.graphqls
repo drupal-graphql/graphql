@@ -1,0 +1,3 @@
+extend type Query {
+  page(id: Int!): Page
+}

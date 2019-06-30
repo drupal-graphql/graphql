@@ -4,20 +4,11 @@ namespace Drupal\graphql\Controller;
 
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\graphql\GraphQL\Execution\QueryProcessor;
+use Drupal\graphql\Entity\ServerInterface;
+use GraphQL\Server\OperationParams;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Handles GraphQL requests.
- */
 class RequestController implements ContainerInjectionInterface {
-
-  /**
-   * The query processor.
-   *
-   * @var \Drupal\graphql\GraphQL\Execution\QueryProcessor
-   */
-  protected $processor;
 
   /**
    * The service configuration parameters.
@@ -32,76 +23,70 @@ class RequestController implements ContainerInjectionInterface {
    * @codeCoverageIgnore
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('graphql.query_processor'),
-      $container->getParameter('graphql.config')
-    );
+    return new static($container->getParameter('graphql.config'));
   }
 
   /**
    * RequestController constructor.
    *
-   * @param \Drupal\graphql\GraphQL\Execution\QueryProcessor $processor
-   *   The query processor.
    * @param array $parameters
    *   The service configuration parameters.
    *
    * @codeCoverageIgnore
    */
-  public function __construct(QueryProcessor $processor, array $parameters) {
-    $this->processor = $processor;
+  public function __construct(array $parameters) {
     $this->parameters = $parameters;
   }
 
   /**
    * Handles graphql requests.
    *
-   * @param string $schema
-   *   The name of the schema.
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   *   The name of the server.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    *   The JSON formatted response.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Exception
    */
-  public function handleRequest($schema, $operations) {
+  public function handleRequest(ServerInterface $server, $operations) {
     if (is_array($operations)) {
-      return $this->handleBatch($schema, $operations);
+      return $this->handleBatch($server, $operations);
     }
 
-    return $this->handleSingle($schema, $operations);
+    /** @var \GraphQL\Server\OperationParams $operations */
+    return $this->handleSingle($server, $operations);
   }
 
   /**
-   * @param $schema
-   * @param $operations
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   * @param \GraphQL\Server\OperationParams $operation
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Exception
    */
-  protected function handleSingle($schema, $operations) {
-    $result = $this->processor->processQuery($schema, $operations);
+  protected function handleSingle(ServerInterface $server, OperationParams $operation) {
+    $result = $server->executeOperation($operation);
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
     return $response;
   }
 
   /**
-   * @param $schema
-   * @param $operations
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   * @param \GraphQL\Server\OperationParams[] $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Exception
    */
-  protected function handleBatch($schema, $operations) {
-    $result = $this->processor->processQuery($schema, $operations);
+  protected function handleBatch(ServerInterface $server, array $operations) {
+    $result = $server->executeBatch($operations);
     $response = new CacheableJsonResponse($result);
 
     // In case of a batch request, the result is an array.
-    $dependencies = is_array($operations) ? $result : [$result];
-    foreach ($dependencies as $dependency) {
+    foreach ($result as $dependency) {
       $response->addCacheableDependency($dependency);
     }
 

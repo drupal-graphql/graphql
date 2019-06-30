@@ -20,15 +20,19 @@ class QueryRoutes {
 
       $routes["graphql.query.$id"] = (new Route($path))
         ->addDefaults([
-          'schema' => $id,
+          'server' => $id,
           '_graphql' => TRUE,
           '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
+          '_disable_route_normalizer' => TRUE,
         ])
         ->addRequirements([
           '_graphql_query_access' => 'TRUE',
+          '_format' => 'json',
         ])
         ->addOptions([
           'no_cache' => TRUE,
+          'default_url_options' => ['path_processing' => FALSE],
+          'parameters' => ['server' => ['type' => 'entity:graphql_server']]
         ]);
     }
 

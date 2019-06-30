@@ -2,11 +2,11 @@
 
 namespace Drupal\graphql\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\graphql\GraphQL\Buffers\SubRequestResponse;
+use Drupal\graphql\SubRequestResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -50,7 +50,7 @@ class SubrequestExtractionController extends ControllerBase {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The rewnderer service.
+   *   The renderer service.
    *
    * @codeCoverageIgnore
    */
@@ -63,26 +63,16 @@ class SubrequestExtractionController extends ControllerBase {
   /**
    * Extracts the sub-request callback response.
    *
-   * @return \Drupal\graphql\GraphQL\Buffers\SubRequestResponse
+   * @return \Drupal\graphql\SubRequestResponse
    *   The sub-request response object.
    */
   public function extract() {
     $request = $this->requestStack->getCurrentRequest();
     $callback = $request->attributes->get('_graphql_subrequest');
 
-    // TODO: Remove this once https://www.drupal.org/project/drupal/issues/2940036#comment-12479912 is resolved.
-    $this->languageManager->reset();
-
-    // Collect any potentially leaked cache metadata released by the callback.
-    $context = new RenderContext();
-    $result = $this->renderer->executeInRenderContext($context, function () use ($callback) {
-      return $callback();
-    });
-
-    $response = new SubRequestResponse($result);
-    if (!$context->isEmpty()) {
-      $response->addCacheableDependency($context->pop());
-    }
+    $metadata = new CacheableMetadata();
+    $response = new SubRequestResponse($callback($metadata));
+    $response->addCacheableDependency($metadata);
 
     return $response;
   }

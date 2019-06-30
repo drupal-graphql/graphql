@@ -12,24 +12,16 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class ImageResourceUrlTest extends GraphQLTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public function setUp() {
-    parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
-  }
-
-  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Images\ImageResourceUrl::resolve
    *
    * @dataProvider testImageResourceUrlProvider
    */
   public function testImageResourceUrl($input, $expected) {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'image_style_url',
-      'configuration' => []
+    $result = $this->executeDataProducer('image_style_url', [
+      'derivative' => $input,
     ]);
-    $this->assertEquals($expected, $plugin->resolve($input));
+
+    $this->assertEquals($expected, $result);
   }
 
   /**

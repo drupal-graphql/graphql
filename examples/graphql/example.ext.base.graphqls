@@ -1,0 +1,4 @@
+type Page {
+  id: Int!
+  title: String
+}

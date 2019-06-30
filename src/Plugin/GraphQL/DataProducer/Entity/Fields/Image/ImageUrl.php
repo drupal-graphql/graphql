@@ -24,7 +24,9 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class ImageUrl extends DataProducerPluginBase {
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\file\FileInterface $entity
+   *
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return mixed
    */

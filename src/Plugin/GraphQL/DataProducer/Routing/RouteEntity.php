@@ -9,6 +9,7 @@ use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -97,14 +98,14 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function resolve($url, $language = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($url, $language = NULL, FieldContext $context) {
     if ($url instanceof Url) {
       list(, $type) = explode('.', $url->getRouteName());
       $parameters = $url->getRouteParameters();
       $id = $parameters[$type];
       $resolver = $this->entityBuffer->add($type, $id);
 
-      return new Deferred(function () use ($type, $id, $resolver, $metadata, $language) {
+      return new Deferred(function () use ($type, $id, $resolver, $context, $language) {
         if (!$entity = $resolver()) {
           // If there is no entity with this id, add the list cache tags so that
           // the cache entry is purged whenever a new entity of this type is
@@ -112,12 +113,12 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
           $type = $this->entityTypeManager->getDefinition($type);
           /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
           $tags = $type->getListCacheTags();
-          $metadata->addCacheTags($tags)->addCacheTags(['4xx-response']);
+          $context->addCacheTags($tags)->addCacheTags(['4xx-response']);
           return NULL;
         }
 
         $access = $entity->access('view', NULL, TRUE);
-        $metadata->addCacheableDependency($access);
+        $context->addCacheableDependency($access);
         if ($access->isAllowed()) {
           if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
             $entity = $entity->getTranslation($language);
