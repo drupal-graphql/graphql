@@ -45,20 +45,19 @@ class LanguageConfigOverride implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    $method = OperationLanguageNegotiation::METHOD_ID;
+    // We can't use the static property of the negotiation method here because
+    // the language module might not be enabled.
+    $method = 'language-graphql-operation';
 
-    if (
-      $this->negotiatorManager &&
-      in_array('language.types', $names)
-      && $this->negotiatorManager->hasDefinition($method)
-      && $config = $this->baseStorage->read('language.types')
-    ) {
-      foreach (array_keys($config['negotiation']) as $type) {
-        $config['negotiation'][$type]['enabled'][$method] = -999;
-        asort($config['negotiation'][$type]['enabled']);
+    if ($this->negotiatorManager && in_array('language.types', $names)) {
+      if ($this->negotiatorManager->hasDefinition($method) && $config = $this->baseStorage->read('language.types')) {
+        foreach (array_keys($config['negotiation']) as $type) {
+          $config['negotiation'][$type]['enabled'][$method] = -999;
+          asort($config['negotiation'][$type]['enabled']);
+        }
+
+        return ['language.types' => $config];
       }
-
-      return ['language.types' => $config];
     }
 
     return [];
