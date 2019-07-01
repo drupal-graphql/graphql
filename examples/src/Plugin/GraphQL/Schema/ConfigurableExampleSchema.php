@@ -118,7 +118,7 @@ class ConfigurableExampleSchema extends SdlSchemaPluginBase implements Configura
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setErrorByName('plugins', 'test validation');
+//    $form_state->setErrorByName('plugins', 'test validation');
   }
 
   /**

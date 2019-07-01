@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Form;
 
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
@@ -85,9 +86,11 @@ class ServerForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $formState) {
     $form = parent::form($form, $formState);
-
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
+    $userInput = $formState->getUserInput();
+    $schema = (!empty($userInput['schema'])) ? $userInput['schema'] : $server->get('schema');
+
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
     }
@@ -121,7 +124,7 @@ class ServerForm extends EntityForm {
       '#options' => array_map(function ($definition) {
         return $definition['name'] ?? $definition['id'];
       }, $this->schemaManager->getDefinitions()),
-      '#default_value' => $server->get('schema'),
+      '#default_value' => $schema,
       '#description' => t('The schema to use with this server.'),
       '#ajax' => [
         'callback' => '::ajaxSchemaConfigurationForm',
@@ -138,11 +141,9 @@ class ServerForm extends EntityForm {
       '#tree' => TRUE,
     ];
 
-    $schema = (!empty($formState->getUserInput()['schema'])) ? $formState->getUserInput()['schema'] : $server->get('schema');
     if (!empty($schema)) {
-      $schema_configuration = (!empty($server->get('schema_configuration')) && !empty($server->get('schema_configuration')[$schema])) ? $server->get('schema_configuration')[$schema] : [];
       /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
-      $instance = $this->schemaManager->createInstance($schema, $schema_configuration);
+      $instance = $this->schemaManager->createInstance($schema);
 
       $form['schema_configuration'][$instance->getPluginId()] = [
         '#type' => 'container',
@@ -151,7 +152,11 @@ class ServerForm extends EntityForm {
         ],
       ];
 
-      if ($instance instanceof PluginFormInterface) {
+      if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
+        $schemaConfiguration = $server->get('schema_configuration') ?? [];
+        $pluginConfiguration = (!empty($schemaConfiguration) && !empty($schemaConfiguration[$schema])) ? $schemaConfiguration[$schema] : [];
+        $instance->setConfiguration($pluginConfiguration);
+
         $form['schema_configuration'][$instance->getPluginId()] += $instance->buildConfigurationForm([], $formState);
       }
       else {
@@ -222,7 +227,7 @@ class ServerForm extends EntityForm {
 
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($formState->getValue('schema'));
-    if (!empty($form['schema_configuration'][$instance->getPluginId()]) && $instance instanceof PluginFormInterface) {
+    if (!empty($form['schema_configuration'][$instance->getPluginId()]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $schema_form_state = SubformState::createForSubform($form['schema_configuration'][$instance->getPluginId()], $form, $formState);
       $instance->validateConfigurationForm($form['schema_configuration'][$instance->getPluginId()], $schema_form_state);
     }
@@ -242,7 +247,7 @@ class ServerForm extends EntityForm {
 
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($formState->getValue('schema'));
-    if ($instance instanceof PluginFormInterface) {
+    if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
       $schema_form_state = SubformState::createForSubform($form['schema_configuration'][$instance->getPluginId()], $form, $formState);
       $instance->submitConfigurationForm($form['schema_configuration'][$instance->getPluginId()], $schema_form_state);
     }
