@@ -5,6 +5,7 @@ namespace Drupal\graphql_examples\Plugin\GraphQL\Schema;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
+use Drupal\graphql_examples\Wrappers\QueryConnection;
 
 /**
  * @Schema(
@@ -23,6 +24,9 @@ class ExampleSchema extends SdlSchemaPluginBase {
 
     $this->addQueryFields($registry, $builder);
     $this->addArticleFields($registry, $builder);
+
+    // Re-usable connection type fields.
+    $this->addConnectionFields('ArticleConnection', $registry, $builder);
 
     return $registry;
   }
@@ -66,6 +70,31 @@ class ExampleSchema extends SdlSchemaPluginBase {
         ->map('type', $builder->fromValue('node'))
         ->map('bundles', $builder->fromValue(['article']))
         ->map('id', $builder->fromArgument('id'))
+    );
+
+    $registry->addFieldResolver('Query', 'articles',
+      $builder->produce('query_articles')
+        ->map('offset', $builder->fromArgument('offset'))
+        ->map('limit', $builder->fromArgument('limit'))
+    );
+  }
+
+  /**
+   * @param string $type
+   * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
+   * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
+   */
+  protected function addConnectionFields($type, ResolverRegistry $registry, ResolverBuilder $builder) {
+    $registry->addFieldResolver($type, 'total',
+      $builder->callback(function (QueryConnection $connection) {
+        return $connection->total();
+      })
+    );
+
+    $registry->addFieldResolver($type, 'items',
+      $builder->callback(function (QueryConnection $connection) {
+        return $connection->items();
+      })
     );
   }
 }

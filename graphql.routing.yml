@@ -65,4 +65,4 @@ entity.graphql_server.delete_form:
     _admin_route: TRUE
 
 route_callbacks:
-  - '\Drupal\graphql\Routing\QueryRoutes::routes'
+  - 'graphql.route_provider::routes'
