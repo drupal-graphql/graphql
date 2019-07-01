@@ -306,8 +306,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @return mixed|callable
    *   The error formatter.
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
    *
+   * @see \GraphQL\Error\FormattedError::prepareFormatter
    */
   protected function getErrorFormatter() {
     return function (Error $error) {
@@ -325,8 +325,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @return mixed|callable
    *   The error handler.
-   * @see \GraphQL\Executor\ExecutionResult::toArray
    *
+   * @see \GraphQL\Executor\ExecutionResult::toArray
    */
   protected function getErrorHandler() {
     return function (array $errors, callable $formatter) {
