@@ -75,8 +75,10 @@ class ServerForm extends EntityForm {
    *   The ajax response.
    */
   public function ajaxSchemaConfigurationForm(array $form, FormStateInterface $form_state) {
+    $schema = $form_state->getValue('schema');
+
     $response = new AjaxResponse();
-    $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration'][$form_state->getValue('schema')]));
+    $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration'][$schema]));
 
     return $response;
   }
@@ -86,10 +88,10 @@ class ServerForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $formState) {
     $form = parent::form($form, $formState);
+
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
-    $userInput = $formState->getUserInput();
-    $schema = (!empty($userInput['schema'])) ? $userInput['schema'] : $server->get('schema');
+    $schema = $formState->getUserInput()['schema'] ?: $server->get('schema');
 
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
@@ -136,32 +138,23 @@ class ServerForm extends EntityForm {
     ];
 
     $form['schema_configuration'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Schema configuration'),
+      '#prefix' => '<div id="edit-schema-configuration-plugin-wrapper">',
+      '#suffix' => '</div>',
       '#tree' => TRUE,
     ];
 
-    if (!empty($schema)) {
-      /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
-      $instance = $this->schemaManager->createInstance($schema);
+    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    $instance = $schema ? $this->schemaManager->createInstance($schema) : NULL;
+    if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
+      $instance->setConfiguration($server->get('schema_configuration')[$schema] ?? []);
 
-      $form['schema_configuration'][$instance->getPluginId()] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'id' => 'edit-schema-configuration-plugin-wrapper',
-        ],
+      $form['schema_configuration'][$schema] = [
+        '#type' => 'fieldset',
+        '#title' => $this->t('Schema configuration'),
+        '#tree' => TRUE,
       ];
 
-      if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
-        $schemaConfiguration = $server->get('schema_configuration') ?? [];
-        $pluginConfiguration = (!empty($schemaConfiguration) && !empty($schemaConfiguration[$schema])) ? $schemaConfiguration[$schema] : [];
-        $instance->setConfiguration($pluginConfiguration);
-
-        $form['schema_configuration'][$instance->getPluginId()] += $instance->buildConfigurationForm([], $formState);
-      }
-      else {
-        $form['schema_configuration'][$instance->getPluginId()] += ['#markup' => $this->t("This schema doesn't have a configuration form.")];
-      }
+      $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $formState);
     }
 
     $form['endpoint'] = [

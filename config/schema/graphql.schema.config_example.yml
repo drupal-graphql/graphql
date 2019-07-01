@@ -1,6 +1,6 @@
-graphql.schema.config_example:
+graphql.schema.composable:
   type: mapping
-  label: 'Config example schema'
+  label: 'Composable schema'
   mapping:
     extensions:
       label: Enabled extensions
