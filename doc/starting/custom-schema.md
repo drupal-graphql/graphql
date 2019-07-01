@@ -1,10 +1,8 @@
 # Creating a custom schema
 
-The best way to start making a new schema is to take the test schema provided by the graphql module in `src/Plugin/GraphQL/Schema/SdlSchemaTest.php` and add it to a custom module of your own. By doing this you can then start adapting the schema to your needs including your own content types and making them available in the schema.
+The best way to start making a new schema is to take the example schema provided by the graphql_examples module in `/graphql/examples/` and copy all the files from the example module to a custom module of your own. By doing this you can then start adapting the schema to your needs including your own content types and making them available in the schema.
 
- The code including all the demo queries and mutations from these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
-
-## Clone the SdlSchemaTest
+## Clone the SdlSchemaTest (deprecated)
 
 First create your own module and call it `mydrupalgql`. Make sure you have a .info file inside the module to make sure drupal will know about this module (for more info see [Custom modules in drupal](https://www.drupal.org/docs/8/creating-custom-modules)).
 Then head to the graphql module folder and copy the content of `src/Plugin/GraphQL/Schema/SdlSchemaTest.php`.

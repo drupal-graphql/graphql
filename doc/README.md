@@ -10,7 +10,7 @@ Anyone who wants to get JSON data out of Drupal.
 
 A few examples of where the GraphQL module could be used:
 
-* Decoupled Drupal applications with a javascript front-end \(React, Angular, Ember, etc\), 
+* Decoupled Drupal applications with a javascript front-end \(React, Angular, Ember, etc\),
 * Twig Templates \(Drupal theming\)
 * Mobile applications that need a persistent data store
 * IOT data storage
@@ -23,14 +23,14 @@ This trade-off does come with costs mostly around ease of use, where in the 3.x 
 
 ## Hello World \(Quick Start\)
 
-1. Familiarize yourself with the GraphQL language. The official GraphQL docs are very well written. 
+1. Familiarize yourself with the GraphQL language. The official GraphQL docs are very well written.
 
    [http://graphql.org/learn/](http://graphql.org/learn/)
 
 2. Install the module and enable GraphQL.
-3. Login and navigate to `/admin/config/graphql` create a new server. You can use the Test schema that comes with the module to try out using GraphQL for the first time before making your own schema. Create the server and specify and endpoint such as `/graphql`. After creating the server click on `explorer` and this should bring you to the Graphiql explorer.
+3. Login and navigate to `/admin/config/graphql` create a new server. You can use the "Example schema" that comes with the graphql_examples module (comes with the graphql module but needs to be enabled separately) to try out using GraphQL for the first time before making your own schema. Create a server and specify an endpoint such as `/graphql`. After creating the server click on `explorer` and this should bring you to the Graphiql explorer.
 
-For a query to work first you need to make an Article node. Create one with the title "Hello GraphQL" and save it.
+To be able to query something you first have to create an Article in the Drupal backend.
 
 4. **Read the comments** and then enter the following query in the left pane:
 
@@ -59,6 +59,6 @@ For a query to work first you need to make an Article node. Create one with the 
 
 **NOTES:**
 
-* The GraphiQL explorer, included with the module, is your friend, it’s amazing. You will most likely use the GraphiQL explorer to build and test more complicated queries. 
-* GraphQL is introspective, meaning that the entire schema \(data model\) is known up front. This is important as it allows tools like GraphiQL to implement autocompletion. 
+* The GraphiQL explorer, included with the module, is your friend, it’s amazing. You will most likely use the GraphiQL explorer to build and test more complicated queries.
+* GraphQL is introspective, meaning that the entire schema \(data model\) is known up front. This is important as it allows tools like GraphiQL to implement autocompletion.
 * You can use GraphiQL to explore your way through the data and configuration, once you know the basic GraphQL syntax. You can use the tab key in the explorer like you would with autocompletion or intellisense in modern IDEs.
