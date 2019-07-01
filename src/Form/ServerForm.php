@@ -68,17 +68,13 @@ class ServerForm extends EntityForm {
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   Current form state.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The ajax response.
    */
-  public function ajaxSchemaConfigurationForm(array $form, FormStateInterface $form_state) {
-    $schema = $form_state->getValue('schema');
-
+  public function ajaxSchemaConfigurationForm(array $form) {
     $response = new AjaxResponse();
-    $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration'][$schema]));
+    $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration']));
 
     return $response;
   }
@@ -88,10 +84,12 @@ class ServerForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $formState) {
     $form = parent::form($form, $formState);
-
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
-    $schema = $formState->getUserInput()['schema'] ?: $server->get('schema');
+    $schemas = array_map(function ($definition) {
+      return $definition['name'] ?? $definition['id'];
+    }, $this->schemaManager->getDefinitions());
+    $schema = ($formState->getUserInput()['schema'] ?: $server->get('schema')) ?: reset(array_keys($schemas));
 
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
@@ -123,9 +121,7 @@ class ServerForm extends EntityForm {
     $form['schema'] = [
       '#title' => t('Schema'),
       '#type' => 'select',
-      '#options' => array_map(function ($definition) {
-        return $definition['name'] ?? $definition['id'];
-      }, $this->schemaManager->getDefinitions()),
+      '#options' => $schemas,
       '#default_value' => $schema,
       '#description' => t('The schema to use with this server.'),
       '#ajax' => [
@@ -138,6 +134,7 @@ class ServerForm extends EntityForm {
     ];
 
     $form['schema_configuration'] = [
+      '#type' => 'container',
       '#prefix' => '<div id="edit-schema-configuration-plugin-wrapper">',
       '#suffix' => '</div>',
       '#tree' => TRUE,
@@ -202,6 +199,8 @@ class ServerForm extends EntityForm {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function validateForm(array &$form, FormStateInterface $formState) {
     $endpoint = &$formState->getValue('endpoint');
@@ -217,15 +216,18 @@ class ServerForm extends EntityForm {
     }
 
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
-    $instance = $this->schemaManager->createInstance($formState->getValue('schema'));
-    if (!empty($form['schema_configuration'][$instance->getPluginId()]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
-      $schema_form_state = SubformState::createForSubform($form['schema_configuration'][$instance->getPluginId()], $form, $formState);
-      $instance->validateConfigurationForm($form['schema_configuration'][$instance->getPluginId()], $schema_form_state);
+    $schema = $formState->getValue('schema');
+    $instance = $this->schemaManager->createInstance($schema);
+    if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $instance->validateConfigurationForm($form['schema_configuration'][$schema], $state);
     }
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function save(array $form, FormStateInterface $formState) {
     parent::save($form, $formState);
@@ -237,10 +239,11 @@ class ServerForm extends EntityForm {
     $formState->setRedirect('entity.graphql_server.collection');
 
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
-    $instance = $this->schemaManager->createInstance($formState->getValue('schema'));
+    $schema = $formState->getValue('schema');
+    $instance = $this->schemaManager->createInstance($schema);
     if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
-      $schema_form_state = SubformState::createForSubform($form['schema_configuration'][$instance->getPluginId()], $form, $formState);
-      $instance->submitConfigurationForm($form['schema_configuration'][$instance->getPluginId()], $schema_form_state);
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
     }
   }
 
