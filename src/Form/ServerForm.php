@@ -219,10 +219,8 @@ class ServerForm extends EntityForm {
     if ($endpoint[0] !== '/') {
       $formState->setErrorByName('endpoint', 'The endpoint path has to start with a forward slash.');
     }
-    else {
-      if (!UrlHelper::isValid($endpoint)) {
-        $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
-      }
+    elseif (!UrlHelper::isValid($endpoint)) {
+      $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
     }
 
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */

@@ -132,10 +132,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public function executeOperation(OperationParams $operation) {
     $previous = Executor::getImplementationFactory();
-    Executor::setImplementationFactory([
-      \Drupal::service('graphql.executor'),
-      'create'
-    ]);
+    Executor::setImplementationFactory([\Drupal::service('graphql.executor'), 'create']);
 
     try {
       $config = $this->configuration();
@@ -147,7 +144,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
         $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
         $result->mergeCacheMaxAge(0);
       }
-    } finally {
+    }
+    finally {
       Executor::setImplementationFactory($previous);
     }
 
