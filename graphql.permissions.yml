@@ -1,6 +1,12 @@
 administer graphql configuration:
   title: 'Administer configuration'
   description: 'Allows users to create, edit and delete server configurations.'
+  restrict access: true
+
+bypass graphql access:
+  title: 'Bypass graphql access restrictions'
+  description: 'Use any graphql server regardless of permission restrictions.'
+  restrict access: true
 
 permission_callbacks:
   - graphql.permission_provider::permissions

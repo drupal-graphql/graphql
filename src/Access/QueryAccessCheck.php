@@ -39,8 +39,11 @@ class QueryAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(AccountInterface $account, ServerInterface $graphql_server) {
-    $id = $graphql_server->id();
+    if ($account->hasPermission('bypass graphql access')) {
+      return AccessResult::allowed();
+    }
 
+    $id = $graphql_server->id();
     // If the user has the global permission to execute any query, let them.
     if ($account->hasPermission("execute $id arbitrary graphql requests")) {
       return AccessResult::allowed();

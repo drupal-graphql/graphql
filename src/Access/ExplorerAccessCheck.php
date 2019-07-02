@@ -21,8 +21,11 @@ class ExplorerAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(AccountInterface $account, ServerInterface $graphql_server) {
-    $id = $graphql_server->id();
+    if ($account->hasPermission('bypass graphql access')) {
+      return AccessResult::allowed();
+    }
 
+    $id = $graphql_server->id();
     return AccessResult::allowedIfHasPermissions($account, [
       "use $id graphql explorer",
       "execute $id arbitrary graphql requests",
