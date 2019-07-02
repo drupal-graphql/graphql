@@ -8,7 +8,9 @@ use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 
 /**
  * @SchemaExtension(
- *   id = "example.ext",
+ *   id = "example_extension",
+ *   name = "Example extension",
+ *   description = "A simple extension that adds node related fields.",
  *   schema = "example"
  * )
  */

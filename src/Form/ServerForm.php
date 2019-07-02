@@ -2,10 +2,15 @@
 
 namespace Drupal\graphql\Form;
 
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
+use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -59,13 +64,33 @@ class ServerForm extends EntityForm {
   }
 
   /**
+   * Ajax callback triggered by the type schema select element.
+   *
+   * @param array $form
+   *   The form array.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The ajax response.
+   */
+  public function ajaxSchemaConfigurationForm(array $form) {
+    $response = new AjaxResponse();
+    $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration']));
+
+    return $response;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $formStaet) {
-    $form = parent::form($form, $formStaet);
-
+  public function form(array $form, FormStateInterface $formState) {
+    $form = parent::form($form, $formState);
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
+    $schemas = array_map(function ($definition) {
+      return $definition['name'] ?? $definition['id'];
+    }, $this->schemaManager->getDefinitions());
+    $schema = ($formState->getUserInput()['schema'] ?: $server->get('schema')) ?: reset(array_keys($schemas));
+
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
     }
@@ -96,12 +121,38 @@ class ServerForm extends EntityForm {
     $form['schema'] = [
       '#title' => t('Schema'),
       '#type' => 'select',
-      '#options' => array_map(function ($definition) {
-        return $definition['name'] ?? $definition['id'];
-      }, $this->schemaManager->getDefinitions()),
-      '#default_value' => $server->get('schema'),
+      '#options' => $schemas,
+      '#default_value' => $schema,
       '#description' => t('The schema to use with this server.'),
+      '#ajax' => [
+        'callback' => '::ajaxSchemaConfigurationForm',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => $this->t('Updating schema configuration form.'),
+        ],
+      ],
     ];
+
+    $form['schema_configuration'] = [
+      '#type' => 'container',
+      '#prefix' => '<div id="edit-schema-configuration-plugin-wrapper">',
+      '#suffix' => '</div>',
+      '#tree' => TRUE,
+    ];
+
+    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    $instance = $schema ? $this->schemaManager->createInstance($schema) : NULL;
+    if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
+      $instance->setConfiguration($server->get('schema_configuration')[$schema] ?? []);
+
+      $form['schema_configuration'][$schema] = [
+        '#type' => 'fieldset',
+        '#title' => $this->t('Schema configuration'),
+        '#tree' => TRUE,
+      ];
+
+      $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $formState);
+    }
 
     $form['endpoint'] = [
       '#title' => t('Endpoint'),
@@ -148,6 +199,8 @@ class ServerForm extends EntityForm {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function validateForm(array &$form, FormStateInterface $formState) {
     $endpoint = &$formState->getValue('endpoint');
@@ -158,13 +211,35 @@ class ServerForm extends EntityForm {
     if ($endpoint[0] !== '/') {
       $formState->setErrorByName('endpoint', 'The endpoint path has to start with a forward slash.');
     }
-    else if (!UrlHelper::isValid($endpoint)) {
+    elseif (!UrlHelper::isValid($endpoint)) {
       $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
+    }
+
+    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    $schema = $formState->getValue('schema');
+    $instance = $this->schemaManager->createInstance($schema);
+    if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $instance->validateConfigurationForm($form['schema_configuration'][$schema], $state);
+    }
+  }
+
+  public function submitForm(array &$form, FormStateInterface $formState) {
+    parent::submitForm($form, $formState);
+
+    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    $schema = $formState->getValue('schema');
+    $instance = $this->schemaManager->createInstance($schema);
+    if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
     }
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function save(array $form, FormStateInterface $formState) {
     parent::save($form, $formState);

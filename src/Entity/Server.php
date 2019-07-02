@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Entity;
 
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -46,6 +47,7 @@ use GraphQL\Validator\DocumentValidator;
  *     "name",
  *     "label",
  *     "schema",
+ *     "schema_configuration",
  *     "endpoint",
  *     "debug",
  *     "caching",
@@ -82,6 +84,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var string
    */
   public $schema;
+
+  /**
+   * Schema configuration.
+   *
+   * @var array
+   */
+  public $schema_configuration = [];
 
   /**
    * Whether the server is in debug mode.
@@ -156,27 +165,34 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function configuration() {
     $params = \Drupal::getContainer()->getParameter('graphql.config');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.graphql.schema');
+    $schema = $this->get('schema');
 
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    $plugin = $manager->createInstance($this->get('schema'));
-    $registry = $plugin->getResolverRegistry();
+    $plugin = $manager->createInstance($schema);
+    if ($plugin instanceof ConfigurableInterface && $config = $this->get('schema_configuration')) {
+      $plugin->setConfiguration($config[$schema] ?? []);
+    }
 
     // Create the server config.
-    $config = ServerConfig::create();
-    $config->setDebug(!!$this->get('debug'));
-    $config->setQueryBatching(!!$this->get('batching'));
-    $config->setValidationRules($this->getValidationRules());
-    $config->setPersistentQueryLoader($this->getPersistedQueryLoader());
-    $config->setContext($this->getContext($plugin, $params));
-    $config->setFieldResolver($this->getFieldResolver($registry));
-    $config->setSchema($plugin->getSchema($registry));
-    $config->setPromiseAdapter(new SyncPromiseAdapter());
+    $registry = $plugin->getResolverRegistry();
+    $server = ServerConfig::create();
+    $server->setDebug(!!$this->get('debug'));
+    $server->setQueryBatching(!!$this->get('batching'));
+    $server->setValidationRules($this->getValidationRules());
+    $server->setPersistentQueryLoader($this->getPersistedQueryLoader());
+    $server->setContext($this->getContext($plugin, $params));
+    $server->setFieldResolver($this->getFieldResolver($registry));
+    $server->setSchema($plugin->getSchema($registry));
+    $server->setPromiseAdapter(new SyncPromiseAdapter());
 
-    return $config;
+    return $server;
   }
 
   /**
@@ -290,10 +306,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * essential when there is a need to adjust error format, for instance
    * to add an additional fields or remove some of the default ones.
    *
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
-   *
    * @return mixed|callable
    *   The error formatter.
+   *
+   * @see \GraphQL\Error\FormattedError::prepareFormatter
    */
   protected function getErrorFormatter() {
     return function (Error $error) {
@@ -309,10 +325,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * Allows to replace the default error handler with a custom one. For example
    * when there is a need to handle specific errors differently.
    *
-   * @see \GraphQL\Executor\ExecutionResult::toArray
-   *
    * @return mixed|callable
    *   The error handler.
+   *
+   * @see \GraphQL\Executor\ExecutionResult::toArray
    */
   protected function getErrorHandler() {
     return function (array $errors, callable $formatter) {

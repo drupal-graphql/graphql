@@ -21,6 +21,20 @@ class SchemaExtension extends Plugin {
   public $id;
 
   /**
+   * The plugin name.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * The plugin description.
+   *
+   * @var string
+   */
+  public $description = '';
+
+  /**
    * The id of the schema plugin to extend.
    *
    * @var string
