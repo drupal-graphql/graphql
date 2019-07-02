@@ -57,7 +57,7 @@ GQL;
    * The user is allowed to post any queries.
    */
   public function testFullQueryAccess() {
-    $this->setUpCurrentUser([], ['execute graphql requests']);
+    $this->setUpCurrentUser([], ["execute {$this->server->id()} arbitrary graphql requests"]);
 
     // All queries should work.
     $this->assertEquals(200, $this->query('{ root }')->getStatusCode());

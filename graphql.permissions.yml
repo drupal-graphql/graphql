@@ -1,19 +1,12 @@
-'execute graphql requests':
-  title: 'Execute arbitrary GraphQL requests'
-  description: 'Allows users to execute arbitrary GraphQL requests.'
-
-'execute persisted graphql requests':
-  title: 'Execute persisted GraphQL requests'
-  description: 'Allows users to execute persisted GraphQL requests.'
-
-'use graphql explorer':
-  title: 'Use GraphiQL'
-  description: 'Allows users to use the GraphiQL interface.'
-
-'use graphql voyager':
-  title: 'Use GraphQL Voyager'
-  description: 'Allows users to use the GraphQL Voyager interface.'
-
-'administer graphql configuration':
+administer graphql configuration:
   title: 'Administer configuration'
   description: 'Allows users to create, edit and delete server configurations.'
+  restrict access: true
+
+bypass graphql access:
+  title: 'Bypass graphql access restrictions'
+  description: 'Use any graphql server regardless of permission restrictions.'
+  restrict access: true
+
+permission_callbacks:
+  - graphql.permission_provider::permissions

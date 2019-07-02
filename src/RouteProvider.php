@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\graphql\Routing;
+namespace Drupal\graphql;
 
 use Drupal\Core\Authentication\AuthenticationCollectorInterface;
-use Drupal\graphql\Entity\Server;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\Routing\Route;
 
-class QueryRouteProvider {
+class RouteProvider {
 
   /**
    * The authentication collector service.
@@ -16,21 +16,32 @@ class QueryRouteProvider {
   protected $authenticationCollector;
 
   /**
-   * QueryRouteProvider constructor.
+   * The entity type manager service.
    *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * RouteProvider constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
    * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authenticationCollector
    *   The authentication collector service.
    */
-  public function __construct(AuthenticationCollectorInterface $authenticationCollector) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, AuthenticationCollectorInterface $authenticationCollector) {
     $this->authenticationCollector = $authenticationCollector;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
    * Collects routes for the server endpoints.
    */
   public function routes() {
+    $storage = $this->entityTypeManager->getStorage('graphql_server');
     /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
-    $servers = Server::loadMultiple();
+    $servers = $storage->loadMultiple();
     $routes = [];
 
     // Allow all authentication providers by default.
@@ -41,20 +52,20 @@ class QueryRouteProvider {
 
       $routes["graphql.query.$id"] = (new Route($path))
         ->addDefaults([
-          'server' => $id,
+          'graphql_server' => $id,
           '_graphql' => TRUE,
           '_controller' => '\Drupal\graphql\Controller\RequestController::handleRequest',
           '_disable_route_normalizer' => TRUE,
         ])
         ->addRequirements([
-          '_graphql_query_access' => 'TRUE',
+          '_graphql_query_access' => 'graphql_server:{graphql_server}',
           '_format' => 'json',
         ])
         ->addOptions([
           '_auth' => $auth,
           'no_cache' => TRUE,
           'default_url_options' => ['path_processing' => FALSE],
-          'parameters' => ['server' => ['type' => 'entity:graphql_server']]
+          'parameters' => ['graphql_server' => ['type' => 'entity:graphql_server']]
         ]);
     }
 
