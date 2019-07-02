@@ -34,11 +34,11 @@ graphql.explorer:
     _controller: '\Drupal\graphql\Controller\ExplorerController::viewExplorer'
     _title: 'Explorer'
   requirements:
-    _permission: 'use graphql explorer'
+    _graphql_explorer_access: graphql_server:{graphql_server}
   options:
     _admin_route: TRUE
     parameters:
-      graphql_server:
+      server:
         type: entity:graphql_server
 
 graphql.voyager:
@@ -47,7 +47,7 @@ graphql.voyager:
     _controller: '\Drupal\graphql\Controller\VoyagerController::viewVoyager'
     _title: 'Voyager'
   requirements:
-    _permission: 'use graphql voyager'
+    _graphql_voyager_access: graphql_server:{graphql_server}
   options:
     _admin_route: TRUE
     parameters:
@@ -65,4 +65,4 @@ entity.graphql_server.delete_form:
     _admin_route: TRUE
 
 route_callbacks:
-  - 'graphql.route_provider::routes'
+  - graphql.route_provider::routes

@@ -18,6 +18,14 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: access_check, applies_to: _graphql_query_access }
+  access_check.graphql.explorer:
+    class: Drupal\graphql\Access\ExplorerAccessCheck
+    tags:
+      - { name: access_check, applies_to: _graphql_explorer_access }
+  access_check.graphql.voyager:
+    class: Drupal\graphql\Access\VoyagerAccessCheck
+    tags:
+      - { name: access_check, applies_to: _graphql_voyager_access }
 
   # Logger channel for graphql related logging.
   logger.channel.graphql:
@@ -69,8 +77,13 @@ services:
 
   # Handles the dynamic creation of routes (see graphql.routing.yml).
   graphql.route_provider:
-    class: Drupal\graphql\Routing\QueryRouteProvider
-    arguments: ['@authentication_collector']
+    class: Drupal\graphql\RouteProvider
+    arguments: ['@entity_type.manager', '@authentication_collector']
+
+  # Handles the dynamic creation of routes (see graphql.permissions.yml).
+  graphql.permission_provider:
+    class: Drupal\graphql\PermissionProvider
+    arguments: ['@entity_type.manager']
 
   # Schema introspection service.
   graphql.introspection:

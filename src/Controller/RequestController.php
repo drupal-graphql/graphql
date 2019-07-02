@@ -41,8 +41,8 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * Handles graphql requests.
    *
-   * @param \Drupal\graphql\Entity\ServerInterface $server
-   *   The name of the server.
+   * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
+   *   The server instance.
    * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
    *   The graphql operation(s) to execute.
    *
@@ -51,13 +51,13 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @throws \Exception
    */
-  public function handleRequest(ServerInterface $server, $operations) {
+  public function handleRequest(ServerInterface $graphql_server, $operations) {
     if (is_array($operations)) {
-      return $this->handleBatch($server, $operations);
+      return $this->handleBatch($graphql_server, $operations);
     }
 
     /** @var \GraphQL\Server\OperationParams $operations */
-    return $this->handleSingle($server, $operations);
+    return $this->handleSingle($graphql_server, $operations);
   }
 
   /**
