@@ -224,6 +224,18 @@ class ServerForm extends EntityForm {
     }
   }
 
+  public function submitForm(array &$form, FormStateInterface $formState) {
+    parent::submitForm($form, $formState);
+
+    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    $schema = $formState->getValue('schema');
+    $instance = $this->schemaManager->createInstance($schema);
+    if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
+    }
+  }
+
   /**
    * {@inheritdoc}
    *
@@ -237,14 +249,6 @@ class ServerForm extends EntityForm {
     ]));
 
     $formState->setRedirect('entity.graphql_server.collection');
-
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
-    $schema = $formState->getValue('schema');
-    $instance = $this->schemaManager->createInstance($schema);
-    if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
-      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
-      $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
-    }
   }
 
 }

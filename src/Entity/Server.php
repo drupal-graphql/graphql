@@ -90,7 +90,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @var array
    */
-  public $schema_configuration;
+  public $schema_configuration = [];
 
   /**
    * Whether the server is in debug mode.

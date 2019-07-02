@@ -1,9 +1,0 @@
-graphql.schema.composable:
-  type: mapping
-  label: 'Composable schema'
-  mapping:
-    extensions:
-      label: Enabled extensions
-      type: sequence
-      sequence:
-        type: string

@@ -75,18 +75,21 @@ GQL;
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $extensions = $this->extensionManager->getDefinitions();
-    $options = [];
-    foreach ($extensions as $key => $extension) {
-      $options[$key] = $extension['id'];
-    }
 
     $form['extensions'] = array(
       '#type' => 'checkboxes',
       '#required' => FALSE,
-      '#options' => $options,
-      '#title' => t('Enabled extensions.'),
+      '#title' => t('Enabled extensions'),
       '#default_value' => $this->configuration['extensions'] ?? [],
     );
+
+    foreach ($extensions as $key => $extension) {
+      $form['extensions']['#options'][$key] = $extension['name'] ?? $extension['id'];
+
+      if (!empty($extension['description'])) {
+        $form['extensions'][$key]['#description'] = $extension['description'];
+      }
+    }
 
     return $form;
   }
@@ -94,15 +97,15 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-//    $form_state->setErrorByName('plugins', 'test validation');
+  public function validateConfigurationForm(array &$form, FormStateInterface $formState) {
+    // TODO: Validate dependencies between extensions.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Implement submitConfigurationForm() method.
+  public function submitConfigurationForm(array &$form, FormStateInterface $formState) {
+    // Nothing to do here.
   }
 
 }
