@@ -36,37 +36,32 @@ Again inside the `getResolverRegistry` method :
 
 ```php
 /**
-   * {@inheritdoc}
-   */
-  protected function getResolverRegistry() {
+ * {@inheritdoc}
+ */
+protected function getResolverRegistry() {
 
-    ...
+  ...
 
-    $registry->addFieldResolver('Article', 'tags',
-      $builder->produce('entity_reference', [
-        'mapping' => [
-          'entity' => $builder->fromParent(),
-          'field' => $builder->fromValue('field_tags'),
-        ],
-      ])
-    );
+  $registry->addFieldResolver('Article', 'tags',
+    $builder->produce('entity_reference')
+      ->map('entity', $builder->fromParent())
+      ->map('field', $builder->fromValue('field_tags'))
+  );
 
-    $registry->addFieldResolver('TagTerm', 'id',
-      $builder->produce('entity_id', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]])
-    );
+  $registry->addFieldResolver('TagTerm', 'id',
+    $builder->produce('entity_id')
+      ->map('entity', $builder->fromParent())
+  );
 
-    $registry->addFieldResolver('TagTerm', 'name',
-      $builder->produce('entity_label', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]])
-    );
+  $registry->addFieldResolver('TagTerm', 'name',
+    $builder->produce('entity_label')
+      ->map('entity', $builder->fromParent())
+  );
 
-    ...
+  ...
 
-    return $registry;
-  }
+  return $registry;
+}
 ```
 
 Notice how again we are using common data producers provided by the module like `entity_id`, `entity_label` and also `entity_reference` in this case.

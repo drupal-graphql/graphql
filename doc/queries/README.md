@@ -17,13 +17,10 @@ type Article implements NodeInterface {
 We now need to resolve the title field via a data producer which is already provided by the `entity_label` module. This will give us the label of an entity:
 
 ```php
-    $registry->addFieldResolver('Article', 'title',
-      $builder->produce('entity_label', [
-        'mapping' => [
-          'entity' => $builder->fromParent(),
-        ],
-      ])
-    );
+$registry->addFieldResolver('Article', 'title',
+  $builder->produce('entity_label')
+    ->map('entity' => $builder->fromParent())
+);
 ```
 
 We can now run a query like this:

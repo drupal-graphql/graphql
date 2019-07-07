@@ -103,13 +103,10 @@ Lets see how we can consume our newly created data producer :
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-    $builder->produce('current_user'),
-    $builder->produce('entity_load', [
-        'mapping' => [
-            'type' => $builder->fromValue('user'),
-            'id' => $builder->fromParent(),
-        ],
-    ])
+  $builder->produce('current_user'),
+  $builder->produce('entity_load')
+    ->map('type', $builder->fromValue('user'))
+    ->map('id', $builder->fromParent())
 ));
 ```
 

@@ -40,46 +40,40 @@ To add the resolvers we go to our schema implementation and call the appropriate
 
 ```php
 /**
-   * {@inheritdoc}
-   */
-  protected function getResolverRegistry() {
-    $builder = new ResolverBuilder();
-    $registry = new ResolverRegistry([
-      'Article' => ContextDefinition::create('entity:node')
-        ->addConstraint('Bundle', 'article'),
-    ]);
-
-    $registry->addFieldResolver('Query', 'article',
-      $builder->produce('entity_load', ['mapping' => [
-        'type' => $builder->fromValue('node'),
-        'bundles' => $builder->fromValue(['article']),
-        'id' => $builder->fromArgument('id'),
-      ]])
-    );
-
-    $registry->addFieldResolver('Article', 'id',
-      $builder->produce('entity_id', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]])
-    );
-
-    $registry->addFieldResolver('Article', 'title',
-      $builder->produce('entity_label', ['mapping' => [
-        'entity' => $builder->fromParent(),
-      ]])
-    );
-
-    $registry->addFieldResolver('Article', 'creator',
-      $builder->produce('property_path', [
-        'mapping' => [
-          'type' => $builder->fromValue('entity:node'),
-          'value' => $builder->fromParent(),
-          'path' => $builder->fromValue('field_article_creator.value'),
-        ],
-      ])
-    );
-
-    return $registry;
-  }
+ * {@inheritdoc}
+ */
+protected function getResolverRegistry() {
+  $builder = new ResolverBuilder();
+  $registry = new ResolverRegistry([
+    'Article' => ContextDefinition::create('entity:node')
+      ->addConstraint('Bundle', 'article'),
+  ]);
+  
+  $registry->addFieldResolver('Query', 'article',
+    $builder->produce('entity_load')
+      ->map('type', $builder->fromValue('node'))
+      ->map('bundles', $builder->fromValue(['article']))
+      ->map('id', $builder->fromArgument('id'))
+    ]])
+  );
+  
+  $registry->addFieldResolver('Article', 'id',
+    $builder->produce('entity_id')
+      ->map('entity' => $builder->fromParent())
+  );
+  
+  $registry->addFieldResolver('Article', 'title',
+    $builder->produce('entity_label')
+      ->map('entity', $builder->fromParent())
+  );
+  
+  $registry->addFieldResolver('Article', 'creator',
+    $builder->produce('property_path')
+      ->map('type', $builder->fromValue('entity:node'))
+      ->map('value', $builder->fromParent())
+      ->map('path', $builder->fromValue('field_article_creator.value'))
+  );
+  
+  return $registry;
+}
 ```
-

@@ -6,13 +6,10 @@ This can be accomplished using some of the built-in helpers inside the `$builder
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-    $builder->produce('current_user'),
-    $builder->produce('entity_load', [
-        'mapping' => [
-            'type' => $builder->fromValue('user'),
-            'id' => $builder->fromParent(),
-        ],
-    ])
+  $builder->produce('current_user'),
+  $builder->produce('entity_load')
+    ->map('type', $builder->fromValue('user'))
+    ->map('id', $builder->fromParent())
 ));
 ```
 
@@ -24,16 +21,13 @@ What if we need to do some massaging but not necessarily using any data producer
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-    $builder->produce('current_user'),
-    $builder->produce('entity_load', [
-        'mapping' => [
-            'type' => $builder->fromValue('user'),
-            'id' => $builder->fromParent(),
-        ],
-    ]),
-    $builder->callback(function ($entity) {
-        // Here we can do anything we want to the data. We get as a parameter anyting that was returned
-        // in the previous step.
-    })
+  $builder->produce('current_user'),
+  $builder->produce('entity_load')
+    ->map('type', $builder->fromValue('user'))
+    ->map('id', $builder->fromParent()),
+  $builder->callback(function ($entity) {
+    // Here we can do anything we want to the data. We get as a parameter anyting that was returned
+    // in the previous step.
+  })
 ));
 ```

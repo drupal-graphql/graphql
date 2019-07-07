@@ -23,8 +23,3 @@
 ## Mutations
 
 * [Mutations](mutations/README.md)
-
-## Advanced
-
-* [Split up schema](advanced/split-schema.md)
-

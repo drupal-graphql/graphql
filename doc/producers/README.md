@@ -25,15 +25,12 @@ We are telling the schema that we have a new field on the "Article" type called 
 The following code is an example of how a data producer for a creator field on the Article type can be implemented in code.
 
 ```php
-    $registry->addFieldResolver('Article', 'creator',
-      $builder->produce('property_path', [
-        'mapping' => [
-          'type' => $builder->fromValue('entity:node'),
-          'value' => $builder->fromParent(),
-          'path' => $builder->fromValue('field_article_creator.value'),
-        ],
-      ])
-    );
+$registry->addFieldResolver('Article', 'creator',
+  $builder->produce('property_path')
+    ->map('type', $builder->fromValue('entity:node'))
+    ->map('value', $builder->fromParent())
+    ->map('path', $builder->fromValue('field_article_creator.value'))
+);
 ```
 
 Essentially this is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
