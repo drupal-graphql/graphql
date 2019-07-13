@@ -133,7 +133,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     if ($extendSchema = $this->getExtensionDocument($extensions)) {
-      return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
+      return SchemaExtender::extend($schema, $extendSchema);
     }
 
     return $schema;
@@ -202,7 +202,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    if (empty($ast)) {
+    if (empty($extensions)) {
       return NULL;
     }
 
