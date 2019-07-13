@@ -132,7 +132,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $extension->registerResolvers($registry);
     }
 
-    return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
+    if ($extendSchema = $this->getExtensionDocument($extensions)) {
+      return SchemaExtender::extend($schema, $extendSchema);
+    }
+
+    return $schema;
   }
 
   /**
@@ -198,7 +202,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    $ast = Parser::parse(implode("\n\n", $extensions));
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
