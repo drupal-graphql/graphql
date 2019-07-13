@@ -202,11 +202,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    if (empty($extensions)) {
-      return NULL;
-    }
-
-    $ast = Parser::parse(implode("\n\n", $extensions));
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
