@@ -132,7 +132,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $extension->registerResolvers($registry);
     }
 
-    return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
+    if ($extendSchema = $this->getExtensionDocument($extensions)) {
+      return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
+    }
+
+    return $schema;
   }
 
   /**
@@ -197,6 +201,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }, $extensions), function ($definition) {
       return !empty($definition);
     });
+
+    if (empty($ast)) {
+      return NULL;
+    }
 
     $ast = Parser::parse(implode("\n\n", $extensions));
     if (empty($this->inDevelopment)) {
