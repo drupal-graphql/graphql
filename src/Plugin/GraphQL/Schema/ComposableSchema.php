@@ -29,7 +29,7 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
   protected function getExtensions() {
     return array_map(function ($id) {
       return $this->extensionManager->createInstance($id);
-    }, $this->getConfiguration()['extensions']);
+    }, array_filter($this->getConfiguration()['extensions']));
   }
 
   /**
