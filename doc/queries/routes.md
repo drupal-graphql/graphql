@@ -37,22 +37,39 @@ To add the resolvers we go to our schema implementation and call the appropriate
 
 ```php
 /**
- * {@inheritdoc}
- */
-protected function getResolverRegistry() {
-  ...
+   * {@inheritdoc}
+   */
+  protected function getResolverRegistry() {
+    ...
 
-  $registry->addFieldResolver('Query', 'route', $builder->compose(
-    $builder->produce('route_load')
-      ->map('path', $builder->fromArgument('path')),
-    $builder->produce('route_entity')
-      ->map('url', $builder->fromParent())
-  ));
+    // Tell GraphQL how to resolve types of a common interface.
+    $registry->addTypeResolver('NodeInterface', function ($value) {
+      if ($value instanceof NodeInterface) {
+        switch ($value->bundle()) {
+          case 'article': return 'Article';
+          case 'page': return 'Page';
+        }
+      }
+      throw new Error('Could not resolve content type.');
+    });
 
-  ...
+    $registry->addFieldResolver('Query', 'route', $builder->compose(
+      $builder->produce('route_load', [
+        'mapping' => [
+          'path' => $builder->fromArgument('path'),
+        ],
+      ]),
+      $builder->produce('route_entity', [
+        'mapping' => [
+          'url' => $builder->fromParent(),
+        ],
+      ])
+    ));
 
-  return $registry;
-}
+    ...
+
+    return $registry;
+  }
 ```
 
 Here we take advantage of the `compose` method inside our resolver builder object that allows chaining multiple producers together. This technique can be very helpful when dealing with more complex scenarios.
@@ -61,12 +78,12 @@ In this example our query could look like this :
 
 ```graphql
 query {
-  route(path: "/node/1") {
-    ... on Article {
-      id
-      title
-    }
-  }
+	route(path: "/node/1") {
+		... on Article {
+			id
+			title
+		}
+	}
 }
 ```
 
@@ -74,11 +91,11 @@ and the response :
 
 ```json
 {
-  "data": {
-    "route": {
-      "id": 1,
-      "title": "Hello GraphQL"
-    }
-  }
+	"data": {
+		"route": {
+			"id": 1,
+			"title": "Hello GraphQL"
+		}
+	}
 }
 ```
