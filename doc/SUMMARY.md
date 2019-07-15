@@ -23,3 +23,7 @@
 ## Mutations
 
 * [Mutations](mutations/README.md)
+
+## Advanced
+
+* [Composable schemas](advanced/composable-schemas.md)

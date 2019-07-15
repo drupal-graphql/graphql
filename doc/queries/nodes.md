@@ -36,7 +36,7 @@ Now we have an "Article" type in the schema with three fields `id`, `label` and 
 
 ## Adding resolvers
 
-To add the resolvers we go to our schema implementation and call the appropriate data producers inside the `getResolverRegistry` method.
+To add the resolvers we go to our schema implementation and call the appropriate data producers inside the `getResolverRegistry` method. Because our types are extending a common `NodeInterface` we need to also tell what to resolve for a particular type, otherwise it could be an Article or a Page.
 
 ```php
 /**
@@ -48,7 +48,18 @@ protected function getResolverRegistry() {
     'Article' => ContextDefinition::create('entity:node')
       ->addConstraint('Bundle', 'article'),
   ]);
-  
+
+  // Tell GraphQL how to resolve types of a common interface.
+  $registry->addTypeResolver('NodeInterface', function ($value) {
+    if ($value instanceof NodeInterface) {
+      switch ($value->bundle()) {
+        case 'article': return 'Article';
+        case 'page': return 'Page';
+      }
+    }
+    throw new Error('Could not resolve content type.');
+  });
+
   $registry->addFieldResolver('Query', 'article',
     $builder->produce('entity_load')
       ->map('type', $builder->fromValue('node'))
@@ -56,24 +67,24 @@ protected function getResolverRegistry() {
       ->map('id', $builder->fromArgument('id'))
     ]])
   );
-  
+
   $registry->addFieldResolver('Article', 'id',
     $builder->produce('entity_id')
       ->map('entity' => $builder->fromParent())
   );
-  
+
   $registry->addFieldResolver('Article', 'title',
     $builder->produce('entity_label')
       ->map('entity', $builder->fromParent())
   );
-  
+
   $registry->addFieldResolver('Article', 'creator',
     $builder->produce('property_path')
       ->map('type', $builder->fromValue('entity:node'))
       ->map('value', $builder->fromParent())
       ->map('path', $builder->fromValue('field_article_creator.value'))
   );
-  
+
   return $registry;
 }
 ```
