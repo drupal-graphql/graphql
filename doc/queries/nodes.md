@@ -25,10 +25,6 @@ type Article implements NodeInterface {
     creator: String
 }
 
-type Page implements NodeInterface {
-  id: Int!
-}
-
 ...
 
 interface NodeInterface {
