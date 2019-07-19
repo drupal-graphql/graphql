@@ -57,7 +57,7 @@ protected function getResolverRegistry() {
         case 'page': return 'Page';
       }
     }
-    throw new Error('Could not resolve content type.');
+    throw new \Exception('Could not resolve content type.');
   });
 
   $registry->addFieldResolver('Query', 'article',
