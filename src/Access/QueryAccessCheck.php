@@ -5,6 +5,7 @@ namespace Drupal\graphql\Access;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class QueryAccessCheck implements AccessInterface {
@@ -31,13 +32,20 @@ class QueryAccessCheck implements AccessInterface {
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The currently logged in account.
+   * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
+   *   The server instance.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function access(AccountInterface $account) {
+  public function access(AccountInterface $account, ServerInterface $graphql_server) {
+    if ($account->hasPermission('bypass graphql access')) {
+      return AccessResult::allowed();
+    }
+
+    $id = $graphql_server->id();
     // If the user has the global permission to execute any query, let them.
-    if ($account->hasPermission('execute graphql requests')) {
+    if ($account->hasPermission("execute $id arbitrary graphql requests")) {
       return AccessResult::allowed();
     }
 
@@ -53,12 +61,12 @@ class QueryAccessCheck implements AccessInterface {
       // not a persisted query). Hence, we only grant access if the user has the
       // permission to execute any query.
       if ($operation->getOriginalInput('query')) {
-        return AccessResult::allowedIfHasPermission($account, 'execute graphql requests');
+        return AccessResult::allowedIfHasPermission($account, "execute $id arbitrary graphql requests");
       }
     }
 
     // If we reach this point, this is a persisted query.
-    return AccessResult::allowedIfHasPermission($account, 'execute persisted graphql requests');
+    return AccessResult::allowedIfHasPermission($account, "execute $id persisted graphql requests");
   }
 
 }

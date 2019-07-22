@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Resolver;
 
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -15,10 +16,9 @@ class Callback implements ResolverInterface {
   protected $callback;
 
   /**
-   * Construct DataProducerCallable object.
+   * Callback constructor.
    *
    * @param callable $callback
-   *   Callback.
    */
   public function __construct(callable $callback) {
     $this->callback = $callback;
@@ -27,8 +27,8 @@ class Callback implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
-    $result = ($this->callback)($value, $args, $context, $info);
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+    $result = ($this->callback)($value, $args, $context, $info, $field);
     return $result;
   }
 

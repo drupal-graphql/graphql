@@ -7,17 +7,26 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Invalid payloads should not trigger a PHP error, but be handled as empty.
+ *
+ * @group graphql
  */
 class InvalidPayloadTest extends GraphQLTestBase {
 
-  public function testEmptyPayload() {
-    $gql_schema = <<<GQL
+  protected function setUp() {
+    parent::setUp();
+
+    $schema = <<<GQL
       type Query {
         root: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, 'graphql_test');
-    $this->container->get('http_kernel')->handle(Request::create('/graphql/graphql_test', 'POST', [], [], [], [], '{ invalid'));
+
+    $this->setUpSchema($schema);
+  }
+
+  public function testEmptyPayload() {
+    $request = Request::create('/graphql/test', 'POST', [], [], [], [], '{ invalid');
+    $this->container->get('http_kernel')->handle($request);
   }
 
 }

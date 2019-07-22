@@ -10,28 +10,24 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer\XML;
 class XMLXpathTest extends XMLTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public function setUp() {
-    parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
-  }
-
-  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLXpath::resolve
    */
   public function testXMLXpath() {
-    $plugin = $this->dataProducerManager->getInstance([
-      'id' => 'xml_xpath',
-      'configuration' => []
-    ]);
     $document = $this->loadDocument();
 
-    $result = $plugin->resolve($document, '//div/h1');
+    $result = $this->executeDataProducer('xml_xpath', [
+      'dom' => $document,
+      'query' => '//div/h1',
+    ]);
+
     $this->assertEquals(1, count($result));
     $this->assertEquals('h1', $result[0]->tagName);
 
-    $result = $plugin->resolve($document, '//div/div/div');
+    $result = $this->executeDataProducer('xml_xpath', [
+      'dom' => $document,
+      'query' => '//div/div/div',
+    ]);
+
     $this->assertEquals(3, count($result));
     $this->assertEquals('div', $result[0]->tagName);
     $this->assertEquals('div', $result[1]->tagName);
@@ -39,14 +35,26 @@ class XMLXpathTest extends XMLTestBase {
 
     // Test that the resolve can accept a DOMElement object too, not only a
     // document root.
-    $dom_element = $plugin->resolve($document, '//div/div/span');
-    $result = $plugin->resolve($dom_element[0], './p');
+    $element = $this->executeDataProducer('xml_xpath', [
+      'dom' => $document,
+      'query' => '//div/div/span',
+    ]);
+
+    $result = $this->executeDataProducer('xml_xpath', [
+      'dom' => $element[0],
+      'query' => './p',
+    ]);
+
     $this->assertEquals(2, count($result));
     $this->assertEquals('p', $result[0]->tagName);
     $this->assertEquals('p', $result[1]->tagName);
 
     // Test for non-existent element.
-    $result = $plugin->resolve($document, '//div/h2');
+    $result = $this->executeDataProducer('xml_xpath', [
+      'dom' => $document,
+      'query' => '//div/h2',
+    ]);
+
     $this->assertSame(0, count($result));
   }
 }

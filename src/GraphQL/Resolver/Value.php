@@ -3,6 +3,7 @@
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -16,10 +17,9 @@ class Value implements ResolverInterface {
   protected $value;
 
   /**
-   * Constructor.
+   * Value constructor.
    *
-   * @param mixed $value
-   *   Value.
+   * @param $value
    */
   public function __construct($value) {
     $this->value = $value;
@@ -28,7 +28,7 @@ class Value implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($parent, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     if ($this->value instanceof CacheableDependencyInterface) {
       $context->addCacheableDependency($this->value);
     }

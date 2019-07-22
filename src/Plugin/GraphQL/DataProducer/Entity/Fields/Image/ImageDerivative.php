@@ -83,11 +83,13 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *   The metadata object to add caching to objects.
    *
+   * @param $style
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *
    * @return mixed
    *   The image url and dimensions for the image style .
    */
   public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
-
     // Return if we dont have an entity.
     if (!$entity) {
       return NULL;
@@ -115,5 +117,7 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
       });
       return $image;
     }
+
+    return NULL;
   }
 }

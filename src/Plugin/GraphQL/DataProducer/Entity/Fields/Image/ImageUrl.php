@@ -76,6 +76,8 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
    * @param \Drupal\file\FileInterface $entity
    *   The file entity.
    *
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *
    * @return mixed
    *   The file url.
    */

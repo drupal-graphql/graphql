@@ -7,10 +7,14 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataTrait;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * @TODO: Delete this resolver. This is a plugin already.
+ */
 class Path implements ResolverInterface {
 
   use TypedDataTrait;
@@ -38,14 +42,11 @@ class Path implements ResolverInterface {
   protected $value;
 
   /**
-   * Constructor.
+   * Path constructor.
    *
-   * @param string $type
-   *   Entity type.
-   * @param string $path
-   *   Path to get value.
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
-   *   Resolver.
+   * @param $type
+   * @param $path
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|NULL $value
    */
   public function __construct($type, $path, ResolverInterface $value = NULL) {
     $this->type = $type;
@@ -56,9 +57,9 @@ class Path implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($parent, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $value = $this->value ?? new ParentValue();
-    $value = $value->resolve($parent, $args, $context, $info);
+    $value = $value->resolve($value, $args, $context, $info, $field);
     $metadata = new BubbleableMetadata();
 
     $type = $this->type instanceof DataDefinitionInterface ? $this->type : DataDefinition::create($this->type);

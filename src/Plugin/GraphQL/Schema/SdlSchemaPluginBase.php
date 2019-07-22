@@ -2,23 +2,23 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
+use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
+use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
-use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\BuildSchema;
+use GraphQL\Utils\SchemaExtender;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
@@ -39,6 +39,20 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected $inDevelopment;
 
   /**
+   * The schema extension plugin manager.
+   *
+   * @var \Drupal\graphql\Plugin\SchemaExtensionPluginManager
+   */
+  protected $extensionManager;
+
+  /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -49,6 +63,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('cache.graphql.ast'),
+      $container->get('module_handler'),
+      $container->get('plugin.manager.graphql.schema_extension'),
       $container->getParameter('graphql.config')
     );
   }
@@ -64,6 +80,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The plugin definition array.
    * @param \Drupal\Core\Cache\CacheBackendInterface $astCache
    *   The cache bin for caching the parsed SDL.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler service.
+   * @param \Drupal\graphql\Plugin\SchemaExtensionPluginManager $extensionManager
+   *   The schema extension plugin manager.
    * @param $config
    *   The service configuration.
    *
@@ -74,184 +94,141 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $pluginId,
     $pluginDefinition,
     CacheBackendInterface $astCache,
+    ModuleHandlerInterface $moduleHandler,
+    SchemaExtensionPluginManager $extensionManager,
     $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-
     $this->inDevelopment = !empty($config['development']);
     $this->astCache = $astCache;
+    $this->extensionManager = $extensionManager;
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GraphQL\Error\SyntaxError
+   * @throws \GraphQL\Error\Error
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getSchema() {
-    return BuildSchema::build($this->getSchemaDocument(), function ($config, TypeDefinitionNode $type) {
+  public function getSchema(ResolverRegistryInterface $registry) {
+    $extensions = $this->getExtensions();
+    $resolver = [$registry, 'resolveType'];
+    $document = $this->getSchemaDocument($extensions);
+    $schema = BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
-        $config['resolveType'] = $this->getTypeResolver($type);
+        $config['resolveType'] = $resolver;
       }
 
       return $config;
     });
+
+    if (empty($extensions)) {
+      return $schema;
+    }
+
+    foreach ($extensions as $extension) {
+      $extension->registerResolvers($registry);
+    }
+
+    if ($extendSchema = $this->getExtensionDocument($extensions)) {
+      return SchemaExtender::extend($schema, $extendSchema);
+    }
+
+    return $schema;
   }
 
   /**
-   * {@inheritdoc}
+   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
    */
-  public function validateSchema() {
-    /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */
-    $messenger = \Drupal::service('messenger');
-
-    try {
-      $schema = $this->getSchema();
-      $schema->assertValid();
-    }
-    catch (SyntaxError $error) {
-      $messenger->addError(sprintf('Syntax error in schema: %s', $error->getMessage()));
-      return FALSE;
-    }
-    catch (InvariantViolation $error) {
-      $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
-      return FALSE;
-    }
-    catch (Error $error) {
-      $messenger->addError(sprintf('Schema validation error: %s', $error->getMessage()));
-      return FALSE;
-    }
-
-    $registry = $this->getResolverRegistry();
-    if ($messages = $registry->validateCompliance($schema)) {
-      foreach ($messages as $message) {
-        $messenger->addError($message);
-      }
-
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRootValue() {
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContext() {
-    $registry = $this->getResolverRegistry();
-
-    // Each document (e.g. in a batch query) gets its own resolve context. This
-    // allows us to collect the cache metadata and contextual values (e.g.
-    // inheritance for language) for each query separately.
-    return function ($params, $document, $operation) use ($registry) {
-      $context = new ResolveContext(['registry' => $registry]);
-      $context->addCacheTags(['graphql_response']);
-      if ($this instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($this);
-      }
-
-      return $context;
-    };
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldResolver() {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-      return $context->getGlobal('registry')->resolveField($value, $args, $context, $info);
-    };
-  }
-
-  /**
-   * Resolves the name of concrete type at run-time.
-   *
-   * @param \GraphQL\Language\AST\TypeDefinitionNode $type
-   *   An abstract type to resolve the concrete type for.
-   *
-   * @return \Closure
-   *   The run-time type resolver.
-   */
-  protected function getTypeResolver(TypeDefinitionNode $type) {
-    return function ($value, ResolveContext $context, ResolveInfo $info) {
-      return $context->getGlobal('registry')->resolveType($value, $context, $info);
-    };
+  protected function getExtensions() {
+    return $this->extensionManager->getExtensions($this->getPluginId());
   }
 
   /**
    * Retrieves the parsed AST of the schema definition.
    *
+   * @param array $extensions
+   *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed schema document.
+   *
+   * @throws \GraphQL\Error\SyntaxError
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getSchemaDocument() {
+  protected function getSchemaDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($this->getPluginId())) {
+    $cid = "schema:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
 
-    $ast = Parser::parse($this->getSchemaDefinition());
-    if (!empty($this->inDevelopment)) {
-      $this->astCache->set($this->getPluginId(), $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
+      return $extension->getBaseDefinition();
+    }, $extensions), function ($definition) {
+      return !empty($definition);
+    });
+
+    $schema = array_merge([$this->getSchemaDefinition()], $extensions);
+    $ast = Parser::parse(implode("\n\n", $schema));
+    if (empty($this->inDevelopment)) {
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
 
     return $ast;
   }
 
   /**
-   * Retrieves the error formatter.
+   * Retrieves the parsed AST of the schema extension definitions.
    *
-   * By default uses the graphql error formatter.
+   * @param array $extensions
    *
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
+   * @return \GraphQL\Language\AST\DocumentNode|null
+   *   The parsed schema document.
    *
-   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
-   *
-   * @return \Closure
-   *   Error formatter.
+   * @throws \GraphQL\Error\SyntaxError
    */
-  public function getErrorFormatter() {
-    return function (Error $error) {
-      return FormattedError::createFromException($error);
-    };
-  }
+  protected function getExtensionDocument(array $extensions = []) {
+    // Only use caching of the parsed document if we aren't in development mode.
+    $cid = "extension:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
+      return $cache->data;
+    }
 
-  /**
-   * Retrieves the error handler.
-   *
-   * By default uses the default graphql error handler.
-   *
-   * @see \GraphQL\Executor\ExecutionResult::toArray
-   *
-   * @see https://webonyx.github.io/graphql-php/error-handling/#custom-error-handling-and-formatting
-   *
-   * @return \Closure
-   *   Error handler.
-   */
-  public function getErrorHandler() {
-    return function (array $errors, callable $formatter) {
-      return array_map($formatter, $errors);
-    };
-  }
+    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
+      return $extension->getExtensionDefinition();
+    }, $extensions), function ($definition) {
+      return !empty($definition);
+    });
 
-  /**
-   * Retrieves the resolver registry.
-   *
-   * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
-   *   The resolver registry.
-   */
-  abstract protected function getResolverRegistry();
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
+    if (empty($this->inDevelopment)) {
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    }
+
+    return $ast;
+  }
 
   /**
    * Retrieves the raw schema definition string.
    *
    * @return string
    *   The schema definition.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  abstract protected function getSchemaDefinition();
+  protected function getSchemaDefinition() {
+    $id = $this->getPluginId();
+    $definition = $this->getPluginDefinition();
+    $module = $this->moduleHandler->getModule($definition['provider']);
+    $file = "{$module->getPath()}/graphql/{$id}.graphqls";
+
+    if (!file_exists($file)) {
+      throw new InvalidPluginDefinitionException(sprintf("Missing schema definition file at %s.", $file));
+    }
+
+    return file_get_contents($file) ?: NULL;
+  }
 
 }

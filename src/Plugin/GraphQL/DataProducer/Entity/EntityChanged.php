@@ -33,6 +33,7 @@ class EntityChanged extends DataProducerPluginBase {
    * @param string|null $format
    *
    * @return string
+   * @throws \Exception
    */
   public function resolve(EntityInterface $entity, $format = NULL) {
     if ($entity instanceof EntityChangedInterface) {
