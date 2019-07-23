@@ -67,6 +67,6 @@ This list includes all available data producers inside GraphQL to this day and b
 
 ## How to use the producers
 
-This is no doubt a very long list of supported properties byt itself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations. 
+This is no doubt a very long list of supported properties by itself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations. 
 
 We will look how to use the data producers together in the section "Queries" where we will do many common query scenarios like querying nodes or taxonomies, menus, custom fields, entity reference fields etc..
