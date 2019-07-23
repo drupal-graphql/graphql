@@ -33,7 +33,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "bundles" = @ContextDefinition("array",
+ *     "bundles" = @ContextDefinition("any",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
