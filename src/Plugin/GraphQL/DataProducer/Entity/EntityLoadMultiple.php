@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "ids" = @ContextDefinition("any",
+ *     "ids" = @ContextDefinition("string",
  *       label = @Translation("Identifier"),
  *       multiple = TRUE
  *     ),
@@ -33,7 +33,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "bundles" = @ContextDefinition("any",
+ *     "bundles" = @ContextDefinition("string",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
