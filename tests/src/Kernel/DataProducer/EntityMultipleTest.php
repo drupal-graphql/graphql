@@ -90,7 +90,7 @@ class EntityMultipleTest extends GraphQLTestBase {
   public function testResolveEntityLoadMultiple() {
     $result = $this->executeDataProducer('entity_load_multiple', [
       'type' => $this->node1->getEntityTypeId(),
-      'bundle' => [$this->node1->bundle(), $this->node2->bundle()],
+      'bundles' => [$this->node1->bundle(), $this->node2->bundle()],
       'ids' => [$this->node1->id(), $this->node2->id(), $this->node3->id()],
     ]);
 

@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @DataProducer(
  *   id = "entity_load_by_uuid",
- *   name = @Translation("Load entity by Uuid"),
- *   description = @Translation("Loads a single entity by Uuid."),
+ *   name = @Translation("Load entity by uuid"),
+ *   description = @Translation("Loads a single entity by uuid."),
  *   produces = @ContextDefinition("entity",
  *     label = @Translation("Entity")
  *   ),
@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "bundle" = @ContextDefinition("string",
+ *     "bundles" = @ContextDefinition("string",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
@@ -120,7 +120,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $uuid, $language = NULL, $bundles = [], FieldContext $context) {
+  public function resolve($type, $uuid, $language = NULL, $bundles = NULL, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context) {
