@@ -21,19 +21,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     label = @Translation("Entities")
  *   ),
  *   consumes = {
- *     "entity_type" = @ContextDefinition("string",
+ *     "type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "entity_ids" = @ContextDefinition("string",
+ *     "ids" = @ContextDefinition("any",
  *       label = @Translation("Identifier"),
  *       multiple = TRUE
  *     ),
- *     "entity_language" = @ContextDefinition("string",
- *       label = @Translation("Entity languages(s)"),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Entity languages"),
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "entity_bundle" = @ContextDefinition("string",
+ *     "bundles" = @ContextDefinition("any",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
@@ -127,8 +127,9 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
     return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
-        // If there is no entity with this id, add the list cache tags so that the
-        // cache entry is purged whenever a new entity of this type is saved.
+        // If there is no entity with this id, add the list cache tags so that
+        // the cache entry is purged whenever a new entity of this type is
+        // saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
@@ -163,4 +164,5 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
       return $entities;
     });
   }
+
 }
