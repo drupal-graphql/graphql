@@ -10,10 +10,9 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Wrappers\FileUploadResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
@@ -21,13 +20,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 class FileUpload {
 
   use StringTranslationTrait;
-
-  /**
-   * List of violations during file upload.
-   *
-   * @var array
-   */
-  protected $violations = [];
 
   /**
    * The entity type manager.
@@ -79,34 +71,6 @@ class FileUpload {
     $this->mimeTypeGuesser = $mimeTypeGuesser;
     $this->fileSystem = $fileSystem;
     $this->logger = $logger;
-  }
-
-  /**
-   * Register violations.
-   *
-   * @param mixed $violations
-   *   List of violations.
-   */
-  protected function registerViolations($violations) {
-    if ($violations instanceof TranslatableMarkup) {
-      $violations = [$violations];
-    }
-    foreach ($violations as $violation) {
-      if ($violation instanceof ConstraintViolation) {
-        $violation = $violation->getMessage();
-      }
-      $this->violations[] = (string) $violation;
-    }
-  }
-
-  /**
-   * Gets violations.
-   *
-   * @return array
-   *   List of violations.
-   */
-  public function getViolations() {
-    return $this->violations;
   }
 
   /**
@@ -164,32 +128,37 @@ class FileUpload {
    * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
    *   The file entity to upload.
    * @param array $settings
-   *   Fle settings as specified in regular file field config.
+   *   File settings as specified in regular file field config. Contains keys:
+   *   - file_directory: Where to upload the file
+   *   - uri_scheme: Uri scheme to upload the file to (eg public://, private://)
+   *   - file_extensions: List of valid file extensions (eg [xml, pdf])
+   *   - max_filesize: Maximum allowed size of uploaded file.
    *
-   * @return \Drupal\file\FileInterface|bool
-   *   The file entity or false in case of unsuccessful upload.
+   * @return \Drupal\graphql\Wrappers\FileUploadResponse
+   *   The file upload response containing file entity or list of violations.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function createTemporaryFileUpload(UploadedFile $file, array $settings) {
-    $this->violations = [];
+    $response = new FileUploadResponse();
+
     // Check for file upload errors and return FALSE for this file if a lower
     // level system error occurred.
     // @see http://php.net/manual/features.file-upload.errors.php.
     switch ($file->getError()) {
       case UPLOAD_ERR_INI_SIZE:
       case UPLOAD_ERR_FORM_SIZE:
-        $max_upload_size = format_size($this->getMaxUploadSize($settings));
-        $this->registerViolations($this->t('The file %file could not be saved because it exceeds %maxsize, the maximum allowed size for uploads.', ['%file' => $file->getFilename(), '%maxsize' => $max_upload_size]));
-        $this->logger->error(sprintf('The file "%s" could not be saved because it exceeds "%s", the maximum allowed size for uploads.', $file->getFilename(), $max_upload_size));
-        return FALSE;
+        $maxUploadSize = format_size($this->getMaxUploadSize($settings));
+        $response->setViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getClientOriginalName(), '@maxsize' => $maxUploadSize]));
+        $this->logger->error('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getFilename(), '@maxsize' => $maxUploadSize]);
+        return $response;
 
       case UPLOAD_ERR_PARTIAL:
       case UPLOAD_ERR_NO_FILE:
-        $this->registerViolations($this->t('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getFilename()]));
-        $this->logger->error(sprintf('The file "%s" could not be saved because the upload did not complete.', $file->getFilename()));
-        return FALSE;
+        $response->setViolation($this->t('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getClientOriginalName()]));
+        $this->logger->error('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getFilename()]);
+        return $response;
 
       case UPLOAD_ERR_OK:
         // Final check that this is a valid upload, if it isn't, use the
@@ -199,19 +168,22 @@ class FileUpload {
         }
 
       default:
-        $this->registerViolations($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getFilename()]));
-        $this->logger->error(sprintf('Unknown error while uploading the file "%s".', $file->getFilename()));
-        return FALSE;
+        $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+        $this->logger->error('Error while uploading the file "@file" with an error code "@code".', ['@file' => $file->getFilename(), '@code' => $file->getError()]);
+        return $response;
     }
-    $upload_dir = $settings['uri_scheme'] . '://' . trim($settings['file_directory'], '/');
-    if (!$this->fileSystem->prepareDirectory($upload_dir, FileSystem::CREATE_DIRECTORY)) {
-      $this->registerViolations($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getFilename()]));
-      $this->logger->error(sprintf('Could not create directory "%s".', $upload_dir));
-      return FALSE;
+
+    // Make sure the destination directory exists.
+    $uploadDir = $settings['uri_scheme'] . '://' . trim($settings['file_directory'], '/');
+    if (!$this->fileSystem->prepareDirectory($uploadDir, FileSystem::CREATE_DIRECTORY)) {
+      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+      $this->logger->error('Could not create directory "@upload_directory".', ["@upload_directory" => $uploadDir]);
+      return $response;
     }
     $name = $file->getClientOriginalName();
     $mime = $this->mimeTypeGuesser->guess($name);
-    $destination = $this->fileSystem->getDestinationFilename("{$upload_dir}/{$name}", $this->fileSystem::EXISTS_RENAME);
+    $destination = $this->fileSystem->getDestinationFilename("{$uploadDir}/{$name}", $this->fileSystem::EXISTS_RENAME);
+
     // Begin building file entity.
     $values = [
       'uid' => $this->currentUser->id(),
@@ -222,33 +194,39 @@ class FileUpload {
       'filemime' => $mime,
     ];
     $storage = $this->entityTypeManager->getStorage('file');
-    /** @var \Drupal\file\FileInterface $file_entity */
-    $file_entity = $storage->create($values);
+    /** @var \Drupal\file\FileInterface $fileEntity */
+    $fileEntity = $storage->create($values);
+
     // Validate the entity values.
-    if (($violations = $file_entity->validate()) && $violations->count()) {
-      $this->registerViolations($violations);
-      return FALSE;
+    if (($violations = $fileEntity->validate()) && $violations->count()) {
+      $response->setViolations($violations);
+      return $response;
     }
+
     // Validate the file name length.
-    if ($violations = file_validate($file_entity, $this->getUploadValidators($settings))) {
-      $this->registerViolations($violations);
-      return FALSE;
+    if ($violations = file_validate($fileEntity, $this->getUploadValidators($settings))) {
+      $response->setViolations($violations);
+      return $response;
     }
+
     // Move uploaded files from PHP's upload_tmp_dir to Drupal's temporary
     // directory. This overcomes open_basedir restrictions for future file
     // operations.
-    if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $file_entity->getFileUri())) {
-      $this->registerViolations($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getFilename()]));
-      $this->logger->error(sprintf('Unable to move file from "%s" to "%s".', $file->getRealPath(), $file_entity->getFileUri()));
-      return FALSE;
+    if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
+      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+      $this->logger->error('Unable to move file from "@file" to "@destination".', ['@file' => $file->getRealPath(), '@destination' => $fileEntity->getFileUri()]);
+      return $response;
     }
+
     // Adjust permissions.
-    if (!$this->fileSystem->chmod($file_entity->getFileUri())) {
-      $this->registerViolations($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getFilename()]));
-      $this->logger->error(sprintf('Unable to set file permission for file "%s".', $file_entity->getFileUri()));
-      return FALSE;
+    if (!$this->fileSystem->chmod($fileEntity->getFileUri())) {
+      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+      $this->logger->error('Unable to set file permission for file "@file".', ['@file' => $fileEntity->getFileUri()]);
+      return $response;
     }
-    return $file_entity;
+
+    $response->setFileEntity($fileEntity);
+    return $response;
   }
 
 }
