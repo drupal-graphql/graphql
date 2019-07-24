@@ -5,15 +5,11 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Render\RenderContext;
-use Drupal\graphql\GraphQL\Cache\CacheableValue;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use GraphQL\Type\Definition\ResolveInfo;
 use Prophecy\Argument;
 use Drupal\graphql\Entity\Server;
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 use GraphQL\Deferred;
 
 /**
@@ -29,38 +25,34 @@ class ResultCacheTest extends GraphQLTestBase {
   public function setUp() {
     parent::setUp();
 
-    $gql_schema = <<<GQL
+    $schema = <<<GQL
       type Query {
         root: String
         leakA: String
         leakB: String
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $this->builder = new ResolverBuilder();
+    $this->setUpSchema($schema);
   }
 
   /**
    * Check basic result caching.
    */
   public function testCacheableResult() {
-    $dummy_object = $this->getMockBuilder(Server::class)
+    $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
       ->getMock();
-    $dummy_object->expects($this->once())
+
+    $dummy->expects($this->once())
       ->method('id')
       ->willReturn('test');
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], function ($value, $args, $context, $info) use ($dummy_object) {
-      return $dummy_object->id();
-    });
-
+    $this->mockResolver('Query', 'root',
+      function () use ($dummy) {
+        return $dummy->id();
+      }
+    );
 
     // The first request that is supposed to be cached.
     $this->query('{ root }');
@@ -76,33 +68,33 @@ GQL;
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
+
     $cacheable->expects($this->any())
       ->method('getCacheTags')
       ->willReturn([]);
+
     $cacheable->expects($this->any())
       ->method('getCacheMaxAge')
       ->willReturn(0);
+
     $cacheable->expects($this->any())
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $dummy_object = $this->getMockBuilder(Server::class)
+    $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
       ->getMock();
-    $dummy_object->expects($this->exactly(2))
+
+    $dummy->expects($this->exactly(2))
       ->method('id')
       ->willReturn('test');
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $this->builder->compose(
+    $this->mockResolver('Query', 'root',
+      $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
-          return $dummy_object->id();
+        $this->builder->callback(function () use ($dummy) {
+          return $dummy->id();
         })
       )
     );
@@ -121,33 +113,33 @@ GQL;
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
+
     $cacheable->expects($this->any())
       ->method('getCacheTags')
       ->willReturn([]);
+
     $cacheable->expects($this->any())
       ->method('getCacheMaxAge')
       ->willReturn(0);
+
     $cacheable->expects($this->any())
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $dummy_object = $this->getMockBuilder(Server::class)
+    $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
       ->getMock();
-    $dummy_object->expects($this->exactly(2))
+
+    $dummy->expects($this->exactly(2))
       ->method('id')
       ->willReturn('test');
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $this->builder->compose(
+    $this->mockResolver('Query', 'root',
+      $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
-          return $dummy_object->id();
+        $this->builder->callback(function () use ($dummy) {
+          return $dummy->id();
         })
       )
     );
@@ -160,24 +152,21 @@ GQL;
   }
 
   /**
-   * Test if caching properly handles variabels.
+   * Test if caching properly handles variables.
    */
   public function testVariables() {
-    $dummy_object = $this->getMockBuilder(Server::class)
+    $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
       ->getMock();
-    $dummy_object->expects($this->exactly(2))
+
+    $dummy->expects($this->exactly(2))
       ->method('id')
       ->willReturn('test');
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], function ($value, $args, $context, $info) use ($dummy_object) {
-        return $dummy_object->id();
+    $this->mockResolver('Query', 'root',
+      function () use ($dummy) {
+        return $dummy->id();
       }
     );
 
@@ -198,21 +187,25 @@ GQL;
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
+
     $cacheable->expects($this->any())
       ->method('getCacheTags')
       ->willReturn([]);
+
     $cacheable->expects($this->any())
       ->method('getCacheMaxAge')
       ->willReturn(45);
+
     $cacheable->expects($this->any())
       ->method('getCacheContexts')
       ->willReturn(['context']);
 
-    $dummy_object = $this->getMockBuilder(Server::class)
+    $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
       ->getMock();
-    $dummy_object->expects($this->exactly(2))
+
+    $dummy->expects($this->exactly(2))
       ->method('id')
       ->willReturn('test');
 
@@ -238,15 +231,11 @@ GQL;
     /** @var \Prophecy\Prophecy\MethodProphecy $contextKeys */
     $contextKeys = $contextManager->convertTokensToKeys($hasContext);
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $this->builder->compose(
+    $this->mockResolver('Query', 'root',
+      $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
-          return $dummy_object->id();
+        $this->builder->callback(function () use ($dummy) {
+          return $dummy->id();
         })
       )
     );
@@ -274,33 +263,33 @@ GQL;
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
+
     $cacheable->expects($this->any())
       ->method('getCacheTags')
       ->willReturn(['a', 'b']);
+
     $cacheable->expects($this->any())
       ->method('getCacheMaxAge')
       ->willReturn(45);
+
     $cacheable->expects($this->any())
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $dummy_object = $this->getMockBuilder(Server::class)
+    $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
       ->getMock();
-    $dummy_object->expects($this->exactly(2))
+
+    $dummy->expects($this->exactly(2))
       ->method('id')
       ->willReturn('test');
 
-    $this->mockField('root', [
-      'id' => 'root',
-      'name' => 'root',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], $this->builder->compose(
+    $this->mockResolver('Query', 'root',
+      $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->mockCallable(function ($value, $args, $context, $info) use ($dummy_object) {
-          return $dummy_object->id();
+        $this->builder->callback(function () use ($dummy) {
+          return $dummy->id();
         })
       )
     );
@@ -331,12 +320,8 @@ GQL;
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
-    $this->mockField('leakA', [
-      'id' => 'leakA',
-      'name' => 'leakA',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($renderer) {
+    $this->mockResolver('Query', 'leakA',
+      function ($a, $b, $c, $d, FieldContext $field) use ($renderer) {
         $el = [
           '#plain_text' => 'Leak A',
           '#cache' => [
@@ -350,31 +335,29 @@ GQL;
         });
 
         if (!$renderContext->isEmpty()) {
-          $context->addCacheableDependency($renderContext->pop());
+          $field->addCacheableDependency($renderContext->pop());
         }
+
         return $value;
       }
     );
 
-    $this->mockField('leakB', [
-      'id' => 'leakB',
-      'name' => 'leakB',
-      'type' => 'String',
-      'parent' => 'Query',
-    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($renderer) {
+    $this->mockResolver('Query', 'leakB',
+      function ($a, $b, $c, $d, FieldContext $field) use ($renderer) {
         $el = [
           '#plain_text' => 'Leak B',
           '#cache' => [
             'tags' => ['b'],
           ],
         ];
+
         $renderContext = new RenderContext();
         $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
           return $renderer->render($el)->__toString();
         });
 
         if (!$renderContext->isEmpty()) {
-          $context->addCacheableDependency($renderContext->pop());
+          $field->addCacheableDependency($renderContext->pop());
         }
 
         return new Deferred(function () use ($value) {
@@ -384,10 +367,10 @@ GQL;
     );
 
     $query = <<<GQL
-query {
-  leakA
-  leakB
-}
+      query {
+        leakA
+        leakB
+      }
 GQL;
 
     $metadata = $this->defaultCacheMetaData()

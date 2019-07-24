@@ -2,11 +2,19 @@
 
 namespace Drupal\graphql\Plugin;
 
-use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use GraphQL\Type\Definition\ResolveInfo;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 
-interface DataProducerPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
+interface DataProducerPluginInterface extends ContextAwarePluginInterface, CacheableDependencyInterface, DerivativeInspectionInterface {
+
+  /**
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
+   *
+   * @return \GraphQL\Deferred|mixed
+   */
+  public function resolveField(FieldContext $field);
 
 }

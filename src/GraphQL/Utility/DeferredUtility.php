@@ -56,7 +56,6 @@ class DeferredUtility {
    */
   public static function returnFinally($value, callable $callback) {
     if ($value instanceof Deferred) {
-      // Recursively apply this function to deferred results.
       return new Deferred(function () use ($value, $callback) {
         return $value->then(function ($value) use ($callback) {
           return $callback($value);
@@ -74,7 +73,7 @@ class DeferredUtility {
    * values. If it does not contain any promises at all, it will simply return
    * the original array unchanged.
    *
-   * @param $values
+   * @param array $values
    *   An array of promises and arbitrary values.
    *
    * @return \GraphQL\Deferred|array

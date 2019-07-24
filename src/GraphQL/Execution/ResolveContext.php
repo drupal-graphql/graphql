@@ -4,64 +4,117 @@ namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use Drupal\graphql\Entity\ServerInterface;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
-   * Read-only list of global values.
-   *
-   * @var array
+   * @var \Drupal\graphql\Entity\ServerInterface
    */
-  protected $globals;
+  protected $server;
 
   /**
-   * The context stack.
-   *
    * @var array
    */
-  protected $contexts = [];
+  protected $config;
+
+  /**
+   * @var array
+   */
+  protected $contexts;
+
+  /**
+   * @var \GraphQL\Server\OperationParams
+   */
+  protected $operation;
+
+  /**
+   * @var \GraphQL\Language\AST\DocumentNode
+   */
+  protected $document;
+
+  /**
+   * @var string
+   */
+  protected $type;
+
+  /**
+   * @var string
+   */
+  protected $language;
 
   /**
    * ResolveContext constructor.
    *
-   * @param array $globals
-   *   List of global values to expose to field resolvers.
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   * @param \GraphQL\Server\OperationParams $operation
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   * @param $type
+   * @param array $config
    */
-  public function __construct(array $globals = []) {
-    $this->globals = $globals;
+  public function __construct(
+    ServerInterface $server,
+    OperationParams $operation,
+    DocumentNode $document,
+    $type,
+    array $config
+  ) {
+    $this->addCacheContexts(['user.permissions']);
+
+    $this->server = $server;
+    $this->config = $config;
+    $this->operation = $operation;
+    $this->document = $document;
+    $this->type = $type;
   }
 
   /**
-   * Get a contextual value for the current field.
-   *
-   * Allows field resolvers to inherit contextual values from their ancestors.
-   *
-   * @param string $name
-   *   The name of the context.
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *   The resolve info object.
-   * @param mixed $default
-   *   An arbitrary default value in case the context is not set.
-   *
-   * @return mixed
-   *   The current value of the given context or the given default value if the
-   *   context wasn't set.
+   * @return \Drupal\graphql\Entity\ServerInterface
    */
-  public function getContext($name, ResolveInfo $info, $default = NULL) {
-    $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
-    $path = $info->path;
+  public function getServer() {
+    return $this->server;
+  }
 
-    do {
-      $key = implode('.', $path);
-      if (isset($this->contexts[$operation][$key]) && array_key_exists($name, $this->contexts[$operation][$key])) {
-        return $this->contexts[$operation][$key][$name];
-      }
-      array_pop($path);
-    } while (count($path));
+  /**
+   * @return \GraphQL\Server\OperationParams
+   */
+  public function getOperation() {
+    return $this->operation;
+  }
 
-    return $default;
+  /**
+   * @return \GraphQL\Language\AST\DocumentNode
+   */
+  public function getDocument() {
+    return $this->document;
+  }
+
+  /**
+   * @return string
+   */
+  public function getType(): string {
+    return $this->type;
+  }
+
+  /**
+   * @return string
+   */
+  public function getContextLanguage() {
+    return $this->language;
+  }
+
+  /**
+   * @param $language
+   *
+   * @return string
+   */
+  public function setContextLanguage($language) {
+    $this->language = $language;
+    return $this;
   }
 
   /**
@@ -70,41 +123,75 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * Allows field resolvers to set contextual values which can be inherited by
    * their descendants.
    *
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
    * @param string $name
    *   The name of the context.
    * @param $value
    *   The value of the context.
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *   The resolve info object.
    *
    * @return $this
    */
-  public function setContext($name, $value, ResolveInfo $info) {
-    $operation = isset($info->operation->name->value) ? $info->operation->name->value : $info->operation->operation;
+  public function setContextValue(ResolveInfo $info, $name, $value) {
     $key = implode('.', $info->path);
-    $this->contexts[$operation][$key][$name] = $value;
+    $this->contexts[$key][$name] = $value;
 
     return $this;
   }
 
   /**
-   * Retrieve a global/static parameter value.
+   * Get a contextual value for the current field.
    *
+   * Allows field resolvers to inherit contextual values from their ancestors.
+   *
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
    * @param string $name
-   *   The name of the global parameter.
-   * @param mixed $default
-   *   An arbitrary default value in case the context is not set.
+   *   The name of the context.
    *
-   * @return mixed|null
-   *   The requested global parameter value or the given default value if the
-   *   parameter is not set.
+   * @return mixed
+   *   The current value of the given context or NULL if it's not set.
    */
-  public function getGlobal($name, $default = NULL) {
-    if (isset($this->globals[$name])) {
-      return $this->globals[$name];
-    }
+  public function getContextValue(ResolveInfo $info, $name) {
+    $path = $info->path;
 
-    return $default;
+    do {
+      $key = implode('.', $path);
+      if (isset($this->contexts[$key]) && array_key_exists($name, $this->contexts[$key])) {
+        return $this->contexts[$key][$name];
+      }
+
+      array_pop($path);
+    } while (count($path));
+
+    return NULL;
   }
 
+  /**
+   * Checks whether contextual value for the current field exists.
+   *
+   * Also checks ancestors of the field.
+   *
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   The resolve info object.
+   * @param string $name
+   *   The name of the context.
+   *
+   * @return boolean
+   *   TRUE if the context exists, FALSE Otherwise.
+   */
+  public function hasContextValue(ResolveInfo $info, $name) {
+    $path = $info->path;
+
+    do {
+      $key = implode('.', $path);
+      if (isset($this->contexts[$key]) && array_key_exists($name, $this->contexts[$key])) {
+        return TRUE;
+      }
+
+      array_pop($path);
+    } while (count($path));
+
+    return FALSE;
+  }
 }

@@ -33,7 +33,6 @@ module.exports = {
     new CopyWebpackPlugin([
       { from: path.resolve(__dirname, 'node_modules/graphql-voyager/dist/voyager.worker.js') },
       { from: path.resolve(__dirname, 'node_modules/graphql-voyager/dist/voyager.css') },
-      { from: path.resolve(__dirname, 'node_modules/graphql-voyager/dist/voyager.css.map') },
       { from: path.resolve(__dirname, 'src/container.css') },
     ]),
   ]).concat(process.env.NODE_ENV === 'production' ? [

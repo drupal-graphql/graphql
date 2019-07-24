@@ -14,6 +14,13 @@ use Drupal\Component\Annotation\Plugin;
 class DataProducer extends Plugin {
 
   /**
+   * The plugin ID.
+   *
+   * @var string
+   */
+  public $id;
+
+  /**
    * The component name.
    *
    * @var string

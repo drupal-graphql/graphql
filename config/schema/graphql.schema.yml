@@ -1,0 +1,41 @@
+graphql.graphql_servers.*:
+  type: config_entity
+  label: 'Server'
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+    label:
+      type: string
+      label: 'Label'
+    endpoint:
+      type: string
+      label: 'Endpoint'
+    debug:
+      type: boolean
+      label: 'Debug'
+    schema:
+      type: string
+      label: 'Schema'
+    caching:
+      type: boolean
+      label: 'Caching'
+    batching:
+      type: boolean
+      label: 'Batching'
+    schema_configuration:
+      type: 'graphql.schema.[%parent.schema]'
+
+graphql.schema.*:
+  type: mapping
+  label: 'Schema settings'
+
+graphql.schema.composable:
+  type: mapping
+  label: 'Composable schema'
+  mapping:
+    extensions:
+      label: Enabled extensions
+      type: sequence
+      sequence:
+        type: boolean

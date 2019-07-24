@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\GraphQL\Resolver;
 
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -15,10 +16,9 @@ class Map implements ResolverInterface {
   protected $resolver;
 
   /**
-   * Constructor.
+   * Map constructor.
    *
-   * @param mixed $resolver
-   *   Resolver to tap.
+   * @param $resolver
    */
   public function __construct($resolver) {
     $this->resolver = $resolver;
@@ -27,14 +27,14 @@ class Map implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     if (!is_iterable($value)) {
       return NULL;
     }
 
     $array = is_array($value) ? $value : iterator_to_array($value);
-    return array_map(function ($item) use ($args, $context, $info) {
-      return $this->resolver->resolve($item, $args, $context, $info);
+    return array_map(function ($item) use ($args, $context, $info, $field) {
+      return $this->resolver->resolve($item, $args, $context, $info, $field);
     }, $array);
   }
 

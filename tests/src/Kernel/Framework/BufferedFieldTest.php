@@ -3,13 +3,9 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\Buffers\BufferBase;
-use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Zend\Stdlib\ArrayObject;
 use GraphQL\Deferred;
-use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use GraphQL\Type\Definition\ResolveInfo;
-use Drupal\graphql\GraphQL\ResolverBuilder;
 
 /**
  * Test batched field resolving.
@@ -19,13 +15,16 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 class BufferedFieldTest extends GraphQLTestBase {
 
   /**
-   * Test if the schema is created properly.
+   * {@inheritdoc}
    */
-  public function testBatchedFields() {
-    $gql_schema = <<<GQL
+  protected function setUp() {
+    parent::setUp();
+
+    $schema = <<<GQL
       schema {
         query: Query
       }
+
       type Query {
         users(uids: [String]): [User]
       }
@@ -36,9 +35,14 @@ class BufferedFieldTest extends GraphQLTestBase {
         foe: User
       }
 GQL;
-    $this->setUpSchema($gql_schema, $this->getDefaultSchema());
-    $builder = new ResolverBuilder();
 
+    $this->setUpSchema($schema);
+  }
+
+  /**
+   * Test if the schema is created properly.
+   */
+  public function testBatchedFields() {
     $buffer = $this->getMockBuilder(BufferBase::class)
       ->setMethods(['resolveBufferArray'])
       ->getMock();
@@ -65,11 +69,8 @@ GQL;
         }, $items);
       });
 
-    $this->mockField('users', [
-      'name' => 'users',
-      'type' => '[User]',
-      'parent' => 'Query',
-    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($buffer) {
+    $this->mockResolver('Query', 'users',
+      function ($parent, $args) use ($buffer) {
         $resolvers = array_map(function ($uid) use ($buffer) {
           return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
         }, $args['uids']);
@@ -79,48 +80,35 @@ GQL;
           foreach ($resolvers as $resolver) {
             $result[] = $resolver();
           }
+
           return $result;
         });
       }
     );
 
-    $this->mockField('name', [
-      'name' => 'name',
-      'type' => 'String',
-      'parent' => 'User',
-    ], $builder->compose(
-        $builder->fromParent(),
-        new Callback(function ($value, $args, ResolveContext $context, ResolveInfo $info) {
-          return $value['name'];
-        })
-      )
+    $this->mockResolver('User', 'name',
+      function ($parent) {
+        return $parent['name'];
+      }
     );
 
-    $this->mockField('friends', [
-      'name' => 'friends',
-      'type' => '[User]',
-      'parent' => 'User',
-    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($buffer) {
+    $this->mockResolver('User', 'friends',
+      function ($parent) use ($buffer) {
         $resolvers = array_map(function ($uid) use ($buffer) {
           return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
-        }, $value['friends']);
+        }, $parent['friends']);
 
         return new Deferred(function () use ($resolvers) {
-          $result = [];
-          foreach ($resolvers as $resolver) {
-            $result[] = $resolver();
-          }
-          return $result;
+          return array_map(function ($resolver) {
+            return $resolver();
+          }, $resolvers);
         });
       }
     );
 
-    $this->mockField('foe', [
-      'name' => 'foe',
-      'type' => 'User',
-      'parent' => 'User',
-    ], function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($buffer) {
-        $resolver = $buffer->createBufferResolver(new ArrayObject(['uid' => $value['foe']]));
+    $this->mockResolver('User', 'foe',
+      function ($parent) use ($buffer) {
+        $resolver = $buffer->createBufferResolver(new ArrayObject(['uid' => $parent['foe']]));
 
         return new Deferred(function () use ($resolver) {
           return $resolver();

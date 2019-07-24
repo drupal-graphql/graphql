@@ -3,6 +3,7 @@
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -23,12 +24,10 @@ class Context implements ResolverInterface {
   protected $default;
 
   /**
-   * Constructor.
+   * Context constructor.
    *
-   * @param string $name
-   *   Name of the context.
-   * @param mixed $default
-   *   An arbitrary default value in case the context is not set.
+   * @param $name
+   * @param null $default
    */
   public function __construct($name, $default = NULL) {
     $this->name = $name;
@@ -38,8 +37,12 @@ class Context implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info) {
-    $output = $context->getContext($this->name, $info, $this->default);
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+    $output = $field->getContextValue($this->name);
+    if (!isset($output) && !$field->hasContextValue($this->name)) {
+      $output = $this->default;
+    }
+
     if ($output instanceof CacheableDependencyInterface) {
       $context->addCacheableDependency($output);
     }
