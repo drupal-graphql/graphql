@@ -67,7 +67,7 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
    * @return int
    *   The current user id.
    */
-  public function resolve(FieldContext $field_context) {
+  public function resolve(FieldContext $field_context): int {
     // Response must be cached based on current user as a cache context,
     // otherwise a new user would became a previous user.
     $field_context->addCacheableDependency($this->currentUser);
