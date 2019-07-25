@@ -57,7 +57,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
   /**
    * The entity revision buffer service.
    *
-   * @var \Drupal\jobiqo_graphql\GraphQL\Buffers\EntityRevisionBuffer
+   * @var \Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
    */
   protected $entityRevisionBuffer;
 
@@ -72,7 +72,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('jobiqo_graphql.buffer.entity_revisions')
+      $container->get('graphql.buffer.entity_revision')
     );
   }
 
@@ -87,7 +87,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\jobiqo_graphql\GraphQL\Buffers\EntityRevisionBuffer $entityRevisionBuffer
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer $entityRevisionBuffer
    *   The entity revision buffer service.
    *
    * @codeCoverageIgnore
