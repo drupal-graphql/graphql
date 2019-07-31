@@ -45,12 +45,13 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
           'name' => StringHelper::propCase($id, 'context'),
           'context_id' => $id,
           'type' => $context->getContextDefinition()->getDataType(),
-        ] + $basePluginDefinition;
+        ];
         // Add cache contexts, if available
         if ($context instanceof CacheableDependencyInterface) {
-          $this->derivatives[$id]['response_cache_contexts'] = array_merge($this->derivatives[$id]['response_cache_contexts'], $context->getCacheContexts());
-
+          $this->derivatives[$id]['response_cache_contexts'] = $context->getCacheContexts();
         }
+        // Add default base
+        $this->derivatives[$id] += $basePluginDefinition;
       }
     }
 
