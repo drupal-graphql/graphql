@@ -172,7 +172,7 @@ class QueryProcessor {
   protected function executeOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, $batching = FALSE) {
     try {
       if (!$config->getSchema()) {
-        throw new \LogicException('Missing schema for query execution.');
+        throw new Error('Missing schema for query execution.');
       }
 
       if ($batching && !$config->getQueryBatching()) {
@@ -403,6 +403,7 @@ class QueryProcessor {
    * @param $operation
    *
    * @return array
+   * @throws \GraphQL\Server\RequestError
    */
   protected function resolveValidationRules(ServerConfig $config, OperationParams $params, DocumentNode $document, $operation) {
     // Allow customizing validation rules per operation:
@@ -410,7 +411,7 @@ class QueryProcessor {
     if (is_callable($rules)) {
       $rules = $rules($params, $document, $operation);
       if (!is_array($rules)) {
-        throw new \LogicException(sprintf("Expecting validation rules to be array or callable returning array, but got: %s", Utils::printSafe($rules)));
+        throw new RequestError(sprintf("Expecting validation rules to be array or callable returning array, but got: %s", Utils::printSafe($rules)));
       }
     }
 
@@ -431,7 +432,7 @@ class QueryProcessor {
 
     $source = $loader($params->queryId, $params);
     if (!is_string($source) && !$source instanceof DocumentNode) {
-      throw new \LogicException(sprintf('The persisted query loader must return query string or instance of %s but got: %s.', DocumentNode::class, Utils::printSafe($source)));
+      throw new RequestError(sprintf('The persisted query loader must return query string or instance of %s but got: %s.', DocumentNode::class, Utils::printSafe($source)));
     }
 
     return $source;
