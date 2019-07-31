@@ -47,7 +47,7 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
         ] + $basePluginDefinition;
         // Add cache contexts, if available
         if (is_callable([$context, 'getCacheContexts'])) {
-          $this->derivatives[$id]['response_cache_contexts'] = $context->getCacheContexts();
+          $this->derivatives[$id]['response_cache_contexts'] = array_merge($this->derivatives[$id]['response_cache_contexts'], $context->getCacheContexts());
         }
       }
     }
