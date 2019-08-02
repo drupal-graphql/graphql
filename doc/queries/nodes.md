@@ -39,6 +39,9 @@ Now we have an "Article" type in the schema with three fields `id`, `label` and 
 To add the resolvers we go to our schema implementation and call the appropriate data producers inside the `getResolverRegistry` method. Because our types are extending a common `NodeInterface` we need to also tell what to resolve for a particular type, otherwise it could be an Article or a Page.
 
 ```php
+use GraphQL\Error\Error;
+...
+
 /**
  * {@inheritdoc}
  */
@@ -57,7 +60,7 @@ protected function getResolverRegistry() {
         case 'page': return 'Page';
       }
     }
-    throw new \Exception('Could not resolve content type.');
+    throw new Error('Could not resolve content type.');
   });
 
   $registry->addFieldResolver('Query', 'article',
