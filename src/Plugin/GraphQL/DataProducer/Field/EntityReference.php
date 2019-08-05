@@ -32,8 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Field name")
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity bundle(s)"),
- *       multiple = TRUE,
+ *       label = @Translation("Entity language"),
  *       required = FALSE
  *     ),
  *     "bundle" = @ContextDefinition("string",
