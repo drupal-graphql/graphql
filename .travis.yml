@@ -4,9 +4,7 @@ dist: bionic
 
 php:
   - 7.2
-# PHP 7.3 testing is disabled for now because there is an error we cannot
-# reproduce locally. See https://github.com/drupal-graphql/graphql/pull/872
-# - 7.3
+  - 7.3
 
 services:
   - mysql
