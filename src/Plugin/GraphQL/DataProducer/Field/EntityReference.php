@@ -32,8 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Field name")
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity bundle(s)"),
- *       multiple = TRUE,
+ *       label = @Translation("Entity language"),
  *       required = FALSE
  *     ),
  *     "bundle" = @ContextDefinition("string",
@@ -158,12 +157,11 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
         if (isset($language)) {
           $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
               $entity = $entity->getTranslation($language);
-              $entity->addCacheContexts(["static:language:{$language}"]);
-              return $entity;
             }
 
+            $entity->addCacheContexts(["static:language:{$language}"]);
             return $entity;
           }, $entities);
         }
