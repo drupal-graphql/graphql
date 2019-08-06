@@ -116,7 +116,7 @@ GQL;
       }
     );
 
-    /*$query = $this->getQueryFromFile('batched.gql');
+    $query = $this->getQueryFromFile('batched.gql');
     $metadata = $this->defaultCacheMetaData();
     $this->assertResults($query, [], [
       'a' => [
@@ -134,7 +134,7 @@ GQL;
           'foe' => ['name' => 'E'],
         ],
       ],
-    ], $metadata);*/
+    ], $metadata);
   }
 
 }
