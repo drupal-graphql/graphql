@@ -92,7 +92,7 @@ GQL;
       }
     );
 
-    /*$this->mockResolver('User', 'friends',
+    $this->mockResolver('User', 'friends',
       function ($parent) use ($buffer) {
         $resolvers = array_map(function ($uid) use ($buffer) {
           return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
@@ -106,7 +106,7 @@ GQL;
       }
     );
 
-    $this->mockResolver('User', 'foe',
+    /*$this->mockResolver('User', 'foe',
       function ($parent) use ($buffer) {
         $resolver = $buffer->createBufferResolver(new ArrayObject(['uid' => $parent['foe']]));
 
