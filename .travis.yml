@@ -3,9 +3,7 @@ sudo: false
 
 php:
   - 7.2
-# PHP 7.3 testing is disabled for now because there is an error we cannot
-# reproduce locally. See https://github.com/drupal-graphql/graphql/pull/872
-# - 7.3
+  - 7.3
 
 env:
   global:
@@ -31,6 +29,10 @@ matrix:
         - DRUPAL_CORE=8.7.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
+    # PHP 7.3 testing is allowed to fail for now because there is an error we
+    # cannot reproduce locally.
+    # See https://github.com/drupal-graphql/graphql/pull/872
+    - php: 7.3
 
 mysql:
   database: graphql
