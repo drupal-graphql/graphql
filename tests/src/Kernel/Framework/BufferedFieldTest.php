@@ -41,6 +41,8 @@ GQL;
 
   /**
    * Test if the schema is created properly.
+   *
+   * @preserveGlobalState disabled
    */
   public function testBatchedFields() {
     $buffer = $this->getMockBuilder(BufferBase::class)
