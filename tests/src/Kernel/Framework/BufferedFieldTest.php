@@ -106,7 +106,7 @@ GQL;
       }
     );
 
-    /*$this->mockResolver('User', 'foe',
+    $this->mockResolver('User', 'foe',
       function ($parent) use ($buffer) {
         $resolver = $buffer->createBufferResolver(new ArrayObject(['uid' => $parent['foe']]));
 
@@ -116,7 +116,7 @@ GQL;
       }
     );
 
-    $query = $this->getQueryFromFile('batched.gql');
+    /*$query = $this->getQueryFromFile('batched.gql');
     $metadata = $this->defaultCacheMetaData();
     $this->assertResults($query, [], [
       'a' => [
