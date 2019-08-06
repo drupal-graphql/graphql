@@ -61,7 +61,7 @@ GQL;
       'e' => ['name' => 'E'],
     ];
 
-    $buffer->expects(static::exactly(2))
+    $buffer
       ->method('resolveBufferArray')
       ->willReturnCallback(function ($items) use ($users) {
         return array_map(function ($item) use ($users) {
@@ -69,7 +69,7 @@ GQL;
         }, $items);
       });
 
-    $this->mockResolver('Query', 'users',
+    /*$this->mockResolver('Query', 'users',
       function ($parent, $args) use ($buffer) {
         $resolvers = array_map(function ($uid) use ($buffer) {
           return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
@@ -134,7 +134,7 @@ GQL;
           'foe' => ['name' => 'E'],
         ],
       ],
-    ], $metadata);
+    ], $metadata);*/
   }
 
 }

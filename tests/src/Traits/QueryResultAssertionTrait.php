@@ -89,9 +89,9 @@ trait QueryResultAssertionTrait {
       ])
     );
 
-    /*$this->assertResultErrors($result, []);
+    $this->assertResultErrors($result, []);
     $this->assertResultData($result, $expected);
-    $this->assertResultMetadata($result, $metadata ?: $this->defaultCacheMetaData());*/
+    $this->assertResultMetadata($result, $metadata ?: $this->defaultCacheMetaData());
   }
 
   /**
