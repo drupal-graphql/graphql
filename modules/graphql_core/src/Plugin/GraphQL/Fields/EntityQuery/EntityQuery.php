@@ -153,7 +153,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     }
 
     if (array_key_exists('filter', $args)) {
-      $query = $this->applyFilter($query, $args['filter']);
+      $secure = $context->getGlobal('development', FALSE) || $context->getGlobal('bypass field security', FALSE);
+      $query = $this->applyFilter($query, $args['filter'], $secure);
     }
 
     if (array_key_exists('sort', $args)) {
@@ -273,14 +274,17 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The entity query object.
    * @param mixed $filter
    *   The filter definitions from the field arguments.
+   * @param bool $secure
+   *   Whether the query is running in a secure context. Defaults to FALSE.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The entity query object.
+   * @throws \GraphQL\Error\Error
    */
-  protected function applyFilter(QueryInterface $query, $filter) {
+  protected function applyFilter(QueryInterface $query, $filter, $secure = FALSE) {
     if (!empty($filter) && is_array($filter)) {
       //Conditions can be disabled. Check we are not adding an empty condition group.
-      $filterConditions = $this->buildFilterConditions($query, $filter);
+      $filterConditions = $this->buildFilterConditions($query, $filter, $secure);
       if (count($filterConditions->conditions())) {
         $query->condition($filterConditions);
       }
@@ -296,14 +300,15 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   The entity query object.
    * @param array $filter
    *   The filter definitions from the field arguments.
+   * @param bool $secure
+   *   Whether the query is running in a secure context. Defaults to FALSE.
    *
    * @return \Drupal\Core\Entity\Query\ConditionInterface
    *   The generated condition group according to the given filter definitions.
    *
-   * @throws \GraphQL\Error\Error
-   *   If the given operator and value for a filter are invalid.
+   * @throws \GraphQL\Error\Error If the given operator and value for a filter are invalid.
    */
-  protected function buildFilterConditions(QueryInterface $query, array $filter) {
+  protected function buildFilterConditions(QueryInterface $query, array $filter, $secure = FALSE) {
     $conjunction = !empty($filter['conjunction']) ? $filter['conjunction'] : 'AND';
     $group = $conjunction === 'AND' ? $query->andConditionGroup() : $query->orConditionGroup();
 
@@ -344,6 +349,11 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
         if (!empty($value)) {
           throw new Error(sprintf("Null operators must not be associated with a filter value (field '%s').", $field));
         }
+      }
+
+      // Protect against unsafe operators
+      if (!empty($operator) && !$secure && $this->isUnsafeOperator($operator)) {
+        throw new Error(sprintf("The unsafe query operator '%s' is not allowed in this context (field '%s').", $operator, $field));
       }
 
       // If no operator is set, however, we default to EQUALS or IN, depending
@@ -409,8 +419,22 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
    *   TRUE if the given operator is a range operator, FALSE otherwise.
    */
   protected function isRangeOperator($operator) {
-    $null = ["BETWEEN", "NOT BETWEEN"];
-    return in_array($operator, $null);
+    $range = ["BETWEEN", "NOT BETWEEN"];
+    return in_array($operator, $range);
+  }
+
+  /**
+   * Checks if an operator is potentially unsafe.
+   *
+   * @param string $operator
+   *   The query operator to check against.
+   *
+   * @return bool
+   *   TRUE if the given operator is an unsafe operator, FALSE otherwise.
+   */
+  protected function isUnsafeOperator($operator) {
+    $unsafe = ["<", "<=", ">", ">=", "LIKE", "NOT LIKE", "BETWEEN", "NOT BETWEEN"];
+    return in_array($operator, $unsafe);
   }
 
 }
