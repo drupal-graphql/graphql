@@ -41,7 +41,7 @@ class EntityFieldBase extends FieldPluginBase {
       }
       
       if ($result instanceof ContentEntityInterface) {
-        $access = $entity->access('view', NULL, TRUE);
+        $access = $result->access('view', NULL, TRUE);
         $context->addCacheableDependency($access);
 
         if (!$access->isAllowed()) {
