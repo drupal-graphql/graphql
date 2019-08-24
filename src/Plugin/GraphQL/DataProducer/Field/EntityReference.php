@@ -91,7 +91,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository service.
@@ -104,7 +104,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
     $configuration,
     $pluginId,
     $pluginDefinition,
-    EntityTypeManager $entityTypeManager,
+    EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
   ) {
