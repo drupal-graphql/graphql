@@ -46,7 +46,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("User"),
  *       required = FALSE
  *     ),
- *     "operation" = @ContextDefinition("string",
+ *     "access_operation" = @ContextDefinition("string",
  *       label = @Translation("Operation"),
  *       required = FALSE
  *     )
@@ -129,14 +129,17 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @param $id
    * @param null $language
    * @param null $bundles
+   * @param bool $access
+   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, $access = NULL, AccountInterface $accessUser = NULL, string $operation = NULL, FieldContext $context) {
+  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, $access = TRUE, AccountInterface $accessUser = NULL, string $accessOperation = 'view', FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $operation) {
+    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
@@ -150,7 +153,10 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
-        if (!$entity->access($operation ?? 'view', $accessUser)) {
+        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+        $context->addCacheableDependency($accessResult);
+        if ($accessResult->isForbidden()) {
           return NULL;
         }
       }
