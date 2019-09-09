@@ -93,7 +93,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
    *
    * @return |null
    */
-  public function resolve(EntityInterface $entity, $language, bool $access = TRUE, AccountInterface $accessUser = NULL, string $accessOperation = 'view') {
+  public function resolve(EntityInterface $entity, $language, ?bool $access = TRUE, AccountInterface $accessUser = NULL, ?string $accessOperation = 'view') {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $entity = $entity->getTranslation($language);
       $entity->addCacheContexts(["static:language:{$language}"]);
