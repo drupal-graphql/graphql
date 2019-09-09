@@ -136,7 +136,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, ?$access = TRUE, AccountInterface $accessUser = NULL, ?string $accessOperation = 'view', FieldContext $context) {
+  public function resolve($type, $id = NULL, $language = NULL, $bundles = NULL, ?bool $access = TRUE, AccountInterface $accessUser = NULL, ?string $accessOperation = 'view', FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
     return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
