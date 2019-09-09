@@ -22,7 +22,7 @@ This list includes all available data producers inside GraphQL to this day and b
 * **Entity id** (`entity_id`) : Returns the entity identifier.
 * **Entity label** (`entity_label`) : Returns the entity label given an entity such as a node.
 * **Entity language** (`entity_language`) : Returns the entity language.
-* **Entity load** (`entity_load`) : Loads a single entity given parameters like type, id (optional), language (optional) or bundles (optional)
+* **Entity load** (`entity_load`) : Loads a single entity given parameters like type, id (optional), language (optional) bundles (optional), access (TRUE by default), access_user (current user by default) or access_operation ("view" by default).
 * **Entity load multiple** (`entity_load_multiple`) : Loads a multiple entities given parameters like type, ids (optional), language (optional) or bundles (optional)
 * **Entity load by uuid** (`entity_load_by_uuid`) : Loads a single entity by Uuid.
 * **Entity owner** (`entity_owner`) : Returns the entity owner given an entity such as a node.
