@@ -28,15 +28,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     ),
  *     "access" = @ContextDefinition("boolean",
  *       label = @Translation("Check access"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = TRUE
  *     ),
  *     "access_user" = @ContextDefinition("entity:user",
  *       label = @Translation("User"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = NULL
  *     ),
  *     "access_operation" = @ContextDefinition("string",
  *       label = @Translation("Operation"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
