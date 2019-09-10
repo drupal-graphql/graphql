@@ -140,7 +140,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, array $ids, $language = NULL, array $bundles = NULL, ?bool $access = TRUE, AccountInterface $accessUser = NULL, ?string $accessOperation = 'view', FieldContext $context) {
+  public function resolve($type, array $ids, $language, array $bundles, ?bool $access, AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
