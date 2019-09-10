@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -36,6 +37,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -116,14 +132,17 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    * @param $uuid
    * @param array|string $language
    * @param array|string $bundles
+   * @param bool $access
+   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $uuid, $language = NULL, $bundles = NULL, FieldContext $context) {
+  public function resolve($type, $uuid, $language, $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
-    return new Deferred(function () use ($type, $language, $bundles, $resolver, $context) {
+    return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that the
         // cache entry is purged whenever a new entity of this type is saved.
@@ -132,6 +151,17 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
         $tags = $type->getListCacheTags();
         $context->addCacheTags($tags);
         return NULL;
+      }
+
+      // Check if the passed user (or current user if none is passed) has access
+      // to the entity, if not return NULL.
+      if ($access) {
+        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+        $context->addCacheableDependency($accessResult);
+        if ($accessResult->isForbidden()) {
+          return NULL;
+        }
       }
 
       if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {

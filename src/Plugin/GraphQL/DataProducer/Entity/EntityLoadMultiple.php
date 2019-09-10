@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -37,6 +38,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -113,18 +129,21 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
-   * @param string $type
-   * @param int[] $ids
-   * @param string $language
-   * @param string[] $bundles
+   * @param $type
+   * @param array $ids
+   * @param null $language
+   * @param array|NULL $bundles
+   * @param bool $access
+   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, array $ids, $language = NULL, array $bundles = NULL, FieldContext $context) {
+  public function resolve($type, array $ids, $language, array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
-    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
+    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that
@@ -150,15 +169,15 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
           $entities[$id]->addCacheContexts(["static:language:{$language}"]);
         }
 
-        $access = $entity->access('view', NULL, TRUE);
-        $context->addCacheableDependency($access);
-
-        if (!$access->isAllowed()) {
-          // Do not return the entity if access is denied.
-          unset($entities[$id]);
-          continue;
+        if ($access) {
+          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+          $context->addCacheableDependency($accessResult);
+          if ($accessResult->isForbidden()) {
+            unset($entities[$id]);
+            continue;
+          }
         }
-
       }
 
       return $entities;

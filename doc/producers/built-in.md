@@ -22,14 +22,14 @@ This list includes all available data producers inside GraphQL to this day and b
 * **Entity id** (`entity_id`) : Returns the entity identifier.
 * **Entity label** (`entity_label`) : Returns the entity label given an entity such as a node.
 * **Entity language** (`entity_language`) : Returns the entity language.
-* **Entity load** (`entity_load`) : Loads a single entity given parameters like type, id (optional), language (optional) or bundles (optional)
-* **Entity load multiple** (`entity_load_multiple`) : Loads a multiple entities given parameters like type, ids (optional), language (optional) or bundles (optional)
-* **Entity load by uuid** (`entity_load_by_uuid`) : Loads a single entity by Uuid.
+* **Entity load** (`entity_load`) : Loads a single entity given parameters like type, id (optional), language (optional) bundles (optional), access (TRUE by default), access_user (current user by default) or access_operation ("view" by default).
+* **Entity load multiple** (`entity_load_multiple`) : Loads a multiple entities given parameters like type, ids (optional), language (optional), bundles (optional), access (TRUE by default), access_user (current user by default) or access_operation ("view" by default)
+* **Entity load by uuid** (`entity_load_by_uuid`) : Loads a single entity by Uuid with access control parameters: access (TRUE by default), access_user (current user by default) or access_operation ("view" by default).
 * **Entity owner** (`entity_owner`) : Returns the entity owner given an entity such as a node.
 * **Entity published** (`entity_published`) : Returns whether the entity is published given an entity such as a node.
 * **Entity rendered** (`entity_rendered`) : Returns the rendered entity.
-* **Entity translation** (`entity_translation`) : Returns the translated entity.
-* **Entity translations** (`entity_translations`) : Returns all available translations of an entity.
+* **Entity translation** (`entity_translation`) : Returns the translated entity with access control parameters: access (TRUE by default), access_user (current user by default) or access_operation ("view" by default).
+* **Entity translations** (`entity_translations`) : Returns all available translations of an entity with access control parameters: access (TRUE by default), access_user (current user by default) or access_operation ("view" by default).
 * **Entity type** (`entity_type_id`) : Returns an entity's entity type.
 * **Entity url** (`entity_url`) : Returns the entity's url.
 * **Entity uuid** (`entity_uuid`) : Returns the entity's uuid.
