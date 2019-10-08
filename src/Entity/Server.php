@@ -33,7 +33,8 @@ use GraphQL\Validator\DocumentValidator;
  *     "form" = {
  *       "edit" = "Drupal\graphql\Form\ServerForm",
  *       "create" = "Drupal\graphql\Form\ServerForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
+ *       "persisted_queries" = "Drupal\graphql\Form\PersistedQueriesForm"
  *     }
  *   },
  *   config_prefix = "graphql_servers",
@@ -47,6 +48,7 @@ use GraphQL\Validator\DocumentValidator;
  *     "label",
  *     "schema",
  *     "schema_configuration",
+ *     "persisted_queries_settings",
  *     "endpoint",
  *     "debug",
  *     "caching",
@@ -56,7 +58,8 @@ use GraphQL\Validator\DocumentValidator;
  *     "collection" = "/admin/config/graphql/servers",
  *     "create-form" = "/admin/config/graphql/servers/create",
  *     "edit-form" = "/admin/config/graphql/servers/manage/{graphql_server}",
- *     "delete-form" = "/admin/config/graphql/servers/manage/{graphql_server}/delete"
+ *     "delete-form" = "/admin/config/graphql/servers/manage/{graphql_server}/delete",
+ *     "persisted_queries-form" = "/admin/config/graphql/servers/manage/{graphql_server}/persisted_queries",
  *   }
  * )
  */

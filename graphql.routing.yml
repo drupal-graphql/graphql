@@ -28,6 +28,16 @@ entity.graphql_server.edit_form:
   options:
     _admin_route: TRUE
 
+entity.graphql_server.persisted_queries_form:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}/persisted_queries'
+  defaults:
+    _entity_form: 'graphql_server.persisted_queries'
+    _title: 'Persisted queries'
+  requirements:
+    _permission: 'administer graphql configuration'
+  options:
+    _admin_route: TRUE
+
 graphql.explorer:
   path: '/admin/config/graphql/servers/manage/{graphql_server}/explorer'
   defaults:
