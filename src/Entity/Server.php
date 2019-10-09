@@ -9,6 +9,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
+use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use GraphQL\Server\OperationParams;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Server\ServerConfig;
@@ -121,6 +122,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var string
    */
   public $endpoint;
+
+  /**
+   * Persisted query plugins configuration.
+   *
+   * @var array
+   */
+  public $persisted_queries_settings = [];
 
   /**
    * {@inheritdoc}
@@ -339,6 +347,53 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin) {
+    // Make sure the persistedQueryInstances are loaded before trying to add a
+    // plugin to them.
+    if ($this->persistedQueryInstances === NULL) {
+      $this->getPersistedQueryInstances();
+    }
+    $this->persistedQueryInstances[$queryPlugin->getPluginId()] = $queryPlugin;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removePersistedQueryInstance($queryPluginId) {
+    // Make sure the persistedQueryInstances are loaded before trying to remove
+    // a plugin from them.
+    if ($this->persistedQueryInstances === NULL) {
+      $this->getPersistedQueryInstances();
+    }
+    unset($this->persistedQueryInstances[$queryPluginId]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPersistedQueryInstances() {
+    if ($this->persistedQueryInstances !== NULL) {
+      return $this->persistedQueryInstances;
+    }
+
+    /* @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
+    $plugin_manager = \Drupal::service('plugin.manager.graphql.persisted_query');
+    $definitions = $plugin_manager->getDefinitions();
+    $persisted_queries_settings = $this->get('persisted_queries_settings');
+    foreach ($definitions as $id => $definition) {
+      if (isset($persisted_queries_settings[$id])) {
+        $configuration = !empty($persisted_queries_settings[$id]) ? $persisted_queries_settings[$id] : [];
+        $this->persistedQueryInstances[$id] = $plugin_manager->createInstance($id, $configuration);
+      }
+    }
+
+    return $this->persistedQueryInstances;
+  }
+
+  /**
    * TODO: Handle this through configurable plugins on the server.
    *
    * Returns a callable for loading persisted queries.
@@ -393,6 +448,19 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
       return array_values(DocumentValidator::defaultRules());
     };
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    // Write all the persisted queries configuration.
+    $this->persisted_queries_settings = [];
+    foreach ($this->getPersistedQueryInstances() as $plugin_id => $plugin) {
+      $this->persisted_queries_settings[$plugin_id] = $plugin->getConfiguration();
+    }
+
+    parent::preSave($storage);
   }
 
   /**

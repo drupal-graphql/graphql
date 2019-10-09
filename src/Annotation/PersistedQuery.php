@@ -23,11 +23,11 @@ class PersistedQuery extends Plugin {
   public $id;
 
   /**
-   * The component name.
+   * The component label.
    *
    * @var string
    */
-  public $name;
+  public $label;
 
   /**
    * The component description.

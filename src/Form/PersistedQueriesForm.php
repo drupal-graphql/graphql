@@ -2,9 +2,11 @@
 
 namespace Drupal\graphql\Form;
 
-
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
+use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -43,13 +45,58 @@ class PersistedQueriesForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    $plugins = $this->persistedQueryPluginManager->getDefinitions();
+
+    /* @var PersistedQueryPluginInterface[] $plugins */
+    $plugins = $this->entity->getPersistedQueryInstances();
+    $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
-    foreach ($plugins as $id => $plugin) {
-      $form['persisted_query_plugins'][$id] = [
+    $form['enabled'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Enabled persisted query plugins'),
+    ];
+    foreach ($all_plugins as $id => $plugin) {
+      $form['enabled'][$plugin->getPluginId()] = [
         '#type' => 'checkbox',
-        '#title' => $plugin['name'],
-        '#description' => $plugin['description'],
+        '#title' => $plugin->label(),
+        '#description' => $plugin->getDescription(),
+        '#default_value' => !empty($plugins[$id]),
+      ];
+    }
+
+    // Set the weights of the persisted query plugins
+    $form['weights'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Order'),
+    ];
+    $form['weights']['order'] = [
+      '#type' => 'table',
+    ];
+    $form['weights']['order']['#tabledrag'][] = [
+      'action' => 'order',
+      'relationship' => 'sibling',
+      'group' => 'persisted-query-plugin-weight'
+    ];
+    $plugins_weight = [];
+    foreach ($all_plugins as $plugin_id => $plugin) {
+      $plugins_weight[$plugin_id] = !empty($plugins[$plugin_id]) ? $plugins[$plugin_id]->getWeight() : $plugin->getWeight();
+    }
+    asort($plugins_weight);
+    foreach ($plugins_weight as $id => $weight) {
+      $plugin = $all_plugins[$id];
+      $form['weights']['order'][$id]['#attributes']['class'][] = 'draggable';
+      $form['weights']['order'][$id]['#weight'] = $weight;
+      $form['weights']['order'][$id]['label']['#plain_text'] = $plugin->label();
+      $form['weights']['order'][$id]['weight'] = [
+        '#type' => 'weight',
+        '#title' => $this->t('Weight for persisted query plugin %title', ['%title' => $plugin->label()]),
+        '#title_display' => 'invisible',
+        '#delta' => 50,
+        '#default_value' => $weight,
+        '#attributes' => [
+          'class' => [
+            'persisted-query-plugin-weight',
+          ],
+        ],
       ];
     }
 
@@ -63,6 +110,43 @@ class PersistedQueriesForm extends EntityForm {
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $formState) {
+    parent::submitForm($form, $formState);
+    $values = $formState->getValues();
+
+    $plugins = $this->getAllPersistedQueryPlugins();
+    foreach ($plugins as $id => $plugin) {
+      if (empty($values['enabled'][$id])) {
+        $this->entity->removePersistedQueryInstance($id);
+        continue;
+      }
+      if ($plugin instanceof PluginFormInterface) {
+        $plugin_form_state = SubformState::createForSubform($form['settings'][$id], $form, $formState);
+        $plugin->submitConfigurationForm($form['settings'][$id], $plugin_form_state);
+      }
+      if (!empty($values['weights']['order'][$id]['weight'])) {
+        $plugin->setWeight((int) $values['weights']['order'][$id]['weight']);
+      }
+      $this->entity->addPersistedQueryInstance($plugin);
+    }
+  }
+
+  /**
+   * Returns an array with all the available persisted query plugins.
+   *
+   * @return PersistedQueryPluginInterface[]
+   */
+  protected function getAllPersistedQueryPlugins() {
+    $plugins = [];
+    foreach ($this->persistedQueryPluginManager->getDefinitions() as $id => $definition) {
+      $plugins[$id] = $this->persistedQueryPluginManager->createInstance($id);
+    }
+    return $plugins;
   }
 
 }
