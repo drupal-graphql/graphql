@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
@@ -50,16 +51,29 @@ class PersistedQueriesForm extends EntityForm {
     $plugins = $this->entity->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
+    $form['#attached']['library'][] = 'graphql/persisted_queries';
     $form['enabled'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Enabled persisted query plugins'),
+      '#attributes' => [
+        'class' => [
+          'persisted-queries-enabled-wrapper',
+        ],
+      ],
     ];
     foreach ($all_plugins as $id => $plugin) {
+      $clean_css_id = Html::cleanCssIdentifier($plugin->getPluginId());
       $form['enabled'][$plugin->getPluginId()] = [
         '#type' => 'checkbox',
         '#title' => $plugin->label(),
         '#description' => $plugin->getDescription(),
         '#default_value' => !empty($plugins[$id]),
+        '#attributes' => [
+          'class' => [
+            'persisted-queries-enabled-' . $clean_css_id,
+          ],
+          'data-id' => $clean_css_id,
+        ],
       ];
     }
 
@@ -84,6 +98,7 @@ class PersistedQueriesForm extends EntityForm {
     foreach ($plugins_weight as $id => $weight) {
       $plugin = $all_plugins[$id];
       $form['weights']['order'][$id]['#attributes']['class'][] = 'draggable';
+      $form['weights']['order'][$id]['#attributes']['class'][] = 'persisted-queries-weight--' . Html::cleanCssIdentifier($id);
       $form['weights']['order'][$id]['#weight'] = $weight;
       $form['weights']['order'][$id]['label']['#plain_text'] = $plugin->label();
       $form['weights']['order'][$id]['weight'] = [
@@ -98,6 +113,33 @@ class PersistedQueriesForm extends EntityForm {
           ],
         ],
       ];
+    }
+
+    // Add vertical tabs containing the settings for the plugins.
+    $form['plugin_settings'] = [
+      '#title' => $this->t('Persisted queries settings'),
+      '#type' => 'vertical_tabs',
+    ];
+
+    foreach ($plugins_weight as $plugin_id => $weight) {
+      $plugin = !empty($plugins[$plugin_id]) ? $plugins[$plugin_id] : $all_plugins[$plugin_id];
+      if ($plugin instanceof PluginFormInterface) {
+        $form['settings'][$plugin_id] = [
+          '#type' => 'details',
+          '#title' => $plugin->label(),
+          '#group' => 'plugin_settings',
+          '#attributes' => [
+            'class' => [
+              'persisted-queries-settings--' . Html::cleanCssIdentifier($plugin_id),
+            ],
+          ],
+        ];
+        $plugin_form_state = SubformState::createForSubform($form['settings'][$plugin_id], $form, $form_state);
+        $form['settings'][$plugin_id] += $plugin->buildConfigurationForm($form['settings'][$plugin_id], $plugin_form_state);
+      }
+      else {
+        unset($form['settings'][$plugin_id]);
+      }
     }
 
     $form['actions'] = [
@@ -115,9 +157,9 @@ class PersistedQueriesForm extends EntityForm {
   /**
    * {@inheritDoc}
    */
-  public function submitForm(array &$form, FormStateInterface $formState) {
-    parent::submitForm($form, $formState);
-    $values = $formState->getValues();
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+    $values = $form_state->getValues();
 
     $plugins = $this->getAllPersistedQueryPlugins();
     foreach ($plugins as $id => $plugin) {
@@ -126,7 +168,7 @@ class PersistedQueriesForm extends EntityForm {
         continue;
       }
       if ($plugin instanceof PluginFormInterface) {
-        $plugin_form_state = SubformState::createForSubform($form['settings'][$id], $form, $formState);
+        $plugin_form_state = SubformState::createForSubform($form['settings'][$id], $form, $form_state);
         $plugin->submitConfigurationForm($form['settings'][$id], $plugin_form_state);
       }
       if (!empty($values['weights']['order'][$id]['weight'])) {
