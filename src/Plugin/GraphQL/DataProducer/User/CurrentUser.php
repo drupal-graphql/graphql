@@ -9,7 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Gets the ID of current user.
+ * Gets the current user.
  *
  * @DataProducer(
  *   id = "current_user",
@@ -59,19 +59,19 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
   }
 
   /**
-   * Returns current user id.
+   * Returns current user.
    *
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field_context
    *   Field context.
    *
-   * @return int
-   *   The current user id.
+   * @return \Drupal\Core\Session\AccountInterface
+   *   The current user.
    */
-  public function resolve(FieldContext $field_context): int {
+  public function resolve(FieldContext $field_context): AccountInterface {
     // Response must be cached based on current user as a cache context,
     // otherwise a new user would became a previous user.
     $field_context->addCacheableDependency($this->currentUser);
-    return (int) $this->currentUser->id();
+    return $this->currentUser;
   }
 
 }
