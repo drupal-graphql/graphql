@@ -131,7 +131,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @param $type
    * @param $id
    * @param null $language
-   * @param null $bundles
+   * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
    * @param string $accessOperation
@@ -139,7 +139,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id, $language, $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve($type, $id, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
     return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
