@@ -42,7 +42,7 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
   }
 
   /**
-   * UserRegister constructor.
+   * CurrentUser constructor.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
