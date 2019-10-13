@@ -16,8 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "entity_query",
  *   name = @Translation("Load entities"),
  *   description = @Translation("Loads entities."),
- *   produces = @ContextDefinition("entities",
- *     label = @Translation("Entities")
+ *   produces = @ContextDefinition("string",
+ *     label = @Translation("Entity IDs"),
+ *     multiple = TRUE
  *   ),
  *   consumes = {
  *     "type" = @ContextDefinition("string",
