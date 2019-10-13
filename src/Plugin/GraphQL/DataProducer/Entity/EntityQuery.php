@@ -118,9 +118,7 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    */
   public function resolve(string $type, int $limit = 10, ?int $offset = NULL, ?array $conditions = NULL, ?string $language = NULL, ?array $bundles = NULL, RefinableCacheableDependencyInterface $metadata): array {
     // Make sure offset is zero or positive.
-    if (!isset($offset) || $offset < 0) {
-      $offset = 0;
-    }
+    $offset = max($offset ?: 0, 0);
 
     $entity_type = $this->entityTypeManager->getStorage($type);
     $query = $entity_type->getQuery()
