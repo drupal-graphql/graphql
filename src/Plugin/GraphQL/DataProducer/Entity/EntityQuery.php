@@ -52,13 +52,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Maximum number of results.
-   *
-   * To prevent denial of service attacks with loading too many items.
-   */
-  const SIZE_MAX = 50;
-
-  /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManager
@@ -124,12 +117,6 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    *   No bundles defined for given entity type.
    */
   public function resolve(string $type, int $limit = 10, ?int $offset = NULL, ?array $conditions = NULL, ?string $language = NULL, ?array $bundles = NULL, RefinableCacheableDependencyInterface $metadata): array {
-
-    // Make sure that max limit is not crossed.
-    if ($limit > static::SIZE_MAX) {
-      $limit = static::SIZE_MAX;
-    }
-
     // Make sure offset is zero or positive.
     if (!isset($offset) || $offset < 0) {
       $offset = 0;
