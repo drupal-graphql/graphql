@@ -9,6 +9,8 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer;
 use GraphQL\Deferred;
@@ -42,6 +44,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -118,13 +135,19 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
    *   Optional. Language to be respected for retrieved entities.
    * @param array|null $bundles
    *   Optional. List of bundles to be respected for retrieved entities.
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *   The metadata object for caching.
+   * @param bool $access
+   *   Whether check for access or not. Default is true.
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   User entity to check access for. Default is null.
+   * @param string $accessOperation
+   *   Operation to check access for. Default is view.
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The caching context related to the current field.
    *
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(EntityInterface $entity, string $field, ?string $language = NULL, ?array $bundles = NULL, RefinableCacheableDependencyInterface $metadata): ?Deferred {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -142,17 +165,22 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       }, $values->getValue());
 
       $resolver = $this->entityRevisionBuffer->add($type, $vids);
-      return new Deferred(function () use ($type, $language, $bundles, $resolver, $metadata) {
+      return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
-        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles) {
+        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
           if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
           }
 
-          // Filter out also entity where access is missing.
-          $access = $entity->access('view', NULL, TRUE);
-          if (!$access->isAllowed()) {
-            return FALSE;
+          // Check if the passed user (or current user if none is passed) has
+          // access to the entity, if not return NULL.
+          if ($access) {
+            /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+            $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+            $context->addCacheableDependency($accessResult);
+            if ($accessResult->isForbidden()) {
+              return FALSE;
+            }
           }
 
           return TRUE;
@@ -162,7 +190,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
           $type = $this->entityTypeManager->getDefinition($type);
           /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
           $tags = $type->getListCacheTags();
-          $metadata->addCacheTags($tags);
+          $context->addCacheTags($tags);
           return NULL;
         }
 
