@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "entity_reference_revisions",
  *   name = @Translation("Entity reference revisions"),
  *   description = @Translation("Loads entities from an entity reference revisions field."),
+ *   provider = "entity_reference_revisions",
  *   produces = @ContextDefinition("entity",
  *     label = @Translation("Entity"),
  *     multiple = TRUE
