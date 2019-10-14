@@ -41,10 +41,7 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
         query: Query
       }
 
-      type Query {
-        # TODO: Remove placeholder field.
-        __placeholder: String
-      }
+      type Query
 GQL;
 
   }
