@@ -26,6 +26,7 @@ use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
 use GraphQL\Validator\Rules\AbstractValidationRule;
 use GraphQL\Validator\ValidationContext;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 // TODO: Refactor this and clean it up.
@@ -350,7 +351,12 @@ class QueryProcessor {
     $schema = $config->getSchema();
     $info = new TypeInfo($schema);
     $validation = new ValidationContext($schema, $document, $info);
-    $visitors = array_values(array_map(function (AbstractValidationRule $rule) use ($validation) {
+    $visitors = array_values(array_map(function (AbstractValidationRule $rule) use ($validation, $params) {
+      // Set current variable values for QueryComplexity validation rule case
+      // @see \GraphQL\GraphQL::promiseToExecute for equivalent
+      if ($rule instanceof QueryComplexity && !empty($params->variables)) {
+        $rule->setRawVariableValues($params->variables);
+      }
       return $rule($validation);
     }, $rules));
 
