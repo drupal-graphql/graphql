@@ -1,5 +1,9 @@
 language: php
 sudo: false
+dist: bionic
+
+services:
+  - mysql
 
 php:
   - 7.2
