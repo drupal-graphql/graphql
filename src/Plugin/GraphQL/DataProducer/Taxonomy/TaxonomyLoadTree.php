@@ -150,7 +150,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     if (!isset($max_depth)) {
       $max_depth = self::MAX_DEPTH;
     }
-    // @todo This should use a buffer system similar to other entities are using.
+
     $terms = $this->entityTypeManager
       ->getStorage('taxonomy_term')
       ->loadTree($vid, $parent, $max_depth);
