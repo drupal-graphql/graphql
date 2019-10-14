@@ -73,7 +73,7 @@ class MenuLinks extends FieldPluginBase implements ContainerFactoryPluginInterfa
       ];
 
       foreach (array_filter($this->menuLinkTree->transform($tree, $manipulators), function (MenuLinkTreeElement $item) {
-        return $item->link instanceof MenuLinkInterface && $item->link->isEnabled();
+        return $item->link instanceof MenuLinkInterface && $item->link->isEnabled() && (empty($item->access) || $item->access->isAllowed());
       }) as $branch) {
         yield $branch;
       }
