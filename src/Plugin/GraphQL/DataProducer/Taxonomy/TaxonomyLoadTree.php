@@ -3,7 +3,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -153,7 +152,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     $term_ids = array_column($terms, 'tid');
     $resolver = $this->entityBuffer->add('taxonomy_term', $term_ids);
 
-    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
+    return new Deferred(function () use ($type, $ids, $language, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that
@@ -168,11 +167,6 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
 
       foreach ($entities as $id => $entity) {
         $context->addCacheableDependency($entities[$id]);
-        if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
-          // If the entity is not among the allowed bundles, don't return it.
-          unset($entities[$id]);
-          continue;
-        }
 
         if (isset($language) && $language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
           $entities[$id] = $entities[$id]->getTranslation($language);
