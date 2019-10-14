@@ -28,7 +28,7 @@ class MenuLinkLinks extends FieldPluginBase {
     if ($value instanceof MenuLinkTreeElement) {
       $items = array_filter($value->subtree, function(MenuLinkTreeElement $item) {
         if ($item->link instanceof MenuLinkInterface) {
-          return $item->link->isEnabled();
+          return ($item->link->isEnabled() && (empty($item->access) || $item->access->isAllowed()));
         }
         return TRUE;
       });
