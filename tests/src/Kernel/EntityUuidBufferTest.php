@@ -70,8 +70,8 @@ GQL;
 
     $this->mockResolver('Query', 'node',
       $this->builder->produce('entity_load_by_uuid')
-        ->map('entity_type', $this->builder->fromValue('node'))
-        ->map('entity_uuid', $this->builder->fromArgument('uuid'))
+        ->map('type', $this->builder->fromValue('node'))
+        ->map('uuid', $this->builder->fromArgument('uuid'))
     );
 
     $this->mockResolver('Node', 'title',

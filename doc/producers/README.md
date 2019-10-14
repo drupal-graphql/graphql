@@ -41,5 +41,5 @@ This particular resolver uses the `property_path` data producer that comes with 
 
 You can find a list of all Data Producers provided by the module inside `src/Plugin/GraphQL/DataProducer` folder.
 
-The 4.x module leverages the advantages of custom schemas and data producers, where you can create your own API structure. In the 3.x module if you had a field named `field_article_creator` the API would expose this field as `fieldArticleCreator`. This means that the API consumer needs to have knowlegdge about how Drupal structures its data internally.
+The 4.x module leverages the advantages of custom schemas and data producers, where you can create your own API structure. In the 3.x module if you had a field named `field_article_creator` the API would expose this field as `fieldArticleCreator`. This means that the API consumer needs to have knowledge about how Drupal structures its data internally.
 In the 4.x module you can (and also need to) define your own custom schemas (and data producers) and therefore create your own structure so that someone that uses the API does not need to know how Drupal structures the data.

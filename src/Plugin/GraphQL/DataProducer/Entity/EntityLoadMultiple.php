@@ -3,9 +3,10 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -21,22 +22,37 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     label = @Translation("Entities")
  *   ),
  *   consumes = {
- *     "entity_type" = @ContextDefinition("string",
+ *     "type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
  *     ),
- *     "entity_ids" = @ContextDefinition("string",
+ *     "ids" = @ContextDefinition("string",
  *       label = @Translation("Identifier"),
  *       multiple = TRUE
  *     ),
- *     "entity_language" = @ContextDefinition("string",
- *       label = @Translation("Entity languages(s)"),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Entity languages"),
  *       multiple = TRUE,
  *       required = FALSE
  *     ),
- *     "entity_bundle" = @ContextDefinition("string",
+ *     "bundles" = @ContextDefinition("string",
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -46,7 +62,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -89,7 +105,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository service.
@@ -102,7 +118,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
     $configuration,
     $pluginId,
     $pluginDefinition,
-    EntityTypeManager $entityTypeManager,
+    EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
   ) {
@@ -113,22 +129,26 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
-   * @param string $type
-   * @param int[] $ids
-   * @param string $language
-   * @param string[] $bundles
+   * @param $type
+   * @param array $ids
+   * @param null $language
+   * @param array|NULL $bundles
+   * @param bool $access
+   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, array $ids, $language = NULL, array $bundles = NULL, FieldContext $context) {
+  public function resolve($type, array $ids, $language, array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
-    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context) {
+    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
-        // If there is no entity with this id, add the list cache tags so that the
-        // cache entry is purged whenever a new entity of this type is saved.
+        // If there is no entity with this id, add the list cache tags so that
+        // the cache entry is purged whenever a new entity of this type is
+        // saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
@@ -149,18 +169,22 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
           $entities[$id]->addCacheContexts(["static:language:{$language}"]);
         }
 
-        $access = $entity->access('view', NULL, TRUE);
-        $context->addCacheableDependency($access);
-
-        if (!$access->isAllowed()) {
-          // Do not return the entity if access is denied.
-          unset($entities[$id]);
-          continue;
+        if ($access) {
+          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+          $context->addCacheableDependency($accessResult);
+          // We need to call isAllowed() because isForbidden() returns FALSE
+          // for neutral access results, which is dangerous. Only an explicitly
+          // allowed result means that the user has access.
+          if (!$accessResult->isAllowed()) {
+            unset($entities[$id]);
+            continue;
+          }
         }
-
       }
 
       return $entities;
     });
   }
+
 }
