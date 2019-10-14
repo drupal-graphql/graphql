@@ -178,7 +178,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
             /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
             $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
             $context->addCacheableDependency($accessResult);
-            if ($accessResult->isForbidden()) {
+            if (!$accessResult->isAllowed()) {
               return FALSE;
             }
           }
