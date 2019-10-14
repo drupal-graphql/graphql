@@ -7,6 +7,7 @@ use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\graphql\Utility\StringHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 
 class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
 
@@ -44,7 +45,13 @@ class ContextDeriver extends DeriverBase implements ContainerDeriverInterface {
           'name' => StringHelper::propCase($id, 'context'),
           'context_id' => $id,
           'type' => $context->getContextDefinition()->getDataType(),
-        ] + $basePluginDefinition;
+        ];
+        // Add cache contexts, if available
+        if ($context instanceof CacheableDependencyInterface) {
+          $this->derivatives[$id]['response_cache_contexts'] = $context->getCacheContexts();
+        }
+        // Add default base
+        $this->derivatives[$id] += $basePluginDefinition;
       }
     }
 

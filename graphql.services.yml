@@ -266,7 +266,7 @@ services:
 
   graphql.language_context:
     class: Drupal\graphql\GraphQLLanguageContext
-    arguments: ['@language_manager']
+    arguments: ['@language_manager', '@string_translation']
 
   graphql.config_factory_override:
     class: Drupal\graphql\Config\GraphQLConfigOverrides

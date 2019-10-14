@@ -104,7 +104,6 @@ class SubRequestBuffer extends BufferBase {
       }, $buffer);
     });
 
-    $request->setRequestFormat('_graphql_subrequest');
     if ($session = $current->getSession()) {
       $request->setSession($session);
     }

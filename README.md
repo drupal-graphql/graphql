@@ -28,7 +28,7 @@ Check out [https://github.com/fubhy/drupal-decoupled-app](https://github.com/fub
 
 ### Documentation
 
-[Documentation](https://github.com/drupal-graphql/graphql/tree/3c8b237bc3698c82b05291d528fb6701e8d7b501/doc/SUMMARY.md) is heavily worked on, but still far from complete. This is due to the vast amount of improvements and additional features we've added to the module recently. As we are finishing up the 3.x version of this module we will be re-doing the documentation and record a series of screencasts.
+[Documentation](https://drupal-graphql.gitbook.io/graphql/) is hosted on [gitbook.io](http://www.gitbook.io). There is a separate branch for documentation on [version 4](https://drupal-graphql.gitbook.io/graphql/v/8.x-4.x/) of the module.
 
 These blog posts provide additional information on how to use and extend the module as well as other other contributed modules supporting it:
 
