@@ -35,6 +35,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Maximum tree depth"),
  *       required = FALSE
  *     ),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Language"),
+ *       required = FALSE
+ *     ),
  *     "access" = @ContextDefinition("boolean",
  *       label = @Translation("Check access"),
  *       required = FALSE,
@@ -128,6 +132,8 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    *   The ID of the parent's term to load the tree for.
    * @param int|null $max_depth
    *   Max depth to search in.
+   * @param string|null $language
+   *   Optional. Language to be respected for retrieved entities.
    * @param bool $access
    *   Whether check for access or not. Default is true.
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
@@ -140,7 +146,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(string $vid, int $parent = 0, ?int $max_depth = NULL, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): array {
+  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): array {
     if (!isset($max_depth)) {
       $max_depth = self::MAX_DEPTH;
     }
@@ -152,13 +158,13 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     $term_ids = array_column($terms, 'tid');
     $resolver = $this->entityBuffer->add('taxonomy_term', $term_ids);
 
-    return new Deferred(function () use ($type, $ids, $language, $resolver, $context, $access, $accessUser, $accessOperation) {
+    return new Deferred(function () use ($language, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that
         // the cache entry is purged whenever a new entity of this type is
         // saved.
-        $type = $this->entityTypeManager->getDefinition($type);
+        $type = $this->entityTypeManager->getDefinition('taxonomy_term');
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
         $context->addCacheTags($tags);
