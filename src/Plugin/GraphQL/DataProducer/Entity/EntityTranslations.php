@@ -106,7 +106,7 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
         if ($access) {
           /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
           $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
-          if ($accessResult->isForbidden()) {
+          if (!$accessResult->isAllowed()) {
             return NULL;
           }
         }
