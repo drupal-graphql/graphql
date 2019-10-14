@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,6 +25,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   consumes = {
  *     "entity" = @ContextDefinition("entity",
  *       label = @Translation("Entity")
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -73,17 +89,27 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param bool $access
+   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    *
-   * @return \Drupal\Core\Entity\TranslatableInterface|null
+   * @return array|null
    */
-  public function resolve(EntityInterface $entity) {
+  public function resolve(EntityInterface $entity, ?bool $access , ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $languages = $entity->getTranslationLanguages();
 
-      return array_map(function (LanguageInterface $language) use ($entity) {
+      return array_map(function (LanguageInterface $language) use ($entity, $access, $accessOperation, $accessUser) {
         $langcode = $language->getId();
         $entity = $entity->getTranslation($langcode);
         $entity->addCacheContexts(["static:language:{$langcode}"]);
+        if ($access) {
+          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+          if ($accessResult->isForbidden()) {
+            return NULL;
+          }
+        }
         return $entity;
       }, $languages);
     }

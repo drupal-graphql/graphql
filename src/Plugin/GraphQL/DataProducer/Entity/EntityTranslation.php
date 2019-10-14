@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,6 +25,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     ),
  *     "language" = @ContextDefinition("string",
  *       label = @Translation("Language")
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -74,13 +90,25 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param $language
+   * @param bool $access
+   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    *
-   * @return \Drupal\Core\Entity\TranslatableInterface|null
+   * @return |null
    */
-  public function resolve(EntityInterface $entity, $language) {
+  public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $entity = $entity->getTranslation($language);
       $entity->addCacheContexts(["static:language:{$language}"]);
+      // Check if the passed user (or current user if none is passed) has access
+      // to the entity, if not return NULL.
+      if ($access) {
+        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+        if ($accessResult->isForbidden()) {
+          return NULL;
+        }
+      }
       return $entity;
     }
 
