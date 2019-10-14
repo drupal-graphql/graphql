@@ -50,7 +50,7 @@ class Status extends DataProducerPluginBase {
       return $entity_definition_field->status();
     }
 
-    return NULL;
+    return FALSE;
   }
 
 }
