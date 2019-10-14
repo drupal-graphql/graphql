@@ -70,7 +70,7 @@ protected function getResolverRegistry() {
 
   $registry->addFieldResolver('Article', 'id',
     $builder->produce('entity_id')
-      ->map('entity' => $builder->fromParent())
+      ->map('entity', $builder->fromParent())
   );
 
   $registry->addFieldResolver('Article', 'title',

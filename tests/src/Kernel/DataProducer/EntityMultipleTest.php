@@ -89,9 +89,13 @@ class EntityMultipleTest extends GraphQLTestBase {
    */
   public function testResolveEntityLoadMultiple() {
     $result = $this->executeDataProducer('entity_load_multiple', [
-      'entity_type' => $this->node1->getEntityTypeId(),
-      'entity_bundle' => [$this->node1->bundle(), $this->node2->bundle()],
-      'entity_ids' => [$this->node1->id(), $this->node2->id(), $this->node3->id()],
+      'type' => $this->node1->getEntityTypeId(),
+      'bundles' => [$this->node1->bundle(), $this->node2->bundle()],
+      'ids' => [$this->node1->id(), $this->node2->id(), $this->node3->id()],
+      // @todo We need to set these default values here to make the access
+      // handling work. Ideally that should not be needed.
+      'access' => TRUE,
+      'access_operation' => 'view',
     ]);
 
     $nids = array_values(array_map(function (NodeInterface $item) {

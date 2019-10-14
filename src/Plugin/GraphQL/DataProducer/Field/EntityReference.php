@@ -4,7 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
@@ -32,8 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Field name")
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity bundle(s)"),
- *       multiple = TRUE,
+ *       label = @Translation("Entity language"),
  *       required = FALSE
  *     ),
  *     "bundle" = @ContextDefinition("string",
@@ -92,7 +91,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
    *   The entity repository service.
@@ -105,7 +104,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
     $configuration,
     $pluginId,
     $pluginDefinition,
-    EntityTypeManager $entityTypeManager,
+    EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
   ) {
@@ -158,12 +157,11 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
         if (isset($language)) {
           $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
               $entity = $entity->getTranslation($language);
-              $entity->addCacheContexts(["static:language:{$language}"]);
-              return $entity;
             }
 
+            $entity->addCacheContexts(["static:language:{$language}"]);
             return $entity;
           }, $entities);
         }
