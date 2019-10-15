@@ -19,7 +19,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  *     )
  *   },
  *   produces = @ContextDefinition("string",
- *     id = @Translation("Entity definition field description")
+ *     label = @Translation("Entity definition field description")
  *   )
  * )
  */

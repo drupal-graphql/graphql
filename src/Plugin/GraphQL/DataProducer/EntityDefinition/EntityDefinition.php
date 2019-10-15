@@ -31,7 +31,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     )
  *   },
  *   produces = @ContextDefinition("any",
- *     entity_definition = @Translation("Entity definition")
+ *     label = @Translation("Entity definition")
  *   )
  * )
  */
