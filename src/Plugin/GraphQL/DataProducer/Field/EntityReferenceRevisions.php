@@ -168,20 +168,15 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
 
-        // Get the language version of entities.
-        if (isset($language)) {
-          $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-              return $entity->getTranslation($language);
-            }
-
-            return $entity;
-          }, $entities);
-        }
-
-        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
+        $entities = array_filter($entities, function (EntityInterface $entity) use ($language, $bundles, $access, $accessOperation, $accessUser, $context) {
           if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
+          }
+
+          // Get the correct translation.
+          if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            $entity = $entity->getTranslation($language);
+            $entity->addCacheContexts(["static:language:{$language}"]);
           }
 
           // Check if the passed user (or current user if none is passed) has
