@@ -167,6 +167,18 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       $resolver = $this->entityRevisionBuffer->add($type, $vids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
+
+        // Get the language version of entities.
+        if (isset($language)) {
+          $entities = array_map(function (EntityInterface $entity) use ($language) {
+            if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+              return $entity->getTranslation($language);
+            }
+
+            return $entity;
+          }, $entities);
+        }
+
         $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
           if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
@@ -192,16 +204,6 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
           $tags = $type->getListCacheTags();
           $context->addCacheTags($tags);
           return NULL;
-        }
-
-        if (isset($language)) {
-          $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-              return $entity->getTranslation($language);
-            }
-
-            return $entity;
-          }, $entities);
         }
 
         return $entities;
