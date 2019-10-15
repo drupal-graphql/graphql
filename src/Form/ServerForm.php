@@ -89,16 +89,8 @@ class ServerForm extends EntityForm {
     $schemas = array_map(function ($definition) {
       return $definition['name'] ?? $definition['id'];
     }, $this->schemaManager->getDefinitions());
-    $userInput = $formState->getUserInput();
-    $schemaKeys = array_keys($schemas);
-    if (isset($userInput['schema'])) {
-        $schema = $userInput['schema'];
-    } elseif (!empty($server->get('schema'))) {
-        $schema = $server->get('schema');
-    } else {
-        $schema = reset($schemaKeys);
-    }
-
+    
+    $schema = ($formState->getUserInput()['schema'] ?? $server->get('schema')) ?: reset(array_keys($schemas));
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
     }
