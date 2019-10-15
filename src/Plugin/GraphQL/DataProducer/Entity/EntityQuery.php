@@ -2,9 +2,9 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Error\UserError;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,6 +36,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Conditions"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "allowed_filters" = @ContextDefinition("string",
+ *       label = @Translation("Allowed filters"),
+ *       multiple = TRUE,
+ *       required = FALSE,
+ *       default_value = {}
  *     ),
  *     "language" = @ContextDefinition("string",
  *       label = @Translation("Entity languages(s)"),
@@ -104,12 +110,14 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    *   Offset to start with.
    * @param array|null $conditions
    *   List of conditions to filter the entities.
+   * @param array|null $allowedFilters
+   *   List of fields to be used in conditions to restrict access to data.
    * @param string|null $language
    *   Language of queried entities.
    * @param array|null $bundles
    *   List of bundles to be filtered.
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *   The metadata object for caching.
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The caching context related to the current field.
    *
    * @return array
    *   The list of ids that match this query.
@@ -117,7 +125,7 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
    */
-  public function resolve(string $type, int $limit = 10, ?int $offset = NULL, ?array $conditions = NULL, ?string $language = NULL, ?array $bundles = NULL, RefinableCacheableDependencyInterface $metadata): array {
+  public function resolve(string $type, int $limit = 10, ?int $offset, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, FieldContext $context): array {
     // Make sure offset is zero or positive.
     $offset = max($offset ?: 0, 0);
 
@@ -140,6 +148,9 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
     }
 
     foreach ($conditions as $condition) {
+      if ($allowedFilters && !in_array($condition['field'], $allowedFilters)) {
+        continue;
+      }
       $operation = isset($condition['operator']) ? $condition['operator'] : NULL;
       $query->condition($condition['field'], $condition['value'], $operation);
     }
