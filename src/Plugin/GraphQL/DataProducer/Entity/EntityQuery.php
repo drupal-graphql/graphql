@@ -148,8 +148,8 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
     }
 
     foreach ($conditions as $condition) {
-      if ($allowedFilters && !in_array($condition['field'], $allowedFilters)) {
-        continue;
+      if (!in_array($condition['field'], $allowedFilters)) {
+        throw new UserError("Field '{$condition['field']}' is not allowed as filter.");
       }
       $operation = isset($condition['operator']) ? $condition['operator'] : NULL;
       $query->condition($condition['field'], $condition['value'], $operation);
