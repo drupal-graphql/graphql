@@ -74,7 +74,7 @@ class EntityBuffer extends BufferBase {
           $result[] = $entities[$id];
         }
       } else {
-        $result[] = $entities[$item['id']];
+        $result = $entities[$item['id']];
       }
     }
     return [$result];
