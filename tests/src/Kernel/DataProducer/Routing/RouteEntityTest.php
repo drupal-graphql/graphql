@@ -29,6 +29,7 @@ class RouteEntityTest extends GraphQLTestBase {
     ]);
     $content_type->save();
 
+    // Published node and published translations.
     $this->published_node = Node::create([
       'title' => 'Test Event',
       'type' => 'event',
@@ -42,6 +43,7 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->translation_de_published = $this->published_node->addTranslation('de', ['title' => 'Test Event DE']);
     $this->translation_de_published->save();
 
+    // Unpublished node and unpublished translations.
     $this->unpublished_node = Node::create([
       'title' => 'Test Unpublished Event',
       'type' => 'event',
@@ -50,9 +52,11 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->unpublished_node->save();
 
     $this->translation_fr_unpublished = $this->unpublished_node->addTranslation('fr', ['title' => 'Test Unpublished Event FR']);
+    $this->translation_fr_unpublished->status = NodeInterface::NOT_PUBLISHED;
     $this->translation_fr_unpublished->save();
 
     $this->translation_de_unpublished = $this->unpublished_node->addTranslation('de', ['title' => 'Test Unpublished Event DE']);
+    $this->translation_de_unpublished->status = NodeInterface::NOT_PUBLISHED;
     $this->translation_de_unpublished->save();
 
     \Drupal::service('content_translation.manager')->setEnabled('node', 'event', TRUE);
