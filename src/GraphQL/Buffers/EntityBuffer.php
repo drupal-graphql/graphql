@@ -67,19 +67,18 @@ class EntityBuffer extends BufferBase {
       ->getStorage($type)
       ->loadMultiple($ids);
 
-    return array_map(function ($item) use ($entities) {
+
+    $result = [];
+    foreach ($buffer as $item) {
       if (is_array($item['id'])) {
-        return array_reduce($item['id'], function ($carry, $current) use ($entities) {
-          if (!empty($entities[$current])) {
-            return $carry + [$current => $entities[$current]];
-          }
-
-          return $carry;
-        }, []);
+        foreach ($item['id'] as $id) {
+          $result[] = $entities[$id];
+        }
+      } else {
+        $result = $entities[$item['id']];
       }
-
-      return isset($entities[$item['id']]) ? $entities[$item['id']] : NULL;
-    }, $buffer);
+    }
+    return [$result];
   }
 
 }
