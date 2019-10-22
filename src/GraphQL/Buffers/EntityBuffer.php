@@ -67,7 +67,6 @@ class EntityBuffer extends BufferBase {
       ->getStorage($type)
       ->loadMultiple($ids);
 
-
     $result = [];
     foreach ($buffer as $item) {
       if (is_array($item['id'])) {
