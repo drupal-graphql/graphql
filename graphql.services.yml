@@ -145,6 +145,9 @@ services:
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
     arguments: ['@entity_type.manager']
+  graphql.buffer.entity_revision:
+    class: Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
+    arguments: ['@entity_type.manager']
   graphql.buffer.entity_uuid:
     class: Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer
     arguments: ['@entity_type.manager']

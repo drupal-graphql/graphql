@@ -2,24 +2,28 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads the entity reference revisions.
+ *
  * @DataProducer(
- *   id = "entity_reference",
- *   name = @Translation("Entity reference"),
- *   description = @Translation("Loads entities from an entity reference field."),
+ *   id = "entity_reference_revisions",
+ *   name = @Translation("Entity reference revisions"),
+ *   description = @Translation("Loads entities from an entity reference revisions field."),
+ *   provider = "entity_reference_revisions",
  *   produces = @ContextDefinition("entity",
  *     label = @Translation("Entity"),
  *     multiple = TRUE
@@ -32,7 +36,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Field name")
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity language"),
+ *       label = @Translation("Language"),
+ *       multiple = TRUE,
  *       required = FALSE
  *     ),
  *     "bundle" = @ContextDefinition("string",
@@ -58,7 +63,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class EntityReference extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class EntityReferenceRevisions extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.
@@ -68,18 +73,11 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   protected $entityTypeManager;
 
   /**
-   * The entity repository service.
+   * The entity revision buffer service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var \Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
    */
-  protected $entityRepository;
-
-  /**
-   * The entity buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
-   */
-  protected $entityBuffer;
+  protected $entityRevisionBuffer;
 
   /**
    * {@inheritdoc}
@@ -92,8 +90,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('entity.repository'),
-      $container->get('graphql.buffer.entity')
+      $container->get('graphql.buffer.entity_revision')
     );
   }
 
@@ -106,59 +103,80 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
-   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
-   *   The entity buffer service.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer $entityRevisionBuffer
+   *   The entity revision buffer service.
    *
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
-    $pluginId,
-    $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityRepositoryInterface $entityRepository,
-    EntityBuffer $entityBuffer
+    array $configuration,
+    string $pluginId,
+    array $pluginDefinition,
+    EntityTypeManager $entityTypeManager,
+    EntityRevisionBuffer $entityRevisionBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
-    $this->entityRepository = $entityRepository;
-    $this->entityBuffer = $entityBuffer;
+    $this->entityRevisionBuffer = $entityRevisionBuffer;
   }
 
   /**
+   * Resolves entity reference revisions for a given field of a given entity.
+   *
+   * May optionally respect the entity bundles and language.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param $field
-   * @param null $language
+   *   The entity.
+   * @param string $field
+   *   The field of a given entity to get entity reference revisions for.
+   * @param string|null $language
+   *   Optional. Language to be respected for retrieved entities.
    * @param array|null $bundles
+   *   Optional. List of bundles to be respected for retrieved entities.
    * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   *   Whether check for access or not. Default is true.
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   User entity to check access for. Default is null.
    * @param string $accessOperation
+   *   Operation to check access for. Default is view.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The caching context related to the current field.
    *
    * @return \GraphQL\Deferred|null
+   *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(EntityInterface $entity, $field, $language = NULL, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
+      return NULL;
+    }
+
+    $definition = $entity->getFieldDefinition($field);
+    if ($definition->getType() !== 'entity_reference_revisions') {
       return NULL;
     }
 
     $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
     if (($values = $entity->get($field)) && $values instanceof EntityReferenceFieldItemListInterface) {
-      $ids = array_map(function ($value) {
-        return $value['target_id'];
+      $vids = array_map(function ($value) {
+        return $value['target_revision_id'];
       }, $values->getValue());
 
-      $resolver = $this->entityBuffer->add($type, $ids);
+      $resolver = $this->entityRevisionBuffer->add($type, $vids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
-        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
+
+        $entities = array_filter($entities, function (EntityInterface $entity) use ($language, $bundles, $access, $accessOperation, $accessUser, $context) {
           if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
+          }
+
+          // Get the correct translation.
+          if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            $entity = $entity->getTranslation($language);
+            $entity->addCacheContexts(["static:language:{$language}"]);
           }
 
           // Check if the passed user (or current user if none is passed) has
@@ -183,21 +201,11 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
           return NULL;
         }
 
-        if (isset($language)) {
-          $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
-              $entity = $entity->getTranslation($language);
-            }
-
-            $entity->addCacheContexts(["static:language:{$language}"]);
-            return $entity;
-          }, $entities);
-        }
-
         return $entities;
       });
     }
 
     return NULL;
   }
+
 }

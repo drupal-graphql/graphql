@@ -77,6 +77,7 @@ GQL;
       '#type' => 'checkboxes',
       '#required' => FALSE,
       '#title' => t('Enabled extensions'),
+      '#options' => [],
       '#default_value' => $this->configuration['extensions'] ?? [],
     );
 
