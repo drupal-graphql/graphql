@@ -51,7 +51,7 @@ class PermissionProvider {
         'description' => $this->t('Allows users use the explorer interface.', $params),
       ];
 
-      $permissions["execute $id graphql voyager"] = [
+      $permissions["use $id graphql voyager"] = [
         'title' => $this->t('%name: Use voyager', $params),
         'description' => $this->t('Allows users to use the voyager interface.', $params),
       ];
