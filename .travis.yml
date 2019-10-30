@@ -16,6 +16,7 @@ env:
   matrix:
     - DRUPAL_CORE=8.6.x
     - DRUPAL_CORE=8.7.x
+    - DRUPAL_CORE=8.8.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -59,6 +60,7 @@ before_install:
 
   # Update composer.
   - composer self-update
+  if [[ $DRUPAL_VER
   # Upgrade zend-stdlib to avoid PHP 7.3 incompatibility
   - composer require zendframework/zend-stdlib:3.2.1
 
@@ -87,8 +89,10 @@ install:
   # require also triggers a full 'composer install'.
   - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.12.5
 
-  - if [[ "$DRUPAL_CORE" != "8.3.x" && "$DRUPAL_CORE" != "8.4.x" ]];
-      then composer --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade;
+  # For Drupal < 8.8 we have to manually upgrade zend-stdlib to avoid PHP 7.3
+  # incompatibilities.
+  - if [[ "$DRUPAL_CORE" = "8.6.x" || "$DRUPAL_CORE" = "8.7.x" ]];
+      then composer require zendframework/zend-stdlib:3.2.1
     fi
 
 script:
