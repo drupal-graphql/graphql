@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql_core\Kernel\Blocks;
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
 /**
