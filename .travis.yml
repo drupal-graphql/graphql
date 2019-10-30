@@ -2,7 +2,6 @@ language: php
 sudo: false
 
 php:
-  - 7.4
   - 7.3
   - 7.2
 
@@ -22,14 +21,14 @@ matrix:
   # Don't wait for the allowed failures to build.
   fast_finish: true
   include:
-    - php: 7.4
+    - php: 7.3
       env:
         - DRUPAL_CORE=8.7.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
   allow_failures:
     # Allow the code coverage report to fail.
-    - php: 7.4
+    - php: 7.3
       env:
         - DRUPAL_CORE=8.7.x
         # Only run code coverage on the latest php and drupal versions.
