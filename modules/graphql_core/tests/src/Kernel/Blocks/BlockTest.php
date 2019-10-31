@@ -25,6 +25,7 @@ class BlockTest extends GraphQLCoreTestBase {
     'filter',
     'editor',
     'ckeditor',
+    'path',
     'graphql_block_test',
   ];
 
