@@ -60,8 +60,6 @@ before_install:
 
   # Update composer.
   - composer self-update
-  # Upgrade zend-stdlib to avoid PHP 7.3 incompatibility
-  - composer require zendframework/zend-stdlib:3.2.1
 
 install:
   # Create the database.
