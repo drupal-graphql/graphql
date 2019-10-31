@@ -112,15 +112,6 @@ class MenuTest extends GraphQLCoreTestBase {
               ],
             ],
             1 => [
-              'label' => 'Inaccessible',
-              'route' => [
-                'path' => '/',
-                'routed' => TRUE,
-              ],
-              'attribute' => NULL,
-              'links' => [],
-            ],
-            2 => [
               'label' => 'Drupal',
               'route' => [
                 'path' => 'http://www.drupal.org',
