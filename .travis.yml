@@ -91,7 +91,7 @@ install:
   # For Drupal < 8.8 we have to manually upgrade zend-stdlib to avoid PHP 7.3
   # incompatibilities.
   - if [[ "$DRUPAL_CORE" = "8.6.x" || "$DRUPAL_CORE" = "8.7.x" ]];
-      then composer --working-dir=$DRUPAL_BUILD_DIR require zendframework/zend-stdlib:3.2.1
+      then composer --working-dir=$DRUPAL_BUILD_DIR require zendframework/zend-stdlib:3.2.1;
     fi
 
 script:
