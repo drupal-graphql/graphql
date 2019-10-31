@@ -37,6 +37,10 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   },
  *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityQueryDeriver"
  * )
+ *
+ * This field is marked as not secure because it does not enforce entity field
+ * access over a chain of filters. For example node.uid.pass could be used as
+ * filter input which would disclose information about Drupal's password hashes.
  */
 class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
