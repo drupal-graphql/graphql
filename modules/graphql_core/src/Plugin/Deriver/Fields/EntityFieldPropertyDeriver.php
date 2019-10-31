@@ -21,8 +21,13 @@ class EntityFieldPropertyDeriver extends EntityFieldDeriverBase {
       $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
       $supportsBundles = $entityType->hasKey('bundle');
 
+      if (!isset($basePluginDefinition['parents'])) {
+        $basePluginDefinition['parents'] = [];
+      }
+
+      $parents = [StringHelper::camelCase('field', $entityTypeId, $supportsBundles ? $fieldBundle : '', $fieldName)];
       return ["$entityTypeId-$fieldBundle-$fieldName" => [
-        'parents' => [StringHelper::camelCase('field', $entityTypeId, $supportsBundles ? $fieldBundle : '', $fieldName)],
+        'parents' => array_merge($parents, $basePluginDefinition['parents']),
       ] + $basePluginDefinition];
     }
 
