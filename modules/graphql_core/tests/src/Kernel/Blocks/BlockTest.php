@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql_core\Kernel\Blocks;
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 
@@ -40,6 +41,12 @@ class BlockTest extends GraphQLCoreTestBase {
     $themeInstaller->install(['stark']);
 
     $this->installEntitySchema('block_content');
+    try {
+      $this->installEntitySchema('path_alias');
+    } catch (PluginNotFoundException $exc) {
+      // Ignore if the path_alias entity doesn't exist. This means we are
+      // testing a Drupal version < 8.8 and aliases are not entities yet.
+    }
     $this->installConfig('block_content');
     $this->installConfig('graphql_block_test');
 
