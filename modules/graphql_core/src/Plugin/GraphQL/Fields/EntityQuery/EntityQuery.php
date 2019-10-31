@@ -17,7 +17,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 /**
  * @GraphQLField(
  *   id = "entity_query",
- *   secure = true,
+ *   secure = false,
  *   type = "EntityQueryResult",
  *   arguments = {
  *     "filter" = "EntityQueryFilterInput",
