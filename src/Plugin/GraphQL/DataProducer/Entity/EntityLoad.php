@@ -153,6 +153,18 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
         return NULL;
       }
 
+      $context->addCacheableDependency($entity);
+      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
+        // If the entity is not among the allowed bundles, don't return it.
+        return NULL;
+      }
+
+      // Get the correct translation.
+      if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+        $entity = $entity->getTranslation($language);
+        $entity->addCacheContexts(["static:language:{$language}"]);
+      }
+
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
@@ -162,17 +174,6 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
         if (!$accessResult->isAllowed()) {
           return NULL;
         }
-      }
-
-      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
-        // If the entity is not among the allowed bundles, don't return it.
-        $context->addCacheableDependency($entity);
-        return NULL;
-      }
-
-      if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-        $entity = $entity->getTranslation($language);
-        $entity->addCacheContexts(["static:language:{$language}"]);
       }
 
       return $entity;

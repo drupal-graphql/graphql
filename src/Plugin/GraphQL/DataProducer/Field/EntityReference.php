@@ -161,6 +161,12 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
             return FALSE;
           }
 
+          // Get the correct translation.
+          if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            $entity = $entity->getTranslation($language);
+            $entity->addCacheContexts(["static:language:{$language}"]);
+          }
+
           // Check if the passed user (or current user if none is passed) has
           // access to the entity, if not return NULL.
           if ($access) {
@@ -181,17 +187,6 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
           $tags = $type->getListCacheTags();
           $context->addCacheTags($tags);
           return NULL;
-        }
-
-        if (isset($language)) {
-          $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
-              $entity = $entity->getTranslation($language);
-            }
-
-            $entity->addCacheContexts(["static:language:{$language}"]);
-            return $entity;
-          }, $entities);
         }
 
         return $entities;
