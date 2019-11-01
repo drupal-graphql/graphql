@@ -36,6 +36,9 @@ In this schema we can see that we can query a node by its route, that takes a pa
 To add the resolvers we go to our schema implementation and call the appropriate data producers inside the `getResolverRegistry` method.
 
 ```php
+use GraphQL\Error\Error;
+...
+
 /**
  * {@inheritdoc}
  */
