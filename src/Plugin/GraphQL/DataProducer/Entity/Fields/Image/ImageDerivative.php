@@ -45,10 +45,23 @@ class ImageDerivative extends DataProducerPluginBase {
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
+
+      $width = $entity->width;
+      $height = $entity->height;
+
+      if (empty($width) || empty($height)) {
+        /** @var \Drupal\Core\Image\ImageInterface $image */
+        $image = \Drupal::service('image.factory')->get($entity->getFileUri());
+        if ($image->isValid()) {
+          $width = $image->getWidth();
+          $height = $image->getHeight();
+        }
+      }
+
       // Determine the dimensions of the styled image.
       $dimensions = [
-        'width' => $entity->width,
-        'height' => $entity->height,
+        'width' => $width,
+        'height' => $height,
       ];
 
       $image_style->transformDimensions($dimensions, $entity->getFileUri());
