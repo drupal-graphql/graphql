@@ -82,14 +82,14 @@ class ServerForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $form_state) {
-    $form = parent::form($form, $form_state);
+  public function form(array $form, FormStateInterface $formState) {
+    $form = parent::form($form, $formState);
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
     $schemas = array_map(function ($definition) {
       return $definition['name'] ?? $definition['id'];
     }, $this->schemaManager->getDefinitions());
-    $schema = ($form_state->getUserInput()['schema'] ?? $server->get('schema')) ?: reset(array_keys($schemas));
+    $schema = ($formState->getUserInput()['schema'] ?? $server->get('schema')) ?: reset(array_keys($schemas));
 
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
@@ -151,7 +151,7 @@ class ServerForm extends EntityForm {
         '#tree' => TRUE,
       ];
 
-      $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $form_state);
+      $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $formState);
     }
 
     $form['endpoint'] = [
@@ -224,14 +224,14 @@ class ServerForm extends EntityForm {
     }
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
+  public function submitForm(array &$form, FormStateInterface $formState) {
+    parent::submitForm($form, $formState);
 
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
-    $schema = $form_state->getValue('schema');
+    $schema = $formState->getValue('schema');
     $instance = $this->schemaManager->createInstance($schema);
     if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
-      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $form_state);
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
       $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
     }
   }
