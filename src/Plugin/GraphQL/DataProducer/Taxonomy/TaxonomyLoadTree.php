@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
+
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -14,29 +14,29 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads the taxonomy tree.
+ *
  * @DataProducer(
- *   id = "entity_load_multiple",
- *   name = @Translation("Load multiple entities"),
- *   description = @Translation("Loads multiple entities."),
- *   produces = @ContextDefinition("entities",
- *     label = @Translation("Entities")
+ *   id = "taxonomy_load_tree",
+ *   name = @Translation("Load multiple taxonomy terms"),
+ *   description = @Translation("Loads Taxonomy terms as a tree"),
+ *   produces = @ContextDefinition("taxonomy tree",
+ *     label = @Translation("Taxonomy tree")
  *   ),
  *   consumes = {
- *     "type" = @ContextDefinition("string",
- *       label = @Translation("Entity type")
+ *     "vid" = @ContextDefinition("string",
+ *       label = @Translation("Vocabulary id")
  *     ),
- *     "ids" = @ContextDefinition("string",
- *       label = @Translation("Identifier"),
- *       multiple = TRUE
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity languages"),
- *       multiple = TRUE,
+ *     "parent" = @ContextDefinition("integer",
+ *       label = @Translation("The term ID under which to generate the tree"),
  *       required = FALSE
  *     ),
- *     "bundles" = @ContextDefinition("string",
- *       label = @Translation("Entity bundle(s)"),
- *       multiple = TRUE,
+ *     "max_depth" = @ContextDefinition("integer",
+ *       label = @Translation("Maximum tree depth"),
+ *       required = FALSE
+ *     ),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Language"),
  *       required = FALSE
  *     ),
  *     "access" = @ContextDefinition("boolean",
@@ -56,22 +56,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     )
  *   }
  * )
+ *   }
+ * )
  */
-class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The default max depth to search in taxonomy tree if it is not set.
+   */
+  const MAX_DEPTH = 10;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManager
    */
   protected $entityTypeManager;
-
-  /**
-   * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
 
   /**
    * The entity buffer service.
@@ -91,7 +91,6 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
-      $container->get('entity.repository'),
       $container->get('graphql.buffer.entity')
     );
   }
@@ -105,51 +104,67 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
    * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
    *   The entity buffer service.
    *
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
-    $pluginId,
-    $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityRepositoryInterface $entityRepository,
+    array $configuration,
+    string $pluginId,
+    array $pluginDefinition,
+    EntityTypeManager $entityTypeManager,
     EntityBuffer $entityBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
-    $this->entityRepository = $entityRepository;
     $this->entityBuffer = $entityBuffer;
   }
 
   /**
-   * @param $type
-   * @param array $ids
-   * @param null $language
-   * @param array|null $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   * Resolves the taxonomy tree for given vocabulary.
    *
-   * @return \GraphQL\Deferred
+   * @param string $vid
+   *   The vocanulary ID.
+   * @param int $parent
+   *   The ID of the parent's term to load the tree for.
+   * @param int|null $max_depth
+   *   Max depth to search in.
+   * @param string|null $language
+   *   Optional. Language to be respected for retrieved entities.
+   * @param bool $access
+   *   Whether check for access or not. Default is true.
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   User entity to check access for. Default is null.
+   * @param string $accessOperation
+   *   Operation to check access for. Default is view.
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The caching context related to the current field.
+   *
+   * @return \GraphQL\Deferred|null
+   *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve($type, array $ids, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
-    $resolver = $this->entityBuffer->add($type, $ids);
+  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): array {
+    if (!isset($max_depth)) {
+      $max_depth = self::MAX_DEPTH;
+    }
 
-    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
+    $terms = $this->entityTypeManager
+      ->getStorage('taxonomy_term')
+      ->loadTree($vid, $parent, $max_depth);
+
+    $term_ids = array_column($terms, 'tid');
+    $resolver = $this->entityBuffer->add('taxonomy_term', $term_ids);
+
+    return new Deferred(function () use ($language, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that
         // the cache entry is purged whenever a new entity of this type is
         // saved.
-        $type = $this->entityTypeManager->getDefinition($type);
+        $type = $this->entityTypeManager->getDefinition('taxonomy_term');
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
         $context->addCacheTags($tags);
@@ -158,11 +173,6 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
       foreach ($entities as $id => $entity) {
         $context->addCacheableDependency($entities[$id]);
-        if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
-          // If the entity is not among the allowed bundles, don't return it.
-          unset($entities[$id]);
-          continue;
-        }
 
         if (isset($language) && $language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
           $entities[$id] = $entities[$id]->getTranslation($language);
@@ -171,11 +181,8 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
         if ($access) {
           /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
-          $accessResult = $entities[$id]->access($accessOperation, $accessUser, TRUE);
+          $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
           $context->addCacheableDependency($accessResult);
-          // We need to call isAllowed() because isForbidden() returns FALSE
-          // for neutral access results, which is dangerous. Only an explicitly
-          // allowed result means that the user has access.
           if (!$accessResult->isAllowed()) {
             unset($entities[$id]);
             continue;
