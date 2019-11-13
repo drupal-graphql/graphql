@@ -32,7 +32,6 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-
   protected function query($query, $server = NULL, array $variables = [], array $extensions = NULL) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {

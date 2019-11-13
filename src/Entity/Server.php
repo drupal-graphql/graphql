@@ -394,6 +394,20 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public function getSortedPersistedQueryInstances() {
+    if ($this->sortedPersistedQueryInstances !== NULL) {
+      return $this->sortedPersistedQueryInstances;
+    }
+    $this->sortedPersistedQueryInstances = $this->getPersistedQueryInstances();
+    uasort($this->sortedPersistedQueryInstances, function($a, $b) {
+      return $a->getWeight() < $b->getWeight() ? -1 : 1;
+    });
+    return $this->sortedPersistedQueryInstances;
+  }
+
+  /**
    * TODO: Handle this through configurable plugins on the server.
    *
    * Returns a callable for loading persisted queries.
@@ -403,7 +417,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getPersistedQueryLoader() {
     return function ($id, OperationParams $params) {
-      throw new RequestError('Persisted queries are currently not supported');
+      foreach ($this->getSortedPersistedQueryInstances() as $persistedQueryInstance) {
+        $query = $persistedQueryInstance->getQuery($id, $params);
+        if (!is_null($query)) {
+          return $query;
+        }
+      }
     };
   }
 
