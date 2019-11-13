@@ -403,9 +403,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getPersistedQueryLoader() {
     return function ($id, OperationParams $params) {
-      /* @var \Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface $queryProvider */
-      $queryProvider = \Drupal::service('graphql.query_provider');
-      return $queryProvider->getQuery($id, $params);
+      throw new RequestError('Persisted queries are currently not supported');
     };
   }
 

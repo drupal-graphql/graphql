@@ -1,5 +1,0 @@
-services:
-  graphql_query_provider_test.query_map_provider:
-    class: Drupal\graphql_query_provider_test\DummyQueryProvider
-    tags:
-    - { name: graphql_query_provider }
