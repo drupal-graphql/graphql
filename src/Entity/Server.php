@@ -130,6 +130,21 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public $persisted_queries_settings = [];
 
+
+  /**
+   * Persisted query plugin instances available on this server.
+   *
+   * @var array
+   */
+  protected $persisted_query_instances = NULL;
+
+  /**
+   * The sorted persisted query plugin instances available on this server.
+   *
+   * @var array
+   */
+  protected $sorted_persisted_query_instances = NULL;
+
   /**
    * {@inheritdoc}
    */
@@ -352,10 +367,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin) {
     // Make sure the persistedQueryInstances are loaded before trying to add a
     // plugin to them.
-    if ($this->persistedQueryInstances === NULL) {
+    if (is_null($this->persisted_query_instances)) {
       $this->getPersistedQueryInstances();
     }
-    $this->persistedQueryInstances[$queryPlugin->getPluginId()] = $queryPlugin;
+    $this->persisted_query_instances[$queryPlugin->getPluginId()] = $queryPlugin;
     return $this;
   }
 
@@ -365,18 +380,26 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public function removePersistedQueryInstance($queryPluginId) {
     // Make sure the persistedQueryInstances are loaded before trying to remove
     // a plugin from them.
-    if ($this->persistedQueryInstances === NULL) {
+    if (is_null($this->persisted_query_instances)) {
       $this->getPersistedQueryInstances();
     }
-    unset($this->persistedQueryInstances[$queryPluginId]);
+    unset($this->persisted_query_instances[$queryPluginId]);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function removeAllPersistedQueryInstances() {
+    $this->persisted_query_instances = NULL;
+    $this->sorted_persisted_query_instances = NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPersistedQueryInstances() {
-    if ($this->persistedQueryInstances !== NULL) {
-      return $this->persistedQueryInstances;
+    if (!is_null($this->persisted_query_instances)) {
+      return $this->persisted_query_instances;
     }
 
     /* @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
@@ -386,25 +409,27 @@ class Server extends ConfigEntityBase implements ServerInterface {
     foreach ($definitions as $id => $definition) {
       if (isset($persisted_queries_settings[$id])) {
         $configuration = !empty($persisted_queries_settings[$id]) ? $persisted_queries_settings[$id] : [];
-        $this->persistedQueryInstances[$id] = $plugin_manager->createInstance($id, $configuration);
+        $this->persisted_query_instances[$id] = $plugin_manager->createInstance($id, $configuration);
       }
     }
 
-    return $this->persistedQueryInstances;
+    return $this->persisted_query_instances;
   }
 
   /**
    * {@inheritDoc}
    */
   public function getSortedPersistedQueryInstances() {
-    if ($this->sortedPersistedQueryInstances !== NULL) {
-      return $this->sortedPersistedQueryInstances;
+    if (!is_null($this->sorted_persisted_query_instances)) {
+      return $this->sorted_persisted_query_instances;
     }
-    $this->sortedPersistedQueryInstances = $this->getPersistedQueryInstances();
-    uasort($this->sortedPersistedQueryInstances, function($a, $b) {
-      return $a->getWeight() < $b->getWeight() ? -1 : 1;
-    });
-    return $this->sortedPersistedQueryInstances;
+    $this->sorted_persisted_query_instances = $this->getPersistedQueryInstances();
+    if (!empty($this->sorted_persisted_query_instances)) {
+      uasort($this->sorted_persisted_query_instances, function ($a, $b) {
+        return $a->getWeight() <= $b->getWeight() ? -1 : 1;
+      });
+    }
+    return $this->sorted_persisted_query_instances;
   }
 
   /**
@@ -417,10 +442,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getPersistedQueryLoader() {
     return function ($id, OperationParams $params) {
-      foreach ($this->getSortedPersistedQueryInstances() as $persistedQueryInstance) {
-        $query = $persistedQueryInstance->getQuery($id, $params);
-        if (!is_null($query)) {
-          return $query;
+      $sortedPersistedQueryInstances = $this->getSortedPersistedQueryInstances();
+      if (!empty($sortedPersistedQueryInstances)) {
+        foreach ($sortedPersistedQueryInstances as $persistedQueryInstance) {
+          $query = $persistedQueryInstance->getQuery($id, $params);
+          if (!is_null($query)) {
+            return $query;
+          }
         }
       }
     };
@@ -473,8 +501,11 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public function preSave(EntityStorageInterface $storage) {
     // Write all the persisted queries configuration.
     $this->persisted_queries_settings = [];
-    foreach ($this->getPersistedQueryInstances() as $plugin_id => $plugin) {
-      $this->persisted_queries_settings[$plugin_id] = $plugin->getConfiguration();
+    $persistedQueryInstances = $this->getPersistedQueryInstances();
+    if (!empty($persistedQueryInstances)) {
+      foreach ($persistedQueryInstances as $plugin_id => $plugin) {
+        $this->persisted_queries_settings[$plugin_id] = $plugin->getConfiguration();
+      }
     }
 
     parent::preSave($storage);

@@ -46,6 +46,11 @@ interface ServerInterface extends ConfigEntityInterface {
   public function removePersistedQueryInstance($queryPluginId);
 
   /**
+   * Removes all the persisted query instances.
+   */
+  public function removeAllPersistedQueryInstances();
+
+  /**
    * Returns the current persisted queries set.
    *
    * @return \Drupal\graphql\Plugin\PersistedQueryPluginInterface[]
