@@ -50,8 +50,8 @@ cache:
     - $HOME/.composer
 
 before_install:
-  # Disable xdebug.
-  - phpenv config-rm xdebug.ini
+  # Disable xdebug. It might not exist on PHP 7.4 so ignore that error.
+  - phpenv config-rm xdebug.ini || true
 
   # Determine the php settings file location.
   - if [[ $TRAVIS_PHP_VERSION = hhvm* ]];
