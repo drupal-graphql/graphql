@@ -38,6 +38,9 @@ matrix:
     # cannot reproduce locally.
     # See https://github.com/drupal-graphql/graphql/pull/872
     - php: 7.3
+    # PHP 7.4 testing is allowed to fail because the GD extension is not
+    # packaged on Travis CI yet.
+    - php: 7.4
 
 mysql:
   database: graphql
