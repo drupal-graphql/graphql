@@ -16,7 +16,7 @@ env:
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
     - TRAVIS=true
   matrix:
-    - DRUPAL_CORE=8.7.x
+    - DRUPAL_CORE=8.8.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -24,20 +24,16 @@ matrix:
   include:
     - php: 7.2
       env:
-        - DRUPAL_CORE=8.7.x
+        - DRUPAL_CORE=8.8.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
   allow_failures:
     # Allow the code coverage report to fail.
     - php: 7.2
       env:
-        - DRUPAL_CORE=8.7.x
+        - DRUPAL_CORE=8.8.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
-    # PHP 7.3 testing is allowed to fail for now because there is an error we
-    # cannot reproduce locally.
-    # See https://github.com/drupal-graphql/graphql/pull/872
-    - php: 7.3
     # PHP 7.4 testing is allowed to fail because the GD extension is not
     # packaged on Travis CI yet.
     # See https://travis-ci.community/t/some-extensions-are-missing-in-php-7-4-0-zip-gmp-sodium/6320/9
