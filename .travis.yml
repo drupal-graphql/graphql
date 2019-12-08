@@ -8,6 +8,7 @@ services:
 php:
   - 7.2
   - 7.3
+  - 7.4
 
 env:
   global:
@@ -37,6 +38,10 @@ matrix:
     # cannot reproduce locally.
     # See https://github.com/drupal-graphql/graphql/pull/872
     - php: 7.3
+    # PHP 7.4 testing is allowed to fail because the GD extension is not
+    # packaged on Travis CI yet.
+    # See https://travis-ci.community/t/some-extensions-are-missing-in-php-7-4-0-zip-gmp-sodium/6320/9
+    - php: 7.4
 
 mysql:
   database: graphql
@@ -49,8 +54,8 @@ cache:
     - $HOME/.composer
 
 before_install:
-  # Disable xdebug.
-  - phpenv config-rm xdebug.ini
+  # Disable xdebug. It might not exist on PHP 7.4 so ignore that error.
+  - phpenv config-rm xdebug.ini || true
 
   # Determine the php settings file location.
   - if [[ $TRAVIS_PHP_VERSION = hhvm* ]];
