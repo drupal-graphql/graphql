@@ -131,7 +131,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @param $type
    * @param $id
    * @param null $language
-   * @param null $bundles
+   * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
    * @param string $accessOperation
@@ -139,7 +139,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id, $language, $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve($type, $id, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
     return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
@@ -153,26 +153,27 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
         return NULL;
       }
 
+      $context->addCacheableDependency($entity);
+      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
+        // If the entity is not among the allowed bundles, don't return it.
+        return NULL;
+      }
+
+      // Get the correct translation.
+      if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+        $entity = $entity->getTranslation($language);
+        $entity->addCacheContexts(["static:language:{$language}"]);
+      }
+
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
         /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
         $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
         $context->addCacheableDependency($accessResult);
-        if ($accessResult->isForbidden()) {
+        if (!$accessResult->isAllowed()) {
           return NULL;
         }
-      }
-
-      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
-        // If the entity is not among the allowed bundles, don't return it.
-        $context->addCacheableDependency($entity);
-        return NULL;
-      }
-
-      if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-        $entity = $entity->getTranslation($language);
-        $entity->addCacheContexts(["static:language:{$language}"]);
       }
 
       return $entity;
