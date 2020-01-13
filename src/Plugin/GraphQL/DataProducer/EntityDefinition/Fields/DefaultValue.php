@@ -30,7 +30,7 @@ class DefaultValue extends DataProducerPluginBase {
    * @param \Drupal\Core\Field\FieldDefinitionInterface $entity_definition_field
    *   The entity field definition.
    *
-   * @return string|bool|null
+   * @return string|bool|int|null
    *   The default value.
    */
   public function resolve(FieldDefinitionInterface $entity_definition_field) {
@@ -38,6 +38,7 @@ class DefaultValue extends DataProducerPluginBase {
     $default_value = $entity_definition_field->getDefaultValueLiteral();
     if (is_array($default_value)) {
       switch ($entity_definition_field->getType()) {
+        case 'list_integer':
         case 'text_long':
           return $default_value ? $default_value[0]['value'] : NULL;
 
