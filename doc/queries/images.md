@@ -3,6 +3,7 @@ The following examples should help accessing images and their derivatives based 
 ## Add the schema declaration
 
 ´´´
+
 type Article implements NodeInterface {
 ...
   image_url: String
@@ -17,11 +18,13 @@ type Image {
   width: Int
   height: Int
 }
+
 ´´´
 
 ## Adding resolvers
 
 ´´´
+
     $registry->addFieldResolver('Article', 'image_url',
       $builder->compose(
         $builder->produce('property_path')
