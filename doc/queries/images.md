@@ -2,7 +2,7 @@ The following examples should help accessing images and their derivatives based 
 
 ## Add the schema declaration
 
-´´´
+```
 
 type Article implements NodeInterface {
 ...
@@ -19,11 +19,11 @@ type Image {
   height: Int
 }
 
-´´´
+```
 
 ## Adding resolvers
 
-´´´
+```
 
     $registry->addFieldResolver('Article', 'image_url',
       $builder->compose(
@@ -67,4 +67,4 @@ type Image {
       )
     );
 
-´´´
+```
