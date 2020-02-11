@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
@@ -59,6 +58,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class EntityReference extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+
+  use EntityReferenceTrait;
 
   /**
    * The entity type manager service.
@@ -155,44 +156,11 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
       $resolver = $this->entityBuffer->add($type, $ids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
-        $entities = $resolver() ?: [];
-        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
-          if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
-            return FALSE;
-          }
-
-          // Get the correct translation.
-          if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
-            $entity = $entity->getTranslation($language);
-            $entity->addCacheContexts(["static:language:{$language}"]);
-          }
-
-          // Check if the passed user (or current user if none is passed) has
-          // access to the entity, if not return NULL.
-          if ($access) {
-            /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
-            $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
-            $context->addCacheableDependency($accessResult);
-            if (!$accessResult->isAllowed()) {
-              return FALSE;
-            }
-          }
-
-          return TRUE;
-        });
-
-        if (empty($entities)) {
-          $type = $this->entityTypeManager->getDefinition($type);
-          /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
-          $tags = $type->getListCacheTags();
-          $context->addCacheTags($tags);
-          return NULL;
-        }
-
-        return $entities;
+        return $this->defer($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
       });
     }
 
     return NULL;
   }
+
 }
