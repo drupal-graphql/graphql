@@ -146,7 +146,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): array {
+  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
     if (!isset($max_depth)) {
       $max_depth = self::MAX_DEPTH;
     }
