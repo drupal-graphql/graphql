@@ -196,6 +196,28 @@ GQL;
   }
 
   /**
+   * @covers ::compose
+   */
+  public function testComposeNullValue() {
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Tree', 'name', $this->builder->compose(
+      $this->builder->fromValue(NULL),
+      $this->builder->produce('uppercase')
+        ->map('string', $this->builder->fromParent())
+    ));
+
+    $query = <<<GQL
+      query {
+        tree {
+          name
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['name' => NULL]]);
+  }
+
+  /**
    * @covers ::context
    * @covers ::fromContext
    */
@@ -286,6 +308,106 @@ GQL;
 GQL;
 
     $this->assertResults($query, [], ['tree' => ['name' => 'But this should.']]);
+  }
+
+  /**
+   * @covers ::defaultValue
+   */
+  public function testSimpleDefaultValue() {
+    $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
+    $this->mockResolver('Tree', 'name', $this->builder->defaultValue(
+      $this->builder->fromValue(NULL),
+      $this->builder->fromValue('bar')
+    ));
+
+    $this->mockResolver('Tree', 'uri', $this->builder->defaultValue(
+      $this->builder->fromValue('baz'),
+      $this->builder->fromValue('bar')
+    ));
+
+    $query = <<<GQL
+      query {
+        tree(id: 1) {
+          name
+          uri
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], [
+      'tree' => [
+        'name' => 'bar',
+        'uri' => 'baz',
+      ]
+    ]);
+  }
+
+  public function testCompositeDefaultValue() {
+
+    $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
+    $this->mockResolver('Tree', 'name', $this->builder->defaultValue(
+      $this->builder->compose(
+        $this->builder->fromValue('baz'),
+        $this->builder->fromValue(NULL)
+      ),
+      $this->builder->fromValue('bar')
+    ));
+
+    $this->mockResolver('Tree', 'uri', $this->builder->defaultValue(
+      $this->builder->compose(
+        $this->builder->fromValue(TRUE),
+        $this->builder->fromValue('baz')
+      ),
+      $this->builder->fromValue('bar')
+    ));
+
+    $query = <<<GQL
+      query {
+        tree(id: 1) {
+          name
+          uri
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], [
+      'tree' => [
+        'name' => 'bar',
+        'uri' => 'baz',
+      ]
+    ]);
+  }
+
+  /**
+   * @covers ::defaultValue
+   */
+  public function testDeferredDefaultValue() {
+    $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
+    $this->mockResolver('Tree', 'name', $this->builder->defaultValue(
+      $this->builder->callback(function () { return new Deferred(function () { return NULL; }); }),
+      $this->builder->callback(function () { return new Deferred(function () { return 'bar'; }); })
+    ));
+
+    $this->mockResolver('Tree', 'uri', $this->builder->defaultValue(
+      $this->builder->callback(function () { return new Deferred(function () { return 'baz'; }); }),
+      $this->builder->callback(function () { return new Deferred(function () { return 'bar'; }); })
+    ));
+
+    $query = <<<GQL
+      query {
+        tree(id: 1) {
+          name
+          uri
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], [
+      'tree' => [
+        'name' => 'bar',
+        'uri' => 'baz',
+      ]
+    ]);
   }
 }
 
