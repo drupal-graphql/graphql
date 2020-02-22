@@ -2,7 +2,7 @@ The following examples should help accessing images and their derivatives based 
 
 ## Add the schema declaration
 
-```
+```gql
 type Article implements NodeInterface {
 ...
   image_url: String
