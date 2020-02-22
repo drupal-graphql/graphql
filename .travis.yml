@@ -1,5 +1,4 @@
 language: php
-sudo: false
 
 php:
   - 7.3
@@ -16,7 +15,6 @@ env:
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
     - TRAVIS=true
   matrix:
-    - DRUPAL_CORE=8.6.x
     - DRUPAL_CORE=8.7.x
     - DRUPAL_CORE=8.8.x
 
@@ -88,15 +86,15 @@ install:
   # require also triggers a full 'composer install'.
   - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.12.5
 
-  # For Drupal < 8.8 we have to manually upgrade zend-stdlib to avoid PHP 7.3
+  # For Drupal 8.7 we have to manually upgrade zend-stdlib to avoid PHP 7.3
   # incompatibilities.
-  - if [[ "$DRUPAL_CORE" = "8.6.x" || "$DRUPAL_CORE" = "8.7.x" ]];
+  - if [[ "$DRUPAL_CORE" = "8.7.x" ]];
       then composer --working-dir=$DRUPAL_BUILD_DIR require zendframework/zend-stdlib:3.2.1;
     fi
 
-  # For Drupal < 8.8 we have to manually upgrade phpunit to avoid PHP 7.3
+  # For Drupal 8.7 we have to manually upgrade phpunit to avoid PHP 7.3
   # incompatibilities.
-  - if [[ "$DRUPAL_CORE" = "8.6.x" || "$DRUPAL_CORE" = "8.7.x" ]];
+  - if [[ "$DRUPAL_CORE" = "8.7.x" ]];
       then composer --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade;
     fi
 
