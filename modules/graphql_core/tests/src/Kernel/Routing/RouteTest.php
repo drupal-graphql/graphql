@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
 use Drupal\Core\GeneratedUrl;
-use Drupal\Core\Path\AliasManagerInterface;
+use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 use Prophecy\Argument;
@@ -39,7 +39,7 @@ class RouteTest extends GraphQLCoreTestBase {
       ->generateFromRoute('graphql_context_test.a', [], ['query' => []], TRUE)
       ->willReturn((new GeneratedUrl())->setGeneratedUrl('/my/other/alias'));
 
-    $this->container->set('path.alias_manager', $aliasManager->reveal());
+    $this->container->set('path_alias.manager', $aliasManager->reveal());
     $this->container->set('url_generator', $urlGenerator->reveal());
   }
 

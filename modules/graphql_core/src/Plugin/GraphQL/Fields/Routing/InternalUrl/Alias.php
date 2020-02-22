@@ -4,7 +4,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Routing\InternalUrl;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Path\AliasManagerInterface;
+use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -29,7 +29,7 @@ class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
   /**
    * Instance of an alias manager.
    *
-   * @var \Drupal\Core\Path\AliasManagerInterface
+   * @var \Drupal\path_alias\AliasManagerInterface
    */
   protected $aliasManager;
 
@@ -41,7 +41,7 @@ class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('path.alias_manager')
+      $container->get('path_alias.manager')
     );
   }
 
@@ -54,7 +54,7 @@ class Alias extends FieldPluginBase implements ContainerFactoryPluginInterface {
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   * @param \Drupal\Core\Path\AliasManagerInterface $aliasManager
+   * @param \Drupal\path_alias\AliasManagerInterface $aliasManager
    *   The alias manager service
    */
   public function __construct(
