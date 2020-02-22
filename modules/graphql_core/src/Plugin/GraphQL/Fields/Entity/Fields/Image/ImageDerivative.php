@@ -5,6 +5,7 @@ namespace Drupal\graphql_core\Plugin\GraphQL\Fields\Entity\Fields\Image;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\file\Entity\File;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
@@ -69,7 +70,9 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
    */
   protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof ImageItem && $value->entity && $value->entity->access('view') && $style = ImageStyle::load($args['style'])) {
+      assert($style instanceof ImageStyle);
       $file = $value->entity;
+      assert($file instanceof File);
 
       // Determine the dimensions of the styled image.
       $dimensions = [
@@ -77,10 +80,16 @@ class ImageDerivative extends FieldPluginBase implements ContainerFactoryPluginI
         'height' => $value->height,
       ];
 
-      $style->transformDimensions($dimensions, $file->getFileUri());
+      if ($style->supportsUri($file->getFileUri())) {
+        $style->transformDimensions($dimensions, $file->getFileUri());
+        $url = $style->buildUrl($file->getFileUri());
+      }
+      else {
+        $url = $file->url();
+      }
 
       yield new CacheableValue([
-        'url' => $style->buildUrl($file->getFileUri()),
+        'url' => $url,
         'width' => $dimensions['width'],
         'height' => $dimensions['height'],
       ], [$style]);
