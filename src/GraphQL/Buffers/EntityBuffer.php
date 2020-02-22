@@ -71,7 +71,8 @@ class EntityBuffer extends BufferBase {
       if (is_array($item['id'])) {
         return array_reduce($item['id'], function ($carry, $current) use ($entities) {
           if (!empty($entities[$current])) {
-            return $carry + [$current => $entities[$current]];
+            array_push($carry, $entities[$current]);
+            return $carry;
           }
 
           return $carry;
