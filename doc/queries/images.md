@@ -21,7 +21,7 @@ type Image {
 
 ## Adding resolvers
 
-```
+```php
     $registry->addFieldResolver('Article', 'image_url',
       $builder->compose(
         $builder->produce('property_path')
