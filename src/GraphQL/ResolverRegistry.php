@@ -110,6 +110,13 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAllFieldResolvers() {
+    return $this->fieldResolvers;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function addTypeResolver($abstract, callable $resolver) {
     $this->typeResolvers[$abstract] = $resolver;
     return $this;
