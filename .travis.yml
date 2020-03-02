@@ -34,9 +34,6 @@ matrix:
         - DRUPAL_CORE=8.8.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
-    # PHP 7.4 testing is allowed to fail because Drupal core is not compatible
-    # yet. See https://www.drupal.org/project/drupal/issues/3086374
-    - php: 7.4
 
 mysql:
   database: graphql
