@@ -35,6 +35,9 @@ matrix:
         - DRUPAL_CORE=8.8.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
+    # Tests on PHP 7.4 are broken right now, see
+    # https://github.com/drupal-graphql/graphql/issues/982
+    - php: 7.4
 
 mysql:
   database: graphql
