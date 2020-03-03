@@ -34,6 +34,13 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   /**
    * @return string
    */
+  public function getFieldName() {
+    return $this->info->fieldName;
+  }
+
+  /**
+   * @return string
+   */
   public function getContextLanguage() {
     return $this->context->getContextLanguage();
   }
