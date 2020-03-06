@@ -132,7 +132,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    * @param $type
    * @param array $ids
    * @param null $language
-   * @param array|NULL $bundles
+   * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
    * @param string $accessOperation
@@ -140,7 +140,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, array $ids, $language, array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve($type, array $ids, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
@@ -171,7 +171,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
         if ($access) {
           /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
-          $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+          $accessResult = $entities[$id]->access($accessOperation, $accessUser, TRUE);
           $context->addCacheableDependency($accessResult);
           // We need to call isAllowed() because isForbidden() returns FALSE
           // for neutral access results, which is dangerous. Only an explicitly

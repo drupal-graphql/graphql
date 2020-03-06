@@ -36,7 +36,13 @@ class MenuLinkAttribute extends DataProducerPluginBase {
    */
   public function resolve(MenuLinkInterface $link, $attribute) {
     $options = $link->getOptions();
-    return NestedArray::getValue($options, ['attributes', $attribute]);
+    // Certain attributes like class can be arrays. Check for that and implode them.
+    $attributeValue = NestedArray::getValue($options, ['attributes', $attribute]);
+    if (is_array($attributeValue)) {
+      return implode(" ", $attributeValue);
+    } else {
+      return $attributeValue;
+    }
   }
 
 }

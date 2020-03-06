@@ -39,6 +39,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
+ *     "access_user" = @ContextDefinition("entity:user",
+ *       label = @Translation("User"),
+ *       required = FALSE,
+ *       default_value = NULL
+ *     ),
+ *     "access_operation" = @ContextDefinition("string",
+ *       label = @Translation("Operation"),
+ *       required = FALSE,
+ *       default_value = "view"
  *     )
  *   }
  * )
@@ -118,13 +133,15 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param $field
    * @param null $language
-   * @param null $bundles
-   *
+   * @param array|null $bundles
+   * @param bool $access
+   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param string $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred|null
    */
-  public function resolve(EntityInterface $entity, $field, $language = NULL, $bundles = NULL, FieldContext $context) {
+  public function resolve(EntityInterface $entity, $field, $language = NULL, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -137,15 +154,32 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       }, $values->getValue());
 
       $resolver = $this->entityBuffer->add($type, $ids);
-      return new Deferred(function () use ($type, $language, $bundles, $resolver, $context) {
+      return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
-        $entities = isset($bundles) ? array_filter($entities, function (EntityInterface $entity) use ($bundles) {
-          if (!in_array($entity->bundle(), $bundles)) {
+        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
+          if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
           }
 
+          // Get the correct translation.
+          if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+            $entity = $entity->getTranslation($language);
+            $entity->addCacheContexts(["static:language:{$language}"]);
+          }
+
+          // Check if the passed user (or current user if none is passed) has
+          // access to the entity, if not return NULL.
+          if ($access) {
+            /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+            $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+            $context->addCacheableDependency($accessResult);
+            if (!$accessResult->isAllowed()) {
+              return FALSE;
+            }
+          }
+
           return TRUE;
-        }) : $entities;
+        });
 
         if (empty($entities)) {
           $type = $this->entityTypeManager->getDefinition($type);
@@ -153,17 +187,6 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
           $tags = $type->getListCacheTags();
           $context->addCacheTags($tags);
           return NULL;
-        }
-
-        if (isset($language)) {
-          $entities = array_map(function (EntityInterface $entity) use ($language) {
-            if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
-              $entity = $entity->getTranslation($language);
-            }
-
-            $entity->addCacheContexts(["static:language:{$language}"]);
-            return $entity;
-          }, $entities);
         }
 
         return $entities;

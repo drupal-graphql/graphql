@@ -136,4 +136,4 @@ we get a result like this :
 }
 ```
 
-(For this to actually work we would need to add resolves to the User object to resolve the `id` and `name` properties).
+(For this to actually work we would need to add resolvers to the User object to resolve the `id` and `name` properties).
