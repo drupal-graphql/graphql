@@ -7,7 +7,7 @@ use Drupal\Core\Entity\TranslatableInterface;
 
 trait EntityReferenceTrait {
 
-  private function defer($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
+  protected function getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
     $entities = $resolver() ?: [];
 
     // Get the correct translation.

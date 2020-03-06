@@ -157,7 +157,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
       $resolver = $this->entityBuffer->add($type, $ids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
-        return $this->defer($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
+        return $this->getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
       });
     }
 
