@@ -9,8 +9,7 @@ namespace Drupal\graphql\Plugin\GraphQL\Scalars\Internal;
  *
  * @GraphQLScalar(
  *   id = "layout_section",
- *   name = "layout_section",
- *   type = "string"
+ *   name = "layout_section"
  * )
  */
 class LayoutSectionScalar extends StringScalar {
