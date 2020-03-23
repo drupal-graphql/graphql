@@ -7,6 +7,7 @@ use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\Utility\JsonHelper;
 use GraphQL\Server\Helper;
+use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -23,19 +24,18 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
    * {@inheritdoc}
    */
   public function enhance(array $defaults, Request $request) {
+    $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
+    if (!$this->applies($route)) {
+      return $defaults;
+    }
+
     $helper = new Helper();
     $method = $request->getMethod();
     $body = $this->extractBody($request);
     $query = $this->extractQuery($request);
     $operations = $helper->parseRequestParams($method, $body, $query);
 
-    // By default we assume a 'single' request. This is going to fail in the
-    // graphql processor due to a missing query string but at least provides
-    // the right format for the client to act upon.
-    return $defaults + [
-      '_controller' => $defaults['_graphql']['single'],
-      'operations' => $operations,
-    ];
+    return $defaults + ['operations' => $operations];
   }
 
   /**
