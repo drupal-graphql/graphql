@@ -82,10 +82,13 @@ install:
       then grep -rl 'cli' $DRUPAL_BUILD_DIR/core $DRUPAL_BUILD_DIR/modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
     fi
 
+  # We don't care about any dirty changes in the vendor directory, throw them
+  # all away.
+  - composer --working-dir=$DRUPAL_BUILD_DIR config discard-changes true
   # Bring in the module dependencies without requiring a merge plugin. The
   # require also triggers a full 'composer install'.
-  - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.13.1 drupal/typed_data:^1.0
-  - composer --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.13.1 drupal/typed_data:^1.0
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
