@@ -43,7 +43,7 @@ mysql:
 # Cache composer downloads.
 cache:
   directories:
-    - $HOME/.composer
+    - $HOME/.composer/cache
 
 before_install:
   # Disable xdebug. It might not exist on PHP 7.4 so ignore that error.
