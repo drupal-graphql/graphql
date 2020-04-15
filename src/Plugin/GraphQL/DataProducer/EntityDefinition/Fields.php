@@ -114,23 +114,22 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
       if ($bundle_context) {
         $key = $bundle_context['key'];
         $id = $entity_definition->id();
-        $entity_id = $id . '.' . $id . '.' . $key;
         $fields = \Drupal::entityManager()->getFieldDefinitions($id, $key);
+
+        // Set entity form default display as context.
+        $entity_id = $id . '.' . $key . '.default';
+        /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $form_display_context */
+        $form_display_context = $this->entityTypeManager
+          ->getStorage('entity_form_display')
+          ->load($entity_id);
+        $field_context->setContextValue('entity_form_display', $form_display_context);
       }
       else {
         $id = $entity_definition->id();
-        $entity_id = $id . '.' . $id . '.default';
         $fields = \Drupal::entityManager()->getFieldDefinitions($id, $id);
       }
 
-      /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $form_display_context */
-      $form_display_context = $this->entityTypeManager
-        ->getStorage('entity_form_display')
-        ->load($entity_id);
-
-      $field_context->setContextValue('entity_form_display', $form_display_context);
       if ($field_types_context) {
-        $field_types = $field_types_context['key'];
         foreach ($fields as $field) {
           if ($field_types === 'BASE_FIELDS') {
             if ($field instanceof BaseFieldDefinition) {
