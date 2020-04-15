@@ -131,6 +131,7 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
 
       if ($field_types_context) {
         foreach ($fields as $field) {
+          $field_types = $field_types_context['key'];
           if ($field_types === 'BASE_FIELDS') {
             if ($field instanceof BaseFieldDefinition) {
               yield $field;
