@@ -3,7 +3,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -69,7 +69,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -104,7 +104,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
    *   The entity buffer service.
@@ -115,7 +115,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManager $entityTypeManager,
+    EntityTypeManagerInterface $entityTypeManager,
     EntityBuffer $entityBuffer
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -146,7 +146,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): array {
+  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
     if (!isset($max_depth)) {
       $max_depth = self::MAX_DEPTH;
     }

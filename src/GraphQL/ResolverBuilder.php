@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\GraphQL\Resolver\Composite;
 use Drupal\graphql\GraphQL\Resolver\Condition;
 use Drupal\graphql\GraphQL\Resolver\Context;
+use Drupal\graphql\GraphQL\Resolver\DefaultValue;
 use Drupal\graphql\GraphQL\Resolver\Map;
 use Drupal\graphql\GraphQL\Resolver\ParentValue;
 use Drupal\graphql\GraphQL\Resolver\Path;
@@ -132,6 +133,16 @@ class ResolverBuilder {
    */
   public function fromContext($name, $default = NULL) {
     return new Context($name, $default);
+  }
+
+  /**
+   * @param $value
+   * @param $default
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\DefaultValue
+   */
+  public function defaultValue($value, $default) {
+    return new DefaultValue($value, $default);
   }
 
 }
