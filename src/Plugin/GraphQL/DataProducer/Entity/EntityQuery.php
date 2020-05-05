@@ -26,16 +26,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     ),
  *     "limit" = @ContextDefinition("integer",
  *       label = @Translation("Limit"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = 10
  *     ),
  *     "offset" = @ContextDefinition("integer",
  *       label = @Translation("Offset"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = 0
  *     ),
  *     "conditions" = @ContextDefinition("any",
  *       label = @Translation("Conditions"),
  *       multiple = TRUE,
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = {}
  *     ),
  *     "allowed_filters" = @ContextDefinition("string",
  *       label = @Translation("Allowed filters"),
@@ -125,7 +128,7 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
    */
-  public function resolve(string $type, int $limit = 10, ?int $offset, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, FieldContext $context): array {
+  public function resolve(string $type, ?int $limit, ?int $offset, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, FieldContext $context): array {
     // Make sure offset is zero or positive.
     $offset = max($offset ?: 0, 0);
 
