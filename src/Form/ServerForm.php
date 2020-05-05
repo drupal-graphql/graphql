@@ -92,7 +92,7 @@ class ServerForm extends EntityForm {
     
     $input = $formState->getUserInput();
     $inputSchema = array_key_exists('schema', $input) ? $input['schema'] : NULL;
-    $schema = ($formSchema ?? $server->get('schema')) ?: reset(array_keys($schemas));
+    $schema = ($inputSchema ?? $server->get('schema')) ?: reset(array_keys($schemas));
 
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
