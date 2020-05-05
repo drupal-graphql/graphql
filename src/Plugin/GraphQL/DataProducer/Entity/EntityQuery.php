@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Error\UserError;
@@ -33,6 +34,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Offset"),
  *       required = FALSE,
  *       default_value = 0
+ *     ),
+ *     "owned_only" = @ContextDefinition("boolean",
+ *       label = @Translation("Query only owned entities"),
+ *       required = FALSE,
+ *       default_value = FALSE
  *     ),
  *     "conditions" = @ContextDefinition("any",
  *       label = @Translation("Conditions"),
@@ -69,6 +75,13 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
   protected $entityTypeManager;
 
   /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -76,7 +89,8 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('current_user')
     );
   }
 
@@ -91,15 +105,19 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManager $entityTypeManager
+    EntityTypeManager $entityTypeManager,
+    AccountInterface $current_user
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -111,6 +129,8 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    *   Maximum number of queried entities.
    * @param int|null $offset
    *   Offset to start with.
+   * @param bool|null $ownedOnly
+   *   Query only entities owned by current user.
    * @param array|null $conditions
    *   List of conditions to filter the entities.
    * @param array|null $allowedFilters
@@ -128,13 +148,18 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
    */
-  public function resolve(string $type, ?int $limit, ?int $offset, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, FieldContext $context): array {
+  public function resolve(string $type, int $limit = 10, ?int $offset, ?bool $ownedOnly, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, FieldContext $context): array {
     // Make sure offset is zero or positive.
     $offset = max($offset ?: 0, 0);
 
     $entity_type = $this->entityTypeManager->getStorage($type);
     $query = $entity_type->getQuery()
       ->range($offset, $limit);
+
+    // Query only those entities which are owned by current user, if desired.
+    if ($ownedOnly) {
+      $query->condition('uid', $this->currentUser->id());
+    }
 
     // Ensure that access checking is performed on the query.
     $query->accessCheck(TRUE);
