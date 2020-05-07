@@ -92,7 +92,14 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
     $file = "{$module->getPath()}/graphql/{$id}.{$type}.graphqls";
 
     if (!file_exists($file)) {
-      throw new InvalidPluginDefinitionException(sprintf("Missing schema definition file at %s.", $file));
+      throw new InvalidPluginDefinitionException(
+        $id,
+        t('The module "@name" needs to have a schema definition "@file" in its folder for "@plugin" to be valid.', [
+          '@name' => \Drupal::moduleHandler()->getName($module->getName()),
+          '@file' => "graphql/{$id}.{$type}.graphqls",
+          '@plugin' => $definition['class'],
+        ])
+      );
     }
 
     return file_get_contents($file) ?: NULL;
