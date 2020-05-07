@@ -222,17 +222,15 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);
-    $file = "{$module->getPath()}/graphql/{$id}.graphqls";
+    $path = 'graphql/' . $id . '.graphqls';
+    $file = $module->getPath() . '/' . $path;
 
     if (!file_exists($file)) {
       throw new InvalidPluginDefinitionException(
         $id,
-        t('The module "@name" needs to have a schema definition "@file" in its folder for "@plugin" to be valid.', [
-          '@name' => \Drupal::moduleHandler()->getName($module->getName()),
-          '@file' => "graphql/{$id}.graphqls",
-          '@plugin' => $definition['class'],
-        ])
-      );
+        sprintf(
+          'The module "%s" needs to have a schema definition "%s" in its folder for "%s" to be valid.',
+          \Drupal::moduleHandler()->getName($module->getName()), $path, $definition['class']));
     }
 
     return file_get_contents($file) ?: NULL;
