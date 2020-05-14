@@ -96,7 +96,7 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
       throw new InvalidPluginDefinitionException(
         $id,
         sprintf('The module "%s" needs to have a schema definition "%s" in its folder for "%s" to be valid.',
-          \Drupal::moduleHandler()->getName($module->getName()), $path, $definition['class']));
+          $module->getName(), $path, $definition['class']));
     }
 
     return file_get_contents($file) ?: NULL;
