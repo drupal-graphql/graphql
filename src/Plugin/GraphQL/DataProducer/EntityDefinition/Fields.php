@@ -81,7 +81,6 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
    *   The entity type manager service.
-   *
    * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
    *   The entity field manager service.
    *
