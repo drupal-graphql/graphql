@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
 use Drupal\Core\Entity\ContentEntityType;
+use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -48,6 +49,13 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
   protected $entityTypeManager;
 
   /**
+   * The entity field manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $entityFieldManager;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -57,7 +65,8 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager')
     );
   }
 
@@ -72,6 +81,8 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
+   *   The entity field manager service.
    *
    * @codeCoverageIgnore
    */
@@ -79,10 +90,12 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    EntityTypeManager $entity_type_manager
+    EntityTypeManager $entity_type_manager,
+    EntityFieldManager $entity_field_manager
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
@@ -115,12 +128,12 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
         $key = $bundle_context['key'];
         $id = $entity_definition->id();
         $entity_id = $id . '.' . $id . '.' . $key;
-        $fields = \Drupal::entityManager()->getFieldDefinitions($id, $key);
+        $fields = $this->entityFieldManager->getFieldDefinitions($id, $key);
       }
       else {
         $id = $entity_definition->id();
         $entity_id = $id . '.' . $id . '.default';
-        $fields = \Drupal::entityManager()->getFieldDefinitions($id, $id);
+        $fields = $this->entityFieldManager->getFieldDefinitions($id, $id);
       }
 
       /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $form_display_context */
