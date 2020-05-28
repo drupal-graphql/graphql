@@ -63,7 +63,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
     $type,
     array $config
   ) {
-    $this->addCacheContexts(['user.permissions']);
+    $this->addCacheContexts(['user.permissions', 'url.path']);
 
     $this->server = $server;
     $this->config = $config;

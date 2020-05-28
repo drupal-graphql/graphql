@@ -26,7 +26,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    */
   public function __construct(ResolveContext $context, ResolveInfo $info) {
-    $this->addCacheContexts(['user.permissions']);
+    $this->addCacheContexts(['user.permissions', 'url.path']);
     $this->context = $context;
     $this->info = $info;
   }
