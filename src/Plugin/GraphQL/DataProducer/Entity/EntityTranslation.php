@@ -97,7 +97,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
    * @return |null
    */
   public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
-    if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
+    if ($entity instanceof TranslatableInterface && $entity->isTranslatable() && $entity->hasTranslation($language)) {
       $entity = $entity->getTranslation($language);
       $entity->addCacheContexts(["static:language:{$language}"]);
       // Check if the passed user (or current user if none is passed) has access
