@@ -20,7 +20,7 @@ interface ResponseInterface {
   /**
    * Gets the violations.
    *
-   * @return array
+   * @return string[]
    *   List of violations occurred during query or mutation.
    */
   public function errors(): array;
