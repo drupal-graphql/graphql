@@ -17,4 +17,12 @@ interface ResponseInterface {
    */
   public function code(): int;
 
+  /**
+   * Gets the violations.
+   *
+   * @return array
+   *   List of violations occurred during query or mutation.
+   */
+  public function errors(): array;
+
 }

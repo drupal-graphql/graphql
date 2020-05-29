@@ -36,10 +36,7 @@ class ViolationResponse implements ResponseInterface {
   }
 
   /**
-   * Gets the violations.
-   *
-   * @return array
-   *   List of violations occurred during query or mutation.
+   * {@inheritdoc}
    */
   public function errors(): array {
     return $this->violations->getViolations();
