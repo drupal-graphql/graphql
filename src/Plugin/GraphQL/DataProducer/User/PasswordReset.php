@@ -6,8 +6,8 @@ use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
-use Drupal\graphql\GraphQL\Wrappers\Response\ViolationResponse;
-use Drupal\graphql\GraphQL\Wrappers\Violation\ViolationCollection;
+use Drupal\graphql\GraphQL\Response\ViolationResponse;
+use Drupal\graphql\GraphQL\Violation\ViolationCollection;
 use Drupal\user\Controller\UserAuthenticationController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +33,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
   /**
    * List of validation violations.
    *
-   * @var \Drupal\jobiqo_graphql\GraphQL\Wrappers\Violation\ViolationCollection
+   * @var \Drupal\graphql\GraphQL\Violation\ViolationCollection
    */
   protected $violations;
 
@@ -101,7 +101,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    * @param string $email
    *   The email address to reset the password for.
    *
-   * @return \Drupal\graphql\GraphQL\Wrappers\Response\ViolationResponse
+   * @return \Drupal\graphql\GraphQL\Response\ViolationResponse
    *   Response for password reset mutation with violations in case of failure.
    */
   public function resolve(string $email): ViolationResponse {
