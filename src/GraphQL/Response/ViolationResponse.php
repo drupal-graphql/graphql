@@ -31,13 +31,6 @@ class ViolationResponse implements ResponseInterface {
   /**
    * {@inheritdoc}
    */
-  public function code(): int {
-    return 200;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function errors(): array {
     return $this->violations->getViolations();
   }
