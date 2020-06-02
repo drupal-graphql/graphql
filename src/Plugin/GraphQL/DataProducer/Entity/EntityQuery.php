@@ -159,9 +159,11 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
     // Query only those entities which are owned by current user, if desired.
     if ($ownedOnly) {
       $query->condition('uid', $this->currentUser->id());
-      // Add caching dependencies to make sure entity query is cached per user.
+      // Add user cacheable dependencies.
       $account = $this->currentUser->getAccount();
       $context->addCacheableDependency($account);
+      // Cache response per user to make sure the user related result is shown.
+      $context->addCacheContexts(['user']);
     }
 
     // Ensure that access checking is performed on the query.
