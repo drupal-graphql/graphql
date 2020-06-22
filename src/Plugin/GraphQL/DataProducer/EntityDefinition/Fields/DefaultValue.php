@@ -40,7 +40,7 @@ class DefaultValue extends DataProducerPluginBase {
       switch ($entity_definition_field->getType()) {
         case 'list_integer':
         case 'list_string':
-	case 'text_long':
+        case 'text_long':
           return $default_value ? $default_value[0]['value'] : NULL;
 
         case 'boolean':
