@@ -10,11 +10,31 @@ namespace Drupal\graphql\GraphQL\Response;
 interface ResponseInterface {
 
   /**
+   * Adds the violation.
+   *
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $message
+   *   Violation message.
+   * @param array $properties
+   *   Other properties related to the violation.
+   */
+  public function addViolation($message, array $properties = []): void;
+
+  /**
+   * Adds multiple violations.
+   *
+   * @param string[]|\Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+   *   Violation messages.
+   * @param array $properties
+   *   Other properties related to the violation.
+   */
+  public function addViolations(array $messages, array $properties = []): void;
+
+  /**
    * Gets the violations.
    *
-   * @return string[]
-   *   List of violations occurred during query or mutation.
+   * @return array
+   *   Violations.
    */
-  public function errors(): array;
+  public function getViolations(): array;
 
 }

@@ -2,12 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\graphql\GraphQL\Violation;
+namespace Drupal\graphql\GraphQL\Response;
+
+use Drupal\jobiqo_graphql\Wrappers\Violation\ViolationCollection;
 
 /**
- * Violation collection.
+ * Base class for responses containing the violations.
  */
-class ViolationCollection implements ViolationCollectionInterface {
+class Response implements ResponseInterface {
 
   /**
    * List of violations.
