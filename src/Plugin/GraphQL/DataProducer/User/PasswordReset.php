@@ -5,6 +5,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\graphql\GraphQL\Response\ViolationResponse;
 use Drupal\graphql\GraphQL\Violation\ViolationCollection;
@@ -93,10 +94,10 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    * @param string $email
    *   The email address to reset the password for.
    *
-   * @return \Drupal\graphql\GraphQL\Response\ViolationResponse
+   * @return \Drupal\graphql\GraphQL\Response\ResponseInterface
    *   Response for password reset mutation with violations in case of failure.
    */
-  public function resolve(string $email): ViolationResponse {
+  public function resolve(string $email): ResponseInterface {
     $content = [
       'mail' => $email,
     ];
