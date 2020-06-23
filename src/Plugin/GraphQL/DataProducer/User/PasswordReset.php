@@ -31,13 +31,6 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
   use StringTranslationTrait;
 
   /**
-   * List of validation violations.
-   *
-   * @var \Drupal\graphql\GraphQL\Violation\ViolationCollection
-   */
-  protected $violations;
-
-  /**
    * The current request.
    *
    * @var \Symfony\Component\HttpFoundation\Request
@@ -92,7 +85,6 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->currentRequest = $current_request;
     $this->logger = $logger;
-    $this->violations = new ViolationCollection();
   }
 
   /**
@@ -128,6 +120,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     );
     $auth_request->setRequestFormat('json');
 
+    $violations = new ViolationCollection();
     try {
       $response = $controller->resetPassword($auth_request);
     }
@@ -136,15 +129,15 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
       // to eg check if some email exist or not. Log to watchdog for potential
       // further investigation.
       $this->logger->warning($e->getMessage());
-      $this->violations->addViolation($this->t('Unable to reset password, please try again later.'));
-      return new ViolationResponse($this->violations);
+      $violations->addViolation($this->t('Unable to reset password, please try again later.'));
+      return new ViolationResponse($violations);
     }
     // Show general error message also in case of unexpected response. Log to
     // watchdog for potential further investigation.
     if ($response->getStatusCode() !== 200) {
       $this->logger->warning("Unexpected response code @code during password reset.", ['@code' => $response->getStatusCode()]);
-      $this->violations->addViolation($this->t('Unable to reset password, please try again later.'));
-      return new ViolationResponse($this->violations);
+      $violations->addViolation($this->t('Unable to reset password, please try again later.'));
+      return new ViolationResponse($violations);
     }
 
     return new ViolationResponse();
