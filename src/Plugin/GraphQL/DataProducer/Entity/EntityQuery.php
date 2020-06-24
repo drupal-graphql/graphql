@@ -61,6 +61,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Entity bundle(s)"),
  *       multiple = TRUE,
  *       required = FALSE
+ *     ),
+ *     "sorts" = @ContextDefinition("any",
+ *       label = @Translation("Sorts"),
+ *       multiple = TRUE,
+ *       default_value = {},
+ *       required = FALSE
  *     )
  *   }
  * )
@@ -139,6 +145,8 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    *   Language of queried entities.
    * @param array|null $bundles
    *   List of bundles to be filtered.
+   * @param array|null $sorts
+   *   List of sorts.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
@@ -148,7 +156,7 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
    */
-  public function resolve(string $type, int $limit = 10, ?int $offset, ?bool $ownedOnly, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, FieldContext $context): array {
+  public function resolve(string $type, int $limit = 10, ?int $offset, ?bool $ownedOnly, ?array $conditions, ?array $allowedFilters, ?string $language, ?array $bundles, ?array $sorts, FieldContext $context): array {
     // Make sure offset is zero or positive.
     $offset = max($offset ?: 0, 0);
 
@@ -186,6 +194,18 @@ class EntityQuery extends DataProducerPluginBase implements ContainerFactoryPlug
       }
       $operation = isset($condition['operator']) ? $condition['operator'] : NULL;
       $query->condition($condition['field'], $condition['value'], $operation);
+    }
+
+    foreach ($sorts as $sort) {
+      if (!empty($sort['field'])) {
+        if (!empty($sort['direction']) && strtolower($sort['direction']) == 'desc') {
+          $direction = 'DESC';
+        }
+        else {
+          $direction = 'ASC';
+        }
+        $query->sort($sort['field'], $direction);
+      }
     }
 
     $ids = $query->execute();
