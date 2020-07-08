@@ -87,7 +87,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function resolve($offset, $limit, RefinableCacheableDependencyInterface $metadata) {
-    if (!$limit > static::MAX_LIMIT) {
+    if ($limit > static::MAX_LIMIT) {
       throw new UserError(sprintf('Exceeded maximum query limit: %s.', static::MAX_LIMIT));
     }
 

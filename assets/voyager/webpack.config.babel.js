@@ -16,7 +16,7 @@ module.exports = {
       'node_modules',
     ],
   },
-
+  mode: 'production',
   module: {
     rules: [
       {
