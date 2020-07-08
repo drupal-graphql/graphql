@@ -18,4 +18,4 @@ If your requirements are simple this file should be enough to get started.
 
 ### Extensions
 
-`example.extension.base.graphqls` and `example_extension.extension.graphqls` are files that can be added on top of the existing schema file to "extend" the schema with new functionality. We will approach this in the Advanced section when talking about spliting schemas so that you can make certain modules enable new functionalities as they are enabled.
+`example_extension.base.graphqls` and `example_extension.extension.graphqls` are files that can be added on top of the existing schema file to "extend" the schema with new functionality. We will approach this in the Advanced section when talking about spliting schemas so that you can make certain modules enable new functionalities as they are enabled.
