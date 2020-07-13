@@ -14,3 +14,7 @@ By installing the module with composer it will also install the necessary librar
 ## Permissions
 
 At this point you can check the permissions added by the module in the permissions page at `/admin/people/permissions`. You can control who can perform arbitrary and persisted queries against graphql and also who can access the Voyager or the GraphiQL pages.
+
+## Creating a schema
+
+Like mentioned in the [Introduction](./../README.md) the 4.x version of the module uses a schema first approach which requires you to first start by making a schema and then start implementing how to resolve each of the fields of your schema. In the next chapter we will look at how to create your own schema to start resolving fields and returning actual Data from Drupal using the module.

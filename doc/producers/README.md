@@ -18,7 +18,7 @@ type Article implements NodeInterface {
 }
 ```
 
-We are telling the schema that we have a new field on the "Article" type called creator. This is how a user will consume the API so we are not yet telling how to get that data. For now this would return NULL as we don't yet have a resolver in place.
+We are telling the schema that we have a new field on the "Article" type called "creator". This is how a user will consume the API so we are not yet telling how to get that data. For now this would return NULL as we don't yet have a resolver in place.
 
 ## Add the resolver
 

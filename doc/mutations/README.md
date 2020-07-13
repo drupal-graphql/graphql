@@ -1,12 +1,12 @@
 # Mutations
 
-In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are also technically Data producers which we already looked at.
+In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are called and return types are also resolved with Data producers which we already looked at.
 
-Lets create a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `creator` in order to set these fields when creating the new article if they have been provided.
+Lets make a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `creator` in order to set these fields when creating the new article if they have been provided.
 
 Similar to queries we can start by adding the necessary schema information, not only to register our new mutation but also provide type safety on all parameters as well. This mutation will return the newly created "Article".
 
- The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
+The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
 
 ## Add the schema declaration
 
@@ -110,7 +110,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
 
   /**
    * Creates an article.
-   * 
+   *
    * @param array $data
    *   The title of the job.
    *
@@ -145,7 +145,7 @@ To add the resolvers we go to our schema implementation and call the created dat
  * {@inheritdoc}
  */
 protected function getResolverRegistry() {
-  
+
   ...
   // Create article mutation.
   $registry->addFieldResolver('Mutation', 'createArticle',
@@ -159,10 +159,10 @@ protected function getResolverRegistry() {
 ```
 
 This mutation can now be called like this :
- 
+
 ```graphql
 mutation {
-  createArticle(data: {title: "Hello GraphQl 2"}) {
+  createArticle(data: { title: "Hello GraphQl 2" }) {
     ... on Article {
       id
       title
@@ -171,7 +171,7 @@ mutation {
 }
 ```
 
-and should return something like : 
+and should return something like :
 
 ```json
 {
@@ -183,3 +183,7 @@ and should return something like :
   }
 }
 ```
+
+## Validating mutations
+
+Now that we have our mutation in place one way we can improve this is by adding some validation so that if someone is not to create an article they get a nice error back (technically in Drupal these are called Violations) so that it can be printed to the user in whichever app this is called. In the next chapter we will look at how we can improve this code to add some validation to it.
