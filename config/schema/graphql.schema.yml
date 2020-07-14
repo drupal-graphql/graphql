@@ -25,6 +25,13 @@ graphql.graphql_servers.*:
       label: 'Batching'
     schema_configuration:
       type: 'graphql.schema.[%parent.schema]'
+    persisted_queries_settings:
+      type: sequence
+      label: 'Persisted queries settings'
+      orderby: key
+      sequence:
+        type: plugin.plugin_configuration.persisted_query.[%key]
+        label: 'The configuration for a single persisted query plugin.'
 
 graphql.schema.*:
   type: mapping
@@ -39,3 +46,14 @@ graphql.schema.composable:
       type: sequence
       sequence:
         type: boolean
+
+graphql.default_persisted_query_configuration:
+  type: mapping
+  label: 'Persisted query settings'
+  mapping:
+    weight:
+      type: integer
+      label: 'The weight'
+
+plugin.plugin_configuration.persisted_query.*:
+  type: graphql.default_persisted_query_configuration
