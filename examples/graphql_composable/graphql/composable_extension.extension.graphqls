@@ -1,7 +1,3 @@
 extend type Query {
   article(id: Int!): Article
-  articles(
-    offset: Int = 0
-    limit: Int = 10
-  ): [Article]
 }

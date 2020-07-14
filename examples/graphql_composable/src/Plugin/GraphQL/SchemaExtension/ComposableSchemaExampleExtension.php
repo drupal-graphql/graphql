@@ -29,12 +29,6 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
         ->map('id', $builder->fromArgument('id'))
     );
 
-    $registry->addFieldResolver('Query', 'articles',
-      $builder->produce('query_articles')
-        ->map('offset', $builder->fromArgument('offset'))
-        ->map('limit', $builder->fromArgument('limit'))
-    );
-
     $registry->addFieldResolver('Article', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())

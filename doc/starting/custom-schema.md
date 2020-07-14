@@ -6,7 +6,7 @@ The best way to start making a new schema is to take the example schema provided
 
 Each schema is associated to a server. A server defines the URL where a schema is accessible (e.g. `/graphql`) as well as other options like if query batching or caching are enabled.
 
-Go to the list of servers under `/admin/config/graphql` to create a new server for your custom schema. When creating the server choose the "Composable Example schema" as the schema. After saving click "Explorer". This will take you to the "GraphiQL" page, where you can explore your custom schema.
+Go to the list of servers under `/admin/config/graphql` to create a new server for your custom schema. When creating the server choose the "Composable Example schema" as the schema and make sure to check the `Composable Example extension` checkbox. After saving click "Explorer". This will take you to the "GraphiQL" page, where you can explore your custom schema.
 
 ## Adapt module to your needs
 
