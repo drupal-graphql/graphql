@@ -200,13 +200,13 @@ We have added a new type that is returned `$response` where we call the `setArti
 
 ## Resolve errors and article
 
-To resolve our fields similar to before we go to our schema implementation and call the created data producer `create_article` inside the `getResolverRegistry` method.
+To resolve our fields similar to before we go to our schema implementation :
 
 ```php
 /**
  * {@inheritdoc}
  */
-protected function getResolverRegistry() {
+public function registerResolvers(ResolverRegistryInterface $registry) {
 
   ...
 
@@ -228,5 +228,21 @@ protected function getResolverRegistry() {
 
   ...
   return $registry;
+}
+```
+
+But in order to resolve the errors field we need to set it as a defaultResolver in the file where we define our schema.
+
+```php
+/**
+ * {@inheritdoc}
+ */
+public static function defaultFieldResolver($source, array $args, ResolveContext $context, ResolveInfo $info) {
+  ...
+  // Resolve violations which are stored under "errors" key.
+  if ($source instanceof ResponseInterface && $fieldName == 'errors') {
+    return $source->getViolations();
+  }
+  ...
 }
 ```

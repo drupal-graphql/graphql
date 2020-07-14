@@ -138,13 +138,13 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
 
 ## Adding resolvers
 
-To add the resolvers we go to our schema implementation and call the created data producer `create_article` inside the `getResolverRegistry` method.
+To add the resolvers we go to our schema implementation and call the created data producer `create_article` inside the `registerResolvers` method.
 
 ```php
 /**
  * {@inheritdoc}
  */
-protected function getResolverRegistry() {
+public function registerResolvers(ResolverRegistryInterface $registry) {
 
   ...
   // Create article mutation.

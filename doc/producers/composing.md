@@ -2,7 +2,7 @@
 
 Often you will find that you need to call multiple producers in a sequence in order to get the data you actually want. Maybe because you call a producer that only returns an `id` and then you need an `entity_load` producer to use that `id` to return the actual entity, or maybe a route that returns a URL Object and then you want to take that URL can get the entity out of it using the `route_entity` data producer.
 
-This can be accomplished using some of the built-in helpers inside the `$builder` object called `compose`. given our example for the previous example `current_user`, this is how it works : 
+This can be accomplished using some of the built-in helpers inside the `$builder` object called `compose`. given our example for the previous example `current_user`, this is how it works :
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
@@ -17,7 +17,7 @@ We are chaining the two data producers together here, one after the other and ca
 
 ## Custom steps
 
-What if we need to do some massaging but not necessarily using any data producer? The `$builder` object includes a callback property as well that we can use for this : 
+What if we need to do some massaging but not necessarily using any data producer? The `$builder` object includes a callback property as well that we can use for this :
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
@@ -36,7 +36,7 @@ $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
 
 Note that you can always easily tap into the chain and e.g. use xdebug to debug the values:
 
-```
+```php
   $builder->compose(
         $builder->tap($builder->callback(function ($parent, $args) {
            // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
