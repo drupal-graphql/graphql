@@ -10,33 +10,36 @@ The code with all the demo queries and mutations in these docs can be found in [
 
 ## Add the schema declaration
 
+Adapt your base schema file to something like this where we include a new type called `Mutation` and we also create a new input called `ArticleInput` which we will use as the type for our mutation argument.
+
 ```
-schema {
-    mutation: Mutation
+type schema {
+  mutation: Mutation
 }
 
-type Mutation {
-    createArticle(data: ArticleInput): Article
-}
+type Mutation
 
-type Article implements NodeInterface {
-    id: Int!
-    title: String!
-    creator: String
-}
-
-interface NodeInterface {
-    id: Int!
+type Article {
+  id: Int!
+  title: String!
+  author: String
 }
 
 input ArticleInput {
     title: String!
     description: String
 }
-
 ```
 
-We can now see we have a Mutation called `createArticle` which takes a data parameter, but because GraphQL is heavily typed we know everything we can and must include in the new Article like the title which is mandatory in this case.
+And in our `.exntends.graphqls` file we will extend the Mutation type to add our new mutation. This is so that in the future other modules can also themselves extend this type with new mutations keeping things organized.
+
+```
+extend type Mutation {
+   createArticle(data: ArticleInput): Article
+}
+```
+
+We can now see we have a Mutation called `createArticle` which takes a data parameter, and because GraphQL is heavily typed we know everything we can and must include in the new Article (`ArticleInput`) like the title which is mandatory in this case.
 
 ## Implement the custom data producer (mutation)
 
@@ -45,7 +48,7 @@ We now need to implement the actual mutation, in the file `src/Plugin/GraphQL/Da
 ```php
 <?php
 
-namespace Drupal\mydrupalgql\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -114,20 +117,21 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    * @param array $data
    *   The title of the job.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return \Drupal\Core\Entity\EntityBase|\Drupal\Core\Entity\EntityInterface
    *   The newly created article.
    *
    * @throws \Exception
    */
   public function resolve(array $data) {
     if ($this->currentUser->hasPermission("create article content")) {
-        $values = [
-            'title' => $data['title'],
-            'field_article_creator' => $data['creator'],
-        ];
-        $node = Node::create($values);
-        $node->save();
-        return $node;
+      $values = [
+        'type' => 'article',
+        'title' => $data['title'],
+        'field_article_creator' => $data['creator'],
+      ];
+      $node = Node::create($values);
+      $node->save();
+      return $node;
     }
     return NULL;
   }

@@ -29,6 +29,12 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
         ->map('id', $builder->fromArgument('id'))
     );
 
+    // Create article mutation.
+    $registry->addFieldResolver('Mutation', 'createArticle',
+      $builder->produce('create_article')
+        ->map('data', $builder->fromArgument('data'))
+    );
+
     $registry->addFieldResolver('Article', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())
@@ -37,9 +43,7 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
     $registry->addFieldResolver('Article', 'title',
       $builder->compose(
         $builder->produce('entity_label')
-          ->map('entity', $builder->fromParent()),
-        $builder->produce('uppercase')
-          ->map('string', $builder->fromParent())
+          ->map('entity', $builder->fromParent())
       )
     );
 

@@ -1,5 +1,16 @@
+type schema {
+  mutation: Mutation
+}
+
+type Mutation
+
 type Article {
   id: Int!
   title: String!
   author: String
+}
+
+input ArticleInput {
+    title: String!
+    description: String
 }

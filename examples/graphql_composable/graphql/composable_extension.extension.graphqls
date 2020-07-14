@@ -1,3 +1,7 @@
 extend type Query {
   article(id: Int!): Article
 }
+
+extend type Mutation {
+   createArticle(data: ArticleInput): Article
+}
