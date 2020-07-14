@@ -8,6 +8,8 @@ For example, if we want to make a custom field available for a schema let's imag
 
 ## Add the field to the schema
 
+In your `.graphqls` file add the schema defintion
+
 ```
 type Article implements NodeInterface {
     id: Int!
@@ -22,9 +24,18 @@ We are telling the schema that we have a new field on the "Article" type called 
 
 ## Add the resolver
 
-The following code is an example of how a data producer for a creator field on the Article type can be implemented in code.
+The following code is an example of how a data producer for a creator field on the Article type can be implemented in code. Like mentioned previously this is done inside the `GraphqlSchemaExtension` plugin inside `src/Plugin/SchemaExtension` in your module.
 
 ```php
+
+// Initialize builder which is used to build the resolving logic for the
+// fields. This includes the output data which is going to be produced,
+// the inputs required for resolving them (resolver arguments, other static
+// or dynamic values, or even values produced by parent resolver), then the
+// contexts which the resolver can be aware of (eg language), and other
+// essentials.
+$builder = new ResolverBuilder();
+
 $registry->addFieldResolver('Article', 'creator',
   $builder->produce('property_path')
     ->map('type', $builder->fromValue('entity:node'))
@@ -33,7 +44,11 @@ $registry->addFieldResolver('Article', 'creator',
 );
 ```
 
-Essentially this is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
+### Resolver builder
+
+You need to initalize the `ResolverBuilder` once inside the `registerResolvers` method (or `getResolverRegistry` if you do not want to use schema extensions) in order to start registering resolvers. This is what will give you access to all the data producers by calling the `produce` method which takes as a parameter the data producer id.
+
+Essentially calling the `produce` method with the data producer id is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
 
 This particular resolver uses the `property_path` data producer that comes with the GraphQL module. It's one of the most common ones and you will find yourself using it often to resolve any kind of property on an entity. The module includes a lot more which we will see in the "Built in Data Producers" section.
 

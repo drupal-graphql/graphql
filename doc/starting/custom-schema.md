@@ -22,10 +22,14 @@ This is the main entry point for your schema. You can insert new types, inputs a
 
 ### Plugins
 
-The module also includes some Plugins which are required inside the folder `src/Plugin/GraphQL/Schema` and `src/Plugin/GraphQL/SchemaExtension`:
+The module also includes some Plugins which are required inside the folder `src/Plugin/GraphQL/Schema` and optionally `src/Plugin/GraphQL/SchemaExtension`:
 
-- GraphQLSchema.php : This file will define the schema itself.
-- GraphQLSchemaExtension.php : This file will be used to implement resolvers. The module requires having at least one of these, but you can also implement resolvers across multiple modules by including several schema extensions in each module that exposes certain functionality to the schema when enabled. See the [Advanced section](./../advanced/composable-schemas.md) when talking about spliting schemas.
+- GraphQLSchema.php : This file will define the schema itself. You can register default resolvers and also regular resolvers here.
+- GraphQLSchemaExtension.php : This file will be used to implement resolvers in a way that is composeable (recommended). We recommend having at least one of these, but you can also implement resolvers across multiple modules by including several schema extensions in each module that exposes certain functionality to the schema when enabled. See the [Advanced section](./../advanced/composable-schemas.md) when talking about spliting schemas.
+
+#### Note
+
+Technically you can also just have everything inside the `src/Plugin/GraphQL/Schema` by defining resolvers directly inside the `getResolverRegistry` method.
 
 ## Start implementing resolvers
 
