@@ -3,9 +3,13 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\file\FileInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\image\Entity\ImageStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @DataProducer(
@@ -26,7 +30,52 @@ use Drupal\image\Entity\ImageStyle;
  *   }
  * )
  */
-class ImageDerivative extends DataProducerPluginBase {
+class ImageDerivative extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The rendering service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('renderer')
+    );
+  }
+
+  /**
+   * ImageDerivative constructor.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $pluginId
+   *   The plugin id.
+   * @param mixed $pluginDefinition
+   *   The plugin definition.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   *
+   * @codeCoverageIgnore
+   */
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+    RendererInterface $renderer
+  ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    $this->renderer = $renderer;
+  }
 
   /**
    * @param \Drupal\file\FileInterface $entity
@@ -67,8 +116,21 @@ class ImageDerivative extends DataProducerPluginBase {
       $image_style->transformDimensions($dimensions, $entity->getFileUri());
       $metadata->addCacheableDependency($image_style);
 
+      // The underlying URL generator that will be invoked will leak cache
+      // metadata, resulting in an exception. By wrapping within a new render
+      // context, we can capture the leaked metadata and make sure it gets
+      // incorporated into the response.
+      $context = new RenderContext();
+      $url = $this->renderer->executeInRenderContext($context, function () use ($image_style, $entity) {
+        return $image_style->buildUrl($entity->getFileUri());
+      });
+
+      if (!$context->isEmpty()) {
+        $metadata->addCacheableDependency($context->pop());
+      }
+
       return [
-        'url' => $image_style->buildUrl($entity->getFileUri()),
+        'url' => $url,
         'width' => $dimensions['width'],
         'height' => $dimensions['height'],
       ];
