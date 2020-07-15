@@ -6,7 +6,7 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
-use Drupal\graphql_composable\Wrappers\Response\ArticleResponse;
+use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 
 /**
  * @SchemaExtension(
