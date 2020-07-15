@@ -2,9 +2,10 @@
 
 namespace Drupal\graphql_composable\Plugin\GraphQL\Schema;
 
-use Drupal\graphql\GraphQL\ResolverBuilder;
+use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
+use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * @Schema(
