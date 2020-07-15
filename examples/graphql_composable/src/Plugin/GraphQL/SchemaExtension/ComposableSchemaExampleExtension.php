@@ -43,6 +43,12 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
       }),
     );
 
+    $registry->addFieldResolver('ArticleResponse', 'errors',
+      $builder->callback(function (ArticleResponse $response) {
+        return $response->getViolations();
+      }),
+    );
+
     $registry->addFieldResolver('Article', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())

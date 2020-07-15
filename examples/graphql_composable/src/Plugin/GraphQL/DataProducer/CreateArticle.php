@@ -86,7 +86,8 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
       $node = Node::create($values);
       $node->save();
       $response->setArticle($node);
-    }else {
+    }
+    else {
       $response->addViolation(
         $this->t('You do not have permissions to create articles.')
       );
