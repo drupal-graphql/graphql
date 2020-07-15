@@ -14,6 +14,24 @@ use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
  * )
  */
 class ComposableSchemaExample extends ComposableSchema {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResolverRegistry() {
+    // Initialize registry which will register all the field and type resolvers
+    // we'd need. Initialize it with default field resolver which is used as
+    // a fallback option to resolve the generic fields or fields following
+    // some specific rules. Can be initialized also with default type resolver
+    // (second argument to ResolverRegistry constructor).
+    $registry = new ResolverRegistry([
+      __CLASS__,
+      'defaultFieldResolver',
+    ]);
+
+    return $registry;
+  }
+
   /**
    * The default field resolver.
    *
