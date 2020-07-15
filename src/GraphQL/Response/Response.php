@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\graphql\GraphQL\Response;
 
-use Drupal\jobiqo_graphql\Wrappers\Violation\ViolationCollection;
-
 /**
  * Base class for responses containing the violations.
  */

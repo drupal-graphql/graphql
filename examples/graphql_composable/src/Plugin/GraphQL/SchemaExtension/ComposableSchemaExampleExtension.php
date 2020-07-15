@@ -6,7 +6,7 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
-use Drupal\graphql_composable\Wrappers\Response\ArticleResponse;
+use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 
 /**
  * @SchemaExtension(
@@ -37,6 +37,18 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
         ->map('data', $builder->fromArgument('data'))
     );
 
+    $registry->addFieldResolver('ArticleResponse', 'article',
+      $builder->callback(function (ArticleResponse $response) {
+        return $response->article();
+      }),
+    );
+
+    $registry->addFieldResolver('ArticleResponse', 'errors',
+      $builder->callback(function (ArticleResponse $response) {
+        return $response->getViolations();
+      }),
+    );
+
     $registry->addFieldResolver('Article', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())
@@ -59,7 +71,7 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
     );
 
     // Response type resolver.
-    $registry->addTypeResolver('ResponseInterface', [
+    $registry->addTypeResolver('Response', [
       __CLASS__,
       'resolveResponse',
     ]);
