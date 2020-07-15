@@ -59,7 +59,7 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
     );
 
     // Response type resolver.
-    $registry->addTypeResolver('ResponseInterface', [
+    $registry->addTypeResolver('Response', [
       __CLASS__,
       'resolveResponse',
     ]);
