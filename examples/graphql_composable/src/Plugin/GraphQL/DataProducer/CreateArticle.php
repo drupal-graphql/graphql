@@ -7,6 +7,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql_composable\Wrappers\Response\ArticleResponse;
 
 /**
  * Creates a new article entity.
@@ -69,12 +70,13 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    * @param array $data
    *   The title of the job.
    *
-   * @return \Drupal\Core\Entity\EntityBase|\Drupal\Core\Entity\EntityInterface
+   * @return \Drupal\graphql_composable\Wrappers\Response\ArticleResponse
    *   The newly created article.
    *
    * @throws \Exception
    */
   public function resolve(array $data) {
+    $response = new ArticleResponse();
     if ($this->currentUser->hasPermission("create article content")) {
       $values = [
         'type' => 'article',
@@ -83,9 +85,13 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
       ];
       $node = Node::create($values);
       $node->save();
-      return $node;
+      $response->setArticle($node);
+    }else {
+      $response->addViolation(
+        $this->t('You do not have permissions to create articles.')
+      );
     }
-    return NULL;
+    return $response;
   }
 
 }

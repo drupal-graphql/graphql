@@ -18,21 +18,26 @@ But when we implement error handling properly it makes sense to have a response 
 
 ```
 ...
-type Mutation {
-    createArticle(data: ArticleInput): ArticleResponse
-}
-
 type ArticleResponse {
   errors: [Violation]
   article: Article
 }
 
 scalar Violation
-
 ...
 ```
 
-Lets analyze what we are doing here because there are a couple of things that might not be 100% obvious at first, but they can be extremely useful in the long run to prepare your types to handle more than just the first use case you have.
+and in our extension we change our mutation to return the response
+
+```
+...
+extend type Mutation {
+   createArticle(data: ArticleInput): ArticleResponse
+}
+...
+```
+
+Let's analyze what we are doing here because there are a couple of things that might not be 100% obvious at first, but they can be extremely useful in the long run to prepare your types to handle more than just the first use case you have.
 
 ### ArticleResponse
 
@@ -44,7 +49,7 @@ We define a Violation scalar which will just hold the error messages that will b
 
 ## Create the ArticleResponse class
 
-Because we need adition content inside our Response we make a class that implements the module's ResponseInterface. Inside it will have a `article` property (like we saw before).
+Because we need adition content inside our Response we make a class that implements the module's ResponseInterface. Inside it will have a `article` property (like we saw before). This will be added in the `src/Wrappers/Response` folder and we will call it `ArticleResponse.php`
 
 ```php
 
@@ -52,7 +57,7 @@ Because we need adition content inside our Response we make a class that impleme
 
 declare(strict_types = 1);
 
-namespace Drupal\mydrupalgql\Wrappers\Response;
+namespace Drupal\graphql_composable\Wrappers\Response;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\graphql\GraphQL\Response\Response;
@@ -99,14 +104,14 @@ Now we will make the mutation return a type that the module exposes which is the
 ```php
 <?php
 
-namespace Drupal\mydrupalgql\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\mydrupalgql\Wrappers\Response\ArticleResponse;
+use Drupal\graphql_composable\Wrappers\Response\ArticleResponse;
 
 /**
  * Creates a new article entity.
@@ -169,7 +174,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    * @param array $data
    *   The title of the job.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return \Drupal\graphql_composable\Wrappers\Response\ArticleResponse
    *   The newly created article.
    *
    * @throws \Exception
@@ -178,22 +183,21 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
     $response = new ArticleResponse();
     if ($this->currentUser->hasPermission("create article content")) {
       $values = [
-          'title' => $data['title'],
-          'field_article_creator' => $data['creator'],
+        'title' => $data['title'],
+        'field_article_creator' => $data['creator'],
       ];
       $node = Node::create($values);
       $node->save();
       $response->setArticle($node);
     }else {
       $response->addViolation(
-      $this->t('You do not have permissions to create articles.')
-    );
+        $this->t('You do not have permissions to create articles.')
+      );
     }
     return $response;
   }
 
 }
-
 ```
 
 We have added a new type that is returned `$response` where we call the `setArticle` method and if there are some validation errors we call the `addValidation` method to register in the errors property. Next we will resolve both these fields.
@@ -210,11 +214,6 @@ public function registerResolvers(ResolverRegistryInterface $registry) {
 
   ...
 
-  // Resolve violations which are stored under "errors" key.
-  if ($source instanceof ResponseInterface && $fieldName == 'errors') {
-    return $source->getViolations();
-  }
-
   // Create article mutation.
   $registry->addFieldResolver('Mutation', 'createArticle',
     $builder->produce('create_article')
@@ -225,24 +224,34 @@ public function registerResolvers(ResolverRegistryInterface $registry) {
   // 1 ) ArticleRespones is even usable
   // 2 ) Resolve fields from it like the article and errors (maybe errors already works with code above)
 
+  $registry->addTypeResolver('ResponseInterface', function ($object) {
+    switch (TRUE) {
+      case $object instanceof ArticleResponse:
+        return 'ArticleResponse';
+    }
+    throw new \Exception('Invalid response type.');
+  });
 
   ...
   return $registry;
 }
+
+
+
 ```
 
 But in order to resolve the errors field we need to set it as a defaultResolver in the file where we define our schema.
 
 ```php
-/**
- * {@inheritdoc}
- */
 public static function defaultFieldResolver($source, array $args, ResolveContext $context, ResolveInfo $info) {
-  ...
+  $fieldName = $info->fieldName;
+  $property = NULL;
+
   // Resolve violations which are stored under "errors" key.
   if ($source instanceof ResponseInterface && $fieldName == 'errors') {
     return $source->getViolations();
   }
-  ...
+
+  return $property;
 }
 ```

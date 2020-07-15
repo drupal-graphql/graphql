@@ -4,7 +4,9 @@ namespace Drupal\graphql_composable\Plugin\GraphQL\SchemaExtension;
 
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
+use Drupal\graphql_composable\Wrappers\Response\ArticleResponse;
 
 /**
  * @SchemaExtension(
@@ -55,5 +57,31 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
           ->map('entity', $builder->fromParent())
       )
     );
+
+    // Response type resolver.
+    $registry->addTypeResolver('ResponseInterface', [
+      __CLASS__,
+      'resolveResponse',
+    ]);
+  }
+
+  /**
+   * Resolves the response type.
+   *
+   * @param \Drupal\graphql\GraphQL\Response\ResponseInterface $response
+   *   Response object.
+   *
+   * @return string
+   *   Response type.
+   *
+   * @throws \Exception
+   *   Invalid response type.
+   */
+  public static function resolveResponse(ResponseInterface $response): string {
+    // Resolve content response.
+    if ($response instanceof ArticleResponse) {
+      return 'ArticleResponse';
+    }
+    throw new \Exception('Invalid response type.');
   }
 }
