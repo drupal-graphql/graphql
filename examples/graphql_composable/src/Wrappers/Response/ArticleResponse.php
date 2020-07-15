@@ -1,7 +1,4 @@
-
 <?php
-
-declare(strict_types = 1);
 
 namespace Drupal\graphql_composable\Wrappers\Response;
 
