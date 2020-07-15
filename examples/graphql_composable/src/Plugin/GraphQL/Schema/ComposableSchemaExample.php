@@ -4,6 +4,7 @@ namespace Drupal\graphql_composable\Plugin\GraphQL\Schema;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -51,12 +52,25 @@ class ComposableSchemaExample extends ComposableSchema {
    *   The result for the field.
    */
   public static function defaultFieldResolver($source, array $args, ResolveContext $context, ResolveInfo $info) {
-    $fieldName = $info->fieldName;
+    $field_name = $info->fieldName;
     $property = NULL;
 
-    // Resolve violations which are stored under "errors" key.
-    if ($source instanceof ResponseInterface && $fieldName == 'errors') {
-      return $source->getViolations();
+    if ($source instanceof ResponseInterface) {
+      // Resolves violations which are defined under "error" key in the example
+      // schema.
+      if ($field_name == 'errors') {
+        return $source->getViolations();
+      }
+
+      // Allow automatic resolving of fields on Response objects with the same
+      // name as the method on that Response object. For example, this will
+      // automatically resolve "article" field as there is a method on
+      // ArticleResponse object "ArticleResponse::article()" which returns
+      // article node.
+      if (is_callable([$source, $field_name])) {
+        $property = [$source, $field_name];
+        return $property($source, $args, $context, $info);
+      }
     }
 
     return $property;
