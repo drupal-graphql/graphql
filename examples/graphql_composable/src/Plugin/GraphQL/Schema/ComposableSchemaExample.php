@@ -61,16 +61,6 @@ class ComposableSchemaExample extends ComposableSchema {
       if ($field_name == 'errors') {
         return $source->getViolations();
       }
-
-      // Allow automatic resolving of fields on Response objects with the same
-      // name as the method on that Response object. For example, this will
-      // automatically resolve "article" field as there is a method on
-      // ArticleResponse object "ArticleResponse::article()" which returns
-      // article node.
-      if (is_callable([$source, $field_name])) {
-        $property = [$source, $field_name];
-        return $property($source, $args, $context, $info);
-      }
     }
 
     return $property;
