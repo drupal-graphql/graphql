@@ -64,7 +64,7 @@ class RouteProvider {
         ->addOptions([
           '_auth' => $auth,
           'no_cache' => TRUE,
-          'default_url_options' => ['path_processing' => FALSE],
+          'default_url_options' => ['path_processing' => TRUE],
           'parameters' => ['graphql_server' => ['type' => 'entity:graphql_server']]
         ]);
     }
