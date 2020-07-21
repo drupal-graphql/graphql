@@ -3,7 +3,7 @@
 ## Getting started
 
 - [Installation](starting/README.md)
-- [Creating a schemas](starting/custom-schema.md)
+- [Creating schemas](starting/custom-schema.md)
 
 ## Data Producers
 

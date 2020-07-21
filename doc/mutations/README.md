@@ -1,23 +1,21 @@
 # Mutations
 
-In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are called and return types are also resolved with Data producers which we already looked at.
+In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are called using also Data producers which we already looked at.
 
-Lets make a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `creator` in order to set these fields when creating the new article if they have been provided.
+Let's make a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `description` in order to set these fields when creating the new article if they have been provided.
 
 Similar to queries we can start by adding the necessary schema information, not only to register our new mutation but also provide type safety on all parameters as well. This mutation will return the newly created "Article".
 
-The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
+The code with all the demo queries and mutations in these docs can be found in the same `graphql_composable` example module.
 
 ## Add the schema declaration
 
 Adapt your base schema file to something like this where we include a new type called `Mutation` and we also create a new input called `ArticleInput` which we will use as the type for our mutation argument.
 
 ```
-type schema {
-  mutation: Mutation
-}
-
 type Mutation
+
+scalar Violation
 
 type Article {
   id: Int!
@@ -26,12 +24,12 @@ type Article {
 }
 
 input ArticleInput {
-    title: String!
-    description: String
+  title: String!
+  description: String
 }
 ```
 
-And in our `.exntends.graphqls` file we will extend the Mutation type to add our new mutation. This is so that in the future other modules can also themselves extend this type with new mutations keeping things organized.
+And now in our `.exntends.graphqls` file we will extend the Mutation type to add our new mutation. This is so that in the future other modules can also themselves extend this type with new mutations keeping things organized.
 
 ```
 extend type Mutation {
@@ -127,7 +125,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
       $values = [
         'type' => 'article',
         'title' => $data['title'],
-        'field_article_creator' => $data['creator'],
+        'body' => $data['description'],
       ];
       $node = Node::create($values);
       $node->save();
@@ -137,12 +135,17 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
 }
-
 ```
 
-## Adding resolvers
+### Important note 
 
-To add the resolvers we go to our schema implementation and call the created data producer `create_article` inside the `registerResolvers` method.
+On thing to notice when creating mutations like this is that Access checking needs to be done in the mutation, for queries this usually is done in the
+data producer directly (e.g. `entity_load` has access checking built-in) but because we are programatically creating
+things we need to check the user actually has access to do the operation.
+
+## Calling the mutation
+
+To add the resolvers for the `createArticle` mutation we go to our schema implementation and call the created data producer `create_article` inside the `registerResolvers` method.
 
 ```php
 /**

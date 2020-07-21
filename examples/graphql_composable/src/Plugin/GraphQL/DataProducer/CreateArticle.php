@@ -81,7 +81,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
       $values = [
         'type' => 'article',
         'title' => $data['title'],
-        'field_article_creator' => $data['creator'],
+        'body' => $data['description'],
       ];
       $node = Node::create($values);
       $node->save();

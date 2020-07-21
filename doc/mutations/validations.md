@@ -109,9 +109,9 @@ namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\graphql_composable\Wrappers\Response\ArticleResponse;
 
 /**
  * Creates a new article entity.
@@ -174,7 +174,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    * @param array $data
    *   The title of the job.
    *
-   * @return \Drupal\graphql_composable\Wrappers\Response\ArticleResponse
+   * @return \Drupal\graphql_composable\GraphQL\Response\ArticleResponse
    *   The newly created article.
    *
    * @throws \Exception
@@ -183,13 +183,15 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
     $response = new ArticleResponse();
     if ($this->currentUser->hasPermission("create article content")) {
       $values = [
+        'type' => 'article',
         'title' => $data['title'],
-        'field_article_creator' => $data['creator'],
+        'body' => $data['description'],
       ];
       $node = Node::create($values);
       $node->save();
       $response->setArticle($node);
-    }else {
+    }
+    else {
       $response->addViolation(
         $this->t('You do not have permissions to create articles.')
       );
@@ -198,60 +200,51 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
 }
+
 ```
 
 We have added a new type that is returned `$response` where we call the `setArticle` method and if there are some validation errors we call the `addValidation` method to register in the errors property. Next we will resolve both these fields.
 
 ## Resolve errors and article
 
-To resolve our fields similar to before we go to our schema implementation :
+To resolve our fields similar to before we go to our schema implementation again and add the resolvers for the 
+`ArticleResponse` we created (what the mutation now returns back):
 
 ```php
 /**
  * {@inheritdoc}
  */
 public function registerResolvers(ResolverRegistryInterface $registry) {
-
   ...
-
-  // Create article mutation.
-  $registry->addFieldResolver('Mutation', 'createArticle',
-    $builder->produce('create_article')
-      ->map('data', $builder->fromArgument('data'))
+  $registry->addFieldResolver('ArticleResponse', 'article',
+    $builder->callback(function (ArticleResponse $response) {
+      return $response->article();
+    })
   );
 
-  // WHAT DOES THE USER NEED TO ADD HERE SO THAT
-  // 1 ) ArticleRespones is even usable
-  // 2 ) Resolve fields from it like the article and errors (maybe errors already works with code above)
-
-  $registry->addTypeResolver('ResponseInterface', function ($object) {
-    switch (TRUE) {
-      case $object instanceof ArticleResponse:
-        return 'ArticleResponse';
-    }
-    throw new \Exception('Invalid response type.');
-  });
-
+  $registry->addFieldResolver('ArticleResponse', 'errors',
+    $builder->callback(function (ArticleResponse $response) {
+      return $response->getViolations();
+    })
+  );
   ...
   return $registry;
 }
-
-
-
 ```
 
-But in order to resolve the errors field we need to set it as a defaultResolver in the file where we define our schema.
+And that's it if we now call this mutation for example as an anonymous user (if we set aribtrary queries enabled in the permissions for the module) we should get an error : 
 
-```php
-public static function defaultFieldResolver($source, array $args, ResolveContext $context, ResolveInfo $info) {
-  $fieldName = $info->fieldName;
-  $property = NULL;
-
-  // Resolve violations which are stored under "errors" key.
-  if ($source instanceof ResponseInterface && $fieldName == 'errors') {
-    return $source->getViolations();
+```json
+{
+  "data": {
+    "createArticle": {
+      "errors": [
+        {
+          "message": "You do not have permissions to create articles."
+        }
+      ],
+      "article": null
+    }
   }
-
-  return $property;
 }
 ```

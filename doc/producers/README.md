@@ -4,19 +4,17 @@ The 4.x version of the Drupal GraphQL module is built on top of a concept called
 
 A data producer is more or less a function that takes arguments (either from an end user query or static) and resolves these into some other data, for example taking an entity (such as a node) and giving back a particular field.
 
-For example, if we want to make a custom field available for a schema let's imagine we have a `creator` field in the "Article" content type. For this field we can have a producer that takes an entity and returns or resolves the creator field. Let's apply this to our custom schema which alreay defines an "Article" type.
+Lets imagine we want to make a custom field available for a schema, in this case we have a `author` field in the "Article" content type. For this field we can have a producer that takes an entity and returns or resolves the creator field. Let's apply this to our custom schema which alreay defines an "Article" type.
 
 ## Add the field to the schema
 
 In your `.graphqls` file add the schema defintion
 
 ```
-type Article implements NodeInterface {
+type Article {
     id: Int!
-    uid: String
     title: String!
-    render: String
-    creator: String
+    author: String
 }
 ```
 
@@ -24,7 +22,8 @@ We are telling the schema that we have a new field on the "Article" type called 
 
 ## Add the resolver
 
-The following code is an example of how a data producer for a creator field on the Article type can be implemented in code. Like mentioned previously this is done inside the `GraphqlSchemaExtension` plugin inside `src/Plugin/SchemaExtension` in your module.
+The following code is an example of how a data producer for an `author` field on the Article type can be implemented in code. Like mentioned previously this is done inside the `GraphqlSchemaExtension` plugin inside `src/Plugin/SchemaExtension` in your module. You can check the example
+module which already implements this as an example.
 
 ```php
 
@@ -36,13 +35,40 @@ The following code is an example of how a data producer for a creator field on t
 // essentials.
 $builder = new ResolverBuilder();
 
-$registry->addFieldResolver('Article', 'creator',
-  $builder->produce('property_path')
-    ->map('type', $builder->fromValue('entity:node'))
-    ->map('value', $builder->fromParent())
-    ->map('path', $builder->fromValue('field_article_creator.value'))
+$registry->addFieldResolver('Article', 'author',
+  $builder->compose(
+    $builder->produce('entity_owner')
+      ->map('entity', $builder->fromParent()),
+    $builder->produce('entity_label')
+      ->map('entity', $builder->fromParent())
+  )
 );
 ```
+Now you can make a sample article (as a user) and if you now go over to your graphql explorer and run the following query : 
+
+```
+{
+  article(id: 1) {
+    id
+    title
+    author
+  }
+}
+``` 
+
+You should get a response in the same format e.g. : 
+
+```json
+{
+  "data": {
+    "article": {
+      "id": 1,
+      "title": "Testing article",
+      "author": "admin"
+    }
+  }
+}
+``` 
 
 ### Resolver builder
 

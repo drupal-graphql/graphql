@@ -35,4 +35,4 @@ Technically you can also just have everything inside the `src/Plugin/GraphQL/Sch
 
 ## Start implementing resolvers
 
-Now that we have a schema available that we can access we need these types and fields to return actual data that lives in Drupal content types and fields and for this we need to implement what are called [GraphQL resolvers](https://graphql.org/learn/execution/). In this module this is done through a cocept of "Data producers" which are helpers to return data from common Drupal entities and other Drupal objects. In the next chapter we will go through what are "Data producers" and how to use them.
+Now that we have a schema available that we can access we need these types and fields to return actual data that lives in Drupal content types and fields and for this we need to implement what are called [GraphQL resolvers](https://graphql.org/learn/execution/). In this module this is done through a concept of "Data producers" which are helpers to return data from common Drupal entities and other Drupal objects. In the next chapter we will go through what are "Data producers" and how to use them.

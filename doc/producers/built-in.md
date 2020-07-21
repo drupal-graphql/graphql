@@ -51,7 +51,7 @@ This list includes all available data producers inside GraphQL to this day and b
 * **Menu Link label** (`menu_link_label`) : Returns the label of a menu link.
 * **Menu Link expanded** (`menu_link_expanded`) : Returns whether a menu link is expanded.
 * **Menu Link description** (`menu_link_description`) : Returns the description of a menu link.
-* **Menu Link attribute** (`menu_link_attribute`) : Returns an attribute of a menu link given a menu link and an attribute name.
+* **Menu Link attribute** (`menu_link_attribute`) : Returns an attribute of a menu link given a menu link and an attribute name. If you are using the `menu_link_attributes` module this will return those options out of the box.
 * **Menu tree subtree** (`menu_tree_subtree`) : Returns the subtree of a menu tree element.
 * **Menu tree link** (`menu_tree_link`) : Returns the link of a menu tree element.
 
