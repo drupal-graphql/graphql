@@ -141,6 +141,17 @@ services:
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
 
+  plugin.manager.graphql.persisted_query:
+    class: Drupal\graphql\Plugin\PersistedQueryPluginManager
+    arguments:
+      - 'Plugin/GraphQL/PersistedQuery'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\PersistedQueryPluginInterface'
+      - '\Drupal\graphql\Annotation\PersistedQuery'
+      - '%graphql.config%'
+
   # Buffers.
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
