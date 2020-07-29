@@ -68,7 +68,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    * Creates an article.
    *
    * @param array $data
-   *   The title of the job.
+   *   The submitted values for the article.
    *
    * @return \Drupal\graphql_composable\GraphQL\Response\ArticleResponse
    *   The newly created article.
