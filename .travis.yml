@@ -90,6 +90,10 @@ install:
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.13.1 drupal/typed_data:^1.0
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade
 
+  # Install PHPCS to check for Drupal coding standards.
+  - travis_retry composer global require drupal/coder
+  - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
+
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
@@ -100,6 +104,9 @@ script:
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
       then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml $TRAVIS_BUILD_DIR;
     fi
+
+  # Check for coding standards violations
+  - cd modules/graphql && $HOME/.composer/vendor/bin/phpcs
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
