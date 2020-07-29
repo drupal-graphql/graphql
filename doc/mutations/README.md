@@ -139,7 +139,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
 
 ### Important note 
 
-On thing to notice when creating mutations like this is that Access checking needs to be done in the mutation, for queries this usually is done in the
+One thing to notice when creating mutations like this is that Access checking needs to be done in the mutation, for queries this usually is done in the
 data producer directly (e.g. `entity_load` has access checking built-in) but because we are programatically creating
 things we need to check the user actually has access to do the operation.
 
