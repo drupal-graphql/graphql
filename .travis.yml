@@ -106,7 +106,7 @@ script:
     fi
 
   # Check for coding standards violations
-  - cd modules/graphql && $HOME/.composer/vendor/bin/phpcs
+  - cd $DRUPAL_BUILD_DIR/modules/graphql && $HOME/.composer/vendor/bin/phpcs
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
