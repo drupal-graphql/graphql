@@ -4,7 +4,7 @@ The 4.x version of the Drupal GraphQL module is built on top of a concept called
 
 A data producer is more or less a function that takes arguments (either from an end user query or static) and resolves these into some other data, for example taking an entity (such as a node) and giving back a particular field.
 
-Lets imagine we want to make a custom field available for a schema, in this case we have a `author` field in the "Article" content type. For this field we can have a producer that takes an entity and returns or resolves the creator field. Let's apply this to our custom schema which alreay defines an "Article" type.
+Lets imagine we want to make a custom field available for a schema, in this case we have an `author` field in the "Article" content type. For this field we can have a producer that takes an entity and returns or resolves the creator field. Let's apply this to our custom schema which alreay defines an "Article" type.
 
 ## Add the field to the schema
 
