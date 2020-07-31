@@ -148,6 +148,13 @@ class DataProducerProxy implements ResolverInterface {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
     return DeferredUtility::returnFinally($plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
+      foreach ($plugin->getContexts() as $id => $item) {
+        /** @var \Drupal\Core\Plugin\Context\Context $item */
+        if ($item->getContextDefinition()->isRequired() && !$item->hasContextValue()) {
+          return NULL;
+        }
+      }
+
       if ($this->cached && $plugin instanceof DataProducerPluginCachingInterface) {
         if (!!$context->getServer()->get('caching')) {
           return $this->resolveCached($plugin, $context, $field);
@@ -165,7 +172,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
-   * @return \GraphQL\Deferred|mixed
+   * @return \GraphQL\Deferred|\Drupal\graphql\Plugin\DataProducerPluginInterface
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Exception
@@ -173,23 +180,26 @@ class DataProducerProxy implements ResolverInterface {
   protected function prepare($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     /** @var DataProducerPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($this->id, $this->config);
-    $contexts = [];
+    $contexts = $plugin->getContextDefinitions();
 
-    foreach ($plugin->getContextDefinitions() as $name => $definition) {
+    $values = [];
+    foreach ($contexts as $name => $definition) {
       $mapper = $this->mapping[$name] ?? NULL;
-      if (isset($mapper)) {
-        if (!$mapper instanceof ResolverInterface) {
-          throw new \Exception(sprintf('Invalid input mapper for argument %s.', $name));
-        }
-
-        $contexts[$name] = $mapper->resolve($value, $args, $context, $info, $field);
+      if ($definition->isRequired() && empty($mapper)) {
+        throw new \LogicException(sprintf('Missing input mapper for argument %s.', $name));
       }
+
+      if (!empty($mapper) && !($mapper instanceof ResolverInterface)) {
+        throw new \Exception(sprintf('Invalid input mapper for argument %s.', $name));
+      }
+
+      $values[$name] = !empty($mapper) ? $mapper->resolve($value, $args, $context, $info, $field) : NULL;
     }
 
-    $contexts = DeferredUtility::waitAll($contexts);
-    return DeferredUtility::returnFinally($contexts, function ($contexts) use ($plugin) {
-      foreach ($contexts as $name => $context) {
-        $plugin->setContextValue($name, $context);
+    $values = DeferredUtility::waitAll($values);
+    return DeferredUtility::returnFinally($values, function ($values) use ($contexts, $plugin) {
+      foreach ($values as $name => $value) {
+        $plugin->setContextValue($name, $value);
       }
 
       return $plugin;

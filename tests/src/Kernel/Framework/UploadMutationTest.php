@@ -20,7 +20,7 @@ class UploadMutationTest extends GraphQLTestBase {
       schema {
         mutation: Mutation
       }
-  
+
       type Mutation {
         store(file: Upload!): String
       }
@@ -31,7 +31,7 @@ GQL;
     $this->setUpSchema($schema);
 
     // Create dummy file, since symfony will test if it exists..
-    $file = file_directory_temp() . '/graphql_upload_test.txt';
+    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
     touch($file);
 
     // Mock a mutation that accepts the upload input and just returns

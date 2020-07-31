@@ -18,6 +18,14 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: access_check, applies_to: _graphql_query_access }
+  access_check.graphql.explorer:
+    class: Drupal\graphql\Access\ExplorerAccessCheck
+    tags:
+      - { name: access_check, applies_to: _graphql_explorer_access }
+  access_check.graphql.voyager:
+    class: Drupal\graphql\Access\VoyagerAccessCheck
+    tags:
+      - { name: access_check, applies_to: _graphql_voyager_access }
 
   # Logger channel for graphql related logging.
   logger.channel.graphql:
@@ -67,6 +75,16 @@ services:
     tags:
       - { name: route_enhancer }
 
+  # Handles the dynamic creation of routes (see graphql.routing.yml).
+  graphql.route_provider:
+    class: Drupal\graphql\RouteProvider
+    arguments: ['@entity_type.manager', '@authentication_collector']
+
+  # Handles the dynamic creation of routes (see graphql.permissions.yml).
+  graphql.permission_provider:
+    class: Drupal\graphql\PermissionProvider
+    arguments: ['@entity_type.manager']
+
   # Schema introspection service.
   graphql.introspection:
     class: Drupal\graphql\GraphQL\Utility\Introspection
@@ -81,7 +99,7 @@ services:
   # Reset the current language during operations.
   graphql.operation_subscriber:
     class: Drupal\graphql\EventSubscriber\OperationSubscriber
-    arguments: ['@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
+    arguments: ['@module_handler', '@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
     tags:
       - { name: event_subscriber }
 
@@ -123,9 +141,23 @@ services:
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
 
+  plugin.manager.graphql.persisted_query:
+    class: Drupal\graphql\Plugin\PersistedQueryPluginManager
+    arguments:
+      - 'Plugin/GraphQL/PersistedQuery'
+      - '@container.namespaces'
+      - '@module_handler'
+      - '@cache.graphql.definitions'
+      - '\Drupal\graphql\Plugin\PersistedQueryPluginInterface'
+      - '\Drupal\graphql\Annotation\PersistedQuery'
+      - '%graphql.config%'
+
   # Buffers.
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
+    arguments: ['@entity_type.manager']
+  graphql.buffer.entity_revision:
+    class: Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
     arguments: ['@entity_type.manager']
   graphql.buffer.entity_uuid:
     class: Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer

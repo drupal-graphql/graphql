@@ -317,8 +317,8 @@ class EntityTest extends GraphQLTestBase {
    */
   public function testResolveEntityLoadByUuid() {
     $result = $this->executeDataProducer('entity_load_by_uuid', [
-      'entity_type' => $this->node->getEntityTypeId(),
-      'entity_uuid' => $this->node->uuid(),
+      'type' => $this->node->getEntityTypeId(),
+      'uuid' => $this->node->uuid(),
     ]);
 
     $this->assertEquals($this->node->id(), $result->id());

@@ -6,13 +6,10 @@ This can be accomplished using some of the built-in helpers inside the `$builder
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-    $builder->produce('current_user'),
-    $builder->produce('entity_load', [
-        'mapping' => [
-            'type' => $builder->fromValue('user'),
-            'id' => $builder->fromParent(),
-        ],
-    ])
+  $builder->produce('current_user'),
+  $builder->produce('entity_load')
+    ->map('type', $builder->fromValue('user'))
+    ->map('id', $builder->fromParent())
 ));
 ```
 
@@ -24,16 +21,51 @@ What if we need to do some massaging but not necessarily using any data producer
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-    $builder->produce('current_user'),
-    $builder->produce('entity_load', [
-        'mapping' => [
-            'type' => $builder->fromValue('user'),
-            'id' => $builder->fromParent(),
-        ],
-    ]),
-    $builder->callback(function ($entity) {
-        // Here we can do anything we want to the data. We get as a parameter anyting that was returned
-        // in the previous step.
-    })
+  $builder->produce('current_user'),
+  $builder->produce('entity_load')
+    ->map('type', $builder->fromValue('user'))
+    ->map('id', $builder->fromParent()),
+  $builder->callback(function ($entity) {
+    // Here we can do anything we want to the data. We get as a parameter anyting that was returned
+    // in the previous step.
+  })
 ));
+```
+
+## Debugging producers
+
+Note that you can always easily tap into the chain and e.g. use xdebug to debug the values:
+
+```
+  $builder->compose(
+        $builder->tap($builder->callback(function ($parent, $args) {
+           // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
+           echo("Compose step 0.");
+        })),
+        // Load the file object from the field.
+        $builder->produce('property_path')
+          ->map('type', $builder->fromValue('entity:YOUR_ENTITY_TYPE'))
+          ->map('value', $builder->fromParent())
+          ->map('path', $builder->fromValue('YOUR_FIELD_NAME.YOUR_FIELD_PROPERTY')),
+        $builder->tap($builder->callback(function ($parent, $args) {
+           // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
+           echo("Compose step 1.");
+        })),
+        // Load the image style derivative of the file.
+        $builder->produce('image_derivative')
+          ->map('entity', $builder->fromParent())
+          ->map('style', $builder->fromValue('YOUR_IMAGE_STYLE')),
+        $builder->tap($builder->callback(function ($parent, $args) {
+           // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
+           echo("Compose step 2.");
+        })),
+        // Retrieve the url of the generated image.
+        $builder->produce('image_style_url')
+          ->map('derivative', $builder->fromParent()),
+        $builder->tap($builder->callback(function ($parent, $args) {
+           // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
+           echo("Compose step 3.");
+        }))
+      )
+  );
 ```

@@ -26,5 +26,4 @@
 
 ## Advanced
 
-* [Split up schema](advanced/split-schema.md)
-
+* [Composable schemas](advanced/composable-schemas.md)

@@ -1,9 +1,14 @@
 language: php
 sudo: false
+dist: bionic
+
+services:
+  - mysql
 
 php:
-  - 7.1
   - 7.2
+  - 7.3
+  - 7.4
 
 env:
   global:
@@ -11,7 +16,7 @@ env:
     - SIMPLETEST_DB=mysql://root:@127.0.0.1/graphql
     - TRAVIS=true
   matrix:
-    - DRUPAL_CORE=8.7.x
+    - DRUPAL_CORE=8.8.x
 
 matrix:
   # Don't wait for the allowed failures to build.
@@ -19,14 +24,14 @@ matrix:
   include:
     - php: 7.2
       env:
-        - DRUPAL_CORE=8.7.x
+        - DRUPAL_CORE=8.8.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
   allow_failures:
     # Allow the code coverage report to fail.
     - php: 7.2
       env:
-        - DRUPAL_CORE=8.7.x
+        - DRUPAL_CORE=8.8.x
         # Only run code coverage on the latest php and drupal versions.
         - WITH_PHPDBG_COVERAGE=true
 
@@ -38,11 +43,11 @@ mysql:
 # Cache composer downloads.
 cache:
   directories:
-    - $HOME/.composer
+    - $HOME/.composer/cache
 
 before_install:
-  # Disable xdebug.
-  - phpenv config-rm xdebug.ini
+  # Disable xdebug. It might not exist on PHP 7.4 so ignore that error.
+  - phpenv config-rm xdebug.ini || true
 
   # Determine the php settings file location.
   - if [[ $TRAVIS_PHP_VERSION = hhvm* ]];
@@ -77,10 +82,13 @@ install:
       then grep -rl 'cli' $DRUPAL_BUILD_DIR/core $DRUPAL_BUILD_DIR/modules | xargs sed -i "s/'cli'/'phpdbg'/g" || true;
     fi
 
+  # We don't care about any dirty changes in the vendor directory, throw them
+  # all away.
+  - composer --working-dir=$DRUPAL_BUILD_DIR config discard-changes true
   # Bring in the module dependencies without requiring a merge plugin. The
   # require also triggers a full 'composer install'.
-  - composer --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.13.1 drupal/typed_data:^1.0
-  - composer --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.13.1 drupal/typed_data:^1.0
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.

@@ -103,13 +103,10 @@ Lets see how we can consume our newly created data producer :
 
 ```php
 $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-    $builder->produce('current_user'),
-    $builder->produce('entity_load', [
-        'mapping' => [
-            'type' => $builder->fromValue('user'),
-            'id' => $builder->fromParent(),
-        ],
-    ])
+  $builder->produce('current_user'),
+  $builder->produce('entity_load')
+    ->map('type', $builder->fromValue('user'))
+    ->map('id', $builder->fromParent())
 ));
 ```
 
@@ -139,4 +136,4 @@ we get a result like this :
 }
 ```
 
-(For this to actually work we would need to add resolves to the User object to resolve the `id` and `name` properties).
+(For this to actually work we would need to add resolvers to the User object to resolve the `id` and `name` properties).

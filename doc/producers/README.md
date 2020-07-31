@@ -25,24 +25,21 @@ We are telling the schema that we have a new field on the "Article" type called 
 The following code is an example of how a data producer for a creator field on the Article type can be implemented in code.
 
 ```php
-    $registry->addFieldResolver('Article', 'creator',
-      $builder->produce('property_path', [
-        'mapping' => [
-          'type' => $builder->fromValue('entity:node'),
-          'value' => $builder->fromParent(),
-          'path' => $builder->fromValue('field_article_creator.value'),
-        ],
-      ])
-    );
+$registry->addFieldResolver('Article', 'creator',
+  $builder->produce('property_path')
+    ->map('type', $builder->fromValue('entity:node'))
+    ->map('value', $builder->fromParent())
+    ->map('path', $builder->fromValue('field_article_creator.value'))
+);
 ```
 
 Essentially this is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
 
-This particular resolver uses the `property_path` data producer that comes with the GraphQL module. It's one of the most common ones and you will find yourself using often to resolve any kind of property on an entity. The module includes a lot more which we will see in the "Built in Data Producers" section.
+This particular resolver uses the `property_path` data producer that comes with the GraphQL module. It's one of the most common ones and you will find yourself using it often to resolve any kind of property on an entity. The module includes a lot more which we will see in the "Built in Data Producers" section.
 
 ## Notes
 
 You can find a list of all Data Producers provided by the module inside `src/Plugin/GraphQL/DataProducer` folder.
 
-The 4.x module leverages the advantages of custom schemas and data producers, where you can create your own API structure. In the 3.x module if you had a field named `field_article_creator` the API would expose this field as `fieldArticleCreator`. This means that the API consumer needs to have knowlegdge about how Drupal structures its data internally.
+The 4.x module leverages the advantages of custom schemas and data producers, where you can create your own API structure. In the 3.x module if you had a field named `field_article_creator` the API would expose this field as `fieldArticleCreator`. This means that the API consumer needs to have knowledge about how Drupal structures its data internally.
 In the 4.x module you can (and also need to) define your own custom schemas (and data producers) and therefore create your own structure so that someone that uses the API does not need to know how Drupal structures the data.

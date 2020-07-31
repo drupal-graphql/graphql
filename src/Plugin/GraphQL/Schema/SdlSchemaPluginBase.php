@@ -132,7 +132,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $extension->registerResolvers($registry);
     }
 
-    return SchemaExtender::extend($schema, $this->getExtensionDocument($extensions));
+    if ($extendSchema = $this->getExtensionDocument($extensions)) {
+      return SchemaExtender::extend($schema, $extendSchema);
+    }
+
+    return $schema;
   }
 
   /**
@@ -198,7 +202,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    $ast = Parser::parse(implode("\n\n", $extensions));
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
@@ -218,10 +222,15 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);
-    $file = "{$module->getPath()}/graphql/{$id}.graphqls";
+    $path = 'graphql/' . $id . '.graphqls';
+    $file = $module->getPath() . '/' . $path;
 
     if (!file_exists($file)) {
-      throw new InvalidPluginDefinitionException(sprintf("Missing schema definition file at %s.", $file));
+      throw new InvalidPluginDefinitionException(
+        $id,
+        sprintf(
+          'The module "%s" needs to have a schema definition "%s" in its folder for "%s" to be valid.',
+          $module->getName(), $path, $definition['class']));
     }
 
     return file_get_contents($file) ?: NULL;

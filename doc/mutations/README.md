@@ -142,25 +142,20 @@ To add the resolvers we go to our schema implementation and call the created dat
 
 ```php
 /**
-   * {@inheritdoc}
-   */
-  protected function getResolverRegistry() {
-    
-    ...
+ * {@inheritdoc}
+ */
+protected function getResolverRegistry() {
+  
+  ...
+  // Create article mutation.
+  $registry->addFieldResolver('Mutation', 'createArticle',
+    $builder->produce('create_article')
+      ->map('data', $builder->fromArgument('data'))
+  );
 
-    // Create article mutation.
-    $registry->addFieldResolver('Mutation', 'createArticle',
-      $builder->produce('create_article', [
-        'mapping' => [
-          'data' => $builder->fromArgument('data'),
-        ],
-      ])
-    );
-
-    ...
-
-    return $registry;
-  }
+  ...
+  return $registry;
+}
 ```
 
 This mutation can now be called like this :

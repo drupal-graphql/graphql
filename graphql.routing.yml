@@ -28,17 +28,27 @@ entity.graphql_server.edit_form:
   options:
     _admin_route: TRUE
 
+entity.graphql_server.persisted_queries_form:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}/persisted_queries'
+  defaults:
+    _entity_form: 'graphql_server.persisted_queries'
+    _title: 'Persisted queries'
+  requirements:
+    _permission: 'administer graphql configuration'
+  options:
+    _admin_route: TRUE
+
 graphql.explorer:
   path: '/admin/config/graphql/servers/manage/{graphql_server}/explorer'
   defaults:
     _controller: '\Drupal\graphql\Controller\ExplorerController::viewExplorer'
     _title: 'Explorer'
   requirements:
-    _permission: 'use graphql explorer'
+    _graphql_explorer_access: graphql_server:{graphql_server}
   options:
     _admin_route: TRUE
     parameters:
-      graphql_server:
+      server:
         type: entity:graphql_server
 
 graphql.voyager:
@@ -47,7 +57,7 @@ graphql.voyager:
     _controller: '\Drupal\graphql\Controller\VoyagerController::viewVoyager'
     _title: 'Voyager'
   requirements:
-    _permission: 'use graphql voyager'
+    _graphql_voyager_access: graphql_server:{graphql_server}
   options:
     _admin_route: TRUE
     parameters:
@@ -65,4 +75,4 @@ entity.graphql_server.delete_form:
     _admin_route: TRUE
 
 route_callbacks:
-  - '\Drupal\graphql\Routing\QueryRoutes::routes'
+  - graphql.route_provider::routes
