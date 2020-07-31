@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class SubrequestSubscriber implements EventSubscriberInterface {
@@ -36,7 +36,7 @@ class SubrequestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The kernel event object.
    */
-  public function onKernelRequest(GetResponseEvent $event) {
+  public function onKernelRequest(RequestEvent $event) {
     $request = $event->getRequest();
     if (!$request->attributes->has('_graphql_subrequest')) {
       return;

@@ -26,7 +26,7 @@ GQL;
     $this->setUpSchema($schema);
 
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $cacheable->expects($this->any())
