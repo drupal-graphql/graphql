@@ -29,11 +29,8 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     $query = $this->extractQuery($request);
     $operations = $helper->parseRequestParams($method, $body, $query);
 
-    // By default we assume a 'single' request. This is going to fail in the
-    // graphql processor due to a missing query string but at least provides
-    // the right format for the client to act upon.
     return $defaults + [
-      '_controller' => $defaults['_graphql']['single'],
+      '_controller' => $defaults['_controller'],
       'operations' => $operations,
     ];
   }
