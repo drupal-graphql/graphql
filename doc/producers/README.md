@@ -4,36 +4,77 @@ The 4.x version of the Drupal GraphQL module is built on top of a concept called
 
 A data producer is more or less a function that takes arguments (either from an end user query or static) and resolves these into some other data, for example taking an entity (such as a node) and giving back a particular field.
 
-For example, if we want to make a custom field available for a schema let's imagine we have a `creator` field in the "Article" content type. For this field we can have a producer that takes an entity and returns or resolves the creator field. Let's apply this to our custom schema which alreay defines an "Article" type.
+Lets imagine we want to make a custom field available for a schema, in this case we have an `author` field in the "Article" content type. For this field we can have a producer that takes an entity and returns or resolves the creator field. Let's apply this to our custom schema which alreay defines an "Article" type.
 
 ## Add the field to the schema
 
+In your `.graphqls` file add the schema defintion
+
 ```
-type Article implements NodeInterface {
+type Article {
     id: Int!
-    uid: String
     title: String!
-    render: String
-    creator: String
+    author: String
 }
 ```
 
-We are telling the schema that we have a new field on the "Article" type called creator. This is how a user will consume the API so we are not yet telling how to get that data. For now this would return NULL as we don't yet have a resolver in place.
+We are telling the schema that we have a new field on the "Article" type called "author". This is how a user will consume the API so we are not yet telling how to get that data. For now this would return NULL as we don't yet have a resolver in place.
 
 ## Add the resolver
 
-The following code is an example of how a data producer for a creator field on the Article type can be implemented in code.
+The following code is an example of how a data producer for an `author` field on the Article type can be implemented in code. Like mentioned previously this is done inside the `GraphqlSchemaExtension` plugin inside `src/Plugin/SchemaExtension` in your module. You can check the example
+module which already implements this as an example.
 
 ```php
-$registry->addFieldResolver('Article', 'creator',
-  $builder->produce('property_path')
-    ->map('type', $builder->fromValue('entity:node'))
-    ->map('value', $builder->fromParent())
-    ->map('path', $builder->fromValue('field_article_creator.value'))
+
+// Initialize builder which is used to build the resolving logic for the
+// fields. This includes the output data which is going to be produced,
+// the inputs required for resolving them (resolver arguments, other static
+// or dynamic values, or even values produced by parent resolver), then the
+// contexts which the resolver can be aware of (eg language), and other
+// essentials.
+$builder = new ResolverBuilder();
+
+$registry->addFieldResolver('Article', 'author',
+  $builder->compose(
+    $builder->produce('entity_owner')
+      ->map('entity', $builder->fromParent()),
+    $builder->produce('entity_label')
+      ->map('entity', $builder->fromParent())
+  )
 );
 ```
+Now you can make a sample article (as a user) and if you now go over to your graphql explorer and run the following query : 
 
-Essentially this is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
+```
+{
+  article(id: 1) {
+    id
+    title
+    author
+  }
+}
+``` 
+
+You should get a response in the same format e.g. : 
+
+```json
+{
+  "data": {
+    "article": {
+      "id": 1,
+      "title": "Testing article",
+      "author": "admin"
+    }
+  }
+}
+``` 
+
+### Resolver builder
+
+You need to initalize the `ResolverBuilder` once inside the `registerResolvers` method (or `getResolverRegistry` if you do not want to use schema extensions) in order to start registering resolvers. This is what will give you access to all the data producers by calling the `produce` method which takes as a parameter the data producer id.
+
+Essentially calling the `produce` method with the data producer id is what you need to do every time you want to make a field available in the schema. We tell Drupal where and how to get the data and specify where this maps to.
 
 This particular resolver uses the `property_path` data producer that comes with the GraphQL module. It's one of the most common ones and you will find yourself using it often to resolve any kind of property on an entity. The module includes a lot more which we will see in the "Built in Data Producers" section.
 
