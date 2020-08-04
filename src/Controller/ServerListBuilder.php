@@ -56,6 +56,14 @@ class ServerListBuilder extends ConfigEntityListBuilder {
       ];
     }
 
+    if (\Drupal::currentUser()->hasPermission("administer graphql configuration")) {
+      $operations['persisted_queries'] = [
+        'title' => 'Persisted queries',
+        'weight' => 10,
+        'url' => Url::fromRoute('entity.graphql_server.persisted_queries_form', ['graphql_server' => $id]),
+      ];
+    }
+
     return $operations;
   }
 

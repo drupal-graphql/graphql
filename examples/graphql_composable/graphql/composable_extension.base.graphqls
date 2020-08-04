@@ -1,0 +1,23 @@
+type Mutation
+
+scalar Violation
+
+type Article {
+  id: Int!
+  title: String!
+  author: String
+}
+
+type ArticleResponse implements Response {
+  errors: [Violation]
+  article: Article
+}
+
+interface Response {
+  errors: [Violation]
+}
+
+input ArticleInput {
+  title: String!
+  description: String
+}
