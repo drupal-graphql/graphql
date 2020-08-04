@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       multiple = TRUE
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity languages"),
+ *       label = @Translation("Entity language"),
  *       required = FALSE
  *     ),
  *     "bundles" = @ContextDefinition("string",
