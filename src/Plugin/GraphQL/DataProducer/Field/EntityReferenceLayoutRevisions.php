@@ -123,7 +123,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
   }
 
   /**
-   * Resolves entity reference layout revisions for a given field of a given entity.
+   * Resolves entity reference layout revisions for a field of a given entity.
    *
    * May optionally respect the entity bundles and language.
    *

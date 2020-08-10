@@ -45,4 +45,5 @@ class QueryConnection {
       return $callback();
     });
   }
+
 }

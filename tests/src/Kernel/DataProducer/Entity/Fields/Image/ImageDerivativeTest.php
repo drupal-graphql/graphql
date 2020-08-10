@@ -77,7 +77,8 @@ class ImageDerivativeTest extends GraphQLTestBase {
     );
 
     // TODO: Add cache checks.
-    //    $this->assertContains('config:image.style.test_style', $metadata->getCacheTags());
+    //    $this->assertContains('config:image.style.test_style',
+    //    $metadata->getCacheTags());
     //    $this->assertContains('test_tag', $metadata->getCacheTags());
 
     // Test that we don't get the derivative if we don't have access to the
@@ -90,7 +91,8 @@ class ImageDerivativeTest extends GraphQLTestBase {
     $this->assertNull($result);
 
     // TODO: Add cache checks.
-    //    $this->assertContains('test_tag_forbidden', $metadata->getCacheTags());
+    //    $this->assertContains('test_tag_forbidden',
+    //    $metadata->getCacheTags());
   }
 
 }

@@ -54,4 +54,5 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
   public static function setContext(ResolveContext $context = NULL) {
     static::$context = $context;
   }
+
 }
