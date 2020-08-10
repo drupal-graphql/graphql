@@ -37,4 +37,5 @@ class XMLXpath extends DataProducerPluginBase {
     $xpath = new \DOMXPath($dom->ownerDocument);
     return iterator_to_array($xpath->query($query, $dom));
   }
+
 }

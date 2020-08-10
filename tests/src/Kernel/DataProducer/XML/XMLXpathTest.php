@@ -57,4 +57,5 @@ class XMLXpathTest extends XMLTestBase {
 
     $this->assertSame(0, count($result));
   }
+
 }

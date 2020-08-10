@@ -35,4 +35,5 @@ class XMLAttribute extends DataProducerPluginBase {
   public function resolve(\DOMElement $dom, $name) {
     return $dom->getAttribute($name);
   }
+
 }

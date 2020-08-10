@@ -44,4 +44,5 @@ class Seek extends DataProducerPluginBase {
     }
     return $iterator->current();
   }
+
 }

@@ -35,7 +35,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
     $this->file->method('getFileUri')->willReturn($this->file_uri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
     $this->file->width = 600;
-    $this->file->height= 400;
+    $this->file->height = 400;
 
     $this->style = ImageStyle::create(['name' => 'test_style']);
     $effect = [

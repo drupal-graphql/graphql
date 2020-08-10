@@ -89,7 +89,7 @@ class ServerForm extends EntityForm {
     $schemas = array_map(function ($definition) {
       return $definition['name'] ?? $definition['id'];
     }, $this->schemaManager->getDefinitions());
-    
+
     $input = $formState->getUserInput();
     $inputSchema = array_key_exists('schema', $input) ? $input['schema'] : NULL;
     $schema = ($inputSchema ?? $server->get('schema')) ?: reset(array_keys($schemas));
@@ -233,7 +233,7 @@ class ServerForm extends EntityForm {
     /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
     $instance = $this->schemaManager->createInstance($schema);
-    if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
+    if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
       $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
     }

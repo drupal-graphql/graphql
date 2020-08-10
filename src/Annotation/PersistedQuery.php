@@ -51,4 +51,5 @@ class PersistedQuery extends Plugin {
 
     parent::__construct($values);
   }
+
 }

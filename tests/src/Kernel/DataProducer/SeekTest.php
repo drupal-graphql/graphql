@@ -60,4 +60,5 @@ class SeekTest extends GraphQLTestBase {
       ]
     ];
   }
+
 }

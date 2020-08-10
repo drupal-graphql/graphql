@@ -15,14 +15,6 @@
     <exclude name="Squiz.Functions.FunctionDeclarationArgumentSpacing.SpaceBeforeComma"/>
     <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.SpaceAfterFunction"/>
     <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.SpaceBeforeBrace"/>
-    <exclude name="Squiz.WhiteSpace.FunctionSpacing.After"/>
-    <exclude name="Squiz.WhiteSpace.FunctionSpacing.AfterLast"/>
-    <exclude name="Squiz.WhiteSpace.FunctionSpacing.Before"/>
-    <exclude name="Squiz.WhiteSpace.FunctionSpacing.BeforeFirst"/>
-    <exclude name="Squiz.WhiteSpace.LanguageConstructSpacing.Incorrect"/>
-    <exclude name="Squiz.WhiteSpace.OperatorSpacing.NoSpaceBefore"/>
-    <exclude name="Squiz.WhiteSpace.OperatorSpacing.SpacingAfter"/>
-    <exclude name="Squiz.WhiteSpace.SuperfluousWhitespace.EndLine"/>
     <exclude name="Drupal.Arrays.Array.CommaLastItem"/>
     <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
     <exclude name="Drupal.Arrays.DisallowLongArraySyntax.Found"/>

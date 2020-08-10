@@ -33,4 +33,5 @@ class XMLParse extends DataProducerPluginBase {
     $document->loadHTML($input);
     return $document->documentElement;
   }
+
 }

@@ -61,4 +61,5 @@ abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQ
     $this->configuration['weight'] = $weight;
     return $this;
   }
+
 }

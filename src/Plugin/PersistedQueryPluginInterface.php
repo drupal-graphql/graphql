@@ -46,4 +46,5 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    *   The weight.
    */
   public function setWeight($weight);
+
 }

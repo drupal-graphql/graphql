@@ -33,7 +33,6 @@ class PersistedQueriesForm extends EntityForm {
     );
   }
 
-
   /**
    * {@inheritDoc}
    */

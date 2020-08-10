@@ -169,4 +169,5 @@ class ResolverRegistry implements ResolverRegistryInterface {
   protected function resolveTypeDefault($value, ResolveContext $context, ResolveInfo $info) {
     return NULL;
   }
+
 }

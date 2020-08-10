@@ -82,4 +82,5 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
 
     return $this->extensions[$id];
   }
+
 }

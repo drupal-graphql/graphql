@@ -33,4 +33,5 @@ class XMLAttributeTest extends XMLTestBase {
       'name' => 'class'
     ]));
   }
+
 }
