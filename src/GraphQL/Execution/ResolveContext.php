@@ -194,4 +194,5 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
     return FALSE;
   }
+
 }

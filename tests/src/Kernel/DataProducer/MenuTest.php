@@ -130,7 +130,6 @@ class MenuTest extends GraphQLTestBase {
     }
   }
 
-
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree\MenuTreeSubtree::resolve
    */

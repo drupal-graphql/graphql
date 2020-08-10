@@ -19,4 +19,5 @@ class XMLParseTest extends XMLTestBase {
 
     $this->assertInstanceOf(\DOMElement::class, $result);
   }
+
 }

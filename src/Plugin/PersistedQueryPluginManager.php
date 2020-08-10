@@ -47,4 +47,5 @@ class PersistedQueryPluginManager extends DefaultPluginManager {
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($definitionCacheBackend, 'persisted_query', ['graphql']);
   }
+
 }

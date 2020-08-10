@@ -96,4 +96,5 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
     }
     throw new \Exception('Invalid response type.');
   }
+
 }

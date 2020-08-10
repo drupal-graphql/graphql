@@ -530,4 +530,5 @@ class Server extends ConfigEntityBase implements ServerInterface {
     parent::postDelete($storage, $entities);
     \Drupal::service('router.builder')->setRebuildNeeded();
   }
+
 }

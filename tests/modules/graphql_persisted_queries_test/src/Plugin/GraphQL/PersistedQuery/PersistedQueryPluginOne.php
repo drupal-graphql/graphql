@@ -17,7 +17,6 @@ use GraphQL\Server\OperationParams;
  */
 class PersistedQueryPluginOne extends PersistedQueryPluginBase {
 
-
   /**
    * {@inheritdoc}
    */
@@ -27,8 +26,9 @@ class PersistedQueryPluginOne extends PersistedQueryPluginBase {
   }
 
   protected function queryMap() {
-    return[
+    return [
       'query_1' => 'query { field_one }',
     ];
   }
+
 }

@@ -126,5 +126,4 @@ class QueryRouteEnhancer implements EnhancerInterface {
     return $values;
   }
 
-
 }

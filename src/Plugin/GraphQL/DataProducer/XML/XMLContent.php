@@ -37,4 +37,5 @@ class XMLContent extends DataProducerPluginBase {
       }
     }, iterator_to_array($dom->childNodes)));
   }
+
 }

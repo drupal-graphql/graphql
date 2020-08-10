@@ -27,4 +27,5 @@ class XMLContentTest extends XMLTestBase {
       'dom' => $span[0],
     ]));
   }
+
 }

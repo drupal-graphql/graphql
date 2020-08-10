@@ -28,4 +28,5 @@ class XMLTestBase extends GraphQLTestBase {
   public function getDocumentSource() {
     return file_get_contents(drupal_get_path('module', 'graphql') . '/tests/files/xml/test.xml');
   }
+
 }

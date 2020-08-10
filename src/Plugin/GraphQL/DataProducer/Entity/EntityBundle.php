@@ -30,4 +30,5 @@ class EntityBundle extends DataProducerPluginBase {
   public function resolve(EntityInterface $entity) {
     return $entity->bundle();
   }
+
 }

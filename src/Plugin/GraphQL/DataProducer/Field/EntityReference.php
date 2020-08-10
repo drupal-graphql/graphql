@@ -195,4 +195,5 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
     return NULL;
   }
+
 }

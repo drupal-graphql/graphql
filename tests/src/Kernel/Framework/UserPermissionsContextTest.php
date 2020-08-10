@@ -38,4 +38,5 @@ GQL;
     $this->mockResolver('Query', 'root', 'test');
     $this->assertResults('{ root }', [], ['root' => 'test']);
   }
+
 }

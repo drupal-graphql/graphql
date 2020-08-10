@@ -103,4 +103,5 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   public function hasContextValue($name) {
     return $this->context->hasContextValue($this->info, $name);
   }
+
 }
