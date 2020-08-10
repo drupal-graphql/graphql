@@ -9,7 +9,7 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer\XML;
  */
 class XMLAttributeTest extends XMLTestBase {
 
- /**
+  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLAttribute::resolve
    */
   public function testXMLAttribute() {

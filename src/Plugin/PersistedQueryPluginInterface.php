@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;

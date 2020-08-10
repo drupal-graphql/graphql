@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;

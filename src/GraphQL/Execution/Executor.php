@@ -331,7 +331,7 @@ class Executor implements ExecutorImplementation {
 
     $this->cacheBackend->setMultiple([
       "contexts:$prefix"       => ['data' => $contexts, 'expire' => $expire, 'tags' => $tags],
-      "result:$prefix:$suffix" => ['data' => $cache,   'expire' => $expire, 'tags' => $tags],
+      "result:$prefix:$suffix" => ['data' => $cache, 'expire' => $expire, 'tags' => $tags],
     ]);
 
     return $this;

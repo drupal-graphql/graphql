@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\graphql\Annotation;
 
 
