@@ -61,7 +61,8 @@ class ImageUrlTest extends GraphQLTestBase {
     $this->assertNull($result);
 
     // TODO: Add cache checks.
-    //    $this->assertContains('test_tag_forbidden', $metadata->getCacheTags());
+    //    $this->assertContains('test_tag_forbidden',
+    //    $metadata->getCacheTags());
   }
 
 }

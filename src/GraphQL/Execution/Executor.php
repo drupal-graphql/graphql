@@ -267,7 +267,8 @@ class Executor implements ExecutorImplementation {
     // TODO: Should we try to sort these recursively?
     $variables = $this->variables ?: [];
     ksort($variables);
-    // TODO: Should we submit a pull request to also pass the extensions in the executor?
+    // TODO: Should we submit a pull request to also pass the extensions in the
+    // executor?
     $extensions = $this->context->getOperation()->extensions ?: [];
     ksort($extensions);
 

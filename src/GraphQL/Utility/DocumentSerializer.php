@@ -32,4 +32,5 @@ class DocumentSerializer {
 
     return $item;
   }
+
 }

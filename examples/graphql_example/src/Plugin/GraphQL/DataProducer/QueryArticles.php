@@ -105,4 +105,5 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
 
     return new QueryConnection($query);
   }
+
 }

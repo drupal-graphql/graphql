@@ -12,7 +12,7 @@ class XMLXpathTest extends XMLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLXpath::resolve
    */
-  public function testXMLXpath() {
+  public function testXmlxPath() {
     $document = $this->loadDocument();
 
     $result = $this->executeDataProducer('xml_xpath', [

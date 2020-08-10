@@ -55,10 +55,6 @@
     <exclude name="Drupal.Commenting.VariableComment.IncorrectVarType"/>
     <exclude name="Drupal.Commenting.VariableComment.Missing"/>
     <exclude name="Drupal.ControlStructures.ControlSignature.NewlineAfterCloseBrace"/>
-    <exclude name="Drupal.Files.EndFileNewline.NoneFound"/>
-    <exclude name="Drupal.Files.EndFileNewline.TooMany"/>
-    <exclude name="Drupal.Files.LineLength.TooLong"/>
-    <exclude name="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
   </rule>
 
 </ruleset>

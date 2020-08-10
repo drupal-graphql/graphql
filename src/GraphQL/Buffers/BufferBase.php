@@ -145,4 +145,5 @@ abstract class BufferBase {
   protected function resolveBufferArray(array $buffer) {
     throw new \LogicException('Method not implemented.');
   }
+
 }

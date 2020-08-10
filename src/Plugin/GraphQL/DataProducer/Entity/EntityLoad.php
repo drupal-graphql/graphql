@@ -144,8 +144,9 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
 
     return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
-        // If there is no entity with this id, add the list cache tags so that the
-        // cache entry is purged whenever a new entity of this type is saved.
+        // If there is no entity with this id, add the list cache tags so that
+        // the cache entry is purged whenever a new entity of this type is
+        // saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
