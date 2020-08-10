@@ -67,14 +67,6 @@
     <exclude name="Drupal.Files.EndFileNewline.TooMany"/>
     <exclude name="Drupal.Files.LineLength.TooLong"/>
     <exclude name="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
-<<<<<<< HEAD
-=======
-    <exclude name="Drupal.WhiteSpace.CloseBracketSpacing.ClosingWhitespace"/>
-    <exclude name="Drupal.WhiteSpace.Comma.NoSpace"/>
-    <exclude name="Drupal.WhiteSpace.Comma.TooManySpaces"/>
-    <exclude name="Drupal.WhiteSpace.OpenBracketSpacing.OpeningWhitespace"/>
->>>>>>> graphql/8.x-4.x
-    <exclude name="Drupal.WhiteSpace.OpenTagNewline.BlankLine"/>
     <exclude name="Drupal.WhiteSpace.ScopeClosingBrace.Line"/>
     <exclude name="Drupal.WhiteSpace.ScopeIndent.IncorrectExact"/>
   </rule>
