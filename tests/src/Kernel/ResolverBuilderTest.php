@@ -275,7 +275,7 @@ GQL;
       [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
       [function () {
         return new Deferred(function () {
-            return TRUE;
+          return TRUE;
         });
       }, $this->builder->fromValue('But this should.')
       ],
@@ -389,20 +389,28 @@ GQL;
   public function testDeferredDefaultValue() {
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
     $this->mockResolver('Tree', 'name', $this->builder->defaultValue(
-      $this->builder->callback(function () {return new Deferred(function () {return NULL;
-      });
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return NULL;
+        });
       }),
-      $this->builder->callback(function () {return new Deferred(function () {return 'bar';
-      });
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return 'bar';
+        });
       })
     ));
 
     $this->mockResolver('Tree', 'uri', $this->builder->defaultValue(
-      $this->builder->callback(function () {return new Deferred(function () {return 'baz';
-      });
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return 'baz';
+        });
       }),
-      $this->builder->callback(function () {return new Deferred(function () {return 'bar';
-      });
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return 'bar';
+        });
       })
     ));
 
