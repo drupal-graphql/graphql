@@ -33,28 +33,28 @@ class SeekTest extends GraphQLTestBase {
   public function testSeekProvider() {
     return [
       [
-        [1,2,3],
+        [1, 2, 3],
         0,
         1,
       ],
       [
-        [1,2,3],
+        [1, 2, 3],
         1,
         2,
       ],
       [
-        [1,2,3],
+        [1, 2, 3],
         3,
         NULL,
       ],
       [
-        [1,[2],3],
+        [1, [2], 3],
         1,
         [2],
       ],
       // For now, we do not support negative indices.
       [
-        [1,2,3],
+        [1, 2, 3],
         -1,
         NULL,
       ]
