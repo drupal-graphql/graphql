@@ -67,8 +67,6 @@
     <exclude name="Drupal.Files.EndFileNewline.TooMany"/>
     <exclude name="Drupal.Files.LineLength.TooLong"/>
     <exclude name="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
-    <exclude name="Drupal.WhiteSpace.ScopeClosingBrace.Line"/>
-    <exclude name="Drupal.WhiteSpace.ScopeIndent.IncorrectExact"/>
   </rule>
 
 </ruleset>
