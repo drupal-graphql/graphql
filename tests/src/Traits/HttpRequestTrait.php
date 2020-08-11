@@ -3,8 +3,8 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\graphql\Entity\Server;
-use Symfony\Component\HttpFoundation\Request;
 use Drupal\graphql\Entity\ServerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test trait for the GraphQL HTTP interface.

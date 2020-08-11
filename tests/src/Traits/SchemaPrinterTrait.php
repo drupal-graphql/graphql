@@ -3,8 +3,8 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\graphql\Entity\Server;
-use GraphQL\Utils\SchemaPrinter;
 use Drupal\graphql\Entity\ServerInterface;
+use GraphQL\Utils\SchemaPrinter;
 
 /**
  * Trait to get printed version of the schema.
