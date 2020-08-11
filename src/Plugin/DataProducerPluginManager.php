@@ -35,7 +35,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   * *   The module handler.
+   *   *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
