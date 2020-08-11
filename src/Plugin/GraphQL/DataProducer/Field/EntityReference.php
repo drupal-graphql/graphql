@@ -116,9 +116,9 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
@@ -132,7 +132,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param $field
-   * @param null $language
+   * @param NULL $language
    * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser

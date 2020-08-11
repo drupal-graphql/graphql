@@ -64,7 +64,7 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries(array $queries, $server = NULL) {
+  protected function batchedQueries(array $queries, \Drupal\graphql\Entity\Server $server = NULL) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');

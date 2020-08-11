@@ -81,7 +81,7 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\Core\Cache\CacheableMetadata|null $metadata
    *   The expected cache metadata object.
    */
-  protected function assertResults($query, $variables, $expected, CacheableMetadata $metadata = NULL) {
+  protected function assertResults($query, array $variables, array $expected, CacheableMetadata $metadata = NULL) {
     $result = $this->server->executeOperation(
       OperationParams::create([
         'query' => $query,
@@ -106,7 +106,7 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\Core\Cache\CacheableMetadata $metadata
    *   The expected cache metadata object.
    */
-  protected function assertErrors($query, $variables, $expected, CacheableMetadata $metadata) {
+  protected function assertErrors($query, array $variables, $expected, CacheableMetadata $metadata) {
     $result = $this->server->executeOperation(
       OperationParams::create([
         'query' => $query,

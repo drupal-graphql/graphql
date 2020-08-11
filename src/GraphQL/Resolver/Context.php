@@ -27,7 +27,7 @@ class Context implements ResolverInterface {
    * Context constructor.
    *
    * @param $name
-   * @param null $default
+   * @param NULL $default
    */
   public function __construct($name, $default = NULL) {
     $this->name = $name;

@@ -45,8 +45,6 @@
     <exclude name="Drupal.Commenting.FunctionComment.ParamMissingDefinition"/>
     <exclude name="Drupal.Commenting.FunctionComment.ParamNameNoMatch"/>
     <exclude name="Drupal.Commenting.FunctionComment.ReturnCommentIndentation"/>
-    <exclude name="Drupal.Commenting.FunctionComment.ReturnTypeSpaces"/>
-    <exclude name="Drupal.Commenting.FunctionComment.TypeHintMissing"/>
   </rule>
 
 </ruleset>

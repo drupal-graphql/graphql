@@ -14,7 +14,7 @@ class Introspection {
    * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server instance.
    *
-   * @return array The introspection result as an array.
+   * @return array
    *   The introspection result as an array.
    *
    */

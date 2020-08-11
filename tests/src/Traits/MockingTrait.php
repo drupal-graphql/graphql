@@ -80,7 +80,7 @@ trait MockingTrait {
    *   Schema id.
    * @param array $values
    */
-  protected function setUpSchema($schema, $id = 'test', $values = []) {
+  protected function setUpSchema($schema, $id = 'test', array $values = []) {
     $this->mockSchema($id, $schema);
     $this->mockSchemaPluginManager($id);
     $this->createTestServer($id, '/graphql/' . $id, $values);
@@ -101,7 +101,7 @@ trait MockingTrait {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createTestServer($schema, $endpoint, $values = []) {
+  protected function createTestServer($schema, $endpoint, array $values = []) {
     $this->server = Server::create([
       'schema' => $schema,
       'name' => $this->randomGenerator->name(),
@@ -121,7 +121,7 @@ trait MockingTrait {
    * @param \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[] $extensions
    *   An array of schema extension plugins.
    */
-  protected function mockSchema($id, $schema, $extensions = []) {
+  protected function mockSchema($id, $schema, array $extensions = []) {
     /** @var \PHPUnit\Framework\MockObject\MockObject $extensionManager */
     $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
       ->disableOriginalConstructor()

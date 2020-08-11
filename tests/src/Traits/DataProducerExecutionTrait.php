@@ -15,7 +15,7 @@ trait DataProducerExecutionTrait {
    *
    * @return mixed
    */
-  protected function executeDataProducer($id, $contexts = []) {
+  protected function executeDataProducer($id, array $contexts = []) {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.data_producer');
 

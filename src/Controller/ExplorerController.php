@@ -79,7 +79,7 @@ class ExplorerController implements ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
    *
-   * @return array The render array.
+   * @return array
    *   The render array.
    */
   public function viewExplorer(ServerInterface $graphql_server, Request $request) {
