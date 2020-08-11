@@ -11,6 +11,7 @@ class DocumentSerializer {
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
    * @return array
+   *   Returns an array.
    */
   public static function serializeDocument(DocumentNode $document) {
     return static::sanitizeRecursive(AST::toArray($document));
@@ -20,6 +21,7 @@ class DocumentSerializer {
    * @param array $item
    *
    * @return array
+   *   Returns an array.
    */
   public static function sanitizeRecursive(array $item) {
     unset($item['loc']);

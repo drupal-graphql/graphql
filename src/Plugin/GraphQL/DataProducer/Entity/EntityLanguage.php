@@ -26,6 +26,7 @@ class EntityLanguage extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return \Drupal\Core\Language\LanguageInterface
+   *   Returns a LanguageInterface.
    */
   public function resolve(EntityInterface $entity) {
     return $entity->language();

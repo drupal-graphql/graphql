@@ -38,7 +38,6 @@
     <exclude name="Drupal.Commenting.FunctionComment.InvalidReturn"/>
     <exclude name="Drupal.Commenting.FunctionComment.MissingParamComment"/>
     <exclude name="Drupal.Commenting.FunctionComment.MissingParamType"/>
-    <exclude name="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
   </rule>
 
 </ruleset>

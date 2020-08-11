@@ -65,6 +65,7 @@ GQL;
 
   /**
    * @return array
+   *   Returns an array.
    */
   public function testBuilderProducingProvider() {
     return [

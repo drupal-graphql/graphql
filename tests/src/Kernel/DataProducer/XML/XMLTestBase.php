@@ -24,6 +24,7 @@ class XMLTestBase extends GraphQLTestBase {
   /**
    * Returns the source of the test document.
    * @return bool|string
+   *   Returns a boolean or string.
    */
   public function getDocumentSource() {
     return file_get_contents(drupal_get_path('module', 'graphql') . '/tests/files/xml/test.xml');

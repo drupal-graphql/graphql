@@ -65,6 +65,7 @@ class RequestController implements ContainerInjectionInterface {
    * @param \GraphQL\Server\OperationParams $operation
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
+   *   Returns a CacheableJsonResponse.
    * @throws \Exception
    */
   protected function handleSingle(ServerInterface $server, OperationParams $operation) {
@@ -79,6 +80,7 @@ class RequestController implements ContainerInjectionInterface {
    * @param \GraphQL\Server\OperationParams[] $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
+   *   Returns a CacheableJsonResponse.
    * @throws \Exception
    */
   protected function handleBatch(ServerInterface $server, array $operations) {

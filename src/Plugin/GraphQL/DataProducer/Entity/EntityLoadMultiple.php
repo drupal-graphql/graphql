@@ -139,6 +139,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
+   *   Returns Deferred.
    */
   public function resolve($type, array $ids, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);

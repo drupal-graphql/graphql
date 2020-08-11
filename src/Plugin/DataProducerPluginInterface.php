@@ -14,6 +14,7 @@ interface DataProducerPluginInterface extends ContextAwarePluginInterface, Cache
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return \GraphQL\Deferred|mixed
+   *   Returns Deffered or mixed values.
    */
   public function resolveField(FieldContext $field);
 

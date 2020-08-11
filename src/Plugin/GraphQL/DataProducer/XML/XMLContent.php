@@ -26,6 +26,7 @@ class XMLContent extends DataProducerPluginBase {
    * @param \DOMElement $dom
    *   The source (root) DOM element.
    * @return string
+   *   Returns a string.
    */
   public function resolve(\DOMElement $dom) {
     return implode('', array_map(function ($child) {

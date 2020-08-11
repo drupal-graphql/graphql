@@ -29,6 +29,7 @@ class SeekTest extends GraphQLTestBase {
    * Data provider for testSeek().
    *
    * @return array
+   *   Returns an array.
    */
   public function testSeekProvider() {
     return [

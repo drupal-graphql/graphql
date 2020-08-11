@@ -129,6 +129,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
    * @return callable|null
+   *   Returns callable or null.
    */
   protected function getRuntimeFieldResolver($value, $args, ResolveContext $context, ResolveInfo $info) {
     return $this->getFieldResolver($info->parentType->name, $info->fieldName);
@@ -143,6 +144,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed|null
+   *   Returns mixed values or null.
    */
   protected function resolveFieldDefault($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     return Executor::defaultFieldResolver($value, $args, $context, $info);
@@ -154,6 +156,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
    * @return callable|null
+   *   Returns callable or null.
    */
   protected function getRuntimeTypeResolver($value, ResolveContext $context, ResolveInfo $info) {
     return $this->getTypeResolver(Type::getNamedType($info->returnType)->name);
@@ -165,6 +168,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
    * @return null
+   *   Returns null.
    */
   protected function resolveTypeDefault($value, ResolveContext $context, ResolveInfo $info) {
     return NULL;

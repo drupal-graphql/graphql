@@ -28,6 +28,7 @@ class EntityOwner extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return \Drupal\user\UserInterface|null
+   *   Returns a UserInterface or null.
    */
   public function resolve(EntityInterface $entity) {
     if ($entity instanceof EntityOwnerInterface) {

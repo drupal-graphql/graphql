@@ -141,6 +141,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   *   Returns an SchemaExtensionPluginInterface array.
    */
   protected function getExtensions() {
     return $this->extensionManager->getExtensions($this->getPluginId());

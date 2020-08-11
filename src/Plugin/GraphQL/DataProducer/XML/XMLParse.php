@@ -26,6 +26,7 @@ class XMLParse extends DataProducerPluginBase {
    * @param string $input
    *   The source input.
    * @return \DOMElement
+   *   Returns an \DOMElement.
    */
   public function resolve($input) {
     $document = new \DOMDocument();

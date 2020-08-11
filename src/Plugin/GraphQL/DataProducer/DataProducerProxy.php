@@ -105,6 +105,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param array $config
    *
    * @return mixed
+   *   Returns mixed values.
    */
   public static function create($id, array $mapping = [], array $config = []) {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
@@ -142,6 +143,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
+   *   Returns mixed values.
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
@@ -173,6 +175,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return \GraphQL\Deferred|\Drupal\graphql\Plugin\DataProducerPluginInterface
+   *   Returns a DataProducerPluginInterface.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Exception
@@ -212,6 +215,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
+   *   Returns mixed values.
    */
   protected function resolveUncached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field) {
     $output = $plugin->resolveField($field);
@@ -226,6 +230,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
+   *   Returns mixed values.
    */
   protected function resolveCached(DataProducerPluginCachingInterface $plugin, ResolveContext $context, FieldContext $field) {
     $prefix = $this->edgeCachePrefix($plugin);
@@ -245,6 +250,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
    *
    * @return string
+   *   Returns a string.
    */
   protected function edgeCachePrefix(DataProducerPluginCachingInterface $plugin) {
     try {
@@ -263,6 +269,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param $prefix
    *
    * @return array|null
+   *   Returns an array or null.
    */
   protected function cacheRead($prefix) {
     if ($cache = $this->cacheBackend->get("$prefix:context")) {

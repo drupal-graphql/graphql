@@ -99,6 +99,7 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return string
+   *   Returns a string.
    */
   public function resolve(EntityInterface $entity, $mode = NULL, RefinableCacheableDependencyInterface $metadata) {
     $mode = $mode ?? 'full';

@@ -30,6 +30,7 @@ class MenuTreeSubtree extends DataProducerPluginBase {
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *
    * @return mixed
+   *   Returns mixed values.
    */
   public function resolve(MenuLinkTreeElement $element) {
     return array_filter($element->subtree, function(MenuLinkTreeElement $item) {

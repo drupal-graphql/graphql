@@ -26,6 +26,7 @@ class EntityUrl extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return \Drupal\Core\Url
+   *   Returns a Url.
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
   public function resolve(EntityInterface $entity) {

@@ -27,6 +27,7 @@ class EntityDescription extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return string
+   *   Returns a string.
    */
   public function resolve(EntityInterface $entity) {
     if ($entity instanceof EntityDescriptionInterface) {

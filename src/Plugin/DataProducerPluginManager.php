@@ -82,6 +82,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
    * @param array $config
    *
    * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
+   *   Returns an DataProducerProxy.
    */
   public function proxy($id, array $mapping = [], array $config = []) {
     return new DataProducerProxy(

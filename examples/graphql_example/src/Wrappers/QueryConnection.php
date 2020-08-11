@@ -23,6 +23,7 @@ class QueryConnection {
 
   /**
    * @return int
+   *   Returns an int.
    */
   public function total() {
     $query = clone $this->query;
@@ -32,6 +33,7 @@ class QueryConnection {
 
   /**
    * @return array|\GraphQL\Deferred
+   *   Returns Deferred.
    */
   public function items() {
     $result = $this->query->execute();

@@ -95,6 +95,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
    * @param string $accessOperation
    *
    * @return |null
+   *   Returns a null.
    */
   public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {

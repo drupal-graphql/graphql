@@ -184,6 +184,7 @@ class PersistedQueriesForm extends EntityForm {
    * Returns an array with all the available persisted query plugins.
    *
    * @return PersistedQueryPluginInterface[]
+   *   Returns an array.
    */
   protected function getAllPersistedQueryPlugins() {
     $plugins = [];

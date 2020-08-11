@@ -17,6 +17,7 @@ interface ResolverRegistryInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return callable|null
+   *   Returns either callable or null.
    */
   public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field);
 
@@ -26,6 +27,7 @@ interface ResolverRegistryInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
    * @return callable|null
+   *   Returns either callable or null.
    */
   public function resolveType($value, ResolveContext $context, ResolveInfo $info);
 
@@ -43,6 +45,7 @@ interface ResolverRegistryInterface {
    * @param string $field
    *
    * @return callable|null
+   *   Returns either callable or null.
    */
   public function getFieldResolver($type, $field);
 
@@ -60,6 +63,7 @@ interface ResolverRegistryInterface {
    * @param string $type
    *
    * @return callable|null
+   *   Returns either callable or null.
    */
   public function getTypeResolver($type);
 

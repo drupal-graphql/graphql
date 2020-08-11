@@ -44,6 +44,7 @@ class PropertyPath extends DataProducerPluginBase {
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return mixed
+   *   Returns mixed values.
    */
   public function resolve($path, $value, $type = NULL, RefinableCacheableDependencyInterface $metadata) {
     if (!($value instanceof TypedDataInterface) && !empty($type)) {

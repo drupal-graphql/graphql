@@ -18,6 +18,7 @@ interface ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
+   *   Returns mixed types.
    */
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field);
 

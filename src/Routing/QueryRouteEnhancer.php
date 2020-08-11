@@ -19,6 +19,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
    *   The current route.
    *
    * @return bool
+   *   Returns a boolean.
    */
   public function applies(Route $route) {
     return $route->hasDefault('_graphql');
