@@ -21,7 +21,7 @@ class EntityBufferTest extends GraphQLTestBase {
   protected $entityBuffer;
 
   /**
-   * @cover EntityBuffer::setUp
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
@@ -54,7 +54,7 @@ GQL;
   }
 
   /**
-   * @cover EntityBuffer::resolve
+   * Tests the entity buffer.
    */
   public function testEntityBuffer() {
     $query = <<<GQL

@@ -26,7 +26,7 @@ class PersistedQueryPluginTwo extends PersistedQueryPluginBase {
   }
 
   /**
-   * @cover queryMap::resolve
+   * Map between persisted query IDs and corresponding GraphQL queries.
    */
   protected function queryMap() {
     return [

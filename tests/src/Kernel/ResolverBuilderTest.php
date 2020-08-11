@@ -348,7 +348,7 @@ GQL;
   }
 
   /**
-   * @covers ::defaultValue
+   * Tests the composite default value resolver.
    */
   public function testCompositeDefaultValue() {
 

@@ -21,7 +21,7 @@ class EntityUuidBufferTest extends GraphQLTestBase {
   protected $entityBuffer;
 
   /**
-   * @cover EntityUuidBufferTest::setUp
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
@@ -55,7 +55,7 @@ GQL;
   }
 
   /**
-   * @cover EntityUuidBufferTest::resolve
+   * Tests the entity UUID buffer.
    */
   public function testEntityUuidBuffer() {
     $query = <<<GQL
