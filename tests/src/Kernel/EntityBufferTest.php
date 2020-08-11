@@ -10,6 +10,9 @@ use Drupal\node\Entity\NodeType;
  */
 class EntityBufferTest extends GraphQLTestBase {
 
+  /**
+   * @var string[]
+   */
   protected $nodeIds = [];
 
   /**
@@ -26,10 +29,12 @@ class EntityBufferTest extends GraphQLTestBase {
     ])->save();
 
     foreach (range(1, 3) as $i) {
-      $this->nodeIds[] = Node::create([
+      $node = Node::create([
         'title' => 'Node ' . $i,
         'type' => 'test',
-      ])->save();
+      ]);
+      $node->save();
+      $this->nodeIds[] = $node->id();
     }
 
     $schema = <<<GQL

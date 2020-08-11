@@ -207,8 +207,8 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->assertNull($result);
 
     // TODO: Add cache checks.
-    //    $this->assertContains('node_list', $metadata->getCacheTags());
-    //    $this->assertContains('4xx-response', $metadata->getCacheTags());
+    // $this->assertContains('node_list', $metadata->getCacheTags());
+    // $this->assertContains('4xx-response', $metadata->getCacheTags());
   }
 
 }
