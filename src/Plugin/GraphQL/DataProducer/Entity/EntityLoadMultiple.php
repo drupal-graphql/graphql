@@ -115,9 +115,9 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
@@ -131,7 +131,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   /**
    * @param $type
    * @param array $ids
-   * @param null $language
+   * @param NULL $language
    * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser

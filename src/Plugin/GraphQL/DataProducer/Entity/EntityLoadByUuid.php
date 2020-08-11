@@ -114,9 +114,9 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityUuidBuffer $entityBuffer

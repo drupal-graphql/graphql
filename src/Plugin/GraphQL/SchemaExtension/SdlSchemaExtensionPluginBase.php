@@ -47,9 +47,9 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     ModuleHandlerInterface $moduleHandler
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);

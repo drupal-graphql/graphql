@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -64,7 +65,7 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries(array $queries, $server = NULL) {
+  protected function batchedQueries(array $queries, ServerInterface $server = NULL) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');

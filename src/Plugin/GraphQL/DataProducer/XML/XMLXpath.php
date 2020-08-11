@@ -33,7 +33,7 @@ class XMLXpath extends DataProducerPluginBase {
    *  The xpath query.
    * @return \DOMElement
    */
-  public function resolve($dom, $query) {
+  public function resolve(\DOMElement $dom, $query) {
     $xpath = new \DOMXPath($dom->ownerDocument);
     return iterator_to_array($xpath->query($query, $dom));
   }

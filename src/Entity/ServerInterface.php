@@ -20,7 +20,7 @@ interface ServerInterface extends ConfigEntityInterface {
    *
    * @return \Drupal\graphql\GraphQL\Execution\ExecutionResult[]
    */
-  public function executeBatch($operations);
+  public function executeBatch(array $operations);
 
   /**
    * Retrieves the server configuration

@@ -90,9 +90,9 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     CacheBackendInterface $astCache,
     ModuleHandlerInterface $moduleHandler,
     SchemaExtensionPluginManager $extensionManager,

@@ -114,9 +114,9 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
@@ -130,7 +130,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   /**
    * @param $type
    * @param $id
-   * @param null $language
+   * @param NULL $language
    * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
