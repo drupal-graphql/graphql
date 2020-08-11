@@ -4,6 +4,7 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\graphql\Entity\Server;
 use GraphQL\Utils\SchemaPrinter;
+use Drupal\graphql\Entity\ServerInterface;
 
 /**
  * Trait to get printed version of the schema.
@@ -19,7 +20,7 @@ trait SchemaPrinterTrait {
    * @return string
    *   The printed version of the schema.
    */
-  protected function getPrintedSchema(\Drupal\graphql\Entity\ServerInterface $server = NULL) {
+  protected function getPrintedSchema(ServerInterface $server = NULL) {
     $server = $server ?? $this->server;
     /** @var \GraphQL\Server\ServerConfig $config */
     $config = $server->configuration();
