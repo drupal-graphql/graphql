@@ -47,14 +47,6 @@
     <exclude name="Drupal.Commenting.FunctionComment.ReturnCommentIndentation"/>
     <exclude name="Drupal.Commenting.FunctionComment.ReturnTypeSpaces"/>
     <exclude name="Drupal.Commenting.FunctionComment.TypeHintMissing"/>
-    <exclude name="Drupal.Commenting.InlineComment.InvalidEndChar"/>
-    <exclude name="Drupal.Commenting.InlineComment.NoSpaceBefore"/>
-    <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
-    <exclude name="Drupal.Commenting.InlineComment.SpacingBefore"/>
-    <exclude name="Drupal.Commenting.InlineComment.SpacingBefore"/>
-    <exclude name="Drupal.Commenting.VariableComment.IncorrectVarType"/>
-    <exclude name="Drupal.Commenting.VariableComment.Missing"/>
-    <exclude name="Drupal.ControlStructures.ControlSignature.NewlineAfterCloseBrace"/>
   </rule>
 
 </ruleset>

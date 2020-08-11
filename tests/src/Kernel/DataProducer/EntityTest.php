@@ -334,7 +334,7 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     // TODO: Add metadata check.
-    //$this->assertContains('node_list', $metadata->getCacheTags());
+    // $this->assertContains('node_list', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 
@@ -349,7 +349,7 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     // TODO: Add metadata check.
-    //$this->assertContains('node:1', $metadata->getCacheTags());
+    // $this->assertContains('node:1', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 
@@ -377,7 +377,7 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     // TODO: Add metadata check.
-    //$this->assertContains('node:1', $metadata->getCacheTags());
+    // $this->assertContains('node:1', $metadata->getCacheTags());
     $this->assertContains('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
   }
 

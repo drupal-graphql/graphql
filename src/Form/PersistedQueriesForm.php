@@ -13,6 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PersistedQueriesForm extends EntityForm {
 
+  /**
+   * @var PersistedQueryPluginManager
+   */
   protected $persistedQueryPluginManager;
 
   /**
@@ -76,7 +79,7 @@ class PersistedQueriesForm extends EntityForm {
       ];
     }
 
-    // Set the weights of the persisted query plugins
+    // Set the weights of the persisted query plugins.
     $form['weights'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Order'),

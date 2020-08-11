@@ -10,6 +10,9 @@ use Drupal\node\Entity\NodeType;
  */
 class EntityBufferTest extends GraphQLTestBase {
 
+  /**
+   * @var NodeIDsArray
+   */
   protected $nodeIds = [];
 
   /**

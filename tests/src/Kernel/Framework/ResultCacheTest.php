@@ -240,7 +240,7 @@ GQL;
       )
     );
 
-    // Set the context value to 'a'/
+    // Set the context value to 'a'/.
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     // This will be stored in the cache key for context 'a'.
     $this->query('{ root }');

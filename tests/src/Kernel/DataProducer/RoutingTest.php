@@ -46,7 +46,7 @@ class RoutingTest extends GraphQLTestBase {
       'path' => '/idontexist',
     ]);
 
-    //    $this->assertContains('4xx-response', $metadata->getCacheTags());
+    // $this->assertContains('4xx-response', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 

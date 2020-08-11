@@ -64,7 +64,7 @@ class DataProducerProxy implements ResolverInterface {
   protected $mapping = [];
 
   /**
-   * @var boolean
+   * @var bool
    */
   protected $cached = FALSE;
 

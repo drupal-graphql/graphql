@@ -41,7 +41,8 @@ class MenuLinkAttribute extends DataProducerPluginBase {
     $attributeValue = NestedArray::getValue($options, ['attributes', $attribute]);
     if (is_array($attributeValue)) {
       return implode(" ", $attributeValue);
-    } else {
+    }
+    else {
       return $attributeValue;
     }
   }
