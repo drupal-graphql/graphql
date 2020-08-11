@@ -25,6 +25,9 @@ class PersistedQueryPluginOne extends PersistedQueryPluginBase {
     return $queryMap[$id] ?? NULL;
   }
 
+  /**
+   * @cover queryMap::resolve
+   */
   protected function queryMap() {
     return [
       'query_1' => 'query { field_one }',

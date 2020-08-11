@@ -41,7 +41,7 @@ interface ServerInterface extends ConfigEntityInterface {
    * Removes a Persisted Query plugin instance from the persisted queries set.
    *
    * @param string $queryPluginId
-   *  The plugin id to be removed.
+   *   The plugin id to be removed.
    */
   public function removePersistedQueryInstance($queryPluginId);
 

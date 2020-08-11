@@ -347,6 +347,9 @@ GQL;
     ]);
   }
 
+  /**
+   * @covers ::defaultValue
+   */
   public function testCompositeDefaultValue() {
 
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);

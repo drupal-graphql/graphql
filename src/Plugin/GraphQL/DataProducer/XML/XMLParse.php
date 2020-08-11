@@ -24,7 +24,7 @@ class XMLParse extends DataProducerPluginBase {
 
   /**
    * @param string $input
-   *  The source input.
+   *   The source input.
    * @return \DOMElement
    */
   public function resolve($input) {

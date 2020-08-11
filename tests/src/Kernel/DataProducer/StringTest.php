@@ -24,6 +24,9 @@ class StringTest extends GraphQLTestBase {
     $this->assertEquals($expected, $result);
   }
 
+  /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase::resolve
+   */
   public function testUppercaseProvider() {
     return [
       ['test', 'TEST'],

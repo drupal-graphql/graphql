@@ -28,9 +28,9 @@ class XMLXpath extends DataProducerPluginBase {
 
   /**
    * @param \DOMElement $dom
-   *  The source (root) DOM element.
+   *   The source (root) DOM element.
    * @param string $query
-   *  The xpath query.
+   *   The xpath query.
    * @return \DOMElement
    */
   public function resolve(\DOMElement $dom, $query) {
