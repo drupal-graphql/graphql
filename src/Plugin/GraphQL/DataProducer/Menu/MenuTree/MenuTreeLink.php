@@ -29,7 +29,7 @@ class MenuTreeLink extends DataProducerPluginBase {
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *
    * @return mixed
-   *   Returns mixed values.
+   *   Returns a link.
    */
   public function resolve(MenuLinkTreeElement $element) {
     return $element->link;

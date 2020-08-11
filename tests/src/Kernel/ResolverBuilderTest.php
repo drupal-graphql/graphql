@@ -65,7 +65,7 @@ GQL;
 
   /**
    * @return array
-   *   Returns an array.
+   *   Returns an array containing entity_load, entity_id and uppercase.
    */
   public function testBuilderProducingProvider() {
     return [

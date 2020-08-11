@@ -25,7 +25,7 @@ class Uppercase extends DataProducerPluginBase {
    * @param $string
    *
    * @return mixed
-   *   Returns mixed values.
+   *   Returns a strtoupper.
    */
   public function resolve($string) {
     return strtoupper($string);

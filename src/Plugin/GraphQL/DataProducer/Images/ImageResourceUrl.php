@@ -25,7 +25,7 @@ class ImageResourceUrl extends DataProducerPluginBase {
    * @param $derivative
    *
    * @return mixed
-   *   Returns mixed values.
+   *   Returns mixed derivative values.
    */
   public function resolve($derivative) {
     return $derivative['url'] ?? '';

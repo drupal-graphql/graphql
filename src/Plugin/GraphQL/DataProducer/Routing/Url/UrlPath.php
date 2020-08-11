@@ -30,7 +30,7 @@ class UrlPath extends DataProducerPluginBase {
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return string
-   *   Returns a string.
+   *   Returns a generatedUrl.
    */
   public function resolve(Url $url, RefinableCacheableDependencyInterface $metadata) {
     $url = $url->toString(TRUE);

@@ -28,7 +28,7 @@ class ResolverBuilder {
    * @param $config
    *
    * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
-   *   Returns a DataProducerProxy.
+   *   Returns a new DataProducerProxy.
    */
   public function produce($id, $config = []) {
     return DataProducerProxy::create($id, $config);
@@ -48,7 +48,7 @@ class ResolverBuilder {
    * @param ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
-   *   Returns a Tap.
+   *   Returns a new Tap.
    */
   public function tap(ResolverInterface $callback) {
     return new Tap($callback);
@@ -58,7 +58,7 @@ class ResolverBuilder {
    * @param ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Map
-   *   Returns a Map.
+   *   Returns a new Map.
    */
   public function map(ResolverInterface $callback) {
     return new Map($callback);
@@ -68,7 +68,7 @@ class ResolverBuilder {
    * @param callable $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Callback
-   *   Returns a Callback.
+   *   Returns a new Callback.
    */
   public function callback(callable $callback) {
     return new Callback($callback);
@@ -90,7 +90,7 @@ class ResolverBuilder {
    * @param array $branches
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Condition
-   *   Returns a Condition.
+   *   Returns a new Condition.
    */
   public function cond(array $branches) {
     return new Condition($branches);
@@ -102,7 +102,7 @@ class ResolverBuilder {
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Path
-   *   Returns a Path.
+   *   Returns a new Path.
    */
   public function fromPath($type, $path, ResolverInterface $value = NULL) {
     return new Path($type, $path, $value);
@@ -112,7 +112,7 @@ class ResolverBuilder {
    * @param $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Value
-   *   Returns a Value.
+   *   Returns a new Value.
    */
   public function fromValue($value) {
     return new Value($value);
@@ -122,7 +122,7 @@ class ResolverBuilder {
    * @param $name
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Argument
-   *   Returns a Argument.
+   *   Returns a new Argument.
    */
   public function fromArgument($name) {
     return new Argument($name);
@@ -130,7 +130,7 @@ class ResolverBuilder {
 
   /**
    * @return \Drupal\graphql\GraphQL\Resolver\ParentValue
-   *   Returns a ParentValue.
+   *   Returns a new ParentValue.
    */
   public function fromParent() {
     return new ParentValue();
@@ -141,7 +141,7 @@ class ResolverBuilder {
    * @param callable|null $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Context
-   *   Returns a Context.
+   *   Returns a new Context.
    */
   public function fromContext($name, $default = NULL) {
     return new Context($name, $default);
@@ -152,7 +152,7 @@ class ResolverBuilder {
    * @param $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\DefaultValue
-   *   Returns a DefaultValue.
+   *   Returns a new DefaultValue.
    */
   public function defaultValue($value, $default) {
     return new DefaultValue($value, $default);

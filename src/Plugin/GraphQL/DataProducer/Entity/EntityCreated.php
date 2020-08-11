@@ -32,7 +32,7 @@ class EntityCreated extends DataProducerPluginBase {
    * @param string|null $format
    *
    * @return string
-   *   Returns a string.
+   *   Returns a datetime string.
    */
   public function resolve(EntityInterface $entity, $format = NULL) {
     // `getCreatedTime` is on NodeInterface which feels weird, since there

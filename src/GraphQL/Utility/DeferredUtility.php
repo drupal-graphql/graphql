@@ -33,7 +33,7 @@ class DeferredUtility {
    * @param callable $callback
    *
    * @return mixed
-   *   Returns mixed Values.
+   *   Returns applied values.
    */
   public static function applyFinally($value, callable $callback) {
     if ($value instanceof Deferred) {
@@ -54,7 +54,7 @@ class DeferredUtility {
    * @param callable $callback
    *
    * @return \GraphQL\Deferred|mixed
-   *   Returns mixed Deffered Values.
+   *   Returns a Deferred response.
    */
   public static function returnFinally($value, callable $callback) {
     if ($value instanceof Deferred) {

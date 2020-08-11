@@ -14,7 +14,7 @@ trait DataProducerExecutionTrait {
    * @param array $contexts
    *
    * @return mixed
-   *   Returns mixed values.
+   *   Returns an adapter.
    */
   protected function executeDataProducer($id, array $contexts = []) {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */

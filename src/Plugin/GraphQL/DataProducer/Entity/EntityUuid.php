@@ -26,7 +26,7 @@ class EntityUuid extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return null|string
-   *   Returns a string or null.
+   *   Returns a uuid string or null.
    */
   public function resolve(EntityInterface $entity) {
     return $entity->uuid();

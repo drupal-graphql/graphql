@@ -26,7 +26,7 @@ class EntityBundle extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return string
-   *   Returns a string.
+   *   Returns a bundled string.
    */
   public function resolve(EntityInterface $entity) {
     return $entity->bundle();

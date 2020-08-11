@@ -140,7 +140,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred|null
-   *   Returns Deferred or null.
+   *   Returns Deferred response or null.
    */
   public function resolve(EntityInterface $entity, $field, $language = NULL, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {

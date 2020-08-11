@@ -28,7 +28,7 @@ class MenuLinkUrl extends DataProducerPluginBase {
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
    * @return \Drupal\Core\Url
-   *   Returns a Url.
+   *   Returns an URL Object.
    */
   public function resolve(MenuLinkInterface $link) {
     return $link->getUrlObject();

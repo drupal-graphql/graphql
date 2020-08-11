@@ -33,7 +33,7 @@ class MenuLinkAttribute extends DataProducerPluginBase {
    * @param $attribute
    *
    * @return mixed
-   *   Returns mixed values.
+   *   Returns attributevalues.
    */
   public function resolve(MenuLinkInterface $link, $attribute) {
     $options = $link->getOptions();

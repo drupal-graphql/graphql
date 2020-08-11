@@ -74,7 +74,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * @return \Drupal\graphql\Entity\ServerInterface
-   *   Returns a ServerInterface.
+   *   Returns the server interface for $this.
    */
   public function getServer() {
     return $this->server;
@@ -82,7 +82,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * @return \GraphQL\Server\OperationParams
-   *   Returns OperationParams.
+   *   Returns the operation for $this.
    */
   public function getOperation() {
     return $this->operation;
@@ -90,7 +90,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * @return \GraphQL\Language\AST\DocumentNode
-   *   Returns a DocumentNode.
+   *   Returns the DocumentNode for $this.
    */
   public function getDocument() {
     return $this->document;
@@ -98,7 +98,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * @return string
-   *   Returns a string.
+   *   Returns the type of $this.
    */
   public function getType(): string {
     return $this->type;
@@ -106,7 +106,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * @return string
-   *   Returns a string.
+   *   Returns the language of $this.
    */
   public function getContextLanguage() {
     return $this->language;
@@ -116,7 +116,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @param $language
    *
    * @return string
-   *   Returns a string.
+   *   Returns $this with the set ContextLanguage.
    */
   public function setContextLanguage($language) {
     $this->language = $language;

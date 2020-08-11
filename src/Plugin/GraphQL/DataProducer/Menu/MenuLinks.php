@@ -77,7 +77,7 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\system\MenuInterface $menu
    *
    * @return array
-   *   Returns an array.
+   *   Returns an array filter.
    */
   public function resolve(MenuInterface $menu) {
     $tree = $this->menuLinkTree->load($menu->id(), new MenuTreeParameters());

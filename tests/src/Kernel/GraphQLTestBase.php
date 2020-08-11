@@ -118,7 +118,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
 
   /**
    * @return array
-   *   Returns an array.
+   *   Returns an array containing userPermissions.
    */
   protected function userPermissions() {
     return ['access content', 'bypass graphql access'];

@@ -29,7 +29,7 @@ class ImageUrl extends DataProducerPluginBase {
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return mixed
-   *   Returns mixed values.
+   *   Returns mixed file urls.
    */
   public function resolve(FileInterface $entity, RefinableCacheableDependencyInterface $metadata) {
     $access = $entity->access('view', NULL, TRUE);

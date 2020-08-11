@@ -33,7 +33,7 @@ class QueryConnection {
 
   /**
    * @return array|\GraphQL\Deferred
-   *   Returns Deferred.
+   *   Returns Deferred Response.
    */
   public function items() {
     $result = $this->query->execute();

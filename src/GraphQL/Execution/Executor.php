@@ -159,7 +159,7 @@ class Executor implements ExecutorImplementation {
    * @param $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
-   *   Returns an Executor.
+   *   Returns a new Executor.
    */
   public static function create(
     ContainerInterface $container,
@@ -213,7 +213,7 @@ class Executor implements ExecutorImplementation {
    * @param string $prefix
    *
    * @return \GraphQL\Executor\Promise\Promise
-   *   Returns a Promise.
+   *   Returns an ExecutedCache Promise.
    */
   protected function doExecuteCached($prefix) {
     if ($result = $this->cacheRead($prefix)) {
@@ -237,7 +237,7 @@ class Executor implements ExecutorImplementation {
 
   /**
    * @return \GraphQL\Executor\Promise\Promise
-   *   Returns a Promise.
+   *   Returns an Executed Noncached Promise.
    */
   protected function doExecuteUncached() {
     $executor = ReferenceExecutor::create(
@@ -264,7 +264,7 @@ class Executor implements ExecutorImplementation {
 
   /**
    * @return string
-   *   Returns a string.
+   *   Returns the cachePrefix.
    */
   protected function cachePrefix() {
     // Sorting the variables and extensions will cause fewer cache vectors.
@@ -289,7 +289,7 @@ class Executor implements ExecutorImplementation {
    * @param array $contexts
    *
    * @return string
-   *   Returns a string.
+   *   Returns the cache Suffix.
    */
   protected function cacheSuffix(array $contexts = []) {
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
@@ -300,7 +300,7 @@ class Executor implements ExecutorImplementation {
    * @param string $prefix
    *
    * @return \GraphQL\Executor\ExecutionResult|null
-   *   Returns an ExecutionResult or null.
+   *   Returns the read chache or null.
    */
   protected function cacheRead($prefix) {
     if (($cache = $this->cacheBackend->get("contexts:$prefix"))) {
@@ -320,7 +320,7 @@ class Executor implements ExecutorImplementation {
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
-   *   Returns an Executor.
+   *   Returns $this with the chache.
    */
   protected function cacheWrite($prefix, CacheableExecutionResult $result) {
     $contexts = $result->getCacheContexts();
