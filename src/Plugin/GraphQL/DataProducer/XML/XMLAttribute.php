@@ -27,9 +27,9 @@ class XMLAttribute extends DataProducerPluginBase {
 
   /**
    * @param \DOMElement $dom
-   *  The source (root) DOM element.
+   *   The source (root) DOM element.
    * @param string $name
-   *  The name of the attribute.
+   *   The name of the attribute.
    * @return string
    */
   public function resolve(\DOMElement $dom, $name) {

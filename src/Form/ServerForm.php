@@ -227,6 +227,9 @@ class ServerForm extends EntityForm {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $formState) {
     parent::submitForm($form, $formState);
 

@@ -27,11 +27,11 @@ class Seek extends DataProducerPluginBase {
 
   /**
    * @param array $input
-   *  The input array.
-   * @param int position
-   *  The position to seek.
+   *   The input array.
+   * @param int $position
+   *   The position to seek.
    * @return mixed
-   *  The element at the specified position.
+   *   The element at the specified position.
    */
   public function resolve(array $input, $position) {
     $array_object = new \ArrayObject($input);

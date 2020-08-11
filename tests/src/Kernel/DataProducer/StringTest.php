@@ -24,6 +24,9 @@ class StringTest extends GraphQLTestBase {
     $this->assertEquals($expected, $result);
   }
 
+  /**
+   * Tests the upper case data producer.
+   */
   public function testUppercaseProvider() {
     return [
       ['test', 'TEST'],

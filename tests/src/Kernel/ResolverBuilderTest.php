@@ -347,6 +347,9 @@ GQL;
     ]);
   }
 
+  /**
+   * Tests the composite default value resolver.
+   */
   public function testCompositeDefaultValue() {
 
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);

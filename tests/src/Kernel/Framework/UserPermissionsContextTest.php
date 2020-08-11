@@ -15,6 +15,9 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  */
 class UserPermissionsContextTest extends GraphQLTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
