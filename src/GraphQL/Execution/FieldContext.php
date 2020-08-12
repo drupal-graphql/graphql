@@ -97,7 +97,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @param string $name
    *   The name of the context.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the context exists, FALSE Otherwise.
    */
   public function hasContextValue($name) {

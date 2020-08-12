@@ -28,17 +28,10 @@
     <exclude name="Drupal.Commenting.DocComment.ParamGroup"/>
     <exclude name="Drupal.Commenting.DocComment.ShortFullStop"/>
     <exclude name="Drupal.Commenting.DocComment.SpacingAfter"/>
-    <exclude name="Drupal.Commenting.DocComment.SpacingBeforeTags"/>
-    <exclude name="Drupal.Commenting.DocComment.TagGroupSpacing"/>
-    <exclude name="Drupal.Commenting.DocCommentAlignment.SpaceBeforeStar"/>
-    <exclude name="Drupal.Commenting.FileComment.Missing"/>
-    <exclude name="Drupal.Commenting.FunctionComment.IncorrectParamVarName"/>
-    <exclude name="Drupal.Commenting.FunctionComment.IncorrectTypeHint"/>
-    <exclude name="Drupal.Commenting.FunctionComment.InvalidNoReturn"/>
-    <exclude name="Drupal.Commenting.FunctionComment.InvalidReturn"/>
     <exclude name="Drupal.Commenting.FunctionComment.MissingParamComment"/>
     <exclude name="Drupal.Commenting.FunctionComment.MissingParamType"/>
     <exclude name="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
+    <exclude name="Drupal.Commenting.FunctionComment.InvalidNoReturn"/>
   </rule>
 
 </ruleset>

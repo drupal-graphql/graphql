@@ -142,6 +142,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed
+   *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {

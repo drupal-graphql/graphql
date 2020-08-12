@@ -89,9 +89,9 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    *
    * @return array|null
    */

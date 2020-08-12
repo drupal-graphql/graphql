@@ -132,11 +132,11 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param $field
-   * @param NULL $language
+   * @param $language
    * @param array|null $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred|null
