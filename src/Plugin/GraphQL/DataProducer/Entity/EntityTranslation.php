@@ -92,11 +92,11 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
    * @param $language
    * @param bool|null $access
    * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\AccountInterface|null $accessUser
-   * @param string $accessOperation
+   * @param string|null $accessOperation
    *
    * @return |null
    */
-  public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, string $accessOperation) {
+  public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $entity = $entity->getTranslation($language);
       $entity->addCacheContexts(["static:language:{$language}"]);
