@@ -147,7 +147,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): ?Deferred {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }

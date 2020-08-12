@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_requirements().
  */
 function graphql_requirements($phase) {

@@ -65,7 +65,7 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries(array $queries, ServerInterface $server = NULL) {
+  protected function batchedQueries(array $queries, Server $server = NULL) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');

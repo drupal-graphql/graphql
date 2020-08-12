@@ -90,12 +90,12 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
    * @param string $accessOperation
    *
    * @return array|null
    */
-  public function resolve(EntityInterface $entity, ?bool $access , ?AccountInterface $accessUser, ?string $accessOperation) {
+  public function resolve(EntityInterface $entity, bool $access , ?AccountInterface $accessUser, string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $languages = $entity->getTranslationLanguages();
 
