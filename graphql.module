@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Primary module hooks for GraphQL module.
  */
 
 /**
