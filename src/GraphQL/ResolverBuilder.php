@@ -34,11 +34,11 @@ class ResolverBuilder {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[] $resolvers
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[]|array $resolvers
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Composite
    */
-  public function compose(array ...$resolvers) {
+  public function compose(ResolverInterface ...$resolvers) {
     return new Composite($resolvers);
   }
 

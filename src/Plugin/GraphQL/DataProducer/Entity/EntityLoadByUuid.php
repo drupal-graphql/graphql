@@ -132,14 +132,14 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    * @param $uuid
    * @param array|string $language
    * @param array|string $bundles
-   * @param bool $access
+   * @param bool|null $access
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
    * @param string $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $uuid, $language, $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context) {
+  public function resolve($type, $uuid, $language, $bundles, ?bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
