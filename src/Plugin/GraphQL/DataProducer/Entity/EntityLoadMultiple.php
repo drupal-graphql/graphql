@@ -134,7 +134,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
-   * @param string $accessOperation
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
