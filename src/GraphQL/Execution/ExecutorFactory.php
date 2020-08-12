@@ -34,7 +34,8 @@ class ExecutorFactory {
    * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
-   *   Returns a new Executor.
+   *   Returns an Executor with $container, $adapter, $schema, $document
+   *   $context, $root, $variables, $operation, $resolver.
    */
   public function create(
     PromiseAdapter $adapter,

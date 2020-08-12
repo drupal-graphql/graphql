@@ -93,7 +93,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
-   *   Returns a redirectUrl or null.
+   *   Returns the redirectUrl from the $path.
    */
   public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
     if ($this->redirectRepository) {

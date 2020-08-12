@@ -105,7 +105,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param array $config
    *
    * @return mixed
-   *   Returns a proxy.
+   *   Returns a proxy containing $id $mapping $config from $manager.
    */
   public static function create($id, array $mapping = [], array $config = []) {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');

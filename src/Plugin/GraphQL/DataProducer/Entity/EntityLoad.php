@@ -138,7 +138,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
-   *   Returns a Deferred response.
+   *   Returns $entity using a Deferred object.
    */
   public function resolve($type, $id, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);

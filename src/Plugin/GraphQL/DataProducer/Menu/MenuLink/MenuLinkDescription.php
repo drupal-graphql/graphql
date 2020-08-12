@@ -28,7 +28,7 @@ class MenuLinkDescription extends DataProducerPluginBase {
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
    * @return mixed
-   *   Returns a description.
+   *   Returns the description from the menu link.
    */
   public function resolve(MenuLinkInterface $link) {
     return $link->getDescription();

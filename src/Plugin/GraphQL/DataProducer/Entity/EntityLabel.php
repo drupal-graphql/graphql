@@ -29,7 +29,7 @@ class EntityLabel extends DataProducerPluginBase implements DataProducerPluginCa
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return mixed
-   *   Returns a label.
+   *   Returns the label from the entity.
    */
   public function resolve(EntityInterface $entity) {
     return $entity->label();

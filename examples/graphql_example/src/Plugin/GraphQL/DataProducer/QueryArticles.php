@@ -83,7 +83,8 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\graphql_examples\Wrappers\QueryConnection
-   *   Returns new QuerryConnection.
+   *   A query connection wrapper on top of Drupal's entity query to obtain
+   *   the articles and their total amount.
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */

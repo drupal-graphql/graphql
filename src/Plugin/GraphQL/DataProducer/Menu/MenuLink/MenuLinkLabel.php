@@ -28,7 +28,7 @@ class MenuLinkLabel extends DataProducerPluginBase {
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
    * @return mixed
-   *   Returns a title.
+   *   Returns the title from the menu link.
    */
   public function resolve(MenuLinkInterface $link) {
     return $link->getTitle();

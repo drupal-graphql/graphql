@@ -35,7 +35,7 @@ class ImageDerivative extends DataProducerPluginBase {
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return mixed
-   *   Returns mixed values containing url, width and height.
+   *   Returns mixed values containing file url, width and height.
    */
   public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
     // Return if we dont have an entity.

@@ -33,7 +33,7 @@ class EntityChanged extends DataProducerPluginBase {
    * @param string|null $format
    *
    * @return string
-   *   Returns a datetime string.
+   *   Returns a datetime string or null.
    * @throws \Exception
    */
   public function resolve(EntityInterface $entity, $format = NULL) {

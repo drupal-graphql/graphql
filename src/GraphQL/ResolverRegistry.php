@@ -129,7 +129,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
    * @return callable|null
-   *   Returns a FieldResolver or null.
+   *   Returns a FieldResolver from $this or null.
    */
   protected function getRuntimeFieldResolver($value, $args, ResolveContext $context, ResolveInfo $info) {
     return $this->getFieldResolver($info->parentType->name, $info->fieldName);
@@ -156,7 +156,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
    * @return callable|null
-   *   Returns a TypeResolver or null.
+   *   Returns the TypeResolver from $this or null.
    */
   protected function getRuntimeTypeResolver($value, ResolveContext $context, ResolveInfo $info) {
     return $this->getTypeResolver(Type::getNamedType($info->returnType)->name);

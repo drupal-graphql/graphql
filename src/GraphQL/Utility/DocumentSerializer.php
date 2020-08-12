@@ -21,7 +21,7 @@ class DocumentSerializer {
    * @param array $item
    *
    * @return array
-   *   Returns an item array.
+   *   Returns $item array unset with ['loc'].
    */
   public static function sanitizeRecursive(array $item) {
     unset($item['loc']);

@@ -45,7 +45,7 @@ class OperationEvent extends Event {
 
   /**
    * @return \GraphQL\Executor\ExecutionResult
-   *   Returns results.
+   *   Returns the result from $this.
    */
   public function getResult() {
     return $this->result;
@@ -53,7 +53,7 @@ class OperationEvent extends Event {
 
   /**
    * @return \Drupal\graphql\GraphQL\Execution\ResolveContext
-   *   Returns context.
+   *   Returns the context from $this.
    */
   public function getContext() {
     return $this->context;

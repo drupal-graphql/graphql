@@ -27,8 +27,9 @@ class MenuLinkExpanded extends DataProducerPluginBase {
   /**
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
-   * @return mixed
-   *   Returns an expandedLink.
+   * @return boolean
+   *   Returns either true or false, depending on if the link is expanded
+   *   or not.
    */
   public function resolve(MenuLinkInterface $link) {
     return $link->isExpanded();

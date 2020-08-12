@@ -26,7 +26,7 @@ class EntityId extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return mixed
-   *   Returns mixed id values.
+   *   Returns mixed id values from $entity.
    */
   public function resolve(EntityInterface $entity) {
     return $entity->id();

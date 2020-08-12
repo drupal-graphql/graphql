@@ -47,7 +47,7 @@ class RequestController implements ContainerInjectionInterface {
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
-   *   The JSON formatted response.
+   *   Returns a JSON formatted response.
    *
    * @throws \Exception
    */

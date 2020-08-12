@@ -26,7 +26,7 @@ class EntityType extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return string
-   *   Returns entityTypeID as a string.
+   *   Returns the EntityTypeID from the entity as a string.
    */
   public function resolve(EntityInterface $entity) {
     return $entity->getEntityTypeId();

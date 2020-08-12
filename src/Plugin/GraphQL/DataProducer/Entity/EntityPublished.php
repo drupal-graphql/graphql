@@ -28,7 +28,7 @@ class EntityPublished extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return bool|null
-   *   Returns a boolean if Published or not or null.
+   *   Returns a boolean if Published or not. If none of that occurs then null.
    */
   public function resolve(EntityInterface $entity) {
     if ($entity instanceof EntityPublishedInterface) {

@@ -24,8 +24,8 @@ class Uppercase extends DataProducerPluginBase {
   /**
    * @param $string
    *
-   * @return mixed
-   *   Returns a strtoupper.
+   * @return string
+   *   Returns all alphabetic characters in uppercase form.
    */
   public function resolve($string) {
     return strtoupper($string);
