@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;

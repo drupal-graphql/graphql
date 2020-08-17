@@ -7,13 +7,6 @@
 
   <rule ref="Drupal">
     <!-- TODO: those rules are disabled for now until we fix the coding standards for them. -->
-    <exclude name="Drupal.Arrays.Array.CommaLastItem"/>
-    <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
-    <exclude name="Drupal.Arrays.DisallowLongArraySyntax.Found"/>
-    <exclude name="Drupal.Classes.ClassDeclaration.CloseBraceAfterBody"/>
-    <exclude name="Drupal.Classes.FullyQualifiedNamespace.UseStatementMissing"/>
-    <exclude name="Drupal.Classes.PropertyDeclaration.ScopeMissing"/>
-    <exclude name="Drupal.Classes.UnusedUseStatement.UnusedUse"/>
     <exclude name="Drupal.Commenting.ClassComment.Missing"/>
     <exclude name="Drupal.Commenting.DocComment.MissingShort"/>
     <exclude name="Drupal.Commenting.FunctionComment.MissingParamComment"/>

@@ -87,7 +87,7 @@ GQL;
           'data' => [
             'field_one' => 'this is the field one',
           ],
-        ]
+        ],
       ],
       // Same as previous, but with a different order.
       [
@@ -97,7 +97,7 @@ GQL;
           'data' => [
             'field_two' => 'this is the field two',
           ],
-        ]
+        ],
       ],
       // Execute a query that actually exists only in the last plugin.
       [
@@ -110,8 +110,8 @@ GQL;
               'title' => 'Ecosia',
             ],
           ],
-        ]
-      ]
+        ],
+      ],
     ];
   }
 

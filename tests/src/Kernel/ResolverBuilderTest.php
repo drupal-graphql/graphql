@@ -277,8 +277,11 @@ GQL;
         return new Deferred(function () {
           return TRUE;
         });
-      }, $this->builder->fromValue('But this should.')
+        // Code Sniffer creates endless error loop trying to fix here.
+      // @codingStandardsIgnoreStart
+      }, $this->builder->fromValue('But this should.'),
       ],
+      // @codingStandardsIgnoreEnd
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
 
@@ -343,7 +346,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 
@@ -382,7 +385,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 
@@ -430,7 +433,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 

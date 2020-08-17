@@ -5,7 +5,6 @@ namespace Drupal\Tests\graphql\Traits;
 use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Resolver\Value;
-use Drupal\graphql\Plugin\GraphQL\Schema\SdlExtendedSchemaPluginBase;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
@@ -140,7 +139,7 @@ trait MockingTrait {
         $this->container->get('cache.graphql.ast'),
         $this->container->get('module_handler'),
         $extensionManager,
-        ['development' => FALSE]
+        ['development' => FALSE],
       ])
       ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
       ->getMockForAbstractClass();
@@ -172,8 +171,8 @@ trait MockingTrait {
           'id' => $id,
           'name' => 'Test schema',
           'provider' => 'graphql',
-          'class' => '\Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase'
-        ]
+          'class' => '\Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase',
+        ],
       ]));
   }
 
