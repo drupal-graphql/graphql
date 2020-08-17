@@ -11,8 +11,8 @@ interface ResolverInterface {
   /**
    * Resolve values for the fields.
    *
-   * @param $value
-   * @param $args
+   * @param int $value
+   * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field

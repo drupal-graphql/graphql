@@ -84,7 +84,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The module handler service.
    * @param \Drupal\graphql\Plugin\SchemaExtensionPluginManager $extensionManager
    *   The schema extension plugin manager.
-   * @param $config
+   * @param array $config
    *   The service configuration.
    *
    * @codeCoverageIgnore
@@ -96,7 +96,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     CacheBackendInterface $astCache,
     ModuleHandlerInterface $moduleHandler,
     SchemaExtensionPluginManager $extensionManager,
-    $config
+    array $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->inDevelopment = !empty($config['development']);

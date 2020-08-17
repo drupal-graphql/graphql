@@ -113,10 +113,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $root
-   * @param $variables
-   * @param $operation
-   * @param $resolver
+   * @param string $root
+   * @param string $variables
+   * @param object $operation
+   * @param object $resolver
    */
   public function __construct(
     CacheContextsManager $contextsManager,
@@ -153,10 +153,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $root
-   * @param $variables
-   * @param $operation
-   * @param $resolver
+   * @param string $root
+   * @param string $variables
+   * @param object $operation
+   * @param object $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
    */

@@ -123,8 +123,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
-   * @param $args
+   * @param int $value
+   * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -135,8 +135,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
-   * @param $args
+   * @param int $value
+   * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -149,7 +149,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
+   * @param int $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -160,7 +160,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
+   * @param int $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *

@@ -19,7 +19,7 @@ class Value implements ResolverInterface {
   /**
    * Value constructor.
    *
-   * @param $value
+   * @param int $value
    */
   public function __construct($value) {
     $this->value = $value;

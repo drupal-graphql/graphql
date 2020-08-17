@@ -53,7 +53,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @param \Drupal\graphql\Entity\ServerInterface $server
    * @param \GraphQL\Server\OperationParams $operation
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param $type
+   * @param string $type
    * @param array $config
    */
   public function __construct(
@@ -108,7 +108,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
-   * @param $language
+   * @param string $language
    *
    * @return string
    */
@@ -127,7 +127,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    *   The resolve info object.
    * @param string $name
    *   The name of the context.
-   * @param $value
+   * @param int $value
    *   The value of the context.
    *
    * @return $this

@@ -31,7 +31,7 @@ class ImageDerivative extends DataProducerPluginBase {
   /**
    * @param \Drupal\file\FileInterface $entity
    *
-   * @param $style
+   * @param string $style
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return mixed

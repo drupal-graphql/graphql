@@ -32,8 +32,8 @@ class EntityAccess extends DataProducerPluginBase {
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param $operation
-   * @param $user
+   * @param string $operation
+   * @param string $user
    *
    * @return bool|\Drupal\Core\Access\AccessResultInterface
    */

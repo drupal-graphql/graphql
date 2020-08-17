@@ -128,9 +128,9 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
-   * @param $type
+   * @param string $type
    * @param array $ids
-   * @param $language
+   * @param string $language
    * @param array|null $bundles
    * @param bool $access
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser

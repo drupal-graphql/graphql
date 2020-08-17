@@ -100,7 +100,7 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param array $mapping
    * @param array $config
    *
@@ -112,7 +112,7 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $mapping
    *
    * @return $this
@@ -135,8 +135,8 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Resolve field value.
    *
-   * @param $value
-   * @param $args
+   * @param int $value
+   * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
@@ -167,8 +167,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param $value
-   * @param $args
+   * @param int $value
+   * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
@@ -261,7 +261,7 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param $prefix
+   * @param string $prefix
    *
    * @return array|null
    */
@@ -279,8 +279,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param $prefix
-   * @param $value
+   * @param string $prefix
+   * @param int $value
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    */
   protected function cacheWrite($prefix, $value, FieldContext $field) {
