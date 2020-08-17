@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\FieldableEntityInterface;

@@ -57,7 +57,7 @@ class SeekTest extends GraphQLTestBase {
         [1, 2, 3],
         -1,
         NULL,
-      ]
+      ],
     ];
   }
 

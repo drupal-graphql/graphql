@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginFormInterface;
-use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -90,7 +89,7 @@ class PersistedQueriesForm extends EntityForm {
     $form['weights']['order']['#tabledrag'][] = [
       'action' => 'order',
       'relationship' => 'sibling',
-      'group' => 'persisted-query-plugin-weight'
+      'group' => 'persisted-query-plugin-weight',
     ];
     $plugins_weight = [];
     foreach ($all_plugins as $plugin_id => $plugin) {

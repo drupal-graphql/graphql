@@ -62,7 +62,7 @@ class FieldTest extends GraphQLTestBase {
     $this->node = Node::create([
       'title' => 'Dolor',
       'type' => 'test1',
-      'field_test1_to_test2' => $this->referenced_node->id()
+      'field_test1_to_test2' => $this->referenced_node->id(),
     ]);
     $this->node->save();
   }

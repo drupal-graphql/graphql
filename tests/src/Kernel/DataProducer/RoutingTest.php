@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Data producers Routing test class.

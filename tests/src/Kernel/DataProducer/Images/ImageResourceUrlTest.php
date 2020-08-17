@@ -31,12 +31,12 @@ class ImageResourceUrlTest extends GraphQLTestBase {
     return [
       [
         ['url' => 'http://localhost/test_image.jpg'],
-        'http://localhost/test_image.jpg'
+        'http://localhost/test_image.jpg',
       ],
       [
         [],
-        ''
-      ]
+        '',
+      ],
     ];
   }
 

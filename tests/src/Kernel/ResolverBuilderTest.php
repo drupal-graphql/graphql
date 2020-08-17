@@ -273,11 +273,13 @@ GQL;
     $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
     $this->mockResolver('Tree', 'name', $this->builder->cond([
       [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
-      [function () {
-        return new Deferred(function () {
-          return TRUE;
-        });
-      }, $this->builder->fromValue('But this should.')
+      [
+        function () {
+          return new Deferred(function () {
+            return TRUE;
+          });
+        },
+        $this->builder->fromValue('But this should.'),
       ],
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
@@ -343,7 +345,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 
@@ -382,7 +384,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 
@@ -430,7 +432,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 

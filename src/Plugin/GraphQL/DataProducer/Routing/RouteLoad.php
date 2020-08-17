@@ -3,7 +3,6 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;

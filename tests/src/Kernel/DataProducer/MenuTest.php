@@ -3,12 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\system\Entity\Menu;
-use Drupal\Tests\Core\Menu\MenuLinkMock;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuLinkTreeElement;
@@ -54,10 +49,10 @@ class MenuTest extends GraphQLTestBase {
         'options' => [
           'attributes' => [
             'target' => '_blank',
-          ]
+          ],
         ],
       ],
-      'description' => 'Test description'
+      'description' => 'Test description',
     ];
     $link = MenuLinkContent::create($parent);
     $link->save();

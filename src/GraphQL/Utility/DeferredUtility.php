@@ -12,7 +12,7 @@ class DeferredUtility {
    *
    * @var \GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter
    */
-  static $promiseAdapter;
+  public static $promiseAdapter;
 
   /**
    * Return the singleton promise adapter.
