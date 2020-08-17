@@ -100,7 +100,7 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
-   * @param int $id
+   * @param string $id
    * @param array $mapping
    * @param array $config
    *
@@ -135,7 +135,7 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Resolve field value.
    *
-   * @param int $value
+   * @param mixed $value
    * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info

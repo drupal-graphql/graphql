@@ -110,7 +110,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   /**
    * @param string $language
    *
-   * @return string
+   * @return $this
    */
   public function setContextLanguage($language) {
     $this->language = $language;
@@ -127,7 +127,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    *   The resolve info object.
    * @param string $name
    *   The name of the context.
-   * @param int $value
+   * @param mixed $value
    *   The value of the context.
    *
    * @return $this

@@ -10,7 +10,7 @@ use Prophecy\Argument;
 trait DataProducerExecutionTrait {
 
   /**
-   * @param int $id
+   * @param string $id
    * @param array $contexts
    *
    * @return mixed

@@ -33,11 +33,11 @@ class EntityAccess extends DataProducerPluginBase {
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string $operation
-   * @param string $user
+   * @param \Drupal\Core\Session\AccountInterface $user
    *
    * @return bool|\Drupal\Core\Access\AccessResultInterface
    */
-  public function resolve(EntityInterface $entity, $operation = NULL, $user = NULL) {
+  public function resolve(EntityInterface $entity, $operation = NULL, AccountInterface $user = NULL) {
     return $entity->access($operation ?? 'view', $user);
   }
 

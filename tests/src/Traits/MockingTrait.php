@@ -157,7 +157,7 @@ trait MockingTrait {
   /**
    * Mock schema plugin manager.
    *
-   * @param int $id
+   * @param string $id
    */
   protected function mockSchemaPluginManager($id) {
     $this->schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)

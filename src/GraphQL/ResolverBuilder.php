@@ -24,7 +24,7 @@ class ResolverBuilder {
   use DataFetcherTrait;
 
   /**
-   * @param int $id
+   * @param string $id
    * @param array $config
    *
    * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
@@ -136,8 +136,8 @@ class ResolverBuilder {
   }
 
   /**
-   * @param int $value
-   * @param object $default
+   * @param mixed $value
+   * @param mixed $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\DefaultValue
    */

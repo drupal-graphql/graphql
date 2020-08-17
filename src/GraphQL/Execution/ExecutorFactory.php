@@ -27,10 +27,10 @@ class ExecutorFactory {
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param string $root
+   * @param mixed $root
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param string $variables
-   * @param object $operation
+   * @param array $variables
+   * @param string $operation
    * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
@@ -41,7 +41,7 @@ class ExecutorFactory {
     DocumentNode $document,
     $root,
     ResolveContext $context,
-    $variables,
+    array $variables,
     $operation,
     callable $resolver
   ) {

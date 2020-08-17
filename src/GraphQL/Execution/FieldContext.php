@@ -63,7 +63,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    *
    * @param string $name
    *   The name of the context.
-   * @param int $value
+   * @param mixed $value
    *   The value of the context.
    *
    * @return $this

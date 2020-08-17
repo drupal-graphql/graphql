@@ -77,7 +77,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
   }
 
   /**
-   * @param int $id
+   * @param string $id
    * @param array $mapping
    * @param array $config
    *

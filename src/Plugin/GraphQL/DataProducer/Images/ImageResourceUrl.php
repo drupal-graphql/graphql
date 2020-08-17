@@ -22,11 +22,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class ImageResourceUrl extends DataProducerPluginBase {
 
   /**
-   * @param object $derivative
+   * @param array $derivative
    *
    * @return mixed
    */
-  public function resolve($derivative) {
+  public function resolve(array $derivative) {
     return $derivative['url'] ?? '';
   }
 

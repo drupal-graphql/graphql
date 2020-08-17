@@ -113,10 +113,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param string $root
-   * @param string $variables
-   * @param object $operation
-   * @param object $resolver
+   * @param mixed $root
+   * @param array $variables
+   * @param string $operation
+   * @param callable $resolver
    */
   public function __construct(
     CacheContextsManager $contextsManager,
@@ -128,9 +128,9 @@ class Executor implements ExecutorImplementation {
     DocumentNode $document,
     ResolveContext $context,
     $root,
-    $variables,
+    array $variables,
     $operation,
-    $resolver
+    callable $resolver
   ) {
     $this->contextsManager = $contextsManager;
     $this->cacheBackend = $cacheBackend;
@@ -153,10 +153,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param string $root
-   * @param string $variables
-   * @param object $operation
-   * @param object $resolver
+   * @param mixed $root
+   * @param array $variables
+   * @param string $operation
+   * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
    */
@@ -167,9 +167,9 @@ class Executor implements ExecutorImplementation {
     DocumentNode $document,
     ResolveContext $context,
     $root,
-    $variables,
+    array $variables,
     $operation,
-    $resolver
+    callable $resolver
   ) {
     return new static(
       $container->get('cache_contexts_manager'),
