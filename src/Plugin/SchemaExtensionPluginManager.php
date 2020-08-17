@@ -7,7 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Class SchemaExtensionPluginManager
+ * Class SchemaExtensionPluginManager.
  *
  * @package Drupal\graphql\Plugin
  *

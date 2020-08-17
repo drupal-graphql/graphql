@@ -179,7 +179,7 @@ class DataProducerProxy implements ResolverInterface {
    * @throws \Exception
    */
   protected function prepare($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
-    /** @var DataProducerPluginInterface $plugin */
+    /** @var \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($this->id, $this->config);
     $contexts = $plugin->getContextDefinitions();
 

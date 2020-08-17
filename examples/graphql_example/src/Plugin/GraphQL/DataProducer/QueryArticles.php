@@ -62,7 +62,6 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
    *
    * @codeCoverageIgnore

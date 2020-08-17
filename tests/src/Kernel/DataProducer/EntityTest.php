@@ -21,7 +21,7 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 class EntityTest extends GraphQLTestBase {
 
   /**
-   * @var NodeInterface
+   * @var \Drupal\node\NodeInterface
    */
   protected $node;
 
