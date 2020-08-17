@@ -95,12 +95,12 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    * @param string|null $mode
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return string
    */
-  public function resolve(EntityInterface $entity, RefinableCacheableDependencyInterface $metadata, $mode = NULL) {
+  public function resolve(EntityInterface $entity, $mode, RefinableCacheableDependencyInterface $metadata) {
     $mode = $mode ?? 'full';
     $builder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
     $view = $builder->view($entity, $mode, $entity->language()->getId());
