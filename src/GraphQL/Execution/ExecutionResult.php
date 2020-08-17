@@ -2,11 +2,11 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use GraphQL\Executor\ExecutionResult as LibraryExecutionResult;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 
-//@codingStandardsIgnoreStart
-class ExecutionResult extends GraphQL\Executor\ExecutionResult implements CacheableDependencyInterface {
+class ExecutionResult extends LibraryExecutionResult implements CacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
-//@codingStandardsIgnoreEnd
+
 }
