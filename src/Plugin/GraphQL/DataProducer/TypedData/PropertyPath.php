@@ -40,12 +40,12 @@ class PropertyPath extends DataProducerPluginBase {
   /**
    * @param string $path
    * @param mixed $value
-   * @param string|null $type
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   * @param string|null $type
    *
    * @return mixed
    */
-  public function resolve($path, $value, $type = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($path, $value, RefinableCacheableDependencyInterface $metadata, $type = NULL) {
     if (!($value instanceof TypedDataInterface) && !empty($type)) {
       $manager = $this->getTypedDataManager();
       $definition = $manager->createDataDefinition($type);

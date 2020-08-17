@@ -95,19 +95,19 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param string|null $mode
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   * @param string|null $mode
    *
    * @return string
    */
-  public function resolve(EntityInterface $entity, $mode = NULL, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(EntityInterface $entity, RefinableCacheableDependencyInterface $metadata, $mode = NULL) {
     $mode = $mode ?? 'full';
     $builder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
     $view = $builder->view($entity, $mode, $entity->language()->getId());
 
     $context = new RenderContext();
     /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
-    $result = $this->renderer->executeInRenderContext($context, function() use ($view) {
+    $result = $this->renderer->executeInRenderContext($context, function () use ($view) {
       return $this->renderer->render($view);
     });
 

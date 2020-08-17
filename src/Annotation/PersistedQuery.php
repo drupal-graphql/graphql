@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Annotation;
 
-
 use Doctrine\Common\Annotations\AnnotationException;
 use Drupal\Component\Annotation\Plugin;
 
