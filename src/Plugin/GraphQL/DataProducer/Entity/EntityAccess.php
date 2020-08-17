@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
@@ -37,7 +38,7 @@ class EntityAccess extends DataProducerPluginBase {
    *
    * @return bool|\Drupal\Core\Access\AccessResultInterface
    */
-  public function resolve(EntityInterface $entity, $operation = NULL, \Drupal\Core\Session\AccountInterface $user = NULL) {
+  public function resolve(EntityInterface $entity, $operation = NULL, AccountInterface $user = NULL) {
     return $entity->access($operation ?? 'view', $user);
   }
 
