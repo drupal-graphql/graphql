@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 
 /**
- * Class ServerListBuilder
+ * Class ServerListBuilder.
  *
  * @package Drupal\graphql\Controller
  *

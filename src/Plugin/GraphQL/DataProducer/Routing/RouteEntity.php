@@ -14,7 +14,6 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 /**
  * @DataProducer(
  *   id = "route_entity",
@@ -98,7 +97,7 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function resolve($url, $language = NULL, FieldContext $context) {
+  public function resolve($url, $language, FieldContext $context) {
     if ($url instanceof Url) {
       list(, $type) = explode('.', $url->getRouteName());
       $parameters = $url->getRouteParameters();

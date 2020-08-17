@@ -23,7 +23,7 @@ interface ServerInterface extends ConfigEntityInterface {
   public function executeBatch(array $operations);
 
   /**
-   * Retrieves the server configuration
+   * Retrieves the server configuration.
    *
    * @return \GraphQL\Server\ServerConfig
    *   The server configuration.
@@ -33,7 +33,7 @@ interface ServerInterface extends ConfigEntityInterface {
   /**
    * Adds a Persisted Query plugin instance to the persisted queries set.
    *
-   * @param PersistedQueryPluginInterface $queryPlugin
+   * @param \Drupal\graphql\Plugin\PersistedQueryPluginInterface $queryPlugin
    */
   public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin);
 

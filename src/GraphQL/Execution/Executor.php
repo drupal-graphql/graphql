@@ -251,7 +251,7 @@ class Executor implements ExecutorImplementation {
     $event = new OperationEvent($this->context);
     $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
 
-    return $executor->doExecute()->then(function ($result)  {
+    return $executor->doExecute()->then(function ($result) {
       $event = new OperationEvent($this->context, $result);
       $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
 

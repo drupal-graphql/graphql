@@ -43,7 +43,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param ResolverInterface $callback
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
    */
@@ -52,7 +52,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param ResolverInterface $callback
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Map
    */

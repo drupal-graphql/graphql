@@ -16,7 +16,6 @@ class Introspection {
    *
    * @return array
    *   The introspection result as an array.
-   *
    */
   public function introspect(ServerInterface $server) {
     $operation = new OperationParams();
