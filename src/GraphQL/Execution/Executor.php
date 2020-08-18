@@ -154,7 +154,7 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param mixed $root
-   * @param array $variables
+   * @param array|null $variables
    * @param string $operation
    * @param callable $resolver
    *
