@@ -29,9 +29,7 @@ class ExecutorFactory {
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param mixed $root
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @codingStandardsIgnoreStart
-   * @param $variables
-   * @codingStandardsIgnoreEnd
+   * @param mixed $variables
    * @param string $operation
    * @param callable $resolver
    *
