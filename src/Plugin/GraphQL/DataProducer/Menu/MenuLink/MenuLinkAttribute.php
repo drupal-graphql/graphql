@@ -30,7 +30,7 @@ class MenuLinkAttribute extends DataProducerPluginBase {
 
   /**
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   * @param $attribute
+   * @param string $attribute
    *
    * @return mixed
    */

@@ -77,8 +77,8 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
   /**
-   * @param $offset
-   * @param $limit
+   * @param int $offset
+   * @param int $limit
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\graphql_examples\Wrappers\QueryConnection

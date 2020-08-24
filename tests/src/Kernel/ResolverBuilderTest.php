@@ -55,8 +55,8 @@ GQL;
    *
    * @dataProvider testBuilderProducingProvider
    *
-   * @param $input
-   * @param $expected
+   * @param string $input
+   * @param string $expected
    */
   public function testBuilderProducing($input, $expected) {
     $plugin = $this->builder->produce($input, []);

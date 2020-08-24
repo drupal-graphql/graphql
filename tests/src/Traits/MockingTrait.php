@@ -94,8 +94,8 @@ trait MockingTrait {
   /**
    * Create test server.
    *
-   * @param $schema
-   * @param $endpoint
+   * @param string $schema
+   * @param string $endpoint
    * @param array $values
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
@@ -157,7 +157,7 @@ trait MockingTrait {
   /**
    * Mock schema plugin manager.
    *
-   * @param $id
+   * @param string $id
    */
   protected function mockSchemaPluginManager($id) {
     $this->schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)

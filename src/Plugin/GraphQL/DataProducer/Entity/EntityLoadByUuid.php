@@ -128,8 +128,8 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
   }
 
   /**
-   * @param $type
-   * @param $uuid
+   * @param string $type
+   * @param string $uuid
    * @param array|string $language
    * @param array|string $bundles
    * @param bool|null $access
