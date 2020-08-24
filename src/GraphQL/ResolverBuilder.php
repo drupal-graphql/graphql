@@ -101,7 +101,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param int $value
+   * @param mixed $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Value
    */

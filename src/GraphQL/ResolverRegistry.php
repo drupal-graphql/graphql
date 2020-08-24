@@ -160,7 +160,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param int $value
+   * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
