@@ -138,9 +138,6 @@ abstract class BufferBase {
    *
    * @param array $buffer
    *   The buffer as an array.
-   *
-   * @return array
-   *   The resolved results, keyed by their corresponding buffer item array key.
    */
   protected function resolveBufferArray(array $buffer) {
     throw new \LogicException('Method not implemented.');

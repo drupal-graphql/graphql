@@ -128,9 +128,9 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   }
 
   /**
-   * @param $type
-   * @param $id
-   * @param $language
+   * @param string $type
+   * @param string $id
+   * @param string $language
    * @param array|null $bundles
    * @param bool|null $access
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
