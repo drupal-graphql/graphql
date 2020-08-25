@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\graphql_persisted_queries_test\Plugin\GraphQL\PersistedQuery;
 
 use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
@@ -18,7 +17,6 @@ use GraphQL\Server\OperationParams;
  */
 class PersistedQueryPluginOne extends PersistedQueryPluginBase {
 
-
   /**
    * {@inheritdoc}
    */
@@ -27,9 +25,13 @@ class PersistedQueryPluginOne extends PersistedQueryPluginBase {
     return $queryMap[$id] ?? NULL;
   }
 
+  /**
+   * Map between persisted query IDs and corresponding GraphQL queries.
+   */
   protected function queryMap() {
-    return[
+    return [
       'query_1' => 'query { field_one }',
     ];
   }
+
 }

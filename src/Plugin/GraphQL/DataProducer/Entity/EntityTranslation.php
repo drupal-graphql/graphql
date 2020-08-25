@@ -89,10 +89,10 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param $language
-   * @param bool $access
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param string $language
+   * @param bool|null $access
+   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    *
    * @return |null
    */

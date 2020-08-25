@@ -55,8 +55,8 @@ GQL;
    *
    * @dataProvider testBuilderProducingProvider
    *
-   * @param $input
-   * @param $expected
+   * @param string $input
+   * @param string $expected
    */
   public function testBuilderProducing($input, $expected) {
     $plugin = $this->builder->produce($input, []);
@@ -93,7 +93,7 @@ GQL;
    * @covers ::fromParent
    */
   public function testFromParent() {
-    $this->mockResolver('Query', 'tree',$this->builder->fromValue('Some string value'));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue('Some string value'));
     $this->mockResolver('Tree', 'name', $this->builder->fromParent());
 
     $query = <<<GQL
@@ -273,7 +273,14 @@ GQL;
     $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
     $this->mockResolver('Tree', 'name', $this->builder->cond([
       [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
-      [function () { return new Deferred(function () { return TRUE; }); }, $this->builder->fromValue('But this should.')],
+      [
+        function () {
+          return new Deferred(function () {
+            return TRUE;
+          });
+        },
+        $this->builder->fromValue('But this should.'),
+      ],
       [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
     ]));
 
@@ -338,10 +345,13 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 
+  /**
+   * Tests the composite default value resolver.
+   */
   public function testCompositeDefaultValue() {
 
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
@@ -374,7 +384,7 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
 
@@ -384,13 +394,29 @@ GQL;
   public function testDeferredDefaultValue() {
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
     $this->mockResolver('Tree', 'name', $this->builder->defaultValue(
-      $this->builder->callback(function () { return new Deferred(function () { return NULL; }); }),
-      $this->builder->callback(function () { return new Deferred(function () { return 'bar'; }); })
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return NULL;
+        });
+      }),
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return 'bar';
+        });
+      })
     ));
 
     $this->mockResolver('Tree', 'uri', $this->builder->defaultValue(
-      $this->builder->callback(function () { return new Deferred(function () { return 'baz'; }); }),
-      $this->builder->callback(function () { return new Deferred(function () { return 'bar'; }); })
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return 'baz';
+        });
+      }),
+      $this->builder->callback(function () {
+        return new Deferred(function () {
+          return 'bar';
+        });
+      })
     ));
 
     $query = <<<GQL
@@ -406,8 +432,8 @@ GQL;
       'tree' => [
         'name' => 'bar',
         'uri' => 'baz',
-      ]
+      ],
     ]);
   }
-}
 
+}

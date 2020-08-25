@@ -47,7 +47,7 @@ class VoyagerController implements ContainerInjectionInterface {
    * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
    *   The server.
    *
-   * @return array The render array.
+   * @return array
    *   The render array.
    */
   public function viewVoyager(ServerInterface $graphql_server) {

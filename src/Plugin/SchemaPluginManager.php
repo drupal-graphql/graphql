@@ -7,7 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Class SchemaPluginManager
+ * Class SchemaPluginManager.
  *
  * @package Drupal\graphql\Plugin
  *
@@ -55,4 +55,5 @@ class SchemaPluginManager extends DefaultPluginManager {
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($cacheBackend, 'schemas', ['graphql']);
   }
+
 }

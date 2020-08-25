@@ -73,13 +73,13 @@ GQL;
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $extensions = $this->extensionManager->getDefinitions();
 
-    $form['extensions'] = array(
+    $form['extensions'] = [
       '#type' => 'checkboxes',
       '#required' => FALSE,
       '#title' => t('Enabled extensions'),
       '#options' => [],
       '#default_value' => $this->configuration['extensions'] ?? [],
-    );
+    ];
 
     foreach ($extensions as $key => $extension) {
       $form['extensions']['#options'][$key] = $extension['name'] ?? $extension['id'];

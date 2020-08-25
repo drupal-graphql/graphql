@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
@@ -15,6 +14,9 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  */
 class UserPermissionsContextTest extends GraphQLTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -38,4 +40,5 @@ GQL;
     $this->mockResolver('Query', 'root', 'test');
     $this->assertResults('{ root }', [], ['root' => 'test']);
   }
+
 }

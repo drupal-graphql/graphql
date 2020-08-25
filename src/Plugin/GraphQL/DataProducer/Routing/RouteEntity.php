@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
@@ -13,7 +12,6 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 
 /**
  * @DataProducer(
@@ -98,7 +96,7 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
   /**
    * {@inheritdoc}
    */
-  public function resolve($url, $language = NULL, FieldContext $context) {
+  public function resolve($url, $language, FieldContext $context) {
     if ($url instanceof Url) {
       list(, $type) = explode('.', $url->getRouteName());
       $parameters = $url->getRouteParameters();
@@ -132,4 +130,5 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
       });
     }
   }
+
 }

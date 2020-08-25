@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Primary module hooks for GraphQL module.
+ */
+
+/**
  * Implements hook_help().
  */
 function graphql_help($routeName) {

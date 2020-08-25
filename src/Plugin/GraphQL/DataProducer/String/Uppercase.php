@@ -22,7 +22,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class Uppercase extends DataProducerPluginBase {
 
   /**
-   * @param $string
+   * @param string $string
    *
    * @return mixed
    */

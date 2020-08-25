@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Data producers Routing test class.
@@ -46,7 +45,7 @@ class RoutingTest extends GraphQLTestBase {
       'path' => '/idontexist',
     ]);
 
-//    $this->assertContains('4xx-response', $metadata->getCacheTags());
+    // $this->assertContains('4xx-response', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 

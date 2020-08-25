@@ -6,7 +6,7 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\graphql\Entity\Server;
 
 /**
- * Class VoyagerMenuLinkDeriver
+ * Class VoyagerMenuLinkDeriver.
  *
  * @package Drupal\graphql\Plugin\MenuLink\Deriver
  *

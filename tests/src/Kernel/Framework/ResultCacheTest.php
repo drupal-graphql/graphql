@@ -240,7 +240,7 @@ GQL;
       )
     );
 
-    // Set the context value to 'a'/
+    // Set the context value to 'a'/.
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     // This will be stored in the cache key for context 'a'.
     $this->query('{ root }');
@@ -330,7 +330,7 @@ GQL;
         ];
 
         $renderContext = new RenderContext();
-        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
+        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el) {
           return $renderer->render($el)->__toString();
         });
 
@@ -352,7 +352,7 @@ GQL;
         ];
 
         $renderContext = new RenderContext();
-        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
+        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el) {
           return $renderer->render($el)->__toString();
         });
 

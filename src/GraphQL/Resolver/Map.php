@@ -18,9 +18,9 @@ class Map implements ResolverInterface {
   /**
    * Map constructor.
    *
-   * @param $resolver
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    */
-  public function __construct($resolver) {
+  public function __construct(ResolverInterface $resolver) {
     $this->resolver = $resolver;
   }
 

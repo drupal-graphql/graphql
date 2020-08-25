@@ -97,4 +97,5 @@ class ExampleSchema extends SdlSchemaPluginBase {
       })
     );
   }
+
 }

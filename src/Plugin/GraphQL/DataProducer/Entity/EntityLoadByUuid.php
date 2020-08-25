@@ -114,9 +114,9 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityUuidBuffer $entityBuffer
@@ -128,13 +128,13 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
   }
 
   /**
-   * @param $type
-   * @param $uuid
+   * @param string $type
+   * @param string $uuid
    * @param array|string $language
    * @param array|string $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
@@ -144,8 +144,9 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
-        // If there is no entity with this id, add the list cache tags so that the
-        // cache entry is purged whenever a new entity of this type is saved.
+        // If there is no entity with this id, add the list cache tags so that
+        // the cache entry is purged whenever a new entity of this type is
+        // saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
@@ -179,4 +180,5 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
       return $entity;
     });
   }
+
 }

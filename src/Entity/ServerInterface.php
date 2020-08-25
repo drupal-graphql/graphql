@@ -20,10 +20,10 @@ interface ServerInterface extends ConfigEntityInterface {
    *
    * @return \Drupal\graphql\GraphQL\Execution\ExecutionResult[]
    */
-  public function executeBatch($operations);
+  public function executeBatch(array $operations);
 
   /**
-   * Retrieves the server configuration
+   * Retrieves the server configuration.
    *
    * @return \GraphQL\Server\ServerConfig
    *   The server configuration.
@@ -33,7 +33,7 @@ interface ServerInterface extends ConfigEntityInterface {
   /**
    * Adds a Persisted Query plugin instance to the persisted queries set.
    *
-   * @param PersistedQueryPluginInterface $queryPlugin
+   * @param \Drupal\graphql\Plugin\PersistedQueryPluginInterface $queryPlugin
    */
   public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin);
 
@@ -41,7 +41,7 @@ interface ServerInterface extends ConfigEntityInterface {
    * Removes a Persisted Query plugin instance from the persisted queries set.
    *
    * @param string $queryPluginId
-   *  The plugin id to be removed.
+   *   The plugin id to be removed.
    */
   public function removePersistedQueryInstance($queryPluginId);
 
@@ -63,4 +63,5 @@ interface ServerInterface extends ConfigEntityInterface {
    * @return \Drupal\graphql\Plugin\PersistedQueryPluginInterface[]
    */
   public function getSortedPersistedQueryInstances();
+
 }

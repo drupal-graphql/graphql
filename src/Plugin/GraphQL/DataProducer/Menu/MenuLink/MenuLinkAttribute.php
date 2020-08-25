@@ -30,17 +30,19 @@ class MenuLinkAttribute extends DataProducerPluginBase {
 
   /**
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   * @param $attribute
+   * @param string $attribute
    *
    * @return mixed
    */
   public function resolve(MenuLinkInterface $link, $attribute) {
     $options = $link->getOptions();
-    // Certain attributes like class can be arrays. Check for that and implode them.
+    // Certain attributes like class can be arrays. Check for that and implode
+    // them.
     $attributeValue = NestedArray::getValue($options, ['attributes', $attribute]);
     if (is_array($attributeValue)) {
       return implode(" ", $attributeValue);
-    } else {
+    }
+    else {
       return $attributeValue;
     }
   }

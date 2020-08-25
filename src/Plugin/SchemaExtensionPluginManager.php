@@ -7,7 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Class SchemaExtensionPluginManager
+ * Class SchemaExtensionPluginManager.
  *
  * @package Drupal\graphql\Plugin
  *
@@ -82,4 +82,5 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
 
     return $this->extensions[$id];
   }
+
 }
