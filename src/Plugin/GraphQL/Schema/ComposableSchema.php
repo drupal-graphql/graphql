@@ -76,7 +76,7 @@ GQL;
     $form['extensions'] = [
       '#type' => 'checkboxes',
       '#required' => FALSE,
-      '#title' => t('Enabled extensions'),
+      '#title' => $this->t('Enabled extensions'),
       '#options' => [],
       '#default_value' => $this->configuration['extensions'] ?? [],
     ];
