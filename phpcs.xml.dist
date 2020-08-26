@@ -7,7 +7,7 @@
 
   <rule ref="Drupal"></rule>
   <rule ref="DrupalPractice">
-  <!-- Here Variables would have had to been removed-->
+  <!--DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable-->
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/DataProducerProxy.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php</exclude-pattern>
