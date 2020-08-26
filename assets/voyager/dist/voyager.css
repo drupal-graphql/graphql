@@ -1,7 +1,7 @@
 /*!
  * GraphQL Voyager - Represent any GraphQL API as an interactive graph
  * -------------------------------------------------------------
- *   Version: "1.0.0-rc.29"
+ *   Version: "1.0.0-rc.31"
  *   Repo: https://github.com/APIs-guru/graphql-voyager
  */
 @-webkit-keyframes voyager-shake {
@@ -355,8 +355,8 @@
   border-left: 3px solid transparent
 }
 
-.doc-category > .item > description-box {
-  .margin-top: 5px;
+.doc-category > .item > .description-box {
+  margin-top: 5px;
 }
 
 .doc-category > .title {

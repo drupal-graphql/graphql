@@ -25,7 +25,7 @@ class SourceContext implements ResolverInterface {
   /**
    * SourceContext constructor.
    *
-   * @param $name
+   * @param string $name
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $source
    */
   public function __construct($name, ResolverInterface $source = NULL) {

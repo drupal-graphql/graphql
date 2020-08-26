@@ -10,8 +10,8 @@ use GraphQL\Type\Definition\ResolveInfo;
 interface ResolverRegistryInterface {
 
   /**
-   * @param $value
-   * @param $args
+   * @param mixed $value
+   * @param mixed $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
@@ -21,7 +21,7 @@ interface ResolverRegistryInterface {
   public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field);
 
   /**
-   * @param $value
+   * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *

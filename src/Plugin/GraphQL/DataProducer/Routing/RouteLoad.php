@@ -88,7 +88,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   }
 
   /**
-   * @param $path
+   * @param string $path
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
