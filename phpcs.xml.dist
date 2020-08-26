@@ -305,4 +305,18 @@
     <exclude-pattern>tests/src/Kernel/GraphQLTestBase.php</exclude-pattern>
   </rule>
 
+  <exclude-pattern>graphql.info.yml</exclude-pattern>
+  <exclude-pattern>graphql.links.menu.yml</exclude-pattern>
+  <exclude-pattern>graphql.links.action.yml</exclude-pattern>
+  <exclude-pattern>graphql.services.yml</exclude-pattern>
+  <exclude-pattern>config/schema/graphql.schema.yml</exclude-pattern>
+  <exclude-pattern>graphql.permissions.yml</exclude-pattern>
+  <exclude-pattern>graphql.libraries.yml</exclude-pattern>
+  <exclude-pattern>examples/graphql_example/graphql_examples.info.yml</exclude-pattern>
+  <exclude-pattern>examples/graphql_composable/graphql_composable.info.yml</exclude-pattern>
+  <exclude-pattern>graphql.routing.yml</exclude-pattern>
+  <exclude-pattern>graphql.links.task.yml</exclude-pattern>
+  <exclude-pattern>tests/modules/graphql_persisted_queries_test/graphql_persisted_queries_test.info.yml</exclude-pattern>
+
+
 </ruleset>
