@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Extract arbitrary information from subrequests.
  */
-class SubrequestExtractionController extends ControllerBase {
+final class SubrequestExtractionController extends ControllerBase {
 
   /**
    * The symfony request stack.

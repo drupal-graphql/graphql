@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   }
  * )
  */
-class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+final class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
 

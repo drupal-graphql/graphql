@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   )
  * )
  */
-class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+final class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The current user.

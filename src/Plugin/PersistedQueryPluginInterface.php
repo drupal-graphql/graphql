@@ -12,7 +12,7 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    * @return string
    *   The actual GraphQL query.
    */
-  public function getQuery($id, OperationParams $operation);
+  public function getQuery($id, $operation);
 
   /**
    * Returns the label for use on the administration pages.

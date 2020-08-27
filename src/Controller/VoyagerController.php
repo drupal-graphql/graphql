@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @codeCoverageIgnore
  */
-class VoyagerController implements ContainerInjectionInterface {
+final class VoyagerController implements ContainerInjectionInterface {
   /**
    * The introspection service.
    *

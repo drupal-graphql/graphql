@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+final class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The path validator service.
@@ -80,7 +80,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
-    RedirectRepository $redirectRepository = NULL
+    $redirectRepository = NULL
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;

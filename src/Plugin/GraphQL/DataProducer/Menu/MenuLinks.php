@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+final class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**

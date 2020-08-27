@@ -33,7 +33,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class EntityRendered extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+final class EntityRendered extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**
@@ -121,7 +121,7 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  protected function shouldLookupEdgeCache(array $values, ResolveContext $context, ResolveInfo $info) {
+  protected function shouldLookupEdgeCache(array $values, ResolveContext $context, $info) {
     return TRUE;
   }
 

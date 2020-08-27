@@ -13,7 +13,7 @@ interface ServerInterface extends ConfigEntityInterface {
    *
    * @return \Drupal\graphql\GraphQL\Execution\ExecutionResult
    */
-  public function executeOperation(OperationParams $operation);
+  public function executeOperation($operation);
 
   /**
    * @param \GraphQL\Server\OperationParams[] $operations
