@@ -58,7 +58,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-final class EntityReference extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class EntityReference extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.

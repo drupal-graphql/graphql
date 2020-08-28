@@ -58,7 +58,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-final class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The default max depth to search in taxonomy tree if it is not set.

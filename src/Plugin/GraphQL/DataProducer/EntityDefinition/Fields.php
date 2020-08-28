@@ -39,7 +39,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   )
  * )
  */
-final class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.

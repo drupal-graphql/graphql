@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @codeCoverageIgnore
  */
-final class ServerForm extends EntityForm {
+class ServerForm extends EntityForm {
 
   /**
    * The request context.

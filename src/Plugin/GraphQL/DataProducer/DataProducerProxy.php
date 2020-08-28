@@ -144,7 +144,7 @@ class DataProducerProxy implements ResolverInterface {
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function resolve($value, $args, ResolveContext $context, $info, FieldContext $field) {
+  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
     return DeferredUtility::returnFinally($plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
@@ -177,7 +177,7 @@ class DataProducerProxy implements ResolverInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Exception
    */
-  protected function prepare($value, $args, ResolveContext $context, $info, FieldContext $field) {
+  protected function prepare($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($this->id, $this->config);
     $contexts = $plugin->getContextDefinitions();
@@ -197,7 +197,7 @@ class DataProducerProxy implements ResolverInterface {
     }
 
     $values = DeferredUtility::waitAll($values);
-    return DeferredUtility::returnFinally($values, function ($values) use ($plugin) {
+    return DeferredUtility::returnFinally($values, function ($values) use ($contexts, $plugin) {
       foreach ($values as $name => $value) {
         $plugin->setContextValue($name, $value);
       }
@@ -215,7 +215,7 @@ class DataProducerProxy implements ResolverInterface {
    */
   protected function resolveUncached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field) {
     $output = $plugin->resolveField($field);
-    return DeferredUtility::applyFinally($output, function () use ($plugin, $field) {
+    return DeferredUtility::applyFinally($output, function () use ($context, $plugin, $field) {
       $field->addCacheableDependency($plugin);
     });
   }
@@ -236,7 +236,7 @@ class DataProducerProxy implements ResolverInterface {
     }
 
     $output = $this->resolveUncached($plugin, $context, $field);
-    return DeferredUtility::applyFinally($output, function ($value) use ($field, $prefix) {
+    return DeferredUtility::applyFinally($output, function ($value) use ($context, $field, $prefix) {
       $this->cacheWrite($prefix, $value, $field);
     });
   }

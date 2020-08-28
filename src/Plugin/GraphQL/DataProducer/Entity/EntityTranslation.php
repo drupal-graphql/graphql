@@ -44,7 +44,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-final class EntityTranslation extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class EntityTranslation extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
   /**

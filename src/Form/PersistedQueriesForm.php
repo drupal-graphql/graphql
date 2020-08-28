@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-final class PersistedQueriesForm extends EntityForm {
+class PersistedQueriesForm extends EntityForm {
 
   /**
    * @var \Drupal\graphql\Plugin\PersistedQueryPluginManager

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @codeCoverageIgnore
  */
-final class ExplorerController implements ContainerInjectionInterface {
+class ExplorerController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**

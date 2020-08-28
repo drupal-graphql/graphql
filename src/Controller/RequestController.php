@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-final class RequestController implements ContainerInjectionInterface {
+class RequestController implements ContainerInjectionInterface {
 
   /**
    * The service configuration parameters.
@@ -61,12 +61,12 @@ final class RequestController implements ContainerInjectionInterface {
 
   /**
    * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \GraphQL\Server\OperationParams $operations
+   * @param \GraphQL\Server\OperationParams $operation
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Exception
    */
-  protected function handleSingle(ServerInterface $server, $operation) {
+  protected function handleSingle(ServerInterface $server, OperationParams $operation) {
     $result = $server->executeOperation($operation);
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);

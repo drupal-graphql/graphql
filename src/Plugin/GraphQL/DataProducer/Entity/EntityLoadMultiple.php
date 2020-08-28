@@ -56,7 +56,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-final class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.
@@ -142,7 +142,7 @@ final class EntityLoadMultiple extends DataProducerPluginBase implements Contain
   public function resolve($type, array $ids, $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
-    return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
+    return new Deferred(function () use ($type, $ids, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       if (!$entities = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that
@@ -163,7 +163,7 @@ final class EntityLoadMultiple extends DataProducerPluginBase implements Contain
           continue;
         }
 
-        if ($language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
+        if (isset($language) && $language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
           $entities[$id] = $entities[$id]->getTranslation($language);
           $entities[$id]->addCacheContexts(["static:language:{$language}"]);
         }
