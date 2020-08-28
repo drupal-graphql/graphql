@@ -11,7 +11,6 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
-use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

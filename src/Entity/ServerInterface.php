@@ -4,7 +4,6 @@ namespace Drupal\graphql\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
-use GraphQL\Server\OperationParams;
 
 interface ServerInterface extends ConfigEntityInterface {
 

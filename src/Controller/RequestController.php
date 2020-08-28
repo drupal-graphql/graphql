@@ -5,7 +5,6 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\Entity\ServerInterface;
-use GraphQL\Server\OperationParams;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final class RequestController implements ContainerInjectionInterface {
