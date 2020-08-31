@@ -94,6 +94,11 @@ install:
   - travis_retry composer global require drupal/coder
   - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
 
+  # Install Phpstan to check for Drupal standards
+  - composer global require mglaman/phpstan-drupal ^0.12.3
+  - composer global require phpstan/phpstan-deprecation-rules ^0.12.2
+  - composer global require phpunit/phpunit
+
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
@@ -107,6 +112,9 @@ script:
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
       then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml $TRAVIS_BUILD_DIR;
     fi
+  
+  # Run Phpstan
+  - cd $DRUPAL_BUILD_DIR && ../vendor/bin/phpstan analyse -c /modules/graphql/phpstan.neon
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
