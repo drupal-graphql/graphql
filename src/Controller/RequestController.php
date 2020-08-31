@@ -6,7 +6,6 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\graphql\Controller\OperationParams;
 
 class RequestController implements ContainerInjectionInterface {
 
@@ -43,7 +42,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
    *   The server instance.
-   * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
+   * @param \Drupal\graphql\Controller\OperationParams|\Drupal\graphql\Controller\OperationParams[] $operations
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
@@ -76,7 +75,7 @@ class RequestController implements ContainerInjectionInterface {
 
   /**
    * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \GraphQL\Server\OperationParams[] $operations
+   * @param \Drupal\graphql\Controller\OperationParams[] $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Exception
