@@ -95,9 +95,7 @@ install:
   - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
 
   # Install Phpstan to check for Drupal standards
-  - composer global require mglaman/phpstan-drupal ^0.12.3
-  - composer global require phpstan/phpstan-deprecation-rules ^0.12.2
-  - composer global require phpunit/phpunit
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.

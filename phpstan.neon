@@ -1,12 +1,12 @@
 includes:
-	- ../../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
-	- ../../../vendor/mglaman/phpstan-drupal/extension.neon
+	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+	- ../../vendor/mglaman/phpstan-drupal/extension.neon
 
 parameters:
 	level: 1
 	customRulesetUsed: true
 	paths:
-		- ../../../web/modules/graphql
+		- ../graphql
 	ignoreErrors:
 		# @todo Ignore phpstan-drupal extension's rules for now, activate later.
 		- '#\Drupal calls should be avoided in classes, use dependency injection instead#'
@@ -14,3 +14,11 @@ parameters:
     	# Solarium, so we cannot fix this error.
 		# new static() is a best practice in Drupal, so we cannot fix that.
 		- "#^Unsafe usage of new static\\(\\)\\.$#"
+		# Drupal allows object property access to custom fields, so we cannot fix
+		# that.
+		- "#^Access to an undefined property Drupal\\\\#"
+		- "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
+		# Drupal coding standards want "object" instead of "stdClass" in doc
+		# comments.
+		- "#^PHPDoc tag .+ with type object is not subtype of native type stdClass\\.$#"
+		# Not sure if we should use Smfony 4 event dispatching or not?
