@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * @Schema(

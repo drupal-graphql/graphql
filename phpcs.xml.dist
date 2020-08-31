@@ -16,6 +16,7 @@
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php</exclude-pattern>
     <exclude-pattern>tests/src/Kernel/DataProducer/MenuTest.php</exclude-pattern>
   </rule>
+  
   <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedVariable">
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
     <exclude-pattern>tests/src/Kernel/DataProducer/MenuTest.php</exclude-pattern>
