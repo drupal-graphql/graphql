@@ -34,7 +34,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public function __construct(array $parameters) {
+  public final function __construct(array $parameters) {
     $this->parameters = $parameters;
   }
 

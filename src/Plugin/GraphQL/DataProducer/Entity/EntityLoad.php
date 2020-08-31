@@ -113,7 +113,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @codeCoverageIgnore
    */
-  public function __construct(
+  public final function __construct(
     array $configuration,
     $pluginId,
     array $pluginDefinition,
@@ -142,7 +142,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   public function resolve($type, $id, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
+    return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
         // If there is no entity with this id, add the list cache tags so that
         // the cache entry is purged whenever a new entity of this type is
@@ -161,7 +161,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       }
 
       // Get the correct translation.
-      if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+      if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
         $entity = $entity->getTranslation($language);
         $entity->addCacheContexts(["static:language:{$language}"]);
       }

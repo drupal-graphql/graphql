@@ -1,0 +1,15 @@
+includes:
+  - rules.neon
+  - ../../mglaman/phpstan-drupal/extension.neon
+
+parameters:
+	level: 1
+	paths:
+		- ../../../graphql
+	excludes_analyse:
+		- ../../../graphql/src/Entity/Server.php #Class GraphQL\Executor\ExecutionResult not found.
+		- ../../../graphql/src/Entity/ServerInterface.php #Class GraphQL\Executor\ExecutionResult not found.
+		- ../../../graphql/src/Plugin/DataProducerPluginManager.php #graphql cache tag might be unclear and does not contain the cache key in it.
+		- ../../../graphql/examples/graphql_example/src/Wrappers/QueryConnection.php #Instantiated class GraphQL\Deferred not found.
+		- ../../../graphql/src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php #Instantiated class GraphQL\Deferred not found.
+		- ../../../graphql/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php #Instantiated class GraphQL\Deferred not found.

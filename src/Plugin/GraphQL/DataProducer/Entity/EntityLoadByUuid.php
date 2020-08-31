@@ -113,7 +113,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    *
    * @codeCoverageIgnore
    */
-  public function __construct(
+  public final function __construct(
     array $configuration,
     $pluginId,
     array $pluginDefinition,
@@ -155,13 +155,13 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
       }
 
       $context->addCacheableDependency($entity);
-      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
+      if (!in_array($entity->bundle(), $bundles)) {
         // If the entity is not among the allowed bundles, don't return it.
         return NULL;
       }
 
       // Get the correct translation.
-      if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+      if ($language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
         $entity = $entity->getTranslation($language);
         $entity->addCacheContexts(["static:language:{$language}"]);
       }
