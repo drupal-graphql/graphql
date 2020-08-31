@@ -5,6 +5,7 @@ namespace Drupal\graphql\Controller;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\Entity\ServerInterface;
+use GraphQL\Server\OperationParams;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RequestController implements ContainerInjectionInterface {
@@ -42,7 +43,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
    *   The server instance.
-   * @param \Drupal\graphql\Controller\OperationParams|\Drupal\graphql\Controller\OperationParams[] $operations
+   * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
@@ -50,18 +51,18 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @throws \Exception
    */
-  public function handleRequest(ServerInterface $graphql_server, OperationParams $operations) {
+  public function handleRequest(ServerInterface $graphql_server, $operations) {
     if (is_array($operations)) {
       return $this->handleBatch($graphql_server, $operations);
     }
 
-    /** @var \Drupal\graphql\Controller\OperationParams $operations */
+    /** @var \GraphQL\Server\OperationParams $operations */
     return $this->handleSingle($graphql_server, $operations);
   }
 
   /**
    * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \Drupal\graphql\Controller\OperationParams $operation
+   * @param \GraphQL\Server\OperationParams $operation
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Exception
@@ -75,7 +76,7 @@ class RequestController implements ContainerInjectionInterface {
 
   /**
    * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \Drupal\graphql\Controller\OperationParams[] $operations
+   * @param \GraphQL\Server\OperationParams[] $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Exception
