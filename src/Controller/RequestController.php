@@ -50,7 +50,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @throws \Exception
    */
-  public function handleRequest(ServerInterface $graphql_server, $operations) {
+  public function handleRequest(ServerInterface $graphql_server, OperationParams $operations) {
     if (is_array($operations)) {
       return $this->handleBatch($graphql_server, $operations);
     }
