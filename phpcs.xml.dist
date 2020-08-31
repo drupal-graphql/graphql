@@ -7,7 +7,7 @@
 
   <rule ref="Drupal"></rule>
   <rule ref="DrupalPractice">
-  <!--DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable-->
+  <!-- DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable-->
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/DataProducerProxy.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php</exclude-pattern>
