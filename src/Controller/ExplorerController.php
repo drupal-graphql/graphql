@@ -65,7 +65,7 @@ class ExplorerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public final function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaPluginManager $pluginManager) {
+  final public function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaPluginManager $pluginManager) {
     $this->urlGenerator = $urlGenerator;
     $this->introspection = $introspection;
     $this->pluginManager = $pluginManager;

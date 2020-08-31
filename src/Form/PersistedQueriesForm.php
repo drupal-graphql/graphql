@@ -22,7 +22,7 @@ class PersistedQueriesForm extends EntityForm {
    *
    * @param \Drupal\graphql\Plugin\PersistedQueryPluginManager $persistedQueryPluginManager
    */
-  public final function __construct(PersistedQueryPluginManager $persistedQueryPluginManager) {
+  final public function __construct(PersistedQueryPluginManager $persistedQueryPluginManager) {
     $this->persistedQueryPluginManager = $persistedQueryPluginManager;
   }
 
