@@ -102,10 +102,10 @@ class ServerForm extends EntityForm {
     }
 
     $form['label'] = [
-      '#title' => t('Label'),
+      '#title' => $this->t('Label'),
       '#type' => 'textfield',
       '#default_value' => $server->label(),
-      '#description' => t('The human-readable name of this server.'),
+      '#description' => $this->t('The human-readable name of this server.'),
       '#required' => TRUE,
       '#size' => 30,
     ];
@@ -118,15 +118,15 @@ class ServerForm extends EntityForm {
         'exists' => ['Drupal\graphql\Entity\Server', 'load'],
         'source' => ['label'],
       ],
-      '#description' => t('A unique machine-readable name for this server. It must only contain lowercase letters, numbers, and underscores.'),
+      '#description' => $this->t('A unique machine-readable name for this server. It must only contain lowercase letters, numbers, and underscores.'),
     ];
 
     $form['schema'] = [
-      '#title' => t('Schema'),
+      '#title' => $this->t('Schema'),
       '#type' => 'select',
       '#options' => $schemas,
       '#default_value' => $schema,
-      '#description' => t('The schema to use with this server.'),
+      '#description' => $this->t('The schema to use with this server.'),
       '#ajax' => [
         'callback' => '::ajaxSchemaConfigurationForm',
         'progress' => [
@@ -158,34 +158,34 @@ class ServerForm extends EntityForm {
     }
 
     $form['endpoint'] = [
-      '#title' => t('Endpoint'),
+      '#title' => $this->t('Endpoint'),
       '#type' => 'textfield',
       '#default_value' => $server->get('endpoint'),
-      '#description' => t('The endpoint for http queries. Has to start with a forward slash. For example "/graphql".'),
+      '#description' => $this->t('The endpoint for http queries. Has to start with a forward slash. For example "/graphql".'),
       '#required' => TRUE,
       '#size' => 30,
       '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),
     ];
 
     $form['batching'] = [
-      '#title' => t('Allow query batching'),
+      '#title' => $this->t('Allow query batching'),
       '#type' => 'checkbox',
       '#default_value' => !!$server->get('batching'),
-      '#description' => t('Whether batched queries are allowed.'),
+      '#description' => $this->t('Whether batched queries are allowed.'),
     ];
 
     $form['caching'] = [
-      '#title' => t('Enable caching'),
+      '#title' => $this->t('Enable caching'),
       '#type' => 'checkbox',
       '#default_value' => !!$server->get('caching'),
-      '#description' => t('Whether caching of queries and partial results is enabled.'),
+      '#description' => $this->t('Whether caching of queries and partial results is enabled.'),
     ];
 
     $form['debug'] = [
-      '#title' => t('Enable debugging'),
+      '#title' => $this->t('Enable debugging'),
       '#type' => 'checkbox',
       '#default_value' => !!$server->get('debug'),
-      '#description' => t('In debugging mode, error messages contain more verbose information in the query response.'),
+      '#description' => $this->t('In debugging mode, error messages contain more verbose information in the query response.'),
     ];
 
     $form['actions'] = [
