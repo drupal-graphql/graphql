@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\graphql\Controller\OperationParams;
 
 class RequestController implements ContainerInjectionInterface {
 
@@ -55,13 +56,13 @@ class RequestController implements ContainerInjectionInterface {
       return $this->handleBatch($graphql_server, $operations);
     }
 
-    /** @var \GraphQL\Server\OperationParams $operations */
+    /** @var \Drupal\graphql\Controller\OperationParams $operations */
     return $this->handleSingle($graphql_server, $operations);
   }
 
   /**
    * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \GraphQL\Server\OperationParams $operation
+   * @param \Drupal\graphql\Controller\OperationParams $operation
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
    * @throws \Exception
