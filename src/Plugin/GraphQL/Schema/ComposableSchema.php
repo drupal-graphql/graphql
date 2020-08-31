@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  * )
  */
 class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterface, PluginFormInterface {
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}

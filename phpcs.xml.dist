@@ -8,6 +8,7 @@
   <rule ref="Drupal"></rule>
   <rule ref="DrupalPractice"></rule>
 
+  <!-- TODO: check if we can fix those reported errors in code-->
   <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable">
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/DataProducerProxy.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
@@ -16,7 +17,7 @@
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php</exclude-pattern>
     <exclude-pattern>tests/src/Kernel/DataProducer/MenuTest.php</exclude-pattern>
   </rule>
-  
+
   <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedVariable">
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
     <exclude-pattern>tests/src/Kernel/DataProducer/MenuTest.php</exclude-pattern>
