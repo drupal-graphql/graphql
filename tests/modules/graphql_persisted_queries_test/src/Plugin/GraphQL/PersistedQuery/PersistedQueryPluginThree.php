@@ -3,7 +3,7 @@
 namespace Drupal\graphql_persisted_queries_test\Plugin\GraphQL\PersistedQuery;
 
 use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
-use GraphQL\Server\OperationParams;
+use Drupal\graphql\Plugin\OperationParams;
 
 /**
  * @PersistedQuery(
