@@ -131,7 +131,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    * @param string $type
    * @param string $uuid
    * @param array|string $language
-   * @param array|string|null $bundles
+   * @param array|string $bundles
    * @param bool|null $access
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
    * @param string|null $accessOperation
