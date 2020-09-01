@@ -161,7 +161,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       }
 
       // Get the correct translation.
-      if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+      if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
         $entity = $entity->getTranslation($language);
         $entity->addCacheContexts(["static:language:{$language}"]);
       }
