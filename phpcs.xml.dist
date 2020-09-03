@@ -20,7 +20,6 @@
 
   <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedVariable">
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/DataProducer/MenuTest.php</exclude-pattern>
   </rule>
 
   <!-- TODO: those rules are disabled for now until we fix the coding standards for them. -->
