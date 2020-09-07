@@ -21,7 +21,7 @@ class PermissionsTest extends GraphQLTestBase {
       schema {
         query: Query
       }
-      
+
       type Query {
         root: String
       }
@@ -74,7 +74,10 @@ GQL;
       ],
     ];
 
-    $this->assertEquals([$data, $data], json_decode($batched->getContent(), TRUE));
+    $this->assertEquals(
+      [$data, $data],
+      json_decode($batched->getContent(), TRUE)
+    );
   }
 
 }

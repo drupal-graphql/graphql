@@ -7,7 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Class SchemaExtensionPluginManager.
+ * Manager that collects and exposes GraphQL schema extension plugins.
  *
  * @package Drupal\graphql\Plugin
  *

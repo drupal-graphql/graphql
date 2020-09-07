@@ -179,7 +179,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
         }
 
         if ($access) {
-          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
           $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
           $context->addCacheableDependency($accessResult);
           if (!$accessResult->isAllowed()) {

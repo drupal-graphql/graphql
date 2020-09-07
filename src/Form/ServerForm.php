@@ -143,7 +143,7 @@ class ServerForm extends EntityForm {
       '#tree' => TRUE,
     ];
 
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $schema ? $this->schemaManager->createInstance($schema) : NULL;
     if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $instance->setConfiguration($server->get('schema_configuration')[$schema] ?? []);
@@ -218,7 +218,7 @@ class ServerForm extends EntityForm {
       $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
     }
 
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
     $instance = $this->schemaManager->createInstance($schema);
     if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
@@ -233,7 +233,7 @@ class ServerForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $formState) {
     parent::submitForm($form, $formState);
 
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
     $instance = $this->schemaManager->createInstance($schema);
     if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
