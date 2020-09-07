@@ -6,7 +6,7 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\graphql\Entity\Server;
 
 /**
- * Class ExplorerMenuLinkDeriver.
+ * Generates one menu link per GraphQL server for Explorer.
  *
  * @package Drupal\graphql\Plugin\MenuLink\Deriver
  *

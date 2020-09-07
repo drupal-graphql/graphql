@@ -111,7 +111,10 @@ GQL;
    * @covers ::fromArgument
    */
   public function testFromArgument() {
-    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
+      'name' => 'some tree',
+      'id' => 5,
+    ]));
     $this->mockResolver('Tree', 'id', $this->builder->fromArgument('someArg'));
 
     $query = <<<GQL
@@ -177,7 +180,10 @@ GQL;
    * @covers ::compose
    */
   public function testCompose() {
-    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
+      'name' => 'some tree',
+      'id' => 5,
+    ]));
     $this->mockResolver('Tree', 'name', $this->builder->compose(
       $this->builder->fromValue('Some tree name'),
       $this->builder->produce('uppercase')
@@ -199,7 +205,10 @@ GQL;
    * @covers ::compose
    */
   public function testComposeNullValue() {
-    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
+      'name' => 'some tree',
+      'id' => 5,
+    ]));
     $this->mockResolver('Tree', 'name', $this->builder->compose(
       $this->builder->fromValue(NULL),
       $this->builder->produce('uppercase')
@@ -248,11 +257,23 @@ GQL;
    * @covers ::cond
    */
   public function testSimpleCond() {
-    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
+      'name' => 'some tree',
+      'id' => 5,
+    ]));
     $this->mockResolver('Tree', 'name', $this->builder->cond([
-      [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
-      [$this->builder->fromValue(TRUE), $this->builder->fromValue('But this should.')],
-      [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
+      [
+        $this->builder->fromValue(FALSE),
+        $this->builder->fromValue('This should not be in the result.'),
+      ],
+      [
+        $this->builder->fromValue(TRUE),
+        $this->builder->fromValue('But this should.'),
+      ],
+      [
+        $this->builder->fromValue(TRUE),
+        $this->builder->fromValue('And this not, event though its true.'),
+      ],
     ]));
 
     $query = <<<GQL
@@ -270,9 +291,15 @@ GQL;
    * @covers ::cond
    */
   public function testDeferredCond() {
-    $this->mockResolver('Query', 'tree', $this->builder->fromValue(['name' => 'some tree', 'id' => 5]));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
+      'name' => 'some tree',
+      'id' => 5,
+    ]));
     $this->mockResolver('Tree', 'name', $this->builder->cond([
-      [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
+      [
+        $this->builder->fromValue(FALSE),
+        $this->builder->fromValue('This should not be in the result.'),
+      ],
       [
         function () {
           return new Deferred(function () {
@@ -281,7 +308,10 @@ GQL;
         },
         $this->builder->fromValue('But this should.'),
       ],
-      [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
+      [
+        $this->builder->fromValue(TRUE),
+        $this->builder->fromValue('And this not, event though its true.'),
+      ],
     ]));
 
     $query = <<<GQL
@@ -301,9 +331,18 @@ GQL;
   public function testParentCond() {
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
     $this->mockResolver('Tree', 'name', $this->builder->cond([
-      [$this->builder->fromValue(FALSE), $this->builder->fromValue('This should not be in the result.')],
-      [$this->builder->fromParent(), $this->builder->fromValue('But this should.')],
-      [$this->builder->fromValue(TRUE), $this->builder->fromValue('And this not, event though its true.')],
+      [
+        $this->builder->fromValue(FALSE),
+        $this->builder->fromValue('This should not be in the result.'),
+      ],
+      [
+        $this->builder->fromParent(),
+        $this->builder->fromValue('But this should.'),
+      ],
+      [
+        $this->builder->fromValue(TRUE),
+        $this->builder->fromValue('And this not, event though its true.'),
+      ],
     ]));
 
     $query = <<<GQL

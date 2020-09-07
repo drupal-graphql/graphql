@@ -104,7 +104,7 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
         $entity = $entity->getTranslation($langcode);
         $entity->addCacheContexts(["static:language:{$langcode}"]);
         if ($access) {
-          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
           $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
           if (!$accessResult->isAllowed()) {
             return NULL;

@@ -103,7 +103,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
-        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
         $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
         if (!$accessResult->isAllowed()) {
           return NULL;
