@@ -103,7 +103,7 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
       $id = $parameters[$type];
       $resolver = $this->entityBuffer->add($type, $id);
 
-      return new Deferred(function () use ($type, $id, $resolver, $context, $language) {
+      return new Deferred(function () use ($type, $resolver, $context, $language) {
         if (!$entity = $resolver()) {
           // If there is no entity with this id, add the list cache tags so that
           // the cache entry is purged whenever a new entity of this type is
