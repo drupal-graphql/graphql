@@ -68,8 +68,8 @@ install:
   # Download Drupal 8 core from the Github mirror because it is faster.
   - git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git $DRUPAL_BUILD_DIR
 
-  # Reference the module in the build site.
-  - ln -s $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
+  # Copy the module to the build site. This makes PHPStan find drupal reliably.
+  - cp -r $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
 
   # Copy the customized phpunit configuration file to the core directory so
   # the relative paths are correct.
@@ -97,11 +97,6 @@ install:
   # Install Phpstan to check for Drupal standards.
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
 
-  # As the GraphQL module is symlinked to Drupal's module directory instead of
-  # being physically there, the links in phpstan.neon cannot be located correctly.
-  # Symlink vendor folder so the file links works.
-  - ln -s $DRUPAL_BUILD_DIR $TRAVIS_BUILD_DIR/../../
-
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
@@ -117,7 +112,6 @@ script:
     fi
   
   # Run Phpstan
-  - cd $TRAVIS_BUILD_DIR/../.. && pwd && ls -las
   - cd $DRUPAL_BUILD_DIR/modules/graphql && $DRUPAL_BUILD_DIR/vendor/bin/phpstan analyse
 
 after_success:
