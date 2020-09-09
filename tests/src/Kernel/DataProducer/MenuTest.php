@@ -143,7 +143,9 @@ class MenuTest extends GraphQLTestBase {
    */
   public function testMenuLinkAttribute() {
     $attribute = 'target';
+    $assert_happened = FALSE;
     foreach ($this->linkTree as $link_tree) {
+      $options = $link_tree->link->getOptions();
       if (!empty($options['attributes'][$attribute])) {
         $result = $this->executeDataProducer('menu_link_attribute', [
           'link' => $link_tree->link,
@@ -151,8 +153,10 @@ class MenuTest extends GraphQLTestBase {
         ]);
 
         $this->assertEquals($options['attributes'][$attribute], $result);
+        $assert_happened = TRUE;
       }
     }
+    $this->assertTrue($assert_happened, 'At least one menu attribute was tested');
   }
 
   /**

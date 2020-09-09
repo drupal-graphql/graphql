@@ -149,7 +149,7 @@ class DataProducerProxy implements ResolverInterface {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
     return DeferredUtility::returnFinally($plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
-      foreach ($plugin->getContexts() as $id => $item) {
+      foreach ($plugin->getContexts() as $item) {
         /** @var \Drupal\Core\Plugin\Context\Context $item */
         if ($item->getContextDefinition()->isRequired() && !$item->hasContextValue()) {
           return NULL;

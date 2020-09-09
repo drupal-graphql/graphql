@@ -48,7 +48,7 @@ class PersistedQueriesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    /* @var PersistedQueryPluginInterface[] $plugins */
+    /** @var PersistedQueryPluginInterface[] $plugins */
     $plugins = $this->entity->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;

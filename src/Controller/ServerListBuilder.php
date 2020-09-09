@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 
 /**
- * Class ServerListBuilder.
+ * Admin page controller that shows the list of configured GraphQL servers.
  *
  * @package Drupal\graphql\Controller
  *

@@ -156,7 +156,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       $resolver = $this->entityBuffer->add($type, $ids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
-        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
+        $entities = array_filter($entities, function (EntityInterface $entity) use ($language, $bundles, $access, $accessOperation, $accessUser, $context) {
           if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
           }
@@ -170,7 +170,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
           // Check if the passed user (or current user if none is passed) has
           // access to the entity, if not return NULL.
           if ($access) {
-            /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+            /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
             $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
             $context->addCacheableDependency($accessResult);
             if (!$accessResult->isAllowed()) {
