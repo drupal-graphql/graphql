@@ -92,8 +92,9 @@ class ServerForm extends EntityForm {
     $schema_keys = array_keys($schemas);
 
     $input = $formState->getUserInput();
-    $inputSchema = array_key_exists('schema', $input) ? $input['schema'] : NULL;
-    $schema = ($inputSchema ?? $server->get('schema')) ?: reset($schema_keys);
+    // Use the schema selected by the user, the one configured, or fall back to
+    // the first schema that is defined.
+    $schema = ($input['schema'] ?? $server->get('schema')) ?: reset($schema_keys);
 
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add server');
