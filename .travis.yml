@@ -117,6 +117,8 @@ script:
     fi
   
   # Run Phpstan
+  - cd /home/travis/build && ls -las
+  - cd /home/travis/vendor && ls -las
   - cd $DRUPAL_BUILD_DIR/modules/graphql && $DRUPAL_BUILD_DIR/vendor/bin/phpstan analyse
 
 after_success:
