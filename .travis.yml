@@ -112,7 +112,7 @@ script:
     fi
   
   # Run Phpstan
-  - cd $DRUPAL_BUILD_DIR/modules/graphql && $DRUPAL_BUILD_DIR/modules/graphql/vendor/bin/phpstan analyse
+  - cd $DRUPAL_BUILD_DIR/modules/graphql && ./vendor/bin/phpstan analyse
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
