@@ -1,6 +1,6 @@
 includes:
-	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
-	- ../../vendor/mglaman/phpstan-drupal/extension.neon
+	- ../../../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+	- ../../../../vendor/mglaman/phpstan-drupal/extension.neon
 
 parameters:
 	level: 1
@@ -17,8 +17,3 @@ parameters:
 		# Drupal allows object property access to custom fields, so we cannot fix
 		# that.
 		- "#^Access to an undefined property Drupal\\\\#"
-		- "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
-		# Drupal coding standards want "object" instead of "stdClass" in doc
-		# comments.
-		- "#^PHPDoc tag .+ with type object is not subtype of native type stdClass\\.$#"
-		# Not sure if we should use Smfony 4 event dispatching or not?
