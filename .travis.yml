@@ -95,7 +95,7 @@ install:
   - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
 
   # Install Phpstan to check for Drupal standards
-  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR/modules/graphql require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
@@ -112,7 +112,7 @@ script:
     fi
   
   # Run Phpstan
-  - cd $DRUPAL_BUILD_DIR/modules/graphql && ./vendor/bin/phpstan analyse
+  - cd $DRUPAL_BUILD_DIR && ../vendor/bin/phpstan analyse -c /modules/graphql/phpstan.neon
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];

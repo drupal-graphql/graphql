@@ -1,6 +1,6 @@
 includes:
-	- vendor/phpstan/phpstan-deprecation-rules/rules.neon
-	- vendor/mglaman/phpstan-drupal/extension.neon
+	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+	- ../../vendor/mglaman/phpstan-drupal/extension.neon
 
 parameters:
 	level: 1
