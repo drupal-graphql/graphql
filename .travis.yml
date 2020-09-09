@@ -96,6 +96,9 @@ install:
 
   # Install Phpstan to check for Drupal standards.
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
+  # Require redirect module to prevent PHPStan error on optional dependency
+  # injection of RedirectRepository in RouteLoad data producer.
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require drupal/redirect
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
