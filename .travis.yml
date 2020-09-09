@@ -100,7 +100,7 @@ install:
   # As the GraphQL module is symlinked to Drupal's module directory instead of
   # being physically there, the links in phpstan.neon cannot be located correctly.
   # Symlink vendor folder so the file links works.
-  - ln -s $DRUPAL_BUILD_DIR/vendor $TRAVIS_BUILD_DIR/../../vendor
+  - ln -s $DRUPAL_BUILD_DIR $TRAVIS_BUILD_DIR/../../
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.

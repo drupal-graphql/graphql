@@ -5,6 +5,8 @@ includes:
 parameters:
 	level: 1
 	customRulesetUsed: true
+  drupal:
+      drupal_root: ../../
 	paths:
 		- ../graphql
 	ignoreErrors:
