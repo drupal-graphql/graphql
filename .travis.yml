@@ -112,10 +112,10 @@ script:
     fi
   
   # Run Phpstan
-  - cd $DRUPAL_BUILD_DIR && pwd
-  - cd $TRAVIS_BUILD_DIR && pwd
-  - cd $DRUPAL_BUILD_DIR/modules/graphql && pwd
-  - cd $DRUPAL_BUILD_DIR/modules/graphql/../../vendor && pwd
+  - cd $DRUPAL_BUILD_DIR && pwd && ls -las
+  - cd $TRAVIS_BUILD_DIR && pwd && ls -las
+  - cd $DRUPAL_BUILD_DIR/modules/graphql && pwd && ls -las
+  - cd $DRUPAL_BUILD_DIR/modules/graphql/../../vendor && pwd && ls -las
   - cd $DRUPAL_BUILD_DIR/modules/graphql && $DRUPAL_BUILD_DIR/vendor/bin/phpstan analyse
 
 after_success:
