@@ -113,7 +113,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    *
    * @codeCoverageIgnore
    */
-  final public function __construct(
+  public function __construct(
     array $configuration,
     $pluginId,
     array $pluginDefinition,

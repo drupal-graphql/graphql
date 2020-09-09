@@ -46,7 +46,7 @@ class ServerForm extends EntityForm {
    *
    * @codeCoverageIgnore
    */
-  final public function __construct(SchemaPluginManager $schemaManager, RequestContext $requestContext) {
+  public function __construct(SchemaPluginManager $schemaManager, RequestContext $requestContext) {
     $this->requestContext = $requestContext;
     $this->schemaManager = $schemaManager;
   }

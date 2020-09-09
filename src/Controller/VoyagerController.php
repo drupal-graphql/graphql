@@ -37,7 +37,7 @@ class VoyagerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  final public function __construct(Introspection $introspection) {
+  public function __construct(Introspection $introspection) {
     $this->introspection = $introspection;
   }
 

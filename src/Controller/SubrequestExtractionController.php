@@ -54,7 +54,7 @@ class SubrequestExtractionController extends ControllerBase {
    *
    * @codeCoverageIgnore
    */
-  final public function __construct(RequestStack $requestStack, LanguageManagerInterface $languageManager, RendererInterface $renderer) {
+  public function __construct(RequestStack $requestStack, LanguageManagerInterface $languageManager, RendererInterface $renderer) {
     $this->requestStack = $requestStack;
     $this->languageManager = $languageManager;
     $this->renderer = $renderer;

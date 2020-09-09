@@ -113,7 +113,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    *
    * @codeCoverageIgnore
    */
-  final public function __construct(
+  public function __construct(
     array $configuration,
     $pluginId,
     array $pluginDefinition,
