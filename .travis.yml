@@ -115,7 +115,10 @@ script:
   - cd $DRUPAL_BUILD_DIR && pwd && ls -las
   - cd $TRAVIS_BUILD_DIR && pwd && ls -las
   - cd $DRUPAL_BUILD_DIR/modules/graphql && pwd && ls -las
+  - cd $DRUPAL_BUILD_DIR/modules && pwd && ls -las
   - cd $DRUPAL_BUILD_DIR/modules/graphql/../../vendor && pwd && ls -las
+  - cd $DRUPAL_BUILD_DIR/vendor/phpstan/phpstan-deprecation-rules && pwd && ls -las
+  - cd $DRUPAL_BUILD_DIR/vendor/mglaman/phpstan-drupal && pwd && ls -las
   - cd $DRUPAL_BUILD_DIR/modules/graphql && $DRUPAL_BUILD_DIR/vendor/bin/phpstan analyse
 
 after_success:
