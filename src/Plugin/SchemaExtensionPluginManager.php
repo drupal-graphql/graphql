@@ -60,7 +60,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_schema_extension');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, 'extensions', ['graphql']);
+    $this->setCacheBackend($cacheBackend, 'graphql_schema_extension', ['graphql_schema_extension']);
   }
 
   /**
