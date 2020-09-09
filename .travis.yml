@@ -99,11 +99,6 @@ install:
   # being physically there. Thus the links in phpstan.neon could be located.
   - composer --no-interaction --working-dir=$TRAVIS_BUILD_DIR/../.. require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
 
-  # As the GraphQL module is symlinked to Drupal's module directory instead of
-  # being physically there, the links in phpstan.neon cannot be located correctly.
-  # Symlink vendor folder so the file links works.
-  - ln -s $TRAVIS_BUILD_DIR/../../vendor $DRUPAL_BUILD_DIR/vendor
-
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
