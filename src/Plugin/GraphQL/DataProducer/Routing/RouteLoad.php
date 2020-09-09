@@ -80,7 +80,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
-    ?RedirectRepository $redirectRepository
+    ?RedirectRepository $redirectRepository = NULL
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
