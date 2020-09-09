@@ -17,3 +17,5 @@ parameters:
 		# Drupal allows object property access to custom fields, so we cannot fix
 		# that.
 		- "#^Access to an undefined property Drupal\\\\#"
+		# Ignore Symfony 4 event dispatching for now as Drupal 8 is not using it.
+		- "#extends deprecated class Symfony\\\\Component\\\\EventDispatcher\\\\Event#"

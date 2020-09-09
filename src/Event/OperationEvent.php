@@ -4,7 +4,7 @@ namespace Drupal\graphql\Event;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Executor\ExecutionResult;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\Event;
 
 class OperationEvent extends Event {
 
