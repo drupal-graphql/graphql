@@ -5,6 +5,9 @@
 
   <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml"/>
 
+  <!-- Exclude vendor directory if there are some composer packages installed -->
+  <exclude-pattern>vendor/</exclude-pattern>
+
   <rule ref="Drupal"></rule>
   <rule ref="DrupalPractice"></rule>
 
