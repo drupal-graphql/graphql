@@ -308,4 +308,8 @@
     <exclude-pattern>tests/src/Kernel/GraphQLTestBase.php</exclude-pattern>
   </rule>
 
+  <rule ref="DrupalPractice.Objects.GlobalClass">
+    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/Fields/Image/ImageDerivative.php</exclude-pattern>
+  </rule>
+
 </ruleset>
