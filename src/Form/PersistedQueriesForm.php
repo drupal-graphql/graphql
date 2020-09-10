@@ -173,6 +173,7 @@ class PersistedQueriesForm extends EntityForm {
         $plugin_form_state = SubformState::createForSubform($form['settings'][$id], $form, $form_state);
         $plugin->submitConfigurationForm($form['settings'][$id], $plugin_form_state);
       }
+      // Use isset instead of empty to cover weight with zero index.
       if (isset($values['weights']['order'][$id]['weight'])) {
         $plugin->setWeight((int) $values['weights']['order'][$id]['weight']);
       }
