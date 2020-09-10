@@ -69,7 +69,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_data_producer');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($definitionCacheBackend, 'producer', ['graphql']);
+    $this->setCacheBackend($definitionCacheBackend, 'graphql_data_producer', ['graphql_data_producer']);
 
     $this->requestStack = $requestStack;
     $this->contextsManager = $contextsManager;

@@ -68,8 +68,8 @@ install:
   # Download Drupal 8 core from the Github mirror because it is faster.
   - git clone --branch $DRUPAL_CORE --depth 1 https://github.com/drupal/drupal.git $DRUPAL_BUILD_DIR
 
-  # Reference the module in the build site.
-  - ln -s $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
+  # Copy the module to the build site. This makes PHPStan find drupal reliably.
+  - cp -r $TRAVIS_BUILD_DIR $DRUPAL_BUILD_DIR/modules/graphql
 
   # Copy the customized phpunit configuration file to the core directory so
   # the relative paths are correct.
@@ -94,6 +94,12 @@ install:
   - travis_retry composer global require drupal/coder:8.3.10
   - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
 
+  # Install Phpstan to check for Drupal standards.
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
+  # Require redirect module to prevent PHPStan error on optional dependency
+  # injection of RedirectRepository in RouteLoad data producer.
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require drupal/redirect
+
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];
@@ -107,6 +113,9 @@ script:
   - if [[ "$WITH_PHPDBG_COVERAGE" != "true" ]];
       then $DRUPAL_BUILD_DIR/vendor/bin/phpunit --configuration $DRUPAL_BUILD_DIR/core/phpunit.xml $TRAVIS_BUILD_DIR;
     fi
+  
+  # Run Phpstan
+  - cd $DRUPAL_BUILD_DIR/modules/graphql && $DRUPAL_BUILD_DIR/vendor/bin/phpstan analyse
 
 after_success:
   - if [[ "$WITH_PHPDBG_COVERAGE" == "true" ]];

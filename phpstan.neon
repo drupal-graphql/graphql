@@ -1,0 +1,17 @@
+includes:
+	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+	- ../../vendor/mglaman/phpstan-drupal/extension.neon
+
+parameters:
+	level: 1
+	customRulesetUsed: true
+	paths:
+		- .
+	ignoreErrors:
+		# @todo Ignore phpstan-drupal extension's rules for now, activate later.
+		- '#\Drupal calls should be avoided in classes, use dependency injection instead#'
+		# new static() is a best practice in Drupal, so we cannot fix that.
+		- "#^Unsafe usage of new static\\(\\)\\.$#"
+		# Drupal allows object property access to custom fields, so we cannot fix
+		# that.
+		- "#^Access to an undefined property Drupal\\\\#"
