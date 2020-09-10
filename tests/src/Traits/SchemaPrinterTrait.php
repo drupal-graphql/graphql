@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\graphql\Entity\Server;
 use Drupal\graphql\Entity\ServerInterface;
 use GraphQL\Utils\SchemaPrinter;
 

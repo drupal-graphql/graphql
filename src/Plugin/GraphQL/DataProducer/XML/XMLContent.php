@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**

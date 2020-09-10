@@ -14,7 +14,7 @@ class JsonHelper {
    *   The decoded values.
    */
   public static function decodeParams(array $values = []) {
-    return array_map(function($value) {
+    return array_map(function ($value) {
       if (!is_string($value)) {
         return $value;
       }

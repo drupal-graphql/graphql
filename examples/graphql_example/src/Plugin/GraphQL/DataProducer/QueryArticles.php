@@ -62,7 +62,6 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
    *
    * @codeCoverageIgnore
@@ -78,8 +77,8 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
   /**
-   * @param $offset
-   * @param $limit
+   * @param int $offset
+   * @param int $limit
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\graphql_examples\Wrappers\QueryConnection

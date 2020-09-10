@@ -145,7 +145,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
+  public function resolve(string $vid, int $parent, ?int $max_depth, ?string $language, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): ?Deferred {
     if (!isset($max_depth)) {
       $max_depth = self::MAX_DEPTH;
     }
@@ -179,7 +179,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
         }
 
         if ($access) {
-          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
           $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
           $context->addCacheableDependency($accessResult);
           if (!$accessResult->isAllowed()) {

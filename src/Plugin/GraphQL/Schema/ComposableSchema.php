@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * @Schema(
@@ -15,6 +16,7 @@ use Drupal\graphql\GraphQL\ResolverRegistry;
  * )
  */
 class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterface, PluginFormInterface {
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -73,13 +75,13 @@ GQL;
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $extensions = $this->extensionManager->getDefinitions();
 
-    $form['extensions'] = array(
+    $form['extensions'] = [
       '#type' => 'checkboxes',
       '#required' => FALSE,
-      '#title' => t('Enabled extensions'),
+      '#title' => $this->t('Enabled extensions'),
       '#options' => [],
       '#default_value' => $this->configuration['extensions'] ?? [],
-    );
+    ];
 
     foreach ($extensions as $key => $extension) {
       $form['extensions']['#options'][$key] = $extension['name'] ?? $extension['id'];

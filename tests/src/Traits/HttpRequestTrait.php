@@ -59,7 +59,7 @@ trait HttpRequestTrait {
    *
    * @param string[] $queries
    *   A set of queries to be executed in one go.
-   * @param \Drupal\graphql\Entity\Server $server
+   * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server instance.
    *
    * @return \Symfony\Component\HttpFoundation\Response

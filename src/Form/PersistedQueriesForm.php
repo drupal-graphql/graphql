@@ -7,14 +7,13 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginFormInterface;
-use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PersistedQueriesForm extends EntityForm {
 
   /**
-   * @var PersistedQueryPluginManager
+   * @var \Drupal\graphql\Plugin\PersistedQueryPluginManager
    */
   protected $persistedQueryPluginManager;
 
@@ -49,7 +48,7 @@ class PersistedQueriesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    /* @var PersistedQueryPluginInterface[] $plugins */
+    /** @var PersistedQueryPluginInterface[] $plugins */
     $plugins = $this->entity->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
@@ -90,7 +89,7 @@ class PersistedQueriesForm extends EntityForm {
     $form['weights']['order']['#tabledrag'][] = [
       'action' => 'order',
       'relationship' => 'sibling',
-      'group' => 'persisted-query-plugin-weight'
+      'group' => 'persisted-query-plugin-weight',
     ];
     $plugins_weight = [];
     foreach ($all_plugins as $plugin_id => $plugin) {
@@ -184,7 +183,7 @@ class PersistedQueriesForm extends EntityForm {
   /**
    * Returns an array with all the available persisted query plugins.
    *
-   * @return PersistedQueryPluginInterface[]
+   * @return \Drupal\graphql\Plugin\PersistedQueryPluginInterface[]
    */
   protected function getAllPersistedQueryPlugins() {
     $plugins = [];

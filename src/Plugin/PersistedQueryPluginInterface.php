@@ -4,7 +4,6 @@ namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\search_api\Processor\ProcessorInterface;
 use GraphQL\Server\OperationParams;
 
 interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginInspectionInterface {

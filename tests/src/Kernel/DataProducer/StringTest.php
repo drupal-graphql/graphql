@@ -31,7 +31,7 @@ class StringTest extends GraphQLTestBase {
     return [
       ['test', 'TEST'],
       ['123 ..!!', '123 ..!!'],
-      ['test123', 'TEST123']
+      ['test123', 'TEST123'],
     ];
   }
 

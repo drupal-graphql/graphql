@@ -113,10 +113,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $root
-   * @param $variables
-   * @param $operation
-   * @param $resolver
+   * @param mixed $root
+   * @param mixed $variables
+   * @param string $operation
+   * @param callable $resolver
    */
   public function __construct(
     CacheContextsManager $contextsManager,
@@ -130,7 +130,7 @@ class Executor implements ExecutorImplementation {
     $root,
     $variables,
     $operation,
-    $resolver
+    callable $resolver
   ) {
     $this->contextsManager = $contextsManager;
     $this->cacheBackend = $cacheBackend;
@@ -153,10 +153,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $root
-   * @param $variables
-   * @param $operation
-   * @param $resolver
+   * @param mixed $root
+   * @param mixed $variables
+   * @param string $operation
+   * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
    */
@@ -169,7 +169,7 @@ class Executor implements ExecutorImplementation {
     $root,
     $variables,
     $operation,
-    $resolver
+    callable $resolver
   ) {
     return new static(
       $container->get('cache_contexts_manager'),
@@ -251,7 +251,7 @@ class Executor implements ExecutorImplementation {
     $event = new OperationEvent($this->context);
     $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
 
-    return $executor->doExecute()->then(function ($result)  {
+    return $executor->doExecute()->then(function ($result) {
       $event = new OperationEvent($this->context, $result);
       $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
 
@@ -331,8 +331,16 @@ class Executor implements ExecutorImplementation {
     ];
 
     $this->cacheBackend->setMultiple([
-      "contexts:$prefix"       => ['data' => $contexts, 'expire' => $expire, 'tags' => $tags],
-      "result:$prefix:$suffix" => ['data' => $cache, 'expire' => $expire, 'tags' => $tags],
+      "contexts:$prefix"       => [
+        'data' => $contexts,
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
+      "result:$prefix:$suffix" => [
+        'data' => $cache,
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
     ]);
 
     return $this;

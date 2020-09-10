@@ -23,6 +23,7 @@ class XMLTestBase extends GraphQLTestBase {
 
   /**
    * Returns the source of the test document.
+   *
    * @return bool|string
    */
   public function getDocumentSource() {

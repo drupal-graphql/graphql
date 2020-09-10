@@ -10,7 +10,6 @@ use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Url;
-use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\entity_test\Entity\EntityTestBundle;
 
 /**
@@ -21,7 +20,7 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 class EntityTest extends GraphQLTestBase {
 
   /**
-   * @var NodeInterface
+   * @var \Drupal\node\NodeInterface
    */
   protected $node;
 
