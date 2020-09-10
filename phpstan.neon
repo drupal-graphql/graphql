@@ -10,8 +10,6 @@ parameters:
 	ignoreErrors:
 		# @todo Ignore phpstan-drupal extension's rules for now, activate later.
 		- '#\Drupal calls should be avoided in classes, use dependency injection instead#'
-    	# We have a hacked Symfony 4 event component (instead of 3) because of
-    	# Solarium, so we cannot fix this error.
 		# new static() is a best practice in Drupal, so we cannot fix that.
 		- "#^Unsafe usage of new static\\(\\)\\.$#"
 		# Drupal allows object property access to custom fields, so we cannot fix
