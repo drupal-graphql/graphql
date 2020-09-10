@@ -73,7 +73,7 @@ class OperationSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     return [
       OperationEvent::GRAPHQL_OPERATION_BEFORE => 'onBeforeOperation',
-      OperationEvent::GRAPHQL_OPERATION_AFTER=> 'onAfterOperation',
+      OperationEvent::GRAPHQL_OPERATION_AFTER => 'onAfterOperation',
     ];
   }
 

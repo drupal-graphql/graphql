@@ -98,21 +98,21 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Whether the server is in debug mode.
    *
-   * @var boolean
+   * @var bool
    */
   public $debug = FALSE;
 
   /**
    * Whether the server should cache its results.
    *
-   * @var boolean
+   * @var bool
    */
   public $caching = TRUE;
 
   /**
    * Whether the server allows query batching.
    *
-   * @var boolean
+   * @var bool
    */
   public $batching = TRUE;
 
@@ -157,7 +157,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public function executeOperation(OperationParams $operation) {
     $previous = Executor::getImplementationFactory();
-    Executor::setImplementationFactory([\Drupal::service('graphql.executor'), 'create']);
+    Executor::setImplementationFactory([
+      \Drupal::service('graphql.executor'),
+      'create',
+    ]);
 
     try {
       $config = $this->configuration();
@@ -402,7 +405,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
       return $this->persisted_query_instances;
     }
 
-    /* @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
+    /** @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
     $plugin_manager = \Drupal::service('plugin.manager.graphql.persisted_query');
     $definitions = $plugin_manager->getDefinitions();
     $persisted_queries_settings = $this->get('persisted_queries_settings');
@@ -530,4 +533,5 @@ class Server extends ConfigEntityBase implements ServerInterface {
     parent::postDelete($storage, $entities);
     \Drupal::service('router.builder')->setRebuildNeeded();
   }
+
 }

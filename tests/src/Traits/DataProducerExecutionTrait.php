@@ -10,12 +10,12 @@ use Prophecy\Argument;
 trait DataProducerExecutionTrait {
 
   /**
-   * @param $id
+   * @param string $id
    * @param array $contexts
    *
    * @return mixed
    */
-  protected function executeDataProducer($id, $contexts = []) {
+  protected function executeDataProducer($id, array $contexts = []) {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.data_producer');
 

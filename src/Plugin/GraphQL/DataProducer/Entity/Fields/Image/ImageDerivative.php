@@ -80,7 +80,7 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
   /**
    * @param \Drupal\file\FileInterface $entity
    *
-   * @param $style
+   * @param string $style
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return mixed

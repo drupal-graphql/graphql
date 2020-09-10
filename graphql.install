@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Install, update and uninstall functions for the GraphQL module.
+ */
+
+/**
  * Implements hook_requirements().
  */
 function graphql_requirements($phase) {

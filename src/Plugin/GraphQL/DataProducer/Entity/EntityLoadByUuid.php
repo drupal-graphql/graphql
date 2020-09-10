@@ -114,9 +114,9 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityUuidBuffer $entityBuffer
@@ -128,24 +128,25 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
   }
 
   /**
-   * @param $type
-   * @param $uuid
-   * @param array|string $language
-   * @param array|string $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param string $type
+   * @param string $uuid
+   * @param array|null $language
+   * @param array|null $bundles
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $uuid, $language, $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve($type, $uuid, ?array $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
-        // If there is no entity with this id, add the list cache tags so that the
-        // cache entry is purged whenever a new entity of this type is saved.
+        // If there is no entity with this id, add the list cache tags so that
+        // the cache entry is purged whenever a new entity of this type is
+        // saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
@@ -168,7 +169,7 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
-        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
         $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
         $context->addCacheableDependency($accessResult);
         if (!$accessResult->isAllowed()) {
@@ -179,4 +180,5 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
       return $entity;
     });
   }
+
 }

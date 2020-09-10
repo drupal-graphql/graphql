@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
@@ -24,7 +23,7 @@ class XMLContent extends DataProducerPluginBase {
 
   /**
    * @param \DOMElement $dom
-   *  The source (root) DOM element.
+   *   The source (root) DOM element.
    * @return string
    */
   public function resolve(\DOMElement $dom) {
@@ -37,4 +36,5 @@ class XMLContent extends DataProducerPluginBase {
       }
     }, iterator_to_array($dom->childNodes)));
   }
+
 }
