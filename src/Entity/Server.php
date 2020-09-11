@@ -503,8 +503,11 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public function preSave(EntityStorageInterface $storage) {
     // Write all the persisted queries configuration.
-    $this->persisted_queries_settings = [];
     $persistedQueryInstances = $this->getPersistedQueryInstances();
+    // Reset settings array after getting instances as it might be used when
+    // obtaining them. This would break a config import containing persisted
+    // queries settings as it would end up empty.
+    $this->persisted_queries_settings = [];
     if (!empty($persistedQueryInstances)) {
       foreach ($persistedQueryInstances as $plugin_id => $plugin) {
         $this->persisted_queries_settings[$plugin_id] = $plugin->getConfiguration();
