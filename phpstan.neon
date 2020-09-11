@@ -1,9 +1,11 @@
 includes:
 	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
 	- ../../vendor/mglaman/phpstan-drupal/extension.neon
+	- ../../vendor/jangregor/phpstan-prophecy/extension.neon
+	- ../../vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
-	level: 1
+	level: 2
 	customRulesetUsed: true
 	paths:
 		- .
