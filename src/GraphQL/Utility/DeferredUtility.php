@@ -56,10 +56,8 @@ class DeferredUtility {
    */
   public static function returnFinally($value, callable $callback) {
     if ($value instanceof Deferred) {
-      return new Deferred(function () use ($value, $callback) {
-        return $value->then(function ($value) use ($callback) {
-          return $callback($value);
-        });
+      return $value->then(function ($value) use ($callback) {
+        return $callback($value);
       });
     }
 
