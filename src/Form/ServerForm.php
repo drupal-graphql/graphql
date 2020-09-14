@@ -218,8 +218,8 @@ class ServerForm extends EntityForm {
       $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
     }
 
-    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
@@ -233,8 +233,8 @@ class ServerForm extends EntityForm {
   public function submitForm(array &$form, FormStateInterface $formState) {
     parent::submitForm($form, $formState);
 
-    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
@@ -248,13 +248,14 @@ class ServerForm extends EntityForm {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function save(array $form, FormStateInterface $formState) {
-    parent::save($form, $formState);
+    $save_result = parent::save($form, $formState);
 
     $this->messenger()->addMessage($this->t('Saved the %label server.', [
       '%label' => $this->entity->label(),
     ]));
 
     $formState->setRedirect('entity.graphql_server.collection');
+    return $save_result;
   }
 
 }

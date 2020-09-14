@@ -34,7 +34,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[]|array $resolvers
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface ...$resolvers
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Composite
    */

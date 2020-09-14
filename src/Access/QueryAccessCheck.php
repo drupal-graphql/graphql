@@ -51,7 +51,8 @@ class QueryAccessCheck implements AccessInterface {
 
     $request = $this->requestStack->getCurrentRequest();
     /** @var \GraphQL\Server\OperationParams[] $operations */
-    if (!$operations = $request->attributes->get('operations', [])) {
+    $operations = $request->attributes->get('operations', []);
+    if (!$operations) {
       return AccessResult::forbidden();
     }
 

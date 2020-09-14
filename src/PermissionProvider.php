@@ -11,7 +11,7 @@ class PermissionProvider {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
