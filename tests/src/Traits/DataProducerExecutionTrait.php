@@ -3,7 +3,7 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
-use GraphQL\Deferred;
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Prophecy\Argument;
 
@@ -35,7 +35,7 @@ trait DataProducerExecutionTrait {
     $context->hasContextValue(Argument::any())->willReturn(FALSE);
 
     $result = $plugin->resolveField($context->reveal());
-    if (!$result instanceof Deferred) {
+    if (!$result instanceof SyncPromise) {
       return $result;
     }
 

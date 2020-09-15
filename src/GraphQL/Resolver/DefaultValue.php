@@ -5,7 +5,7 @@ namespace Drupal\graphql\GraphQL\Resolver;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
-use GraphQL\Deferred;
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -57,7 +57,7 @@ class DefaultValue implements ResolverInterface {
       return $this->default->resolve($value, $args, $context, $info, $field);
     }
 
-    if ($result instanceof Deferred) {
+    if ($result instanceof SyncPromise) {
       return DeferredUtility::returnFinally($result, function ($current) use ($value, $args, $context, $info, $field) {
         if ($current === NULL) {
           return $this->default->resolve($value, $args, $context, $info, $field);
