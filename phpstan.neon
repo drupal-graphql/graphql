@@ -3,6 +3,9 @@ includes:
 	- ../../vendor/mglaman/phpstan-drupal/extension.neon
 
 parameters:
+	# PHPStan cannot find files in this test directory automatically.
+	scanDirectories:
+		- ../../core/tests/Drupal/Tests
 	level: 1
 	customRulesetUsed: true
 	paths:
