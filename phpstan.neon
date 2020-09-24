@@ -3,6 +3,9 @@ includes:
 	- ../../vendor/mglaman/phpstan-drupal/extension.neon
 
 parameters:
+	# PHPStan cannot find this file automatically.
+	scanFiles:
+		- ../../core/tests/Drupal/Tests/PhpunitCompatibilityTrait.php
 	level: 1
 	customRulesetUsed: true
 	paths:
