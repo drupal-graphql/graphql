@@ -5,6 +5,9 @@ includes:
 	- ../../vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
+	# PHPStan cannot find files in this test directory automatically.
+	scanDirectories:
+		- ../../core/tests/Drupal/Tests
 	level: 2
 	customRulesetUsed: true
 	paths:
