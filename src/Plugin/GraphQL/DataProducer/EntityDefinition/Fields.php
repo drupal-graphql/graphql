@@ -2,10 +2,10 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
-use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -122,8 +122,8 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
     FieldContext $field_context
   ): \Iterator {
     $entity_definition->getBundleEntityType();
-    /** @var \Drupal\Core\Entity\ContentEntityType $value */
-    if ($entity_definition instanceof ContentEntityType) {
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity_definition */
+    if ($entity_definition instanceof FieldableEntityInterface) {
       if ($bundle_context) {
         $key = $bundle_context['key'];
         $id = $entity_definition->id();
