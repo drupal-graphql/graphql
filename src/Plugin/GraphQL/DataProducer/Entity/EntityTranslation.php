@@ -91,10 +91,10 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string $language
    * @param bool|null $access
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\AccountInterface|null $accessUser
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
    * @param string|null $accessOperation
    *
-   * @return |null
+   * @return \Drupal\Core\Entity\EntityInterface|null
    */
   public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {

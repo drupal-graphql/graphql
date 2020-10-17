@@ -88,20 +88,25 @@ install:
   # We don't care about any dirty changes in the vendor directory, throw them
   # all away.
   - composer --working-dir=$DRUPAL_BUILD_DIR config discard-changes true
-  # Bring in the module dependencies without requiring a merge plugin. The
-  # require also triggers a full 'composer install'.
-  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require webonyx/graphql-php:^0.13.1 drupal/typed_data:^1.0
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR install
+  # Make sure to work with the latest PHPUnit version in Drupal 8.
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR run-script drupal-phpunit-upgrade
+  # Bring in the module dependencies without requiring a merge plugin.
+  # Require redirect module to prevent PHPStan error on an optional dependency.
+  # Install PHPStan to check for Drupal standards.
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require \
+    webonyx/graphql-php:^0.13.1 \
+    drupal/typed_data:^1.0 \
+    drupal/redirect:^1.6 \
+    phpstan/phpstan:^0.12.50 \
+    mglaman/phpstan-drupal:^0.12.3 \
+    phpstan/phpstan-deprecation-rules:^0.12.2 \
+    jangregor/phpstan-prophecy:^0.8 \
+    phpstan/phpstan-phpunit:^0.12
 
   # Install PHPCS to check for Drupal coding standards.
   - travis_retry composer global require drupal/coder:8.3.10
   - $HOME/.composer/vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
-
-  # Install Phpstan to check for Drupal standards.
-  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require mglaman/phpstan-drupal ^0.12.3 phpstan/phpstan-deprecation-rules ^0.12.2
-  # Require redirect module to prevent PHPStan error on optional dependency
-  # injection of RedirectRepository in RouteLoad data producer.
-  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require drupal/redirect
 
 script:
   # Run the unit tests using phpdbg if the environment variable is 'true'.

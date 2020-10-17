@@ -1,12 +1,14 @@
 includes:
 	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
 	- ../../vendor/mglaman/phpstan-drupal/extension.neon
+	- ../../vendor/jangregor/phpstan-prophecy/extension.neon
+	- ../../vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
 	# PHPStan cannot find files in this test directory automatically.
 	scanDirectories:
 		- ../../core/tests/Drupal/Tests
-	level: 1
+	level: 2
 	customRulesetUsed: true
 	paths:
 		- .
@@ -26,3 +28,4 @@ parameters:
 		# Symfony 4 deprecations in Drupal 9 that we don't care about.
 		- "#deprecated class Symfony\\\\Component\\\\EventDispatcher\\\\Event#"
 		- "#deprecated class Symfony\\\\Component\\\\HttpKernel\\\\Event\\\\GetResponseEvent#"
+		- "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"

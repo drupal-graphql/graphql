@@ -139,12 +139,13 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, array $ids, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context) {
+  public function resolve($type, array $ids, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
-      if (!$entities = $resolver()) {
+      $entities = $resolver();
+      if (!$entities) {
         // If there is no entity with this id, add the list cache tags so that
         // the cache entry is purged whenever a new entity of this type is
         // saved.
