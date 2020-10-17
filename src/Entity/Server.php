@@ -134,14 +134,14 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Persisted query plugin instances available on this server.
    *
-   * @var array
+   * @var array|null
    */
   protected $persisted_query_instances = NULL;
 
   /**
    * The sorted persisted query plugin instances available on this server.
    *
-   * @var array
+   * @var array|null
    */
   protected $sorted_persisted_query_instances = NULL;
 

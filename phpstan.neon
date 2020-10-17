@@ -32,3 +32,8 @@ parameters:
 		# Drupal allows object property access to custom fields, so we cannot fix
 		# that.
 		- "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
+		# Incomplete type doc comments in Drupal core that we have to ignore.
+		-
+			message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\LanguageNegotiation\\\\OperationLanguageNegotiation\\:\\:getLangcode\\(\\) should return string but returns false\\.$#"
+			count: 1
+			path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
