@@ -94,14 +94,13 @@ install:
   # Bring in the module dependencies without requiring a merge plugin.
   # Require redirect module to prevent PHPStan error on an optional dependency.
   # Install PHPStan to check for Drupal standards.
-  - >
-    composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require
-    webonyx/graphql-php:^0.13.1
-    drupal/typed_data:^1.0
-    drupal/redirect
-    mglaman/phpstan-drupal:^0.12.3
-    phpstan/phpstan-deprecation-rules:^0.12.2
-    jangregor/phpstan-prophecy:^0.8
+  - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require \
+    webonyx/graphql-php:^0.13.1 \
+    drupal/typed_data:^1.0 \
+    drupal/redirect \
+    mglaman/phpstan-drupal:^0.12.3 \
+    phpstan/phpstan-deprecation-rules:^0.12.2 \
+    jangregor/phpstan-prophecy:^0.8 \
     phpstan/phpstan-phpunit:^0.12
 
   # Install PHPCS to check for Drupal coding standards.
