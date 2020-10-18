@@ -8,7 +8,7 @@ use GraphQL\Deferred;
 class QueryConnection {
 
   /**
-   * @var \Drupal\Core\Entity\Query\Sql\Query
+   * @var \Drupal\Core\Entity\Query\QueryInterface
    */
   protected $query;
 
