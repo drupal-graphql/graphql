@@ -1,0 +1,14 @@
+diff --git a/src/Form/ServerForm.php b/src/Form/ServerForm.php
+index 26b49f1..7788380 100644
+--- a/src/Form/ServerForm.php
++++ b/src/Form/ServerForm.php
+@@ -92,7 +92,8 @@ class ServerForm extends EntityForm {
+ 
+     $input = $formState->getUserInput();
+     $inputSchema = array_key_exists('schema', $input) ? $input['schema'] : NULL;
+-    $schema = ($inputSchema ?? $server->get('schema')) ?: reset(array_keys($schemas));
++    $schemaArray = array_keys($schemas);
++    $schema = ($inputSchema ?? $server->get('schema')) ?: reset($schemaArray);
+ 
+     if ($this->operation == 'add') {
+       $form['#title'] = $this->t('Add server');
