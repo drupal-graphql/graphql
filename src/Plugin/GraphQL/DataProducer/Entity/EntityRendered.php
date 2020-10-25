@@ -104,7 +104,6 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
     $view = $builder->view($entity, $mode, $entity->language()->getId());
 
     $context = new RenderContext();
-    /** @var \GraphQL\Executor\ExecutionResult|\GraphQL\Executor\ExecutionResult[] $result */
     $result = $this->renderer->executeInRenderContext($context, function () use ($view) {
       return $this->renderer->render($view);
     });

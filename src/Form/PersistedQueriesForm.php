@@ -18,6 +18,13 @@ class PersistedQueriesForm extends EntityForm {
   protected $persistedQueryPluginManager;
 
   /**
+   * The entity being used by this form.
+   *
+   * @var \Drupal\graphql\Entity\Server
+   */
+  protected $entity;
+
+  /**
    * PersistedQueriesForm constructor.
    *
    * @param \Drupal\graphql\Plugin\PersistedQueryPluginManager $persistedQueryPluginManager
@@ -48,7 +55,7 @@ class PersistedQueriesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    /** @var PersistedQueryPluginInterface[] $plugins */
+    /** @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface[] $plugins */
     $plugins = $this->entity->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;

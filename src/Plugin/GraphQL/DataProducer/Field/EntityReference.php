@@ -64,7 +64,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 

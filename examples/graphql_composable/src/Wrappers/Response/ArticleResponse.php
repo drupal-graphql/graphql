@@ -15,7 +15,7 @@ class ArticleResponse extends Response {
   /**
    * The article to be served.
    *
-   * @var \Drupal\Core\Entity\ContentEntityInterface|null
+   * @var \Drupal\Core\Entity\EntityInterface|null
    */
   protected $article;
 
@@ -32,7 +32,7 @@ class ArticleResponse extends Response {
   /**
    * Gets the article to be served.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The article to be served.
    */
   public function article(): ?EntityInterface {
