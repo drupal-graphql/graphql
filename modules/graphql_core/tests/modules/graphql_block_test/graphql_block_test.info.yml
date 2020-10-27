@@ -1,6 +1,8 @@
 name: 'GraphQL Test: Blocks'
 type: module
+package: Testing
 core_version_requirement: ^8.8 || ^9
+hidden: TRUE
 dependencies:
   - drupal:block
   - drupal:block_content
