@@ -2,11 +2,11 @@ name: 'GraphQL Test: Blocks'
 type: module
 core_version_requirement: ^8.8 || ^9
 dependencies:
-  - block
-  - block_content
-  - ckeditor
-  - editor
-  - field
-  - filter
-  - system
-  - text
+  - drupal:block
+  - drupal:block_content
+  - drupal:ckeditor
+  - drupal:editor
+  - drupal:field
+  - drupal:filter
+  - drupal:system
+  - drupal:text

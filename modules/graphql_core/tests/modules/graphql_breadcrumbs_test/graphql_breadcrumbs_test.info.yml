@@ -4,4 +4,4 @@ description: 'Test for breadcrumbs.'
 package: GraphQL
 core_version_requirement: ^8.8 || ^9
 dependencies:
-- graphql_breadcrumbs
+- graphql:graphql_core

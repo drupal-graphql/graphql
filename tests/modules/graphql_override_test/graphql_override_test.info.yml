@@ -5,4 +5,4 @@ package: Testing
 core_version_requirement: ^8.8 || ^9
 hidden: TRUE
 dependencies:
-- graphql_plugin_test
+- graphql:graphql_plugin_test
