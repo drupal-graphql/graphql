@@ -74,8 +74,9 @@ before_install:
   # Disable the default memory limit.
   - echo memory_limit = -1 >> $PHPINI
 
-  # Update composer.
-  - composer self-update
+  # Update composer. But keep it at version 1 for compatibility with older
+  # Drupal versions.
+  - composer self-update --1
 
 install:
   # Create the database.
