@@ -1,7 +1,8 @@
 name: GraphQL Breadcrumbs test
 type: module
 description: 'Test for breadcrumbs.'
-package: GraphQL
-core: 8.x
+package: Testing
+core_version_requirement: ^8.8 || ^9
+hidden: TRUE
 dependencies:
-- graphql_breadcrumbs
+- graphql:graphql_core
