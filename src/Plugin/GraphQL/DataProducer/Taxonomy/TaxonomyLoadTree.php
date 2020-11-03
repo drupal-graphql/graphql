@@ -159,7 +159,8 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
 
     return new Deferred(function () use ($language, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
-      if (!$entities = $resolver()) {
+      $entities = $resolver();
+      if (!$entities) {
         // If there is no entity with this id, add the list cache tags so that
         // the cache entry is purged whenever a new entity of this type is
         // saved.

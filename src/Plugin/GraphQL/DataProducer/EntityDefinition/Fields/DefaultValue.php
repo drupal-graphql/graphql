@@ -49,6 +49,7 @@ class DefaultValue extends DataProducerPluginBase {
     else {
       return $default_value;
     }
+    return NULL;
   }
 
 }

@@ -46,7 +46,7 @@ trait MockingTrait {
    * @param mixed $value
    *   The return value. Can also be a value callback.
    *
-   * @return \PHPUnit_Framework_MockObject_Stub_ReturnCallback
+   * @return \PHPUnit\Framework\MockObject\Stub\ReturnCallback
    *   The return callback promise.
    */
   protected function toPromise($value) {
@@ -63,7 +63,7 @@ trait MockingTrait {
    * @param mixed $scope
    *   The resolver's bound object and class scope.
    *
-   * @return \PHPUnit_Framework_MockObject_Stub_ReturnCallback
+   * @return \PHPUnit\Framework\MockObject\Stub\ReturnCallback
    *   The return callback promise.
    */
   protected function toBoundPromise($value, $scope) {
