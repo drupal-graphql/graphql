@@ -95,7 +95,7 @@ install:
   # Require redirect module to prevent PHPStan error on an optional dependency.
   # Install PHPStan to check for Drupal standards.
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require \
-    webonyx/graphql-php:^0.13.1 \
+    webonyx/graphql-php:^14.3 \
     drupal/typed_data:^1.0 \
     drupal/redirect:^1.6 \
     phpstan/phpstan:^0.12.50 \

@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Server\OperationParams;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Server\ServerConfig;
@@ -51,7 +52,7 @@ use GraphQL\Validator\DocumentValidator;
  *     "schema_configuration",
  *     "persisted_queries_settings",
  *     "endpoint",
- *     "debug",
+ *     "debug_flag",
  *     "caching",
  *     "batching"
  *   },
@@ -96,11 +97,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $schema_configuration = [];
 
   /**
-   * Whether the server is in debug mode.
+   * The debug settings for this server.
    *
-   * @var bool
+   * @var int
+   * @see \GraphQL\Error\DebugFlag
    */
-  public $debug = FALSE;
+  public $debug_flag = DebugFlag::NONE;
 
   /**
    * Whether the server should cache its results.
@@ -211,7 +213,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     // Create the server config.
     $registry = $plugin->getResolverRegistry();
     $server = ServerConfig::create();
-    $server->setDebug(!!$this->get('debug'));
+    $server->setDebugFlag($this->get('debug_flag'));
     $server->setQueryBatching(!!$this->get('batching'));
     $server->setValidationRules($this->getValidationRules());
     $server->setPersistentQueryLoader($this->getPersistedQueryLoader());
