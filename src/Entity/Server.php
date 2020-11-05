@@ -52,7 +52,7 @@ use GraphQL\Validator\DocumentValidator;
  *     "schema_configuration",
  *     "persisted_queries_settings",
  *     "endpoint",
- *     "debug",
+ *     "debug_flag",
  *     "caching",
  *     "batching"
  *   },
@@ -97,11 +97,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $schema_configuration = [];
 
   /**
-   * Whether the server is in debug mode.
+   * The debug settings for this server.
    *
    * @var int
+   * @see \GraphQL\Error\DebugFlag
    */
-  public $debug = DebugFlag::NONE;
+  public $debug_flag = DebugFlag::NONE;
 
   /**
    * Whether the server should cache its results.
@@ -212,7 +213,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     // Create the server config.
     $registry = $plugin->getResolverRegistry();
     $server = ServerConfig::create();
-    $server->setDebugFlag($this->get('debug') ? DebugFlag::INCLUDE_TRACE : DebugFlag::NONE);
+    $server->setDebugFlag($this->get('debug_flag'));
     $server->setQueryBatching(!!$this->get('batching'));
     $server->setValidationRules($this->getValidationRules());
     $server->setPersistentQueryLoader($this->getPersistedQueryLoader());
