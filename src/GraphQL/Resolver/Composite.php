@@ -3,7 +3,7 @@
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
-use GraphQL\Deferred;
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -44,7 +44,7 @@ class Composite implements ResolverInterface {
     while ($resolver = array_shift($resolvers)) {
       $value = $resolver->resolve($value, $args, $context, $info, $field);
 
-      if ($value instanceof Deferred) {
+      if ($value instanceof SyncPromise) {
         return DeferredUtility::returnFinally($value, function ($value) use ($resolvers, $args, $context, $info, $field) {
           return isset($value) ? (new Composite($resolvers))->resolve($value, $args, $context, $info, $field) : NULL;
         });

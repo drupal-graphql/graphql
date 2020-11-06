@@ -18,7 +18,7 @@ class Argument implements ResolverInterface {
   /**
    * Argument constructor.
    *
-   * @param $name
+   * @param string $name
    */
   public function __construct($name) {
     $this->name = $name;

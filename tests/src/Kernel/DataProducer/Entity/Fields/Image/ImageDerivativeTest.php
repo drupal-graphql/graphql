@@ -35,7 +35,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
     $this->file->method('getFileUri')->willReturn($this->file_uri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
     $this->file->width = 600;
-    $this->file->height= 400;
+    $this->file->height = 400;
 
     $this->style = ImageStyle::create(['name' => 'test_style']);
     $effect = [
@@ -77,9 +77,9 @@ class ImageDerivativeTest extends GraphQLTestBase {
     );
 
     // TODO: Add cache checks.
-//    $this->assertContains('config:image.style.test_style', $metadata->getCacheTags());
-//    $this->assertContains('test_tag', $metadata->getCacheTags());
-
+    // $this->assertContains('config:image.style.test_style',
+    // $metadata->getCacheTags());
+    // $this->assertContains('test_tag', $metadata->getCacheTags());
     // Test that we don't get the derivative if we don't have access to the
     // original file, but we still get the access result cache tags.
     $result = $this->executeDataProducer('image_derivative', [
@@ -90,7 +90,8 @@ class ImageDerivativeTest extends GraphQLTestBase {
     $this->assertNull($result);
 
     // TODO: Add cache checks.
-//    $this->assertContains('test_tag_forbidden', $metadata->getCacheTags());
+    // $this->assertContains('test_tag_forbidden',
+    // $metadata->getCacheTags());
   }
 
 }

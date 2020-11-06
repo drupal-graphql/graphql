@@ -32,7 +32,7 @@ class EntityChanged extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string|null $format
    *
-   * @return string
+   * @return string|null
    * @throws \Exception
    */
   public function resolve(EntityInterface $entity, $format = NULL) {

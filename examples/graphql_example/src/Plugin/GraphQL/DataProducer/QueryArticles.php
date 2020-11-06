@@ -62,7 +62,6 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
    *
    * @codeCoverageIgnore
@@ -78,8 +77,8 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
   /**
-   * @param $offset
-   * @param $limit
+   * @param int $offset
+   * @param int $limit
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\graphql_examples\Wrappers\QueryConnection
@@ -87,7 +86,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function resolve($offset, $limit, RefinableCacheableDependencyInterface $metadata) {
-    if (!$limit > static::MAX_LIMIT) {
+    if ($limit > static::MAX_LIMIT) {
       throw new UserError(sprintf('Exceeded maximum query limit: %s.', static::MAX_LIMIT));
     }
 
@@ -105,4 +104,5 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
 
     return new QueryConnection($query);
   }
+
 }

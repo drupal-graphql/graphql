@@ -5,7 +5,7 @@ namespace Drupal\graphql\GraphQL\Resolver;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Utility\DeferredUtility;
-use GraphQL\Deferred;
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -45,7 +45,7 @@ class Condition implements ResolverInterface {
         }
       }
 
-      if ($condition instanceof Deferred) {
+      if ($condition instanceof SyncPromise) {
         return DeferredUtility::returnFinally($condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info, $field) {
           array_unshift($branches, [$cond, $resolver]);
           return (new Condition($branches))->resolve($value, $args, $context, $info, $field);

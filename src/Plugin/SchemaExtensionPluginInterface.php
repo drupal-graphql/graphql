@@ -13,9 +13,6 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
    *
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
    *   The resolver registry.
-   *
-   * @return \GraphQL\Type\Schema
-   *   The schema.
    */
   public function registerResolvers(ResolverRegistryInterface $registry);
 
