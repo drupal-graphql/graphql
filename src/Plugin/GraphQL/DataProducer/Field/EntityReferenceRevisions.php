@@ -158,7 +158,8 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
 
     $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
-    if (($values = $entity->get($field)) && $values instanceof EntityReferenceFieldItemListInterface) {
+    $values = $entity->get($field);
+    if ($values instanceof EntityReferenceFieldItemListInterface) {
       $vids = array_map(function ($value) {
         return $value['target_revision_id'];
       }, $values->getValue());
