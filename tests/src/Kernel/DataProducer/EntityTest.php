@@ -10,7 +10,6 @@ use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Url;
-use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\entity_test\Entity\EntityTestBundle;
 
 /**
@@ -21,7 +20,7 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 class EntityTest extends GraphQLTestBase {
 
   /**
-   * @var NodeInterface
+   * @var \Drupal\node\NodeInterface
    */
   protected $node;
 
@@ -334,7 +333,7 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     // TODO: Add metadata check.
-    //$this->assertContains('node_list', $metadata->getCacheTags());
+    // $this->assertContains('node_list', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 
@@ -349,7 +348,7 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     // TODO: Add metadata check.
-    //$this->assertContains('node:1', $metadata->getCacheTags());
+    // $this->assertContains('node:1', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 
@@ -377,8 +376,8 @@ class EntityTest extends GraphQLTestBase {
     ]);
 
     // TODO: Add metadata check.
-    //$this->assertContains('node:1', $metadata->getCacheTags());
-    $this->assertContains('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    // $this->assertContains('node:1', $metadata->getCacheTags());
+    $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
   }
 
 }

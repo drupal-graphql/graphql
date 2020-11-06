@@ -1,46 +1,55 @@
-import webpack from 'webpack';
-import path from 'path';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
+import webpack from "webpack";
+import path from "path";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 
 module.exports = {
-  context: path.resolve(__dirname, 'src'),
-  entry: './index.js',
+  context: path.resolve(__dirname, "src"),
+  entry: "./index.js",
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.min.js',
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.min.js",
   },
   resolve: {
-    extensions: ['.mjs', '.jsx', '.js', '.json'],
-    modules: [
-      path.resolve(__dirname, 'node_modules'),
-      'node_modules',
-    ],
+    extensions: [".mjs", ".jsx", ".js", ".json"],
+    modules: [path.resolve(__dirname, "node_modules"), "node_modules"],
   },
-  mode: 'production',
+  mode: "production",
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: 'babel-loader',
+        use: "babel-loader",
       },
     ],
   },
   optimization: {
-    minimize: true
+    minimize: true,
   },
-  plugins: ([
+  plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     }),
-    new CopyWebpackPlugin([
-      { from: path.resolve(__dirname, 'node_modules/graphql-voyager/dist/voyager.worker.js') },
-      { from: path.resolve(__dirname, 'node_modules/graphql-voyager/dist/voyager.css') },
-      { from: path.resolve(__dirname, 'src/container.css') },
-    ]),
-  ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(
+            __dirname,
+            "node_modules/graphql-voyager/dist/voyager.worker.js"
+          ),
+        },
+        {
+          from: path.resolve(
+            __dirname,
+            "node_modules/graphql-voyager/dist/voyager.css"
+          ),
+        },
+        { from: path.resolve(__dirname, "src/container.css") },
+      ],
+    }),
+  ],
   externals: {
-    jquery: 'jQuery',
-    drupal: 'Drupal',
+    jquery: "jQuery",
+    drupal: "Drupal",
   },
 };

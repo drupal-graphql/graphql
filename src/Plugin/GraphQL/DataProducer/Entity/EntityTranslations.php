@@ -89,13 +89,13 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    *
    * @return array|null
    */
-  public function resolve(EntityInterface $entity, ?bool $access , ?AccountInterface $accessUser, ?string $accessOperation) {
+  public function resolve(EntityInterface $entity, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $languages = $entity->getTranslationLanguages();
 
@@ -104,7 +104,7 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
         $entity = $entity->getTranslation($langcode);
         $entity->addCacheContexts(["static:language:{$langcode}"]);
         if ($access) {
-          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
           $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
           if (!$accessResult->isAllowed()) {
             return NULL;

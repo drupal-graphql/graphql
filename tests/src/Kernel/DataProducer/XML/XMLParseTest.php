@@ -12,11 +12,12 @@ class XMLParseTest extends XMLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLParse::resolve
    */
-  public function testXMLParse() {
+  public function testXmlParse() {
     $result = $this->executeDataProducer('xml_parse', [
       'input' => $this->getDocumentSource(),
     ]);
 
     $this->assertInstanceOf(\DOMElement::class, $result);
   }
+
 }

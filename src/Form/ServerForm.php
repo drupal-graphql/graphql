@@ -13,6 +13,7 @@ use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use GraphQL\Error\DebugFlag;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -89,7 +90,7 @@ class ServerForm extends EntityForm {
     $schemas = array_map(function ($definition) {
       return $definition['name'] ?? $definition['id'];
     }, $this->schemaManager->getDefinitions());
-    
+
     $input = $formState->getUserInput();
     $inputSchema = array_key_exists('schema', $input) ? $input['schema'] : NULL;
     $schema = ($inputSchema ?? $server->get('schema')) ?: reset(array_keys($schemas));
@@ -102,10 +103,10 @@ class ServerForm extends EntityForm {
     }
 
     $form['label'] = [
-      '#title' => t('Label'),
+      '#title' => $this->t('Label'),
       '#type' => 'textfield',
       '#default_value' => $server->label(),
-      '#description' => t('The human-readable name of this server.'),
+      '#description' => $this->t('The human-readable name of this server.'),
       '#required' => TRUE,
       '#size' => 30,
     ];
@@ -118,15 +119,15 @@ class ServerForm extends EntityForm {
         'exists' => ['Drupal\graphql\Entity\Server', 'load'],
         'source' => ['label'],
       ],
-      '#description' => t('A unique machine-readable name for this server. It must only contain lowercase letters, numbers, and underscores.'),
+      '#description' => $this->t('A unique machine-readable name for this server. It must only contain lowercase letters, numbers, and underscores.'),
     ];
 
     $form['schema'] = [
-      '#title' => t('Schema'),
+      '#title' => $this->t('Schema'),
       '#type' => 'select',
       '#options' => $schemas,
       '#default_value' => $schema,
-      '#description' => t('The schema to use with this server.'),
+      '#description' => $this->t('The schema to use with this server.'),
       '#ajax' => [
         'callback' => '::ajaxSchemaConfigurationForm',
         'progress' => [
@@ -143,7 +144,7 @@ class ServerForm extends EntityForm {
       '#tree' => TRUE,
     ];
 
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $schema ? $this->schemaManager->createInstance($schema) : NULL;
     if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $instance->setConfiguration($server->get('schema_configuration')[$schema] ?? []);
@@ -158,34 +159,46 @@ class ServerForm extends EntityForm {
     }
 
     $form['endpoint'] = [
-      '#title' => t('Endpoint'),
+      '#title' => $this->t('Endpoint'),
       '#type' => 'textfield',
       '#default_value' => $server->get('endpoint'),
-      '#description' => t('The endpoint for http queries. Has to start with a forward slash. For example "/graphql".'),
+      '#description' => $this->t('The endpoint for http queries. Has to start with a forward slash. For example "/graphql".'),
       '#required' => TRUE,
       '#size' => 30,
       '#field_prefix' => $this->requestContext->getCompleteBaseUrl(),
     ];
 
     $form['batching'] = [
-      '#title' => t('Allow query batching'),
+      '#title' => $this->t('Allow query batching'),
       '#type' => 'checkbox',
       '#default_value' => !!$server->get('batching'),
-      '#description' => t('Whether batched queries are allowed.'),
+      '#description' => $this->t('Whether batched queries are allowed.'),
     ];
 
     $form['caching'] = [
-      '#title' => t('Enable caching'),
+      '#title' => $this->t('Enable caching'),
       '#type' => 'checkbox',
       '#default_value' => !!$server->get('caching'),
-      '#description' => t('Whether caching of queries and partial results is enabled.'),
+      '#description' => $this->t('Whether caching of queries and partial results is enabled.'),
     ];
 
-    $form['debug'] = [
-      '#title' => t('Enable debugging'),
-      '#type' => 'checkbox',
-      '#default_value' => !!$server->get('debug'),
-      '#description' => t('In debugging mode, error messages contain more verbose information in the query response.'),
+    $debug_flags = $server->get('debug_flag') ?? 0;
+    $form['debug_flag'] = [
+      '#title' => $this->t('Debug settings'),
+      '#type' => 'checkboxes',
+      '#options' => [
+        DebugFlag::INCLUDE_DEBUG_MESSAGE => $this->t("Add debugMessage key containing the exception message to errors."),
+        DebugFlag::INCLUDE_TRACE => $this->t("Include the formatted original backtrace in errors."),
+        DebugFlag::RETHROW_INTERNAL_EXCEPTIONS => $this->t("Rethrow the internal GraphQL exceptions"),
+        DebugFlag::RETHROW_UNSAFE_EXCEPTIONS => $this->t("Rethrow unsafe GraphQL exceptions, these are exceptions that have not been marked as safe to expose to clients."),
+      ],
+      '#default_value' => array_keys(array_filter([
+        DebugFlag::INCLUDE_DEBUG_MESSAGE => (bool) ($debug_flags & DebugFlag::INCLUDE_DEBUG_MESSAGE),
+        DebugFlag::INCLUDE_TRACE => (bool) ($debug_flags & DebugFlag::INCLUDE_TRACE),
+        DebugFlag::RETHROW_INTERNAL_EXCEPTIONS => (bool) ($debug_flags & DebugFlag::RETHROW_INTERNAL_EXCEPTIONS),
+        DebugFlag::RETHROW_UNSAFE_EXCEPTIONS => (bool) ($debug_flags & DebugFlag::RETHROW_UNSAFE_EXCEPTIONS),
+      ])),
+      '#description' => $this->t("It is recommended to disable all debugging in production. During development you can enable the information that you need above."),
     ];
 
     $form['actions'] = [
@@ -218,8 +231,8 @@ class ServerForm extends EntityForm {
       $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
     }
 
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
@@ -227,13 +240,19 @@ class ServerForm extends EntityForm {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $formState) {
+    // Translate the debug flag from individual checkboxes to the enum value
+    // that the GraphQL library expects.
+    $formState->setValue('debug_flag', array_sum($formState->getValue('debug_flag')));
     parent::submitForm($form, $formState);
 
-    /* @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
-    if ($instance instanceof PluginFormInterface && $instance instanceof  ConfigurableInterface) {
+    if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
       $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
     }
@@ -245,13 +264,14 @@ class ServerForm extends EntityForm {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function save(array $form, FormStateInterface $formState) {
-    parent::save($form, $formState);
+    $save_result = parent::save($form, $formState);
 
     $this->messenger()->addMessage($this->t('Saved the %label server.', [
       '%label' => $this->entity->label(),
     ]));
 
     $formState->setRedirect('entity.graphql_server.collection');
+    return $save_result;
   }
 
 }

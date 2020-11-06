@@ -9,6 +9,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -63,7 +64,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -116,9 +117,9 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
@@ -131,17 +132,17 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param $field
-   * @param null $language
+   * @param string $field
+   * @param string|null $language
    * @param array|null $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred|null
    */
-  public function resolve(EntityInterface $entity, $field, $language = NULL, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(EntityInterface $entity, $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -156,7 +157,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       $resolver = $this->entityBuffer->add($type, $ids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
         $entities = $resolver() ?: [];
-        $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
+        $entities = array_filter($entities, function (EntityInterface $entity) use ($language, $bundles, $access, $accessOperation, $accessUser, $context) {
           if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
             return FALSE;
           }
@@ -170,7 +171,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
           // Check if the passed user (or current user if none is passed) has
           // access to the entity, if not return NULL.
           if ($access) {
-            /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+            /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
             $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
             $context->addCacheableDependency($accessResult);
             if (!$accessResult->isAllowed()) {
@@ -195,4 +196,5 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
     return NULL;
   }
+
 }
