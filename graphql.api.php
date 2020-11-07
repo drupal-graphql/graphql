@@ -5,9 +5,6 @@
  * Hooks provided by GraphQL module.
  */
 
-declare(strict_types = 1);
-
-
 /**
  * Alter the query built by the term autocomplete data producer.
  *
