@@ -21,9 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.2', '7.3', '7.4']
+        php-versions: ['7.3', '7.4']
         drupal-core: ['9.0.x']
-        # Extra run to also test on latest Drupal 8.
+        # Extra run to also test on latest Drupal 8 and PHP 7.2.
         include:
           - php-versions: '7.2'
             drupal-core: '8.9.x'
