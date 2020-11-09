@@ -6,7 +6,7 @@ on:
     branches: [ 8.x-4.x ]
 jobs:
   drupal:
-    name: Drupal (PHP ${{ matrix.php-versions }})
+    name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -21,13 +21,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4']
+        php-versions: ['7.2', '7.3', '7.4']
+        drupal-core: 9.0.x
+        # Extra run to also test on latest Drupal 8.
+        include:
+          - php-versions: "7.2"
+            drupal-core: 8.9.x
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
         with:
           repository: drupal/drupal
-          ref: 9.0.x
+          ref: ${{ matrix.drupal-core }}
       - name: Checkout graphql module
         uses: actions/checkout@v2
         with:
@@ -70,7 +75,7 @@ jobs:
         run: |
           mkdir coder
           cd coder
-          composer require drupal/coder:8.3.11 --no-interaction
+          composer require drupal/coder:8.3.11 --no-interaction --no-progress
       - name: Run PHPUnit
         run: |
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml
@@ -83,4 +88,4 @@ jobs:
       - name: Run PHPCS
         run: |
           ./coder/vendor/bin/phpcs --config-set installed_paths ../../drupal/coder/coder_sniffer
-          cd modules/graphql && ../../coder/vendor/bin/phpcs
+          cd modules/graphql && ../../coder/vendor/bin/phpcs -p
