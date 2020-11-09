@@ -133,11 +133,11 @@ GQL;
    */
   public function testFromPath() {
     $manager = $this->createMock(TypedDataManagerInterface::class);
-    $manager->expects($this->any())
+    $manager
       ->method('getDefinition')
-      ->will($this->returnValueMap([
-        'tree_mock' => ['class' => '\Drupal\Core\TypedData\ComplexDataInterface'],
-      ]));
+      ->willReturnMap([
+        'tree_mock' => ['class' => ComplexDataInterface::class],
+      ]);
 
     $this->container->set('typed_data_manager', $manager);
 
@@ -152,7 +152,7 @@ GQL;
     $tree->get('path')->willReturn($path);
     $tree->getValue()->willReturn([]);
 
-    $manager->expects($this->any())
+    $manager
       ->method('create')
       ->willReturn($tree->reveal());
 
