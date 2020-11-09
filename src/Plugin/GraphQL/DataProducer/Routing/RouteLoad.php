@@ -10,7 +10,7 @@ use Drupal\redirect\RedirectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * TODO: Fix the type of the output context.
+ * @todo Fix the type of the output context.
  *
  * @DataProducer(
  *   id = "route_load",
