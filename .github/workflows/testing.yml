@@ -1,4 +1,4 @@
-name: Testing with PHPUnit + PHPCS + PHStan
+name: Tests
 on:
   push:
     branches: [ 8.x-4.x ]
