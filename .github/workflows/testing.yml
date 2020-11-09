@@ -54,6 +54,8 @@ jobs:
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer --no-interaction run-script drupal-phpunit-upgrade
+      - name: Update Coder
+        run: |
           composer update drupal/coder:8.3.11 --with-dependencies --no-progress
       - name: Install GraphQL dependencies
         run: composer --no-interaction --no-progress require \
