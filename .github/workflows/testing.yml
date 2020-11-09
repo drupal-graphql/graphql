@@ -55,7 +55,7 @@ jobs:
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer --no-interaction run-script drupal-phpunit-upgrade
       - name: Install GraphQL dependencies
-        run: composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require \
+        run: composer --no-interaction require \
           webonyx/graphql-php:^14.3 \
           drupal/typed_data:^1.0 \
           drupal/redirect:^1.6 \
