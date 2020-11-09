@@ -63,10 +63,18 @@ jobs:
           mglaman/phpstan-drupal:^0.12.3 \
           phpstan/phpstan-deprecation-rules:^0.12.2 \
           jangregor/phpstan-prophecy:^0.8 \
-          phpstan/phpstan-phpunit:^0.12
+          phpstan/phpstan-phpunit:^0.12 \
+          drupal/coder:8.3.11
       - name: Run PHPUnit
         run: |
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml
           ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
         env:
           SIMPLETEST_DB: mysql://root:graphql@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/graphql
+      - name: Run PHPStan
+        run: |
+          cd modules/graphql && ../../vendor/bin/phpstan analyse
+      - name: Run PHPCS
+        run: |
+          ./vendor/bin/phpcs --config-set installed_paths ../../drupal/coder/coder_sniffer
+          cd modules/graphql && ../../vendor/bin/phpcs
