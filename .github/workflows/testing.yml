@@ -12,8 +12,8 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: graphql
           MYSQL_DATABASE: graphql
         ports:
           - 3306/tcp
@@ -69,4 +69,4 @@ jobs:
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml
           ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
         env:
-          SIMPLETEST_DB: mysql://root:@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/graphql
+          SIMPLETEST_DB: mysql://root:graphql@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/graphql
