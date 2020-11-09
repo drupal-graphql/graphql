@@ -1,6 +1,6 @@
 # GraphQL for Drupal
 
-![Tests](https://github.com/drupal-graphql/graphql/workflows/Tests/badge.svg)
+[![Tests](https://github.com/drupal-graphql/graphql/workflows/Tests/badge.svg)](https://github.com/drupal-graphql/graphql/actions)
 
 This module lets you craft and expose a [GraphQL](http://graphql.org/) schema for [Drupal 8](https://www.drupal.org/8).
 
