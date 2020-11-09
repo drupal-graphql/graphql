@@ -55,7 +55,7 @@ jobs:
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer --no-interaction run-script drupal-phpunit-upgrade
       - name: Install GraphQL dependencies
-        run: composer --no-interaction require \
+        run: composer --no-interaction --no-progress require \
           webonyx/graphql-php:^14.3 \
           drupal/typed_data:^1.0 \
           drupal/redirect:^1.6 \
@@ -66,6 +66,7 @@ jobs:
           phpstan/phpstan-phpunit:^0.12
       - name: Run PHPUnit
         run: |
-          ./vendor/bin/phpunit --configuration modules/graphql/phpunit.xml.dist modules/graphql
+          cp modules/graphql/phpunit.xml.dist core/phpunit.xml
+          ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
         env:
           SIMPLETEST_DB: mysql://root:@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/graphql
