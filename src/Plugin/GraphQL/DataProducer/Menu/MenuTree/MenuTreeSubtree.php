@@ -7,7 +7,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
- * TODO: Fix input and output context type.
+ * @todo Fix input and output context type.
  *
  * @DataProducer(
  *   id = "menu_tree_subtree",

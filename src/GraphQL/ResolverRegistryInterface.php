@@ -47,7 +47,7 @@ interface ResolverRegistryInterface {
   public function getFieldResolver($type, $field);
 
   /**
-   * TODO: Type resolvers should also get their own interface.
+   * @todo Type resolvers should also get their own interface.
    *
    * @param string $abstract
    * @param callable $resolver
