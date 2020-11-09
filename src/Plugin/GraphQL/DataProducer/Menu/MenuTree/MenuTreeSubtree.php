@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree;
 
-use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
