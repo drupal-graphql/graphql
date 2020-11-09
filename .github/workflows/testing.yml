@@ -22,11 +22,11 @@ jobs:
       fail-fast: false
       matrix:
         php-versions: ['7.2', '7.3', '7.4']
-        drupal-core: 9.0.x
+        drupal-core: '9.0.x'
         # Extra run to also test on latest Drupal 8.
         include:
-          - php-versions: "7.2"
-            drupal-core: 8.9.x
+          - php-versions: '7.2'
+            drupal-core: '8.9.x'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
