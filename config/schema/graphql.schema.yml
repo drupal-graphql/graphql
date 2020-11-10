@@ -11,9 +11,9 @@ graphql.graphql_servers.*:
     endpoint:
       type: string
       label: 'Endpoint'
-    debug:
-      type: boolean
-      label: 'Debug'
+    debug_flag:
+      type: integer
+      label: 'Debug Flag'
     schema:
       type: string
       label: 'Schema'

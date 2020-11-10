@@ -13,7 +13,7 @@ use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * TODO: Fix output context type.
+ * @todo Fix output context type.
  *
  * @DataProducer(
  *   id = "menu_links",

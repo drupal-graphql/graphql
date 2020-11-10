@@ -7,7 +7,7 @@ use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
- * TODO: Fix the type of the input context.
+ * @todo Fix the type of the input context.
  *
  * @DataProducer(
  *   id = "url_path",

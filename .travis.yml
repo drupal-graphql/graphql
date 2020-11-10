@@ -95,7 +95,7 @@ install:
   # Require redirect module to prevent PHPStan error on an optional dependency.
   # Install PHPStan to check for Drupal standards.
   - composer --no-interaction --working-dir=$DRUPAL_BUILD_DIR require \
-    webonyx/graphql-php:^0.13.1 \
+    webonyx/graphql-php:^14.3 \
     drupal/typed_data:^1.0 \
     drupal/redirect:^1.6 \
     phpstan/phpstan:^0.12.50 \
@@ -105,7 +105,7 @@ install:
     phpstan/phpstan-phpunit:^0.12
 
   # Install PHPCS to check for Drupal coding standards.
-  - travis_retry composer global require drupal/coder:8.3.10
+  - travis_retry composer global require drupal/coder:8.3.11
   - $HOME/.config/composer/vendor/bin/phpcs --config-set installed_paths $HOME/.config/composer/vendor/drupal/coder/coder_sniffer
 
 script:
