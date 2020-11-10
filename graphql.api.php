@@ -12,7 +12,7 @@
  *   Input arguments of taxonomy term data producer.
  * @param \Drupal\Core\Database\Query\SelectInterface $query
  *   The term autocomplete query.
- * @param Drupal\Core\Database\Query\ConditionInterface $name_condition_group
+ * @param \Drupal\Core\Database\Query\ConditionInterface $name_condition_group
  *   The condition group matching the term name. This condition group is defined
  *   as OR condition group which allows to cover a match in term name OR in some
  *   other fields.
