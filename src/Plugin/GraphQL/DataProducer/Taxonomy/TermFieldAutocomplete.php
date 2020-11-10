@@ -56,7 +56,7 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
   /**
    * The default maximum number of items to be capped to prevent DDOS attacks.
    */
-  const MAX_ITEMS = 10;
+  const MAX_ITEMS = 100;
 
   /**
    * The database connection.
@@ -275,6 +275,10 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
   ): ?array {
     if ($limit <= 0) {
       $limit = 10;
+    }
+
+    if ($limit > self::MAX_ITEMS) {
+      $limit = self::MAX_ITEMS;
     }
 
     // Get configured vocabulary. If none is obtained, bail out.
