@@ -23,7 +23,7 @@ class Path implements ResolverInterface {
   /**
    * Name of the context.
    *
-   * @var string
+   * @var string|\Drupal\Core\TypedData\DataDefinitionInterface
    */
   protected $type;
 
