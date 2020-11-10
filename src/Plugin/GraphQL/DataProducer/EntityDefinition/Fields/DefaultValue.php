@@ -34,21 +34,15 @@ class DefaultValue extends DataProducerPluginBase {
    *   The default value.
    */
   public function resolve(FieldDefinitionInterface $entity_definition_field) {
-    /** @var \Drupal\field\Entity\FieldConfig $entity_definition_field */
     $default_value = $entity_definition_field->getDefaultValueLiteral();
-    if (is_array($default_value)) {
-      switch ($entity_definition_field->getType()) {
-        case 'list_integer':
-        case 'list_string':
-        case 'text_long':
-          return $default_value ? $default_value[0]['value'] : NULL;
+    switch ($entity_definition_field->getType()) {
+      case 'list_integer':
+      case 'list_string':
+      case 'text_long':
+        return $default_value[0]['value'] ?? NULL;
 
-        case 'boolean':
-          return (bool) $default_value ? $default_value[0]['value'] : FALSE;
-      }
-    }
-    else {
-      return $default_value;
+      case 'boolean':
+        return (bool) ($default_value[0]['value'] ?? FALSE);
     }
     return NULL;
   }

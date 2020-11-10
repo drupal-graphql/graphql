@@ -53,7 +53,7 @@ class Condition implements ResolverInterface {
       }
 
       if ((bool) $condition) {
-        /** @var \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver */
+        /** @var \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $resolver */
         return $resolver ? $resolver->resolve($value, $args, $context, $info, $field) : $condition;
       }
     }
