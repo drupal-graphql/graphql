@@ -18,11 +18,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Gets term results on a given field matching given query in given vocabulary.
  *
  * @DataProducer(
- *   id = "term_autocomplete",
- *   name = @Translation("Term autocomplete"),
- *   description = @Translation("Returns autocomplete items matched against
- *   given query in given vocabulary"), produces = @ContextDefinition("list",
- *   label = @Translation("Autocomplete items")
+ *   id = "term_field_autocomplete",
+ *   name = @Translation("Term field autocomplete"),
+ *   description = @Translation("Returns autocomplete items matched against given string for vocabularies in given field"),
+ *   produces = @ContextDefinition("list",
+ *     label = @Translation("List of term ids matching the string.")
  *   ),
  *   consumes = {
  *     "entity_type" = @ContextDefinition("string",
@@ -51,7 +51,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class TermAutocomplete extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The default maximum number of items to be capped to prevent DDOS attacks.
+   */
+  const MAX_ITEMS = 10;
 
   /**
    * The database connection.
@@ -330,13 +335,16 @@ class TermAutocomplete extends DataProducerPluginBase implements ContainerFactor
     // condition group extensions done in alter hooks wouldn't be reflected.
     $query->condition($name_condition_group);
 
+    // Handle access on query.
+    $query->addTag('taxonomy_term_access');
+
     // Process the terms returned by term autocomplete query.
     $terms = [];
     foreach ($query->execute() as $match) {
-      if ($term = $this->getTermStorage()->load($match->tid)) {
-        $context->addCacheableDependency($term);
-        $terms[] = $term;
-      }
+      $terms[] = $match->tid;
+      // Invalidate on term update, because it may change the name which does
+      // not match the string anymore.
+      $context->addCacheTags(['taxonomy_term:' . $match->tid]);
     }
 
     $context->addCacheTags($this->getTermType()->getListCacheTags());
