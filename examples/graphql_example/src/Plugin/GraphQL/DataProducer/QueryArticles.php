@@ -37,7 +37,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   /**
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -49,7 +49,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -62,7 +62,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin id.
    * @param mixed $pluginDefinition
    *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *
    * @codeCoverageIgnore
    */
@@ -70,10 +70,10 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
     array $configuration,
     $pluginId,
     $pluginDefinition,
-    EntityTypeManagerInterface $entityManager
+    EntityTypeManagerInterface $entityTypeManager
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityManager = $entityManager;
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
@@ -90,17 +90,17 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
       throw new UserError(sprintf('Exceeded maximum query limit: %s.', static::MAX_LIMIT));
     }
 
-    $storage = $this->entityManager->getStorage('node');
-    $type = $storage->getEntityType();
+    $storage = $this->entityTypeManager->getStorage('node');
+    $entityType = $storage->getEntityType();
     $query = $storage->getQuery()
       ->currentRevision()
       ->accessCheck();
 
-    $query->condition($type->getKey('bundle'), 'article');
+    $query->condition($entityType->getKey('bundle'), 'article');
     $query->range($offset, $limit);
 
-    $metadata->addCacheTags($type->getListCacheTags());
-    $metadata->addCacheContexts($type->getListCacheContexts());
+    $metadata->addCacheTags($entityType->getListCacheTags());
+    $metadata->addCacheContexts($entityType->getListCacheContexts());
 
     return new QueryConnection($query);
   }
