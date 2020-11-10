@@ -15,7 +15,7 @@ use Drupal\taxonomy\TermStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Gets term results on a given field matching given query in given vocabulary.
+ * Gets term items matching the given string in given field's vocabularies.
  *
  * @DataProducer(
  *   id = "term_field_autocomplete",
