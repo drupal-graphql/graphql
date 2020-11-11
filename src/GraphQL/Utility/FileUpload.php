@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
+ *
+ * This service handles file validations like max upload size.
  */
 class FileUpload {
 
