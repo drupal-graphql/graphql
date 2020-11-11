@@ -155,14 +155,17 @@ class FileUpload {
       case UPLOAD_ERR_INI_SIZE:
       case UPLOAD_ERR_FORM_SIZE:
         $maxUploadSize = format_size($this->getMaxUploadSize($settings));
-        $response->setViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getClientOriginalName(), '@maxsize' => $maxUploadSize]));
-        $this->logger->info('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getFilename(), '@maxsize' => $maxUploadSize]);
+        $response->setViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', [
+          '@file' => $file->getClientOriginalName(),
+          '@maxsize' => $maxUploadSize,
+        ]));
         return $response;
 
       case UPLOAD_ERR_PARTIAL:
       case UPLOAD_ERR_NO_FILE:
-        $response->setViolation($this->t('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getClientOriginalName()]));
-        $this->logger->info('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getFilename()]);
+        $response->setViolation($this->t('The file "@file" could not be saved because the upload did not complete.', [
+          '@file' => $file->getClientOriginalName(),
+        ]));
         return $response;
 
       case UPLOAD_ERR_OK:
@@ -174,7 +177,10 @@ class FileUpload {
 
       default:
         $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
-        $this->logger->error('Error while uploading the file "@file" with an error code "@code".', ['@file' => $file->getFilename(), '@code' => $file->getError()]);
+        $this->logger->error('Error while uploading the file "@file" with an error code "@code".', [
+          '@file' => $file->getFilename(),
+          '@code' => $file->getError(),
+        ]);
         return $response;
     }
 
@@ -222,8 +228,13 @@ class FileUpload {
     // directory. This overcomes open_basedir restrictions for future file
     // operations.
     if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
-      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
-      $this->logger->error('Unable to move file from "@file" to "@destination".', ['@file' => $file->getRealPath(), '@destination' => $fileEntity->getFileUri()]);
+      $response->setViolation($this->t('Unknown error while uploading the file "@file".', [
+        '@file' => $file->getClientOriginalName(),
+      ]));
+      $this->logger->error('Unable to move file from "@file" to "@destination".', [
+        '@file' => $file->getRealPath(),
+        '@destination' => $fileEntity->getFileUri(),
+      ]);
       return $response;
     }
 

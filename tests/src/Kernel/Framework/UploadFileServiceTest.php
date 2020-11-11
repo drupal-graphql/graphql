@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\File\FileSystem;
 use Drupal\graphql\GraphQL\Utility\FileUpload;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -45,25 +44,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // Pass all file system calls through except moveUploadedFile(). We don't
     // have a real uploaded file, so it would fail PHP's move_uploaded_file()
     // checks.
-    $mock_file_system = new class($file_system) extends FileSystem {
-
-      public function __construct(FileSystem $file_system) {
-        $this->fileSystem = $file_system;
-      }
-
-      public function prepareDirectory(&$directory, $options = self::MODIFY_PERMISSIONS) {
-        return $this->fileSystem->prepareDirectory($directory, $options);
-      }
-
-      public function moveUploadedFile($filename, $uri) {
-        // We can use the normal move() functionality instead during testing.
-        return $this->fileSystem->move($filename, $uri);
-      }
-
-      public function chmod($uri, $mode = NULL) {
-        return $this->fileSystem->chmod($uri, $mode);
-      }
-    };
+    $mock_file_system = new MockFileSystem($file_system);
 
     $this->uploadService = new FileUpload(
       \Drupal::service('entity_type.manager'),
@@ -171,7 +152,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   }
 
   /**
-   * Tests that the uploaded file extension is allowed
+   * Tests that the uploaded file extension is allowed.
    */
   public function testExtensionValidation() {
     // Evil php file extension!
