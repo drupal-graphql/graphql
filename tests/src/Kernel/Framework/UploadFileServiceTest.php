@@ -2,9 +2,10 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\File\FileSystem;
+use Drupal\graphql\GraphQL\Utility\FileUpload;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests file uploads that should be mapped to a field in a resolver.
@@ -19,29 +20,72 @@ class UploadFileServiceTest extends GraphQLTestBase {
   public static $modules = ['file'];
 
   /**
+   * The FileUpload object we want to test, gets prepared in setUp().
+   *
+   * @var \Drupal\graphql\GraphQL\Utility\FileUpload
+   */
+  protected $uploadService;
+
+  /**
+   * Path to temporary test file.
+   *
+   * @var string
+   */
+  protected $file;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('file');
+
+    $file_system = \Drupal::service('file_system');
+
+    // Pass all file system calls through except moveUploadedFile(). We don't
+    // have a real uploaded file, so it would fail PHP's move_uploaded_file()
+    // checks.
+    $mock_file_system = new class($file_system) extends FileSystem {
+
+      public function __construct(FileSystem $file_system) {
+        $this->fileSystem = $file_system;
+      }
+
+      public function prepareDirectory(&$directory, $options = self::MODIFY_PERMISSIONS) {
+        return $this->fileSystem->prepareDirectory($directory, $options);
+      }
+
+      public function moveUploadedFile($filename, $uri) {
+        // We can use the normal move() functionality instead during testing.
+        return $this->fileSystem->move($filename, $uri);
+      }
+
+      public function chmod($uri, $mode = NULL) {
+        return $this->fileSystem->chmod($uri, $mode);
+      }
+    };
+
+    $this->uploadService = new FileUpload(
+      \Drupal::service('entity_type.manager'),
+      \Drupal::service('current_user'),
+      \Drupal::service('file.mime_type.guesser'),
+      $mock_file_system,
+      \Drupal::service('logger.channel.graphql')
+    );
+
+    // Create dummy file, since symfony will test if it exists.
+    $this->file = $file_system->getTempDirectory() . '/graphql_upload_test.txt';
+    touch($this->file);
   }
 
   /**
    * Ensure that a correct file upload works.
    */
   public function testSuccess() {
-    // Create dummy file, since symfony will test if it exists.
-    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
-    touch($file);
-
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
-    /** @var \Drupal\graphql\GraphQL\Utility\FileUpload */
-    $uploadService = \Drupal::service('graphql.file_upload');
-    // Activate a test flag to bypass PHP's real file upload validator.
-    $uploadService->setInTests(TRUE);
+    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
 
-    $file_upload_response = $uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);
@@ -56,18 +100,10 @@ class UploadFileServiceTest extends GraphQLTestBase {
    * Tests that a too large file returns a violation.
    */
   public function testFileTooLarge() {
-    // Create dummy file, since symfony will test if it exists.
-    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
-    touch($file);
-
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($file, 'test.txt', 'text/plain', UPLOAD_ERR_INI_SIZE, TRUE);
-    /** @var \Drupal\graphql\GraphQL\Utility\FileUpload */
-    $uploadService = \Drupal::service('graphql.file_upload');
-    // Activate a test flag to bypass PHP's real file upload validator.
-    $uploadService->setInTests(TRUE);
+    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_INI_SIZE, TRUE);
 
-    $file_upload_response = $uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);
@@ -83,18 +119,10 @@ class UploadFileServiceTest extends GraphQLTestBase {
    * Tests that a partial file returns a violation.
    */
   public function testPartialFile() {
-    // Create dummy file, since symfony will test if it exists.
-    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
-    touch($file);
-
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($file, 'test.txt', 'text/plain', UPLOAD_ERR_PARTIAL, TRUE);
-    /** @var \Drupal\graphql\GraphQL\Utility\FileUpload */
-    $uploadService = \Drupal::service('graphql.file_upload');
-    // Activate a test flag to bypass PHP's real file upload validator.
-    $uploadService->setInTests(TRUE);
+    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_PARTIAL, TRUE);
 
-    $file_upload_response = $uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);
@@ -110,38 +138,24 @@ class UploadFileServiceTest extends GraphQLTestBase {
    * Tests that missing settings keys throw an exception.
    */
   public function testMissingSettings() {
-    // Create dummy file, since symfony will test if it exists.
-    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
-    touch($file);
-
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
-    /** @var \Drupal\graphql\GraphQL\Utility\FileUpload */
-    $uploadService = \Drupal::service('graphql.file_upload');
-    // Activate a test flag to bypass PHP's real file upload validator.
-    $uploadService->setInTests(TRUE);
+    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
 
     $this->expectException(\RuntimeException::class);
-    $uploadService->createTemporaryFileUpload($uploadFile, []);
+    $this->uploadService->createTemporaryFileUpload($uploadFile, []);
   }
 
   /**
    * Tests that the file must not be larger than the file size limit.
    */
   public function testSizeValidation() {
-    // Create dummy file, since symfony will test if it exists.
-    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
     // Create a file with 4 bytes.
-    file_put_contents($file, 'test');
+    file_put_contents($this->file, 'test');
 
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
-    /** @var \Drupal\graphql\GraphQL\Utility\FileUpload */
-    $uploadService = \Drupal::service('graphql.file_upload');
-    // Activate a test flag to bypass PHP's real file upload validator.
-    $uploadService->setInTests(TRUE);
+    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
 
-    $file_upload_response = $uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
       // Only allow 1 byte.
@@ -160,18 +174,10 @@ class UploadFileServiceTest extends GraphQLTestBase {
    * Tests that the uploaded file extension is allowed
    */
   public function testExtensionValidation() {
-    // Create dummy file, since symfony will test if it exists.
-    $file = \Drupal::service('file_system')->getTempDirectory() . '/graphql_upload_test.txt';
-    touch($file);
+    // Evil php file extension!
+    $uploadFile = new UploadedFile($this->file, 'test.php', 'text/plain', UPLOAD_ERR_OK, TRUE);
 
-    // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($file, 'test.php', 'text/plain', UPLOAD_ERR_OK, TRUE);
-    /** @var \Drupal\graphql\GraphQL\Utility\FileUpload */
-    $uploadService = \Drupal::service('graphql.file_upload');
-    // Activate a test flag to bypass PHP's real file upload validator.
-    $uploadService->setInTests(TRUE);
-
-    $file_upload_response = $uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);

@@ -57,11 +57,6 @@ class FileUpload {
   protected $logger;
 
   /**
-   * Internal flag for automated testing.
-   */
-  protected $inTests = FALSE;
-
-  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -224,15 +219,10 @@ class FileUpload {
     // Move uploaded files from PHP's upload_tmp_dir to Drupal's temporary
     // directory. This overcomes open_basedir restrictions for future file
     // operations.
-    if ($this->inTests) {
-      $this->fileSystem->move($file->getRealPath(), $fileEntity->getFileUri());
-    }
-    else {
-      if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
-        $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
-        $this->logger->error('Unable to move file from "@file" to "@destination".', ['@file' => $file->getRealPath(), '@destination' => $fileEntity->getFileUri()]);
-        return $response;
-      }
+    if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
+      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+      $this->logger->error('Unable to move file from "@file" to "@destination".', ['@file' => $file->getRealPath(), '@destination' => $fileEntity->getFileUri()]);
+      return $response;
     }
 
     // Adjust permissions.
@@ -244,13 +234,6 @@ class FileUpload {
 
     $response->setFileEntity($fileEntity);
     return $response;
-  }
-
-  /**
-   * Set the internal test flag to bypass PHP's file upload checks.
-   */
-  public function setInTests(bool $test_flag): void {
-    $this->inTests = $test_flag;
   }
 
 }
