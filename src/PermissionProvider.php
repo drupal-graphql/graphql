@@ -9,9 +9,9 @@ class PermissionProvider {
   use StringTranslationTrait;
 
   /**
-   * The entity type manager service
+   * The entity type manager service.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 

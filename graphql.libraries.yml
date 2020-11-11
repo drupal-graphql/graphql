@@ -24,3 +24,12 @@ voyager:
     - core/drupal
     - core/jquery
     - core/jquery.once
+
+persisted_queries:
+  version: VERSION
+  js:
+    js/persisted_queries.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

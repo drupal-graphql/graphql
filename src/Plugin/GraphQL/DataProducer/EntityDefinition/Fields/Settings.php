@@ -36,7 +36,7 @@ class Settings extends DataProducerPluginBase {
    * @param array|null $entity_form_display_context
    *   Entity form display context.
    *
-   * @return array
+   * @return \Iterator
    *   Field settings.
    */
   public function resolve(

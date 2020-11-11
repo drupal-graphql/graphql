@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 
 /**
- * Class ServerListBuilder
+ * Admin page controller that shows the list of configured GraphQL servers.
  *
  * @package Drupal\graphql\Controller
  *
@@ -53,6 +53,14 @@ class ServerListBuilder extends ConfigEntityListBuilder {
         'title' => 'Voyager',
         'weight' => 10,
         'url' => Url::fromRoute('graphql.voyager', ['graphql_server' => $id]),
+      ];
+    }
+
+    if (\Drupal::currentUser()->hasPermission("administer graphql configuration")) {
+      $operations['persisted_queries'] = [
+        'title' => 'Persisted queries',
+        'weight' => 10,
+        'url' => Url::fromRoute('entity.graphql_server.persisted_queries_form', ['graphql_server' => $id]),
       ];
     }
 

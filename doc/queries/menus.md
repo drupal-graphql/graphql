@@ -70,7 +70,7 @@ protected function getResolverRegistry() {
   $registry->addFieldResolver('MenuItem', 'title',
     $builder->produce('menu_link_label')
       ->map('link', $builder->produce('menu_tree_link')
-        ->map('element', $builder->fromParent())
+        ->map('element', $builder->fromParent()))
   );
 
   // Menu children.
@@ -83,7 +83,7 @@ protected function getResolverRegistry() {
   $registry->addFieldResolver('MenuItem', 'url',
     $builder->produce('menu_link_url')
       ->map('link', $builder->produce('menu_tree_link')
-        ->map('element', $builder->fromParent())
+        ->map('element', $builder->fromParent()))
   );
 
   $registry->addFieldResolver('Url', 'path',

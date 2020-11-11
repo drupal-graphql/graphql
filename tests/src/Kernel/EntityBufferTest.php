@@ -10,6 +10,9 @@ use Drupal\node\Entity\NodeType;
  */
 class EntityBufferTest extends GraphQLTestBase {
 
+  /**
+   * @var string[]
+   */
   protected $nodeIds = [];
 
   /**
@@ -17,6 +20,9 @@ class EntityBufferTest extends GraphQLTestBase {
    */
   protected $entityBuffer;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -26,10 +32,12 @@ class EntityBufferTest extends GraphQLTestBase {
     ])->save();
 
     foreach (range(1, 3) as $i) {
-      $this->nodeIds[] = Node::create([
+      $node = Node::create([
         'title' => 'Node ' . $i,
         'type' => 'test',
-      ])->save();
+      ]);
+      $node->save();
+      $this->nodeIds[] = $node->id();
     }
 
     $schema = <<<GQL
@@ -45,6 +53,9 @@ GQL;
     $this->setUpSchema($schema);
   }
 
+  /**
+   * Tests the entity buffer.
+   */
   public function testEntityBuffer() {
     $query = <<<GQL
       query {

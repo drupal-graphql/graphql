@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -28,11 +29,13 @@ trait HttpRequestTrait {
    *   Query variables.
    * @param array|null $extensions
    *   The query extensions.
+   * @param bool $persisted
+   *   Flag if the query is actually the identifier of a persisted query.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function query($query, $server = NULL, array $variables = [], array $extensions = NULL) {
+  protected function query($query, $server = NULL, array $variables = [], array $extensions = NULL, $persisted = FALSE) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');
@@ -40,8 +43,11 @@ trait HttpRequestTrait {
 
     $endpoint = $this->server->get('endpoint');
     $extensions = !empty($extensions) ? ['extensions' => $extensions] : [];
+    // If the persisted flag is true, then instead of sending the full query to
+    // the server we only send the query id.
+    $query_key = $persisted ? 'queryId' : 'query';
     $request = Request::create($endpoint, 'GET', [
-      'query' => $query,
+      $query_key => $query,
       'variables' => $variables,
     ] + $extensions);
 
@@ -53,13 +59,13 @@ trait HttpRequestTrait {
    *
    * @param string[] $queries
    *   A set of queries to be executed in one go.
-   * @param \Drupal\graphql\Entity\Server $server
+   * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server instance.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries(array $queries, $server = NULL) {
+  protected function batchedQueries(array $queries, ServerInterface $server = NULL) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');

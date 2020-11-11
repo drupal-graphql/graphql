@@ -49,9 +49,8 @@ class ImageUrlTest extends GraphQLTestBase {
 
     $this->assertEquals($this->file_url, $result);
 
-    // TODO: Add cache checks.
-//    $this->assertContains('test_tag', $metadata->getCacheTags());
-
+    // @todo Add cache checks.
+    // $this->assertContains('test_tag', $metadata->getCacheTags());
     // Test that we do not get a file we don't have access to, but the cache
     // tags are still added.
     $result = $this->executeDataProducer('image_url', [
@@ -60,8 +59,9 @@ class ImageUrlTest extends GraphQLTestBase {
 
     $this->assertNull($result);
 
-    // TODO: Add cache checks.
-//    $this->assertContains('test_tag_forbidden', $metadata->getCacheTags());
+    // @todo Add cache checks.
+    // $this->assertContains('test_tag_forbidden',
+    // $metadata->getCacheTags());
   }
 
 }
