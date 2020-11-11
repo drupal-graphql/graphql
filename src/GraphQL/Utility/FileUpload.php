@@ -57,6 +57,11 @@ class FileUpload {
   protected $logger;
 
   /**
+   * Internal flag for automated testing.
+   */
+  protected $inTests = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -110,7 +115,10 @@ class FileUpload {
     $validators['file_validate_size'] = [$this->getMaxUploadSize($settings)];
 
     // Add the extension check if necessary.
-    if (!empty($settings['file_extensions'])) {
+    if (empty($settings['file_extensions'])) {
+      $validators['file_validate_extensions'] = ['txt'];
+    }
+    else {
       $validators['file_validate_extensions'] = [$settings['file_extensions']];
     }
 
@@ -140,7 +148,7 @@ class FileUpload {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function createTemporaryFileUpload(UploadedFile $file, array $settings) {
+  public function createTemporaryFileUpload(UploadedFile $file, array $settings): FileUploadResponse {
     $response = new FileUploadResponse();
 
     // Check for file upload errors and return FALSE for this file if a lower
@@ -151,19 +159,19 @@ class FileUpload {
       case UPLOAD_ERR_FORM_SIZE:
         $maxUploadSize = format_size($this->getMaxUploadSize($settings));
         $response->setViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getClientOriginalName(), '@maxsize' => $maxUploadSize]));
-        $this->logger->error('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getFilename(), '@maxsize' => $maxUploadSize]);
+        $this->logger->info('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', ['@file' => $file->getFilename(), '@maxsize' => $maxUploadSize]);
         return $response;
 
       case UPLOAD_ERR_PARTIAL:
       case UPLOAD_ERR_NO_FILE:
         $response->setViolation($this->t('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getClientOriginalName()]));
-        $this->logger->error('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getFilename()]);
+        $this->logger->info('The file "@file" could not be saved because the upload did not complete.', ['@file' => $file->getFilename()]);
         return $response;
 
       case UPLOAD_ERR_OK:
         // Final check that this is a valid upload, if it isn't, use the
         // default error handler.
-        if (is_uploaded_file($file->getRealPath())) {
+        if ($file->isValid()) {
           break;
         }
 
@@ -171,6 +179,10 @@ class FileUpload {
         $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
         $this->logger->error('Error while uploading the file "@file" with an error code "@code".', ['@file' => $file->getFilename(), '@code' => $file->getError()]);
         return $response;
+    }
+
+    if (empty($settings['uri_scheme']) || empty($settings['file_directory'])) {
+      throw new \RuntimeException('uri_scheme or file_directory missing in settings');
     }
 
     // Make sure the destination directory exists.
@@ -212,10 +224,15 @@ class FileUpload {
     // Move uploaded files from PHP's upload_tmp_dir to Drupal's temporary
     // directory. This overcomes open_basedir restrictions for future file
     // operations.
-    if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
-      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
-      $this->logger->error('Unable to move file from "@file" to "@destination".', ['@file' => $file->getRealPath(), '@destination' => $fileEntity->getFileUri()]);
-      return $response;
+    if ($this->inTests) {
+      $this->fileSystem->move($file->getRealPath(), $fileEntity->getFileUri());
+    }
+    else {
+      if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
+        $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+        $this->logger->error('Unable to move file from "@file" to "@destination".', ['@file' => $file->getRealPath(), '@destination' => $fileEntity->getFileUri()]);
+        return $response;
+      }
     }
 
     // Adjust permissions.
@@ -227,6 +244,13 @@ class FileUpload {
 
     $response->setFileEntity($fileEntity);
     return $response;
+  }
+
+  /**
+   * Set the internal test flag to bypass PHP's file upload checks.
+   */
+  public function setInTests(bool $test_flag): void {
+    $this->inTests = $test_flag;
   }
 
 }
