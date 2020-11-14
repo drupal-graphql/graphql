@@ -144,6 +144,7 @@ class FileUpload {
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \RuntimeException
    */
   public function createTemporaryFileUpload(UploadedFile $file, array $settings): FileUploadResponse {
     $response = new FileUploadResponse();

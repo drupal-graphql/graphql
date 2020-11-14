@@ -37,7 +37,8 @@ class MockFileSystem extends FileSystem {
    */
   public function moveUploadedFile($filename, $uri) {
     // We can use the normal move() functionality instead during testing.
-    return $this->fileSystem->move($filename, $uri);
+    $this->fileSystem->move($filename, $uri);
+    return TRUE;
   }
 
   /**
