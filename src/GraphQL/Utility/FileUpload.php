@@ -214,7 +214,8 @@ class FileUpload {
     $fileEntity = $storage->create($values);
 
     // Validate the entity values.
-    if (($violations = $fileEntity->validate()) && $violations->count()) {
+    $violations = $fileEntity->validate();
+    if ($violations->count()) {
       $response->setViolations($violations);
       return $response;
     }

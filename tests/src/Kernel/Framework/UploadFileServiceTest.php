@@ -64,7 +64,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
    */
   public function testSuccess() {
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK);
 
     $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
@@ -82,7 +82,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
    */
   public function testFileTooLarge() {
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_INI_SIZE, TRUE);
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_INI_SIZE);
 
     $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
@@ -101,7 +101,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
    */
   public function testPartialFile() {
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_PARTIAL, TRUE);
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_PARTIAL);
 
     $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
@@ -120,7 +120,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
    */
   public function testMissingSettings() {
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK);
 
     $this->expectException(\RuntimeException::class);
     $this->uploadService->createTemporaryFileUpload($uploadFile, []);
@@ -134,7 +134,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     file_put_contents($this->file, 'test');
 
     // Create a Symfony dummy uploaded file in test mode.
-    $uploadFile = new UploadedFile($this->file, 'test.txt', 'text/plain', UPLOAD_ERR_OK, TRUE);
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
 
     $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
@@ -156,7 +156,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
    */
   public function testExtensionValidation() {
     // Evil php file extension!
-    $uploadFile = new UploadedFile($this->file, 'test.php', 'text/plain', UPLOAD_ERR_OK, TRUE);
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test.php');
 
     $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
       'uri_scheme' => 'public',
@@ -169,6 +169,26 @@ class UploadFileServiceTest extends GraphQLTestBase {
       'Only files with the following extensions are allowed: <em class="placeholder">txt</em>.',
       $violations[0]
     );
+  }
+
+  /**
+   * Helper method to prepare the UploadedFile depending on core version.
+   *
+   * Drupal core uses different Symfony versions where we have a different
+   * UploadedFile constructor signature.
+   */
+  protected function getUploadedFile(
+    int $error_status,
+    int $size = 0,
+    string $name = 'test.txt'): UploadedFile {
+
+    list($version) = explode('.', \Drupal::VERSION, 2);
+    switch ($version) {
+      case 8:
+        return new UploadedFile($this->file, $name, 'text/plain', $size, $error_status, TRUE);
+
+    }
+    return new UploadedFile($this->file, $name, 'text/plain', $error_status, TRUE);
   }
 
 }
