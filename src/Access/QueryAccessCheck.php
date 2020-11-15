@@ -50,7 +50,6 @@ class QueryAccessCheck implements AccessInterface {
     }
 
     $request = $this->requestStack->getCurrentRequest();
-    /** @var \GraphQL\Server\OperationParams[] $operations */
     $operations = $request->attributes->get('operations', []);
     if (!$operations) {
       return AccessResult::forbidden();
@@ -61,6 +60,7 @@ class QueryAccessCheck implements AccessInterface {
       // If a query was provided by the user, this is an arbitrary query (it's
       // not a persisted query). Hence, we only grant access if the user has the
       // permission to execute any query.
+      /** @var \GraphQL\Server\OperationParams $operation */
       if ($operation->getOriginalInput('query')) {
         return AccessResult::allowedIfHasPermission($account, "execute $id arbitrary graphql requests");
       }

@@ -40,7 +40,7 @@ abstract class DataProducerPluginBase extends ContextAwarePluginBase implements 
       throw new \LogicException('Missing data producer resolve method.');
     }
 
-    // TODO: The field context should probably be the first argument.
+    // @todo The field context should probably be the first argument.
     $context = $this->getContextValues();
     return call_user_func_array(
       [$this, 'resolve'],

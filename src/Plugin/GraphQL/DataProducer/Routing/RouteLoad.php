@@ -10,7 +10,7 @@ use Drupal\redirect\RedirectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * TODO: Fix the type of the output context.
+ * @todo Fix the type of the output context.
  *
  * @DataProducer(
  *   id = "route_load",
@@ -95,7 +95,9 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    */
   public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
     if ($this->redirectRepository) {
-      if ($redirect = $this->redirectRepository->findMatchingRedirect($path, [])) {
+      /** @var \Drupal\redirect\Entity\Redirect|null $redirect */
+      $redirect = $this->redirectRepository->findMatchingRedirect($path, []);
+      if ($redirect) {
         return $redirect->getRedirectUrl();
       }
     }

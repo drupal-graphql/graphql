@@ -79,20 +79,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSchemaDefinitions() {
-    return [
-      'default' => [
-        'id' => 'default',
-        'name' => 'default',
-        'path' => 'graphql',
-        'deriver' => 'Drupal\graphql\Plugin\Deriver\PluggableSchemaDeriver',
-      ],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function defaultCacheMaxAge() {
     return Cache::PERMANENT;
   }

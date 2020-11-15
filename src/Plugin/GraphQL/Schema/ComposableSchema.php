@@ -98,7 +98,7 @@ GQL;
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $formState) {
-    // TODO: Validate dependencies between extensions.
+    // @todo Validate dependencies between extensions.
   }
 
   /**
