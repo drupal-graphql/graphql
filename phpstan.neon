@@ -29,6 +29,7 @@ parameters:
 		- "#deprecated class Symfony\\\\Component\\\\EventDispatcher\\\\Event#"
 		- "#deprecated class Symfony\\\\Component\\\\HttpKernel\\\\Event\\\\GetResponseEvent#"
 		- "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+		- "#deprecated interface Symfony\\\\Component\\\\HttpFoundation\\\\File\\\\MimeType\\\\MimeTypeGuesserInterface#"
 		# Drupal allows object property access to custom fields, so we cannot fix
 		# that.
 		- "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
