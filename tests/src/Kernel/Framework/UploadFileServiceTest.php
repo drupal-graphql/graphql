@@ -92,7 +92,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
 
     $this->assertStringMatchesFormat(
       'The file test.txt could not be saved because it exceeds %d %s, the maximum allowed size for uploads.',
-      $violations[0]
+      $violations[0]['message']
     );
   }
 
@@ -111,7 +111,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
 
     $this->assertStringMatchesFormat(
       'The file "test.txt" could not be saved because the upload did not complete.',
-      $violations[0]
+      $violations[0]['message']
     );
   }
 
@@ -147,7 +147,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // @todo Do we want HTML tags in our violations or not?
     $this->assertStringMatchesFormat(
       'The file is <em class="placeholder">4 bytes</em> exceeding the maximum file size of <em class="placeholder">1 byte</em>.',
-      $violations[0]
+      $violations[0]['message']
     );
   }
 
@@ -167,7 +167,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // @todo Do we want HTML tags in our violations or not?
     $this->assertStringMatchesFormat(
       'Only files with the following extensions are allowed: <em class="placeholder">txt</em>.',
-      $violations[0]
+      $violations[0]['message']
     );
   }
 

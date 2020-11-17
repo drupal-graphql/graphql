@@ -10,7 +10,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\graphql\Wrappers\FileUploadResponse;
+use Drupal\graphql\GraphQL\Response\FileUploadResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -156,7 +156,7 @@ class FileUpload {
       case UPLOAD_ERR_INI_SIZE:
       case UPLOAD_ERR_FORM_SIZE:
         $maxUploadSize = format_size($this->getMaxUploadSize($settings));
-        $response->setViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', [
+        $response->addViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', [
           '@file' => $file->getClientOriginalName(),
           '@maxsize' => $maxUploadSize,
         ]));
@@ -164,7 +164,7 @@ class FileUpload {
 
       case UPLOAD_ERR_PARTIAL:
       case UPLOAD_ERR_NO_FILE:
-        $response->setViolation($this->t('The file "@file" could not be saved because the upload did not complete.', [
+        $response->addViolation($this->t('The file "@file" could not be saved because the upload did not complete.', [
           '@file' => $file->getClientOriginalName(),
         ]));
         return $response;
@@ -177,7 +177,7 @@ class FileUpload {
         }
 
       default:
-        $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+        $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
         $this->logger->error('Error while uploading the file "@file" with an error code "@code".', [
           '@file' => $file->getFilename(),
           '@code' => $file->getError(),
@@ -192,7 +192,7 @@ class FileUpload {
     // Make sure the destination directory exists.
     $uploadDir = $settings['uri_scheme'] . '://' . trim($settings['file_directory'], '/');
     if (!$this->fileSystem->prepareDirectory($uploadDir, FileSystem::CREATE_DIRECTORY)) {
-      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+      $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
       $this->logger->error('Could not create directory "@upload_directory".', ["@upload_directory" => $uploadDir]);
       return $response;
     }
@@ -216,13 +216,15 @@ class FileUpload {
     // Validate the entity values.
     $violations = $fileEntity->validate();
     if ($violations->count()) {
-      $response->setViolations($violations);
+      foreach ($violations as $violation) {
+        $response->addViolation($violation->getMessage());
+      }
       return $response;
     }
 
     // Validate the file name length.
     if ($violations = file_validate($fileEntity, $this->getUploadValidators($settings))) {
-      $response->setViolations($violations);
+      $response->addViolations($violations);
       return $response;
     }
 
@@ -230,7 +232,7 @@ class FileUpload {
     // directory. This overcomes open_basedir restrictions for future file
     // operations.
     if (!$this->fileSystem->moveUploadedFile($file->getRealPath(), $fileEntity->getFileUri())) {
-      $response->setViolation($this->t('Unknown error while uploading the file "@file".', [
+      $response->addViolation($this->t('Unknown error while uploading the file "@file".', [
         '@file' => $file->getClientOriginalName(),
       ]));
       $this->logger->error('Unable to move file from "@file" to "@destination".', [
@@ -242,7 +244,7 @@ class FileUpload {
 
     // Adjust permissions.
     if (!$this->fileSystem->chmod($fileEntity->getFileUri())) {
-      $response->setViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
+      $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $file->getClientOriginalName()]));
       $this->logger->error('Unable to set file permission for file "@file".', ['@file' => $fileEntity->getFileUri()]);
       return $response;
     }
