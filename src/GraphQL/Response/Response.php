@@ -44,7 +44,7 @@ class Response implements ResponseInterface {
    * {@inheritdoc}
    */
   public function mergeViolations(ResponseInterface $source): void {
-    array_merge($this->violations, $source->getViolations());
+    $this->violations = array_merge($this->violations, $source->getViolations());
   }
 
 }
