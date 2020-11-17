@@ -139,7 +139,7 @@ class FileUpload {
    *   - file_extensions: List of valid file extensions (eg [xml, pdf])
    *   - max_filesize: Maximum allowed size of uploaded file.
    *
-   * @return \Drupal\graphql\Wrappers\FileUploadResponse
+   * @return \Drupal\graphql\GraphQL\Response\FileUploadResponse
    *   The file upload response containing file entity or list of violations.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
