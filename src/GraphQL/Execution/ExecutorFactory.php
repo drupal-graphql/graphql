@@ -27,10 +27,10 @@ class ExecutorFactory {
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param $root
+   * @param mixed $root
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $variables
-   * @param $operation
+   * @param mixed $variables
+   * @param string $operation
    * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor

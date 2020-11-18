@@ -37,7 +37,7 @@ class Settings extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\Entity\EntityFormDisplay|null $entity_form_display_context
    *   Entity form display context.
    *
-   * @return array
+   * @return \Iterator
    *   Field settings.
    */
   public function resolve(

@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Drupal\graphql\GraphQL\Response;
 
-use Drupal\jobiqo_graphql\Wrappers\Violation\ViolationCollection;
-
 /**
  * Base class for responses containing the violations.
  */
@@ -40,6 +38,13 @@ class Response implements ResponseInterface {
    */
   public function getViolations(): array {
     return $this->violations;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function mergeViolations(ResponseInterface $source): void {
+    $this->violations = array_merge($this->violations, $source->getViolations());
   }
 
 }

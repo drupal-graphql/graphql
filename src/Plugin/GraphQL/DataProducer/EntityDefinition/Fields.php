@@ -122,7 +122,6 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
     FieldContext $field_context
   ): \Iterator {
     $entity_definition->getBundleEntityType();
-    /** @var \Drupal\Core\Entity\ContentEntityType $value */
     if ($entity_definition instanceof ContentEntityType) {
       if ($bundle_context) {
         $key = $bundle_context['key'];

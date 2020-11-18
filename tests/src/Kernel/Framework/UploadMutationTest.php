@@ -66,4 +66,5 @@ GQL;
     $result = json_decode($response->getContent());
     $this->assertEquals('test.txt', $result->data->store);
   }
+
 }

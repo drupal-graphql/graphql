@@ -24,17 +24,17 @@ class ResolverBuilder {
   use DataFetcherTrait;
 
   /**
-   * @param $id
-   * @param $config
+   * @param string $id
+   * @param array $config
    *
    * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
-  public function produce($id, $config = []) {
+  public function produce($id, array $config = []) {
     return DataProducerProxy::create($id, $config);
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[] $resolvers
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface ...$resolvers
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Composite
    */
@@ -43,7 +43,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param ResolverInterface $callback
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
    */
@@ -52,7 +52,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param ResolverInterface $callback
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Map
    */
@@ -70,7 +70,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $source
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
@@ -90,8 +90,8 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $type
-   * @param $path
+   * @param string $type
+   * @param string $path
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Path
@@ -101,7 +101,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Value
    */
@@ -110,7 +110,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Argument
    */
@@ -126,7 +126,7 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param callable|null $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Context
@@ -136,8 +136,8 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $value
-   * @param $default
+   * @param mixed $value
+   * @param mixed $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\DefaultValue
    */

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Prophecy\Argument;
 
 /**
  * Test if query handling respects permissions properly.
@@ -22,7 +21,7 @@ class PermissionsTest extends GraphQLTestBase {
       schema {
         query: Query
       }
-      
+
       type Query {
         root: String
       }
@@ -75,7 +74,10 @@ GQL;
       ],
     ];
 
-    $this->assertEquals([$data, $data], json_decode($batched->getContent(), TRUE));
+    $this->assertEquals(
+      [$data, $data],
+      json_decode($batched->getContent(), TRUE)
+    );
   }
 
 }

@@ -13,7 +13,7 @@ use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
- * @TODO: Delete this resolver. This is a plugin already.
+ * @todo Delete this resolver. This is a plugin already.
  */
 class Path implements ResolverInterface {
 
@@ -23,7 +23,7 @@ class Path implements ResolverInterface {
   /**
    * Name of the context.
    *
-   * @var string
+   * @var string|\Drupal\Core\TypedData\DataDefinitionInterface
    */
   protected $type;
 
@@ -44,9 +44,9 @@ class Path implements ResolverInterface {
   /**
    * Path constructor.
    *
-   * @param $type
-   * @param $path
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|NULL $value
+   * @param string $type
+   * @param mixed $path
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $value
    */
   public function __construct($type, $path, ResolverInterface $value = NULL) {
     $this->type = $type;

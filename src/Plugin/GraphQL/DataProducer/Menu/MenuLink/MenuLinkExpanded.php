@@ -6,7 +6,7 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
- * TODO: Fix input context type.
+ * @todo Fix input context type.
  *
  * @DataProducer(
  *   id = "menu_link_expanded",

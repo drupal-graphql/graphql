@@ -9,6 +9,11 @@ entity.graphql_server.delete_form:
   title: Delete
   weight: 10
 
+entity.graphql_server.persisted_queries_form:
+  route_name: entity.graphql_server.persisted_queries_form
+  base_route: entity.graphql_server.edit_form
+  title: Persisted queries
+
 graphql.explorer:
   route_name: graphql.explorer
   base_route: entity.graphql_server.edit_form
