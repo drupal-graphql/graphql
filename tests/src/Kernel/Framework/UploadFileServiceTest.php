@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\graphql\GraphQL\Utility\FileUpload;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

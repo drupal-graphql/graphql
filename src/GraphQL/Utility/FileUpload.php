@@ -15,7 +15,6 @@ use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
-use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
@@ -99,7 +98,9 @@ class FileUpload {
     LockBackendInterface $lock,
     ConfigFactoryInterface $config_factory
   ) {
-    $this->fileStorage = $entityTypeManager->getStorage('file');
+    /** @var \Drupal\file\FileStorageInterface $file_storage */
+    $file_storage = $entityTypeManager->getStorage('file');
+    $this->fileStorage = $file_storage;
     $this->currentUser = $currentUser;
     $this->mimeTypeGuesser = $mimeTypeGuesser;
     $this->fileSystem = $fileSystem;
@@ -135,7 +136,7 @@ class FileUpload {
    * \Drupal\file\Plugin\Field\FieldType\FileItem
    * \Drupal\file\Plugin\rest\resource\FileUploadResource.
    *
-   * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+   * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploaded_file
    *   The file entity to upload.
    * @param array $settings
    *   File settings as specified in regular file field config. Contains keys:
@@ -271,7 +272,7 @@ class FileUpload {
    *   The file entity to validate.
    * @param array $validators
    *   An array of upload validators to pass to file_validate().
-   * @param FileUploadResponse $response
+   * @param \Drupal\file\Entity\FileUploadResponse $response
    *   The response where validation errors will be added.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
@@ -338,7 +339,8 @@ class FileUpload {
         }
         if (empty($validators['file_validate_extensions'][0]) || $passes_validation) {
           if ((substr($filename, -4) != '.txt')) {
-            // The destination filename will also later be used to create the URI.
+            // The destination filename will also later be used to create the
+            // URI.
             $filename .= '.txt';
           }
           $filename = file_munge_filename($filename, $validators['file_validate_extensions'][0] ?? '');
@@ -386,7 +388,7 @@ class FileUpload {
    *   An array suitable for passing to file_save_upload() or the file field
    *   element's '#upload_validators' property.
    */
-  protected function getUploadValidators(array $settings) {
+  protected function getUploadValidators(array $settings): array {
     $validators = [
       // Add in our check of the file name length.
       'file_validate_name_length' => [],
@@ -412,7 +414,7 @@ class FileUpload {
   /**
    * Generates a lock ID based on the file URI.
    *
-   * @param $file_uri
+   * @param string $file_uri
    *   The file URI.
    *
    * @return string
