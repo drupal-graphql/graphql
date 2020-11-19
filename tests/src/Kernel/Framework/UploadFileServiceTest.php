@@ -39,21 +39,9 @@ class UploadFileServiceTest extends GraphQLTestBase {
     parent::setUp();
     $this->installEntitySchema('file');
 
-    $file_system = \Drupal::service('file_system');
+    $this->uploadService = $this->container->get('graphql.file_upload');
 
-    // Pass all file system calls through except moveUploadedFile(). We don't
-    // have a real uploaded file, so it would fail PHP's move_uploaded_file()
-    // checks.
-    $mock_file_system = new MockFileSystem($file_system);
-
-    $this->uploadService = new FileUpload(
-      \Drupal::service('entity_type.manager'),
-      \Drupal::service('current_user'),
-      \Drupal::service('file.mime_type.guesser'),
-      $mock_file_system,
-      \Drupal::service('logger.channel.graphql')
-    );
-
+    $file_system = $this->container->get('file_system');
     // Create dummy file, since symfony will test if it exists.
     $this->file = $file_system->getTempDirectory() . '/graphql_upload_test.txt';
     touch($this->file);
@@ -66,12 +54,11 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK);
 
-    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);
     $file_entity = $file_upload_response->getFileEntity();
-    $file_entity->save();
 
     $this->assertSame('public://test/test.txt', $file_entity->getFileUri());
     $this->assertFileExists($file_entity->getFileUri());
@@ -84,7 +71,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_INI_SIZE);
 
-    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);
@@ -103,7 +90,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_PARTIAL);
 
-    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
     ]);
@@ -123,7 +110,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK);
 
     $this->expectException(\RuntimeException::class);
-    $this->uploadService->createTemporaryFileUpload($uploadFile, []);
+    $this->uploadService->saveFileUpload($uploadFile, []);
   }
 
   /**
@@ -136,7 +123,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
 
-    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
       // Only allow 1 byte.
@@ -152,21 +139,39 @@ class UploadFileServiceTest extends GraphQLTestBase {
   }
 
   /**
-   * Tests that the uploaded file extension is allowed.
+   * Tests that the uploaded file extension is renamed to txt.
    */
-  public function testExtensionValidation() {
+  public function testExtensionRenaming() {
     // Evil php file extension!
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test.php');
 
-    $file_upload_response = $this->uploadService->createTemporaryFileUpload($uploadFile, [
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
       'file_directory' => 'test',
+    ]);
+    $file_entity = $file_upload_response->getFileEntity();
+
+    $this->assertSame('public://test/test.php_.txt', $file_entity->getFileUri());
+    $this->assertFileExists($file_entity->getFileUri());
+  }
+
+  /**
+   * Tests that the uploaded file extension is validated.
+   */
+  public function testExtensionValidation() {
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test.txt');
+
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      // We only allow odt files, so validation must fail.
+      'file_extensions' => 'odt',
     ]);
     $violations = $file_upload_response->getViolations();
 
     // @todo Do we want HTML tags in our violations or not?
     $this->assertStringMatchesFormat(
-      'Only files with the following extensions are allowed: <em class="placeholder">txt</em>.',
+      'Only files with the following extensions are allowed: <em class="placeholder">odt</em>.',
       $violations[0]['message']
     );
   }
