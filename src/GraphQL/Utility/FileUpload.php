@@ -272,7 +272,7 @@ class FileUpload {
    *   The file entity to validate.
    * @param array $validators
    *   An array of upload validators to pass to file_validate().
-   * @param \Drupal\file\Entity\FileUploadResponse $response
+   * @param \Drupal\graphql\GraphQL\Response\FileUploadResponse $response
    *   The response where validation errors will be added.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
