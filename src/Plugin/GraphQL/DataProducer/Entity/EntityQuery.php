@@ -47,13 +47,13 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *       default_value = {}
  *     ),
  *     "languages" = @ContextDefinition("string",
- *       label = @Translation("Entity languages(s)"),
+ *       label = @Translation("Entity languages"),
  *       multiple = TRUE,
  *       required = FALSE,
  *       default_value = {}
  *     ),
  *     "bundles" = @ContextDefinition("any",
- *       label = @Translation("Entity bundle(s)"),
+ *       label = @Translation("Entity bundles"),
  *       multiple = TRUE,
  *       required = FALSE,
  *       default_value = {}
