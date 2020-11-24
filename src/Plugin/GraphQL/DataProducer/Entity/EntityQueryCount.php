@@ -57,10 +57,6 @@ class EntityQueryCount extends EntityQueryBase {
    *
    * @param string $type
    *   Entity type.
-   * @param int $limit
-   *   Maximum number of queried entities.
-   * @param int|null $offset
-   *   Offset to start with.
    * @param bool $ownedOnly
    *   Query only entities owned by current user.
    * @param array $conditions
@@ -71,15 +67,13 @@ class EntityQueryCount extends EntityQueryBase {
    *   Languages for queried entities.
    * @param string[] $bundles
    *   List of bundles to be filtered.
-   * @param array $sorts
-   *   List of sorts.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
    * @return int
    *   Total count of items queried by entity query.
    */
-  public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, array $sorts, FieldContext $context): int {
+  public function resolve(string $type, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, FieldContext $context): int {
     $query = $this->buildBaseEntityQuery(
       $type,
       $ownedOnly,
