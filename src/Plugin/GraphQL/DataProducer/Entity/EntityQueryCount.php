@@ -5,29 +5,18 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
 /**
- * Builds and executes Drupal entity query.
+ * Builds and executes Drupal entity query count.
  *
  * @DataProducer(
- *   id = "entity_query",
+ *   id = "entity_query_count",
  *   name = @Translation("Load entities"),
  *   description = @Translation("Loads entities."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity IDs"),
- *     multiple = TRUE
+ *   produces = @ContextDefinition("integer",
+ *     label = @Translation("Total count of items queried by entity query."),
  *   ),
  *   consumes = {
  *     "type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
- *     ),
- *     "limit" = @ContextDefinition("integer",
- *       label = @Translation("Limit"),
- *       required = FALSE,
- *       default_value = 10
- *     ),
- *     "offset" = @ContextDefinition("integer",
- *       label = @Translation("Offset"),
- *       required = FALSE,
- *       default_value = 0
  *     ),
  *     "owned_only" = @ContextDefinition("boolean",
  *       label = @Translation("Query only owned entities"),
@@ -57,26 +46,20 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *       multiple = TRUE,
  *       required = FALSE,
  *       default_value = {}
- *     ),
- *     "sorts" = @ContextDefinition("any",
- *       label = @Translation("Sorts"),
- *       multiple = TRUE,
- *       default_value = {},
- *       required = FALSE
  *     )
  *   }
  * )
  */
-class EntityQuery extends EntityQueryBase {
+class EntityQueryCount extends EntityQueryBase {
 
   /**
-   * Resolves the entity query.
+   * Resolves the entity query count.
    *
    * @param string $type
    *   Entity type.
    * @param int $limit
    *   Maximum number of queried entities.
-   * @param int $offset
+   * @param int|null $offset
    *   Offset to start with.
    * @param bool $ownedOnly
    *   Query only entities owned by current user.
@@ -93,13 +76,10 @@ class EntityQuery extends EntityQueryBase {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return array
-   *   The list of ids that match this query.
-   *
-   * @throws \GraphQL\Error\UserError
-   *   No bundles defined for given entity type.
+   * @return int
+   *   Total count of items queried by entity query.
    */
-  public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, array $sorts, FieldContext $context): array {
+  public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, array $sorts, FieldContext $context): int {
     $query = $this->buildBaseEntityQuery(
       $type,
       $ownedOnly,
@@ -110,26 +90,7 @@ class EntityQuery extends EntityQueryBase {
       $context
     );
 
-    // Make sure offset is zero or positive.
-    $offset = max($offset, 0);
-    $query->range($offset, $limit);
-
-    // Add sorts.
-    foreach ($sorts as $sort) {
-      if (!empty($sort['field'])) {
-        if (!empty($sort['direction']) && strtolower($sort['direction']) == 'desc') {
-          $direction = 'DESC';
-        }
-        else {
-          $direction = 'ASC';
-        }
-        $query->sort($sort['field'], $direction);
-      }
-    }
-
-    $ids = $query->execute();
-
-    return $ids;
+    return $query->count()->execute();
   }
 
 }
