@@ -7,7 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
- * Class SchemaPluginManager
+ * Manager that collects and exposes GraphQL schema plugins.
  *
  * @package Drupal\graphql\Plugin
  *
@@ -53,6 +53,7 @@ class SchemaPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_schema');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($cacheBackend, 'schemas', ['graphql']);
+    $this->setCacheBackend($cacheBackend, 'graphql_schema', ['graphql_schema']);
   }
+
 }

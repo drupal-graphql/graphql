@@ -54,8 +54,14 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @param callable|null $defaultTypeResolver
    */
   public function __construct(callable $defaultFieldResolver = NULL, callable $defaultTypeResolver = NULL) {
-    $this->defaultFieldResolver = $defaultFieldResolver ?: [$this, 'resolveFieldDefault'];
-    $this->defaultTypeResolver = $defaultTypeResolver ?: [$this, 'resolveTypeDefault'];
+    $this->defaultFieldResolver = $defaultFieldResolver ?: [
+      $this,
+      'resolveFieldDefault',
+    ];
+    $this->defaultTypeResolver = $defaultTypeResolver ?: [
+      $this,
+      'resolveTypeDefault',
+    ];
   }
 
   /**
@@ -123,8 +129,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
-   * @param $args
+   * @param mixed $value
+   * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -135,8 +141,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
-   * @param $args
+   * @param mixed $value
+   * @param mixed $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -149,7 +155,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -160,7 +166,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * @param $value
+   * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
    *
@@ -169,4 +175,5 @@ class ResolverRegistry implements ResolverRegistryInterface {
   protected function resolveTypeDefault($value, ResolveContext $context, ResolveInfo $info) {
     return NULL;
   }
+
 }

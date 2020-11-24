@@ -58,4 +58,5 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
         ->map('id', $builder->fromArgument('id'))
     );
   }
+
 }

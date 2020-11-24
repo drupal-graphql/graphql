@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -146,7 +145,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(string $vid, ?int $parent, ?int $max_depth, ?string $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
+  public function resolve(string $vid, int $parent, ?int $max_depth, ?string $language, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): ?Deferred {
     if (!isset($max_depth)) {
       $max_depth = self::MAX_DEPTH;
     }
@@ -160,7 +159,8 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
 
     return new Deferred(function () use ($language, $resolver, $context, $access, $accessUser, $accessOperation) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
-      if (!$entities = $resolver()) {
+      $entities = $resolver();
+      if (!$entities) {
         // If there is no entity with this id, add the list cache tags so that
         // the cache entry is purged whenever a new entity of this type is
         // saved.
@@ -180,7 +180,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
         }
 
         if ($access) {
-          /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+          /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
           $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
           $context->addCacheableDependency($accessResult);
           if (!$accessResult->isAllowed()) {

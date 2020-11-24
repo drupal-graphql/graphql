@@ -1,42 +1,43 @@
 # Mutations
 
-In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are also technically Data producers which we already looked at.
+In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are called using also Data producers which we already looked at.
 
-Lets create a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `creator` in order to set these fields when creating the new article if they have been provided.
+Let's make a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `description` in order to set these fields when creating the new article if they have been provided.
 
 Similar to queries we can start by adding the necessary schema information, not only to register our new mutation but also provide type safety on all parameters as well. This mutation will return the newly created "Article".
 
- The code with all the demo queries and mutations in these docs can be found in [this repository](https://github.com/joaogarin/mydrupalgql).
+The code with all the demo queries and mutations in these docs can be found in the same `graphql_composable` example module.
 
 ## Add the schema declaration
 
+Adapt your base schema file to something like this where we include a new type called `Mutation` and we also create a new input called `ArticleInput` which we will use as the type for our mutation argument.
+
 ```
-schema {
-    mutation: Mutation
-}
+type Mutation
 
-type Mutation {
-    createArticle(data: ArticleInput): Article
-}
+scalar Violation
 
-type Article implements NodeInterface {
-    id: Int!
-    title: String!
-    creator: String
-}
-
-interface NodeInterface {
-    id: Int!
+type Article {
+  id: Int!
+  title: String!
+  author: String
 }
 
 input ArticleInput {
-    title: String!
-    description: String
+  title: String!
+  description: String
 }
-
 ```
 
-We can now see we have a Mutation called `createArticle` which takes a data parameter, but because GraphQL is heavily typed we know everything we can and must include in the new Article like the title which is mandatory in this case.
+And now in our `.exntends.graphqls` file we will extend the Mutation type to add our new mutation. This is so that in the future other modules can also themselves extend this type with new mutations keeping things organized.
+
+```
+extend type Mutation {
+   createArticle(data: ArticleInput): Article
+}
+```
+
+We can now see we have a Mutation called `createArticle` which takes a data parameter, and because GraphQL is heavily typed we know everything we can and must include in the new Article (`ArticleInput`) like the title which is mandatory in this case.
 
 ## Implement the custom data producer (mutation)
 
@@ -45,7 +46,7 @@ We now need to implement the actual mutation, in the file `src/Plugin/GraphQL/Da
 ```php
 <?php
 
-namespace Drupal\mydrupalgql\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -110,42 +111,48 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
 
   /**
    * Creates an article.
-   * 
+   *
    * @param array $data
    *   The title of the job.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return \Drupal\Core\Entity\EntityBase|\Drupal\Core\Entity\EntityInterface
    *   The newly created article.
    *
    * @throws \Exception
    */
   public function resolve(array $data) {
     if ($this->currentUser->hasPermission("create article content")) {
-        $values = [
-            'title' => $data['title'],
-            'field_article_creator' => $data['creator'],
-        ];
-        $node = Node::create($values);
-        $node->save();
-        return $node;
+      $values = [
+        'type' => 'article',
+        'title' => $data['title'],
+        'body' => $data['description'],
+      ];
+      $node = Node::create($values);
+      $node->save();
+      return $node;
     }
     return NULL;
   }
 
 }
-
 ```
 
-## Adding resolvers
+### Important note 
 
-To add the resolvers we go to our schema implementation and call the created data producer `create_article` inside the `getResolverRegistry` method.
+One thing to notice when creating mutations like this is that Access checking needs to be done in the mutation, for queries this usually is done in the
+data producer directly (e.g. `entity_load` has access checking built-in) but because we are programatically creating
+things we need to check the user actually has access to do the operation.
+
+## Calling the mutation
+
+To add the resolvers for the `createArticle` mutation we go to our schema implementation and call the created data producer `create_article` inside the `registerResolvers` method.
 
 ```php
 /**
  * {@inheritdoc}
  */
-protected function getResolverRegistry() {
-  
+public function registerResolvers(ResolverRegistryInterface $registry) {
+
   ...
   // Create article mutation.
   $registry->addFieldResolver('Mutation', 'createArticle',
@@ -159,10 +166,10 @@ protected function getResolverRegistry() {
 ```
 
 This mutation can now be called like this :
- 
+
 ```graphql
 mutation {
-  createArticle(data: {title: "Hello GraphQl 2"}) {
+  createArticle(data: { title: "Hello GraphQl 2" }) {
     ... on Article {
       id
       title
@@ -171,7 +178,7 @@ mutation {
 }
 ```
 
-and should return something like : 
+and should return something like :
 
 ```json
 {
@@ -183,3 +190,7 @@ and should return something like :
   }
 }
 ```
+
+## Validating mutations
+
+Now that we have our mutation in place one way we can improve this is by adding some validation so that if someone is not to create an article they get a nice error back (technically in Drupal these are called Violations) so that it can be printed to the user in whichever app this is called. In the next chapter we will look at how we can improve this code to add some validation to it.

@@ -5,7 +5,6 @@ namespace Drupal\graphql\Config;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodManager;
 
 /**
@@ -74,6 +73,9 @@ class LanguageConfigOverride implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
+    // The interface says we should return an object here, but we don't care and
+    // this does not seem to break anything?
+    // @phpstan-ignore-next-line
     return NULL;
   }
 
