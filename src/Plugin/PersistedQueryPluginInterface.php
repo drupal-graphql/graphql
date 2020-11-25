@@ -9,8 +9,9 @@ use GraphQL\Server\OperationParams;
 interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginInspectionInterface {
 
   /**
-   * @return string
-   *   The actual GraphQL query.
+   * @return string|null
+   *   The actual GraphQL query, or NULL if this plugin does not support a query
+   *   with that ID.
    */
   public function getQuery($id, OperationParams $operation);
 
