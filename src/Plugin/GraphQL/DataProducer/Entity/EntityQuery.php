@@ -70,6 +70,11 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 class EntityQuery extends EntityQueryBase {
 
   /**
+   * The default maximum number of items to be capped to prevent DDOS attacks.
+   */
+  const MAX_ITEMS = 100;
+
+  /**
    * Resolves the entity query.
    *
    * @param string $type
@@ -112,6 +117,15 @@ class EntityQuery extends EntityQueryBase {
 
     // Make sure offset is zero or positive.
     $offset = max($offset, 0);
+
+    // Make sure limit is positive and cap the max items to prevent DDOS
+    // attacks.
+    if ($limit <= 0) {
+      $limit = 10;
+    }
+    $limit = min($limit, self::MAX_ITEMS);
+
+    // Apply offset and limit.
     $query->range($offset, $limit);
 
     // Add sorts.
