@@ -144,7 +144,15 @@ services:
   # File upload.
   graphql.file_upload:
     class: Drupal\graphql\GraphQL\Utility\FileUpload
-    arguments: ['@entity_type.manager', '@current_user', '@file.mime_type.guesser', '@file_system', '@logger.channel.graphql']
+    arguments:
+      - '@entity_type.manager'
+      - '@current_user'
+      - '@file.mime_type.guesser'
+      - '@file_system'
+      - '@logger.channel.graphql'
+      - '@token'
+      - '@lock'
+      - '@config.factory'
 
   plugin.manager.graphql.persisted_query:
     class: Drupal\graphql\Plugin\PersistedQueryPluginManager
