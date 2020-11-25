@@ -5,29 +5,24 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
 /**
- * Builds and executes Drupal entity query.
+ * Builds and executes Drupal entity query count.
+ *
+ * It supposed to be used along the entity query to get the total amount of
+ * items. This is important for pagination when the total amount needs to be
+ * known to derive the number of available pages. Otherwise the query works the
+ * same way as entity query. Same filters are applied, just skips the offset and
+ * limit, and turns the query into count query.
  *
  * @DataProducer(
- *   id = "entity_query",
+ *   id = "entity_query_count",
  *   name = @Translation("Load entities"),
  *   description = @Translation("Loads entities."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity IDs"),
- *     multiple = TRUE
+ *   produces = @ContextDefinition("integer",
+ *     label = @Translation("Total count of items queried by entity query."),
  *   ),
  *   consumes = {
  *     "type" = @ContextDefinition("string",
  *       label = @Translation("Entity type")
- *     ),
- *     "limit" = @ContextDefinition("integer",
- *       label = @Translation("Limit"),
- *       required = FALSE,
- *       default_value = 10
- *     ),
- *     "offset" = @ContextDefinition("integer",
- *       label = @Translation("Offset"),
- *       required = FALSE,
- *       default_value = 0
  *     ),
  *     "owned_only" = @ContextDefinition("boolean",
  *       label = @Translation("Query only owned entities"),
@@ -57,32 +52,17 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *       multiple = TRUE,
  *       required = FALSE,
  *       default_value = {}
- *     ),
- *     "sorts" = @ContextDefinition("any",
- *       label = @Translation("Sorts"),
- *       multiple = TRUE,
- *       default_value = {},
- *       required = FALSE
  *     )
  *   }
  * )
  */
-class EntityQuery extends EntityQueryBase {
+class EntityQueryCount extends EntityQueryBase {
 
   /**
-   * The default maximum number of items to be capped to prevent DDOS attacks.
-   */
-  const MAX_ITEMS = 100;
-
-  /**
-   * Resolves the entity query.
+   * Resolves the entity query count.
    *
    * @param string $type
    *   Entity type.
-   * @param int $limit
-   *   Maximum number of queried entities.
-   * @param int $offset
-   *   Offset to start with.
    * @param bool $ownedOnly
    *   Query only entities owned by current user.
    * @param array $conditions
@@ -93,18 +73,13 @@ class EntityQuery extends EntityQueryBase {
    *   Languages for queried entities.
    * @param string[] $bundles
    *   List of bundles to be filtered.
-   * @param array $sorts
-   *   List of sorts.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return array
-   *   The list of ids that match this query.
-   *
-   * @throws \GraphQL\Error\UserError
-   *   No bundles defined for given entity type.
+   * @return int
+   *   Total count of items queried by entity query.
    */
-  public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, array $sorts, FieldContext $context): array {
+  public function resolve(string $type, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, FieldContext $context): int {
     $query = $this->buildBaseEntityQuery(
       $type,
       $ownedOnly,
@@ -115,35 +90,7 @@ class EntityQuery extends EntityQueryBase {
       $context
     );
 
-    // Make sure offset is zero or positive.
-    $offset = max($offset, 0);
-
-    // Make sure limit is positive and cap the max items to prevent DDOS
-    // attacks.
-    if ($limit <= 0) {
-      $limit = 10;
-    }
-    $limit = min($limit, self::MAX_ITEMS);
-
-    // Apply offset and limit.
-    $query->range($offset, $limit);
-
-    // Add sorts.
-    foreach ($sorts as $sort) {
-      if (!empty($sort['field'])) {
-        if (!empty($sort['direction']) && strtolower($sort['direction']) == 'desc') {
-          $direction = 'DESC';
-        }
-        else {
-          $direction = 'ASC';
-        }
-        $query->sort($sort['field'], $direction);
-      }
-    }
-
-    $ids = $query->execute();
-
-    return $ids;
+    return $query->count()->execute();
   }
 
 }
