@@ -7,6 +7,12 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 /**
  * Builds and executes Drupal entity query count.
  *
+ * It supposed to be used along the entity query to get the total amount of
+ * items. This is important for pagination when the total amount needs to be
+ * known to derive the number of available pages. Otherwise the query works the
+ * same way as entity query. Same filters are applied, just skips the offset and
+ * limit, and turns the query into count query.
+ *
  * @DataProducer(
  *   id = "entity_query_count",
  *   name = @Translation("Load entities"),
