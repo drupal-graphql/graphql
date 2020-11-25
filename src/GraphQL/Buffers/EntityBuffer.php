@@ -70,7 +70,7 @@ class EntityBuffer extends BufferBase {
     return array_map(function ($item) use ($entities) {
       if (is_array($item['id'])) {
         return array_reduce($item['id'], function ($carry, $current) use ($entities) {
-          if (!empty($entities[$current])) {
+          if (!empty($entities[$current]) && $entities[$current]->access('view')) {
             array_push($carry, $entities[$current]);
             return $carry;
           }
