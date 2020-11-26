@@ -223,46 +223,51 @@ class FileUpload {
       return $response;
     }
 
-    // Begin building file entity.
-    /** @var \Drupal\file\FileInterface $file */
-    $file = $this->fileStorage->create([]);
-    $file->setOwnerId($this->currentUser->id());
-    $file->setFilename($prepared_filename);
-    $file->setMimeType($this->mimeTypeGuesser->guess($prepared_filename));
-    $file->setFileUri($file_uri);
-    // Set the size. This is done in File::preSave() but we validate the file
-    // before it is saved.
-    $file->setSize(@filesize($temp_file_path));
-
-    // Validate the file entity against entity-level validation and field-level
-    // validators.
-    if (!$this->validate($file, $validators, $response)) {
-      return $response;
-    }
-
-    // Move the file to the correct location after validation. Use
-    // FileSystemInterface::EXISTS_ERROR as the file location has already been
-    // determined above in FileSystem::getDestinationFilename().
     try {
-      $this->fileSystem->move($temp_file_path, $file_uri, FileSystemInterface::EXISTS_ERROR);
-    }
-    catch (FileException $e) {
-      $response->addViolation($this->t('Unknown error while uploading the file "@file".', [
-        '@file' => $uploaded_file->getClientOriginalName(),
-      ]));
-      $this->logger->error('Unable to move file from "@file" to "@destination".', [
-        '@file' => $uploaded_file->getRealPath(),
-        '@destination' => $file->getFileUri(),
-      ]);
+      // Begin building file entity.
+      /** @var \Drupal\file\FileInterface $file */
+      $file = $this->fileStorage->create([]);
+      $file->setOwnerId($this->currentUser->id());
+      $file->setFilename($prepared_filename);
+      $file->setMimeType($this->mimeTypeGuesser->guess($prepared_filename));
+      $file->setFileUri($file_uri);
+      // Set the size. This is done in File::preSave() but we validate the file
+      // before it is saved.
+      $file->setSize(@filesize($temp_file_path));
+
+      // Validate the file entity against entity-level validation and
+      // field-level validators.
+      if (!$this->validate($file, $validators, $response)) {
+        return $response;
+      }
+
+      // Move the file to the correct location after validation. Use
+      // FileSystemInterface::EXISTS_ERROR as the file location has already been
+      // determined above in FileSystem::getDestinationFilename().
+      try {
+        $this->fileSystem->move($temp_file_path, $file_uri, FileSystemInterface::EXISTS_ERROR);
+      }
+      catch (FileException $e) {
+        $response->addViolation($this->t('Unknown error while uploading the file "@file".', [
+          '@file' => $uploaded_file->getClientOriginalName(),
+        ]));
+        $this->logger->error('Unable to move file from "@file" to "@destination".', [
+          '@file' => $uploaded_file->getRealPath(),
+          '@destination' => $file->getFileUri(),
+        ]);
+        return $response;
+      }
+
+      $file->save();
+
+      $response->setFileEntity($file);
       return $response;
     }
-
-    $file->save();
-
-    $this->lock->release($lock_id);
-
-    $response->setFileEntity($file);
-    return $response;
+    finally {
+      // This will always be executed before any return statement or exception
+      // in the try {} block.
+      $this->lock->release($lock_id);
+    }
   }
 
   /**
