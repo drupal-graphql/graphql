@@ -2,7 +2,10 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\graphql\GraphQL\Utility\FileUpload;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -173,6 +176,41 @@ class UploadFileServiceTest extends GraphQLTestBase {
       'Only files with the following extensions are allowed: <em class="placeholder">odt</em>.',
       $violations[0]['message']
     );
+  }
+
+  /**
+   * Tests that the file lock is released on validation errors.
+   */
+  public function testLockReleased() {
+    // Mock the lock system to check that the lock is released.
+    $lock = $this->prophesize(LockBackendInterface::class);
+    $lock->acquire(Argument::any())->willReturn(TRUE);
+    // This is our only assertion - that the lock release method is called.
+    $lock->release(Argument::any())->shouldBeCalled();
+
+    $upload_service = new FileUpload(
+      \Drupal::service('entity_type.manager'),
+      \Drupal::service('current_user'),
+      \Drupal::service('file.mime_type.guesser'),
+      \Drupal::service('file_system'),
+      \Drupal::service('logger.channel.graphql'),
+      \Drupal::service('token'),
+      $lock->reveal(),
+      \Drupal::service('config.factory')
+    );
+
+    // Create a file with 4 bytes.
+    file_put_contents($this->file, 'test');
+
+    // Create a Symfony dummy uploaded file in test mode.
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
+
+    $upload_service->saveFileUpload($uploadFile, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      // Only allow 1 byte.
+      'max_filesize' => 1,
+    ]);
   }
 
   /**
