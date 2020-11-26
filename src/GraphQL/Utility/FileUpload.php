@@ -235,8 +235,8 @@ class FileUpload {
       // before it is saved.
       $file->setSize(@filesize($temp_file_path));
 
-      // Validate the file entity against entity-level validation and field-level
-      // validators.
+      // Validate the file entity against entity-level validation and
+      // field-level validators.
       if (!$this->validate($file, $validators, $response)) {
         return $response;
       }
