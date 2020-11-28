@@ -18,6 +18,13 @@ class PersistedQueriesForm extends EntityForm {
   protected $persistedQueryPluginManager;
 
   /**
+   * The entity being used by this form.
+   *
+   * @var \Drupal\graphql\Entity\Server
+   */
+  protected $entity;
+
+  /**
    * PersistedQueriesForm constructor.
    *
    * @param \Drupal\graphql\Plugin\PersistedQueryPluginManager $persistedQueryPluginManager
@@ -48,7 +55,7 @@ class PersistedQueriesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    /** @var PersistedQueryPluginInterface[] $plugins */
+    /** @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface[] $plugins */
     $plugins = $this->entity->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
@@ -172,7 +179,8 @@ class PersistedQueriesForm extends EntityForm {
         $plugin_form_state = SubformState::createForSubform($form['settings'][$id], $form, $form_state);
         $plugin->submitConfigurationForm($form['settings'][$id], $plugin_form_state);
       }
-      if (!empty($values['weights']['order'][$id]['weight'])) {
+      // Use isset instead of empty to cover weight with zero index.
+      if (isset($values['weights']['order'][$id]['weight'])) {
         $plugin->setWeight((int) $values['weights']['order'][$id]['weight']);
       }
       $this->entity->addPersistedQueryInstance($plugin);

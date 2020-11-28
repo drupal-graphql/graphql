@@ -66,9 +66,9 @@ class EntityRevisionBuffer extends BufferBase {
     $vids = array_values(array_unique($vids));
 
     // Load the buffered entities.
-    $entities = $this->entityTypeManager
-      ->getStorage($type)
-      ->loadMultipleRevisions($vids);
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage($type);
+    $entities = $storage->loadMultipleRevisions($vids);
 
     return array_map(function ($item) use ($entities) {
       if (is_array($item['vid'])) {

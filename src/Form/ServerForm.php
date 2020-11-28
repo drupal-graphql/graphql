@@ -13,6 +13,7 @@ use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use GraphQL\Error\DebugFlag;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -183,11 +184,23 @@ class ServerForm extends EntityForm {
       '#description' => $this->t('Whether caching of queries and partial results is enabled.'),
     ];
 
-    $form['debug'] = [
-      '#title' => $this->t('Enable debugging'),
-      '#type' => 'checkbox',
-      '#default_value' => !!$server->get('debug'),
-      '#description' => $this->t('In debugging mode, error messages contain more verbose information in the query response.'),
+    $debug_flags = $server->get('debug_flag') ?? 0;
+    $form['debug_flag'] = [
+      '#title' => $this->t('Debug settings'),
+      '#type' => 'checkboxes',
+      '#options' => [
+        DebugFlag::INCLUDE_DEBUG_MESSAGE => $this->t("Add debugMessage key containing the exception message to errors."),
+        DebugFlag::INCLUDE_TRACE => $this->t("Include the formatted original backtrace in errors."),
+        DebugFlag::RETHROW_INTERNAL_EXCEPTIONS => $this->t("Rethrow the internal GraphQL exceptions"),
+        DebugFlag::RETHROW_UNSAFE_EXCEPTIONS => $this->t("Rethrow unsafe GraphQL exceptions, these are exceptions that have not been marked as safe to expose to clients."),
+      ],
+      '#default_value' => array_keys(array_filter([
+        DebugFlag::INCLUDE_DEBUG_MESSAGE => (bool) ($debug_flags & DebugFlag::INCLUDE_DEBUG_MESSAGE),
+        DebugFlag::INCLUDE_TRACE => (bool) ($debug_flags & DebugFlag::INCLUDE_TRACE),
+        DebugFlag::RETHROW_INTERNAL_EXCEPTIONS => (bool) ($debug_flags & DebugFlag::RETHROW_INTERNAL_EXCEPTIONS),
+        DebugFlag::RETHROW_UNSAFE_EXCEPTIONS => (bool) ($debug_flags & DebugFlag::RETHROW_UNSAFE_EXCEPTIONS),
+      ])),
+      '#description' => $this->t("It is recommended to disable all debugging in production. During development you can enable the information that you need above."),
     ];
 
     $form['actions'] = [
@@ -220,8 +233,8 @@ class ServerForm extends EntityForm {
       $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
     }
 
-    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
@@ -233,10 +246,13 @@ class ServerForm extends EntityForm {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $formState) {
+    // Translate the debug flag from individual checkboxes to the enum value
+    // that the GraphQL library expects.
+    $formState->setValue('debug_flag', array_sum($formState->getValue('debug_flag')));
     parent::submitForm($form, $formState);
 
-    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $schema = $formState->getValue('schema');
+    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
@@ -250,13 +266,14 @@ class ServerForm extends EntityForm {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function save(array $form, FormStateInterface $formState) {
-    parent::save($form, $formState);
+    $save_result = parent::save($form, $formState);
 
     $this->messenger()->addMessage($this->t('Saved the %label server.', [
       '%label' => $this->entity->label(),
     ]));
 
     $formState->setRedirect('entity.graphql_server.collection');
+    return $save_result;
   }
 
 }

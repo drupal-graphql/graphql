@@ -3,6 +3,7 @@
 namespace Drupal\graphql\GraphQL\Utility;
 
 use GraphQL\Deferred;
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 
 class DeferredUtility {
@@ -35,7 +36,7 @@ class DeferredUtility {
    * @return mixed
    */
   public static function applyFinally($value, callable $callback) {
-    if ($value instanceof Deferred) {
+    if ($value instanceof SyncPromise) {
       // Recursively apply this function to deferred results.
       $value->then(function ($inner) use ($callback) {
         return static::applyFinally($inner, $callback);
@@ -52,14 +53,12 @@ class DeferredUtility {
    * @param mixed $value
    * @param callable $callback
    *
-   * @return \GraphQL\Deferred|mixed
+   * @return \GraphQL\Executor\Promise\Adapter\SyncPromise|mixed
    */
   public static function returnFinally($value, callable $callback) {
-    if ($value instanceof Deferred) {
-      return new Deferred(function () use ($value, $callback) {
-        return $value->then(function ($value) use ($callback) {
-          return $callback($value);
-        });
+    if ($value instanceof SyncPromise) {
+      return $value->then(function ($value) use ($callback) {
+        return $callback($value);
       });
     }
 
@@ -85,7 +84,7 @@ class DeferredUtility {
       return new Deferred(function () use ($values) {
         $adapter = static::promiseAdapter();
         return $adapter->all(array_map(function ($value) use ($adapter) {
-          if ($value instanceof Deferred) {
+          if ($value instanceof SyncPromise) {
             return $adapter->convertThenable($value);
           }
 
@@ -108,7 +107,7 @@ class DeferredUtility {
    */
   public static function containsDeferred(array $values) {
     foreach ($values as $value) {
-      if ($value instanceof Deferred) {
+      if ($value instanceof SyncPromise) {
         return TRUE;
       }
     }

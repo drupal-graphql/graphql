@@ -18,7 +18,7 @@ This is the main entry point for your schema. You can insert new types, inputs a
 
 ### composable_extension.extension.graphqls
 
-For now all you need to know about this file is that it extens the base file. What this will allow is to better organize resolvers into different modules where each module might expose different things to the schema. The only existing type by default is `Query` and so to define new queries you have to add them here in the extension.graphqls file.
+For now all you need to know about this file is that it extends the base file. What this will allow is to better organize resolvers into different modules where each module might expose different things to the schema. The only existing type by default is `Query` and so to define new queries you have to add them here in the extension.graphqls file.
 
 For more information about composable schemas go to [Advanced section](./../advanced/composable-schemas.md) when talking about spliting schemas so that you can make certain modules enable new functionalities as they are enabled.
 

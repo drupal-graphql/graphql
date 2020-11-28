@@ -135,7 +135,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     // Show general error message also in case of unexpected response. Log to
     // watchdog for potential further investigation.
     if ($controller_response->getStatusCode() !== 200) {
-      $this->logger->warning("Unexpected response code @code during password reset.", ['@code' => $response->getStatusCode()]);
+      $this->logger->warning("Unexpected response code @code during password reset.", ['@code' => $controller_response->getStatusCode()]);
       $response->addViolation($this->t('Unable to reset password, please try again later.'));
     }
 

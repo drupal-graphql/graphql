@@ -5,6 +5,9 @@
  * Install, update and uninstall functions for the GraphQL module.
  */
 
+use Drupal\graphql\Entity\Server;
+use GraphQL\Error\DebugFlag;
+
 /**
  * Implements hook_requirements().
  */
@@ -38,4 +41,25 @@ function graphql_uninstall() {
     unset($negotiation[$type]['enabled']['language-graphql']);
   }
   $languageTypes->set('negotiation', $negotiation)->save();
+}
+
+/**
+ * Update GraphQL Server debug configuration value.
+ */
+function graphql_update_8001() {
+  // The `debug` config item has changed to `debug_flag`. It is no longer a
+  // boolean toggle but instead a set of flags providing more control. In this
+  // case we default to debug messages and a backtrace in case debugging was
+  // enabled and just unselect all flags otherwise.
+  $servers = Server::loadMultiple();
+  foreach ($servers as $server) {
+    // There is no need to unset `debug` as its property no longer exists so it
+    // will not get persisted.
+    $debugEnabled = (bool) $server->get('debug');
+    $server->set(
+      'debug_flag',
+      $debugEnabled ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE
+    );
+    $server->save();
+  }
 }
