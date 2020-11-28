@@ -40,3 +40,4 @@ parameters:
 			message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\LanguageNegotiation\\\\OperationLanguageNegotiation\\:\\:getLangcode\\(\\) should return string but returns false\\.$#"
 			count: 1
 			path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
+		- "#^Parameter .+ of method Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:range\\(\\) expects null, int given\\.$#"
