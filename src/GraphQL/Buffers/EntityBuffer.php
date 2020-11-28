@@ -28,7 +28,7 @@ class EntityBuffer extends BufferBase {
    *
    * @param string $type
    *   The entity type of the given entity ids.
-   * @param array|int $id
+   * @param array|int|string $id
    *   The entity id(s) to load.
    *
    * @return \Closure

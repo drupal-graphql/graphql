@@ -57,7 +57,7 @@ trait HttpRequestTrait {
   /**
    * Simulate batched queries over http.
    *
-   * @param string[] $queries
+   * @param array[] $queries
    *   A set of queries to be executed in one go.
    * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server instance.
