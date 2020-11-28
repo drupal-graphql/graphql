@@ -161,7 +161,7 @@ trait QueryResultAssertionTrait {
     while ($error = array_pop($errors)) {
       $match = FALSE;
       foreach ($expected as $pattern) {
-        if (@preg_match($pattern, NULL) === FALSE) {
+        if (@preg_match($pattern, $error) === FALSE) {
           $match = $match || $pattern == $error;
           $matchCount[$pattern]++;
         }

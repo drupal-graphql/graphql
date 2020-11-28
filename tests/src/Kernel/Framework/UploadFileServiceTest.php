@@ -222,7 +222,8 @@ class UploadFileServiceTest extends GraphQLTestBase {
   protected function getUploadedFile(
     int $error_status,
     int $size = 0,
-    string $name = 'test.txt'): UploadedFile {
+    string $name = 'test.txt'
+  ): UploadedFile {
 
     list($version) = explode('.', \Drupal::VERSION, 2);
     switch ($version) {
