@@ -1,43 +1,48 @@
 includes:
-	- ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
-	- ../../vendor/mglaman/phpstan-drupal/extension.neon
-	- ../../vendor/jangregor/phpstan-prophecy/extension.neon
-	- ../../vendor/phpstan/phpstan-phpunit/extension.neon
+  - ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+  - ../../vendor/mglaman/phpstan-drupal/extension.neon
+  - ../../vendor/jangregor/phpstan-prophecy/extension.neon
+  - ../../vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
-	# PHPStan cannot find files in this test directory automatically.
-	scanDirectories:
-		- ../../core/tests/Drupal/Tests
-	level: 5
-	customRulesetUsed: true
-	paths:
-		- .
-	# We test with PHPStan on Drupal 8 and 9 and might have different ignored
-	# errors on both.
-	reportUnmatchedIgnoredErrors: false
-	ignoreErrors:
-		# @todo Ignore phpstan-drupal extension's rules for now, activate later.
-		- '#\Drupal calls should be avoided in classes, use dependency injection instead#'
-		# new static() is a best practice in Drupal, so we cannot fix that.
-		- "#^Unsafe usage of new static\\(\\)\\.$#"
-		# Drupal allows object property access to custom fields, so we cannot fix
-		# that.
-		- "#^Access to an undefined property Drupal\\\\#"
-		# PHPUnit deprecation warnings in Drupal 9 that we don't care about.
-		- "#^Call to deprecated method setMethods\\(\\) of class PHPUnit\\\\Framework\\\\MockObject\\\\MockBuilder:#"
-		# Symfony 4 deprecations in Drupal 9 that we don't care about.
-		- "#deprecated class Symfony\\\\Component\\\\EventDispatcher\\\\Event#"
-		- "#deprecated class Symfony\\\\Component\\\\HttpKernel\\\\Event\\\\GetResponseEvent#"
-		- "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
-		- "#deprecated interface Symfony\\\\Component\\\\HttpFoundation\\\\File\\\\MimeType\\\\MimeTypeGuesserInterface#"
-		- "#^Parameter .+ of class Symfony\\\\Component\\\\HttpFoundation\\\\File\\\\UploadedFile constructor expects .+ given\\.$#"
-		- "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
-		# Drupal allows object property access to custom fields, so we cannot fix
-		# that.
-		- "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
-		# Incomplete type doc comments in Drupal core that we have to ignore.
-		-
-			message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\LanguageNegotiation\\\\OperationLanguageNegotiation\\:\\:getLangcode\\(\\) should return string but returns false\\.$#"
-			count: 1
-			path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
-		- "#^Parameter .+ of method Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:range\\(\\) expects null, int given\\.$#"
+  # PHPStan cannot find files in this test directory automatically.
+  scanDirectories:
+    - ../../core/tests/Drupal/Tests
+  level: 5
+  customRulesetUsed: true
+  paths:
+    - .
+  # We test with PHPStan on Drupal 8 and 9 and might have different ignored
+  # errors on both.
+  reportUnmatchedIgnoredErrors: false
+  ignoreErrors:
+    # @todo Ignore phpstan-drupal extension's rules for now, activate later.
+    - '#\Drupal calls should be avoided in classes, use dependency injection instead#'
+    # new static() is a best practice in Drupal, so we cannot fix that.
+    - "#^Unsafe usage of new static\\(\\)\\.$#"
+    # Drupal allows object property access to custom fields, so we cannot fix
+    # that.
+    - "#^Access to an undefined property Drupal\\\\#"
+    # PHPUnit deprecation warnings in Drupal 9 that we don't care about.
+    - "#^Call to deprecated method setMethods\\(\\) of class PHPUnit\\\\Framework\\\\MockObject\\\\MockBuilder:#"
+    # Other deprecations in Drupal 9 that we can't change because we want to
+    # support Drupal 8.
+    - "#deprecated class Symfony\\\\Component\\\\EventDispatcher\\\\Event#"
+    - "#deprecated class Symfony\\\\Component\\\\HttpKernel\\\\Event\\\\GetResponseEvent#"
+    - "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+    - "#deprecated interface Symfony\\\\Component\\\\HttpFoundation\\\\File\\\\MimeType\\\\MimeTypeGuesserInterface#"
+    - "#^Parameter .+ of class Symfony\\\\Component\\\\HttpFoundation\\\\File\\\\UploadedFile constructor expects .+ given\\.$#"
+    - "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+    - """
+      #^Call to deprecated method toInt\\(\\) of class Drupal\\\\Component\\\\Utility\\\\Bytes\\:
+      in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\\\Component\\\\Utility\\\\Bytes\\:\\:toNumber\\(\\) instead$#
+      """
+    # Drupal allows object property access to custom fields, so we cannot fix
+    # that.
+    - "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
+    # Incomplete type doc comments in Drupal core that we have to ignore.
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\LanguageNegotiation\\\\OperationLanguageNegotiation\\:\\:getLangcode\\(\\) should return string but returns false\\.$#"
+      count: 1
+      path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
+    - "#^Parameter .+ of method Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:range\\(\\) expects null, int given\\.$#"
