@@ -1,0 +1,9 @@
+type: module
+name: GraphQL Resolver Builder Test
+description: Tests the graphql resolver builder functionality.
+package: Testing
+core_version_requirement: ^8 || ^9
+hidden: TRUE
+dependencies:
+  - graphql:graphql
+  - drupal:typed_data
