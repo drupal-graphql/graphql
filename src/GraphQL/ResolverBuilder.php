@@ -11,7 +11,6 @@ use Drupal\graphql\GraphQL\Resolver\Context;
 use Drupal\graphql\GraphQL\Resolver\DefaultValue;
 use Drupal\graphql\GraphQL\Resolver\Map;
 use Drupal\graphql\GraphQL\Resolver\ParentValue;
-use Drupal\graphql\GraphQL\Resolver\Path;
 use Drupal\graphql\GraphQL\Resolver\SourceContext;
 use Drupal\graphql\GraphQL\Resolver\Tap;
 use Drupal\graphql\GraphQL\Resolver\Value;
@@ -94,10 +93,13 @@ class ResolverBuilder {
    * @param string $path
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *
-   * @return \Drupal\graphql\GraphQL\Resolver\Path
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
   public function fromPath($type, $path, ResolverInterface $value = NULL) {
-    return new Path($type, $path, $value);
+    return $this->produce('property_path')
+      ->map('type', $this->fromValue($type))
+      ->map('path', $this->fromValue($path))
+      ->map('value', $value ?: $this->fromParent());
   }
 
   /**
