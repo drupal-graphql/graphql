@@ -3,9 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel;
 
 use GraphQL\Deferred;
-use Drupal\Core\TypedData\TypedDataManagerInterface;
-use Drupal\Core\TypedData\ComplexDataInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 /**
@@ -21,6 +18,7 @@ class ResolverBuilderTest extends GraphQLTestBase {
   public static $modules = [
     'graphql',
     'typed_data',
+    'graphql_resolver_builder_test',
   ];
 
   /**
@@ -132,38 +130,20 @@ GQL;
    * @covers ::fromPath
    */
   public function testFromPath() {
-    $manager = $this->createMock(TypedDataManagerInterface::class);
-    $manager->expects($this->any())
-      ->method('getDefinition')
-      ->will($this->returnValueMap([
-        'tree_mock' => ['class' => '\Drupal\Core\TypedData\ComplexDataInterface'],
-      ]));
+    $manager = $this->container->get('typed_data_manager');
+    $tree_definition = $manager->createDataDefinition('tree');
+    /** @var \Drupal\graphql_resolver_builder_test\Plugin\DataType\Tree $right */
+    $right = $manager->create($tree_definition);
+    $right->set('value', 'Front page');
+    /** @var \Drupal\graphql_resolver_builder_test\Plugin\DataType\Tree $tree */
+    $tree = $manager->create($tree_definition);
+    $tree->set('left', [
+      'value' => '<front>',
+      'right' => $right,
+    ]);
 
-    $this->container->set('typed_data_manager', $manager);
-
-    $uri = $this->prophesize(TypedDataInterface::class);
-    $uri->getValue()->willReturn('<front>');
-
-    $path = $this->prophesize(ComplexDataInterface::class);
-    $path->get('uri')->willReturn($uri);
-    $path->getValue()->willReturn([]);
-
-    $tree = $this->prophesize(ComplexDataInterface::class);
-    $tree->get('path')->willReturn($path);
-    $tree->getValue()->willReturn([]);
-
-    $manager->expects($this->any())
-      ->method('create')
-      ->willReturn($tree->reveal());
-
-    $this->mockResolver('Query', 'tree', $this->builder->fromValue([
-      'path' => [
-        'uri' => '<front>',
-        'path_name' => 'Front page',
-      ],
-    ]));
-
-    $this->mockResolver('Tree', 'uri', $this->builder->fromPath('tree', 'path.uri'));
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue($tree));
+    $this->mockResolver('Tree', 'uri', $this->builder->fromPath('tree', 'left.value'));
 
     $query = <<<GQL
       query {
