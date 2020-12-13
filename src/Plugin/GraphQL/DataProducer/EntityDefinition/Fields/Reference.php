@@ -37,36 +37,7 @@ class Reference extends DataProducerPluginBase {
    *   If the field is referencing entities (is the entity reference type).
    */
   public function resolve(FieldDefinitionInterface $entity_definition_field): bool {
-    if ($entity_definition_field instanceof BaseFieldDefinition) {
-      /** @var \Drupal\Core\Field\BaseFieldDefinition $entity_definition_field */
-      if ($entity_definition_field->getType() === 'entity_reference') {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    elseif ($entity_definition_field instanceof FieldConfig) {
-      /** @var \Drupal\field\Entity\FieldConfig $entity_definition_field */
-      if ($entity_definition_field->getType() === 'entity_reference') {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    elseif ($entity_definition_field instanceof BaseFieldOverride) {
-      /** @var \Drupal\field\Entity\FieldConfig $entity_definition_field */
-      if ($entity_definition_field->getType() === 'entity_reference') {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    else {
-      return FALSE;
-    }
+    return $entity_definition_field->getType() === 'entity_reference';
   }
 
 }

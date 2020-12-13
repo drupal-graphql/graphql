@@ -88,8 +88,6 @@ trait QueryResultAssertionTrait {
         'variables' => $variables,
       ])
     );
-    //var_export($result->toArray()['data']);
-    //return;
 
     $this->assertResultErrors($result, []);
     $this->assertResultData($result, $expected);
