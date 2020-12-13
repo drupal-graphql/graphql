@@ -13,6 +13,7 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
  * @group graphql
  */
 class EntityDefinitionTest extends GraphQLTestBase {
+
   /**
    * {@inheritdoc}
    */
