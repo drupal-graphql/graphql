@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
@@ -33,7 +34,7 @@ class Weight extends DataProducerPluginBase {
    *
    * @param \Drupal\Core\Field\FieldDefinitionInterface $entity_definition_field
    *   The entity field definition.
-   * @param array|null $entity_form_display_context
+   * @param \Drupal\Core\Entity\Entity\EntityFormDisplay|null $entity_form_display_context
    *   Entity form display context.
    *
    * @return int
@@ -41,11 +42,10 @@ class Weight extends DataProducerPluginBase {
    */
   public function resolve(
     FieldDefinitionInterface $entity_definition_field,
-    ?array $entity_form_display_context = NULL
+    ?EntityFormDisplay $entity_form_display_context
   ): int {
     if ($entity_form_display_context) {
-      $entity_form_display = $entity_form_display_context['key'];
-      $content = $entity_form_display->get('content');
+      $content = $entity_form_display_context->get('content');
       $field_id = $entity_definition_field->getName();
 
       if (isset($content[$field_id])) {
