@@ -37,4 +37,9 @@ interface ResponseInterface {
    */
   public function getViolations(): array;
 
+  /**
+   * Adds the violations from another response to this response.
+   */
+  public function mergeViolations(ResponseInterface $source): void;
+
 }

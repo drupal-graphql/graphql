@@ -22,7 +22,7 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
   /**
    * Retrieves the resolver registry.
    *
-   * TODO: Instead, this should be configuration.
+   * @todo Instead, this should be configuration.
    *
    * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
    *   The resolver registry.

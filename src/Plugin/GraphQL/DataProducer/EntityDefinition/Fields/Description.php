@@ -2,8 +2,8 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
@@ -35,9 +35,10 @@ class Description extends DataProducerPluginBase {
    *   The description.
    */
   public function resolve(FieldDefinitionInterface $entity_definition_field): ?string {
+    /** @var \Drupal\Component\Render\MarkupInterface|string|null $description */
     $description = $entity_definition_field->getDescription();
     // Convert translation object to string.
-    if ($description instanceof TranslatableMarkup) {
+    if ($description instanceof MarkupInterface) {
       return (string) $description;
     }
     return $description;

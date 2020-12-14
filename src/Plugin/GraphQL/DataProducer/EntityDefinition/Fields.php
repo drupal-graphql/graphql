@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
-use Drupal\Core\Entity\ContentEntityType;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
@@ -121,26 +121,24 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
     ?string $field_types_context = NULL,
     FieldContext $field_context
   ): \Iterator {
-    $entity_definition->getBundleEntityType();
-    if ($entity_definition instanceof ContentEntityType) {
+
+    if ($entity_definition instanceof ContentEntityTypeInterface) {
+      $entity_type_id = $entity_definition->id();
       if ($bundle_context) {
         $key = $bundle_context['key'];
-        $id = $entity_definition->id();
-        $entity_id = $id . '.' . $id . '.' . $key;
-        $fields = $this->entityFieldManager->getFieldDefinitions($id, $key);
+        $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $key);
+
+        // Set entity form default display as context.
+        $form_display_id = $entity_type_id . '.' . $key . '.default';
+        $form_display_context = $this->entityTypeManager
+          ->getStorage('entity_form_display')
+          ->load($form_display_id);
+        $field_context->setContextValue('entity_form_display', $form_display_context);
       }
       else {
-        $id = $entity_definition->id();
-        $entity_id = $id . '.' . $id . '.default';
-        $fields = $this->entityFieldManager->getFieldDefinitions($id, $id);
+        $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $entity_type_id);
       }
 
-      /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $form_display_context */
-      $form_display_context = $this->entityTypeManager
-        ->getStorage('entity_form_display')
-        ->load($entity_id);
-
-      $field_context->setContextValue('entity_form_display', $form_display_context);
       if ($field_types_context) {
         foreach ($fields as $field) {
           if ($field_types_context === 'BASE_FIELDS') {
