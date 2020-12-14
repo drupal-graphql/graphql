@@ -2,10 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
