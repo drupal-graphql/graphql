@@ -12,6 +12,8 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
@@ -86,6 +88,13 @@ class FileUpload {
   protected $systemFileConfig;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * Constructor.
    */
   public function __construct(
@@ -96,7 +105,8 @@ class FileUpload {
     LoggerChannelInterface $logger,
     Token $token,
     LockBackendInterface $lock,
-    ConfigFactoryInterface $config_factory
+    ConfigFactoryInterface $config_factory,
+    RendererInterface $renderer
   ) {
     /** @var \Drupal\file\FileStorageInterface $file_storage */
     $file_storage = $entityTypeManager->getStorage('file');
@@ -108,6 +118,7 @@ class FileUpload {
     $this->token = $token;
     $this->lock = $lock;
     $this->systemFileConfig = $config_factory->get('system.file');
+    $this->renderer = $renderer;
   }
 
   /**
@@ -374,9 +385,17 @@ class FileUpload {
   protected function getUploadLocation(array $settings): string {
     $destination = trim($settings['file_directory'], '/');
 
-    // Replace tokens. As the tokens might contain HTML we convert it to plain
-    // text.
-    $destination = PlainTextOutput::renderFromHtml($this->token->replace($destination, []));
+    // Replace tokens first. This might produce cacheable metadata if tokens
+    // are used in the path. As this service is intended to be used in mutations
+    // which are not cached at all, it's enough to just catch leaked metadata
+    // and skip including them in current GraphQL field's context.
+    $context = new RenderContext();
+    $destination = $this->renderer->executeInRenderContext($context, function () use ($destination): string {
+      return $this->token->replace($destination, []);
+    });
+
+    // As the tokens might contain HTML we convert it to plain text.
+    $destination = PlainTextOutput::renderFromHtml($destination);
     return $settings['uri_scheme'] . '://' . $destination;
   }
 
