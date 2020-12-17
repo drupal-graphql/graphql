@@ -196,7 +196,8 @@ class UploadFileServiceTest extends GraphQLTestBase {
       \Drupal::service('logger.channel.graphql'),
       \Drupal::service('token'),
       $lock->reveal(),
-      \Drupal::service('config.factory')
+      \Drupal::service('config.factory'),
+      \Drupal::service('renderer')
     );
 
     // Create a file with 4 bytes.
