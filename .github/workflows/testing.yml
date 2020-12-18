@@ -75,7 +75,7 @@ jobs:
         run: |
           mkdir coder
           cd coder
-          composer require drupal/coder:8.3.11 --no-interaction --no-progress
+          composer require drupal/coder:8.3.12 --no-interaction --no-progress
       - name: Run PHPUnit
         run: |
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml

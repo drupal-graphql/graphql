@@ -2,6 +2,7 @@
 <ruleset name="graphql">
   <description>Default PHP CodeSniffer configuration for GraphQL.</description>
   <file>.</file>
+  <exclude-pattern>node_modules</exclude-pattern>
 
   <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml"/>
 
