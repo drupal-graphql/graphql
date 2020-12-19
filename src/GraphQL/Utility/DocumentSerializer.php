@@ -5,6 +5,9 @@ namespace Drupal\graphql\GraphQL\Utility;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Utils\AST;
 
+/**
+ * Cleans up AST recursively for serialization.
+ */
 class DocumentSerializer {
 
   /**

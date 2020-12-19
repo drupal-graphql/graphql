@@ -6,6 +6,9 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\graphql\Language\LanguageNegotiator;
 
+/**
+ * Workaround for Drupal core bug for language sorting.
+ */
 class GraphqlServiceProvider extends ServiceProviderBase {
 
   /**

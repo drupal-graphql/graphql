@@ -10,6 +10,9 @@ use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Adds GraphQL operation information to the Symfony route being resolved.
+ */
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**

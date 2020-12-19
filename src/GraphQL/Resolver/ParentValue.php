@@ -7,6 +7,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves to the current value, which is the parent of the field.
+ */
 class ParentValue implements ResolverInterface {
 
   /**

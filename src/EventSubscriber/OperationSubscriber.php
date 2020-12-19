@@ -11,6 +11,9 @@ use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Sets the language before/after a GraphQL operation.
+ */
 class OperationSubscriber implements EventSubscriberInterface {
 
   use CurrentLanguageResetTrait;

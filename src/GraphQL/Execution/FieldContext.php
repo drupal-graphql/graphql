@@ -6,6 +6,9 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Context that is passed to data producer plugins.
+ */
 class FieldContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 

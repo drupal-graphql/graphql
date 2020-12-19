@@ -6,6 +6,9 @@ use Drupal\graphql\Entity\ServerInterface;
 use GraphQL\Server\OperationParams;
 use GraphQL\Type\Introspection as IntrospectionType;
 
+/**
+ * Runs introspection queries against a GraphQL server.
+ */
 class Introspection {
 
   /**

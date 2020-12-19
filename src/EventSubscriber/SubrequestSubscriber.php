@@ -11,6 +11,9 @@ use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Sets the language on subrequests.
+ */
 class SubrequestSubscriber implements EventSubscriberInterface {
 
   use CurrentLanguageResetTrait;

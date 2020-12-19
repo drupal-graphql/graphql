@@ -7,6 +7,9 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Schema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Service to make our GraphQL executor, can be swapped out.
+ */
 class ExecutorFactory {
 
   /**

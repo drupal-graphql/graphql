@@ -9,6 +9,9 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Context that is provided during resolving the GraphQL tree.
+ */
 class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
