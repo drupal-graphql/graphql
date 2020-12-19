@@ -7,6 +7,9 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Defines a registry to resolve any field in the GraphQL schema tree.
+ */
 interface ResolverRegistryInterface {
 
   /**

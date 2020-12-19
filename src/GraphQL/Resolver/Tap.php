@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves by forwarding to another resolver.
+ */
 class Tap implements ResolverInterface {
 
   /**

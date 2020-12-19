@@ -4,6 +4,9 @@ namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\language\ConfigurableLanguageManagerInterface;
 
+/**
+ * Sets the current language for the current request.
+ */
 trait CurrentLanguageResetTrait {
 
   /**

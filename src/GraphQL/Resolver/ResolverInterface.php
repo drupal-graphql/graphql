@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Defines how to resolve a value for a given field.
+ */
 interface ResolverInterface {
 
   /**

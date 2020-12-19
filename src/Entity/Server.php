@@ -27,6 +27,11 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
 
 /**
+ * The main GraphQL configuration and request entry point.
+ *
+ * Multiple GraphQL servers can be defined on different routing paths with
+ * different GraphQL schemas.
+ *
  * @ConfigEntityType(
  *   id = "graphql_server",
  *   label = @Translation("Server"),

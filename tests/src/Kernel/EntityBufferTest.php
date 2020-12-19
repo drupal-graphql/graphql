@@ -6,6 +6,8 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
 /**
+ * Tests the entity buffer system that it returns the correct cache metadata.
+ *
  * @group graphql
  */
 class EntityBufferTest extends GraphQLTestBase {
@@ -44,7 +46,7 @@ class EntityBufferTest extends GraphQLTestBase {
       type Query {
         node(id: String): Node
       }
-      
+
       type Node {
         title: String!
       }
@@ -62,11 +64,11 @@ GQL;
         a:node(id: "1") {
           title
         }
-  
+
         b:node(id: "2") {
           title
         }
-  
+
         c:node(id: "3") {
           title
         }

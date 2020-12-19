@@ -12,6 +12,9 @@ use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\Tests\RandomGeneratorTrait;
 
+/**
+ * Contains helpers for setting up mock servers and schemas for testing.
+ */
 trait MockingTrait {
   use RandomGeneratorTrait;
 

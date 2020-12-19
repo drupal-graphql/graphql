@@ -6,6 +6,9 @@ use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Provides Symfony routing information for each defined GraphQL server.
+ */
 class RouteProvider {
 
   /**

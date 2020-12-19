@@ -5,6 +5,9 @@ namespace Drupal\graphql_examples\Wrappers;
 use Drupal\Core\Entity\Query\QueryInterface;
 use GraphQL\Deferred;
 
+/**
+ * Helper class that wraps entity queries.
+ */
 class QueryConnection {
 
   /**

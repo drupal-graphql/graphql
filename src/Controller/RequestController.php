@@ -8,6 +8,9 @@ use Drupal\graphql\Entity\ServerInterface;
 use GraphQL\Server\OperationParams;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The main GraphQL request handler that will forward to the responsible server.
+ */
 class RequestController implements ContainerInjectionInterface {
 
   /**

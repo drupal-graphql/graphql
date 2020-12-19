@@ -2,6 +2,9 @@
 
 namespace Drupal\graphql\GraphQL\Utility;
 
+/**
+ * JSON decoder for GraphQL parameters.
+ */
 class JsonHelper {
 
   /**

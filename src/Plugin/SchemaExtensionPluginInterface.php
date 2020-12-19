@@ -6,6 +6,9 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 
+/**
+ * Defines plugins that can extend the GraphQL schema definition.
+ */
 interface SchemaExtensionPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**

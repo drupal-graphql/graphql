@@ -8,6 +8,9 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Grants access to executing arbitrary GraphQL queries on the defined servers.
+ */
 class QueryAccessCheck implements AccessInterface {
 
   /**

@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Executes GraphQL queries with cache lookup.
+ */
 class Executor implements ExecutorImplementation {
 
   /**

@@ -6,6 +6,8 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
 /**
+ * Tests the entity buffer with loading by UUID data producers.
+ *
  * @group graphql
  */
 class EntityUuidBufferTest extends GraphQLTestBase {
@@ -63,11 +65,11 @@ GQL;
         a:node(uuid: "{$this->nodeUuids[0]}") {
           title
         }
-  
+
         b:node(uuid: "{$this->nodeUuids[1]}") {
           title
         }
-  
+
         c:node(uuid: "{$this->nodeUuids[2]}") {
           title
         }

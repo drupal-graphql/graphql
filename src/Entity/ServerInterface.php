@@ -6,6 +6,9 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use GraphQL\Server\OperationParams;
 
+/**
+ * Defines a GraphQL server that has configuration and executes queries.
+ */
 interface ServerInterface extends ConfigEntityInterface {
 
   /**

@@ -21,6 +21,9 @@ use GraphQL\Utils\BuildSchema;
 use GraphQL\Utils\SchemaExtender;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Base class that can be used by schema plugins.
+ */
 abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
