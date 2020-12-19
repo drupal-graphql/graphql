@@ -26,11 +26,15 @@ class OperationEvent extends Event {
   const GRAPHQL_OPERATION_AFTER = 'graphql.operation.after';
 
   /**
+   * Result of the query execution.
+   *
    * @var \GraphQL\Executor\ExecutionResult
    */
   protected $result;
 
   /**
+   * Resolver context used for the query.
+   *
    * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
   protected $context;
@@ -47,6 +51,8 @@ class OperationEvent extends Event {
   }
 
   /**
+   * Returns the execution result.
+   *
    * @return \GraphQL\Executor\ExecutionResult
    */
   public function getResult() {
@@ -54,6 +60,8 @@ class OperationEvent extends Event {
   }
 
   /**
+   * Returns the resolver context.
+   *
    * @return \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
   public function getContext() {

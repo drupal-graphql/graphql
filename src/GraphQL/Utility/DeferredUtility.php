@@ -33,6 +33,8 @@ class DeferredUtility {
   }
 
   /**
+   * Execute a callback after a value is resolved.
+   *
    * @param mixed $value
    * @param callable $callback
    *
@@ -53,6 +55,8 @@ class DeferredUtility {
   }
 
   /**
+   * Execute a callback after a value is resolved and return the result.
+   *
    * @param mixed $value
    * @param callable $callback
    *

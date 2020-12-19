@@ -11,6 +11,8 @@ use GraphQL\Utils\AST;
 class DocumentSerializer {
 
   /**
+   * Turn the AST document to a serializable array.
+   *
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
    * @return array
@@ -20,6 +22,8 @@ class DocumentSerializer {
   }
 
   /**
+   * Recursively turn AST items into a serializable array.
+   *
    * @param array $item
    *
    * @return array

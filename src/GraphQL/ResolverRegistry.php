@@ -132,6 +132,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
+   * Returns the field resolver that should be used at runtime.
+   *
    * @param mixed $value
    * @param string $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
@@ -144,11 +146,12 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
+   * Resolves a default value for a field.
+   *
    * @param mixed $value
    * @param mixed $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return mixed|null
@@ -158,6 +161,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
+   * Returns the type resolver that should be used on runtime.
+   *
    * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info
@@ -169,6 +174,8 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
+   * Returns NULL as default type.
+   *
    * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \GraphQL\Type\Definition\ResolveInfo $info

@@ -8,6 +8,8 @@ namespace Drupal\graphql\Plugin;
 interface DataProducerPluginCachingInterface extends DataProducerPluginInterface {
 
   /**
+   * Calculates a cache prefix.
+   *
    * @return string|null
    */
   public function edgeCachePrefix();

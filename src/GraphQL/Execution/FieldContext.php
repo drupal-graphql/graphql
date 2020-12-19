@@ -13,11 +13,15 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
+   * The context that has been passed down.
+   *
    * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
   protected $context;
 
   /**
+   * Schema type information of the current field.
+   *
    * @var \GraphQL\Type\Definition\ResolveInfo
    */
   protected $info;
@@ -35,6 +39,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the current field name.
+   *
    * @return string
    */
   public function getFieldName() {
@@ -42,6 +48,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the language set as context.
+   *
    * @return string
    */
   public function getContextLanguage() {
@@ -49,6 +57,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Sets the context language.
+   *
    * @param string $language
    *
    * @return $this

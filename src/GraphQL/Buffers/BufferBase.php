@@ -22,8 +22,11 @@ abstract class BufferBase {
   protected $results = [];
 
   /**
+   * Returns the bucket name for grouping items together.
+   *
    * @param object $item
    *   The item to get the buffer id for.
+   *
    * @return string
    *   The buffer id.
    */

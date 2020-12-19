@@ -10,21 +10,29 @@ use Drupal\language\ConfigurableLanguageManagerInterface;
 trait CurrentLanguageResetTrait {
 
   /**
+   * The language manager.
+   *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
+   * The language negotiator.
+   *
    * @var \Drupal\language\LanguageNegotiatorInterface
    */
   protected $languageNegotiator;
 
   /**
+   * The translator.
+   *
    * @var \Drupal\Core\StringTranslation\Translator\TranslatorInterface
    */
   protected $translator;
 
   /**
+   * The current user service.
+   *
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $currentUser;
