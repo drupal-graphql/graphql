@@ -16,6 +16,8 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 interface DataProducerPluginInterface extends ContextAwarePluginInterface, CacheableDependencyInterface, DerivativeInspectionInterface {
 
   /**
+   * Resolves the queried field with the given context.
+   *
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    *
    * @return \GraphQL\Deferred|mixed

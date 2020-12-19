@@ -5,6 +5,8 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * XML child nodes content data producer.
+ *
  * @DataProducer(
  *   id = "xml_content",
  *   name = @Translation("XML Content"),
@@ -22,8 +24,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class XMLContent extends DataProducerPluginBase {
 
   /**
+   * Returns the XML content as string.
+   *
    * @param \DOMElement $dom
    *   The source (root) DOM element.
+   *
    * @return string
    */
   public function resolve(\DOMElement $dom) {

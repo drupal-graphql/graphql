@@ -18,17 +18,6 @@
   </rule>
 
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
-    <exclude-pattern>src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/DataProducerPluginInterface.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/String/Uppercase.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLParse.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLContent.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLAttribute.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLXpath.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/TypedData/PropertyPath.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/DataProducerProxy.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Images/ImageResourceUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLinks.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuTree/MenuTreeLink.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuTree/MenuTreeSubtree.php</exclude-pattern>
