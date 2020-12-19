@@ -7,6 +7,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves by returning the fixed value itself.
+ */
 class Value implements ResolverInterface {
 
   /**

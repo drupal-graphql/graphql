@@ -9,6 +9,9 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Base class that can be used for schema extension plugins.
+ */
 abstract class SdlSchemaExtensionPluginBase extends PluginBase implements SchemaExtensionPluginInterface, ContainerFactoryPluginInterface {
 
   /**

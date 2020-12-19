@@ -5,6 +5,9 @@ namespace Drupal\graphql;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
+/**
+ * Provides access control permissions for all exposed GraphQL servers.
+ */
 class PermissionProvider {
   use StringTranslationTrait;
 

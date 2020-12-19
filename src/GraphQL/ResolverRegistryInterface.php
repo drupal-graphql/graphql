@@ -7,6 +7,9 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ *
+ */
 interface ResolverRegistryInterface {
 
   /**

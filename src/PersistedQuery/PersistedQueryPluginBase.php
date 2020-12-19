@@ -5,6 +5,9 @@ namespace Drupal\graphql\PersistedQuery;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 
+/**
+ *
+ */
 abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQueryPluginInterface {
 
   /**

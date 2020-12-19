@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves by invoking a callback for the field.
+ */
 class Callback implements ResolverInterface {
 
   /**

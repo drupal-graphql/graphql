@@ -7,6 +7,9 @@ use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Prophecy\Argument;
 
+/**
+ * Helper trait for testing data producers.
+ */
 trait DataProducerExecutionTrait {
 
   /**

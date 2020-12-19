@@ -9,6 +9,9 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Collects data producer plugins that are composed to read and write data.
+ */
 class DataProducerPluginManager extends DefaultPluginManager {
 
   /**

@@ -18,6 +18,9 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
 use Drupal\typed_data\DataFetcherTrait;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
+/**
+ *
+ */
 class ResolverBuilder {
   use TypedDataTrait;
   use DataFetcherTrait;

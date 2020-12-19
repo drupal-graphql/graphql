@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Execute a resolver for each item in the given list.
+ */
 class Map implements ResolverInterface {
 
   /**

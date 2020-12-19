@@ -6,6 +6,9 @@ use GraphQL\Deferred;
 use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 
+/**
+ *
+ */
 class DeferredUtility {
 
   /**

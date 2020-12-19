@@ -9,6 +9,9 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
+/**
+ *
+ */
 class ResolverRegistry implements ResolverRegistryInterface {
 
   /**

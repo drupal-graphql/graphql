@@ -17,6 +17,8 @@ use GraphQL\Error\DebugFlag;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Admin form to set up a GraphQL server configuration entity.
+ *
  * @package Drupal\graphql\Form
  *
  * @codeCoverageIgnore

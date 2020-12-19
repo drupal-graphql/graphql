@@ -7,6 +7,9 @@ use Drupal\Core\Plugin\ContextAwarePluginBase;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 
+/**
+ *
+ */
 abstract class DataProducerPluginBase extends ContextAwarePluginBase implements DataProducerPluginInterface {
   use DataProducerPluginCachingTrait;
 

@@ -2,6 +2,9 @@
 
 namespace Drupal\graphql\GraphQL\Utility;
 
+/**
+ *
+ */
 class JsonHelper {
 
   /**

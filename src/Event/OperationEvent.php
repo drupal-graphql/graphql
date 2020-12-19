@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Represents an event that is triggered before and after a GraphQL operation.
+ */
 class OperationEvent extends Event {
 
   /**

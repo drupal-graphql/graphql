@@ -4,6 +4,9 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ *
+ */
 trait DataProducerPluginCachingTrait {
 
   /**

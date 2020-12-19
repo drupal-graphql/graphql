@@ -13,6 +13,8 @@ use Drupal\typed_data\DataFetcherTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
+ * Resolves a property path.
+ *
  * @todo Delete this resolver. This is a plugin already.
  */
 class Path implements ResolverInterface {

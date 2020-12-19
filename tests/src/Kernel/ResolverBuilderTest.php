@@ -6,6 +6,8 @@ use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 /**
+ * Tests that the resolver builder behaves correctly.
+ *
  * @coversDefaultClass \Drupal\graphql\GraphQL\ResolverBuilder
  *
  * @group graphql

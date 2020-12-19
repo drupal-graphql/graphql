@@ -5,6 +5,11 @@ namespace Drupal\graphql\Cache\Context;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 
+/**
+ * Helper class, not sure for what.
+ *
+ * @todo This class and service seems unused, can we remove it?
+ */
 class StaticCacheContext implements CalculatedCacheContextInterface {
 
   /**

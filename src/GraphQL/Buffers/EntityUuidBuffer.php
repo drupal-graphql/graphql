@@ -6,6 +6,9 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
+/**
+ * Collects entity UUIDs per entity type and loads them all at once in the end.
+ */
 class EntityUuidBuffer extends BufferBase {
 
   /**

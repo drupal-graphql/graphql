@@ -10,6 +10,9 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Admin form to set up persisted GraphQL queries.
+ */
 class PersistedQueriesForm extends EntityForm {
 
   /**

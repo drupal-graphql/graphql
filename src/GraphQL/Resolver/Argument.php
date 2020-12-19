@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves by an argument name lookup.
+ */
 class Argument implements ResolverInterface {
 
   /**

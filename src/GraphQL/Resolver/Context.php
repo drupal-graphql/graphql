@@ -7,6 +7,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves a context value with default value support.
+ */
 class Context implements ResolverInterface {
 
   /**

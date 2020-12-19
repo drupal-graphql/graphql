@@ -7,6 +7,12 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
+/**
+ * Defines the contract of data producer plugins.
+ *
+ * Note that this misses a definition of the resolve() method as that has a
+ * different signature per plugin.
+ */
 interface DataProducerPluginInterface extends ContextAwarePluginInterface, CacheableDependencyInterface, DerivativeInspectionInterface {
 
   /**

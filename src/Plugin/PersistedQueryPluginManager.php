@@ -6,6 +6,9 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
+/**
+ * Collects persisted queries that are defined as plugins.
+ */
 class PersistedQueryPluginManager extends DefaultPluginManager {
 
   /**
