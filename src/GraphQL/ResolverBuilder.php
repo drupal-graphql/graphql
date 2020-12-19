@@ -19,7 +19,7 @@ use Drupal\typed_data\DataFetcherTrait;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 /**
- *
+ * Wires and maps different resolvers together to build the GraphQL tree.
  */
 class ResolverBuilder {
   use TypedDataTrait;

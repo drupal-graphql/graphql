@@ -6,7 +6,7 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 
 /**
- *
+ * Base class persisted query plugins that represent a GraphQL persisted query.
  */
 abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQueryPluginInterface {
 

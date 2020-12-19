@@ -8,7 +8,7 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 
 /**
- *
+ * Base class for data producers that resolve fields for queries or mutations.
  */
 abstract class DataProducerPluginBase extends ContextAwarePluginBase implements DataProducerPluginInterface {
   use DataProducerPluginCachingTrait;

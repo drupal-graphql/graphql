@@ -10,7 +10,7 @@ use GraphQL\Type\Definition\Type;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
 /**
- *
+ * Contains all the mappings how to resolve a GraphQL request.
  */
 class ResolverRegistry implements ResolverRegistryInterface {
 
