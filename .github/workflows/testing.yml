@@ -7,17 +7,9 @@ on:
 jobs:
   drupal:
     name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
-    runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: false
-          MYSQL_ROOT_PASSWORD: graphql
-          MYSQL_DATABASE: graphql
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    runs-on: ubuntu-20.04
+    env:
+      extensions: mbstring, xml, pdo_sqlite, gd, opcache
     strategy:
       fail-fast: false
       matrix:
@@ -33,20 +25,42 @@ jobs:
         with:
           repository: drupal/drupal
           ref: ${{ matrix.drupal-core }}
+
       - name: Checkout graphql module
         uses: actions/checkout@v2
         with:
           path: modules/graphql
+
+      - name: Setup PHP extension cache
+        id: extcache
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: ${{ env.extensions }}
+          # Ideally this would be based on env.extensions, how can we make a
+          # hash out of that?
+          key: cache-v1
+
+      - name: Cache PHP extensions
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.extcache.outputs.dir }}
+          key: ${{ steps.extcache.outputs.key }}
+          restore-keys: ${{ steps.extcache.outputs.key }}
+
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql
-      - name: Start mysql service
-        run: sudo /etc/init.d/mysql start
+          # Disable Xdebug for better performance.
+          coverage: none
+          extensions: ${{ env.extensions }}
+          ini-values: opcache.enable_cli=1
+
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
       - name: Cache composer dependencies
         uses: actions/cache@v2
         with:
@@ -55,10 +69,12 @@ jobs:
           # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
+
       - name: Install Drupal core dependencies
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer --no-interaction run-script drupal-phpunit-upgrade
+
       - name: Install GraphQL dependencies
         run: composer --no-interaction --no-progress require \
           webonyx/graphql-php:^14.3 \
@@ -69,6 +85,7 @@ jobs:
           phpstan/phpstan-deprecation-rules:^0.12.2 \
           jangregor/phpstan-prophecy:^0.8 \
           phpstan/phpstan-phpunit:^0.12
+
       # We install Coder separately because updating did not work in the local
       # Drupal vendor dir.
       - name: Install Coder
@@ -76,15 +93,18 @@ jobs:
           mkdir coder
           cd coder
           composer require drupal/coder:8.3.12 --no-interaction --no-progress
+
       - name: Run PHPUnit
         run: |
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml
           ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
         env:
-          SIMPLETEST_DB: mysql://root:graphql@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/graphql
+          SIMPLETEST_DB: "sqlite://localhost/:memory:"
+
       - name: Run PHPStan
         run: |
           cd modules/graphql && ../../vendor/bin/phpstan analyse
+
       - name: Run PHPCS
         run: |
           ./coder/vendor/bin/phpcs --config-set installed_paths ../../drupal/coder/coder_sniffer
