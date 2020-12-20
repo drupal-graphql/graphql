@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
- * Data producers proxy class.
+ * A proxy class that lazy resolves data producers and has a result cache.
  */
 class DataProducerProxy implements ResolverInterface {
 
@@ -44,26 +44,36 @@ class DataProducerProxy implements ResolverInterface {
   protected $pluginManager;
 
   /**
+   * The request stack for looking up request time.
+   *
    * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
   /**
+   * The cache context manager for cache keys.
+   *
    * @var \Drupal\Core\Cache\Context\CacheContextsManager
    */
   protected $contextsManager;
 
   /**
+   * The cache backend for results.
+   *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $cacheBackend;
 
   /**
+   * The mapping of names to resolvers.
+   *
    * @var array
    */
   protected $mapping = [];
 
   /**
+   * If results should be cached.
+   *
    * @var bool
    */
   protected $cached = FALSE;
@@ -100,6 +110,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Create a new data producer proxy.
+   *
    * @param string $id
    * @param array $mapping
    * @param array $config
@@ -112,6 +124,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Store a resolver for a given name.
+   *
    * @param string $name
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $mapping
    *
@@ -123,6 +137,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Set the cached flag.
+   *
    * @param bool $cached
    *
    * @return $this
@@ -167,6 +183,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Instantiate the actual data producer and populate it with context values.
+   *
    * @param mixed $value
    * @param mixed $args
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
@@ -208,6 +226,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Invoke the data producer directly.
+   *
    * @param \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
@@ -222,6 +242,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Try to return a value from cache, otherwise invoke data producer.
+   *
    * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
@@ -243,6 +265,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Calculates a cache prefix.
+   *
    * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
    *
    * @return string
@@ -261,6 +285,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Cache lookup.
+   *
    * @param string $prefix
    *
    * @return array|null
@@ -279,6 +305,8 @@ class DataProducerProxy implements ResolverInterface {
   }
 
   /**
+   * Store result values in cache.
+   *
    * @param string $prefix
    * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field

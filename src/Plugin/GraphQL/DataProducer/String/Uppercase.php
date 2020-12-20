@@ -5,6 +5,8 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\String;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Transforms a string to uppercase.
+ *
  * @DataProducer(
  *   id = "uppercase",
  *   name = @Translation("Uppercase"),
@@ -22,9 +24,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class Uppercase extends DataProducerPluginBase {
 
   /**
+   * Value resolver.
+   *
    * @param string $string
    *
-   * @return mixed
+   * @return string
    */
   public function resolve($string) {
     return strtoupper($string);

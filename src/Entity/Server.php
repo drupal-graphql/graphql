@@ -231,9 +231,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * @todo Handle this through configuration (e.g. a context value).
-   *
    * Returns to root value to use when resolving queries against the schema.
+   *
+   * @todo Handle this through configuration (e.g. a context value).
    *
    * May return a callable to resolve the root value at run-time based on the
    * provided query parameters / operation.
@@ -307,9 +307,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * @todo Handle this through configuration on the server.
-   *
    * Returns the default field resolver.
+   *
+   * @todo Handle this through configuration on the server.
    *
    * Fields that don't explicitly declare a field resolver will use this one
    * as a fallback.
@@ -353,9 +353,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * @todo Handle this through configurable plugins on the server.
-   *
    * Returns the error handler.
+   *
+   * @todo Handle this through configurable plugins on the server.
    *
    * Allows to replace the default error handler with a custom one. For example
    * when there is a need to handle specific errors differently.
@@ -443,8 +443,6 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * @todo Handle this through configurable plugins on the server.
-   *
    * Returns a callable for loading persisted queries.
    *
    * @return callable
@@ -465,9 +463,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * @todo Handle this through configurable plugins on the server.
-   *
    * Returns the validation rules to use for the query.
+   *
+   * @todo Handle this through configurable plugins on the server.
    *
    * May return a callable to allow the server to decide the validation rules
    * independently for each query operation.

@@ -11,6 +11,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Returns the file URL of a file entity.
+ *
  * @DataProducer(
  *   id = "image_url",
  *   name = @Translation("Image URL"),
@@ -73,11 +75,12 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
   }
 
   /**
-   * @param \Drupal\file\FileInterface $entity
+   * Resolver.
    *
+   * @param \Drupal\file\FileInterface $entity
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
-   * @return mixed
+   * @return string|null
    */
   public function resolve(FileInterface $entity, RefinableCacheableDependencyInterface $metadata) {
     $access = $entity->access('view', NULL, TRUE);
@@ -97,6 +100,7 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
       }
       return $url;
     }
+    return NULL;
   }
 
 }

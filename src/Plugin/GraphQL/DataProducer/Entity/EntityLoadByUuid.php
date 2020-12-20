@@ -14,6 +14,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads an entity by UUID.
+ *
  * @DataProducer(
  *   id = "entity_load_by_uuid",
  *   name = @Translation("Load entity by uuid"),
@@ -127,6 +129,8 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
   }
 
   /**
+   * Resolver.
+   *
    * @param string $type
    * @param string $uuid
    * @param string|null $language

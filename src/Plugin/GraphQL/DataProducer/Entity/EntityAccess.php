@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns whether the given user has access to the entity.
+ *
  * @DataProducer(
  *   id = "entity_access",
  *   name = @Translation("Entity access"),
@@ -32,6 +34,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityAccess extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string $operation
    * @param \Drupal\Core\Session\AccountInterface $user

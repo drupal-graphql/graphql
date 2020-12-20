@@ -14,6 +14,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Load multiple entities by IDs.
+ *
  * @DataProducer(
  *   id = "entity_load_multiple",
  *   name = @Translation("Load multiple entities"),
@@ -128,6 +130,8 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
+   * Resolver.
+   *
    * @param string $type
    * @param array $ids
    * @param string|null $language

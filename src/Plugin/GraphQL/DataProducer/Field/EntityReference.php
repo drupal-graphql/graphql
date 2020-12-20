@@ -17,6 +17,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads entities from an entity reference field.
+ *
  * @DataProducer(
  *   id = "entity_reference",
  *   name = @Translation("Entity reference"),
@@ -99,7 +101,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   }
 
   /**
-   * EntityLoad constructor.
+   * Constructor.
    *
    * @param array $configuration
    *   The plugin configuration array.
@@ -131,6 +133,8 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   }
 
   /**
+   * Resolve entity references in the given field name.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field
    * @param string|null $language

@@ -18,67 +18,6 @@
   </rule>
 
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
-    <exclude-pattern>src/GraphQL/Resolver/Path.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/ResolverRegistryInterface.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Execution/Executor.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Execution/FieldContext.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Execution/ExecutorFactory.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Execution/ResolveContext.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/ResolverBuilder.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Utility/DocumentSerializer.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Utility/DeferredUtility.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/ResolverRegistry.php</exclude-pattern>
-    <exclude-pattern>src/GraphQL/Buffers/BufferBase.php</exclude-pattern>
-    <exclude-pattern>src/Event/OperationEvent.php</exclude-pattern>
-    <exclude-pattern>src/Form/PersistedQueriesForm.php</exclude-pattern>
-    <exclude-pattern>src/Form/ServerForm.php</exclude-pattern>
-    <exclude-pattern>src/EventSubscriber/CurrentLanguageResetTrait.php</exclude-pattern>
-    <exclude-pattern>src/Entity/ServerInterface.php</exclude-pattern>
-    <exclude-pattern>src/Entity/Server.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/DataProducerPluginInterface.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/String/Uppercase.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLParse.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLContent.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLAttribute.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/XML/XMLXpath.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/TypedData/PropertyPath.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/DataProducerProxy.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Images/ImageResourceUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Field/EntityReference.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLinks.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuTree/MenuTreeLink.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuTree/MenuTreeSubtree.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkAttribute.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkExpanded.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkLabel.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkDescription.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Utility/Seek.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/Url/UrlPath.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/RouteLoad.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityPublished.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLabel.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityRendered.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityType.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLanguage.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLoadMultiple.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityOwner.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityCreated.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityDescription.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityTranslation.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityTranslations.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/Fields/Image/ImageDerivative.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/Fields/Image/ImageUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityChanged.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityId.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityUuid.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityAccess.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityBundle.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/Schema/SdlSchemaPluginBase.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/Schema/ComposableSchema.php</exclude-pattern>
     <exclude-pattern>src/Plugin/DataProducerPluginManager.php</exclude-pattern>

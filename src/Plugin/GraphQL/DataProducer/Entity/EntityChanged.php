@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the changed time of an entity if it supports it.
+ *
  * @DataProducer(
  *   id = "entity_changed",
  *   name = @Translation("Entity changed date"),
@@ -29,10 +31,13 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityChanged extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string|null $format
    *
    * @return string|null
+   *
    * @throws \Exception
    */
   public function resolve(EntityInterface $entity, $format = NULL) {

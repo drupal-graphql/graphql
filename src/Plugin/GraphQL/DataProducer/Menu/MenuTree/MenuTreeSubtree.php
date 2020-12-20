@@ -6,6 +6,8 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns a list of menu links under the menu tree element.
+ *
  * @todo Fix input and output context type.
  *
  * @DataProducer(
@@ -26,9 +28,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuTreeSubtree extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *
-   * @return mixed
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    */
   public function resolve(MenuLinkTreeElement $element) {
     return array_filter($element->subtree, function (MenuLinkTreeElement $item) {

@@ -7,6 +7,8 @@ use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Generates a URL path from an URL object.
+ *
  * @todo Fix the type of the input context.
  *
  * @DataProducer(
@@ -26,6 +28,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class UrlPath extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Url $url
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *

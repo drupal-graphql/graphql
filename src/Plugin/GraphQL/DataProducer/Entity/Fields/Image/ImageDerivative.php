@@ -12,6 +12,8 @@ use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Returns an image style derivative of an image.
+ *
  * @DataProducer(
  *   id = "image_derivative",
  *   name = @Translation("Image Derivative"),
@@ -78,12 +80,13 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
   }
 
   /**
-   * @param \Drupal\file\FileInterface $entity
+   * Resolver.
    *
+   * @param \Drupal\file\FileInterface $entity
    * @param string $style
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
-   * @return mixed
+   * @return array|null
    */
   public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
     // Return if we dont have an entity.

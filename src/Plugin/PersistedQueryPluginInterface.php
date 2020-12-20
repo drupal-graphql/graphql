@@ -12,6 +12,8 @@ use GraphQL\Server\OperationParams;
 interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginInspectionInterface {
 
   /**
+   * Returns a query if this plugin has it.
+   *
    * @return string|null
    *   The actual GraphQL query, or NULL if this plugin does not support a query
    *   with that ID.
