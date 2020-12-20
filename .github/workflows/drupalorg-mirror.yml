@@ -10,5 +10,5 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         with:
-          source-repo: 'git@github.com:drupal-graphql/graphql.git'
+          source-repo: 'https://github.com/drupal-graphql/graphql.git'
           destination-repo: 'git@git.drupal.org:project/graphql.git'
