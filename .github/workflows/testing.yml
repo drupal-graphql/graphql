@@ -31,6 +31,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
+          # Disable Xdebug for better performance.
+          coverage: none
           extensions: mbstring, xml, pdo_sqlite, opcache
           ini-values: opcache.enable_cli=1
       - name: Get composer cache directory
