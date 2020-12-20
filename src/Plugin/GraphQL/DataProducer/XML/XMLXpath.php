@@ -5,6 +5,8 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * XPath query data producer.
+ *
  * @DataProducer(
  *   id = "xml_xpath",
  *   name = @Translation("XML Path"),
@@ -26,6 +28,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class XMLXpath extends DataProducerPluginBase {
 
   /**
+   * Execute the XPath query and return matching DOMElements.
+   *
    * @param \DOMElement $dom
    *   The source (root) DOM element.
    * @param string $query

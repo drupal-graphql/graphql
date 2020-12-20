@@ -6,6 +6,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the created time of an entity if it supports it.
+ *
  * @DataProducer(
  *   id = "entity_created",
  *   name = @Translation("Entity created date"),
@@ -28,6 +30,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityCreated extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string|null $format
    *

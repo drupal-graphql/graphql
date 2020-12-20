@@ -16,36 +16,50 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
+   * The GraphQL server configuration.
+   *
    * @var \Drupal\graphql\Entity\ServerInterface
    */
   protected $server;
 
   /**
+   * Configuration.
+   *
    * @var array
    */
   protected $config;
 
   /**
+   * List of available contexts keyed by path and context name.
+   *
    * @var array
    */
   protected $contexts;
 
   /**
+   * The operation parameters to perform.
+   *
    * @var \GraphQL\Server\OperationParams
    */
   protected $operation;
 
   /**
+   * The parsed schema document.
+   *
    * @var \GraphQL\Language\AST\DocumentNode
    */
   protected $document;
 
   /**
+   * Type.
+   *
    * @var string
    */
   protected $type;
 
   /**
+   * The context language.
+   *
    * @var string
    */
   protected $language;
@@ -76,6 +90,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the GraphQL server config entity.
+   *
    * @return \Drupal\graphql\Entity\ServerInterface
    */
   public function getServer() {
@@ -83,6 +99,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the current operation parameters.
+   *
    * @return \GraphQL\Server\OperationParams
    */
   public function getOperation() {
@@ -90,6 +108,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the parsed GraphQL schema.
+   *
    * @return \GraphQL\Language\AST\DocumentNode
    */
   public function getDocument() {
@@ -97,6 +117,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the type.
+   *
    * @return string
    */
   public function getType(): string {
@@ -104,6 +126,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the current context language.
+   *
    * @return string
    */
   public function getContextLanguage() {
@@ -111,6 +135,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Sets the current context language.
+   *
    * @param string $language
    *
    * @return $this

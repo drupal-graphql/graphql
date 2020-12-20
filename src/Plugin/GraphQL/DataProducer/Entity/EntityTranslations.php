@@ -13,6 +13,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Returns all available translations of an entity.
+ *
  * @DataProducer(
  *   id = "entity_translations",
  *   name = @Translation("Entity translations"),
@@ -88,6 +90,8 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param bool|null $access
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser

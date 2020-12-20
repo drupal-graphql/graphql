@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PersistedQueriesForm extends EntityForm {
 
   /**
+   * Plugin manager for persisted query plugins.
+   *
    * @var \Drupal\graphql\Plugin\PersistedQueryPluginManager
    */
   protected $persistedQueryPluginManager;

@@ -12,6 +12,8 @@ use Drupal\typed_data\DataFetcherTrait;
 use Drupal\typed_data\Exception\InvalidArgumentException;
 
 /**
+ * Resolves a typed data value at a given property path.
+ *
  * @DataProducer(
  *   id = "property_path",
  *   name = @Translation("Property path"),
@@ -38,6 +40,8 @@ class PropertyPath extends DataProducerPluginBase {
   use DataFetcherTrait;
 
   /**
+   * Resolve the property path.
+   *
    * @param string $path
    * @param mixed $value
    * @param string|null $type

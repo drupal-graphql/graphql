@@ -6,14 +6,16 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the URL object of a menu link.
+ *
  * @todo Fix input and output context type.
  *
  * @DataProducer(
  *   id = "menu_link_url",
  *   name = @Translation("Menu link url"),
- *   description = @Translation("Returns the url of a menu link."),
+ *   description = @Translation("Returns the URL of a menu link."),
  *   produces = @ContextDefinition("any",
- *     label = @Translation("Url")
+ *     label = @Translation("URL")
  *   ),
  *   consumes = {
  *     "link" = @ContextDefinition("any",
@@ -25,6 +27,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuLinkUrl extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
    * @return \Drupal\Core\Url

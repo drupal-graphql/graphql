@@ -14,6 +14,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads a single entity.
+ *
  * @DataProducer(
  *   id = "entity_load",
  *   name = @Translation("Load entity"),
@@ -128,6 +130,8 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   }
 
   /**
+   * Resolver.
+   *
    * @param string $type
    * @param string $id
    * @param string|null $language

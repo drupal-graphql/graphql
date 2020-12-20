@@ -6,6 +6,8 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the label of a menu link.
+ *
  * @todo Fix input context type.
  *
  * @DataProducer(
@@ -25,6 +27,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuLinkLabel extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
    * @return mixed

@@ -10,6 +10,8 @@ use Drupal\redirect\RedirectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Returns the URL of the given path.
+ *
  * @todo Fix the type of the output context.
  *
  * @DataProducer(
@@ -36,11 +38,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   protected $pathValidator;
 
   /**
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
+   * Optional redirect module repository.
+   *
    * @var \Drupal\redirect\RedirectRepository|null
    */
   protected $redirectRepository;
@@ -88,6 +87,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   }
 
   /**
+   * Resolver.
+   *
    * @param string $path
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *

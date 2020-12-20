@@ -6,6 +6,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the ID of an entity.
+ *
  * @DataProducer(
  *   id = "entity_id",
  *   name = @Translation("Entity identifier"),
@@ -23,9 +25,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityId extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
-   * @return mixed
+   * @return int|string|null
    */
   public function resolve(EntityInterface $entity) {
     return $entity->id();

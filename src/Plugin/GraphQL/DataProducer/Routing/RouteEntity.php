@@ -14,6 +14,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads the entity associated with the current URL.
+ *
  * @DataProducer(
  *   id = "route_entity",
  *   name = @Translation("Load entity by uuid"),
@@ -94,7 +96,7 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
   }
 
   /**
-   * {@inheritdoc}
+   * Resolver.
    */
   public function resolve($url, $language, FieldContext $context) {
     if ($url instanceof Url) {

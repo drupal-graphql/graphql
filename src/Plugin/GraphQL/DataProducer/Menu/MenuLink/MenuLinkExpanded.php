@@ -6,6 +6,8 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns whether a menu link is expanded.
+ *
  * @todo Fix input context type.
  *
  * @DataProducer(
@@ -25,9 +27,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuLinkExpanded extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
-   * @return mixed
+   * @return bool
    */
   public function resolve(MenuLinkInterface $link) {
     return $link->isExpanded();

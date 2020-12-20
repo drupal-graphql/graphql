@@ -7,6 +7,8 @@ use Drupal\graphql\Plugin\DataProducerPluginCachingInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the labels of an entity.
+ *
  * @DataProducer(
  *   id = "entity_label",
  *   name = @Translation("Entity label"),
@@ -24,9 +26,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityLabel extends DataProducerPluginBase implements DataProducerPluginCachingInterface {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
-   * @return mixed
+   * @return string|null
    */
   public function resolve(EntityInterface $entity) {
     return $entity->label();
