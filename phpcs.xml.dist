@@ -18,14 +18,6 @@
   </rule>
 
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/Fields/Image/ImageDerivative.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/Fields/Image/ImageUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityChanged.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityId.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityUuid.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityAccess.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityBundle.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/Schema/SdlSchemaPluginBase.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/Schema/ComposableSchema.php</exclude-pattern>
     <exclude-pattern>src/Plugin/DataProducerPluginManager.php</exclude-pattern>
