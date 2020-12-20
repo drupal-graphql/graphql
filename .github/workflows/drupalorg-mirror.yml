@@ -5,6 +5,7 @@ on:
 jobs:
   git-mirror:
     runs-on: ubuntu-latest
+    environment: mirror
     steps:
       - uses: wearerequired/git-mirror-action@v1
         env:
