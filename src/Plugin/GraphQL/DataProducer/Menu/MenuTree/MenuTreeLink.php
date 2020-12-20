@@ -6,6 +6,8 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the menu link of a menu tree element.
+ *
  * @todo Fix input and output context type.
  *
  * @DataProducer(
@@ -25,10 +27,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuTreeLink extends DataProducerPluginBase {
 
   /**
+   * Resolver.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *
-   * @return mixed
+   * @return \Drupal\Core\Menu\MenuLinkInterface
    */
   public function resolve(MenuLinkTreeElement $element) {
     return $element->link;

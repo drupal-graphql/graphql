@@ -18,17 +18,6 @@
   </rule>
 
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLinks.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuTree/MenuTreeLink.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuTree/MenuTreeSubtree.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkAttribute.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkUrl.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkExpanded.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkLabel.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Menu/MenuLink/MenuLinkDescription.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Utility/Seek.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/Url/UrlPath.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/RouteLoad.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityPublished.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Entity/EntityLabel.php</exclude-pattern>
