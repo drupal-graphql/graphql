@@ -1,7 +1,5 @@
 name: Mirror to drupal.org
-on:
-  push:
-    branches: [ 8.x-4.x ]
+on: [ push ]
 jobs:
   git-mirror:
     runs-on: ubuntu-latest
