@@ -37,7 +37,9 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: ${{ env.extensions }}
-          key: ${{ env.extensions }}
+          # Ideally this would be based on env.extensions, how can we make a
+          # hash out of that?
+          key: cache-v1
 
       - name: Cache PHP extensions
         uses: actions/cache@v2
