@@ -6,6 +6,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns the URL of an entity.
+ *
  * @DataProducer(
  *   id = "entity_url",
  *   name = @Translation("Entity url"),
@@ -23,9 +25,12 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityUrl extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return \Drupal\Core\Url
+   *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
   public function resolve(EntityInterface $entity) {

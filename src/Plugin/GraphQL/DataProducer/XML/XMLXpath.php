@@ -28,7 +28,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class XMLXpath extends DataProducerPluginBase {
 
   /**
-   * Execute the XPAth query and return matching DOMElements.
+   * Execute the XPath query and return matching DOMElements.
    *
    * @param \DOMElement $dom
    *   The source (root) DOM element.

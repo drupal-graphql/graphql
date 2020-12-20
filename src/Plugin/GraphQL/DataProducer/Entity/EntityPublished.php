@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns whether the entity is published.
+ *
  * @DataProducer(
  *   id = "entity_published",
  *   name = @Translation("Entity published"),
@@ -25,6 +27,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityPublished extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return bool|null

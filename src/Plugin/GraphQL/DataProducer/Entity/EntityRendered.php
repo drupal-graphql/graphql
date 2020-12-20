@@ -13,6 +13,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Returns the rendered entity in a given view mode.
+ *
  * @DataProducer(
  *   id = "entity_rendered",
  *   name = @Translation("Entity rendered"),
@@ -92,6 +94,8 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
   }
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string|null $mode
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
