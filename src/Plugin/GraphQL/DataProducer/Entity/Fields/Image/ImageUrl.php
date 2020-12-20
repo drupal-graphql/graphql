@@ -100,6 +100,7 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
       }
       return $url;
     }
+    return NULL;
   }
 
 }
