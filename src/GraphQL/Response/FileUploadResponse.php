@@ -12,11 +12,11 @@ use Drupal\file\FileInterface;
 class FileUploadResponse extends Response {
 
   /**
-   * The file entity in case of successful file upload.
+   * The file entities in case of successful file upload.
    *
-   * @var \Drupal\file\FileInterface|null
+   * @var \Drupal\file\FileInterface[]
    */
-  protected $fileEntity;
+  protected $fileEntities = [];
 
   /**
    * Sets file entity.
@@ -25,14 +25,37 @@ class FileUploadResponse extends Response {
    *   File entity.
    */
   public function setFileEntity(FileInterface $fileEntity): void {
-    $this->fileEntity = $fileEntity;
+    $this->fileEntities[] = $fileEntity;
   }
 
   /**
-   * Get the file entity if there is one.
+   * Sets file entities.
+   *
+   * @param \Drupal\file\FileInterface[] $fileEntities
+   *   File entities.
+   */
+  public function setFileEntities(array $fileEntities): void {
+    $this->fileEntities = $fileEntities;
+  }
+
+  /**
+   * Get the first file entity if there is one.
+   *
+   * @return \Drupal\file\FileInterface|null
+   *   First file entity or NULL.
    */
   public function getFileEntity(): ?FileInterface {
-    return $this->fileEntity;
+    return $this->fileEntities[0] ?? NULL;
+  }
+
+  /**
+   * Get the file entities.
+   *
+   * @return \Drupal\file\FileInterface[]
+   *   File entities.
+   */
+  public function getFileEntities(): array {
+    return $this->fileEntities;
   }
 
 }
