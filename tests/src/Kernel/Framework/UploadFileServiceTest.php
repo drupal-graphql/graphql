@@ -242,7 +242,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
 
     // There must be three file entities.
     $file_entities = $file_upload_response->getFileEntities();
-    $this->assertEqual(count($file_entities), 3);
+    $this->assertEquals(count($file_entities), 3);
     foreach ($file_entities as $file_entity) {
       $this->assertInstanceOf('\Drupal\file\Entity\File', $file_entity);
     }
