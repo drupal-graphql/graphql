@@ -282,6 +282,47 @@ class FileUpload {
   }
 
   /**
+   * Validates uploaded files, saves them and returns a file upload response.
+   *
+   * @param \Symfony\Component\HttpFoundation\File\UploadedFile[] $uploaded_files
+   *   The file entities to upload.
+   * @param array $settings
+   *   File settings as specified in regular file field config. Contains keys:
+   *   - file_directory: Where to upload the file
+   *   - uri_scheme: Uri scheme to upload the file to (eg public://, private://)
+   *   - file_extensions: List of valid file extensions (eg [xml, pdf])
+   *   - max_filesize: Maximum allowed size of uploaded file.
+   *
+   * @return \Drupal\graphql\GraphQL\Response\FileUploadResponse
+   *   The file upload response containing file entities or list of violations.
+   */
+  public function saveMultipleFileUploads(array $uploaded_files, array $settings): FileUploadResponse {
+    $response = new FileUploadResponse();
+    foreach ($uploaded_files as $uploaded_file) {
+      if (!$uploaded_file instanceof UploadedFile) {
+        continue;
+      }
+      $file_upload_response = $this->saveFileUpload($uploaded_file, $settings);
+      $file_entity = $file_upload_response->getFileEntity();
+      if ($file_entity) {
+        $response->setFileEntity($file_entity);
+      }
+      else {
+        // If one file upload fails we need to delete any other uploaded files
+        // before that. Avoids file orphans that don't belong to any entity.
+        foreach ($response->getFileEntities() as $saved_file_entity) {
+          $saved_file_entity->delete();
+        }
+        // Reset list of file entities as this is a violation response.
+        $response->setFileEntities([]);
+        $response->mergeViolations($file_upload_response);
+        return $response;
+      }
+    }
+    return $response;
+  }
+
+  /**
    * Validates the file.
    *
    * @param \Drupal\file\FileInterface $file
