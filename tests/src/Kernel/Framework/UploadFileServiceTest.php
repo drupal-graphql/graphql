@@ -32,7 +32,24 @@ class UploadFileServiceTest extends GraphQLTestBase {
    *
    * @var string
    */
-  protected $file;
+  protected $files;
+
+  /**
+   * Gets the file path of the source file.
+   *
+   * @param string $filename
+   *   Filename of the source file to be get the file path for.
+   *
+   * @return string
+   *   File path of the source file.
+   */
+  protected function getSourceTestFilePath(string $filename): string {
+    $file_system = $this->container->get('file_system');
+    // Create dummy file, since symfony will test if it exists.
+    $filepath = $file_system->getTempDirectory() . '/' . $filename;
+    touch($filepath);
+    return $filepath;
+  }
 
   /**
    * {@inheritdoc}
@@ -40,13 +57,9 @@ class UploadFileServiceTest extends GraphQLTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('file');
+    $this->installSchema('file', ['file_usage']);
 
     $this->uploadService = $this->container->get('graphql.file_upload');
-
-    $file_system = $this->container->get('file_system');
-    // Create dummy file, since symfony will test if it exists.
-    $this->file = $file_system->getTempDirectory() . '/graphql_upload_test.txt';
-    touch($this->file);
   }
 
   /**
@@ -215,6 +228,62 @@ class UploadFileServiceTest extends GraphQLTestBase {
   }
 
   /**
+   * Tests successful scenario with multiple file uploads.
+   */
+  public function testSuccessWithMultipleFileUploads() {
+    $uploadFiles = [
+      $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test1.txt', 'graphql_upload_test1.txt'),
+      $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test2.txt', 'graphql_upload_test2.txt'),
+      $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test3.txt', 'graphql_upload_test3.txt'),
+    ];
+
+    $file_upload_response = $this->uploadService->saveMultipleFileUploads($uploadFiles, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      'file_extensions' => 'txt',
+    ]);
+
+    // There must be no violations.
+    $violations = $file_upload_response->getViolations();
+    $this->assertEmpty($violations);
+
+    // There must be three file entities.
+    $file_entities = $file_upload_response->getFileEntities();
+    $this->assertEqual(count($file_entities), 3);
+    foreach ($file_entities as $file_entity) {
+      $this->assertInstanceOf('\Drupal\file\Entity\File', $file_entity);
+    }
+  }
+
+  /**
+   * Tests unsuccessful scenario with multiple file uploads.
+   */
+  public function testUnsuccessWithMultipleFileUploads() {
+    $uploadFiles = [
+      $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test1.txt', 'graphql_upload_test1.txt'),
+      $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test2.txt', 'graphql_upload_test2.txt'),
+      $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test3.jpg', 'graphql_upload_test3.jpg'),
+    ];
+
+    $file_upload_response = $this->uploadService->saveMultipleFileUploads($uploadFiles, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      'file_extensions' => 'txt',
+    ]);
+
+    // There must be violation regarding forbidden file extension.
+    $violations = $file_upload_response->getViolations();
+    $this->assertStringMatchesFormat(
+      'Only files with the following extensions are allowed: <em class="placeholder">txt</em>.',
+      $violations[0]['message']
+    );
+
+    // There must be no file entities.
+    $file_entities = $file_upload_response->getFileEntities();
+    $this->assertEmpty($file_entities);
+  }
+
+  /**
    * Helper method to prepare the UploadedFile depending on core version.
    *
    * Drupal core uses different Symfony versions where we have a different
@@ -223,16 +292,18 @@ class UploadFileServiceTest extends GraphQLTestBase {
   protected function getUploadedFile(
     int $error_status,
     int $size = 0,
-    string $name = 'test.txt'
+    string $dest_filename = 'test.txt',
+    string $source_filename = 'graphql_upload_test.txt'
   ): UploadedFile {
 
-    list($version) = explode('.', \Drupal::VERSION, 2);
+    $source_filepath = $this->getSourceTestFilePath($source_filename);
+    [$version] = explode('.', \Drupal::VERSION, 2);
     switch ($version) {
       case 8:
-        return new UploadedFile($this->file, $name, 'text/plain', $size, $error_status, TRUE);
+        return new UploadedFile($source_filepath, $dest_filename, 'text/plain', $size, $error_status, TRUE);
 
     }
-    return new UploadedFile($this->file, $name, 'text/plain', $error_status, TRUE);
+    return new UploadedFile($source_filepath, $dest_filename, 'text/plain', $error_status, TRUE);
   }
 
 }
