@@ -314,6 +314,8 @@ class FileUpload {
         foreach ($response->getFileEntities() as $saved_file_entity) {
           $saved_file_entity->delete();
         }
+        // Reset list of file entities as this is a violation response.
+        $response->setFileEntities([]);
         $response->mergeViolations($file_upload_response);
         return $response;
       }

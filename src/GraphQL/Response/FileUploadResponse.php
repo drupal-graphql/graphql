@@ -7,7 +7,7 @@ namespace Drupal\graphql\GraphQL\Response;
 use Drupal\file\FileInterface;
 
 /**
- * A response that either has a file entities or some violations.
+ * A response that either has a file entity or some violations.
  */
 class FileUploadResponse extends Response {
 
@@ -26,6 +26,16 @@ class FileUploadResponse extends Response {
    */
   public function setFileEntity(FileInterface $fileEntity): void {
     $this->fileEntities[] = $fileEntity;
+  }
+
+  /**
+   * Sets file entities.
+   *
+   * @param \Drupal\file\FileInterface[] $fileEntities
+   *   File entities.
+   */
+  public function setFileEntities(array $fileEntities): void {
+    $this->fileEntities = $fileEntities;
   }
 
   /**
