@@ -28,13 +28,6 @@ class UploadFileServiceTest extends GraphQLTestBase {
   protected $uploadService;
 
   /**
-   * Path to temporary test file.
-   *
-   * @var string
-   */
-  protected $files;
-
-  /**
    * Gets the file path of the source file.
    *
    * @param string $filename
