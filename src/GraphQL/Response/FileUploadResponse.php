@@ -54,7 +54,7 @@ class FileUploadResponse extends Response {
    * @return \Drupal\file\FileInterface[]
    *   File entities.
    */
-  public function getFileEntities(): ?array {
+  public function getFileEntities(): array {
     return $this->fileEntities;
   }
 

@@ -19,7 +19,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
-use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -283,7 +282,7 @@ class FileUpload {
   }
 
   /**
-   * Validates an uploaded files, saves them and returns a file upload response.
+   * Validates uploaded files, saves them and returns a file upload response.
    *
    * @param \Symfony\Component\HttpFoundation\File\UploadedFile[] $uploaded_files
    *   The file entities to upload.
@@ -297,7 +296,7 @@ class FileUpload {
    * @return \Drupal\graphql\GraphQL\Response\FileUploadResponse
    *   The file upload response containing file entities or list of violations.
    */
-  public function saveMultipleFileUploads(array $uploaded_files, array $settings): ResponseInterface {
+  public function saveMultipleFileUploads(array $uploaded_files, array $settings): FileUploadResponse {
     $response = new FileUploadResponse();
     foreach ($uploaded_files as $uploaded_file) {
       if (!$uploaded_file instanceof UploadedFile) {
