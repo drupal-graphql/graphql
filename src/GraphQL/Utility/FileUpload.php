@@ -300,7 +300,7 @@ class FileUpload {
   public function saveMultipleFileUploads(array $uploaded_files, array $settings): ResponseInterface {
     $response = new FileUploadResponse();
     foreach ($uploaded_files as $uploaded_file) {
-      if (!$uploaded_file) {
+      if (!$uploaded_file instanceof UploadedFile) {
         continue;
       }
       $file_upload_response = $this->saveFileUpload($uploaded_file, $settings);
