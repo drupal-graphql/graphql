@@ -132,11 +132,11 @@ class UploadFileServiceTest extends GraphQLTestBase {
    * Tests that the file must not be larger than the file size limit.
    */
   public function testSizeValidation() {
-    // Create a file with 4 bytes.
-    file_put_contents($this->file, 'test');
-
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
+
+    // Create a file with 4 bytes.
+    file_put_contents($uploadFile->getRealPath(), 'test');
 
     $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
@@ -213,11 +213,11 @@ class UploadFileServiceTest extends GraphQLTestBase {
       \Drupal::service('renderer')
     );
 
-    // Create a file with 4 bytes.
-    file_put_contents($this->file, 'test');
-
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
+
+    // Create a file with 4 bytes.
+    file_put_contents($uploadFile->getRealPath(), 'test');
 
     $upload_service->saveFileUpload($uploadFile, [
       'uri_scheme' => 'public',
