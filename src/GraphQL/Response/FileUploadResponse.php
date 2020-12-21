@@ -35,7 +35,7 @@ class FileUploadResponse extends Response {
    *   First file entity or NULL.
    */
   public function getFileEntity(): ?FileInterface {
-    return $this->fileEntity[0] ?? NULL;
+    return $this->fileEntities[0] ?? NULL;
   }
 
   /**
