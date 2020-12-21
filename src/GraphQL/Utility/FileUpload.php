@@ -311,7 +311,7 @@ class FileUpload {
       else {
         // If one file upload fails we need to delete any other uploaded files
         // before that. Avoids file orphans that don't belong to any entity.
-        foreach ($file_upload_response->getFileEntities() as $saved_file_entity) {
+        foreach ($response->getFileEntities() as $saved_file_entity) {
           $saved_file_entity->delete();
         }
         $response->mergeViolations($file_upload_response);
