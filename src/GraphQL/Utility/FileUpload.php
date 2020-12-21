@@ -19,6 +19,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
+use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -279,6 +280,45 @@ class FileUpload {
       // in the try {} block.
       $this->lock->release($lock_id);
     }
+  }
+
+  /**
+   * Validates an uploaded files, saves them and returns a file upload response.
+   *
+   * @param \Symfony\Component\HttpFoundation\File\UploadedFile[] $uploaded_files
+   *   The file entities to upload.
+   * @param array $settings
+   *   File settings as specified in regular file field config. Contains keys:
+   *   - file_directory: Where to upload the file
+   *   - uri_scheme: Uri scheme to upload the file to (eg public://, private://)
+   *   - file_extensions: List of valid file extensions (eg [xml, pdf])
+   *   - max_filesize: Maximum allowed size of uploaded file.
+   *
+   * @return \Drupal\graphql\GraphQL\Response\FileUploadResponse
+   *   The file upload response containing file entities or list of violations.
+   */
+  public function saveMultipleFileUploads(array $uploaded_files, array $settings): ResponseInterface {
+    $response = new FileUploadResponse();
+    foreach ($uploaded_files as $uploaded_file) {
+      if (!$uploaded_file) {
+        continue;
+      }
+      $file_upload_response = $this->saveFileUpload($uploaded_file, $settings);
+      $file_entity = $file_upload_response->getFileEntity();
+      if ($file_entity) {
+        $response->setFileEntity($file_entity);
+      }
+      else {
+        // If one file upload fails we need to delete any other uploaded files
+        // before that. Avoids file orphans that don't belong to any entity.
+        foreach ($file_upload_response->getFileEntities() as $saved_file_entity) {
+          $saved_file_entity->delete();
+        }
+        $response->mergeViolations($file_upload_response);
+        return $response;
+      }
+    }
+    return $response;
   }
 
   /**
