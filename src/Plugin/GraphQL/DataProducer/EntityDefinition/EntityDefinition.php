@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Bundle"),
  *       required = FALSE
  *     ),
- *     "field_types" = @ContextDefinition("FieldTypes",
- *       label = @Translation("Field types"),
+ *     "field_types" = @ContextDefinition("string",
+ *       label = @Translation("Field types (ALL, BASE_FIELDS, FIELD_CONFIG)"),
  *       default = "ALL",
  *       required = FALSE
  *     )
