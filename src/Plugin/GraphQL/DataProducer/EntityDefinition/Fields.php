@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       label = @Translation("Bundle context"),
  *       required = FALSE,
  *     ),
- *     "field_types_context" = @ContextDefinition("any",
+ *     "field_types_context" = @ContextDefinition("string",
  *       label = @Translation("Field types context"),
  *       required = FALSE,
  *     )
@@ -110,7 +110,7 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
    *   The entity type definition.
    * @param array|null $bundle_context
    *   Bundle context.
-   * @param array|null $field_types_context
+   * @param string|null $field_types_context
    *   Field types context.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field_context
    *   Field context.
@@ -118,7 +118,7 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
   public function resolve(
     EntityTypeInterface $entity_definition,
     ?array $bundle_context = NULL,
-    ?array $field_types_context = NULL,
+    ?string $field_types_context = NULL,
     FieldContext $field_context
   ): \Iterator {
 
@@ -140,14 +140,13 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
       }
 
       if ($field_types_context) {
-        $field_types = $field_types_context['key'];
         foreach ($fields as $field) {
-          if ($field_types === 'BASE_FIELDS') {
+          if ($field_types_context === 'BASE_FIELDS') {
             if ($field instanceof BaseFieldDefinition) {
               yield $field;
             }
           }
-          elseif ($field_types === 'FIELD_CONFIG') {
+          elseif ($field_types_context === 'FIELD_CONFIG') {
             if ($field instanceof FieldConfig || $field instanceof BaseFieldOverride) {
               yield $field;
             }
