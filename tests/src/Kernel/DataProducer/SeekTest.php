@@ -16,7 +16,7 @@ class SeekTest extends GraphQLTestBase {
    *
    * @dataProvider testSeekProvider
    */
-  public function testSeek($input, $position, $expected): void {
+  public function testSeek(array $input, int $position, ?int $expected): void {
     $result = $this->executeDataProducer('seek', [
       'input' => $input,
       'position' => $position,

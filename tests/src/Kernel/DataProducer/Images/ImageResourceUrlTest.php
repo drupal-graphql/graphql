@@ -16,7 +16,7 @@ class ImageResourceUrlTest extends GraphQLTestBase {
    *
    * @dataProvider testImageResourceUrlProvider
    */
-  public function testImageResourceUrl($input, $expected): void {
+  public function testImageResourceUrl(array $input, string $expected): void {
     $result = $this->executeDataProducer('image_style_url', [
       'derivative' => $input,
     ]);

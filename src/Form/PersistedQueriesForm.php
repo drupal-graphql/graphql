@@ -57,7 +57,7 @@ class PersistedQueriesForm extends EntityForm {
   /**
    * {@inheritDoc}
    */
-  public function form(array $form, FormStateInterface $form_state) {
+  public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
 
     /** @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface[] $plugins */

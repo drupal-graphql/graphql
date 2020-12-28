@@ -58,7 +58,7 @@ GQL;
    *
    * @dataProvider persistedQueriesDataProvider
    */
-  public function testPersistedQueries($instanceIds, $queryId, $expected): void {
+  public function testPersistedQueries(array $instanceIds, string $queryId, array $expected): void {
     // Before adding the persisted query plugins to the server, we want to make
     // sure that there are no existing plugins already there.
     $this->server->removeAllPersistedQueryInstances();

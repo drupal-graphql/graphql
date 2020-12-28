@@ -85,7 +85,7 @@ class ServerForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $formState) {
+  public function form(array $form, FormStateInterface $formState): array {
     $form = parent::form($form, $formState);
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
