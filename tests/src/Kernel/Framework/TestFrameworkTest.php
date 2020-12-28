@@ -16,7 +16,7 @@ class TestFrameworkTest extends GraphQLTestBase {
   /**
    * Test mocked fields.
    */
-  public function testFieldMock() {
+  public function testFieldMock(): void {
     $schema = <<<GQL
       type Query {
         root: String
@@ -62,7 +62,7 @@ GQL;
   /**
    * Test result error assertions.
    */
-  public function testErrorAssertion() {
+  public function testErrorAssertion(): void {
     $schema = <<<GQL
       type Query {
         wrongname: String
@@ -86,7 +86,7 @@ GQL;
   /**
    * Test mutation mocking.
    */
-  public function testMutationMock() {
+  public function testMutationMock(): void {
     $schema = <<<GQL
       schema {
         query: Query
@@ -136,7 +136,7 @@ GQL;
   /**
    * Test interface mocking.
    */
-  public function testInterfaceMock() {
+  public function testInterfaceMock(): void {
     $schema = <<<GQL
       schema {
         query: Query
@@ -197,7 +197,7 @@ GQL;
   /**
    * Test union mocks.
    */
-  public function testUnionMock() {
+  public function testUnionMock(): void {
     $schema = <<<GQL
       schema {
         query: Query

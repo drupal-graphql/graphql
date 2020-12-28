@@ -53,7 +53,7 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
    *
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    */
-  public static function setContext(ResolveContext $context = NULL) {
+  public static function setContext(ResolveContext $context = NULL): void {
     static::$context = $context;
   }
 

@@ -98,7 +98,7 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
   /**
    * Resolver.
    */
-  public function resolve($url, $language, FieldContext $context) {
+  public function resolve($url, string $language, FieldContext $context): ?Deferred {
     if ($url instanceof Url) {
       list(, $type) = explode('.', $url->getRouteName());
       $parameters = $url->getRouteParameters();

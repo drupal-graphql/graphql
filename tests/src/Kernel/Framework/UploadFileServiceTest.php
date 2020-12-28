@@ -47,7 +47,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('file');
     $this->installSchema('file', ['file_usage']);
@@ -58,7 +58,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Ensure that a correct file upload works.
    */
-  public function testSuccess() {
+  public function testSuccess(): void {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK);
 
@@ -75,7 +75,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that a too large file returns a violation.
    */
-  public function testFileTooLarge() {
+  public function testFileTooLarge(): void {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_INI_SIZE);
 
@@ -94,7 +94,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that a partial file returns a violation.
    */
-  public function testPartialFile() {
+  public function testPartialFile(): void {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_PARTIAL);
 
@@ -113,7 +113,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that missing settings keys throw an exception.
    */
-  public function testMissingSettings() {
+  public function testMissingSettings(): void {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK);
 
@@ -124,7 +124,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that the file must not be larger than the file size limit.
    */
-  public function testSizeValidation() {
+  public function testSizeValidation(): void {
     // Create a Symfony dummy uploaded file in test mode.
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
 
@@ -149,7 +149,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that the uploaded file extension is renamed to txt.
    */
-  public function testExtensionRenaming() {
+  public function testExtensionRenaming(): void {
     // Evil php file extension!
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test.php');
 
@@ -166,7 +166,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that the uploaded file extension is validated.
    */
-  public function testExtensionValidation() {
+  public function testExtensionValidation(): void {
     $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test.txt');
 
     $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
@@ -187,7 +187,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests that the file lock is released on validation errors.
    */
-  public function testLockReleased() {
+  public function testLockReleased(): void {
     // Mock the lock system to check that the lock is released.
     $lock = $this->prophesize(LockBackendInterface::class);
     $lock->acquire(Argument::any())->willReturn(TRUE);
@@ -223,7 +223,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests successful scenario with multiple file uploads.
    */
-  public function testSuccessWithMultipleFileUploads() {
+  public function testSuccessWithMultipleFileUploads(): void {
     $uploadFiles = [
       $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test1.txt', 'graphql_upload_test1.txt'),
       $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test2.txt', 'graphql_upload_test2.txt'),
@@ -252,7 +252,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * Tests unsuccessful scenario with multiple file uploads.
    */
-  public function testUnsuccessWithMultipleFileUploads() {
+  public function testUnsuccessWithMultipleFileUploads(): void {
     $uploadFiles = [
       $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test1.txt', 'graphql_upload_test1.txt'),
       $this->getUploadedFile(UPLOAD_ERR_OK, 0, 'test2.txt', 'graphql_upload_test2.txt'),

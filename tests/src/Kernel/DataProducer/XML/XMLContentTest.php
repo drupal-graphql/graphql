@@ -12,7 +12,7 @@ class XMLContentTest extends XMLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLContent::resolve
    */
-  public function testXmlContent() {
+  public function testXmlContent(): void {
     $document = $this->loadDocument();
     $xpath = new \DOMXPath($document->ownerDocument);
     $h1 = iterator_to_array($xpath->query('//div/h1', $document));

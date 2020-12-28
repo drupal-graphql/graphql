@@ -17,7 +17,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $content_type = NodeType::create([
@@ -177,7 +177,7 @@ GQL;
   /**
    * Tests that retrieving an entity definition works.
    */
-  public function testEntityDefinition() {
+  public function testEntityDefinition(): void {
     $query = <<<GQL
       query {
         entityDefinition(entity_type: "node", bundle: "article") {
