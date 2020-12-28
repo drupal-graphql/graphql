@@ -17,6 +17,12 @@
     <exclude-pattern>src/GraphQL/ResolverBuilder.php</exclude-pattern>
   </rule>
 
+  <!-- We want to document the return type on the base class even when there is
+    no return statement on the default implementation. -->
+  <rule ref="Drupal.Commenting.FunctionComment.InvalidNoReturn">
+    <exclude-pattern>src/GraphQL/Buffers/BufferBase.php</exclude-pattern>
+  </rule>
+
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
     <exclude-pattern>src/Plugin/GraphQL/Schema/SdlSchemaPluginBase.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/Schema/ComposableSchema.php</exclude-pattern>

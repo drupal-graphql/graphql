@@ -49,3 +49,35 @@ parameters:
       count: 1
       path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
     - "#^Parameter .+ of method Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:range\\(\\) expects null, int given\\.$#"
+    # We forgot to use return type hints on some interfaces, cannot be changed
+    # in stable 4.0.
+    # @todo use return type hints everywhere for 5.0.
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:addPersistedQueryInstance\\(\\) has no return typehint specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return typehint specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removeAllPersistedQueryInstances\\(\\) has no return typehint specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\PersistedQueryPluginInterface\\:\\:setWeight\\(\\) has no return typehint specified\\.$#"
+      count: 1
+      path: src/Plugin/PersistedQueryPluginInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\SchemaExtensionPluginInterface\\:\\:registerResolvers\\(\\) has no return typehint specified\\.$#"
+      count: 1
+      path: src/Plugin/SchemaExtensionPluginInterface.php
+
+    -
+      message: "#^Unable to resolve the template type ExpectedType in call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\)$#"
+      count: 1
+      path: tests/src/Kernel/ResolverBuilderTest.php
