@@ -8,9 +8,9 @@
 /**
  * Implements hook_help().
  */
-function graphql_help($routeName) {
+function graphql_help(string $routeName): ?string {
   if ($routeName !== 'help.page.graphql') {
-    return;
+    return NULL;
   }
 
   $title = t('About');
@@ -32,7 +32,7 @@ EOT;
 /**
  * Implements hook_theme().
  */
-function graphql_theme() {
+function graphql_theme(): array {
   return [
     'page__graphql_explorer' => [
       'render element' => 'elements',
