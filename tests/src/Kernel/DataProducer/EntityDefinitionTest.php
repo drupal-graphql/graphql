@@ -504,7 +504,7 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheMaxAge() {
+  protected function defaultCacheMaxAge(): int {
     // @todo this is wrong, we should have a maximum of caching for entity
     // definitions, not 0.
     return 0;
@@ -513,14 +513,14 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheContexts() {
+  protected function defaultCacheContexts(): array {
     return ['languages:language_interface', 'user.permissions'];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheTags() {
+  protected function defaultCacheTags(): array {
     $tags = parent::defaultCacheTags();
     $tags[] = 'config:core.entity_form_display.node.article.default';
     return $tags;
