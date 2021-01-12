@@ -3,6 +3,8 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\graphql\GraphQL\ResolverBuilder;
@@ -17,6 +19,339 @@ class EntityDefinitionTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
+  public static $modules = [
+    'text',
+  ];
+
+  /**
+   * Default cache tags that should be included with the response.
+   *
+   * @var string[]
+   */
+  protected $defaultCacheTags = ['config:core.entity_form_display.node.article.default'];
+
+  /**
+   * Expected entity definition response for all fields.
+   *
+   * @var array
+   */
+  protected $fullDefinitionResult = [
+    'entityDefinition' =>
+    [
+      'label' => 'Content',
+      'fields' =>
+      [
+        0 =>
+        [
+          'id' => 'nid',
+          'label' => 'ID',
+          'description' => NULL,
+          'type' => 'integer',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        1 =>
+        [
+          'id' => 'uuid',
+          'label' => 'UUID',
+          'description' => NULL,
+          'type' => 'uuid',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        2 =>
+        [
+          'id' => 'vid',
+          'label' => 'Revision ID',
+          'description' => NULL,
+          'type' => 'integer',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        3 =>
+        [
+          'id' => 'langcode',
+          'label' => 'Language',
+          'description' => NULL,
+          'type' => 'language',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 2,
+          'settings' => NULL,
+        ],
+        4 =>
+        [
+          'id' => 'type',
+          'label' => 'Content type',
+          'description' => NULL,
+          'type' => 'entity_reference',
+          'required' => TRUE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => TRUE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        5 =>
+        [
+          'id' => 'revision_timestamp',
+          'label' => 'Revision create time',
+          'description' => 'The time that the current revision was created.',
+          'type' => 'created',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        6 =>
+        [
+          'id' => 'revision_uid',
+          'label' => 'Revision user',
+          'description' => 'The user ID of the author of the current revision.',
+          'type' => 'entity_reference',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => TRUE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        7 =>
+        [
+          'id' => 'revision_log',
+          'label' => 'Revision log message',
+          'description' => 'Briefly describe the changes you have made.',
+          'type' => 'string_long',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 25,
+          'settings' => NULL,
+        ],
+        8 =>
+        [
+          'id' => 'status',
+          'label' => 'Published',
+          'description' => NULL,
+          'type' => 'boolean',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => '1',
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 120,
+          'settings' => NULL,
+        ],
+        9 =>
+        [
+          'id' => 'uid',
+          'label' => 'Authored by',
+          'description' => 'The username of the content author.',
+          'type' => 'entity_reference',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => TRUE,
+          'isHidden' => FALSE,
+          'weight' => 5,
+          'settings' => NULL,
+        ],
+        10 =>
+        [
+          'id' => 'title',
+          'label' => 'Title',
+          'description' => NULL,
+          'type' => 'string',
+          'required' => TRUE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => -5,
+          'settings' => NULL,
+        ],
+        11 =>
+        [
+          'id' => 'created',
+          'label' => 'Authored on',
+          'description' => 'The time that the node was created.',
+          'type' => 'created',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 10,
+          'settings' => NULL,
+        ],
+        12 =>
+        [
+          'id' => 'changed',
+          'label' => 'Changed',
+          'description' => 'The time that the node was last edited.',
+          'type' => 'changed',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        13 =>
+        [
+          'id' => 'promote',
+          'label' => 'Promoted to front page',
+          'description' => NULL,
+          'type' => 'boolean',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => '1',
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 15,
+          'settings' => NULL,
+        ],
+        14 =>
+        [
+          'id' => 'sticky',
+          'label' => 'Sticky at top of lists',
+          'description' => NULL,
+          'type' => 'boolean',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => '',
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 16,
+          'settings' => NULL,
+        ],
+        15 =>
+        [
+          'id' => 'default_langcode',
+          'label' => 'Default translation',
+          'description' => 'A flag indicating whether this is the default translation.',
+          'type' => 'boolean',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => '1',
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        16 =>
+        [
+          'id' => 'revision_default',
+          'label' => 'Default revision',
+          'description' => 'A flag indicating whether this was a default revision when it was saved.',
+          'type' => 'boolean',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => '',
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        17 =>
+        [
+          'id' => 'revision_translation_affected',
+          'label' => 'Revision translation affected',
+          'description' => 'Indicates if the last edit of a translation belongs to current revision.',
+          'type' => 'boolean',
+          'required' => FALSE,
+          'multiple' => FALSE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => '',
+          'isReference' => FALSE,
+          'isHidden' => FALSE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+        18 =>
+        [
+          'id' => 'field_test',
+          'label' => 'Test',
+          'description' => '',
+          'type' => 'text',
+          'required' => FALSE,
+          'multiple' => TRUE,
+          'maxNumItems' => 1,
+          'status' => TRUE,
+          'defaultValue' => NULL,
+          'isReference' => FALSE,
+          'isHidden' => TRUE,
+          'weight' => 0,
+          'settings' => NULL,
+        ],
+      ],
+    ],
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -25,6 +360,21 @@ class EntityDefinitionTest extends GraphQLTestBase {
       'name' => 'article',
     ]);
     $content_type->save();
+
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_test',
+      'type' => 'text',
+      'entity_type' => 'node',
+    ]);
+    $field_storage->save();
+
+    $field = FieldConfig::create([
+      'field_name' => 'field_test',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Test',
+    ]);
+    $field->save();
 
     // Create a form display.
     $form_display = EntityFormDisplay::create([
@@ -201,304 +551,77 @@ GQL;
       }
 GQL;
 
-    $this->assertResults($query, [], [
-      'entityDefinition' =>
-      [
-        'label' => 'Content',
-        'fields' =>
-        [
-          0 =>
-          [
-            'id' => 'nid',
-            'label' => 'ID',
-            'description' => NULL,
-            'type' => 'integer',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          1 =>
-          [
-            'id' => 'uuid',
-            'label' => 'UUID',
-            'description' => NULL,
-            'type' => 'uuid',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          2 =>
-          [
-            'id' => 'vid',
-            'label' => 'Revision ID',
-            'description' => NULL,
-            'type' => 'integer',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          3 =>
-          [
-            'id' => 'langcode',
-            'label' => 'Language',
-            'description' => NULL,
-            'type' => 'language',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 2,
-            'settings' => NULL,
-          ],
-          4 =>
-          [
-            'id' => 'type',
-            'label' => 'Content type',
-            'description' => NULL,
-            'type' => 'entity_reference',
-            'required' => TRUE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => TRUE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          5 =>
-          [
-            'id' => 'revision_timestamp',
-            'label' => 'Revision create time',
-            'description' => 'The time that the current revision was created.',
-            'type' => 'created',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          6 =>
-          [
-            'id' => 'revision_uid',
-            'label' => 'Revision user',
-            'description' => 'The user ID of the author of the current revision.',
-            'type' => 'entity_reference',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => TRUE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          7 =>
-          [
-            'id' => 'revision_log',
-            'label' => 'Revision log message',
-            'description' => 'Briefly describe the changes you have made.',
-            'type' => 'string_long',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 25,
-            'settings' => NULL,
-          ],
-          8 =>
-          [
-            'id' => 'status',
-            'label' => 'Published',
-            'description' => NULL,
-            'type' => 'boolean',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => '1',
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 120,
-            'settings' => NULL,
-          ],
-          9 =>
-          [
-            'id' => 'uid',
-            'label' => 'Authored by',
-            'description' => 'The username of the content author.',
-            'type' => 'entity_reference',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => TRUE,
-            'isHidden' => FALSE,
-            'weight' => 5,
-            'settings' => NULL,
-          ],
-          10 =>
-          [
-            'id' => 'title',
-            'label' => 'Title',
-            'description' => NULL,
-            'type' => 'string',
-            'required' => TRUE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => -5,
-            'settings' => NULL,
-          ],
-          11 =>
-          [
-            'id' => 'created',
-            'label' => 'Authored on',
-            'description' => 'The time that the node was created.',
-            'type' => 'created',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 10,
-            'settings' => NULL,
-          ],
-          12 =>
-          [
-            'id' => 'changed',
-            'label' => 'Changed',
-            'description' => 'The time that the node was last edited.',
-            'type' => 'changed',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => NULL,
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          13 =>
-          [
-            'id' => 'promote',
-            'label' => 'Promoted to front page',
-            'description' => NULL,
-            'type' => 'boolean',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => '1',
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 15,
-            'settings' => NULL,
-          ],
-          14 =>
-          [
-            'id' => 'sticky',
-            'label' => 'Sticky at top of lists',
-            'description' => NULL,
-            'type' => 'boolean',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => '',
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 16,
-            'settings' => NULL,
-          ],
-          15 =>
-          [
-            'id' => 'default_langcode',
-            'label' => 'Default translation',
-            'description' => 'A flag indicating whether this is the default translation.',
-            'type' => 'boolean',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => '1',
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          16 =>
-          [
-            'id' => 'revision_default',
-            'label' => 'Default revision',
-            'description' => 'A flag indicating whether this was a default revision when it was saved.',
-            'type' => 'boolean',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => '',
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-          17 =>
-          [
-            'id' => 'revision_translation_affected',
-            'label' => 'Revision translation affected',
-            'description' => 'Indicates if the last edit of a translation belongs to current revision.',
-            'type' => 'boolean',
-            'required' => FALSE,
-            'multiple' => FALSE,
-            'maxNumItems' => 1,
-            'status' => TRUE,
-            'defaultValue' => '',
-            'isReference' => FALSE,
-            'isHidden' => FALSE,
-            'weight' => 0,
-            'settings' => NULL,
-          ],
-        ],
-      ],
-    ]
-    );
+    $this->defaultCacheTags[] = 'config:field.field.node.article.field_test';
+    $this->assertResults($query, [], $this->fullDefinitionResult);
+  }
+
+  /**
+   * Tests that filtering base field definitions works.
+   */
+  public function testBaseFieldFilter() {
+    $query = <<<GQL
+      query {
+        entityDefinition(entity_type: "node", bundle: "article", field_types: BASE_FIELDS) {
+          label
+          fields {
+            id
+            label
+            description
+            type
+            required
+            multiple
+            maxNumItems
+            status
+            defaultValue
+            isReference
+            isHidden
+            weight
+            settings
+          }
+        }
+      }
+GQL;
+
+    $expectedResult = $this->fullDefinitionResult;
+    // Remove the one configured field that should not be in the list of base
+    // fields.
+    unset($expectedResult['entityDefinition']['fields'][18]);
+    $this->assertResults($query, [], $expectedResult);
+  }
+
+  /**
+   * Tests that filtering configured field definitions works.
+   */
+  public function testConfiguredFieldFilter() {
+    $query = <<<GQL
+      query {
+        entityDefinition(entity_type: "node", bundle: "article", field_types: FIELD_CONFIG) {
+          label
+          fields {
+            id
+            label
+            description
+            type
+            required
+            multiple
+            maxNumItems
+            status
+            defaultValue
+            isReference
+            isHidden
+            weight
+            settings
+          }
+        }
+      }
+GQL;
+
+    $expectedResult = $this->fullDefinitionResult;
+    // Only the configured field should show up.
+    $configured_field = $expectedResult['entityDefinition']['fields'][18];
+    $expectedResult['entityDefinition']['fields'] = [$configured_field];
+    $this->defaultCacheTags[] = 'config:field.field.node.article.field_test';
+    $this->assertResults($query, [], $expectedResult);
   }
 
   /**
@@ -522,7 +645,7 @@ GQL;
    */
   protected function defaultCacheTags() {
     $tags = parent::defaultCacheTags();
-    $tags[] = 'config:core.entity_form_display.node.article.default';
+    $tags = array_merge($tags, $this->defaultCacheTags);
     return $tags;
   }
 
