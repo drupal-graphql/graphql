@@ -26,7 +26,7 @@ For more information about composable schemas go to [Advanced section](./../adva
 
 The module also includes some Plugins which are required inside the folder `src/Plugin/GraphQL/Schema` and optionally `src/Plugin/GraphQL/SchemaExtension`:
 
-- ComposableSchemaExample.php : This file will define the schema itself. You can register default resolvers and also regular resolvers here. If you don't have a particular need you don't really need anything more than the anotation for your schema at fist. Later with more complex examples we will show how it can be useful to add some base functionality (automatic resolvers or default resolvers).
+- ComposableSchemaExample.php : This file will define the schema itself. You can register default resolvers and also regular resolvers here. If you don't have a particular need you don't really need anything more than the anotation for your schema at first. Later with more complex examples we will show how it can be useful to add some base functionality (automatic resolvers or default resolvers).
 - ComposableGraphQLSchemaExtension.php : This file will be used to implement resolvers in a way that is composeable (recommended). We recommend having at least one of these, but you can also implement resolvers across multiple modules by including several schema extensions in each module that exposes certain functionality to the schema when enabled. See the [Advanced section](./../advanced/composable-schemas.md) when talking about spliting schemas.
 
 #### Note
