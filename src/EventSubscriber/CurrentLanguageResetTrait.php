@@ -40,7 +40,7 @@ trait CurrentLanguageResetTrait {
   /**
    * Resets the global language context across different services.
    */
-  protected function resetLanguageContext() {
+  protected function resetLanguageContext(): void {
     if (!isset($this->languageNegotiator)) {
       return;
     }

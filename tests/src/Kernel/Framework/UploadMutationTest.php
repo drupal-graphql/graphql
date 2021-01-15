@@ -15,7 +15,7 @@ class UploadMutationTest extends GraphQLTestBase {
   /**
    * Test a simple file upload.
    */
-  public function testFileUpload() {
+  public function testFileUpload(): void {
     $schema = <<<GQL
       schema {
         mutation: Mutation

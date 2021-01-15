@@ -17,7 +17,7 @@ class BufferedFieldTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
@@ -42,7 +42,7 @@ GQL;
   /**
    * Test if the schema is created properly.
    */
-  public function testBatchedFields() {
+  public function testBatchedFields(): void {
     $buffer = $this->getMockBuilder(BufferBase::class)
       ->setMethods(['resolveBufferArray'])
       ->getMock();

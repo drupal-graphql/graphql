@@ -141,6 +141,9 @@ abstract class BufferBase {
    *
    * @param array $buffer
    *   The buffer as an array.
+   *
+   * @return array
+   *   The resolved/loaded items.
    */
   protected function resolveBufferArray(array $buffer) {
     throw new \LogicException('Method not implemented.');

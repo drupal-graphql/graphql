@@ -16,7 +16,7 @@ class StringTest extends GraphQLTestBase {
    *
    * @dataProvider testUppercaseProvider
    */
-  public function testUppercase($input, $expected) {
+  public function testUppercase(string $input, string $expected): void {
     $result = $this->executeDataProducer('uppercase', [
       'string' => $input,
     ]);
@@ -27,7 +27,7 @@ class StringTest extends GraphQLTestBase {
   /**
    * Tests the upper case data producer.
    */
-  public function testUppercaseProvider() {
+  public function testUppercaseProvider(): array {
     return [
       ['test', 'TEST'],
       ['123 ..!!', '123 ..!!'],

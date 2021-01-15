@@ -23,7 +23,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('menu_link_content');
@@ -98,7 +98,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLinks::resolve
    */
-  public function testMenuLinks() {
+  public function testMenuLinks(): void {
     $result = $this->executeDataProducer('menu_links', [
       'menu' => $this->menu,
     ]);
@@ -115,7 +115,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree\MenuTreeLink::resolve
    */
-  public function testMenuTreeLink() {
+  public function testMenuTreeLink(): void {
     foreach ($this->linkTree as $link_tree) {
       $result = $this->executeDataProducer('menu_tree_link', [
         'element' => $link_tree,
@@ -128,7 +128,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree\MenuTreeSubtree::resolve
    */
-  public function testMenuTreeSubtree() {
+  public function testMenuTreeSubtree(): void {
     foreach ($this->linkTree as $link_tree) {
       $result = $this->executeDataProducer('menu_tree_subtree', [
         'element' => $link_tree,
@@ -141,7 +141,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkAttribute::resolve
    */
-  public function testMenuLinkAttribute() {
+  public function testMenuLinkAttribute(): void {
     $attribute = 'target';
     $assert_happened = FALSE;
     foreach ($this->linkTree as $link_tree) {
@@ -162,7 +162,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkDescription::resolve
    */
-  public function testMenuLinkDescription() {
+  public function testMenuLinkDescription(): void {
     foreach ($this->linkTree as $link_tree) {
       $result = $this->executeDataProducer('menu_link_description', [
         'link' => $link_tree->link,
@@ -175,7 +175,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkExpanded::resolve
    */
-  public function testMenuLinkExpanded() {
+  public function testMenuLinkExpanded(): void {
     foreach ($this->linkTree as $link_tree) {
       $result = $this->executeDataProducer('menu_link_expanded', [
         'link' => $link_tree->link,
@@ -188,7 +188,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkLabel::resolve
    */
-  public function testMenuLinkLabel() {
+  public function testMenuLinkLabel(): void {
     foreach ($this->linkTree as $link_tree) {
       $result = $this->executeDataProducer('menu_link_label', [
         'link' => $link_tree->link,
@@ -201,7 +201,7 @@ class MenuTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkUrl::resolve
    */
-  public function testMenuLinkUrl() {
+  public function testMenuLinkUrl(): void {
     foreach ($this->linkTree as $link_tree) {
       $result = $this->executeDataProducer('menu_link_url', [
         'link' => $link_tree->link,

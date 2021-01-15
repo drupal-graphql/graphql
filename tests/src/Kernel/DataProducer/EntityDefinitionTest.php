@@ -352,7 +352,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $content_type = NodeType::create([
@@ -527,7 +527,7 @@ GQL;
   /**
    * Tests that retrieving an entity definition works.
    */
-  public function testEntityDefinition() {
+  public function testEntityDefinition(): void {
     $query = <<<GQL
       query {
         entityDefinition(entity_type: "node", bundle: "article") {
@@ -558,7 +558,7 @@ GQL;
   /**
    * Tests that filtering base field definitions works.
    */
-  public function testBaseFieldFilter() {
+  public function testBaseFieldFilter(): void {
     $query = <<<GQL
       query {
         entityDefinition(entity_type: "node", bundle: "article", field_types: BASE_FIELDS) {
@@ -592,7 +592,7 @@ GQL;
   /**
    * Tests that filtering configured field definitions works.
    */
-  public function testConfiguredFieldFilter() {
+  public function testConfiguredFieldFilter(): void {
     $query = <<<GQL
       query {
         entityDefinition(entity_type: "node", bundle: "article", field_types: FIELD_CONFIG) {
@@ -627,7 +627,7 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheMaxAge() {
+  protected function defaultCacheMaxAge(): int {
     // @todo this is wrong, we should have a maximum of caching for entity
     // definitions, not 0.
     return 0;
@@ -636,14 +636,14 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheContexts() {
+  protected function defaultCacheContexts(): array {
     return ['languages:language_interface', 'user.permissions'];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheTags() {
+  protected function defaultCacheTags(): array {
     $tags = parent::defaultCacheTags();
     $tags = array_merge($tags, $this->defaultCacheTags);
     return $tags;

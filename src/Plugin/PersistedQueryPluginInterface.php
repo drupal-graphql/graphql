@@ -14,6 +14,11 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
   /**
    * Returns a query if this plugin has it.
    *
+   * @param string $id
+   *   ID of the persisted query.
+   * @param \GraphQL\Server\OperationParams $operation
+   *   The operation with parameters.
+   *
    * @return string|null
    *   The actual GraphQL query, or NULL if this plugin does not support a query
    *   with that ID.

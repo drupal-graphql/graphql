@@ -17,7 +17,7 @@ class ImageUrlTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
 
@@ -41,7 +41,7 @@ class ImageUrlTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image\ImageUrl::resolve
    */
-  public function testImageUrl() {
+  public function testImageUrl(): void {
     // Test that we get a file we have access to.
     $result = $this->executeDataProducer('image_url', [
       'entity' => $this->file,

@@ -35,7 +35,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
    * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
    * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
    */
-  protected function addArticleFields(ResolverRegistry $registry, ResolverBuilder $builder) {
+  protected function addArticleFields(ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Article', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())
@@ -64,7 +64,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
    * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
    * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
    */
-  protected function addQueryFields(ResolverRegistry $registry, ResolverBuilder $builder) {
+  protected function addQueryFields(ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Query', 'article',
       $builder->produce('entity_load')
         ->map('type', $builder->fromValue('node'))
@@ -84,7 +84,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
    * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
    * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
    */
-  protected function addConnectionFields($type, ResolverRegistry $registry, ResolverBuilder $builder) {
+  protected function addConnectionFields($type, ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver($type, 'total',
       $builder->callback(function (QueryConnection $connection) {
         return $connection->total();

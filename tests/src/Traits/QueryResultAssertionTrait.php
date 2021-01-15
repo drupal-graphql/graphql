@@ -81,7 +81,7 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\Core\Cache\CacheableMetadata|null $metadata
    *   The expected cache metadata object.
    */
-  protected function assertResults($query, array $variables, array $expected, CacheableMetadata $metadata = NULL) {
+  protected function assertResults($query, array $variables, array $expected, CacheableMetadata $metadata = NULL): void {
     $result = $this->server->executeOperation(
       OperationParams::create([
         'query' => $query,
@@ -106,7 +106,7 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\Core\Cache\CacheableMetadata $metadata
    *   The expected cache metadata object.
    */
-  protected function assertErrors($query, array $variables, $expected, CacheableMetadata $metadata) {
+  protected function assertErrors($query, array $variables, $expected, CacheableMetadata $metadata): void {
     $result = $this->server->executeOperation(
       OperationParams::create([
         'query' => $query,
@@ -128,7 +128,7 @@ trait QueryResultAssertionTrait {
    *
    * @internal
    */
-  private function assertResultData(ExecutionResult $result, $expected) {
+  private function assertResultData(ExecutionResult $result, $expected): void {
     $data = $result->toArray();
     $this->assertArrayHasKey('data', $data, 'No result data.');
     $this->assertEquals($expected, $data['data'], 'Unexpected query result.');
@@ -144,7 +144,7 @@ trait QueryResultAssertionTrait {
    *
    * @internal
    */
-  private function assertResultErrors(ExecutionResult $result, array $expected) {
+  private function assertResultErrors(ExecutionResult $result, array $expected): void {
     // Retrieve the list of error strings.
     $errors = array_map(function (Error $error) {
       return $error->getMessage();
@@ -195,7 +195,7 @@ trait QueryResultAssertionTrait {
    *
    * @internal
    */
-  private function assertResultMetadata(ExecutionResult $result, CacheableMetadata $expected) {
+  private function assertResultMetadata(ExecutionResult $result, CacheableMetadata $expected): void {
     $this->assertEquals($expected->getCacheMaxAge(), $result->getCacheMaxAge(), 'Unexpected cache max age.');
 
     $missingContexts = array_diff($expected->getCacheContexts(), $result->getCacheContexts());

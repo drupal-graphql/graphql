@@ -48,7 +48,7 @@ class OperationSubscriber implements EventSubscriberInterface {
    * @param \Drupal\graphql\Event\OperationEvent $event
    *   The kernel event object.
    */
-  public function onBeforeOperation(OperationEvent $event) {
+  public function onBeforeOperation(OperationEvent $event): void {
     if ($this->moduleHandler->moduleExists('language') && !empty($this->languageNegotiator)) {
       OperationLanguageNegotiation::setContext($event->getContext());
     }
@@ -62,7 +62,7 @@ class OperationSubscriber implements EventSubscriberInterface {
    * @param \Drupal\graphql\Event\OperationEvent $event
    *   The kernel event object.
    */
-  public function onAfterOperation(OperationEvent $event) {
+  public function onAfterOperation(OperationEvent $event): void {
     if ($this->moduleHandler->moduleExists('language') && !empty($this->languageNegotiator)) {
       OperationLanguageNegotiation::setContext($event->getContext());
     }

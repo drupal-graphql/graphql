@@ -18,7 +18,7 @@ class RouteEntityTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $content_type = NodeType::create([
@@ -97,7 +97,7 @@ class RouteEntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteEntity::resolve
    */
-  public function testRouteEntity() {
+  public function testRouteEntity(): void {
     // Published node to published translations.
     $url = Url::fromRoute('entity.node.canonical', ['node' => $this->published_node->id()]);
 

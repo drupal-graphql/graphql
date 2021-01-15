@@ -311,7 +311,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param mixed $value
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    */
-  protected function cacheWrite($prefix, $value, FieldContext $field) {
+  protected function cacheWrite($prefix, $value, FieldContext $field): void {
     // Bail out early if the field context is already uncacheable.
     if ($field->getCacheMaxAge() === 0) {
       return;

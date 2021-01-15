@@ -12,7 +12,7 @@ class XMLAttributeTest extends XMLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\XML\XMLAttribute::resolve
    */
-  public function testXmlAttribute() {
+  public function testXmlAttribute(): void {
     $document = $this->loadDocument();
     $xpath = new \DOMXPath($document->ownerDocument);
     $div = iterator_to_array($xpath->query('//div/div', $document));
