@@ -352,7 +352,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $content_type = NodeType::create([
@@ -558,7 +558,7 @@ GQL;
   /**
    * Tests that filtering base field definitions works.
    */
-  public function testBaseFieldFilter() {
+  public function testBaseFieldFilter(): void {
     $query = <<<GQL
       query {
         entityDefinition(entity_type: "node", bundle: "article", field_types: BASE_FIELDS) {
@@ -592,7 +592,7 @@ GQL;
   /**
    * Tests that filtering configured field definitions works.
    */
-  public function testConfiguredFieldFilter() {
+  public function testConfiguredFieldFilter(): void {
     $query = <<<GQL
       query {
         entityDefinition(entity_type: "node", bundle: "article", field_types: FIELD_CONFIG) {
