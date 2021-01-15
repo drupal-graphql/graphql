@@ -23,7 +23,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->file_uri = 'public://test.jpg';
@@ -59,7 +59,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image\ImageDerivative::resolve
    */
-  public function testImageDerivative() {
+  public function testImageDerivative(): void {
     // Test that we get the proper style and dimensions if we have access to the
     // file.
     $result = $this->executeDataProducer('image_derivative', [

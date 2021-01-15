@@ -15,7 +15,7 @@ class InvalidPayloadTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
@@ -30,7 +30,7 @@ GQL;
   /**
    * Tests the empty payload.
    */
-  public function testEmptyPayload() {
+  public function testEmptyPayload(): void {
     $request = Request::create('/graphql/test', 'POST', [], [], [], [], '{ invalid');
     $this->container->get('http_kernel')->handle($request);
   }

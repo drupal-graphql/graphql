@@ -58,7 +58,7 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration(array $configuration): void {
     $this->configuration = NestedArray::mergeDeep($this->defaultConfiguration(), $configuration);
   }
 
@@ -97,14 +97,14 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $formState) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $formState): void {
     // @todo Validate dependencies between extensions.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $formState) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $formState): void {
     // Nothing to do here.
   }
 

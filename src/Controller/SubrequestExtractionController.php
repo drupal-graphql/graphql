@@ -34,7 +34,7 @@ class SubrequestExtractionController extends ControllerBase {
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('request_stack'),
       $container->get('language_manager'),

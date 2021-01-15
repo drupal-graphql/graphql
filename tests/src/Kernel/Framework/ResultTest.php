@@ -14,7 +14,7 @@ class ResultTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
@@ -34,7 +34,7 @@ GQL;
   /**
    * Test a simple query result.
    */
-  public function testQuery() {
+  public function testQuery(): void {
     $result = $this->query('query { root }');
 
     $this->assertSame(200, $result->getStatusCode());
@@ -48,7 +48,7 @@ GQL;
   /**
    * Test a batched query result.
    */
-  public function testBatchedQueries() {
+  public function testBatchedQueries(): void {
     $result = $this->batchedQueries([
       ['query' => 'query { root } '],
       ['query' => 'query { root }'],

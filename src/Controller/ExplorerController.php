@@ -45,7 +45,7 @@ class ExplorerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('url_generator'),
       $container->get('graphql.introspection'),

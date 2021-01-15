@@ -11,7 +11,7 @@ use GraphQL\Error\DebugFlag;
 /**
  * Implements hook_requirements().
  */
-function graphql_requirements($phase) {
+function graphql_requirements(string $phase): array {
   // This is the first reference into the library performed by the module.
   $libraryAvailable = class_exists('\GraphQL\GraphQL');
 
@@ -31,7 +31,7 @@ function graphql_requirements($phase) {
 /**
  * Implements hook_uninstall().
  */
-function graphql_uninstall() {
+function graphql_uninstall(): void {
   // Remove the config keys set in GraphQLConfigOverrides::loadOverrides().
   /** @var \Drupal\Core\Config\ConfigFactoryInterface $configFactory */
   $configFactory = \Drupal::getContainer()->get('config.factory');
@@ -46,7 +46,7 @@ function graphql_uninstall() {
 /**
  * Update GraphQL Server debug configuration value.
  */
-function graphql_update_8001() {
+function graphql_update_8001(): void {
   // The `debug` config item has changed to `debug_flag`. It is no longer a
   // boolean toggle but instead a set of flags providing more control. In this
   // case we default to debug messages and a backtrace in case debugging was

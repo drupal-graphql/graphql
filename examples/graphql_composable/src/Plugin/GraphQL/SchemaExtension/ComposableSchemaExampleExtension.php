@@ -21,7 +21,7 @@ class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function registerResolvers(ResolverRegistryInterface $registry) {
+  public function registerResolvers(ResolverRegistryInterface $registry): void {
     $builder = new ResolverBuilder();
 
     $registry->addFieldResolver('Query', 'article',

@@ -39,7 +39,7 @@ class EntityMultipleTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->entity = $this->getMockBuilder(NodeInterface::class)
@@ -87,7 +87,7 @@ class EntityMultipleTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadMultiple::resolve
    */
-  public function testResolveEntityLoadMultiple() {
+  public function testResolveEntityLoadMultiple(): void {
     $result = $this->executeDataProducer('entity_load_multiple', [
       'type' => $this->node1->getEntityTypeId(),
       'bundles' => [$this->node1->bundle(), $this->node2->bundle()],

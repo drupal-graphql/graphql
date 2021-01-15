@@ -30,7 +30,7 @@ class PermissionProvider {
   /**
    * Collects permissions for the server endpoints.
    */
-  public function permissions() {
+  public function permissions(): array {
     $storage = $this->entityTypeManager->getStorage('graphql_server');
     /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
     $servers = $storage->loadMultiple();

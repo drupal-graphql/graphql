@@ -14,7 +14,7 @@ class RoutingTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteLoad::resolve
    */
-  public function testRouteLoad() {
+  public function testRouteLoad(): void {
     $result = $this->executeDataProducer('route_load', [
       'path' => '/user/logout',
     ]);
@@ -26,7 +26,7 @@ class RoutingTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\Url\UrlPath::resolve
    */
-  public function testUrlPath() {
+  public function testUrlPath(): void {
     $this->pathValidator = $this->container->get('path.validator');
     $url = $this->pathValidator->getUrlIfValidWithoutAccessCheck('/user/logout');
 
@@ -40,7 +40,7 @@ class RoutingTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\Url\UrlPath::resolve
    */
-  public function testUrlNotFound() {
+  public function testUrlNotFound(): void {
     $result = $this->executeDataProducer('route_load', [
       'path' => '/idontexist',
     ]);

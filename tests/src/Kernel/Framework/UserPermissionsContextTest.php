@@ -17,7 +17,7 @@ class UserPermissionsContextTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
@@ -36,7 +36,7 @@ GQL;
   /**
    * Assert user.permissions tag on results.
    */
-  public function testUserPermissionsContext() {
+  public function testUserPermissionsContext(): void {
     $this->mockResolver('Query', 'root', 'test');
     $this->assertResults('{ root }', [], ['root' => 'test']);
   }

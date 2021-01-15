@@ -374,20 +374,19 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * {@inheritDoc}
    */
-  public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin) {
+  public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin): void {
     // Make sure the persistedQueryInstances are loaded before trying to add a
     // plugin to them.
     if (is_null($this->persisted_query_instances)) {
       $this->getPersistedQueryInstances();
     }
     $this->persisted_query_instances[$queryPlugin->getPluginId()] = $queryPlugin;
-    return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function removePersistedQueryInstance($queryPluginId) {
+  public function removePersistedQueryInstance($queryPluginId): void {
     // Make sure the persistedQueryInstances are loaded before trying to remove
     // a plugin from them.
     if (is_null($this->persisted_query_instances)) {
@@ -399,7 +398,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * {@inheritDoc}
    */
-  public function removeAllPersistedQueryInstances() {
+  public function removeAllPersistedQueryInstances(): void {
     $this->persisted_query_instances = NULL;
     $this->sorted_persisted_query_instances = NULL;
   }
@@ -506,7 +505,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * {@inheritDoc}
    */
-  public function preSave(EntityStorageInterface $storage) {
+  public function preSave(EntityStorageInterface $storage): void {
     // Write all the persisted queries configuration.
     $persistedQueryInstances = $this->getPersistedQueryInstances();
     // Reset settings array after getting instances as it might be used when
@@ -527,7 +526,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @codeCoverageIgnore
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     parent::postSave($storage, $update);
     \Drupal::service('router.builder')->setRebuildNeeded();
   }
@@ -537,7 +536,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @codeCoverageIgnore
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
     parent::postDelete($storage, $entities);
     \Drupal::service('router.builder')->setRebuildNeeded();
   }

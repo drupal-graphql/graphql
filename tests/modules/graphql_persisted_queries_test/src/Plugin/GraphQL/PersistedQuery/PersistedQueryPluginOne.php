@@ -28,7 +28,7 @@ class PersistedQueryPluginOne extends PersistedQueryPluginBase {
   /**
    * Map between persisted query IDs and corresponding GraphQL queries.
    */
-  protected function queryMap() {
+  protected function queryMap(): array {
     return [
       'query_1' => 'query { field_one }',
     ];

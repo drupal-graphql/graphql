@@ -19,7 +19,7 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function registerResolvers(ResolverRegistryInterface $registry) {
+  public function registerResolvers(ResolverRegistryInterface $registry): void {
     $builder = new ResolverBuilder();
 
     $this->addQueryFields($registry, $builder);
@@ -30,7 +30,7 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
    * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
    */
-  protected function addPageFields(ResolverRegistryInterface $registry, ResolverBuilder $builder) {
+  protected function addPageFields(ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Page', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())
@@ -50,7 +50,7 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
    * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
    */
-  protected function addQueryFields(ResolverRegistryInterface $registry, ResolverBuilder $builder) {
+  protected function addQueryFields(ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Query', 'page',
       $builder->produce('entity_load')
         ->map('type', $builder->fromValue('node'))

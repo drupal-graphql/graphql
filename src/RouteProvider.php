@@ -41,7 +41,7 @@ class RouteProvider {
   /**
    * Collects routes for the server endpoints.
    */
-  public function routes() {
+  public function routes(): array {
     $storage = $this->entityTypeManager->getStorage('graphql_server');
     /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
     $servers = $storage->loadMultiple();
