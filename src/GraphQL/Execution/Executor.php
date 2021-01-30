@@ -212,19 +212,29 @@ class Executor implements ExecutorImplementation {
    * {@inheritdoc}
    */
   public function doExecute(): Promise {
+    $event = new OperationEvent($this->context);
+    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
+
     $server = $this->context->getServer();
     $type = AST::getOperation($this->document, $this->operation);
     if ($type === 'query' && !!$server->get('caching')) {
-      return $this->doExecuteCached($this->cachePrefix());
+      $result = $this->doExecuteCached($this->cachePrefix());
+    }
+    else {
+      // This operation can never be cached because we are either in development
+      // mode (caching is disabled) or this is a non-cacheable operation.
+      $result = $this->doExecuteUncached()->then(function ($result) {
+        $this->context->mergeCacheMaxAge(0);
+
+        $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
+        $result->addCacheableDependency($this->context);
+        return $result;
+      });
     }
 
-    // This operation can never be cached because we are either in development
-    // mode (caching is disabled) or this is a non-cacheable operation.
-    return $this->doExecuteUncached()->then(function ($result) {
-      $this->context->mergeCacheMaxAge(0);
-
-      $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
-      $result->addCacheableDependency($this->context);
+    return $result->then(function ($result) {
+      $event = new OperationEvent($this->context, $result);
+      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
       return $result;
     });
   }
@@ -273,15 +283,7 @@ class Executor implements ExecutorImplementation {
       $this->resolver
     );
 
-    $event = new OperationEvent($this->context);
-    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
-
-    return $executor->doExecute()->then(function ($result) {
-      $event = new OperationEvent($this->context, $result);
-      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
-
-      return $result;
-    });
+    return $executor->doExecute();
   }
 
   /**
