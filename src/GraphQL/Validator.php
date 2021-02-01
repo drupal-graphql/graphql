@@ -7,11 +7,9 @@ use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Error\InvariantViolation;
-use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 
 /**
  * GraphQL validation service.
@@ -67,12 +65,18 @@ class Validator implements ValidatorInterface {
         continue;
       }
 
+      // Skip hidden/internal/introspection types since they're handled by
+      // GraphQL itself.
+      if (strpos($type->name, "__") === 0) {
+        continue;
+      }
+
       if (in_array($type->name, $ignore_types, TRUE)) {
         continue;
       }
 
       foreach ($type->getFields() as $field) {
-        if (!$this->hasResolver($resolver_registry, $type, $field)) {
+        if ($resolver_registry->getFieldResolverWithInheritance($type, $field) === NULL) {
           if (!isset($missing_resolvers[$type->name])) {
             $missing_resolvers[$type->name] = [];
           }
@@ -132,45 +136,6 @@ class Validator implements ValidatorInterface {
     }
 
     return $orphaned_resolvers;
-  }
-
-  /**
-   * Try to find a resolver for the type or one of its implemented interfaces.
-   *
-   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
-   *   The registry to find a resolver in.
-   * @param \GraphQL\Type\Definition\Type $type
-   *   The type definition to find a resolver for.
-   * @param \GraphQL\Type\Definition\FieldDefinition $field
-   *   The field on the type to find a resolver for.
-   *
-   * @return bool
-   *   Whether the registry has a registered resolver.
-   */
-  protected function hasResolver(ResolverRegistryInterface $registry, Type $type, FieldDefinition $field) : bool {
-    // Skip hidden/internal/introspection types since they're handled by GraphQL
-    // itself.
-    if (strpos($type->name, "__") === 0) {
-      return TRUE;
-    }
-
-    if ($registry->getFieldResolver($type->name, $field->name) !== NULL) {
-      return TRUE;
-    }
-
-    // If the type doesn't support interfaces we're done.
-    if (!method_exists($type, "getInterfaces")) {
-      return FALSE;
-    }
-
-    /** @var \GraphQL\Type\Definition\Type $interface */
-    foreach ($type->getInterfaces() as $interface) {
-      if ($this->hasResolver($registry, $interface, $field)) {
-        return TRUE;
-      }
-    }
-
-    return FALSE;
   }
 
   /**
