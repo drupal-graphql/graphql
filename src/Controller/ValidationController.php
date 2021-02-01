@@ -24,7 +24,7 @@ class ValidationController implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container) : self {
     return new static(
       $container->get('graphql.validator'),
     );
@@ -77,7 +77,7 @@ class ValidationController implements ContainerInjectionInterface {
         $type = $error->nodes[1]->name->value;
       }
       $field = '';
-      if (isset($error->nodes[0]) && property_exists($error->nodes[1], 'name')) {
+      if (isset($error->nodes[0]) && property_exists($error->nodes[0], 'name')) {
         $field = $error->nodes[0]->name->value;
       }
 

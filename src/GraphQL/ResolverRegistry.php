@@ -142,7 +142,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldResolverWithInheritance(Type $type, $fieldName) : ?ResolverInterface {
+  public function getFieldResolverWithInheritance(Type $type, string $fieldName) : ?ResolverInterface {
     if ($resolver = $this->getFieldResolver($type->name, $fieldName)) {
       return $resolver;
     }

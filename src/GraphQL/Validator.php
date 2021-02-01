@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -76,7 +77,7 @@ class Validator implements ValidatorInterface {
       }
 
       foreach ($type->getFields() as $field) {
-        if ($resolver_registry->getFieldResolverWithInheritance($type, $field) === NULL) {
+        if ($resolver_registry->getFieldResolverWithInheritance($type, $field->name) === NULL) {
           if (!isset($missing_resolvers[$type->name])) {
             $missing_resolvers[$type->name] = [];
           }
@@ -108,17 +109,27 @@ class Validator implements ValidatorInterface {
     }
 
     $orphaned_resolvers = [];
+    /**
+     * @var string $type_name
+     * @var array $fields
+     */
     foreach ($resolver_registry->getAllFieldResolvers() as $type_name => $fields) {
-      $type = $schema->getType($type_name);
+      if (in_array($type_name, $ignore_types, TRUE)) {
+        continue;
+      }
+
+      try {
+        $type = $schema->getType($type_name);
+      }
+      catch (Error $_) {
+        $type = NULL;
+      }
+
       // If the type can't have any fields then our resolvers don't make sense.
       if (!$type instanceof InterfaceType &&
         !$type instanceof ObjectType &&
         !$type instanceof InputObjectType) {
-        $orphaned_resolvers[$type_name] = $fields;
-        continue;
-      }
-
-      if (in_array($type->name, $ignore_types, TRUE)) {
+        $orphaned_resolvers[$type_name] = array_keys($fields);
         continue;
       }
 
