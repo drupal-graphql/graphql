@@ -19,7 +19,7 @@ class ValidationController implements ContainerInjectionInterface {
    *
    * @var \Drupal\graphql\GraphQL\ValidatorInterface
    */
-  protected ValidatorInterface $validator;
+  protected $validator;
 
   /**
    * {@inheritdoc}

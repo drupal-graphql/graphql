@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Validator;
-use Drupal\graphql\GraphQL\ValidatorInterface;
 
 /**
  * Tests that the GraphQL validator behaves correctly.
@@ -19,7 +18,7 @@ class ValidatorTest extends GraphQLTestBase {
    *
    * @var \Drupal\graphql\GraphQL\ValidatorInterface
    */
-  protected ValidatorInterface $validator;
+  protected $validator;
 
   /**
    * {@inheritdoc}
