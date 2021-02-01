@@ -58,6 +58,14 @@ interface ResolverRegistryInterface {
   public function getFieldResolver($type, $field);
 
   /**
+   * Return all field resolvers in the registry.
+   *
+   * @return callable[]
+   *   A nested list of callables, keyed by type and field name.
+   */
+  public function getAllFieldResolvers() : array;
+
+  /**
    * Add a type resolver.
    *
    * @todo Type resolvers should also get their own interface.
