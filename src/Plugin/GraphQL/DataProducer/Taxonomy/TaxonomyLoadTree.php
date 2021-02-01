@@ -158,16 +158,16 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     $resolver = $this->entityBuffer->add('taxonomy_term', $term_ids);
 
     return new Deferred(function () use ($language, $resolver, $context, $access, $accessUser, $accessOperation) {
+      // Add the list cache tags so that the cache entry is purged
+      // whenever a new entity of this type is saved.
+      $type = $this->entityTypeManager->getDefinition('taxonomy_term');
+      /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
+      $tags = $type->getListCacheTags();
+      $context->addCacheTags($tags);
+      
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       $entities = $resolver();
       if (!$entities) {
-        // If there is no entity with this id, add the list cache tags so that
-        // the cache entry is purged whenever a new entity of this type is
-        // saved.
-        $type = $this->entityTypeManager->getDefinition('taxonomy_term');
-        /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
-        $tags = $type->getListCacheTags();
-        $context->addCacheTags($tags);
         return [];
       }
 
