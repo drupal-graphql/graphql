@@ -5,6 +5,7 @@ namespace Drupal\graphql\GraphQL;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Executor\Executor;
+use GraphQL\Type\Definition\ImplementingType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
@@ -139,6 +140,29 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getFieldResolverWithInheritance(Type $type, $fieldName) : ?ResolverInterface {
+    if ($resolver = $this->getFieldResolver($type->name, $fieldName)) {
+      return $resolver;
+    }
+
+    if (!$type instanceof ImplementingType) {
+      return NULL;
+    }
+
+    // Go through the interfaces implemented for the type on which this field is
+    // resolved and check if they lead to a field resolution.
+    foreach ($type->getInterfaces() as $interface) {
+      if ($resolver = $this->getFieldResolverWithInheritance($interface, $fieldName)) {
+        return $resolver;
+      }
+    }
+
+    return NULL;
+  }
+
+  /**
    * Returns the field resolver that should be used at runtime.
    *
    * @param mixed $value
@@ -149,7 +173,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @return callable|null
    */
   protected function getRuntimeFieldResolver($value, $args, ResolveContext $context, ResolveInfo $info) {
-    return $this->getFieldResolver($info->parentType->name, $info->fieldName);
+    return $this->getFieldResolverWithInheritance($info->parentType, $info->fieldName);
   }
 
   /**
