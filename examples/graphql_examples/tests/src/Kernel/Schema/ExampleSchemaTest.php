@@ -32,7 +32,7 @@ class ExampleSchemaTest extends GraphQLTestBase {
   /**
    * Test the example schema for article listing.
    */
-  public function testExampleSchema() {
+  public function testExampleSchema() : void {
     // Create two authors.
     $userA = User::create([
       'name' => 'A'
