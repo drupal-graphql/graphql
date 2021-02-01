@@ -14,22 +14,6 @@ use Drupal\graphql\GraphQL\Validator;
 class ValidatorTest extends GraphQLTestBase {
 
   /**
-   * The validator under test.
-   *
-   * @var \Drupal\graphql\GraphQL\ValidatorInterface
-   */
-  protected $validator;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->validator = new Validator($this->schemaPluginManager);
-  }
-
-  /**
    * @covers ::getMissingResolvers
    */
   public function testGetMissingResolversCatchesMissingFieldsOnTypes() : void {
@@ -40,7 +24,8 @@ class ValidatorTest extends GraphQLTestBase {
 GQL;
     $this->setUpSchema($schema);
 
-    $missing_resolvers = $this->validator->getMissingResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $missing_resolvers = $validator->getMissingResolvers($this->server);
 
     self::assertEquals(
       ['Query' => ['me']],
@@ -72,7 +57,8 @@ GQL;
     $this->mockResolver('Query', 'me', $this->builder->fromValue('Test User'));
     $this->mockResolver('User', 'name', $this->builder->fromParent());
 
-    $missing_resolvers = $this->validator->getMissingResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $missing_resolvers = $validator->getMissingResolvers($this->server);
     self::assertEquals([], $missing_resolvers);
   }
 
@@ -92,7 +78,8 @@ GQL;
     $this->setUpSchema($schema);
     $this->mockResolver('Query', 'me', $this->builder->fromValue('Test User'));
 
-    $missing_resolvers = $this->validator->getMissingResolvers($this->server, ['User']);
+    $validator = new Validator($this->schemaPluginManager);
+    $missing_resolvers = $validator->getMissingResolvers($this->server, ['User']);
 
     self::assertEquals([], $missing_resolvers);
   }
@@ -115,7 +102,8 @@ GQL;
     $this->setUpSchema($schema);
     $this->mockResolver('Actor', 'name', $this->builder->fromValue('Never used'));
 
-    $orphaned_resolvers = $this->validator->getOrphanedResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
     self::assertEquals(['Actor' => ['name']], $orphaned_resolvers);
   }
 
@@ -133,7 +121,8 @@ GQL;
     $this->mockResolver('Query', 'me', $this->builder->fromValue('Test User'));
     $this->mockResolver('User', 'name', $this->builder->fromValue('Orphaned Name'));
 
-    $orphaned_resolvers = $this->validator->getOrphanedResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
     self::assertEquals(['User' => ['name']], $orphaned_resolvers);
   }
 
@@ -155,7 +144,8 @@ GQL;
     $this->mockResolver('User', 'name', $this->builder->fromParent());
     $this->mockResolver('User', 'birthday', $this->builder->fromValue('01-02-2021'));
 
-    $orphaned_resolvers = $this->validator->getOrphanedResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
     self::assertEquals(['User' => ['birthday']], $orphaned_resolvers);
   }
 
@@ -181,7 +171,8 @@ GQL;
     $this->mockResolver('Actor', 'name', $this->builder->fromParent());
     $this->mockResolver('Actor', 'birthday', $this->builder->fromValue('01-02-2021'));
 
-    $orphaned_resolvers = $this->validator->getOrphanedResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
     self::assertEquals(['Actor' => ['birthday']], $orphaned_resolvers);
   }
 
@@ -206,7 +197,8 @@ GQL;
     $this->setUpSchema($schema);
     $this->mockResolver('FakeInput', 'removed_field', $this->builder->fromValue('Test User'));
 
-    $orphaned_resolvers = $this->validator->getOrphanedResolvers($this->server);
+    $validator = new Validator($this->schemaPluginManager);
+    $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
     self::assertEquals(['FakeInput' => ['removed_field']], $orphaned_resolvers);
   }
 
@@ -228,7 +220,8 @@ GQL;
     $this->setUpSchema($schema);
     $this->mockResolver('Actor', 'name', $this->builder->fromValue('Never used'));
 
-    $orphaned_resolvers = $this->validator->getOrphanedResolvers($this->server, ['Actor']);
+    $validator = new Validator($this->schemaPluginManager);
+    $orphaned_resolvers = $validator->getOrphanedResolvers($this->server, ['Actor']);
     self::assertEquals([], $orphaned_resolvers);
   }
 
