@@ -164,7 +164,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
       /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
       $tags = $type->getListCacheTags();
       $context->addCacheTags($tags);
-      
+
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       $entities = $resolver();
       if (!$entities) {
