@@ -26,7 +26,7 @@ class ValidationController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) : self {
     return new static(
-      $container->get('graphql.validator'),
+      $container->get('graphql.validator')
     );
   }
 
