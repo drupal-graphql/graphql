@@ -7,12 +7,17 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\user\Entity\User;
 
+/**
+ * Runs unit tests agains the `example` schema defined in `graphql_examples`.
+ *
+ * @group graphql
+ */
 class ExampleSchemaTest extends GraphQLTestBase {
 
   /**
    * {@inheritdoc}
    */
-  static $modules = ['graphql_examples'];
+  public static $modules = ['graphql_examples'];
 
   /**
    * {@inheritdoc}
@@ -35,12 +40,12 @@ class ExampleSchemaTest extends GraphQLTestBase {
   public function testExampleSchema() : void {
     // Create two authors.
     $userA = User::create([
-      'name' => 'A'
+      'name' => 'A',
     ]);
     $userA->save();
 
     $userB = User::create([
-      'name' => 'B'
+      'name' => 'B',
     ]);
     $userB->save();
 
@@ -69,7 +74,7 @@ class ExampleSchemaTest extends GraphQLTestBase {
     $this->assertEquals([
       'data' => [
         'articles' => [
-          'total' =>  3,
+          'total' => 3,
           'items' => [
             ['title' => 'ONE', 'author' => 'A'],
             ['title' => 'TWO', 'author' => 'B'],
@@ -79,4 +84,5 @@ class ExampleSchemaTest extends GraphQLTestBase {
       ],
     ], $content);
   }
+
 }
