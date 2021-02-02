@@ -88,7 +88,7 @@ class ValidationController implements ContainerInjectionInterface {
       ];
     }
 
-    // TODO: Ability to configure ignores here.
+    // @todo Ability to configure ignores here.
     $metrics = [
       'orphaned' => $this->validator->getOrphanedResolvers($graphql_server),
       'missing' => $this->validator->getMissingResolvers($graphql_server),
