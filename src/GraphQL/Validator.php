@@ -46,7 +46,13 @@ class Validator implements ValidatorInterface {
    */
   public function validateSchema(ServerInterface $server): array {
     $plugin = $this->getSchemaPlugin($server);
-    return $plugin->getSchema($plugin->getResolverRegistry())->validate();
+    try {
+      return $plugin->getSchema($plugin->getResolverRegistry())->validate();
+    }
+    // Catch errors that may be thrown during schema retrieval.
+    catch (Error $e) {
+      return [$e];
+    }
   }
 
   /**
@@ -55,7 +61,14 @@ class Validator implements ValidatorInterface {
   public function getMissingResolvers(ServerInterface $server, array $ignore_types = []) : array {
     $plugin = $this->getSchemaPlugin($server);
     $resolver_registry = $plugin->getResolverRegistry();
-    $schema = $plugin->getSchema($resolver_registry);
+
+    try {
+      $schema = $plugin->getSchema($resolver_registry);
+    }
+    // In case the schema can't even be loaded we can't report anything.
+    catch (Error $e) {
+      return [];
+    }
 
     $missing_resolvers = [];
     foreach ($schema->getTypeMap() as $type) {
@@ -95,7 +108,14 @@ class Validator implements ValidatorInterface {
   public function getOrphanedResolvers(ServerInterface $server, array $ignore_types = []) : array {
     $plugin = $this->getSchemaPlugin($server);
     $resolver_registry = $plugin->getResolverRegistry();
-    $schema = $plugin->getSchema($resolver_registry);
+
+    try {
+      $schema = $plugin->getSchema($resolver_registry);
+    }
+    // In case the schema can't even be loaded we can't report anything.
+    catch (Error $e) {
+      return [];
+    }
 
     if (!method_exists($resolver_registry, "getAllFieldResolvers")) {
       $this->logger->warning(
