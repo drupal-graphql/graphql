@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql_example\Kernel;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -69,20 +70,19 @@ class ExampleSchemaTest extends GraphQLTestBase {
     ])->save();
 
     // Execute the query and run assertions against its response content.
-    $response = $this->query('{ articles { total, items { title, author } } }');
-    $content = json_decode($response->getContent(), TRUE);
-    $this->assertEquals([
-      'data' => [
-        'articles' => [
-          'total' => 3,
-          'items' => [
-            ['title' => 'ONE', 'author' => 'A'],
-            ['title' => 'TWO', 'author' => 'B'],
-            ['title' => 'THREE', 'author' => 'A'],
-          ],
+    $this->assertResults('{ articles { total, items { title, author } } }', [], [
+      'articles' => [
+        'total' => 3,
+        'items' => [
+          ['title' => 'ONE', 'author' => 'A'],
+          ['title' => 'TWO', 'author' => 'B'],
+          ['title' => 'THREE', 'author' => 'A'],
         ],
       ],
-    ], $content);
+    ], $this->defaultCacheMetaData()
+      ->addCacheContexts(['user.node_grants:view'])
+      ->addCacheTags(['node:1', 'node:2', 'node:3', 'node_list', 'user:3', 'user:4'])
+    );
   }
 
 }
