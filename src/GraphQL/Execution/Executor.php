@@ -301,10 +301,17 @@ class Executor implements ExecutorImplementation {
     $extensions = $this->context->getOperation()->extensions ?: [];
     ksort($extensions);
 
+    // By firing the operation event before executing the operation and before
+    // reading from the cache different contexts might be set to control the
+    // caching and make it possible to cache e.g. by country.
+    $contexts = $this->context->getCacheContexts();
+    $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
+
     $hash = hash('sha256', serialize([
       'query' => DocumentSerializer::serializeDocument($this->document),
       'variables' => $variables,
       'extensions' => $extensions,
+      'keys' => $keys,
     ]));
 
     return $hash;
