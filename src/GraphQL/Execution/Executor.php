@@ -223,7 +223,7 @@ class Executor implements ExecutorImplementation {
     return $this->doExecuteUncached()->then(function ($result) {
       $this->context->mergeCacheMaxAge(0);
 
-      $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
+      $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
       $result->addCacheableDependency($this->context);
       return $result;
     });
@@ -246,7 +246,7 @@ class Executor implements ExecutorImplementation {
         $this->context->mergeCacheMaxAge(0);
       }
 
-      $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
+      $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
       $result->addCacheableDependency($this->context);
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheWrite($prefix, $result);
