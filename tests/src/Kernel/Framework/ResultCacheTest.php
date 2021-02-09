@@ -22,7 +22,7 @@ class ResultCacheTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
@@ -38,7 +38,7 @@ GQL;
   /**
    * Check basic result caching.
    */
-  public function testCacheableResult() {
+  public function testCacheableResult(): void {
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
@@ -64,7 +64,7 @@ GQL;
   /**
    * Verify that uncacheable results are not cached.
    */
-  public function testUncacheableResult() {
+  public function testUncacheableResult(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
@@ -109,7 +109,7 @@ GQL;
   /**
    * Verify that fields with uncacheable annotations are not cached.
    */
-  public function testUncacheableResultAnnotation() {
+  public function testUncacheableResultAnnotation(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
@@ -154,7 +154,7 @@ GQL;
   /**
    * Test if caching properly handles variables.
    */
-  public function testVariables() {
+  public function testVariables(): void {
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
       ->setMethods(['id'])
@@ -183,7 +183,7 @@ GQL;
   /**
    * Test if changing test context's trigger re-evaluations.
    */
-  public function testContext() {
+  public function testContext(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
@@ -240,7 +240,7 @@ GQL;
       )
     );
 
-    // Set the context value to 'a'/
+    // Set the context value to 'a'/.
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     // This will be stored in the cache key for context 'a'.
     $this->query('{ root }');
@@ -259,7 +259,7 @@ GQL;
   /**
    * Test if results cache properly acts on cache tag clears.
    */
-  public function testTags() {
+  public function testTags(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
       ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
@@ -316,7 +316,7 @@ GQL;
    * Intentionally emit undeclared cache metadata as side effect of field
    * resolvers. Should still be added to the processors result.
    */
-  public function testLeakingCacheMetadata() {
+  public function testLeakingCacheMetadata(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
@@ -330,7 +330,7 @@ GQL;
         ];
 
         $renderContext = new RenderContext();
-        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
+        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el) {
           return $renderer->render($el)->__toString();
         });
 
@@ -352,7 +352,7 @@ GQL;
         ];
 
         $renderContext = new RenderContext();
-        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el){
+        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el) {
           return $renderer->render($el)->__toString();
         });
 

@@ -6,6 +6,9 @@ use Drupal\graphql\Entity\ServerInterface;
 use GraphQL\Server\OperationParams;
 use GraphQL\Type\Introspection as IntrospectionType;
 
+/**
+ * Runs introspection queries against a GraphQL server.
+ */
 class Introspection {
 
   /**
@@ -14,9 +17,8 @@ class Introspection {
    * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server instance.
    *
-   * @return array The introspection result as an array.
+   * @return array
    *   The introspection result as an array.
-   *
    */
   public function introspect(ServerInterface $server) {
     $operation = new OperationParams();

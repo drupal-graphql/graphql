@@ -6,15 +6,22 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Context that is passed to data producer plugins.
+ */
 class FieldContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
+   * The context that has been passed down.
+   *
    * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
   protected $context;
 
   /**
+   * Schema type information of the current field.
+   *
    * @var \GraphQL\Type\Definition\ResolveInfo
    */
   protected $info;
@@ -32,6 +39,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the current field name.
+   *
    * @return string
    */
   public function getFieldName() {
@@ -39,6 +48,8 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the language set as context.
+   *
    * @return string
    */
   public function getContextLanguage() {
@@ -46,7 +57,9 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
-   * @param $language
+   * Sets the context language.
+   *
+   * @param string $language
    *
    * @return $this
    */
@@ -63,7 +76,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    *
    * @param string $name
    *   The name of the context.
-   * @param $value
+   * @param mixed $value
    *   The value of the context.
    *
    * @return $this
@@ -97,10 +110,11 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @param string $name
    *   The name of the context.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the context exists, FALSE Otherwise.
    */
   public function hasContextValue($name) {
     return $this->context->hasContextValue($this->info, $name);
   }
+
 }

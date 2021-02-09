@@ -7,6 +7,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\user\EntityOwnerInterface;
 
 /**
+ * Returns the user that owns the entity.
+ *
  * @DataProducer(
  *   id = "entity_owner",
  *   name = @Translation("Entity owner"),
@@ -25,6 +27,8 @@ use Drupal\user\EntityOwnerInterface;
 class EntityOwner extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *
    * @return \Drupal\user\UserInterface|null

@@ -14,6 +14,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads a single entity.
+ *
  * @DataProducer(
  *   id = "entity_load",
  *   name = @Translation("Load entity"),
@@ -30,7 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       required = FALSE
  *     ),
  *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity languages"),
+ *       label = @Translation("Entity language"),
  *       required = FALSE
  *     ),
  *     "bundles" = @ContextDefinition("string",
@@ -114,9 +116,9 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
@@ -128,24 +130,27 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
   }
 
   /**
-   * @param $type
-   * @param $id
-   * @param null $language
+   * Resolver.
+   *
+   * @param string $type
+   * @param string $id
+   * @param string|null $language
    * @param array|null $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred
    */
-  public function resolve($type, $id, $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve($type, $id, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     $resolver = $this->entityBuffer->add($type, $id);
 
-    return new Deferred(function () use ($type, $id, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
+    return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
       if (!$entity = $resolver()) {
-        // If there is no entity with this id, add the list cache tags so that the
-        // cache entry is purged whenever a new entity of this type is saved.
+        // If there is no entity with this id, add the list cache tags so that
+        // the cache entry is purged whenever a new entity of this type is
+        // saved.
         $type = $this->entityTypeManager->getDefinition($type);
         /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
         $tags = $type->getListCacheTags();
@@ -168,7 +173,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
-        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
         $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
         $context->addCacheableDependency($accessResult);
         if (!$accessResult->isAllowed()) {
@@ -179,4 +184,5 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       return $entity;
     });
   }
+
 }

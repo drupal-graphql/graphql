@@ -4,6 +4,9 @@ namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
+/**
+ * Collects entity IDs per entity type and loads them all at once in the end.
+ */
 class EntityBuffer extends BufferBase {
 
   /**
@@ -28,7 +31,7 @@ class EntityBuffer extends BufferBase {
    *
    * @param string $type
    *   The entity type of the given entity ids.
-   * @param array|int $id
+   * @param array|int|string $id
    *   The entity id(s) to load.
    *
    * @return \Closure

@@ -7,6 +7,9 @@ use Drupal\Core\Plugin\ContextAwarePluginBase;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 
+/**
+ * Base class for data producers that resolve fields for queries or mutations.
+ */
 abstract class DataProducerPluginBase extends ContextAwarePluginBase implements DataProducerPluginInterface {
   use DataProducerPluginCachingTrait;
 
@@ -40,9 +43,11 @@ abstract class DataProducerPluginBase extends ContextAwarePluginBase implements 
       throw new \LogicException('Missing data producer resolve method.');
     }
 
-    // TODO: The field context should probably be the first argument.
     $context = $this->getContextValues();
-    return call_user_func_array([$this, 'resolve'], array_merge($context, [$field]));
+    return call_user_func_array(
+      [$this, 'resolve'],
+      array_merge($context, [$field])
+    );
   }
 
 }

@@ -13,7 +13,9 @@ use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * TODO: Fix output context type.
+ * Return the menu links of a menu.
+ *
+ * @todo Fix output context type.
  *
  * @DataProducer(
  *   id = "menu_links",
@@ -74,6 +76,8 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
   }
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\system\MenuInterface $menu
    *
    * @return array

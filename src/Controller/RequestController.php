@@ -8,6 +8,9 @@ use Drupal\graphql\Entity\ServerInterface;
 use GraphQL\Server\OperationParams;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The main GraphQL request handler that will forward to the responsible server.
+ */
 class RequestController implements ContainerInjectionInterface {
 
   /**
@@ -22,7 +25,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static($container->getParameter('graphql.config'));
   }
 
@@ -61,10 +64,13 @@ class RequestController implements ContainerInjectionInterface {
   }
 
   /**
+   * Execute a single operation and turn that into a cacheable response.
+   *
    * @param \Drupal\graphql\Entity\ServerInterface $server
    * @param \GraphQL\Server\OperationParams $operation
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
+   *
    * @throws \Exception
    */
   protected function handleSingle(ServerInterface $server, OperationParams $operation) {
@@ -75,10 +81,13 @@ class RequestController implements ContainerInjectionInterface {
   }
 
   /**
+   * Execute multiple operations as batch and turn that into cacheable response.
+   *
    * @param \Drupal\graphql\Entity\ServerInterface $server
    * @param \GraphQL\Server\OperationParams[] $operations
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
+   *
    * @throws \Exception
    */
   protected function handleBatch(ServerInterface $server, array $operations) {

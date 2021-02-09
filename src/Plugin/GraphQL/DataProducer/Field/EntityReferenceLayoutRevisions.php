@@ -2,7 +2,6 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -123,7 +122,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
   }
 
   /**
-   * Resolves entity reference layout revisions for a given field of a given entity.
+   * Resolves entity reference layout revisions for a field of a given entity.
    *
    * May optionally respect the entity bundles and language.
    *
@@ -147,7 +146,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): ?Deferred {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -159,7 +158,8 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
 
     $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
-    if (($values = $entity->get($field)) && $values instanceof EntityReferenceFieldItemListInterface) {
+    $values = $entity->get($field);
+    if ($values instanceof EntityReferenceFieldItemListInterface) {
       $vids = array_map(function ($value) {
         return $value['target_revision_id'];
       }, $values->getValue());
@@ -182,7 +182,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
           // Check if the passed user (or current user if none is passed) has
           // access to the entity, if not return NULL.
           if ($access) {
-            /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+            /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
             $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
             $context->addCacheableDependency($accessResult);
             if (!$accessResult->isAllowed()) {

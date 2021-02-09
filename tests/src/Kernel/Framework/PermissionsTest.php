@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Prophecy\Argument;
 
 /**
  * Test if query handling respects permissions properly.
@@ -15,14 +14,14 @@ class PermissionsTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
       schema {
         query: Query
       }
-      
+
       type Query {
         root: String
       }
@@ -36,7 +35,7 @@ GQL;
   /**
    * Test if a user without permissions doesn't have access to any query.
    */
-  public function testNoPermissions() {
+  public function testNoPermissions(): void {
     $this->setUpCurrentUser();
 
     // Any query should fail.
@@ -56,7 +55,7 @@ GQL;
    *
    * The user is allowed to post any queries.
    */
-  public function testFullQueryAccess() {
+  public function testFullQueryAccess(): void {
     $this->setUpCurrentUser([], ["execute {$this->server->id()} arbitrary graphql requests"]);
 
     // All queries should work.
@@ -75,7 +74,10 @@ GQL;
       ],
     ];
 
-    $this->assertEquals([$data, $data], json_decode($batched->getContent(), TRUE));
+    $this->assertEquals(
+      [$data, $data],
+      json_decode($batched->getContent(), TRUE)
+    );
   }
 
 }

@@ -2,10 +2,13 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Returns whether the given user has access to the entity.
+ *
  * @DataProducer(
  *   id = "entity_access",
  *   name = @Translation("Entity access"),
@@ -31,13 +34,15 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class EntityAccess extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param null $operation
-   * @param null $user
+   * @param string $operation
+   * @param \Drupal\Core\Session\AccountInterface $user
    *
    * @return bool|\Drupal\Core\Access\AccessResultInterface
    */
-  public function resolve(EntityInterface $entity, $operation = NULL, $user = NULL) {
+  public function resolve(EntityInterface $entity, $operation = NULL, AccountInterface $user = NULL) {
     return $entity->access($operation ?? 'view', $user);
   }
 

@@ -9,40 +9,57 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Context that is provided during resolving the GraphQL tree.
+ */
 class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
+   * The GraphQL server configuration.
+   *
    * @var \Drupal\graphql\Entity\ServerInterface
    */
   protected $server;
 
   /**
+   * Configuration.
+   *
    * @var array
    */
   protected $config;
 
   /**
+   * List of available contexts keyed by path and context name.
+   *
    * @var array
    */
   protected $contexts;
 
   /**
+   * The operation parameters to perform.
+   *
    * @var \GraphQL\Server\OperationParams
    */
   protected $operation;
 
   /**
+   * The parsed schema document.
+   *
    * @var \GraphQL\Language\AST\DocumentNode
    */
   protected $document;
 
   /**
+   * Type.
+   *
    * @var string
    */
   protected $type;
 
   /**
+   * The context language.
+   *
    * @var string
    */
   protected $language;
@@ -53,7 +70,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @param \Drupal\graphql\Entity\ServerInterface $server
    * @param \GraphQL\Server\OperationParams $operation
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param $type
+   * @param string $type
    * @param array $config
    */
   public function __construct(
@@ -73,6 +90,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the GraphQL server config entity.
+   *
    * @return \Drupal\graphql\Entity\ServerInterface
    */
   public function getServer() {
@@ -80,6 +99,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the current operation parameters.
+   *
    * @return \GraphQL\Server\OperationParams
    */
   public function getOperation() {
@@ -87,6 +108,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the parsed GraphQL schema.
+   *
    * @return \GraphQL\Language\AST\DocumentNode
    */
   public function getDocument() {
@@ -94,6 +117,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the type.
+   *
    * @return string
    */
   public function getType(): string {
@@ -101,6 +126,8 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Returns the current context language.
+   *
    * @return string
    */
   public function getContextLanguage() {
@@ -108,9 +135,11 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   }
 
   /**
-   * @param $language
+   * Sets the current context language.
    *
-   * @return string
+   * @param string $language
+   *
+   * @return $this
    */
   public function setContextLanguage($language) {
     $this->language = $language;
@@ -127,7 +156,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    *   The resolve info object.
    * @param string $name
    *   The name of the context.
-   * @param $value
+   * @param mixed $value
    *   The value of the context.
    *
    * @return $this
@@ -177,7 +206,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @param string $name
    *   The name of the context.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the context exists, FALSE Otherwise.
    */
   public function hasContextValue(ResolveInfo $info, $name) {
@@ -194,4 +223,5 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
     return FALSE;
   }
+
 }

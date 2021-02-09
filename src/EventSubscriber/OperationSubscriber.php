@@ -11,6 +11,9 @@ use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Sets the language before/after a GraphQL operation.
+ */
 class OperationSubscriber implements EventSubscriberInterface {
 
   use CurrentLanguageResetTrait;
@@ -45,7 +48,7 @@ class OperationSubscriber implements EventSubscriberInterface {
    * @param \Drupal\graphql\Event\OperationEvent $event
    *   The kernel event object.
    */
-  public function onBeforeOperation(OperationEvent $event) {
+  public function onBeforeOperation(OperationEvent $event): void {
     if ($this->moduleHandler->moduleExists('language') && !empty($this->languageNegotiator)) {
       OperationLanguageNegotiation::setContext($event->getContext());
     }
@@ -59,7 +62,7 @@ class OperationSubscriber implements EventSubscriberInterface {
    * @param \Drupal\graphql\Event\OperationEvent $event
    *   The kernel event object.
    */
-  public function onAfterOperation(OperationEvent $event) {
+  public function onAfterOperation(OperationEvent $event): void {
     if ($this->moduleHandler->moduleExists('language') && !empty($this->languageNegotiator)) {
       OperationLanguageNegotiation::setContext($event->getContext());
     }
@@ -73,7 +76,7 @@ class OperationSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents() {
     return [
       OperationEvent::GRAPHQL_OPERATION_BEFORE => 'onBeforeOperation',
-      OperationEvent::GRAPHQL_OPERATION_AFTER=> 'onAfterOperation',
+      OperationEvent::GRAPHQL_OPERATION_AFTER => 'onAfterOperation',
     ];
   }
 

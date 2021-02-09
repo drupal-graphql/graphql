@@ -45,7 +45,7 @@ class ExplorerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('url_generator'),
       $container->get('graphql.introspection'),
@@ -79,7 +79,7 @@ class ExplorerController implements ContainerInjectionInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request.
    *
-   * @return array The render array.
+   * @return array
    *   The render array.
    */
   public function viewExplorer(ServerInterface $graphql_server, Request $request) {
@@ -100,4 +100,5 @@ class ExplorerController implements ContainerInjectionInterface {
       ],
     ];
   }
+
 }

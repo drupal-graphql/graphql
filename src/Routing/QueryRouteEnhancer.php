@@ -10,6 +10,9 @@ use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Adds GraphQL operation information to the Symfony route being resolved.
+ */
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
@@ -86,13 +89,13 @@ class QueryRouteEnhancer implements EnhancerInterface {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
-   * @param $values
+   * @param array $values
    *   The request body values.
    *
    * @return array
    *   The query parameters with added file uploads.
    */
-  protected function extractMultipart(Request $request, $values) {
+  protected function extractMultipart(Request $request, array $values) {
     // The request body parameters might contain file upload mutations. We treat
     // them according to the graphql multipart request specification.
     //
@@ -125,6 +128,5 @@ class QueryRouteEnhancer implements EnhancerInterface {
 
     return $values;
   }
-
 
 }

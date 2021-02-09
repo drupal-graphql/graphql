@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
@@ -33,7 +34,7 @@ class Hidden extends DataProducerPluginBase {
    *
    * @param \Drupal\Core\Field\FieldDefinitionInterface $entity_definition_field
    *   The entity field definition.
-   * @param array|null $entity_form_display_context
+   * @param \Drupal\Core\Entity\Entity\EntityFormDisplay|null $entity_form_display_context
    *   Entity form display context.
    *
    * @return bool
@@ -41,11 +42,10 @@ class Hidden extends DataProducerPluginBase {
    */
   public function resolve(
     FieldDefinitionInterface $entity_definition_field,
-    ?array $entity_form_display_context = NULL
+    ?EntityFormDisplay $entity_form_display_context
   ): bool {
     if ($entity_form_display_context) {
-      $entity_form_display = $entity_form_display_context['key'];
-      $hidden = $entity_form_display->get('hidden');
+      $hidden = $entity_form_display_context->get('hidden');
       $field_id = $entity_definition_field->getName();
 
       if (isset($hidden[$field_id])) {

@@ -6,6 +6,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves by setting the value as context with the given name.
+ */
 class SourceContext implements ResolverInterface {
 
   /**
@@ -25,8 +28,8 @@ class SourceContext implements ResolverInterface {
   /**
    * SourceContext constructor.
    *
-   * @param $name
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|NULL $source
+   * @param string $name
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $source
    */
   public function __construct($name, ResolverInterface $source = NULL) {
     $this->name = $name;

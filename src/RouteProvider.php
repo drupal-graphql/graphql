@@ -6,6 +6,9 @@ use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Provides Symfony routing information for each defined GraphQL server.
+ */
 class RouteProvider {
 
   /**
@@ -38,7 +41,7 @@ class RouteProvider {
   /**
    * Collects routes for the server endpoints.
    */
-  public function routes() {
+  public function routes(): array {
     $storage = $this->entityTypeManager->getStorage('graphql_server');
     /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
     $servers = $storage->loadMultiple();
@@ -65,7 +68,7 @@ class RouteProvider {
           '_auth' => $auth,
           'no_cache' => TRUE,
           'default_url_options' => ['path_processing' => FALSE],
-          'parameters' => ['graphql_server' => ['type' => 'entity:graphql_server']]
+          'parameters' => ['graphql_server' => ['type' => 'entity:graphql_server']],
         ]);
     }
 

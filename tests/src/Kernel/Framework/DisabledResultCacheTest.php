@@ -16,7 +16,7 @@ class DisabledResultCacheTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $schema = <<<GQL
@@ -31,7 +31,7 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Set the development parameter to TRUE.
     $parameters = $container->getParameter('graphql.config');
@@ -42,7 +42,7 @@ GQL;
   /**
    * Test if disabling the result cache has the desired effect.
    */
-  public function testDisabledCache() {
+  public function testDisabledCache(): void {
     $this->createTestServer('test', '/graphql/uncached', [
       'caching' => FALSE,
     ]);

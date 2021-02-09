@@ -2,10 +2,11 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * XML loader data producer.
+ *
  * @DataProducer(
  *   id = "xml_parse",
  *   name = @Translation("XML Parse"),
@@ -23,8 +24,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class XMLParse extends DataProducerPluginBase {
 
   /**
+   * Returns a parsed XML document.
+   *
    * @param string $input
-   *  The source input.
+   *   The source input.
+   *
    * @return \DOMElement
    */
   public function resolve($input) {
@@ -33,4 +37,5 @@ class XMLParse extends DataProducerPluginBase {
     $document->loadHTML($input);
     return $document->documentElement;
   }
+
 }

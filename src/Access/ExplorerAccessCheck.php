@@ -7,6 +7,9 @@ use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Entity\ServerInterface;
 
+/**
+ * Grants access to the GraphQL explorer for admins.
+ */
 class ExplorerAccessCheck implements AccessInterface {
 
   /**

@@ -63,8 +63,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityReferenceRevisions extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
-  use EntityReferenceTrait;
-
   /**
    * The entity type manager service.
    *
@@ -147,7 +145,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
    * @return \GraphQL\Deferred|null
    *   A promise that will return entities or NULL if there aren't any.
    */
-  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?Deferred {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): ?Deferred {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
@@ -159,14 +157,15 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
 
     $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
-    if (($values = $entity->get($field)) && $values instanceof EntityReferenceFieldItemListInterface) {
+    $values = $entity->get($field);
+    if ($values instanceof EntityReferenceFieldItemListInterface) {
       $vids = array_map(function ($value) {
         return $value['target_revision_id'];
       }, $values->getValue());
 
       $resolver = $this->entityRevisionBuffer->add($type, $vids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
-        return $this->defer($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
+        return $this->getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
       });
     }
 

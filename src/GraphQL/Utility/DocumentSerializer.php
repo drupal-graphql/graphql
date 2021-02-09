@@ -5,9 +5,14 @@ namespace Drupal\graphql\GraphQL\Utility;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Utils\AST;
 
+/**
+ * Cleans up AST recursively for serialization.
+ */
 class DocumentSerializer {
 
   /**
+   * Turn the AST document to a serializable array.
+   *
    * @param \GraphQL\Language\AST\DocumentNode $document
    *
    * @return array
@@ -17,6 +22,8 @@ class DocumentSerializer {
   }
 
   /**
+   * Recursively turn AST items into a serializable array.
+   *
    * @param array $item
    *
    * @return array
@@ -32,4 +39,5 @@ class DocumentSerializer {
 
     return $item;
   }
+
 }

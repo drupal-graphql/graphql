@@ -9,6 +9,9 @@ use Drupal\Core\Plugin\PluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Base class that can be used for schema extension plugins.
+ */
 abstract class SdlSchemaExtensionPluginBase extends PluginBase implements SchemaExtensionPluginInterface, ContainerFactoryPluginInterface {
 
   /**
@@ -47,9 +50,9 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     ModuleHandlerInterface $moduleHandler
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -89,10 +92,14 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);
-    $file = "{$module->getPath()}/graphql/{$id}.{$type}.graphqls";
+    $path = 'graphql/' . $id . '.' . $type . '.graphqls';
+    $file = $module->getPath() . '/' . $path;
 
     if (!file_exists($file)) {
-      throw new InvalidPluginDefinitionException(sprintf("Missing schema definition file at %s.", $file));
+      throw new InvalidPluginDefinitionException(
+        $id,
+        sprintf('The module "%s" needs to have a schema definition "%s" in its folder for "%s" to be valid.',
+          $module->getName(), $path, $definition['class']));
     }
 
     return file_get_contents($file) ?: NULL;

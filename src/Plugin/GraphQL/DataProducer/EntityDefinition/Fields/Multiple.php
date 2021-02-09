@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
@@ -34,6 +35,9 @@ class Multiple extends DataProducerPluginBase {
    *   If the field contains multiple values or just single value.
    */
   public function resolve(FieldDefinitionInterface $entity_definition_field): bool {
+    if ($entity_definition_field instanceof FieldStorageDefinitionInterface) {
+      return $entity_definition_field->isMultiple();
+    }
     return $entity_definition_field->isList();
   }
 

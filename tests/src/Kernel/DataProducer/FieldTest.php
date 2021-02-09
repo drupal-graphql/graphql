@@ -24,7 +24,7 @@ class FieldTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->entity = $this->getMockBuilder(NodeInterface::class)
@@ -62,7 +62,7 @@ class FieldTest extends GraphQLTestBase {
     $this->node = Node::create([
       'title' => 'Dolor',
       'type' => 'test1',
-      'field_test1_to_test2' => $this->referenced_node->id()
+      'field_test1_to_test2' => $this->referenced_node->id(),
     ]);
     $this->node->save();
   }
@@ -70,7 +70,7 @@ class FieldTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Field\EntityReference::resolve
    */
-  public function testResolveEntityReference() {
+  public function testResolveEntityReference(): void {
     $result = $this->executeDataProducer('entity_reference', [
       'entity' => $this->node,
       'field' => 'field_test1_to_test2',

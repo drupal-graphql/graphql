@@ -3,7 +3,6 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -11,7 +10,9 @@ use Drupal\redirect\RedirectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * TODO: Fix the type of the output context.
+ * Returns the URL of the given path.
+ *
+ * @todo Fix the type of the output context.
  *
  * @DataProducer(
  *   id = "route_load",
@@ -37,11 +38,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   protected $pathValidator;
 
   /**
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
+   * Optional redirect module repository.
+   *
    * @var \Drupal\redirect\RedirectRepository|null
    */
   protected $redirectRepository;
@@ -81,7 +79,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
-    RedirectRepository $redirectRepository = NULL
+    ?RedirectRepository $redirectRepository = NULL
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
@@ -89,14 +87,18 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   }
 
   /**
-   * @param $path
+   * Resolver.
+   *
+   * @param string $path
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
    */
   public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
     if ($this->redirectRepository) {
-      if ($redirect = $this->redirectRepository->findMatchingRedirect($path, [])) {
+      /** @var \Drupal\redirect\Entity\Redirect|null $redirect */
+      $redirect = $this->redirectRepository->findMatchingRedirect($path, []);
+      if ($redirect) {
         return $redirect->getRedirectUrl();
       }
     }

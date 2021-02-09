@@ -12,6 +12,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Returns the entity in a given language.
+ *
  * @DataProducer(
  *   id = "entity_translation",
  *   name = @Translation("Entity translation"),
@@ -88,13 +90,15 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
   }
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param $language
-   * @param bool $access
-   * @param \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * Resolver.
    *
-   * @return |null
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param string $language
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
    */
   public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
@@ -103,7 +107,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
       // Check if the passed user (or current user if none is passed) has access
       // to the entity, if not return NULL.
       if ($access) {
-        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
         $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
         if (!$accessResult->isAllowed()) {
           return NULL;

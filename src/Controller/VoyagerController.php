@@ -25,7 +25,7 @@ class VoyagerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static($container->get('graphql.introspection'));
   }
 
@@ -47,7 +47,7 @@ class VoyagerController implements ContainerInjectionInterface {
    * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
    *   The server.
    *
-   * @return array The render array.
+   * @return array
    *   The render array.
    */
   public function viewVoyager(ServerInterface $graphql_server) {

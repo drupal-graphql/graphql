@@ -2,12 +2,13 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree;
 
-use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
- * TODO: Fix input and output context type.
+ * Returns a list of menu links under the menu tree element.
+ *
+ * @todo Fix input and output context type.
  *
  * @DataProducer(
  *   id = "menu_tree_subtree",
@@ -27,17 +28,15 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuTreeSubtree extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *
-   * @return mixed
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    */
   public function resolve(MenuLinkTreeElement $element) {
-    return array_filter($element->subtree, function(MenuLinkTreeElement $item) {
-      if ($item->link instanceof MenuLinkInterface) {
-        return $item->link->isEnabled();
-      }
-
-      return TRUE;
+    return array_filter($element->subtree, function (MenuLinkTreeElement $item) {
+      return $item->link->isEnabled();
     });
   }
 

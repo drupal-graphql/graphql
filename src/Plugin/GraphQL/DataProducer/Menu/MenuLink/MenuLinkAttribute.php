@@ -7,7 +7,9 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
- * TODO: Fix input context type.
+ * Returns the attribute(s) of a menu link.
+ *
+ * @todo Fix input context type.
  *
  * @DataProducer(
  *   id = "menu_link_attribute",
@@ -29,18 +31,25 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuLinkAttribute extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   * @param $attribute
+   * @param string $attribute
    *
    * @return mixed
    */
   public function resolve(MenuLinkInterface $link, $attribute) {
     $options = $link->getOptions();
-    // Certain attributes like class can be arrays. Check for that and implode them.
-    $attributeValue = NestedArray::getValue($options, ['attributes', $attribute]);
+    // Certain attributes like class can be arrays. Check for that and implode
+    // them.
+    $attributeValue = NestedArray::getValue(
+      $options,
+      ['attributes', $attribute]
+    );
     if (is_array($attributeValue)) {
       return implode(" ", $attributeValue);
-    } else {
+    }
+    else {
       return $attributeValue;
     }
   }

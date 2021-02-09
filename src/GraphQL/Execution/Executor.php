@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Executes GraphQL queries with cache lookup.
+ */
 class Executor implements ExecutorImplementation {
 
   /**
@@ -59,41 +62,57 @@ class Executor implements ExecutorImplementation {
   protected $dispatcher;
 
   /**
+   * The adapter for promises.
+   *
    * @var \GraphQL\Executor\Promise\PromiseAdapter
    */
   protected $adapter;
 
   /**
+   * Represents the GraphQL schema document.
+   *
    * @var \GraphQL\Language\AST\DocumentNode
    */
   protected $document;
 
   /**
+   * The context to pass down during field resolving.
+   *
    * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
   protected $context;
 
   /**
+   * The root of the GraphQL execution tree.
+   *
    * @var mixed
    */
   protected $root;
 
   /**
+   * Variables.
+   *
    * @var array
    */
   protected $variables;
 
   /**
+   * The parsed GraphQL schema.
+   *
    * @var \GraphQL\Type\Schema
    */
   protected $schema;
 
   /**
+   * The operation to be performed.
+   *
    * @var string
    */
   protected $operation;
 
   /**
+   * The resolver to get results for the query.
+   *
    * @var callable
    */
   protected $resolver;
@@ -113,10 +132,10 @@ class Executor implements ExecutorImplementation {
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $root
-   * @param $variables
-   * @param $operation
-   * @param $resolver
+   * @param mixed $root
+   * @param mixed $variables
+   * @param string $operation
+   * @param callable $resolver
    */
   public function __construct(
     CacheContextsManager $contextsManager,
@@ -130,7 +149,7 @@ class Executor implements ExecutorImplementation {
     $root,
     $variables,
     $operation,
-    $resolver
+    callable $resolver
   ) {
     $this->contextsManager = $contextsManager;
     $this->cacheBackend = $cacheBackend;
@@ -148,15 +167,17 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Constructs an object from a services container.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $root
-   * @param $variables
-   * @param $operation
-   * @param $resolver
+   * @param mixed $root
+   * @param mixed $variables
+   * @param string $operation
+   * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor
    */
@@ -169,7 +190,7 @@ class Executor implements ExecutorImplementation {
     $root,
     $variables,
     $operation,
-    $resolver
+    callable $resolver
   ) {
     return new static(
       $container->get('cache_contexts_manager'),
@@ -209,6 +230,8 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Try to return cached results, otherwise resolve the query.
+   *
    * @param string $prefix
    *
    * @return \GraphQL\Executor\Promise\Promise
@@ -234,6 +257,8 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Get query results on a cache miss.
+   *
    * @return \GraphQL\Executor\Promise\Promise
    */
   protected function doExecuteUncached() {
@@ -251,7 +276,7 @@ class Executor implements ExecutorImplementation {
     $event = new OperationEvent($this->context);
     $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
 
-    return $executor->doExecute()->then(function ($result)  {
+    return $executor->doExecute()->then(function ($result) {
       $event = new OperationEvent($this->context, $result);
       $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
 
@@ -260,14 +285,17 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Calculates the cache prefix from context for the current query.
+   *
    * @return string
    */
   protected function cachePrefix() {
     // Sorting the variables and extensions will cause fewer cache vectors.
-    // TODO: Should we try to sort these recursively?
+    // @todo Should we try to sort these recursively?
     $variables = $this->variables ?: [];
     ksort($variables);
-    // TODO: Should we submit a pull request to also pass the extensions in the executor?
+    // @todo Should we submit a pull request to also pass the extensions in the
+    // executor?
     $extensions = $this->context->getOperation()->extensions ?: [];
     ksort($extensions);
 
@@ -281,6 +309,8 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Calculate the cache suffix for the current contexts.
+   *
    * @param array $contexts
    *
    * @return string
@@ -291,6 +321,8 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Lookup cached results by contexts for this query.
+   *
    * @param string $prefix
    *
    * @return \GraphQL\Executor\ExecutionResult|null
@@ -309,6 +341,8 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
+   * Store results in cache.
+   *
    * @param string $prefix
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    *
@@ -330,8 +364,16 @@ class Executor implements ExecutorImplementation {
     ];
 
     $this->cacheBackend->setMultiple([
-      "contexts:$prefix"       => ['data' => $contexts, 'expire' => $expire, 'tags' => $tags],
-      "result:$prefix:$suffix" => ['data' => $cache,   'expire' => $expire, 'tags' => $tags],
+      "contexts:$prefix"       => [
+        'data' => $contexts,
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
+      "result:$prefix:$suffix" => [
+        'data' => $cache,
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
     ]);
 
     return $this;

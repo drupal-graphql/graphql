@@ -7,6 +7,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Type\Definition\ResolveInfo;
 
+/**
+ * Resolves a context value with default value support.
+ */
 class Context implements ResolverInterface {
 
   /**
@@ -26,8 +29,8 @@ class Context implements ResolverInterface {
   /**
    * Context constructor.
    *
-   * @param $name
-   * @param null $default
+   * @param string $name
+   * @param mixed $default
    */
   public function __construct($name, $default = NULL) {
     $this->name = $name;

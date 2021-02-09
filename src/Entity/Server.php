@@ -9,6 +9,8 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
+use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Server\OperationParams;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use GraphQL\Server\ServerConfig;
@@ -21,11 +23,15 @@ use GraphQL\Executor\Executor;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\Helper;
-use GraphQL\Server\RequestError;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
 
 /**
+ * The main GraphQL configuration and request entry point.
+ *
+ * Multiple GraphQL servers can be defined on different routing paths with
+ * different GraphQL schemas.
+ *
  * @ConfigEntityType(
  *   id = "graphql_server",
  *   label = @Translation("Server"),
@@ -34,7 +40,8 @@ use GraphQL\Validator\DocumentValidator;
  *     "form" = {
  *       "edit" = "Drupal\graphql\Form\ServerForm",
  *       "create" = "Drupal\graphql\Form\ServerForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
+ *       "persisted_queries" = "Drupal\graphql\Form\PersistedQueriesForm"
  *     }
  *   },
  *   config_prefix = "graphql_servers",
@@ -48,8 +55,9 @@ use GraphQL\Validator\DocumentValidator;
  *     "label",
  *     "schema",
  *     "schema_configuration",
+ *     "persisted_queries_settings",
  *     "endpoint",
- *     "debug",
+ *     "debug_flag",
  *     "caching",
  *     "batching"
  *   },
@@ -57,7 +65,8 @@ use GraphQL\Validator\DocumentValidator;
  *     "collection" = "/admin/config/graphql/servers",
  *     "create-form" = "/admin/config/graphql/servers/create",
  *     "edit-form" = "/admin/config/graphql/servers/manage/{graphql_server}",
- *     "delete-form" = "/admin/config/graphql/servers/manage/{graphql_server}/delete"
+ *     "delete-form" = "/admin/config/graphql/servers/manage/{graphql_server}/delete",
+ *     "persisted_queries-form" = "/admin/config/graphql/servers/manage/{graphql_server}/persisted_queries",
  *   }
  * )
  */
@@ -93,23 +102,24 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $schema_configuration = [];
 
   /**
-   * Whether the server is in debug mode.
+   * The debug settings for this server.
    *
-   * @var boolean
+   * @var int
+   * @see \GraphQL\Error\DebugFlag
    */
-  public $debug = FALSE;
+  public $debug_flag = DebugFlag::NONE;
 
   /**
    * Whether the server should cache its results.
    *
-   * @var boolean
+   * @var bool
    */
   public $caching = TRUE;
 
   /**
    * Whether the server allows query batching.
    *
-   * @var boolean
+   * @var bool
    */
   public $batching = TRUE;
 
@@ -119,6 +129,28 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var string
    */
   public $endpoint;
+
+  /**
+   * Persisted query plugins configuration.
+   *
+   * @var array
+   */
+  public $persisted_queries_settings = [];
+
+
+  /**
+   * Persisted query plugin instances available on this server.
+   *
+   * @var array|null
+   */
+  protected $persisted_query_instances = NULL;
+
+  /**
+   * The sorted persisted query plugin instances available on this server.
+   *
+   * @var array|null
+   */
+  protected $sorted_persisted_query_instances = NULL;
 
   /**
    * {@inheritdoc}
@@ -132,7 +164,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   public function executeOperation(OperationParams $operation) {
     $previous = Executor::getImplementationFactory();
-    Executor::setImplementationFactory([\Drupal::service('graphql.executor'), 'create']);
+    Executor::setImplementationFactory([
+      \Drupal::service('graphql.executor'),
+      'create',
+    ]);
 
     try {
       $config = $this->configuration();
@@ -183,7 +218,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     // Create the server config.
     $registry = $plugin->getResolverRegistry();
     $server = ServerConfig::create();
-    $server->setDebug(!!$this->get('debug'));
+    $server->setDebugFlag($this->get('debug_flag'));
     $server->setQueryBatching(!!$this->get('batching'));
     $server->setValidationRules($this->getValidationRules());
     $server->setPersistentQueryLoader($this->getPersistedQueryLoader());
@@ -196,9 +231,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * TODO: Handle this through configuration (e.g. a context value).
-   *
    * Returns to root value to use when resolving queries against the schema.
+   *
+   * @todo Handle this through configuration (e.g. a context value).
    *
    * May return a callable to resolve the root value at run-time based on the
    * provided query parameters / operation.
@@ -272,9 +307,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * TODO: Handle this through configuration on the server.
-   *
    * Returns the default field resolver.
+   *
+   * @todo Handle this through configuration on the server.
    *
    * Fields that don't explicitly declare a field resolver will use this one
    * as a fallback.
@@ -318,9 +353,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * TODO: Handle this through configurable plugins on the server.
-   *
    * Returns the error handler.
+   *
+   * @todo Handle this through configurable plugins on the server.
    *
    * Allows to replace the default error handler with a custom one. For example
    * when there is a need to handle specific errors differently.
@@ -337,8 +372,76 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * TODO: Handle this through configurable plugins on the server.
-   *
+   * {@inheritDoc}
+   */
+  public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin): void {
+    // Make sure the persistedQueryInstances are loaded before trying to add a
+    // plugin to them.
+    if (is_null($this->persisted_query_instances)) {
+      $this->getPersistedQueryInstances();
+    }
+    $this->persisted_query_instances[$queryPlugin->getPluginId()] = $queryPlugin;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function removePersistedQueryInstance($queryPluginId): void {
+    // Make sure the persistedQueryInstances are loaded before trying to remove
+    // a plugin from them.
+    if (is_null($this->persisted_query_instances)) {
+      $this->getPersistedQueryInstances();
+    }
+    unset($this->persisted_query_instances[$queryPluginId]);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function removeAllPersistedQueryInstances(): void {
+    $this->persisted_query_instances = NULL;
+    $this->sorted_persisted_query_instances = NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPersistedQueryInstances() {
+    if (!is_null($this->persisted_query_instances)) {
+      return $this->persisted_query_instances;
+    }
+
+    /** @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
+    $plugin_manager = \Drupal::service('plugin.manager.graphql.persisted_query');
+    $definitions = $plugin_manager->getDefinitions();
+    $persisted_queries_settings = $this->get('persisted_queries_settings');
+    foreach ($definitions as $id => $definition) {
+      if (isset($persisted_queries_settings[$id])) {
+        $configuration = !empty($persisted_queries_settings[$id]) ? $persisted_queries_settings[$id] : [];
+        $this->persisted_query_instances[$id] = $plugin_manager->createInstance($id, $configuration);
+      }
+    }
+
+    return $this->persisted_query_instances;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function getSortedPersistedQueryInstances() {
+    if (!is_null($this->sorted_persisted_query_instances)) {
+      return $this->sorted_persisted_query_instances;
+    }
+    $this->sorted_persisted_query_instances = $this->getPersistedQueryInstances();
+    if (!empty($this->sorted_persisted_query_instances)) {
+      uasort($this->sorted_persisted_query_instances, function ($a, $b) {
+        return $a->getWeight() <= $b->getWeight() ? -1 : 1;
+      });
+    }
+    return $this->sorted_persisted_query_instances;
+  }
+
+  /**
    * Returns a callable for loading persisted queries.
    *
    * @return callable
@@ -346,14 +449,22 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getPersistedQueryLoader() {
     return function ($id, OperationParams $params) {
-      throw new RequestError('Persisted queries are currently not supported');
+      $sortedPersistedQueryInstances = $this->getSortedPersistedQueryInstances();
+      if (!empty($sortedPersistedQueryInstances)) {
+        foreach ($sortedPersistedQueryInstances as $persistedQueryInstance) {
+          $query = $persistedQueryInstance->getQuery($id, $params);
+          if (!is_null($query)) {
+            return $query;
+          }
+        }
+      }
     };
   }
 
   /**
-   * TODO: Handle this through configurable plugins on the server.
-   *
    * Returns the validation rules to use for the query.
+   *
+   * @todo Handle this through configurable plugins on the server.
    *
    * May return a callable to allow the server to decide the validation rules
    * independently for each query operation.
@@ -392,11 +503,30 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public function preSave(EntityStorageInterface $storage): void {
+    // Write all the persisted queries configuration.
+    $persistedQueryInstances = $this->getPersistedQueryInstances();
+    // Reset settings array after getting instances as it might be used when
+    // obtaining them. This would break a config import containing persisted
+    // queries settings as it would end up empty.
+    $this->persisted_queries_settings = [];
+    if (!empty($persistedQueryInstances)) {
+      foreach ($persistedQueryInstances as $plugin_id => $plugin) {
+        $this->persisted_queries_settings[$plugin_id] = $plugin->getConfiguration();
+      }
+    }
+
+    parent::preSave($storage);
+  }
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     parent::postSave($storage, $update);
     \Drupal::service('router.builder')->setRebuildNeeded();
   }
@@ -406,8 +536,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @codeCoverageIgnore
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
     parent::postDelete($storage, $entities);
     \Drupal::service('router.builder')->setRebuildNeeded();
   }
+
 }

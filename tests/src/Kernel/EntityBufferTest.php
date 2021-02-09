@@ -6,10 +6,15 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
 /**
+ * Tests the entity buffer system that it returns the correct cache metadata.
+ *
  * @group graphql
  */
 class EntityBufferTest extends GraphQLTestBase {
 
+  /**
+   * @var string[]
+   */
   protected $nodeIds = [];
 
   /**
@@ -17,7 +22,10 @@ class EntityBufferTest extends GraphQLTestBase {
    */
   protected $entityBuffer;
 
-  protected function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
 
     NodeType::create([
@@ -26,17 +34,19 @@ class EntityBufferTest extends GraphQLTestBase {
     ])->save();
 
     foreach (range(1, 3) as $i) {
-      $this->nodeIds[] = Node::create([
+      $node = Node::create([
         'title' => 'Node ' . $i,
         'type' => 'test',
-      ])->save();
+      ]);
+      $node->save();
+      $this->nodeIds[] = $node->id();
     }
 
     $schema = <<<GQL
       type Query {
         node(id: String): Node
       }
-      
+
       type Node {
         title: String!
       }
@@ -45,17 +55,20 @@ GQL;
     $this->setUpSchema($schema);
   }
 
-  public function testEntityBuffer() {
+  /**
+   * Tests the entity buffer.
+   */
+  public function testEntityBuffer(): void {
     $query = <<<GQL
       query {
         a:node(id: "1") {
           title
         }
-  
+
         b:node(id: "2") {
           title
         }
-  
+
         c:node(id: "3") {
           title
         }

@@ -6,6 +6,12 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 
+/**
+ * Defines a schema plugin that returns a GraphQL schema part.
+ *
+ * A schema plugin also defines how that schema is resolved to values with data
+ * producers.
+ */
 interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
@@ -22,7 +28,7 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
   /**
    * Retrieves the resolver registry.
    *
-   * TODO: Instead, this should be configuration.
+   * @todo Instead, this should be configuration.
    *
    * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
    *   The resolver registry.

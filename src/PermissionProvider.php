@@ -5,13 +5,16 @@ namespace Drupal\graphql;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
+/**
+ * Provides access control permissions for all exposed GraphQL servers.
+ */
 class PermissionProvider {
   use StringTranslationTrait;
 
   /**
-   * The entity type manager service
+   * The entity type manager service.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -27,7 +30,7 @@ class PermissionProvider {
   /**
    * Collects permissions for the server endpoints.
    */
-  public function permissions() {
+  public function permissions(): array {
     $storage = $this->entityTypeManager->getStorage('graphql_server');
     /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
     $servers = $storage->loadMultiple();

@@ -14,6 +14,9 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
+/**
+ * Provides helper methods for kernel tests in GraphQL module.
+ */
 abstract class GraphQLTestBase extends KernelTestBase {
   use DataProducerExecutionTrait;
   use HttpRequestTrait;
@@ -48,7 +51,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installConfig('system');
@@ -77,30 +80,19 @@ abstract class GraphQLTestBase extends KernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the default cache maximum age for the test.
    */
-  protected function getSchemaDefinitions() {
-    return [
-      'default' => [
-        'id' => 'default',
-        'name' => 'default',
-        'path' => 'graphql',
-        'deriver' => 'Drupal\graphql\Plugin\Deriver\PluggableSchemaDeriver',
-      ],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheMaxAge() {
+  protected function defaultCacheMaxAge(): int {
     return Cache::PERMANENT;
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the default cache tags used in assertions for this test.
+   *
+   * @return string[]
+   *   The list of cache tags.
    */
-  protected function defaultCacheTags() {
+  protected function defaultCacheTags(): array {
     $tags = ['graphql_response'];
     if (isset($this->server)) {
       array_push($tags, "config:graphql.graphql_servers.{$this->server->id()}");
@@ -110,16 +102,22 @@ abstract class GraphQLTestBase extends KernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the default cache contexts used in assertions for this test.
+   *
+   * @return string[]
+   *   The list of cache contexts.
    */
-  protected function defaultCacheContexts() {
+  protected function defaultCacheContexts(): array {
     return ['user.permissions'];
   }
 
   /**
-   * @return array
+   * Provides the user permissions that the test user is set up with.
+   *
+   * @return string[]
+   *   List of user permissions.
    */
-  protected function userPermissions() {
+  protected function userPermissions(): array {
     return ['access content', 'bypass graphql access'];
   }
 

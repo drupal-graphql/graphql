@@ -7,9 +7,14 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Schema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Service to make our GraphQL executor, can be swapped out.
+ */
 class ExecutorFactory {
 
   /**
+   * The service container.
+   *
    * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
   protected $container;
@@ -24,13 +29,15 @@ class ExecutorFactory {
   }
 
   /**
+   * Factory method to make a new executor.
+   *
    * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
    * @param \GraphQL\Type\Schema $schema
    * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param $root
+   * @param mixed $root
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param $variables
-   * @param $operation
+   * @param mixed $variables
+   * @param string $operation
    * @param callable $resolver
    *
    * @return \Drupal\graphql\GraphQL\Execution\Executor

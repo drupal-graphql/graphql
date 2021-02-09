@@ -6,7 +6,9 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
- * TODO: Fix input context type.
+ * Returns the description of a menu link.
+ *
+ * @todo Fix input context type.
  *
  * @DataProducer(
  *   id = "menu_link_description",
@@ -25,6 +27,8 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class MenuLinkDescription extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param \Drupal\Core\Menu\MenuLinkInterface $link
    *
    * @return mixed

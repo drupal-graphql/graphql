@@ -10,7 +10,6 @@ use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Url;
-use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use Drupal\entity_test\Entity\EntityTestBundle;
 
 /**
@@ -21,14 +20,14 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 class EntityTest extends GraphQLTestBase {
 
   /**
-   * @var NodeInterface
+   * @var \Drupal\node\NodeInterface
    */
   protected $node;
 
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->entity = $this->getMockBuilder(NodeInterface::class)
@@ -77,7 +76,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityBundle::resolve
    */
-  public function testResolveBundle() {
+  public function testResolveBundle(): void {
     $this->entity->expects($this->once())
       ->method('bundle')
       ->willReturn('page');
@@ -92,7 +91,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityChanged::resolve
    */
-  public function testResolveChanged() {
+  public function testResolveChanged(): void {
     $this->entity->expects($this->once())
       ->method('getChangedTime')
       ->willReturn(17000000000);
@@ -111,7 +110,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityCreated::resolve
    */
-  public function testResolveCreated() {
+  public function testResolveCreated(): void {
     $this->entity->expects($this->once())
       ->method('getCreatedTime')
       ->willReturn(17000000000);
@@ -130,7 +129,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityDescription::resolve
    */
-  public function testResolveDescription() {
+  public function testResolveDescription(): void {
     $entity = $this->getMockBuilder(EntityTestBundle::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -147,7 +146,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityId::resolve
    */
-  public function testResolveId() {
+  public function testResolveId(): void {
     $this->entity->expects($this->once())
       ->method('id')
       ->willReturn(5);
@@ -160,7 +159,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLabel::resolve
    */
-  public function testResolveLabel() {
+  public function testResolveLabel(): void {
     $this->entity->expects($this->once())
       ->method('label')
       ->willReturn('Dummy label');
@@ -173,7 +172,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLanguage::resolve
    */
-  public function testResolveLanguage() {
+  public function testResolveLanguage(): void {
     $language = $this->getMockBuilder(LanguageInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -190,7 +189,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityOwner::resolve
    */
-  public function testResolveOwner() {
+  public function testResolveOwner(): void {
     $this->entity->expects($this->once())
       ->method('getOwner')
       ->willReturn($this->user);
@@ -207,7 +206,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityType::resolve
    */
-  public function testResolveEntityTypeId() {
+  public function testResolveEntityTypeId(): void {
     $this->entity->expects($this->once())
       ->method('getEntityTypeId')
       ->willReturn('test_graphql');
@@ -220,7 +219,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityPublished::resolve
    */
-  public function testResolvePublished() {
+  public function testResolvePublished(): void {
     $this->entity->expects($this->once())
       ->method('isPublished')
       ->willReturn(TRUE);
@@ -237,7 +236,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityAccess::resolve
    */
-  public function testResolveAccess() {
+  public function testResolveAccess(): void {
     $this->entity->expects($this->any())
       ->method('access')
       ->willReturn(FALSE);
@@ -253,7 +252,7 @@ class EntityTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslation::resolve
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslations::resolve
    */
-  public function testResolveTranslation() {
+  public function testResolveTranslation(): void {
     $french = $this->executeDataProducer('entity_translation', [
       'entity' => $this->node,
       'language' => 'fr',
@@ -273,7 +272,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
    */
-  public function testResolveUrl() {
+  public function testResolveUrl(): void {
     $url = $this->getMockBuilder(Url::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -290,7 +289,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUuid::resolve
    */
-  public function testResolveUuid() {
+  public function testResolveUuid(): void {
     $this->entity->expects($this->once())
       ->method('uuid')
       ->willReturn('some uuid');
@@ -303,7 +302,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
-  public function testResolveEntityLoad() {
+  public function testResolveEntityLoad(): void {
     $result = $this->executeDataProducer('entity_load', [
       'type' => $this->node->getEntityTypeId(),
       'id' => $this->node->id(),
@@ -315,7 +314,7 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadByUuid::resolve
    */
-  public function testResolveEntityLoadByUuid() {
+  public function testResolveEntityLoadByUuid(): void {
     $result = $this->executeDataProducer('entity_load_by_uuid', [
       'type' => $this->node->getEntityTypeId(),
       'uuid' => $this->node->uuid(),
@@ -327,36 +326,36 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
-  public function testResolveUnknownEntityLoad() {
+  public function testResolveUnknownEntityLoad(): void {
     $result = $this->executeDataProducer('entity_load', [
       'type' => $this->node->getEntityTypeId(),
       'id' => 0,
     ]);
 
-    // TODO: Add metadata check.
-    //$this->assertContains('node_list', $metadata->getCacheTags());
+    // @todo Add metadata check.
+    // $this->assertContains('node_list', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
-  public function testResolveMismatchEntityLoad() {
+  public function testResolveMismatchEntityLoad(): void {
     $result = $this->executeDataProducer('entity_load', [
       'type' => $this->node->getEntityTypeId(),
       'id' => $this->node->id(),
       'bundles' => ['otherbundle'],
     ]);
 
-    // TODO: Add metadata check.
-    //$this->assertContains('node:1', $metadata->getCacheTags());
+    // @todo Add metadata check.
+    // $this->assertContains('node:1', $metadata->getCacheTags());
     $this->assertNull($result);
   }
 
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
-  public function testResolveTranslatedEntityLoad() {
+  public function testResolveTranslatedEntityLoad(): void {
     $result = $this->executeDataProducer('entity_load', [
       'type' => $this->node->getEntityTypeId(),
       'id' => $this->node->id(),
@@ -370,15 +369,15 @@ class EntityTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
-  public function testResolveEntityRendered() {
+  public function testResolveEntityRendered(): void {
     $result = $this->executeDataProducer('entity_rendered', [
       'entity' => $this->node,
       'mode' => 'default',
     ]);
 
-    // TODO: Add metadata check.
-    //$this->assertContains('node:1', $metadata->getCacheTags());
-    $this->assertContains('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    // @todo Add metadata check.
+    // $this->assertContains('node:1', $metadata->getCacheTags());
+    $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
   }
 
 }

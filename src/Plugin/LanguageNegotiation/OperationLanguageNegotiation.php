@@ -35,7 +35,7 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
    *
    * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
-  protected static $context = NULL;
+  protected static $context;
 
   /**
    * {@inheritdoc}
@@ -45,13 +45,16 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
       return static::$context->getContextLanguage();
     }
 
-    return NULL;
+    return FALSE;
   }
 
   /**
+   * Set the current resolve context statically which contains the language.
+   *
    * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    */
-  public static function setContext(ResolveContext $context = NULL) {
+  public static function setContext(ResolveContext $context = NULL): void {
     static::$context = $context;
   }
+
 }

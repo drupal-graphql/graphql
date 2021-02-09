@@ -9,19 +9,28 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Collects data producer plugins that are composed to read and write data.
+ */
 class DataProducerPluginManager extends DefaultPluginManager {
 
   /**
+   * The request stack later used to get the request time.
+   *
    * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
   /**
+   * The cache context manager for calculating cache keys.
+   *
    * @var \Drupal\Core\Cache\Context\CacheContextsManager
    */
   protected $contextsManager;
 
   /**
+   * The cache backend to cache results in.
+   *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $resultCacheBackend;
@@ -34,12 +43,12 @@ class DataProducerPluginManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   *   The module handler.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    * @param \Drupal\Core\Cache\CacheBackendInterface $resultCacheBackend
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
    * @param string|null $pluginInterface
    *   The interface each plugin should implement.
    * @param string $pluginAnnotationName
@@ -69,7 +78,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
 
     $this->alterInfo('graphql_data_producer');
     $this->useCaches(empty($config['development']));
-    $this->setCacheBackend($definitionCacheBackend, 'producer', ['graphql']);
+    $this->setCacheBackend($definitionCacheBackend, 'graphql_data_producer', ['graphql_data_producer']);
 
     $this->requestStack = $requestStack;
     $this->contextsManager = $contextsManager;
@@ -77,7 +86,11 @@ class DataProducerPluginManager extends DefaultPluginManager {
   }
 
   /**
-   * @param $id
+   * Creates a data producer proxy that lazy forwards resolve requests.
+   *
+   * The data producer with the given ID is wrapped.
+   *
+   * @param string $id
    * @param array $mapping
    * @param array $config
    *

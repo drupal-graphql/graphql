@@ -11,6 +11,9 @@ use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Sets the language on subrequests.
+ */
 class SubrequestSubscriber implements EventSubscriberInterface {
 
   use CurrentLanguageResetTrait;
@@ -36,7 +39,7 @@ class SubrequestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The kernel event object.
    */
-  public function onKernelRequest(GetResponseEvent $event) {
+  public function onKernelRequest(GetResponseEvent $event): void {
     $request = $event->getRequest();
     if (!$request->attributes->has('_graphql_subrequest')) {
       return;
@@ -52,7 +55,7 @@ class SubrequestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\FinishRequestEvent $event
    *   The kernel event object.
    */
-  public function onKernelRequestFinished(FinishRequestEvent $event) {
+  public function onKernelRequestFinished(FinishRequestEvent $event): void {
     $request = $event->getRequest();
     if (!$request->attributes->has('_graphql_subrequest')) {
       return;

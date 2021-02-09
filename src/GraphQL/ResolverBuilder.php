@@ -11,7 +11,6 @@ use Drupal\graphql\GraphQL\Resolver\Context;
 use Drupal\graphql\GraphQL\Resolver\DefaultValue;
 use Drupal\graphql\GraphQL\Resolver\Map;
 use Drupal\graphql\GraphQL\Resolver\ParentValue;
-use Drupal\graphql\GraphQL\Resolver\Path;
 use Drupal\graphql\GraphQL\Resolver\SourceContext;
 use Drupal\graphql\GraphQL\Resolver\Tap;
 use Drupal\graphql\GraphQL\Resolver\Value;
@@ -19,22 +18,29 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
 use Drupal\typed_data\DataFetcherTrait;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 
+/**
+ * Wires and maps different resolvers together to build the GraphQL tree.
+ */
 class ResolverBuilder {
   use TypedDataTrait;
   use DataFetcherTrait;
 
   /**
-   * @param $id
-   * @param $config
+   * Instantiate a data producer proxy to lazy resolve a data producer plugin.
+   *
+   * @param string $id
+   * @param array $config
    *
    * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
-  public function produce($id, $config = []) {
+  public function produce($id, array $config = []) {
     return DataProducerProxy::create($id, $config);
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface[] $resolvers
+   * Combine multiple resolvers in a chain resolving after each other.
+   *
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface ...$resolvers
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Composite
    */
@@ -43,7 +49,9 @@ class ResolverBuilder {
   }
 
   /**
-   * @param ResolverInterface $callback
+   * Register a resolver.
+   *
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
    */
@@ -52,7 +60,9 @@ class ResolverBuilder {
   }
 
   /**
-   * @param ResolverInterface $callback
+   * Register a resolver for multiple items.
+   *
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Map
    */
@@ -61,6 +71,8 @@ class ResolverBuilder {
   }
 
   /**
+   * Register a callback as resolver.
+   *
    * @param callable $callback
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Callback
@@ -70,7 +82,9 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $name
+   * Add a context that is available for further resolvers.
+   *
+   * @param string $name
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $source
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Tap
@@ -81,6 +95,8 @@ class ResolverBuilder {
   }
 
   /**
+   * Add condition branches to resolve.
+   *
    * @param array $branches
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Condition
@@ -90,18 +106,25 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $type
-   * @param $path
+   * Add a property path resolver.
+   *
+   * @param string $type
+   * @param string $path
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
    *
-   * @return \Drupal\graphql\GraphQL\Resolver\Path
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
   public function fromPath($type, $path, ResolverInterface $value = NULL) {
-    return new Path($type, $path, $value);
+    return $this->produce('property_path')
+      ->map('type', $this->fromValue($type))
+      ->map('path', $this->fromValue($path))
+      ->map('value', $value ?: $this->fromParent());
   }
 
   /**
-   * @param $value
+   * Adds a fixed value to resolve to.
+   *
+   * @param mixed $value
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Value
    */
@@ -110,7 +133,9 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $name
+   * Adds a query argument value to resolve to.
+   *
+   * @param string $name
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Argument
    */
@@ -119,6 +144,8 @@ class ResolverBuilder {
   }
 
   /**
+   * Resolves the current value that will be a parent for the field.
+   *
    * @return \Drupal\graphql\GraphQL\Resolver\ParentValue
    */
   public function fromParent() {
@@ -126,7 +153,9 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $name
+   * Resolves a value from the context by context name.
+   *
+   * @param string $name
    * @param callable|null $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\Context
@@ -136,8 +165,10 @@ class ResolverBuilder {
   }
 
   /**
-   * @param $value
-   * @param $default
+   * Adds a default value resolver.
+   *
+   * @param mixed $value
+   * @param mixed $default
    *
    * @return \Drupal\graphql\GraphQL\Resolver\DefaultValue
    */

@@ -16,6 +16,8 @@ use GraphQL\Deferred;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Loads entities from an entity reference field.
+ *
  * @DataProducer(
  *   id = "entity_reference",
  *   name = @Translation("Entity reference"),
@@ -65,7 +67,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -100,7 +102,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   }
 
   /**
-   * EntityLoad constructor.
+   * Constructor.
    *
    * @param array $configuration
    *   The plugin configuration array.
@@ -118,9 +120,9 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @codeCoverageIgnore
    */
   public function __construct(
-    $configuration,
+    array $configuration,
     $pluginId,
-    $pluginDefinition,
+    array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
     EntityBuffer $entityBuffer
@@ -132,25 +134,28 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   }
 
   /**
+   * Resolve entity references in the given field name.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param $field
-   * @param null $language
+   * @param string $field
+   * @param string|null $language
    * @param array|null $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
-   * @param string $accessOperation
+   * @param bool|null $access
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
    * @return \GraphQL\Deferred|null
    */
-  public function resolve(EntityInterface $entity, $field, $language = NULL, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(EntityInterface $entity, $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return NULL;
     }
 
     $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
-    if (($values = $entity->get($field)) && $values instanceof EntityReferenceFieldItemListInterface) {
+    $values = $entity->get($field);
+    if ($values instanceof EntityReferenceFieldItemListInterface) {
       $ids = array_map(function ($value) {
         return $value['target_id'];
       }, $values->getValue());

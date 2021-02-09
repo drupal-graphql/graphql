@@ -6,6 +6,9 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Helper class that holds a request result for subrequests.
+ */
 class SubRequestResponse extends Response implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 

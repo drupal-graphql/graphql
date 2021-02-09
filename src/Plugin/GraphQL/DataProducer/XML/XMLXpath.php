@@ -2,10 +2,11 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * XPath query data producer.
+ *
  * @DataProducer(
  *   id = "xml_xpath",
  *   name = @Translation("XML Path"),
@@ -27,14 +28,18 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class XMLXpath extends DataProducerPluginBase {
 
   /**
+   * Execute the XPath query and return matching DOMElements.
+   *
    * @param \DOMElement $dom
-   *  The source (root) DOM element.
+   *   The source (root) DOM element.
    * @param string $query
-   *  The xpath query.
-   * @return \DOMElement
+   *   The xpath query.
+   *
+   * @return \DOMElement[]
    */
-  public function resolve($dom, $query) {
+  public function resolve(\DOMElement $dom, $query) {
     $xpath = new \DOMXPath($dom->ownerDocument);
     return iterator_to_array($xpath->query($query, $dom));
   }
+
 }

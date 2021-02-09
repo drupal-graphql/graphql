@@ -5,6 +5,8 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Utility;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
+ * Return an item from a list at a specified position.
+ *
  * @DataProducer(
  *   id = "seek",
  *   name = @Translation("Seek"),
@@ -26,12 +28,15 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 class Seek extends DataProducerPluginBase {
 
   /**
+   * Resolver.
+   *
    * @param array $input
-   *  The input array.
-   * @param int position
-   *  The position to seek.
+   *   The input array.
+   * @param int $position
+   *   The position to seek.
+   *
    * @return mixed
-   *  The element at the specified position.
+   *   The element at the specified position.
    */
   public function resolve(array $input, $position) {
     $array_object = new \ArrayObject($input);
@@ -44,4 +49,5 @@ class Seek extends DataProducerPluginBase {
     }
     return $iterator->current();
   }
+
 }
