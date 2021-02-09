@@ -5,7 +5,6 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -63,6 +62,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
+
+  use EntityReferenceTrait;
 
   /**
    * The entity type manager service.
