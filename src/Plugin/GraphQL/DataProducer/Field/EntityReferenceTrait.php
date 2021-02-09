@@ -19,7 +19,7 @@ trait EntityReferenceTrait {
    * @param \Closure $resolver
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
-   * @return array
+   * @return array|null
    */
   protected function getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
     $entities = $resolver() ?: [];
@@ -47,7 +47,7 @@ trait EntityReferenceTrait {
    * @return array
    */
   private function getTranslated($entities, $language) {
-    if (isset($language)) {
+    if ($language) {
       $entities = array_map(function (EntityInterface $entity) use ($language) {
         if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
           $entity = $entity->getTranslation($language);
