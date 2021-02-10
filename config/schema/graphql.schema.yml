@@ -28,7 +28,7 @@ graphql.graphql_servers.*:
       label: 'Schema configuration'
       orderby: key
       sequence:
-        type: 'graphql.schema.[%key]'
+        type: 'graphql.schema.[%parent.schema]'
         label: 'The configuration for a single schema extension.'
     persisted_queries_settings:
       type: sequence
