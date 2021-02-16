@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult;
-use GraphQL\Error\Error;
 use GraphQL\Server\OperationParams;
 
 /**
@@ -145,34 +144,28 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultErrors(ExecutionResult $result, array $expected): void {
-    // Retrieve the list of error strings.
-    $errors = array_map(function (Error $error) {
-      return $error->getMessage();
-    }, $result->errors);
-
     // Initalize the status.
     $unexpected = [];
-    $matchCount = array_map(function () {
-      return 0;
-    }, array_flip($expected));
+    $matchCount = array_fill_keys($expected, 0);
 
     // Iterate through error messages.
     // Collect unmatched errors and count pattern hits.
-    while ($error = array_pop($errors)) {
+    foreach ($result->errors as $error) {
+      $error_message = $error->getMessage();
       $match = FALSE;
       foreach ($expected as $pattern) {
-        if (@preg_match($pattern, $error) === FALSE) {
-          $match = $match || $pattern == $error;
+        if (@preg_match($pattern, $error_message) === FALSE) {
+          $match = $match || $pattern == $error_message;
           $matchCount[$pattern]++;
         }
         else {
-          $match = $match || preg_match($pattern, $error);
+          $match = $match || preg_match($pattern, $error_message);
           $matchCount[$pattern]++;
         }
       }
 
       if (!$match) {
-        $unexpected[] = $error;
+        $unexpected[] = $error_message;
       }
     }
 
@@ -181,8 +174,8 @@ trait QueryResultAssertionTrait {
       return $count == 0;
     }));
 
-    $this->assertEquals([], $missing, "Missing errors:\n* " . implode("\n* ", $missing));
-    $this->assertEquals([], $unexpected, "Unexpected errors:\n* " . implode("\n* ", $unexpected));
+    self::assertEmpty($missing, "Missing errors:\n* " . implode("\n* ", $missing));
+    self::assertEmpty($unexpected, "Unexpected errors:\n* " . implode("\n* ", $unexpected));
   }
 
   /**
