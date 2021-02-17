@@ -118,7 +118,12 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Return all field resolvers in the registry.
+   *
+   * @return callable[]
+   *   A nested list of callables, keyed by type and field name.
+   *
+   * @todo This should be added to ResolverRegistryInterface in 5.0.0.
    */
   public function getAllFieldResolvers() : array {
     return $this->fieldResolvers;
@@ -140,7 +145,24 @@ class ResolverRegistry implements ResolverRegistryInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Get a field resolver for the type or any of the interfaces it implements.
+   *
+   * This allows common functionality (such as for Edge's or Connections) to be
+   * implemented for an interface and re-used on any concrete type that extends
+   * it.
+   *
+   * This should be used instead of `getFieldResolver` unless you're certain you
+   * want the resolver only for the specific type.
+   *
+   * @param \GraphQL\Type\Definition\Type $type
+   *   The type to find a resolver for.
+   * @param string $fieldName
+   *   The name of the field to find a resolver for.
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null
+   *   The defined resolver for the field or NULL if none exists.
+   *
+   * @todo This should be added to ResolverRegistryInterface in 5.0.0.
    */
   public function getFieldResolverWithInheritance(Type $type, string $fieldName) : ?ResolverInterface {
     if ($resolver = $this->getFieldResolver($type->name, $fieldName)) {

@@ -62,6 +62,17 @@ class Validator implements ValidatorInterface {
     $plugin = $this->getSchemaPlugin($server);
     $resolver_registry = $plugin->getResolverRegistry();
 
+    if (!method_exists($resolver_registry, "getFieldResolverWithInheritance")) {
+      $this->logger->warning(
+        "Could not get missing resolvers for @server_name as its registry class (@klass) does not implement getFieldResolverWithInheritance.",
+        [
+          '@server_name' => $server->id(),
+          '@klass' => get_class($resolver_registry),
+        ]
+      );
+      return [];
+    }
+
     try {
       $schema = $plugin->getSchema($resolver_registry);
     }
@@ -119,7 +130,7 @@ class Validator implements ValidatorInterface {
 
     if (!method_exists($resolver_registry, "getAllFieldResolvers")) {
       $this->logger->warning(
-        "Could not get orphaned resolvers for @server_name as it's registry class (@klass) does not implement getAllFieldResolvers.",
+        "Could not get orphaned resolvers for @server_name as its registry class (@klass) does not implement getAllFieldResolvers.",
         [
           '@server_name' => $server->id(),
           '@klass' => get_class($resolver_registry),
