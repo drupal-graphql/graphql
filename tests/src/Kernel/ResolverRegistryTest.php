@@ -32,7 +32,7 @@ class ResolverRegistryTest extends GraphQLTestBase {
         model: String
       }
 
-      type Tesla implements Car {
+      type Cabrio implements Car {
         model: String
       }
 GQL;
@@ -53,14 +53,14 @@ GQL;
     $this->mockResolver('Query', 'transportation', $transportation_resolver);
     $car_resolver = $this->builder->fromParent();
     $this->mockResolver('Car', 'model', $car_resolver);
-    $tesla_resolver = $this->builder->fromValue('Tesla');
-    $this->mockResolver('Tesla', 'model', $tesla_resolver);
+    $cabrio_resolver = $this->builder->fromValue('Cabrio');
+    $this->mockResolver('Cabrio', 'model', $cabrio_resolver);
 
     self::assertEquals(
       [
         'Query' => ['transportation' => $transportation_resolver],
         'Car' => ['model' => $car_resolver],
-        'Tesla' => ['model' => $tesla_resolver],
+        'Cabrio' => ['model' => $cabrio_resolver],
       ],
       $this->registry->getAllFieldResolvers()
     );
@@ -75,7 +75,7 @@ GQL;
     $this->mockResolver('Car', 'model', $expected_resolver);
 
     $returned_resolver = $this->registry->getFieldResolverWithInheritance(
-      $this->schema->getSchema($this->registry)->getType('Tesla'),
+      $this->schema->getSchema($this->registry)->getType('Cabrio'),
       'model'
     );
 
@@ -93,7 +93,7 @@ GQL;
     $this->mockResolver('Vehicle', 'model', $expected_resolver);
 
     $returned_resolver = $this->registry->getFieldResolverWithInheritance(
-      $this->schema->getSchema($this->registry)->getType('Tesla'),
+      $this->schema->getSchema($this->registry)->getType('Cabrio'),
       'model'
     );
 
@@ -108,11 +108,11 @@ GQL;
    */
   public function testGetFieldResolverWithInheritanceGivesPrecedenceToType() : void {
     $this->mockResolver('Vehicle', 'model', $this->builder->fromValue('Vehicle'));
-    $expected_resolver = $this->builder->fromValue('Tesla');
-    $this->mockResolver('Tesla', 'model', $expected_resolver);
+    $expected_resolver = $this->builder->fromValue('Cabrio');
+    $this->mockResolver('Cabrio', 'model', $expected_resolver);
 
     $returned_resolver = $this->registry->getFieldResolverWithInheritance(
-      $this->schema->getSchema($this->registry)->getType('Tesla'),
+      $this->schema->getSchema($this->registry)->getType('Cabrio'),
       'model'
     );
 
