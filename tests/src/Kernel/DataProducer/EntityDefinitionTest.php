@@ -596,15 +596,6 @@ GQL;
   /**
    * {@inheritdoc}
    */
-  protected function defaultCacheMaxAge(): int {
-    // @todo this is wrong, we should have a maximum of caching for entity
-    // definitions, not 0.
-    return 0;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function defaultCacheContexts(): array {
     return ['languages:language_interface', 'user.permissions'];
   }
