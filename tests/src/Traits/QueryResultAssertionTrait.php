@@ -165,7 +165,13 @@ trait QueryResultAssertionTrait {
       }
 
       if (!$match) {
-        $unexpected[] = $error_message;
+        // Add error location information of the original error in the chain to
+        // show developers where to look.
+        $original_error = $error;
+        while ($original_error->getPrevious() !== NULL) {
+          $original_error = $original_error->getPrevious();
+        }
+        $unexpected[] = "Error message: ${error_message}\n  Originated in: {$original_error->getFile()}:{$original_error->getLine()}";
       }
     }
 
