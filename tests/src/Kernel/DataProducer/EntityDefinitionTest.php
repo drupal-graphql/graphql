@@ -55,7 +55,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         1 =>
         [
@@ -71,7 +70,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         2 =>
         [
@@ -87,7 +85,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         3 =>
         [
@@ -103,7 +100,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 2,
-          'settings' => NULL,
         ],
         4 =>
         [
@@ -119,7 +115,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => TRUE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         5 =>
         [
@@ -135,7 +130,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         6 =>
         [
@@ -151,7 +145,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => TRUE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         7 =>
         [
@@ -167,7 +160,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 25,
-          'settings' => NULL,
         ],
         8 =>
         [
@@ -183,7 +175,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 120,
-          'settings' => NULL,
         ],
         9 =>
         [
@@ -199,7 +190,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => TRUE,
           'isHidden' => FALSE,
           'weight' => 5,
-          'settings' => NULL,
         ],
         10 =>
         [
@@ -215,7 +205,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => -5,
-          'settings' => NULL,
         ],
         11 =>
         [
@@ -231,7 +220,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 10,
-          'settings' => NULL,
         ],
         12 =>
         [
@@ -247,7 +235,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         13 =>
         [
@@ -263,7 +250,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 15,
-          'settings' => NULL,
         ],
         14 =>
         [
@@ -279,7 +265,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 16,
-          'settings' => NULL,
         ],
         15 =>
         [
@@ -295,7 +280,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         16 =>
         [
@@ -311,7 +295,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         17 =>
         [
@@ -327,7 +310,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => FALSE,
           'weight' => 0,
-          'settings' => NULL,
         ],
         18 =>
         [
@@ -343,7 +325,6 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'isReference' => FALSE,
           'isHidden' => TRUE,
           'weight' => 0,
-          'settings' => NULL,
         ],
       ],
     ],
@@ -403,10 +384,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
         isReference: Boolean
         isHidden: Boolean
         weight: Int
-        settings: [KeyValue]
       }
-
-      scalar KeyValue
 
       enum FieldTypes {
         ALL
@@ -516,12 +494,6 @@ GQL;
         'entity_form_display_context' => $builder->fromContext('entity_form_display'),
       ])
     );
-    $registry->addFieldResolver('EntityDefinitionField', 'settings',
-      $builder->produce('translatable_entity_definition_field_settings', [
-        'entity_definition_field' => $builder->fromParent(),
-        'entity_form_display_context' => $builder->fromContext('entity_form_display'),
-      ])
-    );
   }
 
   /**
@@ -545,7 +517,6 @@ GQL;
             isReference
             isHidden
             weight
-            settings
           }
         }
       }
@@ -576,7 +547,6 @@ GQL;
             isReference
             isHidden
             weight
-            settings
           }
         }
       }
@@ -610,7 +580,6 @@ GQL;
             isReference
             isHidden
             weight
-            settings
           }
         }
       }
@@ -622,15 +591,6 @@ GQL;
     $expectedResult['entityDefinition']['fields'] = [$configured_field];
     $this->defaultCacheTags[] = 'config:field.field.node.article.field_test';
     $this->assertResults($query, [], $expectedResult);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function defaultCacheMaxAge(): int {
-    // @todo this is wrong, we should have a maximum of caching for entity
-    // definitions, not 0.
-    return 0;
   }
 
   /**
