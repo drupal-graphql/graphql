@@ -318,8 +318,8 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'description' => '',
           'type' => 'text',
           'required' => FALSE,
-          'multiple' => FALSE,
-          'maxNumItems' => 1,
+          'multiple' => TRUE,
+          'maxNumItems' => -1,
           'status' => TRUE,
           'defaultValue' => NULL,
           'isReference' => FALSE,
@@ -346,6 +346,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
       'field_name' => 'field_test',
       'type' => 'text',
       'entity_type' => 'node',
+      'cardinality' => -1,
     ]);
     $field_storage->save();
 
