@@ -63,3 +63,12 @@ function graphql_update_8001(): void {
     $server->save();
   }
 }
+
+/**
+ * Preserve incorrect error reporting behaviour for PR #1161.
+ */
+function graphql_update_8400() :void {
+  \Drupal::configFactory()->getEditable('graphql.settings')
+    ->set('deprecated_swap_errors_and_extensions_in_results', TRUE)
+    ->save();
+}
