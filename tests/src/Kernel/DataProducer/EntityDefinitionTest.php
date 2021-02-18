@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -319,7 +320,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'type' => 'text',
           'required' => FALSE,
           'multiple' => TRUE,
-          'maxNumItems' => 1,
+          'maxNumItems' => -1,
           'status' => TRUE,
           'defaultValue' => NULL,
           'isReference' => FALSE,
@@ -346,6 +347,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
       'field_name' => 'field_test',
       'type' => 'text',
       'entity_type' => 'node',
+      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ]);
     $field_storage->save();
 

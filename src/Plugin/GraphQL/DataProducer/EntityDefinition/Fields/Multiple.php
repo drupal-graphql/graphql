@@ -38,7 +38,7 @@ class Multiple extends DataProducerPluginBase {
     if ($entity_definition_field instanceof FieldStorageDefinitionInterface) {
       return $entity_definition_field->isMultiple();
     }
-    return $entity_definition_field->isList();
+    return $entity_definition_field->getFieldStorageDefinition()->isMultiple();
   }
 
 }
