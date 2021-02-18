@@ -318,7 +318,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'description' => '',
           'type' => 'text',
           'required' => FALSE,
-          'multiple' => TRUE,
+          'multiple' => FALSE,
           'maxNumItems' => 1,
           'status' => TRUE,
           'defaultValue' => NULL,
