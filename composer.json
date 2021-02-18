@@ -6,7 +6,7 @@
   "license": "GPL-2.0+",
   "require": {
     "php": ">=7.2",
-    "webonyx/graphql-php": "^14.3.0"
+    "webonyx/graphql-php": "^14.5.0"
   },
   "minimum-stability": "dev"
 }

@@ -89,6 +89,11 @@ services:
   graphql.introspection:
     class: Drupal\graphql\GraphQL\Utility\Introspection
 
+  # Validator service.
+  graphql.validator:
+    class: Drupal\graphql\GraphQL\Validator
+    arguments: ['@plugin.manager.graphql.schema', '@logger.channel.graphql']
+
   # Reset the current language during sub-requests.
   graphql.subrequest_subscriber:
     class: Drupal\graphql\EventSubscriber\SubrequestSubscriber
