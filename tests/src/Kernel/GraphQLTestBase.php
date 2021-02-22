@@ -29,7 +29,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'system',
     'user',
     'language',
