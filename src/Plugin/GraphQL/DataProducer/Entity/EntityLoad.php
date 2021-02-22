@@ -133,7 +133,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * Resolver.
    *
    * @param string $type
-   * @param string $id
+   * @param string|int|null $id
    * @param string|null $language
    * @param array|null $bundles
    * @param bool|null $access
