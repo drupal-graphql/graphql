@@ -150,6 +150,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       return NULL;
     }
 
+    $query->addTag('graphql_entity_query');
+
     $query->range($args['offset'], $args['limit']);
 
     if (array_key_exists('revisions', $args)) {
@@ -163,8 +165,6 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
     if (array_key_exists('sort', $args)) {
       $query = $this->applySort($query, $args['sort']);
     }
-
-    $query->addTag('graphql_entity_query');
 
     return $query;
   }
