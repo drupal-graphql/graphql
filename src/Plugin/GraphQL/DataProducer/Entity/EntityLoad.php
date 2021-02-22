@@ -144,6 +144,12 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @return \GraphQL\Deferred
    */
   public function resolve($type, $id, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+    // If this data producer was composed to a field (entity reference) and
+    // there is no ID then we can return immediately.
+    if ($id === NULL) {
+      return NULL;
+    }
+
     $resolver = $this->entityBuffer->add($type, $id);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
