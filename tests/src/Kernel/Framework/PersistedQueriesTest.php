@@ -14,7 +14,7 @@ class PersistedQueriesTest extends GraphQLTestBase {
   /**
    * @var string[]
    */
-  public static $modules = [
+  protected static $modules = [
     'graphql_persisted_queries_test',
   ];
 

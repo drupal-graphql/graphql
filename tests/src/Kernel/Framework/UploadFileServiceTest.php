@@ -18,7 +18,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['file'];
+  protected static $modules = ['file'];
 
   /**
    * The FileUpload object we want to test, gets prepared in setUp().
