@@ -164,6 +164,8 @@ class EntityQuery extends FieldPluginBase implements ContainerFactoryPluginInter
       $query = $this->applySort($query, $args['sort']);
     }
 
+    $query->addTag('graphql_entity_query');
+
     return $query;
   }
 
