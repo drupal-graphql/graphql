@@ -12,7 +12,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class PersistedQueriesTest extends GraphQLTestBase {
 
   /**
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = [
     'graphql_persisted_queries_test',
