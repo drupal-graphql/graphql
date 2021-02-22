@@ -20,7 +20,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'text',
   ];
 

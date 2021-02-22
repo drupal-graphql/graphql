@@ -18,7 +18,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['image', 'file'];
+  protected static $modules = ['image', 'file'];
 
   /**
    * {@inheritdoc}
