@@ -141,7 +141,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
    * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
-   * @return \GraphQL\Deferred
+   * @return \GraphQL\Deferred|null
    */
   public function resolve($type, $id, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     // If this data producer was composed to a field (entity reference) and
