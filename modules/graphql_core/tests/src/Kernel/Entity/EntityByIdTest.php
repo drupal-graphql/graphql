@@ -32,7 +32,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
     parent::setUp();
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $languageStorage */
-    $languageStorage = $this->container->get('entity.manager')->getStorage('configurable_language');
+    $languageStorage = $this->container->get('entity_type.manager')->getStorage('configurable_language');
 
     $language = $languageStorage->create([
       'id' => $this->chineseSimplifiedLangcode,
