@@ -24,6 +24,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   consumes = {
  *     "path" = @ContextDefinition("string",
  *       label = @Translation("Path")
+ *     ),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Language"),
+ *       required = FALSE
  *     )
  *   }
  * )
@@ -87,17 +91,24 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   }
 
   /**
-   * Resolver.
+   * The resolver.
    *
    * @param string $path
+   *   The source path.
+   *
+   * @param string $language
+   *   The language code.
+   *
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *   Cache metadata.
    *
    * @return \Drupal\Core\Url|null
+   *   The Drupal URL object or NULL if not found.
    */
-  public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
     if ($this->redirectRepository) {
       /** @var \Drupal\redirect\Entity\Redirect|null $redirect */
-      $redirect = $this->redirectRepository->findMatchingRedirect($path, []);
+      $redirect = $this->redirectRepository->findMatchingRedirect($path, [], $language);
       if ($redirect) {
         return $redirect->getRedirectUrl();
       }
