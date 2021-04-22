@@ -22,6 +22,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   consumes = {
  *     "path" = @ContextDefinition("string",
  *       label = @Translation("Path")
+ *     ),
+ *     "language" = @ContextDefinition("string",
+ *       label = @Translation("Language"),
+ *       required = FALSE
  *     )
  *   }
  * )
@@ -89,14 +93,15 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * @param string $path
+   * @param string $language
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
    */
-  public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
     if ($this->redirectRepository) {
       /** @var \Drupal\redirect\Entity\Redirect|null $redirect */
-      $redirect = $this->redirectRepository->findMatchingRedirect($path, []);
+      $redirect = $this->redirectRepository->findMatchingRedirect($path, [], $language);
       if ($redirect) {
         return $redirect->getRedirectUrl();
       }
