@@ -91,19 +91,13 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   }
 
   /**
-   * The resolver.
+   * Resolver.
    *
    * @param string $path
-   *   The source path.
-   *
    * @param string $language
-   *   The language code.
-   *
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *   Cache metadata.
    *
    * @return \Drupal\Core\Url|null
-   *   The Drupal URL object or NULL if not found.
    */
   public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
     if ($this->redirectRepository) {
