@@ -52,6 +52,11 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *       multiple = TRUE,
  *       required = FALSE,
  *       default_value = {}
+ *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
  *     )
  *   }
  * )
@@ -73,13 +78,15 @@ class EntityQueryCount extends EntityQueryBase {
    *   Languages for queried entities.
    * @param string[] $bundles
    *   List of bundles to be filtered.
+   * @param bool $access
+   *   Whether entity query should check access.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
    * @return int
    *   Total count of items queried by entity query.
    */
-  public function resolve(string $type, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, FieldContext $context): int {
+  public function resolve(string $type, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, bool $access, FieldContext $context): int {
     $query = $this->buildBaseEntityQuery(
       $type,
       $ownedOnly,
@@ -87,6 +94,7 @@ class EntityQueryCount extends EntityQueryBase {
       $allowedFilters,
       $languages,
       $bundles,
+      $access,
       $context
     );
 

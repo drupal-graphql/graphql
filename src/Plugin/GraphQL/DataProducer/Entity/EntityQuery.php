@@ -58,6 +58,11 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *       required = FALSE,
  *       default_value = {}
  *     ),
+ *     "access" = @ContextDefinition("boolean",
+ *       label = @Translation("Check access"),
+ *       required = FALSE,
+ *       default_value = TRUE
+ *     ),
  *     "sorts" = @ContextDefinition("any",
  *       label = @Translation("Sorts"),
  *       multiple = TRUE,
@@ -93,6 +98,8 @@ class EntityQuery extends EntityQueryBase {
    *   Languages for queried entities.
    * @param string[] $bundles
    *   List of bundles to be filtered.
+   * @param bool $access
+   *   Whether entity query should check access.
    * @param array $sorts
    *   List of sorts.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
@@ -104,7 +111,7 @@ class EntityQuery extends EntityQueryBase {
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
    */
-  public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, array $sorts, FieldContext $context): array {
+  public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, bool $access, array $sorts, FieldContext $context): array {
     $query = $this->buildBaseEntityQuery(
       $type,
       $ownedOnly,
@@ -112,6 +119,7 @@ class EntityQuery extends EntityQueryBase {
       $allowedFilters,
       $languages,
       $bundles,
+      $access,
       $context
     );
 

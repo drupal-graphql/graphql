@@ -84,6 +84,8 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
    *   Languages for queried entities.
    * @param string[] $bundles
    *   List of bundles to be filtered.
+   * @param bool $access
+   *   Whether entity query should check access.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
@@ -93,7 +95,7 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
    */
-  protected function buildBaseEntityQuery(string $type, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, FieldContext $context): QueryInterface {
+  protected function buildBaseEntityQuery(string $type, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, bool $access, FieldContext $context): QueryInterface {
     $entity_type = $this->entityTypeManager->getStorage($type);
     $query = $entity_type->getQuery();
 
@@ -107,8 +109,8 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
       $context->addCacheContexts(['user']);
     }
 
-    // Ensure that access checking is performed on the query.
-    $query->accessCheck(TRUE);
+    // Ensure that desired access checking is performed on the query.
+    $query->accessCheck($access);
 
     // Filter entities only of given bundles, if desired.
     if ($bundles) {
