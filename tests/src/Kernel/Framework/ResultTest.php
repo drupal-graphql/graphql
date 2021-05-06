@@ -2,7 +2,11 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\PageCache\ChainRequestPolicy;
+use Drupal\Core\PageCache\RequestPolicy\NoSessionOpen;
+use Drupal\graphql\Cache\RequestPolicy\DenyPost;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test the whole query result pipeline.
@@ -29,10 +33,14 @@ GQL;
     $this->setUpSchema($schema);
 
     $this->mockResolver('Query', 'root', 'test');
+
+    $this->configureCachePolicy(900);
   }
 
   /**
    * Test a simple query result.
+   *
+   * @coversClass \Drupal\graphql\Cache\RequestPolicy\DenyPost
    */
   public function testQuery(): void {
     $result = $this->query('query { root }');
@@ -43,6 +51,24 @@ GQL;
         'root' => 'test',
       ],
     ], json_decode($result->getContent(), TRUE));
+    $this->assertTrue($result->isCacheable());
+    $this->assertEquals('max-age=900, public', $result->headers->get('Cache-Control'));
+  }
+
+  /**
+   * Test a simple POST query result.
+   *
+   * @coversClass \Drupal\graphql\Cache\RequestPolicy\DenyPost
+   */
+  public function testPostQuery(): void {
+    $result = $this->query('query { root }', NULL, [], NULL, FALSE, Request::METHOD_POST);
+    $this->assertSame(200, $result->getStatusCode());
+    $this->assertSame([
+      'data' => [
+        'root' => 'test',
+      ],
+    ], json_decode($result->getContent(), TRUE));
+    $this->assertFalse($result->isCacheable());
   }
 
   /**
@@ -67,6 +93,7 @@ GQL;
         ],
       ],
     ], json_decode($result->getContent(), TRUE));
+    $this->assertFalse($result->isCacheable());
   }
 
 }
