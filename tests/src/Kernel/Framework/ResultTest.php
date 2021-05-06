@@ -2,9 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\PageCache\ChainRequestPolicy;
-use Drupal\Core\PageCache\RequestPolicy\NoSessionOpen;
-use Drupal\graphql\Cache\RequestPolicy\DenyPost;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Symfony\Component\HttpFoundation\Request;
 
