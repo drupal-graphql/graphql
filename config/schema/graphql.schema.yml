@@ -1,12 +1,3 @@
-graphql.settings:
-  type: config_object
-  label: "GraphQL Settings"
-  mapping:
-    deprecated_swap_errors_and_extensions_in_results:
-      type: boolean
-      label: "Return `errors` in the GraphQL response `extension` key and vice versa"
-      description: "Preserves behaviour that was caused by a bug that caused errors to appear in the extensions key of GraphQL results. Ensures misbehaving client implementations don't break by fixing this bug. Will be removed in 5.0.0"
-
 graphql.graphql_servers.*:
   type: config_entity
   label: 'Server'
