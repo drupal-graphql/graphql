@@ -23,11 +23,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       required = TRUE
  *     ),
  *     "values" = @ContextDefinition("any",
- *       label = @Translation("Values to update"),
+ *       label = @Translation("Field values for creating the entity"),
  *       required = TRUE
  *     ),
  *     "entity_return_key" = @ContextDefinition("string",
- *       label = @Translation("Entity Return Key"),
+ *       label = @Translation("Key name in the returned array where the entity will be placed"),
  *       required = TRUE
  *     ),
  *     "save" = @ContextDefinition("boolean",
@@ -70,15 +70,28 @@ class CreateEntity extends DataProducerPluginBase implements ContainerFactoryPlu
     $context->addCacheableDependency($access);
     if (!$access->isAllowed()) {
       return [
-        'errors' => [$access instanceof AccessResultReasonInterface && $access->getReason() ? $access->getReason() : 'Access was forbidden.'],
+        'errors' => [$access instanceof AccessResultReasonInterface && $access->getReason() ? $access->getReason() : $this->t('Access was forbidden.')],
       ];
     }
 
     $entity = $storage->create($values);
+
+    // Core does not have a concept of create access for fields, so edit access
+    // is used instead. This is consistent with how other Drupal APIs handle
+    // field based create access.
+    $field_access_errors = [];
+    foreach ($values as $field_name => $value) {
+      $create_access = $entity->get($field_name)->access('edit', NULL, TRUE);
+      if (!$create_access->isALlowed()) {
+        $field_access_errors[] = sprintf('%s: %s', $field_name, $create_access instanceof AccessResultReasonInterface ? $create_access->getReason() : $this->t('Access was forbidden.'));
+      }
+    }
+    if (!empty($field_access_errors)) {
+      return ['errors' => $field_access_errors];
+    }
+
     if ($violation_messages = $this->getViolationMessages($entity)) {
-      return [
-        'errors' => $violation_messages,
-      ];
+      return ['errors' => $violation_messages];
     }
 
     if ($save) {

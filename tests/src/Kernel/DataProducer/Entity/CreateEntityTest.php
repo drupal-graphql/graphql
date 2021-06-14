@@ -25,21 +25,28 @@ class CreateEntityTest extends GraphQLTestBase {
   protected $pluginId = 'create_entity';
 
   /**
-   * Test creating entities.
+   * {@inheritdoc}
    */
-  public function testCreateEntity() {
+  protected function setUp(): void {
+    parent::setUp();
+
     $content_type = NodeType::create([
       'type' => 'lorem',
       'name' => 'ipsum',
     ]);
     $content_type->save();
+  }
 
+  /**
+   * Test creating entities.
+   */
+  public function testCreateEntity() {
     $result = $this->executeDataProducer($this->pluginId, [
       'entity_type' => 'node',
       'values' => [],
       'entity_return_key' => 'foo',
     ]);
-    $this->assertSame('Access was forbidden.', $result['errors'][0]);
+    $this->assertSame('Access was forbidden.', (string) $result['errors'][0]);
 
     $this->setCurrentUser($this->createUser(['bypass node access', 'access content']));
 
@@ -77,6 +84,23 @@ class CreateEntityTest extends GraphQLTestBase {
     ]);
     $this->assertEquals('bar', $result['foo']->label());
     $this->assertTrue($result['foo']->isNew());
+  }
+
+  /**
+   * Test field access when creating entities.
+   */
+  public function testCreateEntityFieldAccess() {
+    $this->setCurrentUser($this->createUser(['bypass node access', 'access content']));
+
+    $result = $this->executeDataProducer($this->pluginId, [
+      'entity_type' => 'node',
+      'values' => [
+        'type' => 'lorem',
+        'nid' => 123,
+      ],
+      'entity_return_key' => 'foo',
+    ]);
+    $this->assertSame('nid: The entity ID cannot be changed.', (string) $result['errors'][0]);
   }
 
 }
