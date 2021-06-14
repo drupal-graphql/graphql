@@ -21,11 +21,16 @@ trait EntityValidationTrait {
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   An entity to validate.
    *
-   * @return array|null
-   *   Get a list of violations or NULL if none were found.
+   * @return array
+   *   Get a list of violations.
    */
-  public function getViolationMessages(ContentEntityInterface $entity) {
+  public function getViolationMessages(ContentEntityInterface $entity): array {
     $violations = $entity->validate();
+
+    // Remove violations of inaccessible fields as they cannot stem from our
+    // changes.
+    $violations->filterByFieldAccess();
+
     if ($violations->count() > 0) {
       $violation_messages = [];
       foreach ($violations as $violation) {
@@ -33,7 +38,7 @@ trait EntityValidationTrait {
       }
       return $violation_messages;
     }
-    return NULL;
+    return [];
   }
 
 }
