@@ -65,8 +65,18 @@ class CreateEntity extends DataProducerPluginBase implements ContainerFactoryPlu
     $storage = $this->entityTypeManager->getStorage($entity_type);
     $accessHandler = $this->entityTypeManager->getAccessControlHandler($entity_type);
 
+    // Infer the bundle type from the response and return an error if the entity
+    // type expects one, but one is not present.
+    $entity_type = $this->entityTypeManager->getDefinition($entity_type);
+    $bundle = $entity_type->getKey('bundle') && !empty($values[$entity_type->getKey('bundle')]) ? $values[$entity_type->getKey('bundle')] : NULL;
+    if ($entity_type->getKey('bundle') && !$bundle) {
+      return [
+        'errors' => [$this->t('Entity type being created requried a bundle, but none was present.')],
+      ];
+    }
+
     // Ensure the user has access to create this kind of entity.
-    $access = $accessHandler->createAccess(NULL, NULL, [], TRUE);
+    $access = $accessHandler->createAccess($bundle, NULL, [], TRUE);
     $context->addCacheableDependency($access);
     if (!$access->isAllowed()) {
       return [

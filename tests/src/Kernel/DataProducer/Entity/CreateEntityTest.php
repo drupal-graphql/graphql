@@ -43,7 +43,9 @@ class CreateEntityTest extends GraphQLTestBase {
   public function testCreateEntity() {
     $result = $this->executeDataProducer($this->pluginId, [
       'entity_type' => 'node',
-      'values' => [],
+      'values' => [
+        'type' => 'lorem',
+      ],
       'entity_return_key' => 'foo',
     ]);
     $this->assertSame('Access was forbidden.', (string) $result['errors'][0]);
@@ -101,6 +103,18 @@ class CreateEntityTest extends GraphQLTestBase {
       'entity_return_key' => 'foo',
     ]);
     $this->assertSame('nid: The entity ID cannot be changed.', (string) $result['errors'][0]);
+  }
+
+  /**
+   * Test creating an entity with a missing bundle.
+   */
+  public function testCreateEntityMissingBundle() {
+    $result = $this->executeDataProducer($this->pluginId, [
+      'entity_type' => 'node',
+      'values' => [],
+      'entity_return_key' => 'foo',
+    ]);
+    $this->assertSame('Entity type being created requried a bundle, but none was present.', (string) $result['errors'][0]);
   }
 
 }
