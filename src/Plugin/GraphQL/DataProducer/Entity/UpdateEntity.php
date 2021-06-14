@@ -51,6 +51,9 @@ class UpdateEntity extends DataProducerPluginBase {
     // Filter out keys the user does not have access to update, this may include
     // things such as the owner of the entity or the ID of the entity.
     $update_fields = array_filter($values, function (string $field_name) use ($entity, $context) {
+      if (!$entity->hasField($field_name)) {
+        throw new \Exception("Could not update '$field_name' field, since it does not exist on the given entity.");
+      }
       $access = $entity->{$field_name}->access('edit', NULL, TRUE);
       $context->addCacheableDependency($access);
       return $access->isAllowed();

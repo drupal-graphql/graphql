@@ -26,15 +26,22 @@ class UpdateEntityTest extends GraphQLTestBase {
   protected $pluginId = 'update_entity';
 
   /**
-   * Test updating an entity.
+   * {@inheritdoc}
    */
-  public function testUpdateEntity() {
+  protected function setUp(): void {
+    parent::setUp();
+
     $content_type = NodeType::create([
       'type' => 'lorem',
       'name' => 'ipsum',
     ]);
     $content_type->save();
+  }
 
+  /**
+   * Test updating an entity.
+   */
+  public function testUpdateEntity() {
     $entity = Node::create([
       'type' => 'lorem',
       'title' => 'foo',
@@ -84,6 +91,29 @@ class UpdateEntityTest extends GraphQLTestBase {
     ]);
     $this->assertArrayNotHasKey('errors', $result);
     $this->assertEquals('adf834bd-9e70-4c2a-bf8a-3ef2382e1d78', $result['foo']->uuid());
+  }
+
+  /**
+   * Test updating an entity with an invalid field.
+   */
+  public function testUpdateEntityInvalidField() {
+    $entity = Node::create([
+      'type' => 'lorem',
+      'title' => 'foo',
+      'uuid' => 'adf834bd-9e70-4c2a-bf8a-3ef2382e1d78',
+    ]);
+    $entity->save();
+    $this->setCurrentUser($this->createUser(['bypass node access', 'access content']));
+
+    $this->expectExceptionMessage("Could not update 'not_a_real_field' field, since it does not exist on the given entity.");
+    $result = $this->executeDataProducer($this->pluginId, [
+      'entity' => $entity,
+      'values' => [
+        'not_a_real_field' => 'bar',
+      ],
+      'entity_return_key' => 'foo',
+    ]);
+    $this->assertSame("The 'edit any lorem content' permission is required.", $result['errors'][0]);
   }
 
 }
