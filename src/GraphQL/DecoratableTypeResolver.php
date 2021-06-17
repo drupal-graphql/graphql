@@ -3,36 +3,12 @@
 namespace Drupal\graphql\GraphQL;
 
 /**
- * A decoratable type resolver to resolve GraphQL interfaces to concrete types.
- *
- * Type resolvers should extend this class so that they can be chained in
- * schema extensions plugins.
- *
- * For example with the following class defined.
- * ```php
- * class ConcreteTypeResolver extends DecoratableTypeResolver {
- *
- *   protected function resolve($object) : ?string {
- *     return $object instanceof MyType ? 'MyType' : NULL;
- *   }
- * }
- * ```
- *
- * A schema extension would call:
- * ```php
- * $registry->addTypeResolver(
- *   'InterfaceType',
- *   new ConcreteTypeResolver($registry->getTypeResolver('InterfaceType'))
- * );
- * ```
- *
- * TypeResolvers should not extend other type resolvers but always extend this
- * class directly. Classes will be called in the reverse order of being added
- * (classes added last will be called first).
+ * A base class for decoratable type resolvers.
  *
  * @package Drupal\graphql\GraphQL
+ * @see \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface
  */
-abstract class DecoratableTypeResolver {
+abstract class DecoratableTypeResolver implements DecoratableTypeResolverInterface {
 
   /**
    * The previous type resolver that was set in the chain.
@@ -44,10 +20,10 @@ abstract class DecoratableTypeResolver {
   /**
    * Create a new decoratable type resolver.
    *
-   * @param \Drupal\graphql\GraphQL\DecoratableTypeResolver|null $resolver
+   * @param \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface|null $resolver
    *   The previous type resolver if any.
    */
-  public function __construct(self $resolver = NULL) {
+  public function __construct(DecoratableTypeResolverInterface $resolver = NULL) {
     $this->decorated = $resolver;
   }
 
