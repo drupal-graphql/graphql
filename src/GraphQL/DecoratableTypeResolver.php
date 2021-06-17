@@ -30,7 +30,7 @@ namespace Drupal\graphql\GraphQL;
  * class directly. Classes will be called in the reverse order of being added
  * (classes added last will be called first).
  *
- * @package Drupal\thunder_gqls\GraphQL
+ * @package Drupal\graphql\GraphQL
  */
 abstract class DecoratableTypeResolver {
 
