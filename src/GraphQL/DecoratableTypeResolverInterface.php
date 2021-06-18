@@ -40,7 +40,7 @@ interface DecoratableTypeResolverInterface {
    * @param \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface|null $resolver
    *   The previous type resolver if any.
    */
-  public function __construct(?self $resolver);
+  public function __construct(DecoratableTypeResolverInterface $resolver = NULL);
 
   /**
    * Allows this type resolver to be called by the GraphQL library.
