@@ -23,7 +23,7 @@ abstract class DecoratableTypeResolver implements DecoratableTypeResolverInterfa
    * @param \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface|null $resolver
    *   The previous type resolver if any.
    */
-  public function __construct(DecoratableTypeResolverInterface $resolver = NULL) {
+  public function __construct(?DecoratableTypeResolverInterface $resolver) {
     $this->decorated = $resolver;
   }
 
