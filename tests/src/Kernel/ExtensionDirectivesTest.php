@@ -34,7 +34,7 @@ class ExtensionDirectivesTest extends GraphQLTestBase {
         'schema_configuration' => [
           'composable' => [
             'extensions' => [
-              'extension_directives_test' => 'extension_directives_test'
+              'extension_directives_test' => 'extension_directives_test',
             ],
           ],
         ],
@@ -58,17 +58,20 @@ class ExtensionDirectivesTest extends GraphQLTestBase {
       }
 GQL;
 
-    $this->assertResults($query, [], ['cars' =>
+    $this->assertResults($query, [],
       [
-        [
-          'brand' => 'Brand',
-          'model' => 'Model',
-          'width' => '1',
-          'height' => '1',
-          'depth' => '1',
-        ],
-      ],
-    ]);
+        'cars' =>
+          [
+            [
+              'brand' => 'Brand',
+              'model' => 'Model',
+              'width' => '1',
+              'height' => '1',
+              'depth' => '1',
+            ],
+          ],
+      ]
+    );
   }
 
 }
