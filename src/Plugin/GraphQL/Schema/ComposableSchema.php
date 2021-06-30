@@ -38,7 +38,7 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
     $schemaDocument = $this->getSchemaDocument($extensions);
     // Iterate through all extensions and pass them the current schema, so they
     // can act on it.
-    foreach($extensions as $extension) {
+    foreach ($extensions as $extension) {
       if ($extension instanceof ParentAwareSchemaExtensionInterface) {
         $extension->setParentSchemaDocument($schemaDocument);
       }
@@ -77,7 +77,8 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
 
         type Query
 GQL;
-    } else {
+    }
+    else {
       $schema[] = file_get_contents($file);
     }
 

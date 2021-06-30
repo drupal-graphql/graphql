@@ -19,8 +19,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
  *   schema = "composable"
  * )
  */
-class ExtensionDirectivesTestSchemaExtension extends SdlSchemaExtensionPluginBase
-  implements ParentAwareSchemaExtensionInterface, DirectiveProviderExtensionInterface {
+class ExtensionDirectivesTestSchemaExtension extends SdlSchemaExtensionPluginBase implements ParentAwareSchemaExtensionInterface, DirectiveProviderExtensionInterface {
 
   /**
    * The parent schema's AST.
@@ -30,6 +29,8 @@ class ExtensionDirectivesTestSchemaExtension extends SdlSchemaExtensionPluginBas
   protected $parentAst;
 
   /**
+   * Stores found types with the dimensions directive.
+   *
    * @var array
    */
   protected $typesWithDimensions = [];
@@ -79,9 +80,9 @@ GQL;
   public function registerResolvers(ResolverRegistryInterface $registry): void {
     $builder = new ResolverBuilder();
     $registry->addFieldResolver('Query', 'cars', $builder->callback(function () {
-      return [(object)['brand' => 'Brand', 'model' => 'Model']];
+      return [(object) ['brand' => 'Brand', 'model' => 'Model']];
     }));
-    foreach($this->getTypesWithDimensions() as $typeWithDimensions) {
+    foreach ($this->getTypesWithDimensions() as $typeWithDimensions) {
       $registry->addFieldResolver($typeWithDimensions['type_name'], 'width', $builder->callback(function () {
         return '1';
       }));

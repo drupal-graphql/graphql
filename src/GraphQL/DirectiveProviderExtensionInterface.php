@@ -13,6 +13,7 @@ interface DirectiveProviderExtensionInterface {
    * Retrieve all directive definitions as a string.
    *
    * @return string
+   *   Directive definitions in SDL.
    */
   public function getDirectiveDefinitions() : string;
 

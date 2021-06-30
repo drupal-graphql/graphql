@@ -2,13 +2,6 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\graphql\GraphQL\ResolverBuilder;
-use Drupal\node\Entity\NodeType;
-
 /**
  * Test the entity_definition data producer and friends.
  *
@@ -17,7 +10,7 @@ use Drupal\node\Entity\NodeType;
 class ExtensionDirectivesTest extends GraphQLTestBase {
 
   /**
-   * {@inheritdoc }
+   * {@inheritdoc}
    */
   protected $strictConfigSchema = FALSE;
 
@@ -42,10 +35,10 @@ class ExtensionDirectivesTest extends GraphQLTestBase {
           'composable' => [
             'extensions' => [
               'extension_directives_test' => 'extension_directives_test'
-            ]
-          ]
-        ]
-      ]
+            ],
+          ],
+        ],
+      ],
     );
   }
 
@@ -65,15 +58,17 @@ class ExtensionDirectivesTest extends GraphQLTestBase {
       }
 GQL;
 
-    $this->assertResults($query, [], ['cars' => [
+    $this->assertResults($query, [], ['cars' =>
       [
-        'brand' => 'Brand',
-        'model' => 'Model',
-        'width' => '1',
-        'height' => '1',
-        'depth' => '1',
-      ]
-    ]]);
+        [
+          'brand' => 'Brand',
+          'model' => 'Model',
+          'width' => '1',
+          'height' => '1',
+          'depth' => '1',
+        ],
+      ],
+    ]);
   }
 
 }
