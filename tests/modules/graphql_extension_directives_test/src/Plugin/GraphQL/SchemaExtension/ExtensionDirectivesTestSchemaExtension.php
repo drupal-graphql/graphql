@@ -56,6 +56,7 @@ GQL;
    * {@inheritDoc}
    */
   public function getExtensionDefinition() {
+    $schema = [];
     $typesWithDimensions = $this->getTypesWithDimensions();
 
     foreach ($typesWithDimensions as $typeWithDimensions) {
@@ -75,7 +76,7 @@ GQL;
   /**
    * {@inheritDoc}
    */
-  public function registerResolvers(ResolverRegistryInterface $registry) {
+  public function registerResolvers(ResolverRegistryInterface $registry): void {
     $builder = new ResolverBuilder();
     $registry->addFieldResolver('Query', 'cars', $builder->callback(function () {
       return [(object)['brand' => 'Brand', 'model' => 'Model']];
@@ -105,7 +106,7 @@ GQL;
       // Search for object type definitions ...
       foreach ($this->parentAst->definitions->getIterator() as $definition) {
         // ... that have directives.
-        if ($definition instanceof ObjectTypeDefinitionNode && $definition->directives) {
+        if ($definition instanceof ObjectTypeDefinitionNode) {
           foreach ($definition->directives->getIterator() as $directive) {
             /** @var \GraphQL\Language\AST\DirectiveNode $directive */
             $directiveName = $directive->name->value;
