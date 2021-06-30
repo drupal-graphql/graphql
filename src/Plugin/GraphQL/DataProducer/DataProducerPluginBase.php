@@ -46,7 +46,7 @@ abstract class DataProducerPluginBase extends ContextAwarePluginBase implements 
     $context = $this->getContextValues();
     return call_user_func_array(
       [$this, 'resolve'],
-      array_merge($context, [$field])
+      array_values(array_merge($context, [$field]))
     );
   }
 

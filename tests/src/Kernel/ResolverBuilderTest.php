@@ -17,7 +17,7 @@ class ResolverBuilderTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['graphql_resolver_builder_test'];
+  protected static $modules = ['graphql_resolver_builder_test'];
 
   /**
    * {@inheritdoc}

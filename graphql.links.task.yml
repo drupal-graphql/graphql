@@ -24,6 +24,11 @@ graphql.voyager:
   base_route: entity.graphql_server.edit_form
   title: Voyager
 
+graphql.validate:
+  route_name: graphql.validate
+  base_route: entity.graphql_server.edit_form
+  title: Validate
+
 entity.graphql_server.collection:
   title: Servers
   route_name: entity.graphql_server.collection

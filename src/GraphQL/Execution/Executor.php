@@ -216,8 +216,8 @@ class Executor implements ExecutorImplementation {
     $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
 
     $server = $this->context->getServer();
-    $type = AST::getOperation($this->document, $this->operation);
-    if ($type === 'query' && !!$server->get('caching')) {
+    $operation_def = AST::getOperationAST($this->document, $this->operation);
+    if ($operation_def && $operation_def->operation === 'query' && !!$server->get('caching')) {
       $result = $this->doExecuteCached($this->cachePrefix());
     }
     else {
@@ -226,7 +226,7 @@ class Executor implements ExecutorImplementation {
       $result = $this->doExecuteUncached()->then(function ($result) {
         $this->context->mergeCacheMaxAge(0);
 
-        $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
+        $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
         $result->addCacheableDependency($this->context);
         return $result;
       });
@@ -256,7 +256,7 @@ class Executor implements ExecutorImplementation {
         $this->context->mergeCacheMaxAge(0);
       }
 
-      $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
+      $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
       $result->addCacheableDependency($this->context);
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheWrite($prefix, $result);
@@ -283,7 +283,15 @@ class Executor implements ExecutorImplementation {
       $this->resolver
     );
 
-    return $executor->doExecute();
+    $event = new OperationEvent($this->context);
+    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
+
+    return $executor->doExecute()->then(function ($result) {
+      $event = new OperationEvent($this->context, $result);
+      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
+
+      return $result;
+    });
   }
 
   /**
