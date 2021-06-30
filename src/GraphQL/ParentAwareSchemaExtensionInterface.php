@@ -17,6 +17,6 @@ interface ParentAwareSchemaExtensionInterface {
    * @param \GraphQL\Language\AST\DocumentNode $document
    *   The parent schema document.
    */
-  public function setParentSchemaDocument(DocumentNode $document);
+  public function setParentSchemaDocument(DocumentNode $document): void;
 
 }

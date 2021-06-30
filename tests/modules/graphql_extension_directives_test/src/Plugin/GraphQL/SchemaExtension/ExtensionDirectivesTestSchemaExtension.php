@@ -38,7 +38,7 @@ class ExtensionDirectivesTestSchemaExtension extends SdlSchemaExtensionPluginBas
   /**
    * {@inheritDoc}
    */
-  public function setParentSchemaDocument($document) {
+  public function setParentSchemaDocument($document): void {
     $this->parentAst = $document;
   }
 
