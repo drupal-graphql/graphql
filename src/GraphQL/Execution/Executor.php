@@ -213,8 +213,8 @@ class Executor implements ExecutorImplementation {
    */
   public function doExecute(): Promise {
     $server = $this->context->getServer();
-    $type = AST::getOperation($this->document, $this->operation);
-    if ($type === 'query' && !!$server->get('caching')) {
+    $operation_def = AST::getOperationAST($this->document, $this->operation);
+    if ($operation_def && $operation_def->operation === 'query' && !!$server->get('caching')) {
       return $this->doExecuteCached($this->cachePrefix());
     }
 
@@ -223,13 +223,7 @@ class Executor implements ExecutorImplementation {
     return $this->doExecuteUncached()->then(function ($result) {
       $this->context->mergeCacheMaxAge(0);
 
-      // @todo keep only else case in 5.0.0.
-      if (\Drupal::config('graphql.settings')->get('deprecated_swap_errors_and_extensions_in_results')) {
-        $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
-      }
-      else {
-        $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
-      }
+      $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
       $result->addCacheableDependency($this->context);
       return $result;
     });
@@ -252,13 +246,7 @@ class Executor implements ExecutorImplementation {
         $this->context->mergeCacheMaxAge(0);
       }
 
-      // @todo keep only else case in 5.0.0.
-      if (\Drupal::config('graphql.settings')->get('deprecated_swap_errors_and_extensions_in_results')) {
-        $result = new CacheableExecutionResult($result->data, $result->extensions, $result->errors);
-      }
-      else {
-        $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
-      }
+      $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
       $result->addCacheableDependency($this->context);
       if ($result->getCacheMaxAge() !== 0) {
         $this->cacheWrite($prefix, $result);
