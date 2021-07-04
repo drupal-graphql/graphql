@@ -52,7 +52,12 @@ trait HttpRequestTrait {
       $query_key => $query,
       'variables' => $variables,
     ] + $extensions;
-    $request = $method === Request::METHOD_GET ? Request::create($endpoint, $method, $data) : Request::create($endpoint, $method, [], [], [], [], json_encode($data));
+    if ($method === Request::METHOD_GET) {
+      $request = Request::create($endpoint, $method, $data);
+    }
+    else {
+      $request = Request::create($endpoint, $method, [], [], [], [], json_encode($data));
+    }
 
     return $this->container->get('http_kernel')->handle($request);
   }

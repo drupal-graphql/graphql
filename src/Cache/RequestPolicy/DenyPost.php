@@ -14,7 +14,7 @@ class DenyPost implements RequestPolicyInterface {
    * {@inheritdoc}
    */
   public function check(Request $request) {
-    if ($request->attributes->has('_graphql') && $request->getMethod() === Request::METHOD_POST) {
+    if ($request->attributes->has('_graphql') && $request->getMethod() !== Request::METHOD_GET) {
       return static::DENY;
     }
   }
