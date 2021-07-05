@@ -5,7 +5,7 @@ namespace Drupal\Tests\graphql\Kernel;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\PageCache\ChainRequestPolicy;
 use Drupal\Core\PageCache\RequestPolicy\NoSessionOpen;
-use Drupal\graphql\Cache\RequestPolicy\DenyPost;
+use Drupal\graphql\Cache\RequestPolicy\GetOnly;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -92,12 +92,12 @@ abstract class GraphQLTestBase extends KernelTestBase {
    * @param int $max_age
    *   Max age to cache responses.
    */
-  protected function configureCachePolicy(int $max_age = 900) {
+  protected function configureCachePolicy(int $max_age = 900): void {
     $this->container->set('dynamic_page_cache_request_policy', (new ChainRequestPolicy())
-      ->addPolicy(new DenyPost()));
+      ->addPolicy(new GetOnly()));
     $this->container->set('page_cache_request_policy', (new ChainRequestPolicy())
       ->addPolicy(new NoSessionOpen($this->container->get('session_configuration')))
-      ->addPolicy(new DenyPost()));
+      ->addPolicy(new GetOnly()));
     // Turn on caching.
     $this->config('system.performance')->set('cache.page.max_age', $max_age)->save();
   }
