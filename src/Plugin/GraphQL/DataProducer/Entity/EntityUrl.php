@@ -19,10 +19,10 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  *     "entity" = @ContextDefinition("entity",
  *       label = @Translation("Entity")
  *     ),
- *     "absolute" = @ContextDefinition("boolean",
- *       label = @Translation("Make absolute"),
- *       required = FALSE,
- *       default_value = FALSE
+ *     "options" = @ContextDefinition("any",
+ *       label = @Translation("URL Options"),
+ *       description = @Translation("Options to pass to the toUrl call"),
+ *       required = FALSE
  *     )
  *   }
  * )
@@ -33,16 +33,16 @@ class EntityUrl extends DataProducerPluginBase {
    * Resolver.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to get URL.
-   * @param bool|null $absolute
-   *   Make the URL absolute.
+   *   The entity to create a canonical URL for.
+   * @param null|array $options
+   *   The options to provide to the URL generator.
    *
    * @return \Drupal\Core\Url
    *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function resolve(EntityInterface $entity, bool $absolute = NULL) {
-    return $entity->toUrl('canonical', ['absolute' => $absolute ?? FALSE]);
+  public function resolve(EntityInterface $entity, ?array $options) {
+    return $entity->toUrl('canonical', $options ?? []);
   }
 
 }
