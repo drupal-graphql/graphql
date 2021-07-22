@@ -164,7 +164,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "schema:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
+//      return $cache->data;
     }
 
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
@@ -196,7 +196,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "extension:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
+//      return $cache->data;
     }
 
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
