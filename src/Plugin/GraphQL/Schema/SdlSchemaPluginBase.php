@@ -42,6 +42,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected $inDevelopment;
 
   /**
+   * The ID of the server using this plugin.
+   *
+   * @var string $serverId
+   */
+  protected $serverId;
+
+  /**
    * The schema extension plugin manager.
    *
    * @var \Drupal\graphql\Plugin\SchemaExtensionPluginManager
@@ -109,6 +116,15 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
+   * Set the serverID, required for cache id generation.
+   *
+   * @param string $serverId
+   */
+  public function setServerId(string $serverId) {
+    $this->serverId = $serverId;
+  }
+
+  /**
    * {@inheritdoc}
    *
    * @throws \GraphQL\Error\SyntaxError
@@ -162,9 +178,9 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getSchemaDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "schema:{$this->getPluginId()}";
+    $cid = "server:{$this->serverId}:schema:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-//      return $cache->data;
+      return $cache->data;
     }
 
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
@@ -194,9 +210,9 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getExtensionDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "extension:{$this->getPluginId()}";
+    $cid = "server:{$this->serverId}:extension:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-//      return $cache->data;
+      return $cache->data;
     }
 
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
