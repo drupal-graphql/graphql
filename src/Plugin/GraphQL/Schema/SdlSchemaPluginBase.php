@@ -116,11 +116,9 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * Set the serverID, required for cache id generation.
-   *
-   * @param string $serverId
+   * {@inheritdoc}
    */
-  public function setServerId(string $serverId) {
+  public function setServerId(string $serverId): void {
     $this->serverId = $serverId;
   }
 
