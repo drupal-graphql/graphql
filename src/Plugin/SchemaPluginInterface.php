@@ -17,10 +17,8 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
   /**
    * Set the serverID, required for cache id generation.
    *
-   * @param string
+   * @param string $serverId
    *   The machine name of the server using this plugin.
-   *
-   * @return null
    */
   public function setServerId(string $serverId): void;
 
