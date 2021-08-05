@@ -44,7 +44,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   /**
    * The ID of the server using this plugin.
    *
-   * @var string $serverId
+   * @var string
    */
   protected $serverId;
 
