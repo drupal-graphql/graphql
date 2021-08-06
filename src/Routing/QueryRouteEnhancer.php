@@ -31,7 +31,6 @@ class QueryRouteEnhancer implements EnhancerInterface {
     // graphql processor due to a missing query string but at least provides
     // the right format for the client to act upon.
     return $defaults + [
-      '_controller' => $defaults['_graphql']['single'],
       'operations' => $operations,
     ];
   }
