@@ -27,8 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       required = TRUE
  *     ),
  *     "entity_return_key" = @ContextDefinition("string",
- *       label = @Translation("Key name in the returned array where the entity will be placed"),
- *       required = TRUE
+ *       label = @Translation("Key name in the returned array where the entity
+ *   will be placed"), required = TRUE
  *     ),
  *     "save" = @ContextDefinition("boolean",
  *       label = @Translation("Save entity"),
@@ -71,9 +71,9 @@ class CreateEntity extends DataProducerPluginBase implements ContainerFactoryPlu
     $bundle = $entity_type->getKey('bundle') && !empty($values[$entity_type->getKey('bundle')]) ? $values[$entity_type->getKey('bundle')] : NULL;
     if ($entity_type->getKey('bundle') && !$bundle) {
       return [
-        'errors' => [$this->t('Entity type being created requried a bundle, but none was present.')],
+        'errors' => [$this->t('Entity type being created requires a bundle, but none was present.')],
       ];
-    }
+    };
 
     // Ensure the user has access to create this kind of entity.
     $access = $accessHandler->createAccess($bundle, NULL, [], TRUE);

@@ -21,11 +21,11 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\EntityValidationTrait;
  *       label = @Translation("Entity")
  *     ),
  *     "values" = @ContextDefinition("any",
- *       label = @Translation("Values to update"),
+ *       label = @Translation("Field values for creating the entity"),
  *       required = TRUE
  *     ),
  *     "entity_return_key" = @ContextDefinition("string",
- *       label = @Translation("Entity Return Key"),
+ *       label = @Translation("Key name in the returned array where the entity will be placed"),
  *       required = TRUE
  *     ),
  *   }
