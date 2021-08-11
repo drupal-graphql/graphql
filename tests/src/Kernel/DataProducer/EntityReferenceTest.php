@@ -17,7 +17,7 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
  *
  * @group graphql
  */
-class FieldTest extends GraphQLTestBase {
+class EntityReferenceTest extends GraphQLTestBase {
   use EntityReferenceTestTrait;
   use QueryResultAssertionTrait;
 
