@@ -4,24 +4,37 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\graphql\GraphQL\Execution\FieldContext;
 
+/**
+ * Entity reference helpers.
+ */
 trait EntityReferenceTrait {
 
   /**
    * Get referenced entities my checking language and access.
    *
    * @param string $type
+   *   Entity type ID.
    * @param string|null $language
+   *   Optional. Language to be respected for retrieved entities.
    * @param array|null $bundles
+   *   Optional. List of bundles to be respected for retrieved entities.
    * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   *   Whether to filter out inaccessible entities.
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   User entity to check access for. Default is null.
    * @param string $accessOperation
+   *   Operation to check access for. Default is view.
    * @param \Closure $resolver
+   *   The resolver to execute.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The caching context related to the current field.
    *
-   * @return array|null
+   * @return \Drupal\Core\Entity\EntityInterface[]|null
+   *   The list of references entities. Or NULL.
    */
-  protected function getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
+  protected function getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, \Closure $resolver, FieldContext $context) {
     $entities = $resolver() ?: [];
 
     $entities = $this->getTranslated($entities, $language);
@@ -39,14 +52,17 @@ trait EntityReferenceTrait {
   }
 
   /**
-   * Get the referenced entities in the language of the referencer.
+   * Get the referenced entities in the specified language.
    *
-   * @param array $entities
-   * @param string $language
+   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   *   Entities to process.
+   * @param string|null $language
+   *   Optional. Language to be respected for retrieved entities.
    *
-   * @return array
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Translated entities.
    */
-  private function getTranslated($entities, $language) {
+  private function getTranslated(array $entities, $language) {
     if ($language) {
       $entities = array_map(function (EntityInterface $entity) use ($language) {
         if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
@@ -64,16 +80,23 @@ trait EntityReferenceTrait {
   /**
    * Filter out not accessible entities.
    *
-   * @param array $entities
+   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   *   Entities to filter.
    * @param array|null $bundles
+   *   Optional. List of bundles to be respected for retrieved entities.
    * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|NULL $accessUser
+   *   Whether check for access or not.
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   User entity to check access for. Default is null.
    * @param string $accessOperation
+   *   Operation to check access for. Default is view.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The caching context related to the current field.
    *
-   * @return array
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Filtered entities.
    */
-  private function filterAccessible($entities, $bundles, $access, $accessUser, $accessOperation, $context) {
+  private function filterAccessible(array $entities, $bundles, $access, $accessUser, $accessOperation, FieldContext $context) {
     $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
       if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
         return FALSE;
@@ -82,7 +105,7 @@ trait EntityReferenceTrait {
       // Check if the passed user (or current user if none is passed) has
       // access to the entity, if not return NULL.
       if ($access) {
-        /* @var $accessResult \Drupal\Core\Access\AccessResultInterface */
+        /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
         $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
         $context->addCacheableDependency($accessResult);
         if (!$accessResult->isAllowed()) {
