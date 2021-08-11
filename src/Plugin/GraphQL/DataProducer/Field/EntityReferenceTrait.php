@@ -37,8 +37,17 @@ trait EntityReferenceTrait {
   protected function getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, \Closure $resolver, FieldContext $context) {
     $entities = $resolver() ?: [];
 
-    $entities = $this->getTranslated($entities, $language);
-    $entities = $this->filterAccessible($entities, $bundles, $access, $accessUser, $accessOperation, $context);
+    if (isset($bundles)) {
+      $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles) {
+        return in_array($entity->bundle(), $bundles);
+      });
+    }
+    if (isset($language)) {
+      $entities = $this->getTranslated($entities, $language);
+    }
+    if ($access) {
+      $entities = $this->filterAccessible($entities, $accessUser, $accessOperation, $context);
+    }
 
     if (empty($entities)) {
       $type = $this->entityTypeManager->getDefinition($type);
@@ -56,25 +65,20 @@ trait EntityReferenceTrait {
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   Entities to process.
-   * @param string|null $language
-   *   Optional. Language to be respected for retrieved entities.
+   * @param string $language
+   *   Language to be respected for retrieved entities.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]
    *   Translated entities.
    */
   private function getTranslated(array $entities, $language) {
-    if ($language) {
-      $entities = array_map(function (EntityInterface $entity) use ($language) {
-        if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
-          $entity = $entity->getTranslation($language);
-        }
-
-        $entity->addCacheContexts(["static:language:{$language}"]);
-        return $entity;
-      }, $entities);
-    }
-
-    return $entities;
+    return array_map(function (EntityInterface $entity) use ($language) {
+      if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
+        $entity = $entity->getTranslation($language);
+      }
+      $entity->addCacheContexts(["static:language:{$language}"]);
+      return $entity;
+    }, $entities);
   }
 
   /**
@@ -82,10 +86,6 @@ trait EntityReferenceTrait {
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   Entities to filter.
-   * @param array|null $bundles
-   *   Optional. List of bundles to be respected for retrieved entities.
-   * @param bool $access
-   *   Whether check for access or not.
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
    *   User entity to check access for. Default is null.
    * @param string $accessOperation
@@ -96,26 +96,16 @@ trait EntityReferenceTrait {
    * @return \Drupal\Core\Entity\EntityInterface[]
    *   Filtered entities.
    */
-  private function filterAccessible(array $entities, $bundles, $access, $accessUser, $accessOperation, FieldContext $context) {
-    $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles, $access, $accessOperation, $accessUser, $context) {
-      if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
+  private function filterAccessible(array $entities, $accessUser, $accessOperation, FieldContext $context) {
+    return array_filter($entities, function (EntityInterface $entity) use ($accessOperation, $accessUser, $context) {
+      /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
+      $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+      $context->addCacheableDependency($accessResult);
+      if (!$accessResult->isAllowed()) {
         return FALSE;
-      }
-
-      // Check if the passed user (or current user if none is passed) has
-      // access to the entity, if not return NULL.
-      if ($access) {
-        /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
-        $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
-        $context->addCacheableDependency($accessResult);
-        if (!$accessResult->isAllowed()) {
-          return FALSE;
-        }
       }
       return TRUE;
     });
-
-    return $entities;
   }
 
 }
