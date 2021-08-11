@@ -13,10 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4']
-        drupal-core: ['9.1.x']
-        # Extra run to also test on latest Drupal 8 and PHP 7.2.
+        php-versions: ['7.3', '7.4', '8.0']
+        drupal-core: ['9.2.x']
         include:
+          # Extra run to also test on latest Drupal 8 and PHP 7.2.
           - php-versions: '7.2'
             drupal-core: '8.9.x'
     steps:
@@ -77,11 +77,11 @@ jobs:
 
       - name: Install GraphQL dependencies
         run: composer --no-interaction --no-progress require \
-          webonyx/graphql-php:^14.3 \
+          webonyx/graphql-php:^14.8 \
           drupal/typed_data:^1.0 \
           drupal/redirect:^1.6 \
-          phpstan/phpstan:0.12.69 \
-          mglaman/phpstan-drupal:^0.12.3 \
+          phpstan/phpstan:^0.12.88 \
+          mglaman/phpstan-drupal:^0.12.8 \
           phpstan/phpstan-deprecation-rules:^0.12.2 \
           jangregor/phpstan-prophecy:^0.8 \
           phpstan/phpstan-phpunit:^0.12

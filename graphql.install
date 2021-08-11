@@ -63,3 +63,9 @@ function graphql_update_8001(): void {
     $server->save();
   }
 }
+
+/**
+ * Empty update that was removed again.
+ */
+function graphql_update_8400() :void {
+}

@@ -64,6 +64,20 @@ graphql.voyager:
       graphql_server:
         type: entity:graphql_server
 
+graphql.validate:
+  path: '/admin/config/graphql/servers/manage/{graphql_server}/validate'
+  defaults:
+    _controller: '\Drupal\graphql\Controller\ValidationController::report'
+    _title: 'Validate GraphQL Server'
+  requirements:
+    _permission: 'administer graphql configuration'
+  options:
+    _admin_route: TRUE
+    parameters:
+      graphql_server:
+        type: entity:graphql_server
+
+
 entity.graphql_server.delete_form:
   path: '/admin/config/graphql/servers/manage/{graphql_server}/delete'
   defaults:

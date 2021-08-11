@@ -3,8 +3,9 @@
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult;
-use GraphQL\Error\Error;
 use GraphQL\Server\OperationParams;
 
 /**
@@ -16,6 +17,11 @@ trait QueryResultAssertionTrait {
    * @var \Drupal\graphql\Entity\ServerInterface
    */
   protected $server;
+
+  /**
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
 
   /**
    * Return the default cache max age for this test case.
@@ -82,16 +88,23 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertResults($query, array $variables, array $expected, CacheableMetadata $metadata = NULL): void {
-    $result = $this->server->executeOperation(
-      OperationParams::create([
-        'query' => $query,
-        'variables' => $variables,
-      ])
+    $context = new RenderContext();
+    $result = $this->getRenderer()->executeInRenderContext(
+      $context,
+      function () use ($query, $variables) {
+        return $this->server->executeOperation(
+          OperationParams::create([
+            'query' => $query,
+            'variables' => $variables,
+          ])
+        );
+      }
     );
 
     $this->assertResultErrors($result, []);
     $this->assertResultData($result, $expected);
     $this->assertResultMetadata($result, $metadata ?: $this->defaultCacheMetaData());
+    self::assertTrue($context->isEmpty(), "Metadata was leaked during operation execution: {$context->serialize()}");
   }
 
   /**
@@ -107,15 +120,22 @@ trait QueryResultAssertionTrait {
    *   The expected cache metadata object.
    */
   protected function assertErrors($query, array $variables, $expected, CacheableMetadata $metadata): void {
-    $result = $this->server->executeOperation(
-      OperationParams::create([
-        'query' => $query,
-        'variables' => $variables,
-      ])
+    $context = new RenderContext();
+    $result = $this->getRenderer()->executeInRenderContext(
+      $context,
+      function () use ($query, $variables) {
+        return $this->server->executeOperation(
+          OperationParams::create([
+            'query' => $query,
+            'variables' => $variables,
+          ])
+        );
+      }
     );
 
     $this->assertResultErrors($result, $expected);
     $this->assertResultMetadata($result, $metadata);
+    self::assertTrue($context->isEmpty(), "Metadata was leaked during operation execution: {$context->serialize()}");
   }
 
   /**
@@ -145,34 +165,34 @@ trait QueryResultAssertionTrait {
    * @internal
    */
   private function assertResultErrors(ExecutionResult $result, array $expected): void {
-    // Retrieve the list of error strings.
-    $errors = array_map(function (Error $error) {
-      return $error->getMessage();
-    }, $result->errors);
-
     // Initalize the status.
     $unexpected = [];
-    $matchCount = array_map(function () {
-      return 0;
-    }, array_flip($expected));
+    $matchCount = array_fill_keys($expected, 0);
 
     // Iterate through error messages.
     // Collect unmatched errors and count pattern hits.
-    while ($error = array_pop($errors)) {
+    foreach ($result->errors as $error) {
+      $error_message = $error->getMessage();
       $match = FALSE;
       foreach ($expected as $pattern) {
-        if (@preg_match($pattern, $error) === FALSE) {
-          $match = $match || $pattern == $error;
+        if (@preg_match($pattern, $error_message) === FALSE) {
+          $match = $match || $pattern == $error_message;
           $matchCount[$pattern]++;
         }
         else {
-          $match = $match || preg_match($pattern, $error);
+          $match = $match || preg_match($pattern, $error_message);
           $matchCount[$pattern]++;
         }
       }
 
       if (!$match) {
-        $unexpected[] = $error;
+        // Add error location information of the original error in the chain to
+        // show developers where to look.
+        $original_error = $error;
+        while ($original_error->getPrevious() !== NULL) {
+          $original_error = $original_error->getPrevious();
+        }
+        $unexpected[] = "Error message: ${error_message}\n  Originated in: {$original_error->getFile()}:{$original_error->getLine()}";
       }
     }
 
@@ -181,8 +201,8 @@ trait QueryResultAssertionTrait {
       return $count == 0;
     }));
 
-    $this->assertEquals([], $missing, "Missing errors:\n* " . implode("\n* ", $missing));
-    $this->assertEquals([], $unexpected, "Unexpected errors:\n* " . implode("\n* ", $unexpected));
+    self::assertEmpty($missing, "Missing errors:\n* " . implode("\n* ", $missing));
+    self::assertEmpty($unexpected, "Unexpected errors:\n* " . implode("\n* ", $unexpected));
   }
 
   /**
@@ -209,6 +229,22 @@ trait QueryResultAssertionTrait {
 
     $unexpectedTags = array_diff($result->getCacheTags(), $expected->getCacheTags());
     $this->assertEmpty($unexpectedTags, 'Unexpected cache tags: ' . implode(', ', $unexpectedTags));
+  }
+
+  /**
+   * Get the Drupal renderer.
+   *
+   * Uses either the renderer available in the test class or fetches the Drupal
+   * renderer service.
+   *
+   * @return \Drupal\Core\Render\RendererInterface
+   *   The renderer service for the test.
+   */
+  private function getRenderer() : RendererInterface {
+    if (!isset($this->renderer)) {
+      $this->renderer = \Drupal::service('renderer');
+    }
+    return $this->renderer;
   }
 
 }
