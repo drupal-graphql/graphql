@@ -4,6 +4,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
 /**
@@ -36,7 +37,7 @@ trait EntityReferenceTrait {
    * @return \Drupal\Core\Entity\EntityInterface[]|null
    *   The list of references entities. Or NULL.
    */
-  protected function getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, \Closure $resolver, FieldContext $context) {
+  protected function getReferencedEntities(string $type, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, \Closure $resolver, FieldContext $context): ?array {
     $entities = $resolver() ?: [];
 
     if (isset($bundles)) {
@@ -73,7 +74,7 @@ trait EntityReferenceTrait {
    * @return \Drupal\Core\Entity\EntityInterface[]
    *   Translated entities.
    */
-  private function getTranslated(array $entities, $language) {
+  private function getTranslated(array $entities, string $language): array {
     return array_map(function (EntityInterface $entity) use ($language) {
       if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
         $entity = $entity->getTranslation($language);
@@ -98,7 +99,7 @@ trait EntityReferenceTrait {
    * @return \Drupal\Core\Entity\EntityInterface[]
    *   Filtered entities.
    */
-  private function filterAccessible(array $entities, $accessUser, $accessOperation, FieldContext $context) {
+  private function filterAccessible(array $entities, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): array {
     return array_filter($entities, function (EntityInterface $entity) use ($accessOperation, $accessUser, $context) {
       /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
       $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
