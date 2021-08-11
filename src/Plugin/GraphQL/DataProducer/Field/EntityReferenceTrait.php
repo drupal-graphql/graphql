@@ -12,7 +12,9 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 trait EntityReferenceTrait {
 
   /**
-   * Get referenced entities my checking language and access.
+   * Retrieves referenced entities from the given resolver.
+   *
+   * May optionally respect bundles/language and perform access checks.
    *
    * @param string $type
    *   Entity type ID.
