@@ -58,6 +58,9 @@ class FieldTest extends GraphQLTestBase {
       'type' => 'test2',
     ]);
     $this->referenced_node->save();
+    $this->referenced_node
+      ->addTranslation('fr', ['title' => 'Dolor2 French'])
+      ->save();
 
     $this->node = Node::create([
       'title' => 'Dolor',
@@ -75,8 +78,16 @@ class FieldTest extends GraphQLTestBase {
       'entity' => $this->node,
       'field' => 'field_test1_to_test2',
     ]);
-
     $this->assertEquals($this->referenced_node->id(), reset($result)->id());
+    $this->assertEquals('Dolor2', reset($result)->label());
+
+    $result = $this->executeDataProducer('entity_reference', [
+      'entity' => $this->node,
+      'field' => 'field_test1_to_test2',
+      'language' => 'fr',
+    ]);
+    $this->assertEquals($this->referenced_node->id(), reset($result)->id());
+    $this->assertEquals('Dolor2 French', reset($result)->label());
   }
 
 }
