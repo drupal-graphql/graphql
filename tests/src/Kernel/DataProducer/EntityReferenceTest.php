@@ -77,6 +77,8 @@ class EntityReferenceTest extends GraphQLTestBase {
     $result = $this->executeDataProducer('entity_reference', [
       'entity' => $this->node,
       'field' => 'field_test1_to_test2',
+      'access' => TRUE,
+      'access_operation' => 'view',
     ]);
     $this->assertEquals($this->referenced_node->id(), reset($result)->id());
     $this->assertEquals('Dolor2', reset($result)->label());
@@ -84,6 +86,8 @@ class EntityReferenceTest extends GraphQLTestBase {
     $result = $this->executeDataProducer('entity_reference', [
       'entity' => $this->node,
       'field' => 'field_test1_to_test2',
+      'access' => TRUE,
+      'access_operation' => 'view',
       'language' => 'fr',
     ]);
     $this->assertEquals($this->referenced_node->id(), reset($result)->id());
