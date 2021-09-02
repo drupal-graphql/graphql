@@ -91,7 +91,9 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
     ];
 
     return array_filter($this->menuLinkTree->transform($tree, $manipulators), function (MenuLinkTreeElement $item) {
-      return $item->link instanceof MenuLinkInterface && $item->link->isEnabled();
+      return $item->link instanceof MenuLinkInterface
+        && $item->link->isEnabled()
+        && (!isset($item->access) || $item->access->isAllowed());
     });
   }
 
