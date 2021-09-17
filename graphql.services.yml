@@ -108,6 +108,12 @@ services:
     tags:
       - { name: event_subscriber }
 
+  # Reset the current language during operations.
+  graphql.explorer_subscriber:
+    class: Drupal\graphql\EventSubscriber\ExplorerEventSubscriber
+    tags:
+      - { name: event_subscriber }
+
   # Plugin manager for schemas
   plugin.manager.graphql.schema:
     class: Drupal\graphql\Plugin\SchemaPluginManager

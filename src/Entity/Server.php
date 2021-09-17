@@ -25,6 +25,9 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\Helper;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
 
 /**
  * The main GraphQL configuration and request entry point.
@@ -59,7 +62,11 @@ use GraphQL\Validator\DocumentValidator;
  *     "endpoint",
  *     "debug_flag",
  *     "caching",
- *     "batching"
+ *     "batching",
+ *     "disable_introspection",
+ *     "depth",
+ *     "complexity",
+ *     "bypass_validation_token"
  *   },
  *   links = {
  *     "collection" = "/admin/config/graphql/servers",
@@ -498,7 +505,21 @@ class Server extends ConfigEntityBase implements ServerInterface {
         return [];
       }
 
-      return array_values(DocumentValidator::defaultRules());
+      $rules = array_values(DocumentValidator::defaultRules());
+
+      if (\Drupal::request()->get('bypass_validation') !== $this->get('bypass_validation_token')) {
+        if ($this->get('disable_introspection')) {
+          $rules[DisableIntrospection::class] = new DisableIntrospection();
+        }
+        if ($this->get('depth')) {
+          $rules[QueryDepth::class] = new QueryDepth($this->get('depth'));
+        }
+        if ($this->get('complexity')) {
+          $rules[QueryComplexity::class] = new QueryComplexity($this->get('complexity'));
+        }
+      }
+
+      return $rules;
     };
   }
 

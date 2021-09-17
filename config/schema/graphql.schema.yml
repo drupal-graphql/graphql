@@ -23,6 +23,18 @@ graphql.graphql_servers.*:
     batching:
       type: boolean
       label: 'Batching'
+    disable_introspection:
+      type: boolean
+      label: 'Disable Introspection'
+    depth:
+      type: number
+      label: 'Max query depth'
+    complexity:
+      type: number
+      label: 'Max query complexity'
+    bypass_validation_token:
+      type: string
+      label: 'Bypass validation token'
     schema_configuration:
       type: 'graphql.schema.[%parent.schema]'
     persisted_queries_settings:
