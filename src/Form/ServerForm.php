@@ -186,6 +186,39 @@ class ServerForm extends EntityForm {
       '#description' => $this->t('Whether caching of queries and partial results is enabled.'),
     ];
 
+    $form['validation'] = [
+      '#title' => $this->t('Validation rules'),
+      '#type' => 'fieldset',
+    ];
+
+    $form['validation']['disable_introspection'] = [
+      '#title' => $this->t('Disable introspection'),
+      '#type' => 'checkbox',
+      '#default_value' => !!$server->get('disable_introspection'),
+      '#description' => $this->t('Whether introspection should be disabled.'),
+    ];
+
+    $form['validation']['depth'] = [
+      '#title' => $this->t('Max query depth'),
+      '#type' => 'number',
+      '#default_value' => $server->get('depth'),
+      '#description' => $this->t('The maximum allowed depth of nested queries. Leave empty to set unlimited.'),
+    ];
+
+    $form['validation']['complexity'] = [
+      '#title' => $this->t('Max query complexity'),
+      '#default_value' => $server->get('complexity'),
+      '#type' => 'number',
+      '#description' => $this->t('The maximum allowed complexity of a query. Leave empty to set unlimited.'),
+    ];
+
+    $form['validation']['bypass_validation_token'] = [
+      '#title' => $this->t('Bypass validation token'),
+      '#default_value' => $server->get('bypass_validation_token'),
+      '#type' => 'textfield',
+      '#description' => $this->t('A string token that can be used as the "bypass_validation" parameter when doing a GraphQL request. This bypasses the above validation rules. Could be used when generating types for front-end applications.'),
+    ];
+
     $debug_flags = $server->get('debug_flag') ?? 0;
     $form['debug_flag'] = [
       '#title' => $this->t('Debug settings'),
