@@ -241,17 +241,20 @@ class FileUpload {
       $file->setOwnerId($this->currentUser->id());
       $file->setFilename($prepared_filename);
       $file->setMimeType($this->mimeTypeGuesser->guess($prepared_filename));
-      $file->setFileUri($file_uri);
+      $file->setFileUri($temp_file_path);
       // Set the size. This is done in File::preSave() but we validate the file
       // before it is saved.
       $file->setSize(@filesize($temp_file_path));
 
-      // Validate the file entity against entity-level validation and
-      // field-level validators.
-      if (!$this->validate($file, $validators, $response)) {
+      // Validate against file_validate() first with the temporary path.
+      $errors = file_validate($file, $validators);
+
+      if (!empty($errors)) {
+        $response->addViolations($errors);
         return $response;
       }
 
+      $file->setFileUri($file_uri);
       // Move the file to the correct location after validation. Use
       // FileSystemInterface::EXISTS_ERROR as the file location has already been
       // determined above in FileSystem::getDestinationFilename().
@@ -266,6 +269,12 @@ class FileUpload {
           '@file' => $uploaded_file->getRealPath(),
           '@destination' => $file->getFileUri(),
         ]);
+        return $response;
+      }
+
+      // Validate the file entity against entity-level validation now after the
+      // file has moved.
+      if (!$this->validate($file, $validators, $response)) {
         return $response;
       }
 
@@ -345,14 +354,6 @@ class FileUpload {
         $response->addViolation($violation->getMessage());
         return FALSE;
       }
-    }
-
-    // Validate the file based on the field definition configuration.
-    $errors = file_validate($file, $validators);
-
-    if (!empty($errors)) {
-      $response->addViolations($errors);
-      return FALSE;
     }
 
     return TRUE;
