@@ -35,7 +35,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     ),
  *     "language" = @ContextDefinition("string",
  *       label = @Translation("Language"),
- *       multiple = TRUE,
  *       required = FALSE
  *     ),
  *     "bundle" = @ContextDefinition("string",
