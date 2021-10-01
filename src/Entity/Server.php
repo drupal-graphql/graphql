@@ -25,6 +25,9 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\Helper;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
 
 /**
  * The main GraphQL configuration and request entry point.
@@ -59,7 +62,10 @@ use GraphQL\Validator\DocumentValidator;
  *     "endpoint",
  *     "debug_flag",
  *     "caching",
- *     "batching"
+ *     "batching",
+ *     "disable_introspection",
+ *     "query_depth",
+ *     "query_complexity"
  *   },
  *   links = {
  *     "collection" = "/admin/config/graphql/servers",
@@ -498,8 +504,67 @@ class Server extends ConfigEntityBase implements ServerInterface {
         return [];
       }
 
-      return array_values(DocumentValidator::defaultRules());
+      $rules = array_values(DocumentValidator::defaultRules());
+      if ($this->getDisableIntrospection()) {
+        $rules[DisableIntrospection::class] = new DisableIntrospection();
+      }
+      if ($this->getQueryDepth()) {
+        $rules[QueryDepth::class] = new QueryDepth($this->query_depth);
+      }
+      if ($this->getQueryComplexity()) {
+        $rules[QueryComplexity::class] = new QueryComplexity($this->query_complexity);
+      }
+
+      return $rules;
     };
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDisableIntrospection() {
+    return (bool) $this->get('disable_introspection');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDisableIntrospection($introspection) {
+    $this->set('disable_introspection', $introspection);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getQueryDepth() {
+    return $this->get('query_depth');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setQueryDepth($depth) {
+    $this->set('query_depth', $depth);
+    return $this;
+  }
+
+  /**
+   * Gets query complexity config.
+   *
+   * @return int|null
+   *   The query complexity, NULL otherwise.
+   */
+  public function getQueryComplexity() {
+    return $this->get('query_complexity');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setQueryComplexity($complexity) {
+    $this->set('query_complexity', $complexity);
+    return $this;
   }
 
   /**
