@@ -439,7 +439,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function processFields(array $fields) {
-    return array_map([$this, 'buildField'], $fields);
+    $processFields = array_map([$this, 'buildField'], $fields);
+    foreach($processFields as $key => $processField) {
+      if($processField === false) {
+        unset($processFields[$key]);
+      }
+    }
+    return $processFields;
   }
 
   /**
@@ -506,6 +512,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The field definition.
    */
   protected function buildField($field) {
+    $exceptions = array('layout_section', 'shipment_item');
+    $inArray = in_array($field['definition']['type'][0], $exceptions);
+    
+    if($inArray) {
+      return false;
+    }
+
     if (!isset($this->fields[$field['id']])) {
       $creator = [$field['class'], 'createInstance'];
       $this->fields[$field['id']] = $creator($this, $this->fieldManager, $field['definition'], $field['id']);
