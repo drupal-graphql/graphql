@@ -520,31 +520,47 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets disable introspection config.
+   *
+   * @return bool
+   *   The disable introspection config, FALSE otherwise.
    */
-  public function getDisableIntrospection() {
+  public function getDisableIntrospection(): bool {
     return (bool) $this->get('disable_introspection');
   }
 
   /**
-   * {@inheritdoc}
+   * Sets disable introspection config.
+   *
+   * @param bool $introspection
+   *   The value for the disable introspection config.
+   *
+   * @return $this
    */
-  public function setDisableIntrospection($introspection) {
+  public function setDisableIntrospection(bool $introspection) {
     $this->set('disable_introspection', $introspection);
     return $this;
   }
 
   /**
-   * {@inheritdoc}
+   * Gets query depth config.
+   *
+   * @return int|null
+   *   The query depth, NULL otherwise.
    */
-  public function getQueryDepth() {
-    return $this->get('query_depth');
+  public function getQueryDepth(): ?int {
+    return (int) $this->get('query_depth');
   }
 
   /**
-   * {@inheritdoc}
+   * Sets query depth config.
+   *
+   * @param int $depth
+   *   The value for the query depth config.
+   *
+   * @return $this
    */
-  public function setQueryDepth($depth) {
+  public function setQueryDepth(int $depth) {
     $this->set('query_depth', $depth);
     return $this;
   }
@@ -555,14 +571,19 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return int|null
    *   The query complexity, NULL otherwise.
    */
-  public function getQueryComplexity() {
-    return $this->get('query_complexity');
+  public function getQueryComplexity(): ?int {
+    return (int) $this->get('query_complexity');
   }
 
   /**
-   * {@inheritdoc}
+   * Sets query complexity config.
+   *
+   * @param int $complexity
+   *   The value for the query complexity config.
+   *
+   * @return $this
    */
-  public function setQueryComplexity($complexity) {
+  public function setQueryComplexity(int $complexity) {
     $this->set('query_complexity', $complexity);
     return $this;
   }

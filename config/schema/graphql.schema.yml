@@ -30,7 +30,7 @@ graphql.graphql_servers.*:
       type: integer
       label: 'Max query depth'
     query_complexity:
-      type: number
+      type: integer
       label: 'Max query complexity'
     schema_configuration:
       type: 'graphql.schema.[%parent.schema]'
