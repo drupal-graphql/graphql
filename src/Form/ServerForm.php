@@ -87,7 +87,7 @@ class ServerForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $formState): array {
     $form = parent::form($form, $formState);
-    /** @var \Drupal\graphql\Entity\Server $server */
+    /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
     $schemas = array_map(function ($definition) {
       return $definition['name'] ?? $definition['id'];
