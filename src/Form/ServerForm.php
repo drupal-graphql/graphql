@@ -194,20 +194,20 @@ class ServerForm extends EntityForm {
     $form['validation']['disable_introspection'] = [
       '#title' => $this->t('Disable introspection'),
       '#type' => 'checkbox',
-      '#default_value' => $server->getDisableIntrospection(),
+      '#default_value' => $server->get('disable_introspection'),
       '#description' => $this->t('Security rule: Whether introspection should be disabled.'),
     ];
 
     $form['validation']['query_depth'] = [
       '#title' => $this->t('Max query depth'),
       '#type' => 'number',
-      '#default_value' => $server->getQueryDepth(),
+      '#default_value' => $server->get('query_depth'),
       '#description' => $this->t('Security rule: The maximum allowed depth of nested queries. Leave empty to set unlimited.'),
     ];
 
     $form['validation']['query_complexity'] = [
       '#title' => $this->t('Max query complexity'),
-      '#default_value' => $server->getQueryComplexity(),
+      '#default_value' => $server->get('query_complexity'),
       '#type' => 'number',
       '#description' => $this->t('Security rule: The maximum allowed complexity of a query. Leave empty to set unlimited.'),
     ];

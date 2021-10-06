@@ -506,13 +506,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
       $rules = array_values(DocumentValidator::defaultRules());
       if ($this->getDisableIntrospection()) {
-        $rules[DisableIntrospection::class] = new DisableIntrospection();
+        $rules[] = new DisableIntrospection();
       }
       if ($this->getQueryDepth()) {
-        $rules[QueryDepth::class] = new QueryDepth($this->query_depth);
+        $rules[] = new QueryDepth($this->getQueryDepth());
       }
       if ($this->getQueryComplexity()) {
-        $rules[QueryComplexity::class] = new QueryComplexity($this->query_complexity);
+        $rules[] = new QueryComplexity($this->getQueryComplexity());
       }
 
       return $rules;
@@ -555,12 +555,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Sets query depth config.
    *
-   * @param int $depth
+   * @param int|null $depth
    *   The value for the query depth config.
    *
    * @return $this
    */
-  public function setQueryDepth(int $depth) {
+  public function setQueryDepth(?int $depth) {
     $this->set('query_depth', $depth);
     return $this;
   }
@@ -578,12 +578,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Sets query complexity config.
    *
-   * @param int $complexity
+   * @param int|null $complexity
    *   The value for the query complexity config.
    *
    * @return $this
    */
-  public function setQueryComplexity(int $complexity) {
+  public function setQueryComplexity(?int $complexity) {
     $this->set('query_complexity', $complexity);
     return $this;
   }
