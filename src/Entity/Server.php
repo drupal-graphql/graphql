@@ -130,6 +130,27 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $batching = TRUE;
 
   /**
+   * Whether to disable query introspection.
+   *
+   * @var bool
+   */
+  public $disable_introspection = FALSE;
+
+  /**
+   * The query complexity.
+   *
+   * @var int|null
+   */
+  public $query_complexity = NULL;
+
+  /**
+   * The query depth.
+   *
+   * @var int|null
+   */
+  public $query_depth = NULL;
+
+  /**
    * The server's endpoint.
    *
    * @var string
@@ -142,7 +163,6 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var array
    */
   public $persisted_queries_settings = [];
-
 
   /**
    * Persisted query plugin instances available on this server.
@@ -526,7 +546,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *   The disable introspection config, FALSE otherwise.
    */
   public function getDisableIntrospection(): bool {
-    return (bool) $this->get('disable_introspection');
+    return (bool) $this->disable_introspection;
   }
 
   /**
@@ -538,7 +558,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return $this
    */
   public function setDisableIntrospection(bool $introspection) {
-    $this->set('disable_introspection', $introspection);
+    $this->disable_introspection = $introspection;
     return $this;
   }
 
@@ -549,7 +569,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *   The query depth, NULL otherwise.
    */
   public function getQueryDepth(): ?int {
-    return (int) $this->get('query_depth');
+    return (int) $this->query_depth;
   }
 
   /**
@@ -561,7 +581,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return $this
    */
   public function setQueryDepth(?int $depth) {
-    $this->set('query_depth', $depth);
+    $this->query_depth = $depth;
     return $this;
   }
 
@@ -572,7 +592,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *   The query complexity, NULL otherwise.
    */
   public function getQueryComplexity(): ?int {
-    return (int) $this->get('query_complexity');
+    return (int) $this->query_complexity;
   }
 
   /**
@@ -584,7 +604,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return $this
    */
   public function setQueryComplexity(?int $complexity) {
-    $this->set('query_complexity', $complexity);
+    $this->query_complexity = $complexity;
     return $this;
   }
 
