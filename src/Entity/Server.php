@@ -137,14 +137,14 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $disable_introspection = FALSE;
 
   /**
-   * The query complexity.
+   * The maximum allowed query complexity. NULL means unlimited.
    *
    * @var int|null
    */
   public $query_complexity = NULL;
 
   /**
-   * The query depth.
+   * The maximum allowed query depth. NULL means unlimited.
    *
    * @var int|null
    */
