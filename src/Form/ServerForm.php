@@ -186,6 +186,32 @@ class ServerForm extends EntityForm {
       '#description' => $this->t('Whether caching of queries and partial results is enabled.'),
     ];
 
+    $form['validation'] = [
+      '#title' => $this->t('Validation rules'),
+      '#type' => 'fieldset',
+    ];
+
+    $form['validation']['disable_introspection'] = [
+      '#title' => $this->t('Disable introspection'),
+      '#type' => 'checkbox',
+      '#default_value' => $server->get('disable_introspection'),
+      '#description' => $this->t('Security rule: Whether introspection should be disabled.'),
+    ];
+
+    $form['validation']['query_depth'] = [
+      '#title' => $this->t('Max query depth'),
+      '#type' => 'number',
+      '#default_value' => $server->get('query_depth'),
+      '#description' => $this->t('Security rule: The maximum allowed depth of nested queries. Leave empty to set unlimited.'),
+    ];
+
+    $form['validation']['query_complexity'] = [
+      '#title' => $this->t('Max query complexity'),
+      '#default_value' => $server->get('query_complexity'),
+      '#type' => 'number',
+      '#description' => $this->t('Security rule: The maximum allowed complexity of a query. Leave empty to set unlimited.'),
+    ];
+
     $debug_flags = $server->get('debug_flag') ?? 0;
     $form['debug_flag'] = [
       '#title' => $this->t('Debug settings'),

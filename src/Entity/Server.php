@@ -25,6 +25,9 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\Helper;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
 
 /**
  * The main GraphQL configuration and request entry point.
@@ -59,7 +62,10 @@ use GraphQL\Validator\DocumentValidator;
  *     "endpoint",
  *     "debug_flag",
  *     "caching",
- *     "batching"
+ *     "batching",
+ *     "disable_introspection",
+ *     "query_depth",
+ *     "query_complexity"
  *   },
  *   links = {
  *     "collection" = "/admin/config/graphql/servers",
@@ -124,6 +130,27 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $batching = TRUE;
 
   /**
+   * Whether to disable query introspection.
+   *
+   * @var bool
+   */
+  public $disable_introspection = FALSE;
+
+  /**
+   * The query complexity.
+   *
+   * @var int|null
+   */
+  public $query_complexity = NULL;
+
+  /**
+   * The query depth.
+   *
+   * @var int|null
+   */
+  public $query_depth = NULL;
+
+  /**
    * The server's endpoint.
    *
    * @var string
@@ -136,7 +163,6 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @var array
    */
   public $persisted_queries_settings = [];
-
 
   /**
    * Persisted query plugin instances available on this server.
@@ -498,8 +524,88 @@ class Server extends ConfigEntityBase implements ServerInterface {
         return [];
       }
 
-      return array_values(DocumentValidator::defaultRules());
+      $rules = array_values(DocumentValidator::defaultRules());
+      if ($this->getDisableIntrospection()) {
+        $rules[] = new DisableIntrospection();
+      }
+      if ($this->getQueryDepth()) {
+        $rules[] = new QueryDepth($this->getQueryDepth());
+      }
+      if ($this->getQueryComplexity()) {
+        $rules[] = new QueryComplexity($this->getQueryComplexity());
+      }
+
+      return $rules;
     };
+  }
+
+  /**
+   * Gets disable introspection config.
+   *
+   * @return bool
+   *   The disable introspection config, FALSE otherwise.
+   */
+  public function getDisableIntrospection(): bool {
+    return (bool) $this->disable_introspection;
+  }
+
+  /**
+   * Sets disable introspection config.
+   *
+   * @param bool $introspection
+   *   The value for the disable introspection config.
+   *
+   * @return $this
+   */
+  public function setDisableIntrospection(bool $introspection) {
+    $this->disable_introspection = $introspection;
+    return $this;
+  }
+
+  /**
+   * Gets query depth config.
+   *
+   * @return int|null
+   *   The query depth, NULL otherwise.
+   */
+  public function getQueryDepth(): ?int {
+    return (int) $this->query_depth;
+  }
+
+  /**
+   * Sets query depth config.
+   *
+   * @param int|null $depth
+   *   The value for the query depth config.
+   *
+   * @return $this
+   */
+  public function setQueryDepth(?int $depth) {
+    $this->query_depth = $depth;
+    return $this;
+  }
+
+  /**
+   * Gets query complexity config.
+   *
+   * @return int|null
+   *   The query complexity, NULL otherwise.
+   */
+  public function getQueryComplexity(): ?int {
+    return (int) $this->query_complexity;
+  }
+
+  /**
+   * Sets query complexity config.
+   *
+   * @param int|null $complexity
+   *   The value for the query complexity config.
+   *
+   * @return $this
+   */
+  public function setQueryComplexity(?int $complexity) {
+    $this->query_complexity = $complexity;
+    return $this;
   }
 
   /**
