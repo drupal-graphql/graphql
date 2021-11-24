@@ -135,7 +135,14 @@ GQL;
     $request = Request::create($endpoint, 'GET', $parameters);
     $result = $this->container->get('http_kernel')->handle($request);
     $this->assertSame(200, $result->getStatusCode());
-    $this->assertSame(['errors' => [['message' => 'PersistedQueryNotFound', 'extensions' => ['category' => 'request']]]], json_decode($result->getContent(), TRUE));
+    $this->assertSame([
+      'errors' => [
+        [
+          'message' => 'PersistedQueryNotFound',
+          'extensions' => ['category' => 'request'],
+        ],
+      ],
+    ], json_decode($result->getContent(), TRUE));
 
     // Post query to endpoint.
     $content = json_encode(['query' => 'query { field_one } '] + $parameters);
