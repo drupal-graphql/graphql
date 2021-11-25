@@ -119,7 +119,7 @@ services:
   # Cache the queries to be persistent.
   graphql.apq_subscriber:
     class: Drupal\graphql\EventSubscriber\ApqSubscriber
-    arguments: ['@cache.graphql.apq', '@request_stack']
+    arguments: ['@cache.graphql.apq']
     tags:
       - { name: event_subscriber }
 
