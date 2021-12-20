@@ -377,7 +377,7 @@ class EntityTest extends GraphQLTestBase {
 
     // @todo Add metadata check.
     // $this->assertContains('node:1', $metadata->getCacheTags());
-    $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    $this->assertMatchesRegularExpression('#<a href="/node/1" rel="bookmark">\s*<span>' . $this->node->getTitle() . '</span>#', $result);
   }
 
 }
