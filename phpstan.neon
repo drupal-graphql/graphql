@@ -46,6 +46,13 @@ parameters:
     - """
       #^Call to deprecated function file_munge_filename\\(\\)#
       """
+    - """
+      #^Call to deprecated function drupal_get_path\\(\\)#
+      """
+    - """
+      #^Call to deprecated function file_create_url\\(\\)#
+      """
+    - "#^Call to an undefined method Drupal\\\\Tests\\\\graphql\\\\Kernel\\\\DataProducer\\\\EntityTest\\:\\:assertMatchesRegularExpression\\(\\)\\.$#"
     # Drupal allows object property access to custom fields, so we cannot fix
     # that.
     - "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
