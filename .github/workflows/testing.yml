@@ -103,7 +103,7 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          cd modules/graphql && ../../vendor/bin/phpstan analyse
+          cd modules/graphql && ../../vendor/bin/phpstan analyse --debug
 
       - name: Run PHPCS
         run: |
