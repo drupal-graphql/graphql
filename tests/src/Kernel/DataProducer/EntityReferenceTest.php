@@ -10,7 +10,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 use Drupal\user\UserInterface;
-use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 
 /**
  * Data producers Field test class.
@@ -19,7 +18,6 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
  */
 class EntityReferenceTest extends GraphQLTestBase {
   use EntityReferenceTestTrait;
-  use QueryResultAssertionTrait;
 
   /**
    * {@inheritdoc}

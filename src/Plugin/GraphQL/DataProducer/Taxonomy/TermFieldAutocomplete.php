@@ -75,14 +75,14 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
   /**
    * The term storage.
    *
-   * @var \Drupal\taxonomy\TermStorageInterface
+   * @var \Drupal\taxonomy\TermStorageInterface|null
    */
   protected $termStorage;
 
   /**
    * The term type.
    *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
+   * @var \Drupal\Core\Entity\ContentEntityTypeInterface|null
    */
   protected $termType;
 

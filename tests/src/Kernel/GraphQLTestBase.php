@@ -27,6 +27,13 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use UserCreationTrait;
 
   /**
+   * The server under test.
+   *
+   * @var \Drupal\graphql\Entity\Server|null
+   */
+  protected $server;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [

@@ -33,7 +33,7 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
   /**
    * The current execution context.
    *
-   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
+   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext|null
    */
   protected static $context;
 
