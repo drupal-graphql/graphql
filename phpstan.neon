@@ -101,6 +101,21 @@ parameters:
       path: src/Plugin/SchemaExtensionPluginInterface.php
 
     -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:addPersistedQueryInstance\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removeAllPersistedQueryInstances\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
       message: "#^Unable to resolve the template type ExpectedType in call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\)$#"
       count: 1
       path: tests/src/Kernel/ResolverBuilderTest.php
