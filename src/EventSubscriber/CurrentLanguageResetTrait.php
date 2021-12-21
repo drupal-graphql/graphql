@@ -19,7 +19,7 @@ trait CurrentLanguageResetTrait {
   /**
    * The language negotiator.
    *
-   * @var \Drupal\language\LanguageNegotiatorInterface
+   * @var \Drupal\language\LanguageNegotiatorInterface|null
    */
   protected $languageNegotiator;
 
