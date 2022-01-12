@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Data producers Routing test class.
@@ -22,11 +21,11 @@ class RoutingTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules =[
+  protected static $modules = [
     'redirect',
     'path_alias',
     'views',
-    ];
+  ];
 
   /**
    * {@inheritdoc}
@@ -74,7 +73,7 @@ class RoutingTest extends GraphQLTestBase {
 
     $result = $this->executeDataProducer('route_load', [
       'path' => '/redirect-url',
-      'language' => 'de'
+      'language' => 'de',
     ]);
 
     $this->assertNotNull($result);
