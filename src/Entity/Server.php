@@ -7,9 +7,11 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Utility\Error as ErrorUtil;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
+use GraphQL\Error\ClientAware;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Server\OperationParams;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -210,6 +212,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
       Executor::setImplementationFactory($previous);
     }
 
+    $this->logErrors($operation, $result);
+
     return $result;
   }
 
@@ -395,6 +399,50 @@ class Server extends ConfigEntityBase implements ServerInterface {
     return function (array $errors, callable $formatter) {
       return array_map($formatter, $errors);
     };
+  }
+
+  /**
+   * Logs result errors if any.
+   *
+   * @param \GraphQL\Server\OperationParams $operation
+   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
+   *
+   * @return void
+   */
+  protected function logErrors(OperationParams $operation, CacheableExecutionResult $result) {
+    if (empty($result->errors)) {
+      return;
+    }
+
+    $unsafeErrors = array_filter($result->errors, function ($e) {
+      return !($e instanceof ClientAware) || ! $e->isClientSafe();
+    });
+    $isPreviousErrorLogged = FALSE;
+    foreach ($unsafeErrors as $error) {
+      if ($error->getPrevious() instanceof \Throwable) {
+        _drupal_log_error(ErrorUtil::decodeException($error->getPrevious()));
+        $isPreviousErrorLogged = TRUE;
+      }
+    }
+
+    if ($unsafeErrors) {
+      \Drupal::logger('graphql')->error(
+        "There were errors during a GraphQL execution.\n{see_previous}\nDebug:\n<pre>\n{debug}\n</pre>",
+        [
+          'see_previous' => $isPreviousErrorLogged
+            ? 'See the previous log messages for the error details.'
+            : '',
+          'debug' => json_encode([
+            '$operation' => $operation,
+            // Do not pass $result to json_encode because it implements
+            // JsonSerializable and strips some data out during the serialization.
+            '$result->data' => $result->data,
+            '$result->errors' => $result->errors,
+            '$result->extensions' => $result->extensions,
+          ], JSON_PRETTY_PRINT),
+        ]
+      );
+    }
   }
 
   /**
