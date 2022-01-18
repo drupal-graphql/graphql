@@ -406,16 +406,14 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @param \GraphQL\Server\OperationParams $operation
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
-   *
-   * @return void
    */
-  protected function logErrors(OperationParams $operation, CacheableExecutionResult $result) {
+  protected function logErrors(OperationParams $operation, CacheableExecutionResult $result): void {
     if (empty($result->errors)) {
       return;
     }
 
     $unsafeErrors = array_filter($result->errors, function ($e) {
-      return !($e instanceof ClientAware) || ! $e->isClientSafe();
+      return !($e instanceof ClientAware) || !$e->isClientSafe();
     });
     $isPreviousErrorLogged = FALSE;
     foreach ($unsafeErrors as $error) {
@@ -429,13 +427,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
       \Drupal::logger('graphql')->error(
         "There were errors during a GraphQL execution.\n{see_previous}\nDebug:\n<pre>\n{debug}\n</pre>",
         [
-          'see_previous' => $isPreviousErrorLogged
-            ? 'See the previous log messages for the error details.'
-            : '',
+          'see_previous' => $isPreviousErrorLogged ? 'See the previous log messages for the error details.' : '',
           'debug' => json_encode([
             '$operation' => $operation,
             // Do not pass $result to json_encode because it implements
-            // JsonSerializable and strips some data out during the serialization.
+            // JsonSerializable and strips some data out during the
+            // serialization.
             '$result->data' => $result->data,
             '$result->errors' => $result->errors,
             '$result->extensions' => $result->extensions,
