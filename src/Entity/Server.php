@@ -212,7 +212,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
       Executor::setImplementationFactory($previous);
     }
 
-    $this->logErrors($operation, $result);
+    $this->logUnsafeErrors($operation, $result);
 
     return $result;
   }
@@ -402,12 +402,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * Logs result errors if any.
+   * Logs unsafe errors if any.
    *
    * @param \GraphQL\Server\OperationParams $operation
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    */
-  protected function logErrors(OperationParams $operation, CacheableExecutionResult $result): void {
+  protected function logUnsafeErrors(OperationParams $operation, CacheableExecutionResult $result): void {
     $hasServerErrors = FALSE;
     $hasLoggedPrevious = FALSE;
 
