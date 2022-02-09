@@ -408,26 +408,31 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    */
   protected function logErrors(OperationParams $operation, CacheableExecutionResult $result): void {
-    if (empty($result->errors)) {
-      return;
-    }
+    $hasServerErrors = FALSE;
+    $hasLoggedPrevious = FALSE;
 
-    $unsafeErrors = array_filter($result->errors, function ($e) {
-      return !($e instanceof ClientAware) || !$e->isClientSafe();
-    });
-    $isPreviousErrorLogged = FALSE;
-    foreach ($unsafeErrors as $error) {
+    foreach ($result->errors as $error) {
+      // Don't log errors intended for clients, only log those that
+      // a client would not be able to solve, they'd require work from
+      // a server developer.
+      if ($error instanceof ClientAware && $error->isClientSafe()) {
+        continue;
+      }
+
+      $hasServerErrors = TRUE;
+      // Log the error that cause the error we caught. This makes the error
+      // logs more useful because GraphQL usually wraps the original error.
       if ($error->getPrevious() instanceof \Throwable) {
         _drupal_log_error(ErrorUtil::decodeException($error->getPrevious()));
-        $isPreviousErrorLogged = TRUE;
+        $hasLoggedPrevious = TRUE;
       }
     }
 
-    if ($unsafeErrors) {
+    if ($hasServerErrors) {
       \Drupal::logger('graphql')->error(
         "There were errors during a GraphQL execution.\n{see_previous}\nDebug:\n<pre>\n{debug}\n</pre>",
         [
-          'see_previous' => $isPreviousErrorLogged ? 'See the previous log messages for the error details.' : '',
+          'see_previous' => $hasLoggedPrevious ? 'See the previous log messages for the error details.' : '',
           'debug' => json_encode([
             '$operation' => $operation,
             // Do not pass $result to json_encode because it implements
