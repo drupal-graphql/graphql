@@ -409,9 +409,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function logUnsafeErrors(OperationParams $operation, CacheableExecutionResult $result): void {
     $hasServerErrors = FALSE;
-    $hasLoggedPrevious = FALSE;
+    $previousExceptions = [];
 
-    foreach ($result->errors as $error) {
+    foreach ($result->errors as $index => $error) {
       // Don't log errors intended for clients, only log those that
       // a client would not be able to solve, they'd require work from
       // a server developer.
@@ -423,16 +423,17 @@ class Server extends ConfigEntityBase implements ServerInterface {
       // Log the error that cause the error we caught. This makes the error
       // logs more useful because GraphQL usually wraps the original error.
       if ($error->getPrevious() instanceof \Throwable) {
-        _drupal_log_error(ErrorUtil::decodeException($error->getPrevious()));
-        $hasLoggedPrevious = TRUE;
+        $previousExceptions[] = strtr(
+          "For error #@index: %type: @message in %function (line %line of %file)\n@backtrace_string.",
+          ErrorUtil::decodeException($error->getPrevious()) + ['@index' => $index]
+        );
       }
     }
 
     if ($hasServerErrors) {
       \Drupal::logger('graphql')->error(
-        "There were errors during a GraphQL execution.\n{see_previous}\nDebug:\n<pre>\n{debug}\n</pre>",
+        "There were errors during a GraphQL execution.\nOperation details:\n<pre>\n{debug}\n</pre>\nPrevious exceptions:\n<pre>\n{previous}\n</pre>",
         [
-          'see_previous' => $hasLoggedPrevious ? 'See the previous log messages for the error details.' : '',
           'debug' => json_encode([
             '$operation' => $operation,
             // Do not pass $result to json_encode because it implements
@@ -442,6 +443,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
             '$result->errors' => $result->errors,
             '$result->extensions' => $result->extensions,
           ], JSON_PRETTY_PRINT),
+          'previous' => implode('\n\n', $previousExceptions),
         ]
       );
     }
