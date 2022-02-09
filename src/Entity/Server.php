@@ -408,7 +408,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    */
   protected function logUnsafeErrors(OperationParams $operation, CacheableExecutionResult $result): void {
-    $hasServerErrors = FALSE;
+    $hasUnsafeErrors = FALSE;
     $previousExceptions = [];
 
     foreach ($result->errors as $index => $error) {
@@ -419,7 +419,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
         continue;
       }
 
-      $hasServerErrors = TRUE;
+      $hasUnsafeErrors = TRUE;
       // Log the error that cause the error we caught. This makes the error
       // logs more useful because GraphQL usually wraps the original error.
       if ($error->getPrevious() instanceof \Throwable) {
@@ -430,7 +430,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
       }
     }
 
-    if ($hasServerErrors) {
+    if ($hasUnsafeErrors) {
       \Drupal::logger('graphql')->error(
         "There were errors during a GraphQL execution.\nOperation details:\n<pre>\n{debug}\n</pre>\nPrevious exceptions:\n<pre>\n{previous}\n</pre>",
         [
