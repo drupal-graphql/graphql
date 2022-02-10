@@ -7,11 +7,9 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Utility\Error as ErrorUtil;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
-use GraphQL\Error\ClientAware;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Server\OperationParams;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -212,8 +210,6 @@ class Server extends ConfigEntityBase implements ServerInterface {
       Executor::setImplementationFactory($previous);
     }
 
-    $this->logUnsafeErrors($operation, $result);
-
     return $result;
   }
 
@@ -399,54 +395,6 @@ class Server extends ConfigEntityBase implements ServerInterface {
     return function (array $errors, callable $formatter) {
       return array_map($formatter, $errors);
     };
-  }
-
-  /**
-   * Logs unsafe errors if any.
-   *
-   * @param \GraphQL\Server\OperationParams $operation
-   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
-   */
-  protected function logUnsafeErrors(OperationParams $operation, CacheableExecutionResult $result): void {
-    $hasUnsafeErrors = FALSE;
-    $previousExceptions = [];
-
-    foreach ($result->errors as $index => $error) {
-      // Don't log errors intended for clients, only log those that
-      // a client would not be able to solve, they'd require work from
-      // a server developer.
-      if ($error instanceof ClientAware && $error->isClientSafe()) {
-        continue;
-      }
-
-      $hasUnsafeErrors = TRUE;
-      // Log the error that cause the error we caught. This makes the error
-      // logs more useful because GraphQL usually wraps the original error.
-      if ($error->getPrevious() instanceof \Throwable) {
-        $previousExceptions[] = strtr(
-          "For error #@index: %type: @message in %function (line %line of %file)\n@backtrace_string.",
-          ErrorUtil::decodeException($error->getPrevious()) + ['@index' => $index]
-        );
-      }
-    }
-
-    if ($hasUnsafeErrors) {
-      \Drupal::logger('graphql')->error(
-        "There were errors during a GraphQL execution.\nOperation details:\n<pre>\n{debug}\n</pre>\nPrevious exceptions:\n<pre>\n{previous}\n</pre>",
-        [
-          'debug' => json_encode([
-            '$operation' => $operation,
-            // Do not pass $result to json_encode because it implements
-            // JsonSerializable and strips some data out during the
-            // serialization.
-            '$result->data' => $result->data,
-            '$result->errors' => $result->errors,
-            '$result->extensions' => $result->extensions,
-          ], JSON_PRETTY_PRINT),
-          'previous' => implode('\n\n', $previousExceptions),
-        ]
-      );
-    }
   }
 
   /**
