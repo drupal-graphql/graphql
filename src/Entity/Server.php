@@ -526,6 +526,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
         return [];
       }
 
+      // PHPStan thinks this is unreachable code because of the wrongly
+      // documented $params->queryId.
+      // @phpstan-ignore-next-line
       $rules = array_values(DocumentValidator::defaultRules());
       if ($this->getDisableIntrospection()) {
         $rules[] = new DisableIntrospection();
