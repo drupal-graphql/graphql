@@ -50,6 +50,9 @@ GQL;
     $this->container->get('logger.factory')->addLogger($this);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function log($level, $message, array $context = []) {
     $this->loggerCalls[] = [
       'level' => $level,
