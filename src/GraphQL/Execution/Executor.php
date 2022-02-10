@@ -6,15 +6,18 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Utility\Error as ErrorUtil;
 use Drupal\graphql\Event\OperationEvent;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Utility\DocumentSerializer;
+use GraphQL\Error\ClientAware;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Executor\ExecutorImplementation;
 use GraphQL\Executor\Promise\Promise;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Executor\ReferenceExecutor;
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -280,8 +283,58 @@ class Executor implements ExecutorImplementation {
       $event = new OperationEvent($this->context, $result);
       $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
 
+      $this->logUnsafeErrors($this->context->getOperation(), $result);
+
       return $result;
     });
+  }
+
+  /**
+   * Logs unsafe errors if any.
+   *
+   * @param \GraphQL\Server\OperationParams $operation
+   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
+   */
+  protected function logUnsafeErrors(OperationParams $operation, ExecutionResult $result): void {
+    $hasUnsafeErrors = FALSE;
+    $previousErrors = [];
+
+    foreach ($result->errors as $index => $error) {
+      // Don't log errors intended for clients, only log those that
+      // a client would not be able to solve, they'd require work from
+      // a server developer.
+      if ($error instanceof ClientAware && $error->isClientSafe()) {
+        continue;
+      }
+
+      $hasUnsafeErrors = TRUE;
+      // Log the error that cause the error we caught. This makes the error
+      // logs more useful because GraphQL usually wraps the original error.
+      if ($error->getPrevious() instanceof \Throwable) {
+        $previousErrors[] = strtr(
+          "For error #@index: %type: @message in %function (line %line of %file)\n@backtrace_string.",
+          ErrorUtil::decodeException($error->getPrevious()) + ['@index' => $index]
+        );
+      }
+    }
+
+    if ($hasUnsafeErrors) {
+      \Drupal::logger('graphql')->error(
+        "There were errors during a GraphQL execution.\nOperation details:\n<pre>\n{details}\n</pre>\nPrevious errors:\n<pre>\n{previous}\n</pre>",
+        [
+          'details' => json_encode([
+            '$operation' => $operation,
+            // Do not pass $result to json_encode because it implements
+            // JsonSerializable and strips some data out during the
+            // serialization.
+            '$result->data' => $result->data,
+            '$result->errors' => $result->errors,
+            '$result->extensions' => $result->extensions,
+          ], JSON_PRETTY_PRINT),
+          'previous' => implode('\n\n', $previousErrors),
+        ]
+      );
+    }
   }
 
   /**
