@@ -70,6 +70,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
     $this->installEntitySchema('graphql_server');
     $this->installEntitySchema('configurable_language');
     $this->installConfig(['language']);
+    $this->installEntitySchema('menu_link_content');
 
     $this->setUpCurrentUser([], $this->userPermissions());
 
