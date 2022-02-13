@@ -91,7 +91,7 @@ jobs:
         run: |
           mkdir coder
           cd coder
-          composer require drupal/coder:8.3.12 --no-interaction --no-progress
+          composer require drupal/coder:8.3.14 --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: |
@@ -106,5 +106,4 @@ jobs:
 
       - name: Run PHPCS
         run: |
-          ./coder/vendor/bin/phpcs --config-set installed_paths ../../drupal/coder/coder_sniffer
           cd modules/graphql && ../../coder/vendor/bin/phpcs -p
