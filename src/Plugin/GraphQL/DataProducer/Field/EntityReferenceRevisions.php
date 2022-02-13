@@ -170,7 +170,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       });
     }
 
-    return NULL;
+    return [];
   }
 
 }
