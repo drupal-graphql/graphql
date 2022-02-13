@@ -14,7 +14,7 @@ class ImageResourceUrlTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Images\ImageResourceUrl::resolve
    *
-   * @dataProvider testImageResourceUrlProvider
+   * @dataProvider imageResourceUrlProvider
    */
   public function testImageResourceUrl(array $input, string $expected): void {
     $result = $this->executeDataProducer('image_style_url', [
@@ -27,7 +27,7 @@ class ImageResourceUrlTest extends GraphQLTestBase {
   /**
    * Provider for testImageResourceUrl().
    */
-  public function testImageResourceUrlProvider(): array {
+  public function imageResourceUrlProvider(): array {
     return [
       [
         ['url' => 'http://localhost/test_image.jpg'],
