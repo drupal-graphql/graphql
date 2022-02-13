@@ -367,6 +367,18 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
+   * Make sure that passing a NULL id does not produce any warnings.
+   */
+  public function testResolveEntityLoadWithNullId(): void {
+    $result = $this->executeDataProducer('entity_load', [
+      'type' => $this->node->getEntityTypeId(),
+      'id' => NULL,
+    ]);
+
+    $this->assertNull($result);
+  }
+
+  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveEntityRendered(): void {
