@@ -82,7 +82,7 @@ class EntityBuffer extends BufferBase {
         }, []);
       }
 
-      return isset($entities[$item['id']]) ? $entities[$item['id']] : NULL;
+      return $entities[$item['id']] ?? NULL;
     }, $buffer);
   }
 
