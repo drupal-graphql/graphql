@@ -6,7 +6,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "graphql": "^14.5.8",
+    "graphql": "^15.5.1",
     "graphql-voyager": "^1.0.0-rc.27",
     "react": "^16.3",
     "react-dom": "^16.3"
@@ -21,11 +21,11 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "copy-webpack-plugin": "^6.0.3",
-    "eslint": "^6.8.0",
+    "eslint": "^8.9.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-plugin-import": "^2.20.0",
     "rimraf": "^2.6.2",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "webpack": "^5.40.0",
+    "webpack-cli": "^4.9.2"
   }
 }

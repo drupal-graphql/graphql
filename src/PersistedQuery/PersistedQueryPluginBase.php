@@ -44,7 +44,7 @@ abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQ
    */
   public function getDescription() {
     $plugin_definition = $this->getPluginDefinition();
-    return isset($plugin_definition['description']) ? $plugin_definition['description'] : '';
+    return $plugin_definition['description'] ?? '';
   }
 
   /**

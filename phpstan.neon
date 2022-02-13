@@ -43,6 +43,16 @@ parameters:
       #^Call to deprecated method toInt\\(\\) of class Drupal\\\\Component\\\\Utility\\\\Bytes\\:
       in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\\\Component\\\\Utility\\\\Bytes\\:\\:toNumber\\(\\) instead$#
       """
+    - """
+      #^Call to deprecated function file_munge_filename\\(\\)#
+      """
+    - """
+      #^Call to deprecated function drupal_get_path\\(\\)#
+      """
+    - """
+      #^Call to deprecated function file_create_url\\(\\)#
+      """
+    - "#^Call to an undefined method Drupal\\\\Tests\\\\graphql\\\\Kernel\\\\DataProducer\\\\EntityTest\\:\\:assertMatchesRegularExpression\\(\\)\\.$#"
     # Drupal allows object property access to custom fields, so we cannot fix
     # that.
     - "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
@@ -79,6 +89,31 @@ parameters:
       message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\SchemaExtensionPluginInterface\\:\\:registerResolvers\\(\\) has no return typehint specified\\.$#"
       count: 1
       path: src/Plugin/SchemaExtensionPluginInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\PersistedQueryPluginInterface\\:\\:setWeight\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Plugin/PersistedQueryPluginInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\SchemaExtensionPluginInterface\\:\\:registerResolvers\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Plugin/SchemaExtensionPluginInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:addPersistedQueryInstance\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removeAllPersistedQueryInstances\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
+
+    -
+      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return type specified\\.$#"
+      count: 1
+      path: src/Entity/ServerInterface.php
 
     -
       message: "#^Unable to resolve the template type ExpectedType in call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\)$#"

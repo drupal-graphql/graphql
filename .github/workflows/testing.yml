@@ -13,18 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4']
-        drupal-core: ['9.1.x']
-        phpstan: ['1']
+        php-versions: ['7.3', '7.4', '8.0', '8.1']
+        drupal-core: ['9.3.x']
         include:
           # Extra run to also test on latest Drupal 8 and PHP 7.2.
           - php-versions: '7.2'
             drupal-core: '8.9.x'
-            phpstan: '1'
-          # PHPStan does not work on PHP 8 yet for us.
-          - php-versions: '8.0'
-            drupal-core: '9.1.x'
-            phpstan: '0'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
@@ -61,7 +55,6 @@ jobs:
           # Disable Xdebug for better performance.
           coverage: none
           extensions: ${{ env.extensions }}
-          ini-values: opcache.enable_cli=1
 
       - name: Get composer cache directory
         id: composercache
@@ -83,14 +76,14 @@ jobs:
 
       - name: Install GraphQL dependencies
         run: composer --no-interaction --no-progress require \
-          webonyx/graphql-php:^14.3 \
+          webonyx/graphql-php:^14.8 \
           drupal/typed_data:^1.0 \
           drupal/redirect:^1.6 \
-          phpstan/phpstan:^0.12.70 \
-          mglaman/phpstan-drupal:^0.12.8 \
-          phpstan/phpstan-deprecation-rules:^0.12.2 \
-          jangregor/phpstan-prophecy:^0.8 \
-          phpstan/phpstan-phpunit:^0.12
+          phpstan/phpstan:^1.4.6 \
+          mglaman/phpstan-drupal:^1.1.2 \
+          phpstan/phpstan-deprecation-rules:^1.0.0 \
+          jangregor/phpstan-prophecy:^1.0.0 \
+          phpstan/phpstan-phpunit:^1.0.0
 
       # We install Coder separately because updating did not work in the local
       # Drupal vendor dir.
@@ -98,7 +91,7 @@ jobs:
         run: |
           mkdir coder
           cd coder
-          composer require drupal/coder:8.3.12 --no-interaction --no-progress
+          composer require drupal/coder:8.3.14 --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: |
@@ -109,9 +102,8 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          if [[ ${{ matrix.phpstan }} == "1" ]]; then cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
+          cd modules/graphql && ../../vendor/bin/phpstan analyse
 
       - name: Run PHPCS
         run: |
-          ./coder/vendor/bin/phpcs --config-set installed_paths ../../drupal/coder/coder_sniffer
           cd modules/graphql && ../../coder/vendor/bin/phpcs -p
