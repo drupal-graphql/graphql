@@ -111,7 +111,7 @@ class EntityReferenceTest extends GraphQLTestBase {
   }
 
   /**
-   * Tests the upper case data producer.
+   * Data provider for testEmptyResults().
    */
   public function emptyResultsProvider(): array {
     return [
