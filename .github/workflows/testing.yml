@@ -51,7 +51,7 @@ jobs:
           # Disable Xdebug for better performance.
           coverage: none
           extensions: ${{ env.extensions }}
-          ini-values: opcache.enable_cli=1
+          #ini-values: opcache.enable_cli=1
 
       - name: Get composer cache directory
         id: composercache
@@ -84,4 +84,4 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          cd modules/graphql && timeout 1m strace -y -t ../../vendor/bin/phpstan analyse -vvv --debug src/Controller/ExplorerController.php || df -h
+          cd modules/graphql && timeout 1m strace -y -t ../../vendor/bin/phpstan analyse -vvv --debug src/Controller/ExplorerController.php
