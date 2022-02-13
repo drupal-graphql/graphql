@@ -19,7 +19,7 @@ trait QueryResultAssertionTrait {
   protected $server;
 
   /**
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var \Drupal\Core\Render\RendererInterface|null
    */
   protected $renderer;
 
