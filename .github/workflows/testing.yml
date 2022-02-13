@@ -84,4 +84,4 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          cd modules/graphql && ../../vendor/bin/phpstan analyse -vvv --debug src/Controller/ExplorerController.php
+          cd modules/graphql && strace -e trace=read ../../vendor/bin/phpstan analyse -vvv --debug src/Controller/ExplorerController.php
