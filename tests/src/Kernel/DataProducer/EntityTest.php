@@ -377,7 +377,14 @@ class EntityTest extends GraphQLTestBase {
 
     // @todo Add metadata check.
     // $this->assertContains('node:1', $metadata->getCacheTags());
-    $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    // Rendered output is slightly different in Drupal 8 vs. 9.
+    [$version] = explode('.', \Drupal::VERSION, 2);
+    if ($version == 8) {
+      $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    }
+    else {
+      $this->assertMatchesRegularExpression('#<a href="/node/1" rel="bookmark">\s*<span>' . $this->node->getTitle() . '</span>#', $result);
+    }
   }
 
 }
