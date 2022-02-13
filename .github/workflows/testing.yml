@@ -13,21 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4']
-        phpstan: ['1']
+        php-versions: ['7.3', '7.4', '8.0', '8.1']
         drupal-core: ['9.3.x']
         include:
           # Extra run to also test on latest Drupal 8 and PHP 7.2.
           - php-versions: '7.2'
             drupal-core: '8.9.x'
-            phpstan: '1'
-          # PHPStan is broken on PHP 8.0 and 8.1 for now, don't run it there.
-          - php-versions: '8.0'
-            drupal-core: '9.3.x'
-            phpstan: '0'
-          - php-versions: '8.1'
-            drupal-core: '9.3.x'
-            phpstan: '0'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
@@ -64,7 +55,6 @@ jobs:
           # Disable Xdebug for better performance.
           coverage: none
           extensions: ${{ env.extensions }}
-          ini-values: opcache.enable_cli=1
 
       - name: Get composer cache directory
         id: composercache
@@ -112,7 +102,7 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          if [[ ${{ matrix.phpstan }} == "1" ]]; then cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
+          cd modules/graphql && ../../vendor/bin/phpstan analyse
 
       - name: Run PHPCS
         run: |
