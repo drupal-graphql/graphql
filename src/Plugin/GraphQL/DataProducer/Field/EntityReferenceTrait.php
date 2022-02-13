@@ -37,7 +37,7 @@ trait EntityReferenceTrait {
    * @return \Drupal\Core\Entity\EntityInterface[]|null
    *   The list of references entities. Or NULL.
    */
-  protected function getReferencedEntities(string $type, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, \Closure $resolver, FieldContext $context): ?array {
+  protected function getReferencedEntities(string $type, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, \Closure $resolver, FieldContext $context): array {
     $entities = $resolver() ?: [];
 
     if (isset($bundles)) {
@@ -57,7 +57,7 @@ trait EntityReferenceTrait {
       /** @var \Drupal\Core\Entity\EntityTypeInterface $type */
       $tags = $type->getListCacheTags();
       $context->addCacheTags($tags);
-      return NULL;
+      return [];
     }
 
     return $entities;
