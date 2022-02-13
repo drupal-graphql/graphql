@@ -34,8 +34,8 @@ trait EntityReferenceTrait {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]|null
-   *   The list of references entities. Or NULL.
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   The list of references entities.
    */
   protected function getReferencedEntities(string $type, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, \Closure $resolver, FieldContext $context): array {
     $entities = $resolver() ?: [];
