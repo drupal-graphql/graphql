@@ -12,7 +12,7 @@ use Drupal\node\Entity\Node;
 use Drupal\user\UserInterface;
 
 /**
- * Data producers Field test class.
+ * Tests the entity_reference data producers.
  *
  * @group graphql
  */
@@ -90,6 +90,97 @@ class EntityReferenceTest extends GraphQLTestBase {
     ]);
     $this->assertEquals($this->referenced_node->id(), reset($result)->id());
     $this->assertEquals('Dolor2 French', reset($result)->label());
+  }
+
+  /**
+   * Tests that a given data producer returns an empty array.
+   *
+   * @dataProvider emptyResultsProvider
+   */
+  public function testEmptyResults(string $data_producer, array $contexts): void {
+    $node = Node::create([
+      'title' => 'Dolor',
+      'type' => 'test1',
+    ]);
+    $node->save();
+    $contexts['entity'] = $node;
+
+    $result = $this->executeDataProducer($data_producer, $contexts);
+    $this->assertIsArray($result);
+    $this->assertEmpty($result);
+  }
+
+  /**
+   * Data provider for testEmptyResults().
+   */
+  public function emptyResultsProvider(): array {
+    return [
+      // Test that an empty reference field returns an empty array.
+      ['entity_reference', [
+        'field' => 'field_test1_to_test2',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Test that an invalid field name returns an empty array.
+      ['entity_reference', [
+        'field' => 'does_not_exist',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Test that an invalid field type returns an empty array.
+      ['entity_reference', [
+        'field' => 'title',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Same test set for the entity_reference_revisions data producer.
+      // Test that an empty reference field returns an empty array.
+      ['entity_reference_revisions', [
+        'field' => 'field_test1_to_test2',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Test that an invalid field name returns an empty array.
+      ['entity_reference_revisions', [
+        'field' => 'does_not_exist',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Test that an invalid field type returns an empty array.
+      ['entity_reference_revisions', [
+        'field' => 'title',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Same test set for the entity_reference_layout_revisions data producer.
+      // Test that an empty reference field returns an empty array.
+      ['entity_reference_layout_revisions', [
+        'field' => 'field_test1_to_test2',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Test that an invalid field name returns an empty array.
+      ['entity_reference_layout_revisions', [
+        'field' => 'does_not_exist',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+      // Test that an invalid field type returns an empty array.
+      ['entity_reference_layout_revisions', [
+        'field' => 'title',
+        'access' => TRUE,
+        'access_operation' => 'view',
+      ],
+      ],
+    ];
   }
 
 }
