@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "entity_reference_revisions",
  *   name = @Translation("Entity reference revisions"),
  *   description = @Translation("Loads entities from an entity reference revisions field."),
- *   provider = "entity_reference_revisions",
  *   produces = @ContextDefinition("entity",
  *     label = @Translation("Entity"),
  *     multiple = TRUE
@@ -143,17 +142,18 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return \GraphQL\Deferred|null
-   *   A promise that will return entities or NULL if there aren't any.
+   * @return \GraphQL\Deferred|array
+   *   A promise that will return referenced entities or empty array if there
+   *   aren't any.
    */
-  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): ?Deferred {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
-      return NULL;
+      return [];
     }
 
     $definition = $entity->getFieldDefinition($field);
     if ($definition->getType() !== 'entity_reference_revisions') {
-      return NULL;
+      return [];
     }
 
     $definition = $entity->getFieldDefinition($field);
@@ -170,7 +170,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       });
     }
 
-    return NULL;
+    return [];
   }
 
 }
