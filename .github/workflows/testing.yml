@@ -15,10 +15,6 @@ jobs:
       matrix:
         php-versions: ['8.1']
         drupal-core: ['9.3.x']
-        include:
-          # Extra run to also test on latest Drupal 8 and PHP 7.2.
-          - php-versions: '7.2'
-            drupal-core: '8.9.x'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
@@ -86,26 +82,6 @@ jobs:
           jangregor/phpstan-prophecy:^1.0.0 \
           phpstan/phpstan-phpunit:^1.0.0
 
-      # We install Coder separately because updating did not work in the local
-      # Drupal vendor dir.
-      - name: Install Coder
-        run: |
-          mkdir coder
-          cd coder
-          composer require drupal/coder:8.3.12 --no-interaction --no-progress
-
-      - name: Run PHPUnit
-        run: |
-          cp modules/graphql/phpunit.xml.dist core/phpunit.xml
-          ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
-        env:
-          SIMPLETEST_DB: "sqlite://localhost/:memory:"
-
       - name: Run PHPStan
         run: |
           cd modules/graphql && ../../vendor/bin/phpstan analyse -vvv
-
-      - name: Run PHPCS
-        run: |
-          ./coder/vendor/bin/phpcs --config-set installed_paths ../../drupal/coder/coder_sniffer
-          cd modules/graphql && ../../coder/vendor/bin/phpcs -p
