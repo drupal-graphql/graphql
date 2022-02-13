@@ -120,57 +120,66 @@ class EntityReferenceTest extends GraphQLTestBase {
         'field' => 'field_test1_to_test2',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Test that an invalid field name returns an empty array.
       ['entity_reference', [
         'field' => 'does_not_exist',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Test that an invalid field type returns an empty array.
       ['entity_reference', [
         'field' => 'title',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Same test set for the entity_reference_revisions data producer.
       // Test that an empty reference field returns an empty array.
       ['entity_reference_revisions', [
         'field' => 'field_test1_to_test2',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Test that an invalid field name returns an empty array.
       ['entity_reference_revisions', [
         'field' => 'does_not_exist',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Test that an invalid field type returns an empty array.
       ['entity_reference_revisions', [
         'field' => 'title',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Same test set for the entity_reference_layout_revisions data producer.
       // Test that an empty reference field returns an empty array.
       ['entity_reference_layout_revisions', [
         'field' => 'field_test1_to_test2',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Test that an invalid field name returns an empty array.
       ['entity_reference_layout_revisions', [
         'field' => 'does_not_exist',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
       // Test that an invalid field type returns an empty array.
       ['entity_reference_layout_revisions', [
         'field' => 'title',
         'access' => TRUE,
         'access_operation' => 'view',
-      ]],
+      ],
+      ],
     ];
   }
 
