@@ -84,4 +84,4 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          cd modules/graphql && timeout 1m strace -y -t -e trace=read ../../vendor/bin/phpstan analyse -vvv --debug src/Controller/ExplorerController.php
+          cd modules/graphql && timeout 1m strace -y -t ../../vendor/bin/phpstan analyse -vvv --debug src/Controller/ExplorerController.php
