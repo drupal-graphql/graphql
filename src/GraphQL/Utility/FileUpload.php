@@ -19,9 +19,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
@@ -49,7 +49,7 @@ class FileUpload {
   /**
    * The mime type guesser service.
    *
-   * @var \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface
+   * @var \Symfony\Component\Mime\MimeTypesInterface
    */
   protected $mimeTypeGuesser;
 
@@ -101,7 +101,7 @@ class FileUpload {
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     AccountProxyInterface $currentUser,
-    MimeTypeGuesserInterface $mimeTypeGuesser,
+    MimeTypesInterface $mimeTypeGuesser,
     FileSystemInterface $fileSystem,
     LoggerChannelInterface $logger,
     Token $token,
@@ -128,10 +128,10 @@ class FileUpload {
    * @param array $settings
    *   The file field settings.
    *
-   * @return int
+   * @return float
    *   Max upload size.
    */
-  protected function getMaxUploadSize(array $settings) {
+  protected function getMaxUploadSize(array $settings): float {
     // Cap the upload size according to the PHP limit.
     $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
     if (!empty($settings['max_filesize'])) {
