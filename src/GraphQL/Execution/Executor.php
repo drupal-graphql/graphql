@@ -22,7 +22,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Drupal\Core\Http\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Executes GraphQL queries with cache lookup.
@@ -53,7 +53,7 @@ class Executor implements ExecutorImplementation {
   /**
    * The request stack.
    *
-   * @var \Drupal\Core\Http\RequestStack
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
@@ -127,7 +127,7 @@ class Executor implements ExecutorImplementation {
    *   The cache contexts manager service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for caching query results.
-   * @param \Drupal\Core\Http\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    *   The event dispatcher.

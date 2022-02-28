@@ -7,7 +7,7 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy;
-use Drupal\Core\Http\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Collects data producer plugins that are composed to read and write data.
@@ -17,7 +17,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
   /**
    * The request stack later used to get the request time.
    *
-   * @var \Drupal\Core\Http\RequestStack
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
@@ -46,7 +46,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
-   * @param \Drupal\Core\Http\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    * @param \Drupal\Core\Cache\CacheBackendInterface $resultCacheBackend
    * @param string|null $pluginInterface

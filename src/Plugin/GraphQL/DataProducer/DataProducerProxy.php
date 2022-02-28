@@ -14,7 +14,7 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\DataProducerPluginCachingInterface;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
-use Drupal\Core\Http\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -46,7 +46,7 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * The request stack for looking up request time.
    *
-   * @var \Drupal\Core\Http\RequestStack
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
@@ -87,7 +87,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param array $config
    *   Plugin configuration.
    * @param \Drupal\graphql\Plugin\DataProducerPluginManager $pluginManager
-   * @param \Drupal\Core\Http\RequestStack $requestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    */
