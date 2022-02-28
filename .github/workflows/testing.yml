@@ -73,6 +73,7 @@ jobs:
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer --no-interaction run-script drupal-phpunit-upgrade
+          composer config --no-plugins allow-plugins.phpstan/extension-installer true
 
       - name: Install GraphQL dependencies
         run: composer --no-interaction --no-progress require \
