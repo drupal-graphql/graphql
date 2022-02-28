@@ -14,6 +14,8 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  */
 class ImageUrlTest extends GraphQLTestBase {
 
+  protected $file_uri = 'public://test.jpg';
+
   /**
    * {@inheritdoc}
    */
@@ -21,8 +23,7 @@ class ImageUrlTest extends GraphQLTestBase {
     parent::setUp();
     $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
 
-    $this->file_uri = 'public://test.jpg';
-    $this->file_url = file_create_url($this->file_uri);
+    $this->file_uri = \Drupal::service('file_url_generator')->generateAbsoluteString($this->file_uri);
 
     $this->file = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
@@ -47,7 +48,7 @@ class ImageUrlTest extends GraphQLTestBase {
       'entity' => $this->file,
     ]);
 
-    $this->assertEquals($this->file_url, $result);
+    $this->assertEquals($this->file_uri, $result);
 
     // @todo Add cache checks.
     // $this->assertContains('test_tag', $metadata->getCacheTags());

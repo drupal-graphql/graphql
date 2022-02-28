@@ -46,7 +46,7 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * The request stack for looking up request time.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Http\RequestStack
    */
   protected $requestStack;
 
@@ -87,7 +87,7 @@ class DataProducerProxy implements ResolverInterface {
    * @param array $config
    *   Plugin configuration.
    * @param \Drupal\graphql\Plugin\DataProducerPluginManager $pluginManager
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Http\RequestStack $requestStack
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    */
@@ -363,7 +363,7 @@ class DataProducerProxy implements ResolverInterface {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
 

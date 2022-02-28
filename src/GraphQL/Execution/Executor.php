@@ -53,7 +53,7 @@ class Executor implements ExecutorImplementation {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Http\RequestStack
    */
   protected $requestStack;
 
@@ -127,7 +127,7 @@ class Executor implements ExecutorImplementation {
    *   The cache contexts manager service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend for caching query results.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Http\RequestStack $requestStack
    *   The request stack.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    *   The event dispatcher.
@@ -277,11 +277,11 @@ class Executor implements ExecutorImplementation {
     );
 
     $event = new OperationEvent($this->context);
-    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
+    $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_BEFORE);
 
     return $executor->doExecute()->then(function ($result) {
       $event = new OperationEvent($this->context, $result);
-      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
+      $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_AFTER);
 
       $this->logUnsafeErrors($this->context->getOperation(), $result);
 
@@ -443,7 +443,7 @@ class Executor implements ExecutorImplementation {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
 

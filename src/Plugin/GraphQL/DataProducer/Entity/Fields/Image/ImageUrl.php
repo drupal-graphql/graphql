@@ -92,7 +92,7 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
       // incorporated into the response.
       $context = new RenderContext();
       $url = $this->renderer->executeInRenderContext($context, function () use ($entity) {
-        return file_create_url($entity->getFileUri());
+        return \Drupal::service('file_url_generator')->generateAbsoluteString($entity->getFileUri());
       });
 
       if (!$context->isEmpty()) {
