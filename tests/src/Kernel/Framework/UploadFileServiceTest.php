@@ -203,7 +203,8 @@ class UploadFileServiceTest extends GraphQLTestBase {
       \Drupal::service('token'),
       $lock->reveal(),
       \Drupal::service('config.factory'),
-      \Drupal::service('renderer')
+      \Drupal::service('renderer'),
+      \Drupal::service('event_dispatcher'),
     );
 
     // Create a Symfony dummy uploaded file in test mode.
