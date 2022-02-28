@@ -363,7 +363,7 @@ class DataProducerProxy implements ResolverInterface {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    /** @phpstan-ignore-next-line */
+    /* @phpstan-ignore-next-line */
     $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }

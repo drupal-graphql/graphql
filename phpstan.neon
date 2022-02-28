@@ -1,9 +1,3 @@
-includes:
-  - ../../vendor/phpstan/phpstan-deprecation-rules/rules.neon
-  - ../../vendor/mglaman/phpstan-drupal/extension.neon
-  - ../../vendor/jangregor/phpstan-prophecy/extension.neon
-  - ../../vendor/phpstan/phpstan-phpunit/extension.neon
-
 parameters:
   # PHPStan cannot find files in this test directory automatically.
   scanDirectories:
