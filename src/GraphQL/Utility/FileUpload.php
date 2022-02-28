@@ -22,6 +22,7 @@ use Drupal\graphql\GraphQL\Response\FileUploadResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
@@ -96,6 +97,13 @@ class FileUpload {
   protected $renderer;
 
   /**
+   * The event dispatcher service.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructor.
    */
   public function __construct(
@@ -107,7 +115,8 @@ class FileUpload {
     Token $token,
     LockBackendInterface $lock,
     ConfigFactoryInterface $config_factory,
-    RendererInterface $renderer
+    RendererInterface $renderer,
+    EventDispatcherInterface $eventDispatcher
   ) {
     /** @var \Drupal\file\FileStorageInterface $file_storage */
     $file_storage = $entityTypeManager->getStorage('file');
@@ -120,6 +129,7 @@ class FileUpload {
     $this->lock = $lock;
     $this->systemFileConfig = $config_factory->get('system.file');
     $this->renderer = $renderer;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -380,7 +390,7 @@ class FileUpload {
         // malicious extension hiding within an unknown file type. For example,
         // "filename.html.foo".
         $event = new FileUploadSanitizeNameEvent($filename, $validators['file_validate_extensions'][0]);
-        \Drupal::service('event_dispatcher')->dispatch($event);
+        $this->eventDispatcher->dispatch($event);
         $filename = $event->getFilename();
       }
 
@@ -406,7 +416,7 @@ class FileUpload {
           }
 
           $event = new FileUploadSanitizeNameEvent($filename, $validators['file_validate_extensions'][0] ?? '');
-          \Drupal::service('event_dispatcher')->dispatch($event);
+          $this->eventDispatcher->dispatch($event);
           $filename = $event->getFilename();
 
           // The .txt extension may not be in the allowed list of extensions. We
