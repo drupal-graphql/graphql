@@ -15,20 +15,13 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class ImageUrlTest extends GraphQLTestBase {
 
   /**
-   * A file URI.
-   *
-   * @var string|null
-   */
-  protected ?string $fileUri = 'public://test.jpg';
-
-  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
     $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
 
-    $this->fileUri = \Drupal::service('file_url_generator')->generateAbsoluteString($this->fileUri);
+    $this->fileUri = \Drupal::service('file_url_generator')->generateAbsoluteString('public://test.jpg');
 
     $this->file = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
