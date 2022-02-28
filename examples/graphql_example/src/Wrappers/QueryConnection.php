@@ -30,6 +30,7 @@ class QueryConnection {
   public function total() {
     $query = clone $this->query;
     $query->range(NULL, NULL)->count();
+    /** @var int */
     return $query->execute();
   }
 

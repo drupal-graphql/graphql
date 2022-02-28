@@ -111,4 +111,18 @@ class EntityMultipleTest extends GraphQLTestBase {
     ], $nids);
   }
 
+  /**
+   * Make sure that passing a NULL id does not produce any warnings.
+   */
+  public function testResolveEntityLoadWithNullId(): void {
+    $result = $this->executeDataProducer('entity_load_multiple', [
+      'type' => $this->node1->getEntityTypeId(),
+      'ids' => [NULL],
+      'access' => TRUE,
+      'access_operation' => 'view',
+    ]);
+
+    $this->assertSame([], $result);
+  }
+
 }

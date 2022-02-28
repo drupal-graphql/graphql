@@ -14,7 +14,7 @@ class StringTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase::resolve
    *
-   * @dataProvider testUppercaseProvider
+   * @dataProvider uppercaseProvider
    */
   public function testUppercase(string $input, string $expected): void {
     $result = $this->executeDataProducer('uppercase', [
@@ -27,7 +27,7 @@ class StringTest extends GraphQLTestBase {
   /**
    * Tests the upper case data producer.
    */
-  public function testUppercaseProvider(): array {
+  public function uppercaseProvider(): array {
     return [
       ['test', 'TEST'],
       ['123 ..!!', '123 ..!!'],

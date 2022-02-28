@@ -81,7 +81,7 @@ class EntityRevisionBuffer extends BufferBase {
         }, []);
       }
 
-      return isset($entities[$item['vid']]) ? $entities[$item['vid']] : NULL;
+      return $entities[$item['vid']] ?? NULL;
     }, $buffer);
   }
 
