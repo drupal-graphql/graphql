@@ -9,7 +9,7 @@ jobs:
     name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
     runs-on: ubuntu-20.04
     env:
-      extensions: :sodium, Imagick, gd, PDO, mysql, pdo_mysql, mbstring, xmlwriter, pdo, date, dom, filter, hash, json, pcre, session, SimpleXML, SPL, tokenizer, xml, curl
+      extensions: mbstring, xml, pdo_sqlite, gd, opcache
     strategy:
       fail-fast: false
       matrix:
