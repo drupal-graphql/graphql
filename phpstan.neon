@@ -15,6 +15,8 @@ parameters:
   # Not sure we can specify generic types properly with Drupal coding standards
   # yet, disable for now.
   checkGenericClassInNonGenericObjectType: false
+  # Exclude the RouteLoad producer because the redirect module is not D10
+  # compatible so we are not downloading it.
   excludePaths:
     - src/Plugin/GraphQL/DataProducer/Routing/RouteLoad.php
   ignoreErrors:
