@@ -22,7 +22,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Http\RequestStack;
 
 /**
  * Executes GraphQL queries with cache lookup.

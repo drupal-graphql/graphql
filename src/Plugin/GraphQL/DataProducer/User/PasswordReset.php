@@ -48,7 +48,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */
+    /** @var \Drupal\Core\Http\RequestStack $request_stack */
     $request_stack = $container->get('request_stack');
     /** @var \Drupal\Core\Logger\LoggerChannelInterface $logger */
     $logger = $container->get('logger.channel.graphql');

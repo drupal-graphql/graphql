@@ -6,7 +6,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Entity\ServerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Http\RequestStack;
 
 /**
  * Grants access to executing arbitrary GraphQL queries on the defined servers.
@@ -16,14 +16,14 @@ class QueryAccessCheck implements AccessInterface {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Http\RequestStack
    */
   protected $requestStack;
 
   /**
    * QueryAccessCheck constructor.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Http\RequestStack $requestStack
    *   The request stack.
    */
   public function __construct(RequestStack $requestStack) {

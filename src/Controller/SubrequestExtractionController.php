@@ -8,7 +8,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\SubRequestResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Http\RequestStack;
 
 /**
  * Extract arbitrary information from subrequests.
@@ -18,7 +18,7 @@ class SubrequestExtractionController extends ControllerBase {
   /**
    * The symfony request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Http\RequestStack
    */
   protected $requestStack;
 
@@ -45,7 +45,7 @@ class SubrequestExtractionController extends ControllerBase {
   /**
    * SubrequestExtractionController constructor.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Http\RequestStack $requestStack
    *   The request stack.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.

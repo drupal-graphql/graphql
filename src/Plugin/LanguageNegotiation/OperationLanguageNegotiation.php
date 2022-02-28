@@ -26,7 +26,7 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var \Drupal\Core\Http\RequestStack
    */
   protected $requestStack;
 
