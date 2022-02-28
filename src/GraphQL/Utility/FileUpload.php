@@ -21,7 +21,7 @@ use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
-use Symfony\Component\Mime\MimeTypesInterface;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
@@ -49,7 +49,7 @@ class FileUpload {
   /**
    * The mime type guesser service.
    *
-   * @var \Symfony\Component\Mime\MimeTypesInterface
+   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
    */
   protected $mimeTypeGuesser;
 
@@ -101,7 +101,7 @@ class FileUpload {
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     AccountProxyInterface $currentUser,
-    MimeTypesInterface $mimeTypeGuesser,
+    MimeTypeGuesserInterface $mimeTypeGuesser,
     FileSystemInterface $fileSystem,
     LoggerChannelInterface $logger,
     Token $token,

@@ -14,7 +14,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  */
 class ImageUrlTest extends GraphQLTestBase {
 
-  protected string $file_uri = 'public://test.jpg';
+  protected ?string $file_uri = 'public://test.jpg';
 
   /**
    * {@inheritdoc}
