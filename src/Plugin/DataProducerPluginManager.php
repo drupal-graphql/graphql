@@ -46,7 +46,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param \Drupal\Core\Http\RequestStack $requestStack
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
    * @param \Drupal\Core\Cache\CacheBackendInterface $resultCacheBackend
    * @param string|null $pluginInterface
