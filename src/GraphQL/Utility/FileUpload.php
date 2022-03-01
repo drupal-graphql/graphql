@@ -19,8 +19,10 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
@@ -48,7 +50,7 @@ class FileUpload {
   /**
    * The mime type guesser service.
    *
-   * @var \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface
+   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
    */
   protected $mimeTypeGuesser;
 
@@ -95,6 +97,13 @@ class FileUpload {
   protected $renderer;
 
   /**
+   * The event dispatcher service.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructor.
    */
   public function __construct(
@@ -106,7 +115,8 @@ class FileUpload {
     Token $token,
     LockBackendInterface $lock,
     ConfigFactoryInterface $config_factory,
-    RendererInterface $renderer
+    RendererInterface $renderer,
+    EventDispatcherInterface $eventDispatcher
   ) {
     /** @var \Drupal\file\FileStorageInterface $file_storage */
     $file_storage = $entityTypeManager->getStorage('file');
@@ -119,6 +129,7 @@ class FileUpload {
     $this->lock = $lock;
     $this->systemFileConfig = $config_factory->get('system.file');
     $this->renderer = $renderer;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -127,14 +138,14 @@ class FileUpload {
    * @param array $settings
    *   The file field settings.
    *
-   * @return int
+   * @return float
    *   Max upload size.
    */
-  protected function getMaxUploadSize(array $settings) {
+  protected function getMaxUploadSize(array $settings): float {
     // Cap the upload size according to the PHP limit.
-    $max_filesize = Bytes::toInt(Environment::getUploadMaxSize());
+    $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
     if (!empty($settings['max_filesize'])) {
-      $max_filesize = min($max_filesize, Bytes::toInt($settings['max_filesize']));
+      $max_filesize = min($max_filesize, Bytes::toNumber($settings['max_filesize']));
     }
     return $max_filesize;
   }
@@ -240,7 +251,7 @@ class FileUpload {
       $file = $this->fileStorage->create([]);
       $file->setOwnerId($this->currentUser->id());
       $file->setFilename($prepared_filename);
-      $file->setMimeType($this->mimeTypeGuesser->guess($prepared_filename));
+      $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
       $file->setFileUri($temp_file_path);
       // Set the size. This is done in File::preSave() but we validate the file
       // before it is saved.
@@ -378,13 +389,15 @@ class FileUpload {
         // valid extensions, munge the filename to protect against possible
         // malicious extension hiding within an unknown file type. For example,
         // "filename.html.foo".
-        $filename = file_munge_filename($filename, $validators['file_validate_extensions'][0]);
+        $event = new FileUploadSanitizeNameEvent($filename, $validators['file_validate_extensions'][0]);
+        $this->eventDispatcher->dispatch($event);
+        $filename = $event->getFilename();
       }
 
       // Rename potentially executable files, to help prevent exploits (i.e.
       // will rename filename.php.foo and filename.php to filename._php._foo.txt
       // and filename._php.txt, respectively).
-      if (preg_match(FILE_INSECURE_EXTENSION_REGEX, $filename)) {
+      if (preg_match(FileSystemInterface::INSECURE_EXTENSION_REGEX, $filename)) {
         // If the file will be rejected anyway due to a disallowed extension, it
         // should not be renamed; rather, we'll let file_validate_extensions()
         // reject it below.
@@ -401,7 +414,10 @@ class FileUpload {
             // URI.
             $filename .= '.txt';
           }
-          $filename = file_munge_filename($filename, $validators['file_validate_extensions'][0] ?? '');
+
+          $event = new FileUploadSanitizeNameEvent($filename, $validators['file_validate_extensions'][0] ?? '');
+          $this->eventDispatcher->dispatch($event);
+          $filename = $event->getFilename();
 
           // The .txt extension may not be in the allowed list of extensions. We
           // have to add it here or else the file upload will fail.
@@ -461,9 +477,9 @@ class FileUpload {
     ];
 
     // Cap the upload size according to the PHP limit.
-    $max_filesize = Bytes::toInt(Environment::getUploadMaxSize());
+    $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
     if (!empty($settings['max_filesize'])) {
-      $max_filesize = min($max_filesize, Bytes::toInt($settings['max_filesize']));
+      $max_filesize = min($max_filesize, Bytes::toNumber($settings['max_filesize']));
     }
 
     // There is always a file size limit due to the PHP server limit.

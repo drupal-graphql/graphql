@@ -16,9 +16,9 @@ jobs:
         php-versions: ['7.3', '7.4', '8.0', '8.1']
         drupal-core: ['9.3.x']
         include:
-          # Extra run to also test on latest Drupal 8 and PHP 7.2.
-          - php-versions: '7.2'
-            drupal-core: '8.9.x'
+          # Extra run to also test on latest Drupal 10 and PHP 8.1.
+          - php-versions: '8.1'
+            drupal-core: '10.0.x'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
@@ -73,17 +73,18 @@ jobs:
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
           composer --no-interaction run-script drupal-phpunit-upgrade
+          composer config --no-plugins allow-plugins.phpstan/extension-installer true
 
       - name: Install GraphQL dependencies
         run: composer --no-interaction --no-progress require \
           webonyx/graphql-php:^14.8 \
           drupal/typed_data:^1.0 \
-          drupal/redirect:^1.6 \
           phpstan/phpstan:^1.4.6 \
           mglaman/phpstan-drupal:^1.1.2 \
           phpstan/phpstan-deprecation-rules:^1.0.0 \
           jangregor/phpstan-prophecy:^1.0.0 \
-          phpstan/phpstan-phpunit:^1.0.0
+          phpstan/phpstan-phpunit:^1.0.0 \
+          phpstan/extension-installer:^1.0
 
       # We install Coder separately because updating did not work in the local
       # Drupal vendor dir.
