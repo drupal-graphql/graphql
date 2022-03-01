@@ -2,5 +2,4 @@ type: module
 name: GraphQL File Validate Test
 description: Tests hook_file_validate() on uploads.
 package: Testing
-core_version_requirement: ^8 || ^9
 hidden: TRUE

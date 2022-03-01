@@ -277,11 +277,11 @@ class Executor implements ExecutorImplementation {
     );
 
     $event = new OperationEvent($this->context);
-    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
+    $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_BEFORE);
 
     return $executor->doExecute()->then(function ($result) {
       $event = new OperationEvent($this->context, $result);
-      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
+      $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_AFTER);
 
       $this->logUnsafeErrors($this->context->getOperation(), $result);
 
@@ -443,7 +443,13 @@ class Executor implements ExecutorImplementation {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    /* @todo Can be removed when D9 support is dropped. In D9
+     * \Drupal\Core\Http\RequestStack is used here for forward compatibility,
+     * but phpstan thinks it's \Symfony\Component\HttpFoundation\RequestStack
+     * which doesn't have getMainRequest(), but in Drupal10 (Symfony 6) it has.
+     */
+    /* @phpstan-ignore-next-line */
+    $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
 
