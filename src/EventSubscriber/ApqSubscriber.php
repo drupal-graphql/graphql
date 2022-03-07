@@ -38,7 +38,7 @@ class ApqSubscriber implements EventSubscriberInterface {
    * @throws \GraphQL\Error\Error
    */
   public function onBeforeOperation(OperationEvent $event): void {
-    if (!in_array('automatic_persisted_query', array_keys($event->getContext()->getServer()->getPersistedQueryInstances() ?? []))) {
+    if (!array_key_exists('automatic_persisted_query', $event->getContext()->getServer()->getPersistedQueryInstances() ?? [])) {
       return;
     }
     $query = $event->getContext()->getOperation()->query;
