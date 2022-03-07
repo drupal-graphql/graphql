@@ -17,7 +17,7 @@ class XMLTestBase extends GraphQLTestBase {
   public function loadDocument(): \DOMElement {
     $document = new \DOMDocument();
     libxml_use_internal_errors(TRUE);
-    $document->loadHTMLFile(drupal_get_path('module', 'graphql') . '/tests/files/xml/test.xml');
+    $document->loadHTMLFile(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/xml/test.xml');
     return $document->documentElement;
   }
 
@@ -27,7 +27,7 @@ class XMLTestBase extends GraphQLTestBase {
    * @return bool|string
    */
   public function getDocumentSource() {
-    return file_get_contents(drupal_get_path('module', 'graphql') . '/tests/files/xml/test.xml');
+    return file_get_contents(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/xml/test.xml');
   }
 
 }
