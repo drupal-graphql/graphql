@@ -112,11 +112,13 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
       if ($baseType === 'entity') {
         $parameters = $url->getRouteParameters();
         $id = $parameters[$type];
-      } else if ($baseType === 'view') {
-        // View routeNames have format 'view.VIEW_ID.PAGE_ID'
+      }
+      elseif ($baseType === 'view') {
+        // View routeNames have format 'view.VIEW_ID.PAGE_ID'.
         $id = $type;
         $type = 'view';
-      } else {
+      }
+      else {
         return NULL;
       }
 
