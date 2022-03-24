@@ -177,7 +177,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $schema = implode("\n\n", $schema);
     // Parsing only to check syntax errors in the current schema.
     $ast = Parser::parse($schema);
-    if (empty($this->inDevelopment) && $ast) {
+    if (empty($this->inDevelopment)) {
       // Caching schema string.
       $this->astCache->set($cid, $schema, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
