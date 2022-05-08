@@ -92,7 +92,8 @@ jobs:
         run: |
           mkdir coder
           cd coder
-          composer require drupal/coder:8.3.14 --no-interaction --no-progress
+          echo '{"config": {"allow-plugins": {"dealerdirect/phpcodesniffer-composer-installer": true}}}' > composer.json
+          composer require drupal/coder:8.3.15 --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: |
