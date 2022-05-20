@@ -21,14 +21,13 @@ class ImageUrlTest extends GraphQLTestBase {
     parent::setUp();
     $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
 
-    $this->file_uri = 'public://test.jpg';
-    $this->file_url = file_create_url($this->file_uri);
+    $this->fileUri = \Drupal::service('file_url_generator')->generateAbsoluteString('public://test.jpg');
 
     $this->file = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->file->method('getFileUri')->willReturn($this->file_uri);
+    $this->file->method('getFileUri')->willReturn($this->fileUri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
 
     $this->file_not_accessible = $this->getMockBuilder(FileInterface::class)
@@ -47,7 +46,7 @@ class ImageUrlTest extends GraphQLTestBase {
       'entity' => $this->file,
     ]);
 
-    $this->assertEquals($this->file_url, $result);
+    $this->assertEquals($this->fileUri, $result);
 
     // @todo Add cache checks.
     // $this->assertContains('test_tag', $metadata->getCacheTags());

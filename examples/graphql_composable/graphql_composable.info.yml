@@ -2,8 +2,7 @@ name: GraphQL composable example
 type: module
 description: 'Examples for composable GraphQL schema.'
 package: GraphQL
-core: 8.x
 dependencies:
   - graphql:graphql
   - node:node
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9.3 || ^10

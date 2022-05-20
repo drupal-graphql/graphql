@@ -2,7 +2,6 @@ type: module
 name: GraphQL Persisted Queries Test
 description: Tests the graphql persisted queries functionality.
 package: Testing
-core_version_requirement: ^8 || ^9
 hidden: TRUE
 dependencies:
   - graphql:graphql

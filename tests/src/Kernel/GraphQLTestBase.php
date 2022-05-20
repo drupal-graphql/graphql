@@ -30,6 +30,13 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use UserCreationTrait;
 
   /**
+   * The server under test.
+   *
+   * @var \Drupal\graphql\Entity\Server|null
+   */
+  protected $server;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -66,6 +73,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
     $this->installEntitySchema('graphql_server');
     $this->installEntitySchema('configurable_language');
     $this->installConfig(['language']);
+    $this->installEntitySchema('menu_link_content');
 
     $this->setUpCurrentUser([], $this->userPermissions());
 

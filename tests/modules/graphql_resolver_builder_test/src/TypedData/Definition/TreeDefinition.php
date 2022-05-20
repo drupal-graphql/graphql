@@ -14,7 +14,7 @@ class TreeDefinition extends ComplexDataDefinitionBase {
    * {@inheritdoc}
    */
   public function getPropertyDefinitions() {
-    if (!isset($this->propertyDefinitions)) {
+    if (empty($this->propertyDefinitions)) {
       $info = &$this->propertyDefinitions;
 
       $info['left'] = self::create('tree')
