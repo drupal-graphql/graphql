@@ -165,7 +165,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $cid = "schema:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       $schema = $cache->data;
-    } else {
+    }
+    else {
       $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
         return $extension->getBaseDefinition();
       }, $extensions), function ($definition) {
