@@ -4,9 +4,9 @@ namespace Drupal\graphql\Routing;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Routing\EnhancerInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\graphql\GraphQL\Utility\JsonHelper;
 use GraphQL\Server\Helper;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -77,7 +77,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
       $values = array_merge($values, JsonHelper::decodeParams($content));
     }
 
-    if (stripos($request->headers->get('content-type'), 'multipart/form-data') !== FALSE) {
+    if (stripos($request->headers->get('content-type', ''), 'multipart/form-data') !== FALSE) {
       return $this->extractMultipart($request, $values);
     }
 

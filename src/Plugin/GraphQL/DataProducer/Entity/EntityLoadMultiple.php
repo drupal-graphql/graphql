@@ -144,6 +144,9 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
    * @return \GraphQL\Deferred
    */
   public function resolve($type, array $ids, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+    // Remove any NULL IDs.
+    $ids = array_filter($ids);
+
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {

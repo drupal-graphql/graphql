@@ -49,7 +49,7 @@ GQL;
   /**
    * @covers ::produce
    *
-   * @dataProvider testBuilderProducingProvider
+   * @dataProvider builderProducingProvider
    *
    * @param string $input
    * @param string $expected
@@ -62,7 +62,7 @@ GQL;
   /**
    * @return array
    */
-  public function testBuilderProducingProvider(): array {
+  public function builderProducingProvider(): array {
     return [
       ['entity_load', ResolverInterface::class],
       ['entity_id', ResolverInterface::class],
