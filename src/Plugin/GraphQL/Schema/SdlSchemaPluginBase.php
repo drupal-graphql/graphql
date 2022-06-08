@@ -164,22 +164,21 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "schema:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
+      $schema = $cache->data;
+    } else {
+      $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
+        return $extension->getBaseDefinition();
+      }, $extensions), function ($definition) {
+        return !empty($definition);
+      });
+
+      $schema = array_merge([$this->getSchemaDefinition()], $extensions);
+      if (empty($this->inDevelopment)) {
+        $this->astCache->set($cid, $schema, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+      }
     }
 
-    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
-      return $extension->getBaseDefinition();
-    }, $extensions), function ($definition) {
-      return !empty($definition);
-    });
-
-    $schema = array_merge([$this->getSchemaDefinition()], $extensions);
-    $ast = Parser::parse(implode("\n\n", $schema));
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
-    }
-
-    return $ast;
+    return Parser::parse(implode("\n\n", $schema));
   }
 
   /**
