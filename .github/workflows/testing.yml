@@ -13,12 +13,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4', '8.0', '8.1']
+        php-versions: ['7.3', '7.4', '8.0']
         drupal-core: ['9.4.x']
+        phpstan: ['0']
         include:
+          # We only need to run PHPStan once on the latest PHP version.
+          - php-versions: '8.1'
+            drupal-core: '9.4.x'
+            phpstan: '1'
           # Extra run to also test on latest Drupal 10 and PHP 8.1.
           - php-versions: '8.1'
             drupal-core: '10.0.x'
+            phpstan: '0'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v2
@@ -103,8 +109,7 @@ jobs:
           SIMPLETEST_DB: "sqlite://localhost/:memory:"
 
       - name: Run PHPStan
-        run: |
-          cd modules/graphql && ../../vendor/bin/phpstan analyse
+        run: if [[ ${{ matrix.phpstan }} == "1" ]]; then cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
 
       - name: Run PHPCS
         run: |

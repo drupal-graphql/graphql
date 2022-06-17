@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
-use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\Tests\graphql\Traits\CompatibleLoggerTrait;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -13,14 +13,7 @@ use Psr\Log\LoggerInterface;
  */
 class LoggerTest extends GraphQLTestBase implements LoggerInterface {
 
-  use RfcLoggerTrait;
-
-  /**
-   * Loggers calls.
-   *
-   * @var array
-   */
-  protected $loggerCalls = [];
+  use CompatibleLoggerTrait;
 
   /**
    * {@inheritdoc}
@@ -48,17 +41,6 @@ GQL;
     $this->mockResolver('Query', 'takesIntArgument');
 
     $this->container->get('logger.factory')->addLogger($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function log($level, $message, array $context = []) {
-    $this->loggerCalls[] = [
-      'level' => $level,
-      'message' => $message,
-      'context' => $context,
-    ];
   }
 
   /**
