@@ -8,6 +8,7 @@ use Drupal\Core\Logger\RfcLoggerTrait;
 // this hack to register a compatible trait for both Drupal 9 and 10.
 [$version] = explode('.', \Drupal::VERSION, 2);
 if ($version >= 10) {
+  // phpcs:ignore
   eval(<<<'CODE'
   use Drupal\Core\Logger\RfcLoggerTrait;
 
@@ -36,6 +37,9 @@ if ($version >= 10) {
 CODE);
 }
 else {
+  /**
+   * Drupal 9 compatible.
+   */
   trait CompatibleLoggerTrait {
     use RfcLoggerTrait;
 
