@@ -6,19 +6,18 @@ parameters:
   customRulesetUsed: true
   paths:
     - .
-  # We test with PHPStan on Drupal 8 and 9 and might have different ignored
-  # errors on both.
-  reportUnmatchedIgnoredErrors: false
   # We inherit a lot of Drupal core docs that don't specify iterable types on
   # arrays, not sure we can fix this in a good way.
   checkMissingIterableValueType: false
   # Not sure we can specify generic types properly with Drupal coding standards
   # yet, disable for now.
   checkGenericClassInNonGenericObjectType: false
-  # Exclude the RouteLoad producer because the redirect module is not D10
-  # compatible so we are not downloading it.
   excludePaths:
+    # Exclude the RouteLoad producer because the redirect module is not D10
+    # compatible so we are not downloading it.
     - src/Plugin/GraphQL/DataProducer/Routing/RouteLoad.php
+    # This file only exists for Drupal 10 compatibility, ignore it for now.
+    - tests/src/Traits/CompatibleLoggerTrait10.php
   ignoreErrors:
     # @todo Ignore phpstan-drupal extension's rules for now, activate later.
     - '#\Drupal calls should be avoided in classes, use dependency injection instead#'
@@ -38,35 +37,9 @@ parameters:
       message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\LanguageNegotiation\\\\OperationLanguageNegotiation\\:\\:getLangcode\\(\\) should return string but returns false\\.$#"
       count: 1
       path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
-    - "#^Parameter .+ of method Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:range\\(\\) expects null, int given\\.$#"
     # We forgot to use return type hints on some interfaces, cannot be changed
     # in stable 4.0.
     # @todo use return type hints everywhere for 5.0.
-    -
-      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:addPersistedQueryInstance\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: src/Entity/ServerInterface.php
-
-    -
-      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: src/Entity/ServerInterface.php
-
-    -
-      message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removeAllPersistedQueryInstances\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: src/Entity/ServerInterface.php
-
-    -
-      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\PersistedQueryPluginInterface\\:\\:setWeight\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: src/Plugin/PersistedQueryPluginInterface.php
-
-    -
-      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\SchemaExtensionPluginInterface\\:\\:registerResolvers\\(\\) has no return typehint specified\\.$#"
-      count: 1
-      path: src/Plugin/SchemaExtensionPluginInterface.php
-
     -
       message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\PersistedQueryPluginInterface\\:\\:setWeight\\(\\) has no return type specified\\.$#"
       count: 1
@@ -91,8 +64,3 @@ parameters:
       message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return type specified\\.$#"
       count: 1
       path: src/Entity/ServerInterface.php
-
-    -
-      message: "#^Unable to resolve the template type ExpectedType in call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\)$#"
-      count: 1
-      path: tests/src/Kernel/ResolverBuilderTest.php
