@@ -4,7 +4,8 @@ namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Logger\RfcLoggerTrait;
 
-if (version_compare(\Drupal::VERSION, '10.0.0') >= 0) {
+[$version] = explode('.', \Drupal::VERSION, 2);
+if ($version >= 10) {
   eval(<<<'CODE'
   trait CompatibleLoggerTrait {
     use RfcLoggerTrait;
