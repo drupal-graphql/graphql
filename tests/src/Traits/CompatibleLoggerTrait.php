@@ -8,33 +8,7 @@ use Drupal\Core\Logger\RfcLoggerTrait;
 // this hack to register a compatible trait for both Drupal 9 and 10.
 [$version] = explode('.', \Drupal::VERSION, 2);
 if ($version >= 10) {
-  // phpcs:ignore
-  eval(<<<'CODE'
-  use Drupal\Core\Logger\RfcLoggerTrait;
-
-  trait CompatibleLoggerTrait {
-    use RfcLoggerTrait;
-
-    /**
-     * Collected loggers calls.
-     *
-     * @var array
-     */
-    protected $loggerCalls = [];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function log($level, string|\Stringable $message, array $context = []): void {
-      $this->loggerCalls[] = [
-        'level' => $level,
-        'message' => $message,
-        'context' => $context,
-      ];
-    }
-
-  }
-CODE);
+  require_once __DIR__ . '/CompatibleLoggerTrait10.php';
 }
 else {
   /**
