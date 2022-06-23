@@ -14,7 +14,7 @@ class SeekTest extends GraphQLTestBase {
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Utility\Seek::resolve
    *
-   * @dataProvider testSeekProvider
+   * @dataProvider seekProvider
    *
    * @param array $input
    *   The test list to seek in.
@@ -37,7 +37,7 @@ class SeekTest extends GraphQLTestBase {
    *
    * @return array
    */
-  public function testSeekProvider() {
+  public function seekProvider(): array {
     return [
       [
         [1, 2, 3],

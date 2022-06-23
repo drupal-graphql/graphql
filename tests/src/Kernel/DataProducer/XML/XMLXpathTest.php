@@ -20,7 +20,7 @@ class XMLXpathTest extends XMLTestBase {
       'query' => '//div/h1',
     ]);
 
-    $this->assertEquals(1, count($result));
+    $this->assertCount(1, $result);
     $this->assertEquals('h1', $result[0]->tagName);
 
     $result = $this->executeDataProducer('xml_xpath', [
@@ -28,7 +28,7 @@ class XMLXpathTest extends XMLTestBase {
       'query' => '//div/div/div',
     ]);
 
-    $this->assertEquals(3, count($result));
+    $this->assertCount(3, $result);
     $this->assertEquals('div', $result[0]->tagName);
     $this->assertEquals('div', $result[1]->tagName);
     $this->assertEquals('div', $result[2]->tagName);
@@ -45,7 +45,7 @@ class XMLXpathTest extends XMLTestBase {
       'query' => './p',
     ]);
 
-    $this->assertEquals(2, count($result));
+    $this->assertCount(2, $result);
     $this->assertEquals('p', $result[0]->tagName);
     $this->assertEquals('p', $result[1]->tagName);
 
@@ -55,7 +55,7 @@ class XMLXpathTest extends XMLTestBase {
       'query' => '//div/h2',
     ]);
 
-    $this->assertSame(0, count($result));
+    $this->assertCount(0, $result);
   }
 
 }

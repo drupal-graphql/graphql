@@ -14,7 +14,7 @@ class DeferredUtility {
   /**
    * The promise adapter.
    *
-   * @var \GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter
+   * @var \GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter|null
    */
   public static $promiseAdapter;
 

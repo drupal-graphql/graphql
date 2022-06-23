@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\Buffers\BufferBase;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Zend\Stdlib\ArrayObject;
 use GraphQL\Deferred;
 
 /**
@@ -72,7 +71,7 @@ GQL;
     $this->mockResolver('Query', 'users',
       function ($parent, $args) use ($buffer) {
         $resolvers = array_map(function ($uid) use ($buffer) {
-          return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
+          return $buffer->createBufferResolver(new \ArrayObject(['uid' => $uid]));
         }, $args['uids']);
 
         return new Deferred(function () use ($resolvers) {
@@ -95,7 +94,7 @@ GQL;
     $this->mockResolver('User', 'friends',
       function ($parent) use ($buffer) {
         $resolvers = array_map(function ($uid) use ($buffer) {
-          return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
+          return $buffer->createBufferResolver(new \ArrayObject(['uid' => $uid]));
         }, $parent['friends']);
 
         return new Deferred(function () use ($resolvers) {
@@ -108,7 +107,7 @@ GQL;
 
     $this->mockResolver('User', 'foe',
       function ($parent) use ($buffer) {
-        $resolver = $buffer->createBufferResolver(new ArrayObject(['uid' => $parent['foe']]));
+        $resolver = $buffer->createBufferResolver(new \ArrayObject(['uid' => $parent['foe']]));
 
         return new Deferred(function () use ($resolver) {
           return $resolver();
