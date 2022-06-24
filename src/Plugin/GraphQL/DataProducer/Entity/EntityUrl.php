@@ -19,16 +19,16 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  *     "entity" = @ContextDefinition("entity",
  *       label = @Translation("Entity")
  *     ),
- *     "options" = @ContextDefinition("any",
- *       label = @Translation("URL Options"),
- *       description = @Translation("Options to pass to the toUrl call"),
- *       required = FALSE
- *     ),
  *     "rel" = @ContextDefinition("any",
  *       label = @Translation("Relationship type"),
  *       description = @Translation("The relationship type, e.g. canonical"),
  *       required = FALSE
  *     ),
+ *     "options" = @ContextDefinition("any",
+ *       label = @Translation("URL Options"),
+ *       description = @Translation("Options to pass to the toUrl call"),
+ *       required = FALSE
+ *     )
  *   }
  * )
  */
@@ -39,17 +39,17 @@ class EntityUrl extends DataProducerPluginBase {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to create a canonical URL for.
-   * @param null|array $options
-   *   The options to provided to the URL generator.
    * @param null|string $rel
    *   The link relationship type, for example: canonical or edit-form.
+   * @param null|array $options
+   *   The options to provided to the URL generator.
    *
    * @return \Drupal\Core\Url
    *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function resolve(EntityInterface $entity, ?array $options, ?string $rel = 'canonical') {
-    return $entity->toUrl($rel, $options ?? []);
+  public function resolve(EntityInterface $entity, ?string $rel = 'canonical', ?array $options = []) {
+    return $entity->toUrl($rel, $options);
   }
 
 }
