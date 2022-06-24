@@ -299,10 +299,12 @@ class EntityTest extends GraphQLTestBase {
       ->with('canonical', ['absolute' => TRUE])
       ->willReturn($url);
 
-    $this->assertEquals($url, $this->executeDataProducer('entity_url', [
+    $result = $this->executeDataProducer('entity_url', [
       'entity' => $this->entity,
+      'rel' => 'canonical',
       'options' => ['absolute' => TRUE],
-    ]));
+    ]);
+    $this->assertEquals($url, $result);
   }
 
   /**
