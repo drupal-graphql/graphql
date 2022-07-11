@@ -3,7 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Component\Plugin\Exception\ContextException;
-use Drupal\Component\Plugin\ContextAwarePluginBase;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;
@@ -11,7 +11,7 @@ use Drupal\Core\Plugin\ContextAwarePluginTrait;
 /**
  * Base class for data producers that resolve fields for queries or mutations.
  */
-abstract class DataProducerPluginBase extends ContextAwarePluginBase implements DataProducerPluginInterface {
+abstract class DataProducerPluginBase extends PluginBase implements DataProducerPluginInterface {
   use DataProducerPluginCachingTrait;
   use ContextAwarePluginTrait;
 
