@@ -19,7 +19,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  *     "entity" = @ContextDefinition("entity",
  *       label = @Translation("Entity")
  *     ),
- *     "rel" = @ContextDefinition("any",
+ *     "rel" = @ContextDefinition("string",
  *       label = @Translation("Relationship type"),
  *       description = @Translation("The relationship type, e.g. canonical"),
  *       required = FALSE
