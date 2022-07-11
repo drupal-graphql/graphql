@@ -117,8 +117,8 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
    */
   public function resolve(
     EntityTypeInterface $entity_definition,
-    ?array $bundle_context = NULL,
-    ?string $field_types_context = NULL,
+    ?array $bundle_context,
+    ?string $field_types_context,
     FieldContext $field_context
   ): \Iterator {
 

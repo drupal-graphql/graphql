@@ -101,8 +101,8 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
    *   The entity definition.
    */
   public function resolve(string $entity_type,
-    ?string $bundle = NULL,
-    ?string $field_types = NULL,
+    ?string $bundle,
+    ?string $field_types,
     FieldContext $field_context
   ): EntityTypeInterface {
     if ($bundle) {
