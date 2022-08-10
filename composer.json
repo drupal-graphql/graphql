@@ -5,7 +5,8 @@
   "homepage": "http://drupal.org/project/graphql",
   "license": "GPL-2.0+",
   "require": {
-    "webonyx/graphql-php": "^0.12.5"
+    "php": ">=7.2",
+    "webonyx/graphql-php": "^14.8.0"
   },
   "minimum-stability": "dev"
 }
