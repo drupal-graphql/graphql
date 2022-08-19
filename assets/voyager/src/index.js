@@ -9,7 +9,7 @@ import jQuery from 'jquery';
  */
 Drupal.behaviors.graphQLRenderVoyager = {
   attach: (context, settings) => {
-    const container = jQuery('#graphql-voyager', context).once('graphql-voyager')[0] || undefined;
+    const container = jQuery(once('graphql-voyager', '#graphql-voyager', context))[0] || undefined;
 
     if (typeof container === 'undefined') {
       return;
