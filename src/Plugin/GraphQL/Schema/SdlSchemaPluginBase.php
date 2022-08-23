@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -9,6 +10,8 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\Event\AlterSchemaDataEvent;
+use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
@@ -56,6 +59,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected $moduleHandler;
 
   /**
+   * The event dispatcher service.
+   *
+   * @var \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
+   */
+  protected $dispatcher;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -68,7 +78,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $container->get('cache.graphql.ast'),
       $container->get('module_handler'),
       $container->get('plugin.manager.graphql.schema_extension'),
-      $container->getParameter('graphql.config')
+      $container->getParameter('graphql.config'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -89,6 +100,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The schema extension plugin manager.
    * @param array $config
    *   The service configuration.
+   * @param \Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $dispatcher
+   *   The event dispatcher.
    *
    * @codeCoverageIgnore
    */
@@ -99,13 +112,15 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     CacheBackendInterface $astCache,
     ModuleHandlerInterface $moduleHandler,
     SchemaExtensionPluginManager $extensionManager,
-    array $config
+    array $config,
+    ContainerAwareEventDispatcher $dispatcher
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->inDevelopment = !empty($config['development']);
     $this->astCache = $astCache;
     $this->extensionManager = $extensionManager;
     $this->moduleHandler = $moduleHandler;
+    $this->dispatcher = $dispatcher;
   }
 
   /**
@@ -172,13 +187,17 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }, $extensions), function ($definition) {
       return !empty($definition);
     });
-
     $schema = array_merge([$this->getSchemaDefinition()], $extensions);
-    $ast = Parser::parse(implode("\n\n", $schema));
+    // Event in order to alter the schema data.
+    $event = new AlterSchemaDataEvent($schema);
+    $this->dispatcher->dispatch(
+      $event,
+      AlterSchemaDataEvent::EVENT_NAME
+    );
+    $ast = Parser::parse(implode("\n\n", $event->getSchemaData()));
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
-
     return $ast;
   }
 
@@ -205,7 +224,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
+    // Event in order to alter the schema extension data.
+    $event = new AlterSchemaExtensionDataEvent($extensions);
+    $this->dispatcher->dispatch(
+      $event,
+      AlterSchemaExtensionDataEvent::EVENT_NAME
+    );
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData())) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
