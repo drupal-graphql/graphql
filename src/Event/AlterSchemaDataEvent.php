@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\graphql\Event;
 
 use Drupal\Component\EventDispatcher\Event;
@@ -39,7 +41,7 @@ class AlterSchemaDataEvent extends Event {
    * @return array
    *   The schema data.
    */
-  public function getSchemaData() {
+  public function getSchemaData(): array {
     return $this->schemaData;
   }
 
@@ -49,7 +51,7 @@ class AlterSchemaDataEvent extends Event {
    * @param array $schemaData
    *   The schema data.
    */
-  public function setSchemaData(array $schemaData) {
+  public function setSchemaData(array $schemaData): void {
     $this->schemaData = $schemaData;
   }
 
