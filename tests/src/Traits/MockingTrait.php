@@ -143,6 +143,7 @@ trait MockingTrait {
         $this->container->get('module_handler'),
         $extensionManager,
         ['development' => FALSE],
+        $this->container->get('event_dispatcher'),
       ])
       ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
       ->getMockForAbstractClass();
