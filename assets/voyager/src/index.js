@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Voyager } from 'graphql-voyager';
 import Drupal from 'drupal';
 import jQuery from 'jquery';
+import once from '@drupal/once';
 
 /**
  * Behavior for rendering the GraphQL Voyager interface.
