@@ -95,15 +95,15 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @return \Drupal\Core\Url|null
    */
   public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
-    if ($this->redirectRepository) {
+    if ($this->redirectRepository && $redirect = $this->redirectRepository->findMatchingRedirect($path, [])) {
       /** @var \Drupal\redirect\Entity\Redirect|null $redirect */
-      $redirect = $this->redirectRepository->findMatchingRedirect($path, []);
-      if ($redirect) {
-        return $redirect->getRedirectUrl();
-      }
+      $url = $redirect->getRedirectUrl();
+    }
+    else {
+      $url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($path);
     }
 
-    if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($path)) && $url->isRouted() && $url->access()) {
+    if ($url && $url->isRouted() && $url->access()) {
       return $url;
     }
 
