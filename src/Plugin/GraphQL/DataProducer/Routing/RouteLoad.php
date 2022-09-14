@@ -98,7 +98,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
     if ($this->redirectRepository) {
       $redirect = $this->redirectRepository->findMatchingRedirect($path, []);
     }
-    if (!empty($redirect)){
+    if (!empty($redirect)) {
       $url = $redirect->getRedirectUrl();
     }
     else {
