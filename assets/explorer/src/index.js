@@ -10,7 +10,7 @@ import Explorer from './Explorer';
  */
 Drupal.behaviors.graphQLRenderExplorer = {
   attach: (context, settings) => {
-    const container = jQuery('#graphql-explorer', context).once('graphql-explorer')[0] || undefined;
+    const container = jQuery(once('graphql-explorer', '#graphql-explorer', context))[0] || undefined;
 
     if (typeof container === 'undefined') {
       return;
