@@ -127,7 +127,7 @@ trait MockingTrait {
     /** @var \PHPUnit\Framework\MockObject\MockObject $extensionManager */
     $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getExtensions'])
+      ->onlyMethods(['getExtensions'])
       ->getMock();
 
     $extensionManager->expects(static::any())
@@ -144,7 +144,7 @@ trait MockingTrait {
         $extensionManager,
         ['development' => FALSE],
       ])
-      ->setMethods(['getSchemaDefinition', 'getResolverRegistry'])
+      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry'])
       ->getMockForAbstractClass();
 
     $this->schema->expects(static::any())

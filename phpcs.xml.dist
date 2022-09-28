@@ -9,14 +9,6 @@
   <rule ref="Drupal"></rule>
   <rule ref="DrupalPractice"></rule>
 
-  <!-- TODO: Bug in Coder with variadic parameters -->
-  <rule ref="Drupal.Commenting.FunctionComment.ParamTypeSpaces">
-    <exclude-pattern>src/GraphQL/ResolverBuilder.php</exclude-pattern>
-  </rule>
-  <rule ref="Drupal.Commenting.FunctionComment.SpacingAfterParamType">
-    <exclude-pattern>src/GraphQL/ResolverBuilder.php</exclude-pattern>
-  </rule>
-
   <!-- We want to document the return type on the base class even when there is
     no return statement on the default implementation. -->
   <rule ref="Drupal.Commenting.FunctionComment.InvalidNoReturn">

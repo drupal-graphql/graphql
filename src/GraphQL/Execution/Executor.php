@@ -6,15 +6,18 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Utility\Error as ErrorUtil;
 use Drupal\graphql\Event\OperationEvent;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Utility\DocumentSerializer;
+use GraphQL\Error\ClientAware;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Executor\ExecutorImplementation;
 use GraphQL\Executor\Promise\Promise;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Executor\ReferenceExecutor;
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Server\OperationParams;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -274,14 +277,64 @@ class Executor implements ExecutorImplementation {
     );
 
     $event = new OperationEvent($this->context);
-    $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_BEFORE, $event);
+    $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_BEFORE);
 
     return $executor->doExecute()->then(function ($result) {
       $event = new OperationEvent($this->context, $result);
-      $this->dispatcher->dispatch(OperationEvent::GRAPHQL_OPERATION_AFTER, $event);
+      $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_AFTER);
+
+      $this->logUnsafeErrors($this->context->getOperation(), $result);
 
       return $result;
     });
+  }
+
+  /**
+   * Logs unsafe errors if any.
+   *
+   * @param \GraphQL\Server\OperationParams $operation
+   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
+   */
+  protected function logUnsafeErrors(OperationParams $operation, ExecutionResult $result): void {
+    $hasUnsafeErrors = FALSE;
+    $previousErrors = [];
+
+    foreach ($result->errors as $index => $error) {
+      // Don't log errors intended for clients, only log those that
+      // a client would not be able to solve, they'd require work from
+      // a server developer.
+      if ($error instanceof ClientAware && $error->isClientSafe()) {
+        continue;
+      }
+
+      $hasUnsafeErrors = TRUE;
+      // Log the error that cause the error we caught. This makes the error
+      // logs more useful because GraphQL usually wraps the original error.
+      if ($error->getPrevious() instanceof \Throwable) {
+        $previousErrors[] = strtr(
+          "For error #@index: %type: @message in %function (line %line of %file)\n@backtrace_string.",
+          ErrorUtil::decodeException($error->getPrevious()) + ['@index' => $index]
+        );
+      }
+    }
+
+    if ($hasUnsafeErrors) {
+      \Drupal::logger('graphql')->error(
+        "There were errors during a GraphQL execution.\nOperation details:\n<pre>\n{details}\n</pre>\nPrevious errors:\n<pre>\n{previous}\n</pre>",
+        [
+          'details' => json_encode([
+            '$operation' => $operation,
+            // Do not pass $result to json_encode because it implements
+            // JsonSerializable and strips some data out during the
+            // serialization.
+            '$result->data' => $result->data,
+            '$result->errors' => $result->errors,
+            '$result->extensions' => $result->extensions,
+          ], JSON_PRETTY_PRINT),
+          'previous' => implode('\n\n', $previousErrors),
+        ]
+      );
+    }
   }
 
   /**
@@ -390,7 +443,13 @@ class Executor implements ExecutorImplementation {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    /* @todo Can be removed when D9 support is dropped. In D9
+     * \Drupal\Core\Http\RequestStack is used here for forward compatibility,
+     * but phpstan thinks it's \Symfony\Component\HttpFoundation\RequestStack
+     * which doesn't have getMainRequest(), but in Drupal10 (Symfony 6) it has.
+     */
+    /* @phpstan-ignore-next-line */
+    $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
 

@@ -287,6 +287,26 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
+   */
+  public function testResolveAbsoluteUrl(): void {
+    $url = $this->getMockBuilder(Url::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->entity->expects($this->once())
+      ->method('toUrl')
+      ->with('canonical', ['absolute' => TRUE])
+      ->willReturn($url);
+
+    $this->assertEquals($url, $this->executeDataProducer('entity_url', [
+      'entity' => $this->entity,
+      'rel' => 'canonical',
+      'options' => ['absolute' => TRUE],
+    ]));
+  }
+
+  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUuid::resolve
    */
   public function testResolveUuid(): void {
@@ -367,6 +387,18 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
+   * Make sure that passing a NULL id does not produce any warnings.
+   */
+  public function testResolveEntityLoadWithNullId(): void {
+    $result = $this->executeDataProducer('entity_load', [
+      'type' => $this->node->getEntityTypeId(),
+      'id' => NULL,
+    ]);
+
+    $this->assertNull($result);
+  }
+
+  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveEntityRendered(): void {
@@ -377,7 +409,14 @@ class EntityTest extends GraphQLTestBase {
 
     // @todo Add metadata check.
     // $this->assertContains('node:1', $metadata->getCacheTags());
-    $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    // Rendered output is slightly different in Drupal 8 vs. 9.
+    [$version] = explode('.', \Drupal::VERSION, 2);
+    if ($version == 8) {
+      $this->assertStringContainsString('<a href="/node/1" rel="bookmark"><span>' . $this->node->getTitle() . '</span>', $result);
+    }
+    else {
+      $this->assertMatchesRegularExpression('#<a href="/node/1" rel="bookmark">\s*<span>' . $this->node->getTitle() . '</span>#', $result);
+    }
   }
 
 }
