@@ -49,7 +49,7 @@ GQL;
 
     $object = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $object->expects($this->exactly(2))
