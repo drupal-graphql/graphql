@@ -44,7 +44,7 @@ class ApqSubscriber implements EventSubscriberInterface {
     $query = $event->getContext()->getOperation()->query;
     $queryHash = $event->getContext()->getOperation()->extensions['persistedQuery']['sha256Hash'] ?? '';
 
-    if ($query && $queryHash) {
+    if (is_string($query) && is_string($queryHash) && $queryHash !== '') {
       $computedQueryHash = hash('sha256', $query);
       if ($queryHash !== $computedQueryHash) {
         throw new Error('Provided sha does not match query');
