@@ -46,7 +46,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
   }
 
   /**
-   * Test if schema altering data is working and argument data is required.
+   * Test if schema altering data is working and arg id is required.
    */
   public function testSchemaAlteredQueryArgumentToRequired(): void {
     $result = $this->query('query { alterableQuery { id } }');
@@ -71,7 +71,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
   }
 
   /**
-   * Test if schema extension altering data is working and argument data position is non-null.
+   * Test if schema extension altering is working and arg position is non-null.
    */
   public function testSchemaExtensionAlteredQueryResultPropertyToNonNull(): void {
     $result = $this->query('query { alterableQuery(id: 1) { id, position } }');
@@ -112,7 +112,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ->onlyMethods(['getExtensions'])
       ->getMock();
 
-      // Adds extra extension in order to test alter extension data event.
+    // Adds extra extension in order to test alter extension data event.
     $extensions['graphql_alterable_schema_test'] = $this->getMockBuilder(SdlSchemaExtensionPluginBase::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getBaseDefinition', 'getExtensionDefinition'])
