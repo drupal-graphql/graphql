@@ -98,7 +98,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ],
       'data' => [
         'alterableQuery' => NULL,
-      ]
+      ],
     ], json_decode($result->getContent(), TRUE));
   }
 
