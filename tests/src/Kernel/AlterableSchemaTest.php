@@ -43,7 +43,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
   }
 
   /**
-   * Test if invariant violation errors are logged.
+   * Test if schema altering data is working and argument is required.
    */
   public function testSchemaAlteredQueryArgumentToRequired(): void {
     $result = $this->query('query { alterableQuery }');
