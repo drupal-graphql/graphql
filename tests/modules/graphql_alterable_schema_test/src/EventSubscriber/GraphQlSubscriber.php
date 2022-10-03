@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\graphql_alterable_schema_test\EventSubscriber;
 
 use Drupal\graphql\Event\AlterSchemaDataEvent;
+use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -22,8 +23,20 @@ class GraphQlSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
+      AlterSchemaExtensionDataEvent::EVENT_NAME => ['alterSchemaExtensionData'],
       AlterSchemaDataEvent::EVENT_NAME => ['alterSchemaData'],
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alterSchemaExtensionData(AlterSchemaExtensionDataEvent $event): void {
+    $schemaData = $event->getSchemaExtensionData();
+    // I do not recommend direct replace, better user parsing or regex.
+    // But this is an example of what you can do.
+    $schemaData['graphql_alterable_schema_test'] = str_replace('position: Int', 'position: Int!', $schemaData['graphql_alterable_schema_test']);
+    $event->setSchemaExtensionData($schemaData);
   }
 
   /**
@@ -33,7 +46,7 @@ class GraphQlSubscriber implements EventSubscriberInterface {
     $schemaData = $event->getSchemaData();
     // It is not recommended direct replacement, better user parsing or regex.
     // But this is an example of what you can do.
-    $schemaData[0] = str_replace('alterableQuery(data: AlterableArgument): String', 'alterableQuery(data: AlterableArgument!): String', $schemaData[0]);
+    $schemaData[0] = str_replace('alterableQuery(id: Int): Result', 'alterableQuery(id: Int!): Result', $schemaData[0]);
     $event->setSchemaData($schemaData);
   }
 
