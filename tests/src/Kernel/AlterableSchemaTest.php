@@ -48,7 +48,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
   public function testSchemaAlteredQueryArgumentToRequired(): void {
     $result = $this->query('query { alterableQuery }');
     $this->assertSame(200, $result->getStatusCode());
-    // The should be error that query ID is required.
+    // The should be error that query argument is required.
     $this->assertSame([
       'errors' => [
         0 => [
