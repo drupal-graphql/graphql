@@ -40,8 +40,8 @@ class AlterableSchemaTest extends GraphQLTestBase {
     GQL;
 
     $this->setUpSchema($schema);
-    $this->mockResolver('Query', 'alterableQuery',  function () {
-      return [ 'id' => 1];
+    $this->mockResolver('Query', 'alterableQuery', function () {
+      return ['id' => 1];
     });
   }
 
