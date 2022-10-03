@@ -9,7 +9,7 @@ explorer:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 voyager:
   version: VERSION
@@ -23,7 +23,7 @@ voyager:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
+    - core/once
 
 persisted_queries:
   version: VERSION
@@ -32,4 +32,4 @@ persisted_queries:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
+    - core/once
