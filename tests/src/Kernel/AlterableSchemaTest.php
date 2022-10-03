@@ -53,7 +53,6 @@ class AlterableSchemaTest extends GraphQLTestBase {
       'errors' => [
         0 => [
           'message' => 'Field "alterableQuery" argument "data" of type "AlterableArgument!" is required but not provided.',
-          'message' => 'Field "alterableQuery" argument "data" of type "AlterableArgument!" is required but not provided.',
           'extensions' => [
             'category' => 'graphql',
           ],
