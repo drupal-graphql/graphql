@@ -41,7 +41,7 @@ GQL;
   public function testCacheableResult(): void {
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $dummy->expects($this->once())
@@ -66,7 +66,7 @@ GQL;
    */
   public function testUncacheableResult(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $cacheable->expects($this->any())
@@ -83,7 +83,7 @@ GQL;
 
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $dummy->expects($this->exactly(2))
@@ -111,7 +111,7 @@ GQL;
    */
   public function testUncacheableResultAnnotation(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $cacheable->expects($this->any())
@@ -128,7 +128,7 @@ GQL;
 
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $dummy->expects($this->exactly(2))
@@ -157,7 +157,7 @@ GQL;
   public function testVariables(): void {
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $dummy->expects($this->exactly(2))
@@ -185,7 +185,7 @@ GQL;
    */
   public function testContext(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $cacheable->expects($this->any())
@@ -202,7 +202,7 @@ GQL;
 
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $dummy->expects($this->exactly(2))
@@ -261,7 +261,7 @@ GQL;
    */
   public function testTags(): void {
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $cacheable->expects($this->any())
@@ -278,7 +278,7 @@ GQL;
 
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->setMethods(['id'])
+      ->onlyMethods(['id'])
       ->getMock();
 
     $dummy->expects($this->exactly(2))
