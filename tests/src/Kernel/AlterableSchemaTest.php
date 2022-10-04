@@ -51,7 +51,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
   public function testSchemaAlteredQueryArgumentToRequired(): void {
     $result = $this->query('query { alterableQuery { id } }');
     $this->assertSame(200, $result->getStatusCode());
-    // The should be error that query argument data is required.
+    // Here should be error that query argument data is required.
     $this->assertSame([
       'errors' => [
         0 => [
@@ -76,7 +76,8 @@ class AlterableSchemaTest extends GraphQLTestBase {
   public function testSchemaExtensionAlteredQueryResultPropertyToNonNull(): void {
     $result = $this->query('query { alterableQuery(id: 1) { id, position } }');
     $this->assertSame(200, $result->getStatusCode());
-    // The should be error that query argument data position is required.
+    // Here should be error that query result position variable cannot be null.
+    // This leads to the internal server error with reference to the variable.
     $this->assertSame([
       'errors' => [
         0 => [
@@ -92,6 +93,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
           ],
           'path' => [
             'alterableQuery',
+            // Reference to our variable in the error.
             'position',
           ],
         ],

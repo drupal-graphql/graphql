@@ -9,8 +9,6 @@ use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class GraphQlSubscriber.
- *
  * Subscribes to the graphql schema alter events.
  */
 class GraphQlSubscriber implements EventSubscriberInterface {

@@ -13,7 +13,10 @@ use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * GraphQL alterable schema.
+ * Allows to alter the graphql files data before parsing.
+ *
+ * @see \Drupal\graphql\Event\AlterSchemaDataEvent
+ * @see \Drupal\graphql\Event\AlterSchemaExtensionDataEvent
  *
  * @Schema(
  *   id = "alterable_composable",
