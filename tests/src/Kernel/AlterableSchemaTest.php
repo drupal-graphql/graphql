@@ -138,7 +138,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ->method('getExtensions')
       ->willReturn($extensions);
 
-    // Replace mock schema with out own implementation.
+    // Replace mock schema with our own implementation.
     $this->schema = $this->getMockBuilder(AlterableComposableTestSchema::class)
       ->setConstructorArgs([
         [],
