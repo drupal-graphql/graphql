@@ -263,7 +263,7 @@ class PluggableSchemaDeriver extends DeriverBase implements ContainerDeriverInte
         foreach ($types[$parent]['definition']['interfaces'] as $interface) {
           if (isset($fields[$interface][$field]) && $definitions[$fields[$interface][$field]['id']]['type'] != $definitions[$info['id']]['type']) {
             $rename[$parent][$field] = TRUE;
-          } 
+          }
         }
       }
     }
