@@ -70,7 +70,7 @@ class SubrequestExtractionController extends ControllerBase {
     $request = $this->requestStack->getCurrentRequest();
     $callback = $request->attributes->get('_graphql_subrequest');
 
-    // TODO: Remove this once https://www.drupal.org/project/drupal/issues/2940036#comment-12479912 is resolved.
+    // @todo Remove this once https://www.drupal.org/project/drupal/issues/2940036#comment-12479912 is resolved.
     $this->languageManager->reset();
 
     // Collect any potentially leaked cache metadata released by the callback.
