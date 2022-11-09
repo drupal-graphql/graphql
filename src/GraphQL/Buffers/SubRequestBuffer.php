@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- *  SubRequestBuffer class
+ * SubRequestBuffer class provided a buffer for sub-requests.
  */
 class SubRequestBuffer extends BufferBase {
 
@@ -82,15 +82,15 @@ class SubRequestBuffer extends BufferBase {
    *
    * @param \Symfony\Component\HttpFoundation\Request $current
    *   The current main request.
-   * @param string $url
-   *   The url to run the subrequest on.
    * @param array $buffer
    *   The buffer.
+   * @param string $url
+   *   The url to run the subrequest on.
    *
    * @return \Symfony\Component\HttpFoundation\Request
    *   The request object.
    */
-  protected function createRequest(Request $current, array $buffer, $url) {
+  protected function createRequest(Request $current, array $buffer, string $url) {
     $request = Request::create(
       $url,
       'GET',
@@ -136,8 +136,7 @@ class SubRequestBuffer extends BufferBase {
       return array_fill_keys(array_keys($buffer), NULL);
     }
 
-    // @todo
-    // Remove the request stack manipulation once the core issue described at
+    // @todo Remove the request stack manipulation once the core issue described at
     // https://www.drupal.org/node/2613044 is resolved.
     while ($this->requestStack->getCurrentRequest() !== $current) {
       $this->requestStack->pop();
