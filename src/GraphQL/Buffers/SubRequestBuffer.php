@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ *  SubRequestBuffer class
+ */
 class SubRequestBuffer extends BufferBase {
 
   /**
@@ -133,7 +136,7 @@ class SubRequestBuffer extends BufferBase {
       return array_fill_keys(array_keys($buffer), NULL);
     }
 
-    // TODO:
+    // @todo
     // Remove the request stack manipulation once the core issue described at
     // https://www.drupal.org/node/2613044 is resolved.
     while ($this->requestStack->getCurrentRequest() !== $current) {
