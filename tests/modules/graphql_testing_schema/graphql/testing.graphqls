@@ -1,0 +1,11 @@
+schema {
+  query: Query
+}
+
+type Query {
+  article(id: Int!): Article
+}
+
+type Article {
+  title: String!
+}
