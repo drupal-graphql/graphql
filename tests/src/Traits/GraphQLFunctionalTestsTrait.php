@@ -5,6 +5,9 @@ namespace Drupal\Tests\graphql\Traits;
 use Drupal\Component\Serialization\Json;
 use GuzzleHttp\RequestOptions;
 
+/**
+ * Helper trait for GraphQL functional tests.
+ */
 trait GraphQLFunctionalTestsTrait {
 
   /**
@@ -53,9 +56,9 @@ trait GraphQLFunctionalTestsTrait {
    * Creates an APQ request for a given query that is expected not to be found.
    *
    * @param string $query
-   *  The query to send.
+   *   The query to send.
    * @param string $variables
-   *  The variables for the query.
+   *   The variables for the query.
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */

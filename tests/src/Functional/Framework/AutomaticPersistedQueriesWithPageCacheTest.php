@@ -2,19 +2,23 @@
 
 namespace Drupal\Tests\graphql\Functional\Framework;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\graphql\Entity\Server;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\graphql\Functional\GraphQLFunctionalTestBase;
 use Drupal\user\Entity\Role;
 
+/**
+ * Tests the automatic persisted query plugin with page cache.
+ *
+ * @group graphql
+ */
 class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBase {
 
   /**
    * The GraphQL server.
    *
-   * @var \Drupal\graphql\Entity\Server $server
+   * @var \Drupal\graphql\Entity\Server
    */
   protected Server $server;
 
@@ -67,15 +71,17 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
 
     $anonymousRole = Role::load(Role::ANONYMOUS_ID);
     $this->grantPermissions($anonymousRole, [
-        'execute ' . $this->server->id() . ' persisted graphql requests',
-        'execute ' . $this->server->id() . ' arbitrary graphql requests'
-      ]
+      'execute ' . $this->server->id() . ' persisted graphql requests',
+      'execute ' . $this->server->id() . ' arbitrary graphql requests',
+    ]
     );
   }
 
   /**
-   * Test that dynamic page cache correctly add cache context to queries
-   * with the same query hash, but different variables.
+   * Test APQ with dynamic page cache.
+   *
+   * Tests that cache context for different variables parameter is correctly
+   * added to the dynamic page cache entries.
    */
   public function testPageCacheWithDifferentVariables() {
     $query = $this->getQueryFromFile('article.gql');
@@ -95,8 +101,7 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
   }
 
   /**
-   * Test PersistedQueryNotFound error is not read from page cache after the
-   * persisted query was created.
+   * Test PersistedQueryNotFound error is not cached in page cache.
    */
   public function testPersistedQueryNotFoundNotCached() {
     $query = $this->getQueryFromFile('article.gql');
