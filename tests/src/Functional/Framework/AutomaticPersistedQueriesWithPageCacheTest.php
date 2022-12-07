@@ -33,7 +33,7 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Node Type used to create test articles.
