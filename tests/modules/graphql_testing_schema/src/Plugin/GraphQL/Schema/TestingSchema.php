@@ -7,6 +7,8 @@ use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 
 /**
+ * A simple schema for testing purposes
+ *
  * @Schema(
  *   id = "testing",
  *   name = "Test schema"
