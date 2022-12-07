@@ -83,7 +83,7 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
    * Tests that cache context for different variables parameter is correctly
    * added to the dynamic page cache entries.
    */
-  public function testPageCacheWithDifferentVariables() {
+  public function testPageCacheWithDifferentVariables(): void {
     $query = $this->getQueryFromFile('article.gql');
     $variables1 = '{"id": 1}';
     $variables2 = '{"id": 2}';
@@ -103,7 +103,7 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
   /**
    * Test PersistedQueryNotFound error is not cached in page cache.
    */
-  public function testPersistedQueryNotFoundNotCached() {
+  public function testPersistedQueryNotFoundNotCached(): void {
     $query = $this->getQueryFromFile('article.gql');
     $variables = '{"id": 1}';
 

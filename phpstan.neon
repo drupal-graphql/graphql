@@ -61,3 +61,26 @@ parameters:
       message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return type specified\\.$#"
       count: 1
       path: src/Entity/ServerInterface.php
+    -
+      message: """
+        #^Call to deprecated method prophesize\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\:
+        https\\://github\\.com/sebastianbergmann/phpunit/issues/4141$#
+      """
+      count: 1
+      path: tests/src/Kernel/Framework/ResultCacheTest.php
+
+    -
+      message: """
+        #^Call to deprecated method prophesize\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\:
+        https\\://github\\.com/sebastianbergmann/phpunit/issues/4141$#
+      """
+      count: 1
+      path: tests/src/Kernel/Framework/UploadFileServiceTest.php
+
+    -
+      message: """
+        #^Call to deprecated method prophesize\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\:
+        https\\://github\\.com/sebastianbergmann/phpunit/issues/4141$#
+      """
+      count: 1
+      path: tests/src/Kernel/GraphQLTestBase.php
