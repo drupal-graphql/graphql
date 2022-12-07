@@ -20,7 +20,7 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
    *
    * @var \Drupal\graphql\Entity\Server
    */
-  protected Server $server;
+  protected $server;
 
   /**
    * {@inheritdoc}

@@ -108,7 +108,7 @@ jobs:
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml
           ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
         env:
-          SIMPLETEST_DB: "sqlite://localhost/:memory:"
+          SIMPLETEST_DB: "sqlite://127.0.0.1/sites/default/files/db.sqlite"
           SIMPLETEST_BASE_URL: http://127.0.0.1:8080
 
       - name: Run PHPStan
