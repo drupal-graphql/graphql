@@ -104,10 +104,12 @@ jobs:
 
       - name: Run PHPUnit
         run: |
+          php -S 127.0.0.1:8080 >/dev/null 2>&1 &
           cp modules/graphql/phpunit.xml.dist core/phpunit.xml
           ./vendor/bin/phpunit --configuration core/phpunit.xml modules/graphql
         env:
           SIMPLETEST_DB: "sqlite://localhost/:memory:"
+          SIMPLETEST_BASE_URL: http://127.0.0.1:8080
 
       - name: Run PHPStan
         run: if [[ ${{ matrix.phpstan }} == "1" ]]; then cd modules/graphql && ../../vendor/bin/phpstan analyse; fi

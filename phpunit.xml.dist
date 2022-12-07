@@ -11,6 +11,9 @@
     <testsuite name="kernel">
       <file>./tests/TestSuites/KernelTestSuite.php</file>
     </testsuite>
+    <testsuite name="functional">
+      <file>./tests/TestSuites/FunctionalTestSuite.php</file>
+    </testsuite>
   </testsuites>
   <filter>
     <whitelist>
