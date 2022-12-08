@@ -30,6 +30,11 @@ class TestingSchema extends SdlSchemaPluginBase {
         ->map('id', $builder->fromArgument('id'))
     );
 
+    $registry->addFieldResolver('Article', 'id',
+      $builder->produce('entity_id')
+        ->map('entity', $builder->fromParent())
+    );
+
     $registry->addFieldResolver('Article', 'title',
       $builder->produce('entity_label')
         ->map('entity', $builder->fromParent()),

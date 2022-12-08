@@ -84,27 +84,35 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
    * added to the dynamic page cache entries.
    */
   public function testPageCacheWithDifferentVariables(): void {
-    $query = $this->getQueryFromFile('article.gql');
+    $query1 = $this->getQueryFromFile('article_title.gql');
+    $query2 = $this->getQueryFromFile('article_id.gql');
     $variables1 = '{"id": 1}';
     $variables2 = '{"id": 2}';
 
     // Test that requests with different variables but same query hash return
     // different responses. Requesting in both instances with query first,
     // to make sure the query is registered.
-    $this->apqRequest($this->server->endpoint, $query, $variables1, TRUE);
-    $response = $this->apqRequest($this->server->endpoint, $query, $variables1);
+    $this->apqRequest($this->server->endpoint, $query1, $variables1, TRUE);
+    $response = $this->apqRequest($this->server->endpoint, $query1, $variables1);
     $this->assertEquals('Test Article 1', $response['data']['article']['title']);
 
-    $this->apqRequest($this->server->endpoint, $query, $variables2, TRUE);
-    $response = $this->apqRequest($this->server->endpoint, $query, $variables2);
+    $this->apqRequest($this->server->endpoint, $query1, $variables2, TRUE);
+    $response = $this->apqRequest($this->server->endpoint, $query1, $variables2);
     $this->assertEquals('Test Article 2', $response['data']['article']['title']);
+
+    // Test that requests with same variables but different query hash return
+    // different responses.
+    $this->apqRequest($this->server->endpoint, $query2, $variables2, TRUE);
+    $response = $this->apqRequest($this->server->endpoint, $query2, $variables2);
+    $this->assertEquals(2, $response['data']['article']['id']);
+
   }
 
   /**
    * Test PersistedQueryNotFound error is not cached in page cache.
    */
   public function testPersistedQueryNotFoundNotCached(): void {
-    $query = $this->getQueryFromFile('article.gql');
+    $query = $this->getQueryFromFile('article_title.gql');
     $variables = '{"id": 1}';
 
     // The first request should return an PersistedQueryNotFound error.
@@ -114,7 +122,7 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
     $response = $this->apqRequest($this->server->endpoint, $query, $variables, TRUE);
     $this->assertEquals('Test Article 1', $response['data']['article']['title']);
 
-    // Finally a request without the query should return the correct data.
+    // Finally, a request without the query should return the correct data.
     $response = $this->apqRequest($this->server->endpoint, $query, $variables);
     $this->assertEquals('Test Article 1', $response['data']['article']['title']);
   }

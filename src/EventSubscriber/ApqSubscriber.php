@@ -50,7 +50,9 @@ class ApqSubscriber implements EventSubscriberInterface {
         throw new Error('Provided sha does not match query');
       }
       // Add cache context for dynamic page cache compatibility.
-      $event->getContext()->addCacheContexts(['url.query_args:variables']);
+      $event->getContext()->addCacheContexts(
+        ['url.query_args:variables', 'url.query_args:extensions']
+      );
       $this->cache->set($queryHash, $query);
     }
   }
