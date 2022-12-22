@@ -16,6 +16,7 @@ use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Provides helper methods for kernel tests in GraphQL module.
@@ -28,6 +29,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use SchemaPrinterTrait;
   use MockingTrait;
   use UserCreationTrait;
+  use ProphecyTrait;
 
   /**
    * The server under test.
