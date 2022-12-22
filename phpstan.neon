@@ -61,3 +61,10 @@ parameters:
       message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return type specified\\.$#"
       count: 1
       path: src/Entity/ServerInterface.php
+
+    # We already use the ProphecyTrait, so not sure why PHPStan complains about
+    # this?
+    - """
+      #^Call to deprecated method prophesize\\(\\) of class Drupal\\\\Tests\\\\graphql\\\\Kernel\\\\GraphQLTestBase\\:
+      https\\://github\\.com/sebastianbergmann/phpunit/issues/4141$#
+    """
