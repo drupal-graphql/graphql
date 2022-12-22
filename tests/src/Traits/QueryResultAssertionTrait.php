@@ -192,7 +192,7 @@ trait QueryResultAssertionTrait {
         while ($original_error->getPrevious() !== NULL) {
           $original_error = $original_error->getPrevious();
         }
-        $unexpected[] = "Error message: ${error_message}\n  Originated in: {$original_error->getFile()}:{$original_error->getLine()}";
+        $unexpected[] = "Error message: {$error_message}\n  Originated in: {$original_error->getFile()}:{$original_error->getLine()}";
       }
     }
 
