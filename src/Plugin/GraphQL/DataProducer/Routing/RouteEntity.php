@@ -107,7 +107,15 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
    */
   public function resolve($url, ?string $language, FieldContext $context): ?Deferred {
     if ($url instanceof Url) {
+      // Check that this route is actually an entity route.
+      if (strpos($url->getRouteName(), 'entity.') === FALSE) {
+        return NULL;
+      }
       [, $type] = explode('.', $url->getRouteName());
+      // Make sure that entity type is not empty.
+      if (empty($type)) {
+        return NULL;
+      }
       $parameters = $url->getRouteParameters();
       $id = $parameters[$type];
       $resolver = $this->entityBuffer->add($type, $id);
