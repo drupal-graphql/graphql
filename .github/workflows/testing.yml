@@ -110,6 +110,8 @@ jobs:
           SIMPLETEST_DB: "sqlite://localhost/:memory:"
 
       - name: Run PHPStan
+        # phpstan-drupal bug, so we remove 1 stub file
+        # https://github.com/mglaman/phpstan-drupal/issues/509
         run: if [[ ${{ matrix.phpstan }} == "1" ]]; then rm vendor/mglaman/phpstan-drupal/stubs/Drupal/Core/Field/FieldItemList.stub && cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
 
       - name: Run PHPCS
