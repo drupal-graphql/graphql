@@ -101,9 +101,6 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
       $width = $entity->width;
       $height = $entity->height;
 
-      // @todo Not sure why PHPStan complains here, this should be refactored to
-      // check the entity properties first.
-      // @phpstan-ignore-next-line
       if (empty($width) || empty($height)) {
         /** @var \Drupal\Core\Image\ImageInterface $image */
         $image = \Drupal::service('image.factory')->get($entity->getFileUri());
