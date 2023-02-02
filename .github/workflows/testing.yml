@@ -110,7 +110,7 @@ jobs:
           SIMPLETEST_DB: "sqlite://localhost/:memory:"
 
       - name: Run PHPStan
-        run: if [[ ${{ matrix.phpstan }} == "1" ]]; then cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
+        run: if [[ ${{ matrix.phpstan }} == "1" ]]; then rm vendor/mglaman/phpstan-drupal/stubs/Drupal/Core/Field/FieldItemList.stub && cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
 
       - name: Run PHPCS
         run: |
