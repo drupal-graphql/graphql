@@ -13,18 +13,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.3', '7.4', '8.0']
+        php-versions: ['7.3', '7.4', '8.0', '8.1']
         drupal-core: ['9.5.x']
         phpstan: ['0']
         include:
-          # We only need to run PHPStan once on the latest PHP version.
-          - php-versions: '8.1'
-            drupal-core: '9.5.x'
-            phpstan: '1'
-          # Extra run to also test on latest Drupal 10 and PHP 8.1.
+          # Extra runs to also test on latest Drupal 10.
           - php-versions: '8.1'
             drupal-core: '10.0.x'
             phpstan: '0'
+          # We only need to run PHPStan once on the latest PHP version.
+          - php-versions: '8.2'
+            drupal-core: '10.0.x'
+            phpstan: '1'
     steps:
       - name: Checkout Drupal core
         uses: actions/checkout@v3
@@ -110,7 +110,9 @@ jobs:
           SIMPLETEST_DB: "sqlite://localhost/:memory:"
 
       - name: Run PHPStan
-        run: if [[ ${{ matrix.phpstan }} == "1" ]]; then cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
+        # phpstan-drupal bug, so we remove 1 stub file
+        # https://github.com/mglaman/phpstan-drupal/issues/509
+        run: if [[ ${{ matrix.phpstan }} == "1" ]]; then rm vendor/mglaman/phpstan-drupal/stubs/Drupal/Core/Field/FieldItemList.stub && cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
 
       - name: Run PHPCS
         run: |
