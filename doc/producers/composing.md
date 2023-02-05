@@ -9,7 +9,9 @@ $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
   $builder->produce('current_user'),
   $builder->produce('entity_load')
     ->map('type', $builder->fromValue('user'))
-    ->map('id', $builder->fromParent())
+    ->map('id', $builder->callback(function (AccountProxyInterface $account) {
+      return $account->id();
+    }))
 ));
 ```
 
@@ -24,7 +26,9 @@ $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
   $builder->produce('current_user'),
   $builder->produce('entity_load')
     ->map('type', $builder->fromValue('user'))
-    ->map('id', $builder->fromParent()),
+    ->map('id', $builder->callback(function (AccountProxyInterface $account) {
+      return $account->id();
+    })),
   $builder->callback(function ($entity) {
     // Here we can do anything we want to the data. We get as a parameter anyting that was returned
     // in the previous step.

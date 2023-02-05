@@ -106,7 +106,9 @@ $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
   $builder->produce('current_user'),
   $builder->produce('entity_load')
     ->map('type', $builder->fromValue('user'))
-    ->map('id', $builder->fromParent())
+    ->map('id', $builder->callback(function (AccountProxyInterface $account) {
+      return $account->id();
+    }))
 ));
 ```
 
