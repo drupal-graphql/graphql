@@ -490,6 +490,15 @@ class FileUpload {
       $validators['file_validate_extensions'] = [$settings['file_extensions']];
     }
 
+    // Add the resolution check if necessary.
+    if (!empty($settings['max_resolution'])
+      || !empty($settings['min_resolution'])
+    ) {
+      $maxResolution = !empty($settings['max_resolution']) ? $settings['max_resolution'] : 0;
+      $minResolution = !empty($settings['min_resolution']) ? $settings['min_resolution'] : 0;
+      $validators['file_validate_image_resolution'] = [$maxResolution, $minResolution];
+    }
+
     return $validators;
   }
 
