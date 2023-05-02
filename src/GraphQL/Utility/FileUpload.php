@@ -496,7 +496,10 @@ class FileUpload {
     ) {
       $maxResolution = !empty($settings['max_resolution']) ? $settings['max_resolution'] : 0;
       $minResolution = !empty($settings['min_resolution']) ? $settings['min_resolution'] : 0;
-      $validators['file_validate_image_resolution'] = [$maxResolution, $minResolution];
+      $validators['file_validate_image_resolution'] = [
+        $maxResolution,
+        $minResolution,
+      ];
     }
 
     return $validators;
