@@ -496,7 +496,7 @@ class FileUpload {
     ) {
       $maxResolution = $settings['max_resolution'] ?? 0;
       $minResolution = $settings['min_resolution'] ?? 0;
-      $validators['file_validate_image_resolution'] = [
+      $validators['graphql_file_validate_image_resolution'] = [
         $maxResolution,
         $minResolution,
       ];
