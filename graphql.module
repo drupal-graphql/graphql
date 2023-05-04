@@ -79,7 +79,9 @@ function graphql_file_validate_image_resolution(FileInterface $file, $maximum_di
   $errors = [];
 
   // Check first that the file is an image.
+  /** @var \Drupal\Core\Image\ImageFactory $image_factory */
   $image_factory = \Drupal::service('image.factory');
+  /** @var \Drupal\Core\Image\ImageInterface $image */
   $image = $image_factory->get($file->getFileUri());
 
   if ($image->isValid()) {
@@ -89,7 +91,7 @@ function graphql_file_validate_image_resolution(FileInterface $file, $maximum_di
       [$width, $height] = explode('x', $maximum_dimensions);
       if ($image->getWidth() > $width || $image->getHeight() > $height) {
         // Try to resize the image to fit the dimensions.
-        if ($image->scale($width, $height)) {
+        if ($image->scale((int) $width, (int) $height)) {
           $scaling = TRUE;
           $image->save();
         }
