@@ -147,6 +147,32 @@ class UploadFileServiceTest extends GraphQLTestBase {
   }
 
   /**
+   * Tests that the file dimension is not be larger than the limit.
+   *
+   * Image should de resized.
+   */
+  public function testDimensionValidation(): void {
+    // Create a Symfony dummy uploaded file in test mode.
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
+
+    $image = file_get_contents(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/image/10x10.png');
+
+    // Create a file with 4 bytes.
+    file_put_contents($uploadFile->getRealPath(), $image);
+
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      // Only allow 5x5 dimension.
+      'max_resolution' => '5x5',
+    ]);
+    $file_entity = $file_upload_response->getFileEntity();
+    $image = \Drupal::service('image.factory')->get($file_entity->getFileUri());
+    $this->assertEquals(5, $image->getWidth());
+    $this->assertEquals(5, $image->getHeight());
+  }
+
+  /**
    * Tests that the uploaded file extension is renamed to txt.
    */
   public function testExtensionRenaming(): void {
