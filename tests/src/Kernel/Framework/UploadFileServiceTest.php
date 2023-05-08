@@ -205,6 +205,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
       \Drupal::service('config.factory'),
       \Drupal::service('renderer'),
       \Drupal::service('event_dispatcher'),
+      \Drupal::service('image.factory'),
     );
 
     // Create a Symfony dummy uploaded file in test mode.
