@@ -5,8 +5,6 @@
  * Primary module hooks for GraphQL module.
  */
 
-use Drupal\file\FileInterface;
-
 /**
  * Implements hook_help().
  */
