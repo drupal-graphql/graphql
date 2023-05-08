@@ -386,7 +386,8 @@ class FileUpload {
   /**
    * Copy of file_validate_image_resolution() without creating messages.
    *
-   * Verifies that image dimensions are within the specified maximum and minimum.
+   * Verifies that image dimensions are within the specified maximum and
+   * minimum.
    *
    * Non-image files will be ignored. If an image toolkit is available the image
    * will be scaled to fit within the desired maximum dimensions.
@@ -396,8 +397,8 @@ class FileUpload {
    * @param string|int $maximum_dimensions
    *   (optional) A string in the form WIDTHxHEIGHT; for example, '640x480' or
    *   '85x85'. If an image toolkit is installed, the image will be resized down
-   *   to these dimensions. A value of zero (the default) indicates no restriction
-   *   on size, so no resizing will be attempted.
+   *   to these dimensions. A value of zero (the default) indicates no
+   *   restriction on size, so no resizing will be attempted.
    * @param string|int $minimum_dimensions
    *   (optional) A string in the form WIDTHxHEIGHT. This will check that the
    *   image meets a minimum size. A value of zero (the default) indicates that
@@ -428,7 +429,7 @@ class FileUpload {
             $image->save();
           }
           else {
-            $errors[] = t('The image exceeds the maximum allowed dimensions and an attempt to resize it failed.');
+            $errors[] = $this->t('The image exceeds the maximum allowed dimensions and an attempt to resize it failed.');
           }
         }
       }
@@ -438,7 +439,7 @@ class FileUpload {
         [$width, $height] = explode('x', $minimum_dimensions);
         if ($image->getWidth() < $width || $image->getHeight() < $height) {
           if ($scaling) {
-            $errors[] = t('The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.',
+            $errors[] = $this->t('The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.',
               [
                 '%dimensions' => $minimum_dimensions,
                 '%width' => $image->getWidth(),
@@ -446,7 +447,7 @@ class FileUpload {
               ]);
           }
           else {
-            $errors[] = t('The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
+            $errors[] = $this->t('The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
               [
                 '%dimensions' => $minimum_dimensions,
                 '%width' => $image->getWidth(),
