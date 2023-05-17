@@ -271,7 +271,9 @@ class FileUpload {
       $errors = file_validate($file, $validators);
       $maxResolution = $settings['max_resolution'] ?? 0;
       $minResolution = $settings['min_resolution'] ?? 0;
-      $errors += $this->validateFileImageResolution($file, $maxResolution, $minResolution);
+      if (!empty($maxResolution) || !empty($minResolution)) {
+        $errors += $this->validateFileImageResolution($file, $maxResolution, $minResolution);
+      }
 
       if (!empty($errors)) {
         $response->addViolations($errors);
@@ -410,7 +412,7 @@ class FileUpload {
    *   does not meet the requirements or an attempt to resize it fails, an array
    *   containing the error message will be returned.
    */
-  protected function validateFileImageResolution(FileInterface $file, $maximum_dimensions = 0, $minimum_dimensions = 0) {
+  protected function validateFileImageResolution(FileInterface $file, $maximum_dimensions = 0, $minimum_dimensions = 0): array {
     $errors = [];
 
     // Check first that the file is an image.
