@@ -183,6 +183,7 @@ services:
       - '@config.factory'
       - '@renderer'
       - '@event_dispatcher'
+      - '@image.factory'
 
   plugin.manager.graphql.persisted_query:
     class: Drupal\graphql\Plugin\PersistedQueryPluginManager

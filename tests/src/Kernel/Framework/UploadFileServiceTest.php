@@ -147,6 +147,56 @@ class UploadFileServiceTest extends GraphQLTestBase {
   }
 
   /**
+   * Tests that a larger image is resized to maximum dimensions.
+   */
+  public function testDimensionTooLargeValidation(): void {
+    // Create a Symfony dummy uploaded file in test mode.
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
+
+    $image = file_get_contents(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/image/10x10.png');
+
+    // Create a file with 4 bytes.
+    file_put_contents($uploadFile->getRealPath(), $image);
+
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      // Only allow maximum 5x5 dimension.
+      'max_resolution' => '5x5',
+    ]);
+    $file_entity = $file_upload_response->getFileEntity();
+    $image = \Drupal::service('image.factory')->get($file_entity->getFileUri());
+    $this->assertEquals(5, $image->getWidth());
+    $this->assertEquals(5, $image->getHeight());
+  }
+
+  /**
+   * Tests that a image that is too small returns a violation.
+   */
+  public function testDimensionTooSmallValidation(): void {
+    // Create a Symfony dummy uploaded file in test mode.
+    $uploadFile = $this->getUploadedFile(UPLOAD_ERR_OK, 4);
+
+    $image = file_get_contents(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/image/10x10.png');
+
+    // Create a file with 4 bytes.
+    file_put_contents($uploadFile->getRealPath(), $image);
+
+    $file_upload_response = $this->uploadService->saveFileUpload($uploadFile, [
+      'uri_scheme' => 'public',
+      'file_directory' => 'test',
+      // Only allow minimum dimension 15x15.
+      'min_resolution' => '15x15',
+    ]);
+    $violations = $file_upload_response->getViolations();
+
+    $this->assertStringMatchesFormat(
+      'The image is too small. The minimum dimensions are <em class="placeholder">15x15</em> pixels and the image size is <em class="placeholder">10</em>x<em class="placeholder">10</em> pixels.',
+      $violations[0]['message']
+    );
+  }
+
+  /**
    * Tests that the uploaded file extension is renamed to txt.
    */
   public function testExtensionRenaming(): void {
@@ -205,6 +255,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
       \Drupal::service('config.factory'),
       \Drupal::service('renderer'),
       \Drupal::service('event_dispatcher'),
+      \Drupal::service('image.factory'),
     );
 
     // Create a Symfony dummy uploaded file in test mode.
