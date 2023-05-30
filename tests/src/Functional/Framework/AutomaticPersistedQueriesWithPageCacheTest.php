@@ -55,8 +55,8 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
     ])->save();
 
     $config = [
-      'schema' => 'testing',
-      'name' => 'testing',
+      'schema' => 'example',
+      'name' => 'example',
       'endpoint' => '/graphql-testing',
       'persisted_queries_settings' => [
         'automatic_persisted_query' => [
@@ -94,11 +94,11 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
     // to make sure the query is registered.
     $this->apqRequest($this->server->endpoint, $query1, $variables1, TRUE);
     $response = $this->apqRequest($this->server->endpoint, $query1, $variables1);
-    $this->assertEquals('Test Article 1', $response['data']['article']['title']);
+    $this->assertEquals('TEST ARTICLE 1', $response['data']['article']['title']);
 
     $this->apqRequest($this->server->endpoint, $query1, $variables2, TRUE);
     $response = $this->apqRequest($this->server->endpoint, $query1, $variables2);
-    $this->assertEquals('Test Article 2', $response['data']['article']['title']);
+    $this->assertEquals('TEST ARTICLE 2', $response['data']['article']['title']);
 
     // Test that requests with same variables but different query hash return
     // different responses.
@@ -120,11 +120,11 @@ class AutomaticPersistedQueriesWithPageCacheTest extends GraphQLFunctionalTestBa
 
     // Retry with the query included.
     $response = $this->apqRequest($this->server->endpoint, $query, $variables, TRUE);
-    $this->assertEquals('Test Article 1', $response['data']['article']['title']);
+    $this->assertEquals('TEST ARTICLE 1', $response['data']['article']['title']);
 
     // Finally, a request without the query should return the correct data.
     $response = $this->apqRequest($this->server->endpoint, $query, $variables);
-    $this->assertEquals('Test Article 1', $response['data']['article']['title']);
+    $this->assertEquals('TEST ARTICLE 1', $response['data']['article']['title']);
   }
 
 }

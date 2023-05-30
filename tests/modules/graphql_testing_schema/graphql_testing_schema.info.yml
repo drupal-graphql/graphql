@@ -1,8 +1,0 @@
-type: module
-name: GraphQL Testing Schema
-description: A simple GraphQL schema for tests.
-package: Testing
-hidden: TRUE
-dependencies:
-  - graphql:graphql
-  - drupal:node

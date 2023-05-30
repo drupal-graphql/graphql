@@ -25,7 +25,7 @@ abstract class GraphQLFunctionalTestBase extends BrowserTestBase {
   protected static $modules = [
     'graphql',
     'typed_data',
-    'graphql_testing_schema',
+    'graphql_examples',
     'node',
     'text',
     'field',
