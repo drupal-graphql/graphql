@@ -91,8 +91,7 @@ jobs:
           phpstan/phpstan-deprecation-rules:^1.0.0 \
           jangregor/phpstan-prophecy:^1.0.0 \
           phpstan/phpstan-phpunit:^1.0.0 \
-          phpstan/extension-installer:^1.0 \
-          guzzlehttp/guzzle:^7.4.5
+          phpstan/extension-installer:^1.0
 
       # We install Coder separately because updating did not work in the local
       # Drupal vendor dir.
