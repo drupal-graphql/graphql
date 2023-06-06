@@ -24,16 +24,6 @@ parameters:
     # Drupal allows object property access to custom fields, so we cannot fix
     # that.
     - "#^Access to an undefined property Drupal\\\\#"
-    # PHPUnit deprecation warnings in Drupal 9 that we don't care about.
-    - "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
-    # Drupal allows object property access to custom fields, so we cannot fix
-    # that.
-    - "#^Property Drupal\\\\.+ \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept .+\\.$#"
-    # Incomplete type doc comments in Drupal core that we have to ignore.
-    -
-      message: "#^Method Drupal\\\\graphql\\\\Plugin\\\\LanguageNegotiation\\\\OperationLanguageNegotiation\\:\\:getLangcode\\(\\) should return string but returns false\\.$#"
-      count: 1
-      path: src/Plugin/LanguageNegotiation/OperationLanguageNegotiation.php
     # We forgot to use return type hints on some interfaces, cannot be changed
     # in stable 4.0.
     # @todo use return type hints everywhere for 5.0.
@@ -61,3 +51,10 @@ parameters:
       message: "#^Method Drupal\\\\graphql\\\\Entity\\\\ServerInterface\\:\\:removePersistedQueryInstance\\(\\) has no return type specified\\.$#"
       count: 1
       path: src/Entity/ServerInterface.php
+
+    # We already use the ProphecyTrait, so not sure why PHPStan complains about
+    # this?
+    - """
+      #^Call to deprecated method prophesize\\(\\) of class Drupal\\\\Tests\\\\graphql\\\\Kernel\\\\GraphQLTestBase\\:
+      https\\://github\\.com/sebastianbergmann/phpunit/issues/4141$#
+    """

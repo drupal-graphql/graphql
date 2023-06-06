@@ -10,6 +10,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\RenderContext;
@@ -104,6 +105,13 @@ class FileUpload {
   protected $eventDispatcher;
 
   /**
+   * The image factory service.
+   *
+   * @var \Drupal\Core\Image\ImageFactory
+   */
+  protected $imageFactory;
+
+  /**
    * Constructor.
    */
   public function __construct(
@@ -116,7 +124,8 @@ class FileUpload {
     LockBackendInterface $lock,
     ConfigFactoryInterface $config_factory,
     RendererInterface $renderer,
-    EventDispatcherInterface $eventDispatcher
+    EventDispatcherInterface $eventDispatcher,
+    ImageFactory $image_factory
   ) {
     /** @var \Drupal\file\FileStorageInterface $file_storage */
     $file_storage = $entityTypeManager->getStorage('file');
@@ -130,6 +139,7 @@ class FileUpload {
     $this->systemFileConfig = $config_factory->get('system.file');
     $this->renderer = $renderer;
     $this->eventDispatcher = $eventDispatcher;
+    $this->imageFactory = $image_factory;
   }
 
   /**
@@ -259,6 +269,11 @@ class FileUpload {
 
       // Validate against file_validate() first with the temporary path.
       $errors = file_validate($file, $validators);
+      $maxResolution = $settings['max_resolution'] ?? 0;
+      $minResolution = $settings['min_resolution'] ?? 0;
+      if (!empty($maxResolution) || !empty($minResolution)) {
+        $errors += $this->validateFileImageResolution($file, $maxResolution, $minResolution);
+      }
 
       if (!empty($errors)) {
         $response->addViolations($errors);
@@ -368,6 +383,84 @@ class FileUpload {
     }
 
     return TRUE;
+  }
+
+  /**
+   * Copy of file_validate_image_resolution() without creating messages.
+   *
+   * Verifies that image dimensions are within the specified maximum and
+   * minimum.
+   *
+   * Non-image files will be ignored. If an image toolkit is available the image
+   * will be scaled to fit within the desired maximum dimensions.
+   *
+   * @param \Drupal\file\FileInterface $file
+   *   A file entity. This function may resize the file affecting its size.
+   * @param string|int $maximum_dimensions
+   *   (optional) A string in the form WIDTHxHEIGHT; for example, '640x480' or
+   *   '85x85'. If an image toolkit is installed, the image will be resized down
+   *   to these dimensions. A value of zero (the default) indicates no
+   *   restriction on size, so no resizing will be attempted.
+   * @param string|int $minimum_dimensions
+   *   (optional) A string in the form WIDTHxHEIGHT. This will check that the
+   *   image meets a minimum size. A value of zero (the default) indicates that
+   *   there is no restriction on size.
+   *
+   * @return array
+   *   An empty array if the file meets the specified dimensions, was resized
+   *   successfully to meet those requirements or is not an image. If the image
+   *   does not meet the requirements or an attempt to resize it fails, an array
+   *   containing the error message will be returned.
+   */
+  protected function validateFileImageResolution(FileInterface $file, $maximum_dimensions = 0, $minimum_dimensions = 0): array {
+    $errors = [];
+
+    // Check first that the file is an image.
+    /** @var \Drupal\Core\Image\ImageInterface $image */
+    $image = $this->imageFactory->get($file->getFileUri());
+
+    if ($image->isValid()) {
+      $scaling = FALSE;
+      if ($maximum_dimensions) {
+        // Check that it is smaller than the given dimensions.
+        [$width, $height] = explode('x', $maximum_dimensions);
+        if ($image->getWidth() > $width || $image->getHeight() > $height) {
+          // Try to resize the image to fit the dimensions.
+          if ($image->scale((int) $width, (int) $height)) {
+            $scaling = TRUE;
+            $image->save();
+          }
+          else {
+            $errors[] = $this->t('The image exceeds the maximum allowed dimensions and an attempt to resize it failed.');
+          }
+        }
+      }
+
+      if ($minimum_dimensions) {
+        // Check that it is larger than the given dimensions.
+        [$width, $height] = explode('x', $minimum_dimensions);
+        if ($image->getWidth() < $width || $image->getHeight() < $height) {
+          if ($scaling) {
+            $errors[] = $this->t('The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.',
+              [
+                '%dimensions' => $minimum_dimensions,
+                '%width' => $image->getWidth(),
+                '%height' => $image->getHeight(),
+              ]);
+          }
+          else {
+            $errors[] = $this->t('The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
+              [
+                '%dimensions' => $minimum_dimensions,
+                '%width' => $image->getWidth(),
+                '%height' => $image->getHeight(),
+              ]);
+          }
+        }
+      }
+    }
+
+    return $errors;
   }
 
   /**
