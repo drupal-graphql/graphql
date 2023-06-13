@@ -13,9 +13,9 @@ abstract class DecoratableTypeResolver implements DecoratableTypeResolverInterfa
   /**
    * The previous type resolver that was set in the chain.
    *
-   * @var \Drupal\graphql\GraphQL\DecoratableTypeResolver|null
+   * @var \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface|null
    */
-  private $decorated;
+  private ?DecoratableTypeResolverInterface $decorated;
 
   /**
    * Create a new decoratable type resolver.
