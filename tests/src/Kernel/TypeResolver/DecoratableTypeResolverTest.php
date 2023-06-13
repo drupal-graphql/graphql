@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\TypeResolver;
 
 use Drupal\graphql\GraphQL\DecoratableTypeResolver;
-use Drupal\graphql\GraphQL\DecoratableTypeResolverInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
