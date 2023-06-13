@@ -17,14 +17,14 @@ class DecoratableTypeResolverTest extends GraphQLTestBase {
    *
    * @var \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface
    */
-  protected DecoratableTypeResolverInterface $resolver;
+  protected $resolver;
 
   /**
    * The decorated type resolver.
    *
    * @var \Drupal\graphql\GraphQL\DecoratableTypeResolverInterface
    */
-  protected DecoratableTypeResolverInterface $decoratedResolver;
+  protected $decoratedResolver;
 
   /**
    * {@inheritdoc}
