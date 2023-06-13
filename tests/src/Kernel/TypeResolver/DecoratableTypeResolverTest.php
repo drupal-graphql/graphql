@@ -7,7 +7,6 @@ use Drupal\graphql\GraphQL\DecoratableTypeResolverInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
-
 /**
  * Test the pages type resolver.
  */
