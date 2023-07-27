@@ -59,7 +59,7 @@ class AlterableComposableSchema extends ComposableSchema {
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $astCache
+   * @param \Drupal\Core\Cache\CacheBackendInterface $documentCache
    *   The cache bin for caching the parsed SDL.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
@@ -73,20 +73,20 @@ class AlterableComposableSchema extends ComposableSchema {
    * @codeCoverageIgnore
    */
   public function __construct(
-    array $configuration,
-    $pluginId,
-    array $pluginDefinition,
-    CacheBackendInterface $astCache,
-    ModuleHandlerInterface $moduleHandler,
-    SchemaExtensionPluginManager $extensionManager,
-    array $config,
+    array                         $configuration,
+                                  $pluginId,
+    array                         $pluginDefinition,
+    CacheBackendInterface         $documentCache,
+    ModuleHandlerInterface        $moduleHandler,
+    SchemaExtensionPluginManager  $extensionManager,
+    array                         $config,
     ContainerAwareEventDispatcher $dispatcher
   ) {
     parent::__construct(
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $astCache,
+      $documentCache,
       $moduleHandler,
       $extensionManager,
       $config
@@ -114,7 +114,7 @@ class AlterableComposableSchema extends ComposableSchema {
   protected function getSchemaDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "schema:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
+    if (empty($this->inDevelopment) && $cache = $this->documentCache->get($cid)) {
       return $cache->data;
     }
 
@@ -132,7 +132,7 @@ class AlterableComposableSchema extends ComposableSchema {
     );
     $ast = Parser::parse(implode("\n\n", $event->getSchemaData()));
     if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+      $this->documentCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
     return $ast;
   }
@@ -156,7 +156,7 @@ class AlterableComposableSchema extends ComposableSchema {
   protected function getExtensionDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "extension:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
+    if (empty($this->inDevelopment) && $cache = $this->documentCache->get($cid)) {
       return $cache->data;
     }
 
@@ -174,7 +174,7 @@ class AlterableComposableSchema extends ComposableSchema {
     );
     $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData())) : NULL;
     if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+      $this->documentCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
 
     return $ast;

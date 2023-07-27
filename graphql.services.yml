@@ -54,6 +54,14 @@ services:
       - { name: cache.bin }
     factory: cache_factory:get
     arguments: [graphql_ast]
+    deprecated: 'The "%service_id%" service is deprecated. There is no replacement. See https://drupal.org/node/'
+
+  # File cache for the complete GraphQL document.
+  # TODO: We don't benefit from auto-cachebin uninstall and need to implement clean-up
+  cache.graphql.document:
+    class: Drupal\Component\PhpStorage\PhpStorageInterface
+    factory: Drupal\Core\PhpStorage\PhpStorageFactory::get
+    arguments: [graphql_document]
 
   # Cache bin for graphql plugin definitions.
   cache.graphql.definitions:

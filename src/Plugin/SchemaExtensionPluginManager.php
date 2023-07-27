@@ -78,6 +78,16 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
       }, array_filter($this->getDefinitions(), function ($definition) use ($id) {
         return $definition['schema'] === $id;
       }));
+
+      // Sort the definitions by module weight which should respect dependencies
+      // between modules to ensure extensions requiring other extensions are
+      // processed in the right order.
+      // We use $2 <=> $1 to make sure we're from dependency -> dependee.
+      $module_data = \Drupal::service('extension.list.module')->getList();
+      uasort(
+        $this->extensions[$id],
+        fn (SchemaExtensionPluginInterface $definition1, SchemaExtensionPluginInterface $definition2) => $module_data[$this->extractProviderFromDefinition($definition2->getPluginDefinition())]->sort <=> $module_data[$this->extractProviderFromDefinition($definition1->getPluginDefinition())]->sort
+      );
     }
 
     return $this->extensions[$id];

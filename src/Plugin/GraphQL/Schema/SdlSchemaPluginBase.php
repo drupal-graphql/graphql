@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -13,12 +14,21 @@ use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
+use GraphQL\Error\Error;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Language\Source;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Schema;
+use GraphQL\Utils\AST;
 use GraphQL\Utils\BuildSchema;
 use GraphQL\Utils\SchemaExtender;
+use GraphQL\Utils\SchemaPrinter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,11 +38,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   use RefinableCacheableDependencyTrait;
 
   /**
-   * The cache bin for caching the parsed SDL.
+   * The file cache for caching the parsed SDL.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var \Drupal\Component\PhpStorage\PhpStorageInterface
    */
-  protected $astCache;
+  protected $documentCache;
 
   /**
    * Whether the system is currently in development mode.
@@ -65,7 +75,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('cache.graphql.ast'),
+      $container->get('cache.graphql.document'),
       $container->get('module_handler'),
       $container->get('plugin.manager.graphql.schema_extension'),
       $container->getParameter('graphql.config')
@@ -81,8 +91,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $astCache
-   *   The cache bin for caching the parsed SDL.
+   * @param \Drupal\Component\PhpStorage\PhpStorageInterface $documentCache
+   *   The file cache for caching the parsed SDL.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    * @param \Drupal\graphql\Plugin\SchemaExtensionPluginManager $extensionManager
@@ -93,17 +103,17 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @codeCoverageIgnore
    */
   public function __construct(
-    array $configuration,
-    $pluginId,
-    array $pluginDefinition,
-    CacheBackendInterface $astCache,
-    ModuleHandlerInterface $moduleHandler,
+    array                        $configuration,
+                                 $pluginId,
+    array                        $pluginDefinition,
+    PhpStorageInterface          $documentCache,
+    ModuleHandlerInterface       $moduleHandler,
     SchemaExtensionPluginManager $extensionManager,
-    array $config
+    array                        $config
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->inDevelopment = !empty($config['development']);
-    $this->astCache = $astCache;
+    $this->documentCache = $documentCache;
     $this->extensionManager = $extensionManager;
     $this->moduleHandler = $moduleHandler;
   }
@@ -117,9 +127,27 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   public function getSchema(ResolverRegistryInterface $registry) {
     $extensions = $this->getExtensions();
+
+    // TODO: The fact that the registry gets extended here means we can't cache
+    //   all of it easily
+    foreach ($extensions as $extension) {
+      $extension->registerResolvers($registry);
+    }
+
+    // TODO: We might need to think about the naming to work with multiple webheads and configs?
     $resolver = [$registry, 'resolveType'];
-    $document = $this->getSchemaDocument($extensions);
-    $schema = BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
+    $document = empty($this->inDevelopment) ? $this->loadCachedDocument() : NULL;
+    if ($document !== NULL) {
+      return BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
+        if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
+          $config['resolveType'] = $resolver;
+        }
+
+        return $config;
+      });
+    }
+
+    $schema = BuildSchema::build($this->getBaseSchemaAst(), function ($config, TypeDefinitionNode $type) use ($resolver) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $resolver;
       }
@@ -127,19 +155,40 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return $config;
     });
 
-    if (empty($extensions)) {
-      return $schema;
+    /** @var DocumentNode $extensionAst */
+    foreach ($this->getExtensionAsts($extensions) as $extensionAst) {
+      $schema = SchemaExtender::extend($schema, $extensionAst);
     }
 
-    foreach ($extensions as $extension) {
-      $extension->registerResolvers($registry);
+    // This does a full schema load, which is slow. But it's the most correct
+    // way to ensure we can get a cacheable AST that's quick.
+    // TODO: Move this to a drush command that can precalculate this.
+    $schemaDefinitions = [$schema->getAstNode(), ...$schema->extensionASTNodes];
+    foreach ($schema->getTypeMap() as $type) {
+      if ($type->astNode !== NULL) {
+        $schemaDefinitions[] = $type->astNode;
+      }
+      foreach ($type->extensionASTNodes ?? [] as $extensionNode) {
+        $schemaDefinitions[] = $extensionNode;
+      }
     }
-
-    if ($extendSchema = $this->getExtensionDocument($extensions)) {
-      return SchemaExtender::extend($schema, $extendSchema);
-    }
+    $ast = new DocumentNode(
+      ['definitions' => new NodeList($schemaDefinitions)]
+    );
+    $this->storeCachedDocument($ast);
 
     return $schema;
+  }
+
+  private function loadCachedDocument() : ?Node {
+    if ($this->documentCache->load($this->getPluginId())) {
+      return AST::fromArray(__do_get_schema());
+    }
+    return NULL;
+  }
+
+  private function storeCachedDocument(Node $document) : bool {
+    return $this->documentCache->save($this->getPluginId(), "<?php\nfunction __do_get_schema() { return " . var_export(AST::toArray($document), true) . "; }");
   }
 
   /**
@@ -147,6 +196,41 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getExtensions() {
     return $this->extensionManager->getExtensions($this->getPluginId());
+  }
+
+  protected function getBaseSchemaAst() {
+    $base_source = $this->getSchemaDefinition();
+    if (is_string($base_source)) {
+      @trigger_error("Returning a string from " . __CLASS__ . "::getSchemaDefinition is deprecated. Return an instance of Source or NULL instead.");
+      $base_source = new Source($base_source, __CLASS__);
+    }
+    return Parser::parse($base_source ?? "");
+  }
+
+  protected function getExtensionAsts(array $extensions = []) {
+    $extension_base_asts = [];
+    $extension_extend_asts = [];
+    foreach ($extensions as $id => $extension) {
+      $base_definition = $extension->getBaseDefinition();
+      if (is_string($base_definition)) {
+        @trigger_error("Returning a string from " . get_class($extension) . "::getBaseDefinition is deprecated. Return an instance of Source or NULL instead.");
+        $base_definition = new Source($base_definition, $id . "_base");
+      }
+      if ($base_definition !== NULL) {
+        $extension_base_asts[] = Parser::parse($base_definition);
+      }
+
+      $extend_definition = $extension->getExtensionDefinition();
+      if (is_string($extend_definition)) {
+        @trigger_error("Returning a string from " . get_class($extension) . "::getExtensionDefinition is deprecated. Return an instance of Source or NULL instead.");
+        $extend_definition = new Source($extend_definition, $id . "_extend");
+      }
+      if ($extend_definition !== NULL) {
+        $extension_extend_asts[] = Parser::parse($extend_definition);
+      }
+    }
+
+    return [...$extension_base_asts, ...$extension_extend_asts];
   }
 
   /**
@@ -161,23 +245,27 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   protected function getSchemaDocument(array $extensions = []) {
-    // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "schema:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
-    }
 
-    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
-      return $extension->getBaseDefinition();
-    }, $extensions), function ($definition) {
-      return !empty($definition);
-    });
+    $extensions = array_filter(
+      array_map(
+        function (SchemaExtensionPluginInterface $extension) {
+          $definition = $extension->getBaseDefinition();
+          if (is_string($definition)) {
+            @trigger_error("Returning a string from " . get_class($extension) . "::getBaseDefinition is deprecated. Return an instance of Source or NULL instead.");
+            $definition = new Source($definition);
+          }
+          return $definition;
+        },
+        $extensions
+      ),
+      function ($definition) {
+        return !empty($definition);
+      }
+    );
+
 
     $schema = array_merge([$this->getSchemaDefinition()], $extensions);
     $ast = Parser::parse(implode("\n\n", $schema));
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
-    }
 
     return $ast;
   }
@@ -193,12 +281,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \GraphQL\Error\SyntaxError
    */
   protected function getExtensionDocument(array $extensions = []) {
-    // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "extension:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
-    }
-
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
       return $extension->getExtensionDefinition();
     }, $extensions), function ($definition) {
@@ -206,9 +288,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     });
 
     $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
-    }
 
     return $ast;
   }
@@ -216,7 +295,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   /**
    * Retrieves the raw schema definition string.
    *
-   * @return string
+   * @return \GraphQL\Language\Source|string
    *   The schema definition.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
@@ -236,7 +315,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
           $module->getName(), $path, $definition['class']));
     }
 
-    return file_get_contents($file) ?: NULL;
+    $contents = file_get_contents($file);
+    return $contents ? new Source($contents, $file) : NULL;
   }
 
 }
