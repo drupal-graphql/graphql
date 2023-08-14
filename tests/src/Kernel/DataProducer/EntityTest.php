@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
@@ -273,15 +275,42 @@ class EntityTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
    */
   public function testResolveUrl(): void {
+    $accessManager = $this->getMockBuilder(AccessManagerInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $accessManager->expects($this->exactly(2))
+      ->method('checkNamedRoute')
+      ->willReturnCallback(static function (): AccessResult {
+        static $counter = 0;
+        switch ($counter) {
+          case 0:
+            $counter++;
+            return AccessResult::allowed();
+
+          case 1:
+            $counter++;
+            return AccessResult::forbidden();
+
+          default:
+            throw new \LogicException('The access() method should not have been called more than twice.');
+        }
+      });
+    $this->container->set('access_manager', $accessManager);
+
     $url = $this->getMockBuilder(Url::class)
       ->disableOriginalConstructor()
       ->getMock();
+    $url->method('getRouteParameters')->willReturn([]);
 
-    $this->entity->expects($this->once())
+    $this->entity->expects($this->any())
       ->method('toUrl')
       ->willReturn($url);
 
     $this->assertEquals($url, $this->executeDataProducer('entity_url', [
+      'entity' => $this->entity,
+    ]));
+
+    $this->assertNull($this->executeDataProducer('entity_url', [
       'entity' => $this->entity,
     ]));
   }
@@ -293,6 +322,14 @@ class EntityTest extends GraphQLTestBase {
     $url = $this->getMockBuilder(Url::class)
       ->disableOriginalConstructor()
       ->getMock();
+    $url->method('getRouteParameters')->willReturn([]);
+
+    $accessManager = $this->getMockBuilder(AccessManagerInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $accessManager->expects($this->once())
+      ->method('checkNamedRoute')->willReturn(AccessResult::allowed());
+    $this->container->set('access_manager', $accessManager);
 
     $this->entity->expects($this->once())
       ->method('toUrl')
