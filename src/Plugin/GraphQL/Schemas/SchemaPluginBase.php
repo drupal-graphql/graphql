@@ -11,10 +11,11 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\graphql\Plugin\FieldPluginManager;
 use Drupal\graphql\Plugin\MutationPluginManager;
-use Drupal\graphql\Plugin\SubscriptionPluginManager;
 use Drupal\graphql\Plugin\SchemaBuilderInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
+use Drupal\graphql\Plugin\SubscriptionPluginManager;
 use Drupal\graphql\Plugin\TypePluginManagerAggregator;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\ServerConfig;
@@ -26,6 +27,9 @@ use GraphQL\Validator\DocumentValidator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ *
+ */
 abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterface, SchemaBuilderInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
 
   /**
@@ -85,7 +89,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   protected $types = [];
 
   /**
-   * The service parameters
+   * The service parameters.
    *
    * @var array
    */
@@ -288,7 +292,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
 
     $config->setPersistentQueryLoader([$this->queryProvider, 'getQuery']);
     $config->setQueryBatching(TRUE);
-    $config->setDebug(!!$this->parameters['development']);
+    $config->setDebugFlag($this->parameters['development'] ? DebugFlag::INCLUDE_DEBUG_MESSAGE : DebugFlag::NONE);
     $config->setSchema($this->getSchema());
 
     // Always log the errors.
@@ -304,7 +308,6 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     return $config;
   }
 
-  /**
   /**
    * {@inheritdoc}
    */
@@ -377,7 +380,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    */
   public function getSubTypes($name) {
     $association = $this->pluginDefinition['type_association_map'];
-    return isset($association[$name]) ? $association[$name] : [];
+    return $association[$name] ?? [];
   }
 
   /**
@@ -391,7 +394,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     }
 
     foreach ($association[$name] as $type) {
-      // TODO: Try to avoid loading the type for the check. Consider to make it static!
+      // @todo Try to avoid loading the type for the check. Consider to make it static!
       if (isset($types[$type]) && $instance = $this->buildType($types[$type])) {
         if ($instance->isTypeOf($value, $context, $info)) {
           return $instance;
@@ -439,7 +442,13 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function processFields(array $fields) {
-    return array_map([$this, 'buildField'], $fields);
+    $processFields = array_map([$this, 'buildField'], $fields);
+    foreach ($processFields as $key => $processField) {
+      if ($processField === FALSE) {
+        unset($processFields[$key]);
+      }
+    }
+    return $processFields;
   }
 
   /**
@@ -470,7 +479,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * {@inheritdoc}
    */
   public function processType(array $type) {
-    list($type, $decorators) = $type;
+    [$type, $decorators] = $type;
 
     return array_reduce($decorators, function ($type, $decorator) {
       return $decorator($type);
@@ -506,6 +515,9 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    *   The field definition.
    */
   protected function buildField($field) {
+    if ($field['definition']['type'][0] == "layout_section") {
+      return FALSE;
+    }
     if (!isset($this->fields[$field['id']])) {
       $creator = [$field['class'], 'createInstance'];
       $this->fields[$field['id']] = $creator($this, $this->fieldManager, $field['definition'], $field['id']);
@@ -570,4 +582,5 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
   public function getCacheMaxAge() {
     return $this->pluginDefinition['schema_cache_max_age'];
   }
+
 }

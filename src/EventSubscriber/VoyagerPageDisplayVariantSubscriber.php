@@ -18,7 +18,8 @@ class VoyagerPageDisplayVariantSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event) {
-    if (strpos($event->getRouteMatch()->getRouteName(), 'graphql.voyager.') === 0) {
+    if (strpos($event->getRouteMatch()
+      ->getRouteName(), 'graphql.voyager.') === 0) {
       $event->setPluginId(NULL)->stopPropagation();
     }
   }
@@ -33,4 +34,5 @@ class VoyagerPageDisplayVariantSubscriber implements EventSubscriberInterface {
 
     return $events;
   }
+
 }

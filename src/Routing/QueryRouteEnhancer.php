@@ -4,12 +4,14 @@ namespace Drupal\graphql\Routing;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Routing\EnhancerInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\graphql\Utility\JsonHelper;
 use GraphQL\Server\Helper;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Route;
 
+/**
+ *
+ */
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
@@ -112,6 +114,5 @@ class QueryRouteEnhancer implements EnhancerInterface {
 
     return $values;
   }
-
 
 }

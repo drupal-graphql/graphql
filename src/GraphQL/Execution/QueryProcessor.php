@@ -6,8 +6,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\graphql\Plugin\SchemaPluginManager;
 use Drupal\graphql\GraphQL\Cache\CacheableRequestError;
+use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use GraphQL\Executor\ExecutionResult;
@@ -25,11 +25,13 @@ use GraphQL\Utils\AST;
 use GraphQL\Utils\TypeInfo;
 use GraphQL\Utils\Utils;
 use GraphQL\Validator\Rules\AbstractValidationRule;
-use GraphQL\Validator\ValidationContext;
 use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\ValidationContext;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-// TODO: Refactor this and clean it up.
+/**
+ * @todo Refactor this and clean it up.
+ */
 class QueryProcessor {
 
   /**
@@ -149,13 +151,13 @@ class QueryProcessor {
     $result = $this->executeOperation($adapter, $config, $params, $batching);
 
     // Format and print errors.
-    return $result->then(function(QueryResult $result) use ($config) {
+    return $result->then(function (QueryResult $result) use ($config) {
       if ($config->getErrorsHandler()) {
         $result->setErrorsHandler($config->getErrorsHandler());
       }
 
-      if ($config->getErrorFormatter() || $config->getDebug()) {
-        $result->setErrorFormatter(FormattedError::prepareFormatter($config->getErrorFormatter(), $config->getDebug()));
+      if ($config->getErrorFormatter() || $config->getDebugFlag()) {
+        $result->setErrorFormatter(FormattedError::prepareFormatter($config->getErrorFormatter(), $config->getDebugFlag()));
       }
 
       return $result;
@@ -194,8 +196,8 @@ class QueryProcessor {
       // only work through POST requests. One cannot have mutations and queries
       // in the same document, hence this check is sufficient.
       $operation = $params->operation;
-      $type = AST::getOperation($document, $operation);
-      if ($params->isReadOnly() && $type !== 'query') {
+      $type = AST::getOperationAST($document, $operation);
+      if ($params->isReadOnly() && $type->operation !== 'query') {
         throw new RequestError('GET requests are only supported for query operations.');
       }
 
@@ -209,7 +211,7 @@ class QueryProcessor {
     catch (CacheableRequestError $exception) {
       return $adapter->createFulfilled(
         new QueryResult(NULL, [Error::createLocatedError($exception)], [], $exception)
-      );
+          );
     }
     catch (RequestError $exception) {
       return $adapter->createFulfilled(new QueryResult(NULL, [Error::createLocatedError($exception)]));
@@ -352,7 +354,7 @@ class QueryProcessor {
     $info = new TypeInfo($schema);
     $validation = new ValidationContext($schema, $document, $info);
     $visitors = array_values(array_map(function (AbstractValidationRule $rule) use ($validation, $params) {
-      // Set current variable values for QueryComplexity validation rule case
+      // Set current variable values for QueryComplexity validation rule case.
       // @see \GraphQL\GraphQL::promiseToExecute for equivalent
       if ($rule instanceof QueryComplexity && !empty($params->variables)) {
         $rule->setRawVariableValues($params->variables);
@@ -523,7 +525,8 @@ class QueryProcessor {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    $time = $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME');
+    $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
+
 }

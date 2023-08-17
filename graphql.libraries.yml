@@ -9,7 +9,6 @@ explorer:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
 
 voyager:
   version: VERSION
@@ -23,4 +22,3 @@ voyager:
   dependencies:
     - core/drupal
     - core/jquery
-    - core/jquery.once
