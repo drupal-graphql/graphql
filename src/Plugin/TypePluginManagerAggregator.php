@@ -4,9 +4,6 @@ namespace Drupal\graphql\Plugin;
 
 use Traversable;
 
-/**
- *
- */
 class TypePluginManagerAggregator implements \IteratorAggregate {
 
   /**

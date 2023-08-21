@@ -29,9 +29,6 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\ValidationContext;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * @todo Refactor this and clean it up.
- */
 class QueryProcessor {
 
   /**

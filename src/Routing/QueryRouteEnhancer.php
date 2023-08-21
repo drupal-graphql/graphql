@@ -9,9 +9,6 @@ use Drupal\graphql\Utility\JsonHelper;
 use GraphQL\Server\Helper;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- *
- */
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
