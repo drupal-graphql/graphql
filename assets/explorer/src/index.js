@@ -1,17 +1,17 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import Drupal from "drupal";
-import GraphiQL from "graphiql";
-import { buildClientSchema } from "graphql";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Drupal from 'drupal';
+import GraphiQL from 'graphiql';
+import { buildClientSchema } from 'graphql';
 
 /**
  * Behavior for rendering the GraphiQL interface.
  */
 Drupal.behaviors.graphQLRenderExplorer = {
   attach: (context, settings) => {
-    const container = context.querySelector("#graphql-explorer") || undefined;
+    const container = once('#graphql-explorer', context) || undefined;
 
-    if (typeof container === "undefined") {
+    if (typeof container === 'undefined') {
       return;
     }
 
@@ -23,11 +23,11 @@ Drupal.behaviors.graphQLRenderExplorer = {
     // Defines a GraphQL fetcher using the fetch API.
     const graphQLFetcher = (graphQLParams) =>
       fetch(settings.graphqlRequestUrl, {
-        method: "post",
-        credentials: "same-origin",
+        method: 'post',
+        credentials: 'same-origin',
         body: JSON.stringify(graphQLParams),
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       }).then((response) => response.json());
 
