@@ -9,6 +9,7 @@ use Drupal\graphql\Utility\JsonHelper;
 use GraphQL\Server\Helper;
 use Symfony\Component\HttpFoundation\Request;
 
+
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
@@ -29,8 +30,13 @@ class QueryRouteEnhancer implements EnhancerInterface {
     // By default we assume a 'single' request. This is going to fail in the
     // graphql processor due to a missing query string but at least provides
     // the right format for the client to act upon.
+    if (isset($defaults['_graphql']['single'])) {
+      $defaults += [
+        '_controller' => $defaults['_graphql']['single'],
+      ];
+    }
+
     return $defaults + [
-      '_controller' => $defaults['_graphql']['single'],
       'operations' => $operations,
     ];
   }
