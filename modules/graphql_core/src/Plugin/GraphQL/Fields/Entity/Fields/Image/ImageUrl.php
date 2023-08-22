@@ -17,8 +17,7 @@ use GraphQL\Type\Definition\ResolveInfo;
  *   type = "String",
  *   field_types = {"image"},
  *   provider = "image",
- *   deriver =
- *   "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
+ *   deriver = "Drupal\graphql_core\Plugin\Deriver\Fields\EntityFieldPropertyDeriver"
  * )
  */
 class ImageUrl extends FieldPluginBase {
