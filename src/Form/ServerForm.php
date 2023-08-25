@@ -212,7 +212,14 @@ class ServerForm extends EntityForm {
       '#description' => $this->t('Security rule: The maximum allowed complexity of a query. Leave empty to set unlimited.'),
     ];
 
-    $debug_flags = $server->get('debug_flag') ?? 0;
+    $debug_flags_array = $server->get('debug_flag');
+    $debug_flags = 0;
+    if (is_array($debug_flags_array)) {
+      // Convert array of selected options back into bitwise flags
+      foreach ($debug_flags_array as $flag) {
+        $debug_flags |= $flag;
+      }
+    }
     $form['debug_flag'] = [
       '#title' => $this->t('Debug settings'),
       '#type' => 'checkboxes',
