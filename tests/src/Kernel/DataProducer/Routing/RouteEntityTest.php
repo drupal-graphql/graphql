@@ -52,11 +52,11 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->unpublished_node->save();
 
     $this->translation_fr_unpublished = $this->unpublished_node->addTranslation('fr', ['title' => 'Test Unpublished Event FR']);
-    $this->translation_fr_unpublished->status = NodeInterface::NOT_PUBLISHED;
+    $this->translation_fr_unpublished->setUnpublished();
     $this->translation_fr_unpublished->save();
 
     $this->translation_de_unpublished = $this->unpublished_node->addTranslation('de', ['title' => 'Test Unpublished Event DE']);
-    $this->translation_de_unpublished->status = NodeInterface::NOT_PUBLISHED;
+    $this->translation_de_unpublished->setUnpublished();
     $this->translation_de_unpublished->save();
 
     // Unpublished node to published translations.
@@ -68,11 +68,11 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->unpublished_to_published_node->save();
 
     $this->translation_fr_unpublished_to_published = $this->unpublished_to_published_node->addTranslation('fr', ['title' => 'Test Unpublished to Published Event FR']);
-    $this->translation_fr_unpublished_to_published->status = NodeInterface::PUBLISHED;
+    $this->translation_fr_unpublished_to_published->setPublished();
     $this->translation_fr_unpublished_to_published->save();
 
     $this->translation_de_unpublished_to_published = $this->unpublished_to_published_node->addTranslation('de', ['title' => 'Test Unpublished to Published Event DE']);
-    $this->translation_de_unpublished_to_published->status = NodeInterface::PUBLISHED;
+    $this->translation_de_unpublished_to_published->setPublished();
     $this->translation_de_unpublished_to_published->save();
 
     // Published node to unpublished translations.
@@ -84,11 +84,11 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->published_to_unpublished_node->save();
 
     $this->translation_fr_published_to_unpublished = $this->published_to_unpublished_node->addTranslation('fr', ['title' => 'Test Published to Unpublished Event FR']);
-    $this->translation_fr_published_to_unpublished->status = NodeInterface::NOT_PUBLISHED;
+    $this->translation_fr_published_to_unpublished->setUnpublished();
     $this->translation_fr_published_to_unpublished->save();
 
     $this->translation_de_published_to_unpublished = $this->published_to_unpublished_node->addTranslation('de', ['title' => 'Test Published to Unpublished Event DE']);
-    $this->translation_de_published_to_unpublished->status = NodeInterface::NOT_PUBLISHED;
+    $this->translation_de_published_to_unpublished->setUnpublished();
     $this->translation_de_published_to_unpublished->save();
 
     \Drupal::service('content_translation.manager')->setEnabled('node', 'event', TRUE);

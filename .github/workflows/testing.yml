@@ -86,7 +86,7 @@ jobs:
           webonyx/graphql-php:^14.8 \
           drupal/typed_data:^1.0 \
           drupal/redirect:^1.0 \
-          phpstan/phpstan:^1.7.14 \
+          phpstan/phpstan:^1.10.32 \
           mglaman/phpstan-drupal:^1.1.2 \
           phpstan/phpstan-deprecation-rules:^1.0.0 \
           jangregor/phpstan-prophecy:^1.0.0 \
