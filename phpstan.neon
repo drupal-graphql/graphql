@@ -12,6 +12,9 @@ parameters:
   # Not sure we can specify generic types properly with Drupal coding standards
   # yet, disable for now.
   checkGenericClassInNonGenericObjectType: false
+  # Sometimes we have a mismatch between local execution and CI, we don't care
+  # about ignored errors that are not triggered.
+  reportUnmatchedIgnoredErrors: false
   excludePaths:
     # Exclude the RouteLoad producer because the redirect module is not D10
     # compatible so we are not downloading it.
