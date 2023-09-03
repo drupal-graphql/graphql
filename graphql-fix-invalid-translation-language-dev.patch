@@ -1,0 +1,98 @@
+diff --git a/src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php b/src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php
+index 867a28c..386b2b3 100644
+--- a/src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php
++++ b/src/Plugin/GraphQL/DataProducer/Entity/EntityLoad.php
+@@ -172,8 +172,10 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
+ 
+       // Get the correct translation.
+       if (isset($language) && $language !== $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+-        $entity = $entity->getTranslation($language);
+-        $entity->addCacheContexts(["static:language:{$language}"]);
++        if ($entity->hasTranslation($language)) {
++          $entity = $entity->getTranslation($language);
++          $entity->addCacheContexts(["static:language:{$language}"]);
++        }
+       }
+ 
+       // Check if the passed user (or current user if none is passed) has access
+diff --git a/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php b/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php
+index 10e2d40..e4e6ed0 100644
+--- a/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php
++++ b/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadByUuid.php
+@@ -165,8 +165,10 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
+ 
+       // Get the correct translation.
+       if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+-        $entity = $entity->getTranslation($language);
+-        $entity->addCacheContexts(["static:language:{$language}"]);
++        if ($entity->hasTranslation($language)) {
++          $entity = $entity->getTranslation($language);
++          $entity->addCacheContexts(["static:language:{$language}"]);
++        }
+       }
+ 
+       // Check if the passed user (or current user if none is passed) has access
+diff --git a/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadMultiple.php b/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadMultiple.php
+index 2a0259c..27a19e5 100644
+--- a/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadMultiple.php
++++ b/src/Plugin/GraphQL/DataProducer/Entity/EntityLoadMultiple.php
+@@ -172,8 +172,10 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
+         }
+ 
+         if (isset($language) && $language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
+-          $entities[$id] = $entities[$id]->getTranslation($language);
+-          $entities[$id]->addCacheContexts(["static:language:{$language}"]);
++          if ($entities[$id]->hasTranslation($language)) {
++            $entities[$id] = $entities[$id]->getTranslation($language);
++            $entities[$id]->addCacheContexts(["static:language:{$language}"]);
++          }
+         }
+ 
+         if ($access) {
+diff --git a/src/Plugin/GraphQL/DataProducer/Entity/EntityTranslation.php b/src/Plugin/GraphQL/DataProducer/Entity/EntityTranslation.php
+index 633bdc2..3773a9b 100644
+--- a/src/Plugin/GraphQL/DataProducer/Entity/EntityTranslation.php
++++ b/src/Plugin/GraphQL/DataProducer/Entity/EntityTranslation.php
+@@ -101,7 +101,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
+    * @return \Drupal\Core\Entity\EntityInterface|null
+    */
+   public function resolve(EntityInterface $entity, $language, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation) {
+-    if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
++    if ($entity instanceof TranslatableInterface && $entity->isTranslatable() && $entity->hasTranslation($language)) {
+       $entity = $entity->getTranslation($language);
+       $entity->addCacheContexts(["static:language:{$language}"]);
+       // Check if the passed user (or current user if none is passed) has access
+diff --git a/src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php b/src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php
+index 10ea4e6..1eef22a 100644
+--- a/src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php
++++ b/src/Plugin/GraphQL/DataProducer/Routing/RouteEntity.php
+@@ -126,8 +126,10 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
+ 
+         // Get the correct translation.
+         if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
+-          $entity = $entity->getTranslation($language);
+-          $entity->addCacheContexts(["static:language:{$language}"]);
++          if ($entity->hasTranslation($language)) {
++            $entity = $entity->getTranslation($language);
++            $entity->addCacheContexts(["static:language:{$language}"]);
++          }
+         }
+ 
+         $access = $entity->access('view', NULL, TRUE);
+diff --git a/src/Plugin/GraphQL/DataProducer/Taxonomy/TaxonomyLoadTree.php b/src/Plugin/GraphQL/DataProducer/Taxonomy/TaxonomyLoadTree.php
+index 1bcd624..8b2caf2 100644
+--- a/src/Plugin/GraphQL/DataProducer/Taxonomy/TaxonomyLoadTree.php
++++ b/src/Plugin/GraphQL/DataProducer/Taxonomy/TaxonomyLoadTree.php
+@@ -175,8 +175,10 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
+         $context->addCacheableDependency($entities[$id]);
+ 
+         if (isset($language) && $language !== $entities[$id]->language()->getId() && $entities[$id] instanceof TranslatableInterface) {
+-          $entities[$id] = $entities[$id]->getTranslation($language);
+-          $entities[$id]->addCacheContexts(["static:language:{$language}"]);
++          if ($entities[$id]->hasTranslation($language)) {
++            $entities[$id] = $entities[$id]->getTranslation($language);
++            $entities[$id]->addCacheContexts(["static:language:{$language}"]);
++          }
+         }
+ 
+         if ($access) {
