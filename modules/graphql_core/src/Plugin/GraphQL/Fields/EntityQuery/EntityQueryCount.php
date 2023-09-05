@@ -27,7 +27,7 @@ class EntityQueryCount extends FieldPluginBase {
     if ($value instanceof QueryInterface) {
       // Clone the query and execute it as a count query.
       $clone = clone $value;
-      yield (int) $clone->accessCheck(FALSE)->range()->count()->execute();
+      yield (int) $clone->accessCheck(TRUE)->range()->count()->execute();
     }
   }
 
