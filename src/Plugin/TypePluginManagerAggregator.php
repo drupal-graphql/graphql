@@ -2,6 +2,8 @@
 
 namespace Drupal\graphql\Plugin;
 
+use Traversable;
+
 class TypePluginManagerAggregator implements \IteratorAggregate {
 
   /**
@@ -46,7 +48,8 @@ class TypePluginManagerAggregator implements \IteratorAggregate {
   /**
    * {@inheritdoc}
    */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     return new \ArrayIterator($this->pluginManagers);
   }
+
 }
