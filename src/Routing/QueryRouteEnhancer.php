@@ -3,26 +3,24 @@
 namespace Drupal\graphql\Routing;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Routing\Enhancer\RouteEnhancerInterface;
-use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
+use Drupal\Core\Routing\EnhancerInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\graphql\Utility\JsonHelper;
 use GraphQL\Server\Helper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Route;
 
-class QueryRouteEnhancer implements RouteEnhancerInterface {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function applies(Route $route) {
-    return $route->hasDefault('_graphql');
-  }
+class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
    * {@inheritdoc}
    */
   public function enhance(array $defaults, Request $request) {
+    $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
+    if (!$route->hasDefault('_graphql')) {
+      return $defaults;
+    }
+
     $helper = new Helper();
     $method = $request->getMethod();
     $body = $this->extractBody($request);
@@ -32,8 +30,13 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
     // By default we assume a 'single' request. This is going to fail in the
     // graphql processor due to a missing query string but at least provides
     // the right format for the client to act upon.
+    if (isset($defaults['_graphql']['single'])) {
+      $defaults += [
+        '_controller' => $defaults['_graphql']['single'],
+      ];
+    }
+
     return $defaults + [
-      '_controller' => $defaults['_graphql']['single'],
       'operations' => $operations,
     ];
   }
@@ -68,7 +71,7 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
       $values = array_merge($values, JsonHelper::decodeParams($content));
     }
 
-    if (stripos($request->headers->get('content-type'), 'multipart/form-data') !== FALSE) {
+    if (stripos($request->headers->get('content-type') ?? '', 'multipart/form-data') !== FALSE) {
       return $this->extractMultipart($request, $values);
     }
 
@@ -114,6 +117,5 @@ class QueryRouteEnhancer implements RouteEnhancerInterface {
 
     return $values;
   }
-
 
 }
