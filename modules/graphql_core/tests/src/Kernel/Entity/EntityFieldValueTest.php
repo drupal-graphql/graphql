@@ -3,10 +3,7 @@
 namespace Drupal\Tests\graphql_core\Kernel\Entity;
 
 use Drupal\file\Entity\File;
-use Drupal\graphql\Utility\StringHelper;
-use Drupal\node\Entity\Node;
 use Drupal\Tests\graphql_core\Kernel\GraphQLContentTestBase;
-use GraphQL\Server\OperationParams;
 
 /**
  * Test basic entity fields.
@@ -16,12 +13,12 @@ use GraphQL\Server\OperationParams;
 class EntityFieldValueTest extends GraphQLContentTestBase {
 
   /**
-   * @var File
+   * @var \Drupal\file\Entity\File
    */
   protected $testFile;
 
   /**
-   * @var File
+   * @var \Drupal\file\Entity\File
    */
   protected $testImage;
 
@@ -110,7 +107,7 @@ GQL;
         'fieldText' => [
           'value' => 'Foo',
           'processed' => "<p>Foo</p>\n",
-          'format' => null,
+          'format' => NULL,
         ],
       ],
     ], $metadata);
@@ -157,7 +154,7 @@ GQL;
         'body' => [
           'value' => 'http://www.drupal.org',
           'processed' => "<p><a href=\"http://www.drupal.org\">http://www.drupal.org</a></p>\n",
-          'summary' => null,
+          'summary' => NULL,
           'summaryProcessed' => '',
         ],
       ],
@@ -211,14 +208,14 @@ GQL;
     $this->addField('file', 'field_file');
     $this->addField('image', 'field_image');
 
-    // File 1
+    // File 1.
     file_put_contents('public://example.txt', $this->randomMachineName());
     $this->testFile = File::create([
       'uri' => 'public://example.txt',
     ]);
     $this->testFile->save();
 
-    // File 2
+    // File 2.
     file_put_contents('public://example.png', $this->randomMachineName());
     $this->testImage = File::create([
       'uri' => 'public://example.png',
@@ -232,10 +229,14 @@ GQL;
     $node = $this->createNode($values + $actualFieldValues);
 
     // Workaround for public file urls.
-    $expectedFieldValues['fieldFile'][0]['entity']['url'] = file_create_url($this->testFile->getFileUri());
-    $expectedFieldValues['fieldFile'][1]['entity']['url'] = file_create_url($this->testImage->getFileUri());
-    $expectedFieldValues['fieldImage'][0]['entity']['url'] = file_create_url($this->testFile->getFileUri());
-    $expectedFieldValues['fieldImage'][1]['entity']['url'] = file_create_url($this->testImage->getFileUri());
+    $expectedFieldValues['fieldFile'][0]['entity']['url'] = \Drupal::service('file_url_generator')
+      ->generateAbsoluteString($this->testFile->getFileUri());
+    $expectedFieldValues['fieldFile'][1]['entity']['url'] = \Drupal::service('file_url_generator')
+      ->generateAbsoluteString($this->testImage->getFileUri());
+    $expectedFieldValues['fieldImage'][0]['entity']['url'] = \Drupal::service('file_url_generator')
+      ->generateAbsoluteString($this->testFile->getFileUri());
+    $expectedFieldValues['fieldImage'][1]['entity']['url'] = \Drupal::service('file_url_generator')
+      ->generateAbsoluteString($this->testImage->getFileUri());
 
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
@@ -270,7 +271,8 @@ GQL;
           'title' => 'Internal link',
           'uri' => 'internal:/node/1',
           'options' => ['attributes' => ['_target' => 'blank']],
-        ], [
+        ],
+        [
           'title' => 'External link',
           'uri' => 'http://drupal.org',
           'options' => ['attributes' => ['_target' => 'blank']],
@@ -283,7 +285,7 @@ GQL;
       'field_timestamp' => [0, 300],
       'field_email' => ['test@test.com'],
       'field_string' => ['test', '123'],
-      'field_reference' =>  [
+      'field_reference' => [
         ['target_id' => 1],
       ],
       'field_file' => [
@@ -341,7 +343,7 @@ GQL;
         'summary' => 'test summary',
         'summaryProcessed' => "<p>test summary</p>\n",
         'processed' => "<p>test</p>\n",
-        'format' => null,
+        'format' => NULL,
       ],
       'fieldText' => [
         ['value' => 'a'],
@@ -353,8 +355,18 @@ GQL;
         FALSE,
       ],
       'fieldLink' => [
-        ['title' => 'Internal link', 'uri' => 'internal:/node/1', 'target' => 'blank', 'url' => ['internal' => '/node/1']],
-        ['title' => 'External link', 'uri' => 'http://drupal.org', 'target' => 'blank', 'url' => ['external' => 'http://drupal.org']],
+        [
+          'title' => 'Internal link',
+          'uri' => 'internal:/node/1',
+          'target' => 'blank',
+          'url' => ['internal' => '/node/1'],
+        ],
+        [
+          'title' => 'External link',
+          'uri' => 'http://drupal.org',
+          'target' => 'blank',
+          'url' => ['external' => 'http://drupal.org'],
+        ],
       ],
       'fieldInteger' => [
         10,
@@ -403,9 +415,9 @@ GQL;
           'display' => FALSE,
           'description' => 'description test 1',
           'entity' => [
-//            'uri' => [
-//              'value' => 'public://example.txt',
-//            ],
+            // 'uri' => [
+            //              'value' => 'public://example.txt',
+            //            ],
           ],
         ],
         [
@@ -413,9 +425,9 @@ GQL;
           'display' => TRUE,
           'description' => 'description test 2',
           'entity' => [
-//            'uri' => [
-//              'value' => 'public://example.png',
-//            ],
+            // 'uri' => [
+            //              'value' => 'public://example.png',
+            //            ],
           ],
         ],
       ],
@@ -427,9 +439,9 @@ GQL;
           'width' => 100,
           'height' => 50,
           'entity' => [
-//            'uri' => [
-//              'value' => 'public://example.txt',
-//            ],
+            // 'uri' => [
+            //              'value' => 'public://example.txt',
+            //            ],
           ],
         ],
         [
@@ -439,9 +451,9 @@ GQL;
           'width' => 200,
           'height' => 100,
           'entity' => [
-//            'uri' => [
-//              'value' => 'public://example.png',
-//            ],
+            // 'uri' => [
+            //              'value' => 'public://example.png',
+            //            ],
           ],
         ],
       ],

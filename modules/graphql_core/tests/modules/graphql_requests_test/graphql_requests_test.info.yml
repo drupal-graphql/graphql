@@ -2,7 +2,7 @@ type: module
 name: GraphQL Requests Test
 description: Dummy callbacks for internal request testing.
 package: Testing
-core: 8.x
+core_version_requirement: ^9 || ^10
 hidden: TRUE
 dependencies:
-- graphql_core
+  - graphql:graphql_core

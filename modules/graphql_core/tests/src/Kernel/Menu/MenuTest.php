@@ -55,7 +55,7 @@ class MenuTest extends GraphQLCoreTestBase {
     /** @var \Drupal\Core\Menu\MenuTreeStorageInterface $menuStorage */
     $menuStorage = $this->container->get('entity_type.manager')->getStorage('menu');
     $menu = $menuStorage->load('test');
-    $this->assertTrue($menu);
+    $this->assertIsObject($menu);
 
     /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menuTree */
     $menuTree = $this->container->get('menu.link_tree');
