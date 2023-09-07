@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use PhpParser\Node\Arg;
 use Prophecy\Argument;
 
 /**
@@ -24,7 +23,7 @@ class PermissionsTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->mockField('root', [

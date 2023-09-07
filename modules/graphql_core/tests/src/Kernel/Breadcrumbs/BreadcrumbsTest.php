@@ -25,7 +25,7 @@ class BreadcrumbsTest extends GraphQLCoreTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $breadcrumbManager = $this->prophesize('Drupal\Core\Breadcrumb\BreadcrumbManager');

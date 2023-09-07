@@ -22,7 +22,7 @@ class LanguageTest extends GraphQLCoreTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installConfig(['language']);
@@ -51,8 +51,7 @@ class LanguageTest extends GraphQLCoreTestBase {
    */
   public function testLanguageId() {
     $metadata = $this->defaultCacheMetaData();
-    // TODO: Should this also contain the language config cache metadata?
-
+    // @todo Should this also contain the language config cache metadata?
     $this->assertResults($this->getQueryFromFile('languages.gql'), [], [
       'languages' => [
         0 => [
@@ -104,7 +103,7 @@ class LanguageTest extends GraphQLCoreTestBase {
       'config:language.entity.en',
       'config:language.entity.es',
       'config:language.entity.fr',
-      'config:language.entity.pt-br'
+      'config:language.entity.pt-br',
     ]);
 
     $this->assertResults($this->getQueryFromFile('language_switch_links.gql'), [], [
@@ -154,4 +153,5 @@ class LanguageTest extends GraphQLCoreTestBase {
       ],
     ], $metadata);
   }
+
 }

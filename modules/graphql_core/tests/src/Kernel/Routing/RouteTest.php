@@ -3,8 +3,8 @@
 namespace Drupal\Tests\graphql_core\Kernel\Routing;
 
 use Drupal\Core\GeneratedUrl;
-use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
 use Prophecy\Argument;
 
@@ -22,7 +22,7 @@ class RouteTest extends GraphQLCoreTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $aliasManager = $this->prophesize(AliasManagerInterface::class);

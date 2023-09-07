@@ -23,7 +23,7 @@ class ImageFieldTest extends GraphQLContentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installConfig('image');
     $this->installSchema('file', 'file_usage');
@@ -44,7 +44,6 @@ class ImageFieldTest extends GraphQLContentTestBase {
 
     $a->save();
 
-
     $style = ImageStyle::load('thumbnail');
 
     $dimensions = [
@@ -58,7 +57,7 @@ class ImageFieldTest extends GraphQLContentTestBase {
     $metadata->addCacheTags([
       'file:1',
       'node:1',
-      // TODO: Check metatags. Is the config metatag required?
+      // @todo Check metatags. Is the config metatag required?
       'config:image.style.thumbnail',
     ]);
 
@@ -78,7 +77,8 @@ class ImageFieldTest extends GraphQLContentTestBase {
               'width' => $dimensions['width'],
               'height' => $dimensions['height'],
             ],
-          ]],
+          ],
+          ],
         ],
       ],
     ], $metadata);

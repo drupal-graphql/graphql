@@ -26,7 +26,7 @@ class MenuTest extends GraphQLCoreTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('menu_link_content');
     $this->installConfig('menu_link_content');
@@ -126,4 +126,5 @@ class MenuTest extends GraphQLCoreTestBase {
       $metadata
     );
   }
+
 }

@@ -15,7 +15,7 @@ class EntityQueryTest extends GraphQLContentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->createContentType(['type' => 'a']);
     $this->createContentType(['type' => 'b']);
@@ -50,7 +50,7 @@ class EntityQueryTest extends GraphQLContentTestBase {
     $c->save();
     $d->save();
 
-    // TODO: Check cache metadata.
+    // @todo Check cache metadata.
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheContexts(['user.node_grants:view']);
     $metadata->addCacheTags([
@@ -122,11 +122,11 @@ class EntityQueryTest extends GraphQLContentTestBase {
     $metadata->addCacheTags(['graphql', 'user_list']);
     $this->assertResults('query { userQuery (filter: { conditions: [ { field: "pass", value: "foo" } ] }) { count } }', [], [
       'userQuery' => [
-        // TODO: With proper access checking for filters this value should
-        //       become "2" and the entity query field can be marked as secure
+        // @todo With proper access checking for filters this value should
+        //   become "2" and the entity query field can be marked as secure
         //       again.
         'count' => 0,
-      ]
+      ],
     ], $metadata);
   }
 

@@ -18,7 +18,7 @@ class BundleLessEntityTest extends GraphQLContentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     FieldStorageConfig::create([
       'field_name' => 'field_test',

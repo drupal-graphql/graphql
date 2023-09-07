@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\QueryProvider\QueryProviderInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use GraphQL\Server\OperationParams;
 use Prophecy\Argument;
 
 /**
@@ -17,7 +16,7 @@ class ResultTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->mockField('root', [
       'name' => 'root',

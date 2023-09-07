@@ -6,12 +6,11 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
 use Drupal\Tests\graphql\Traits\EnableCliCacheTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\IntrospectionTestTrait;
-use Drupal\Tests\graphql\Traits\MockSchemaTrait;
 use Drupal\Tests\graphql\Traits\MockGraphQLPluginTrait;
+use Drupal\Tests\graphql\Traits\ProphesizePermissionsTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 
@@ -96,7 +95,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->injectTypeSystemPluginManagers($this->container);
 

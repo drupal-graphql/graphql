@@ -40,12 +40,15 @@ class StringFormattingTest extends UnitTestCase {
     $this->assertSame(lcfirst($expected), call_user_func_array([StringHelper::class, 'propCase'], $input));
   }
 
+  /**
+   *
+   */
   public function providerTestStringFormatting() {
     return [
       [['simple-name'], 'SimpleName'],
       [['123-name-with*^&!@some-SPECIAL-chars'], '_123NameWithSomeSPECIALChars'],
       [['simple', 'name-of-string', 'components'], 'SimpleNameOfStringComponents'],
-      [['123', 'array', '%^!@&#*', 'of', 'STRING', '(*&', 'components', 'with', 'SPEcial', 'chars'], '_123ArrayOfSTRINGComponentsWithSPEcialChars']
+      [['123', 'array', '%^!@&#*', 'of', 'STRING', '(*&', 'components', 'with', 'SPEcial', 'chars'], '_123ArrayOfSTRINGComponentsWithSPEcialChars'],
     ];
   }
 

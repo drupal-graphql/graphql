@@ -28,7 +28,7 @@ class EntityByIdTest extends GraphQLContentTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $languageStorage */

@@ -20,14 +20,14 @@ class SecureFieldTest extends GraphQLTestBase {
     // Don't grant the user field security bypass for this test case.
     return [
       'execute graphql requests',
-      //'bypass graphql field security',
+      // 'bypass graphql field security',
     ];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->mockField('secure', [
