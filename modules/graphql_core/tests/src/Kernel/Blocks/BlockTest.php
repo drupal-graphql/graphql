@@ -33,7 +33,7 @@ class BlockTest extends GraphQLCoreTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $themeInstaller */
@@ -43,7 +43,8 @@ class BlockTest extends GraphQLCoreTestBase {
     $this->installEntitySchema('block_content');
     try {
       $this->installEntitySchema('path_alias');
-    } catch (PluginNotFoundException $exc) {
+    }
+    catch (PluginNotFoundException $exc) {
       // Ignore if the path_alias entity doesn't exist. This means we are
       // testing a Drupal version < 8.8 and aliases are not entities yet.
     }
@@ -76,7 +77,7 @@ class BlockTest extends GraphQLCoreTestBase {
     $metadata = $this->defaultCacheMetaData();
     $metadata->addCacheTags([
       'block_content:1',
-      // TODO: Check metatags. Is the config metatag required?
+      // @todo Check metatags. Is the config metatag required?
       'config:block.block.stark_powered',
     ]);
 
@@ -98,4 +99,5 @@ class BlockTest extends GraphQLCoreTestBase {
       ],
     ], $metadata);
   }
+
 }
