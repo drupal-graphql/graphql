@@ -25,7 +25,8 @@ class FileUrl extends FieldPluginBase {
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof FileInterface) {
-      yield file_create_url($value->getFileUri());
+      yield \Drupal::service('file_url_generator')
+        ->generateAbsoluteString($value->getFileUri());
     }
   }
 

@@ -3,7 +3,7 @@
 namespace Drupal\graphql\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -14,10 +14,10 @@ class SubrequestSubscriber implements EventSubscriberInterface {
   /**
    * Handle kernel request events.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The kernel event object.
    */
-  public function onKernelRequest(GetResponseEvent $event) {
+  public function onKernelRequest(RequestEvent $event) {
     $request = $event->getRequest();
     if ($request->attributes->has('_graphql_subrequest')) {
       $request->attributes->set('_graphql_controller', $request->attributes->get('_controller'));
