@@ -33,7 +33,7 @@ class TestFrameworkTest extends GraphQLTestBase {
       'my_tag',
     ]);
 
-    // @todo
+    // @todo make this possible when the new version
     // $schema = $this->introspect();
     // $this->assertArraySubset([
     //   'types' => [

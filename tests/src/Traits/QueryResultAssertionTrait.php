@@ -44,7 +44,6 @@ trait QueryResultAssertionTrait {
    */
   abstract protected function defaultCacheContexts();
 
-
   /**
    * Retrieve the graphql processor.
    *
@@ -226,4 +225,5 @@ trait QueryResultAssertionTrait {
     $unexpectedTags = array_diff($result->getCacheTags(), $expected->getCacheTags());
     $this->assertEmpty($unexpectedTags, 'Unexpected cache tags: ' . implode(', ', $unexpectedTags));
   }
+
 }
