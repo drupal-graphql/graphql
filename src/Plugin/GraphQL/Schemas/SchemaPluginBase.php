@@ -508,13 +508,18 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
    * @param array $field
    *   The type reference.
    *
-   * @return array
+   * @return array|bool
    *   The field definition.
    */
   protected function buildField($field) {
-    if ($field['definition']['type'][0] == "layout_section") {
+    $exceptions = [
+      'layout_section',
+      'shipment_item'
+    ];
+    if (in_array($field['definition']['type'][0], $exceptions, TRUE)) {
       return FALSE;
     }
+
     if (!isset($this->fields[$field['id']])) {
       $creator = [$field['class'], 'createInstance'];
       $this->fields[$field['id']] = $creator($this, $this->fieldManager, $field['definition'], $field['id']);
