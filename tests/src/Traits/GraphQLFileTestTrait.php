@@ -18,7 +18,7 @@ trait GraphQLFileTestTrait {
    *   The path to the collection of test query files.
    */
   protected function getQueriesDirectory() {
-    return \Drupal::service('extension.list.module')->getPath('module', explode('\\', get_class($this))[2]) . '/tests/queries'
+    return \Drupal::service('extension.list.module')->getPath('module', explode('\\', get_class($this))[2]) . '/tests/queries';
   }
 
   /**
