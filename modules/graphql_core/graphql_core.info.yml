@@ -5,3 +5,4 @@ package: GraphQL
 core_version_requirement: ^9 || ^10
 dependencies:
   - graphql:graphql
+  - drupal:path_alias
