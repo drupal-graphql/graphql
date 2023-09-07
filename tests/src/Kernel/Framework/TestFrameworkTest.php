@@ -5,7 +5,6 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\graphql\GraphQL\Cache\CacheableValue;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
-use Drupal\graphql\Plugin\SchemaBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -35,7 +34,7 @@ class TestFrameworkTest extends GraphQLTestBase {
     ]);
 
     $schema = $this->introspect();
-    $this->assertArraySubset([
+    $this->assertSame([
       'types' => [
         'Query' => [
           'fields' => [
@@ -232,13 +231,17 @@ class TestFrameworkTest extends GraphQLTestBase {
       'name' => 'value',
       'type' => 'Int',
       'parents' => ['Number'],
-    ], function ($value) { yield $value['value']; });
+    ], function ($value) {
+      yield $value['value'];
+    });
 
     $this->mockField('string_value', [
       'name' => 'value',
       'type' => 'String',
       'parents' => ['Word'],
-    ], function ($value) { yield $value['value']; });
+    ], function ($value) {
+      yield $value['value'];
+    });
 
     $this->mockField('root', [
       'name' => 'root',

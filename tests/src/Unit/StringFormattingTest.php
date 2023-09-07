@@ -17,7 +17,7 @@ class StringFormattingTest extends UnitTestCase {
    * @expectedExceptionMessageRegExp /Failed to create a specification compliant string representation for '.+'\./
    */
   public function testFailureOnInvalidInput() {
-    $this->expectException(InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     StringHelper::camelCase('^%!@#&');
   }
 
