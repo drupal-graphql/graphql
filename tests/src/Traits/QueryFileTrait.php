@@ -14,7 +14,8 @@ trait QueryFileTrait {
    *   The path to the collection of test query files.
    */
   protected function getQueriesDirectory() {
-    return drupal_get_path('module', explode('\\', get_class($this))[2]) . '/tests/queries';
+    return \Drupal::service('extension.path.resolver')
+      ->getPath('module', explode('\\', get_class($this))[2]) . '/tests/queries';
   }
 
   /**

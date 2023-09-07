@@ -27,7 +27,8 @@ class ImageUrl extends FieldPluginBase {
    */
   protected function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof ImageItem && $value->entity && $value->entity->access('view')) {
-      yield file_create_url($value->entity->getFileUri());
+      yield \Drupal::service('file_url_generator')
+        ->generateAbsoluteString($value->entity->getFileUri());
     }
   }
 
