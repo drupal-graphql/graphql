@@ -71,7 +71,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
       $values = array_merge($values, JsonHelper::decodeParams($content));
     }
 
-    if (stripos($request->headers->get('content-type'), 'multipart/form-data') !== FALSE) {
+    if (stripos($request->headers->get('content-type') ?? '', 'multipart/form-data') !== FALSE) {
       return $this->extractMultipart($request, $values);
     }
 
