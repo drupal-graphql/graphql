@@ -4,7 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\graphql\GraphQL\Buffers\BufferBase;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Zend\Stdlib\ArrayObject;
 
 /**
  * Test batched field resolving.
@@ -56,7 +55,7 @@ class BufferedFieldTest extends GraphQLTestBase {
     ], function ($value, $args) use ($buffer) {
 
       $resolvers = array_map(function ($uid) use ($buffer) {
-        return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
+        return $buffer->createBufferResolver(new \ArrayObject(['uid' => $uid]));
       }, $args['uids']);
 
       return function () use ($resolvers) {
@@ -81,7 +80,7 @@ class BufferedFieldTest extends GraphQLTestBase {
       'parents' => ['User'],
     ], function ($value) use ($buffer) {
       $resolvers = array_map(function ($uid) use ($buffer) {
-        return $buffer->createBufferResolver(new ArrayObject(['uid' => $uid]));
+        return $buffer->createBufferResolver(new \ArrayObject(['uid' => $uid]));
       }, $value['friends']);
 
       return function () use ($resolvers) {
@@ -96,7 +95,7 @@ class BufferedFieldTest extends GraphQLTestBase {
       'type' => 'User',
       'parents' => ['User'],
     ], function ($value) use ($buffer) {
-      $resolver = $buffer->createBufferResolver(new ArrayObject(['uid' => $value['foe']]));
+      $resolver = $buffer->createBufferResolver(new \ArrayObject(['uid' => $value['foe']]));
 
       return function () use ($resolver) {
         yield $resolver();
