@@ -1,7 +1,5 @@
 # Introduction
 
-[![Build Status](https://img.shields.io/travis/drupal-graphql/graphql.svg)](https://travis-ci.org/drupal-graphql/graphql) [![Code Coverage](https://img.shields.io/codecov/c/github/drupal-graphql/graphql.svg)](https://codecov.io/gh/drupal-graphql/graphql) [![Code Quality](https://img.shields.io/scrutinizer/g/drupal-graphql/graphql.svg)](https://scrutinizer-ci.com/g/drupal-graphql/graphql/?branch=8.x-3.x)
-
 ## GraphQL for Drupal
 
 This module lets you craft and expose a [GraphQL](http://graphql.org/) schema for [Drupal 8](https://www.drupal.org/8).
@@ -32,39 +30,38 @@ Check out [https://github.com/fubhy/drupal-decoupled-app](https://github.com/fub
 
 These blog posts provide additional information on how to use and extend the module as well as other other contributed modules supporting it:
 
-* [https://www.amazeelabs.com/en/journal/introduction-graphql](https://www.amazeelabs.com/en/journal/introduction-graphql)
-* [https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo](https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo)
-* [https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included](https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included)
-* [https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields](https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields)
-* [https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces](https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces)
-* [https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields](https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields)
-* [https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations)
-* [https://www.amazeelabs.com/en/journal/dont-push-it-using-graphql-twig](https://www.amazeelabs.com/en/journal/dont-push-it-using-graphql-twig)
+- [https://www.amazeelabs.com/en/journal/introduction-graphql](https://www.amazeelabs.com/en/journal/introduction-graphql)
+- [https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo](https://www.amazeelabs.com/en/journal/drupal-and-graphql-react-and-apollo)
+- [https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included](https://www.amazeelabs.com/en/journal/drupal-and-graphql-batteries-included)
+- [https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields](https://www.amazeelabs.com/en/journal/extending-graphql-part-1-fields)
+- [https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces](https://www.amazeelabs.com/en/journal/extending-graphql-part-2-types-and-interfaces)
+- [https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields](https://www.amazeelabs.com/en/journal/graphql-drupalers-part-3-fields)
+- [https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations](https://www.amazeelabs.com/en/journal/extending-graphql-part-3-mutations)
+- [https://www.amazeelabs.com/en/journal/dont-push-it-using-graphql-twig](https://www.amazeelabs.com/en/journal/dont-push-it-using-graphql-twig)
 
 ### Resources
 
-* Project homepage: [https://www.drupal.org/project/graphql](https://www.drupal.org/project/graphql)
-* Contributing: [https://github.com/drupal-graphql/graphql](https://github.com/drupal-graphql/graphql)
+- Project homepage: [https://www.drupal.org/project/graphql](https://www.drupal.org/project/graphql)
+- Contributing: [https://github.com/drupal-graphql/graphql](https://github.com/drupal-graphql/graphql)
 
 ### Related projects
 
-* GraphQL APQ [https://github.com/lucasconstantino/drupal-graphql-apq](https://github.com/lucasconstantino/drupal-graphql-apq)
+- GraphQL APQ [https://github.com/lucasconstantino/drupal-graphql-apq](https://github.com/lucasconstantino/drupal-graphql-apq)
 
   > Drupal module for Automatic Persisted Queries compatible with the apollo-link-persisted-queries project's proposed protocol.
 
-* GraphQL Metatag [https://github.com/drupal-graphql/graphql-metatag](https://github.com/drupal-graphql/graphql-metatag)
+- GraphQL Metatag [https://github.com/drupal-graphql/graphql-metatag](https://github.com/drupal-graphql/graphql-metatag)
 
   > Module that integrates the Metatag Drupal module with GraphQL.
 
-* GraphQL Twig [https://github.com/drupal-graphql/graphql-twig](https://github.com/drupal-graphql/graphql-twig)
+- GraphQL Twig [https://github.com/drupal-graphql/graphql-twig](https://github.com/drupal-graphql/graphql-twig)
 
   > Allows you to inject data into Twig templates by simply adding a GraphQL query.
 
-* GraphQL Views [https://github.com/drupal-graphql/graphql-views](https://github.com/drupal-graphql/graphql-views)
+- GraphQL Views [https://github.com/drupal-graphql/graphql-views](https://github.com/drupal-graphql/graphql-views)
 
   > Adds support for views to GraphQL.
 
-* GraphQL Entity Definitions [https://www.drupal.org/project/graphql\_entity\_definitions](https://www.drupal.org/project/graphql_entity_definitions)
+- GraphQL Entity Definitions [https://www.drupal.org/project/graphql_entity_definitions](https://www.drupal.org/project/graphql_entity_definitions)
 
   > Adds structural entity information to GraphQL.
-
