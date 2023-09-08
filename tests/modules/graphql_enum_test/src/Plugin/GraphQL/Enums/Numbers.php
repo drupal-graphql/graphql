@@ -20,7 +20,7 @@ class Numbers extends EnumPluginBase {
    *
    * @var string[]
    */
-  public static $NUMBERS = [
+  public static $numbers = [
     'zero',
     'one',
     'two',
@@ -38,7 +38,7 @@ class Numbers extends EnumPluginBase {
    */
   public function buildEnumValues($definition) {
     $values = [];
-    foreach (static::$NUMBERS as $num => $word) {
+    foreach (static::$numbers as $num => $word) {
       $values[strtoupper($word)] = [
         'value' => $num,
         'description' => ucfirst($word),
