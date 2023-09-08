@@ -82,6 +82,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
       'languages:language_url',
       'languages:language_interface',
       'languages:language_content',
+      'theme'
     ];
   }
 
