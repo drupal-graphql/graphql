@@ -6,7 +6,6 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\graphql_core\Kernel\GraphQLCoreTestBase;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Test block retrieval via GraphQL.
@@ -36,11 +35,6 @@ class BlockTest extends GraphQLCoreTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $request = $this->container->get('request_stack')->getCurrentRequest();
-
-    $session = new Session();
-    $request->setSession($session);
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $themeInstaller */
     $themeInstaller = $this->container->get('theme_installer');
@@ -85,7 +79,7 @@ class BlockTest extends GraphQLCoreTestBase {
       'block_content:1',
       // @todo Check metatags. Is the config metatag required?
       'config:block.block.stark_powered',
-    ])->setCacheMaxAge(0);
+    ]);
 
     $this->assertResults($query, [], [
       'route' => [

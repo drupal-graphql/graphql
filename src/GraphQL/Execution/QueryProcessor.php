@@ -29,6 +29,9 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\ValidationContext;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Query processor class.
+ */
 class QueryProcessor {
 
   /**
@@ -199,7 +202,7 @@ class QueryProcessor {
       }
 
       // Only queries can be cached (mutations and subscriptions can't).
-      if ($type === 'query') {
+      if ($type->operation === 'query') {
         return $this->executeCacheableOperation($adapter, $config, $params, $document, !$persisted);
       }
 
@@ -229,7 +232,7 @@ class QueryProcessor {
    */
   protected function executeCacheableOperation(PromiseAdapter $adapter, ServerConfig $config, OperationParams $params, DocumentNode $document, $validate = TRUE) {
     $contextCacheId = 'ccid:' . $this->cacheIdentifier($params, $document);
-    if (!$config->getDebug() && $contextCache = $this->cacheBackend->get($contextCacheId)) {
+    if (!$config->getDebugFlag() && $contextCache = $this->cacheBackend->get($contextCacheId)) {
       $contexts = $contextCache->data ?: [];
       $cid = 'cid:' . $this->cacheIdentifier($params, $document, $contexts);
       if ($cache = $this->cacheBackend->get($cid)) {
