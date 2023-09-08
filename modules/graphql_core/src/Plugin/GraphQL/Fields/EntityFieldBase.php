@@ -40,11 +40,11 @@ class EntityFieldBase extends FieldPluginBase {
         }
       }
 
-      if ($itemProperty instanceof CacheableDependencyInterface) {
-        $context->addCacheTags($itemProperty->getCacheTags());
-        $context->addCacheContexts($itemProperty->getCacheContexts());
-        $context->mergeCacheMaxAge($itemProperty->getCacheMaxAge());
-      }
+      // if ($itemProperty instanceof CacheableDependencyInterface) {
+      //   $context->addCacheTags($itemProperty->getCacheTags());
+      //   $context->addCacheContexts($itemProperty->getCacheContexts());
+      //   $context->mergeCacheMaxAge($itemProperty->getCacheMaxAge());
+      // }
 
       return $result;
     }
