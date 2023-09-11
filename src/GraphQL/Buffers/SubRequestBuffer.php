@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\graphql\SubRequestResponse;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -106,8 +107,11 @@ class SubRequestBuffer extends BufferBase {
       }, $buffer);
     });
 
-    if ($session = $current->getSession()) {
-      $request->setSession($session);
+    // Pass the current session to the sub request if it exists.
+    try {
+      $request->setSession($current->getSession());
+    }
+    catch (SessionNotFoundException) {
     }
 
     return $request;
