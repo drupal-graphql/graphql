@@ -60,6 +60,7 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           # Disable Xdebug for better performance.
           coverage: none
+          ini-file: development
           extensions: ${{ env.extensions }}
 
       - name: Get composer cache directory
