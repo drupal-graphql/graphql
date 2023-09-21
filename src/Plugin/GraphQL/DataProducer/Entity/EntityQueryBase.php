@@ -5,7 +5,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use GraphQL\Error\UserError;
@@ -24,9 +24,9 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
   protected $entityTypeManager;
 
   /**
-   * The current user.
+   * The current user proxy.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var \Drupal\Core\Session\AccountProxyInterface
    */
   protected $currentUser;
 
@@ -54,15 +54,15 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   The current user proxy.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
     EntityTypeManager $entityTypeManager,
-    AccountInterface $current_user
+    AccountProxyInterface $current_user
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
@@ -131,7 +131,7 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
       if (!in_array($condition['field'], $allowedFilters)) {
         throw new UserError("Field '{$condition['field']}' is not allowed as filter.");
       }
-      $operation = isset($condition['operator']) ? $condition['operator'] : NULL;
+      $operation = $condition['operator'] ?? NULL;
       $query->condition($condition['field'], $condition['value'], $operation);
     }
 

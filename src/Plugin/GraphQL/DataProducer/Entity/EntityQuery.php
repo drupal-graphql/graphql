@@ -7,10 +7,48 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 /**
  * Builds and executes Drupal entity query.
  *
+ * Example for mapping this dataproducer to the schema:
+ * @code
+ *   $defaultSorting = [
+ *     [
+ *       'field' => 'created',
+ *       'direction' => 'DESC',
+ *     ],
+ *   ];
+ *   $registry->addFieldResolver('Query', 'jobApplicationsByUserId',
+ *     $builder->compose(
+ *       $builder->fromArgument('id'),
+ *       $builder->callback(function ($uid) {
+ *         $conditions = [
+ *           [
+ *             'field' => 'uid',
+ *             'value' => [$uid],
+ *           ],
+ *         ];
+ *         return $conditions;
+ *       }),
+ *       $builder->produce('entity_query', [
+ *         'type' => $builder->fromValue('node'),
+ *         'conditions' => $builder->fromParent(),
+ *         'offset' => $builder->fromArgument('offset'),
+ *         'limit' => $builder->fromArgument('limit'),
+ *         'language' => $builder->fromArgument('language'),
+ *         'allowed_filters' => $builder->fromValue(['uid']),
+ *         'bundles' => $builder->fromValue(['job_application']),
+ *         'sorts' => $builder->fromArgumentWithDefaultValue('sorting', $defaultSorting),
+ *       ]),
+ *       $builder->produce('entity_load_multiple', [
+ *         'type' => $builder->fromValue('node'),
+ *         'ids' => $builder->fromParent(),
+ *       ]),
+ *     )
+ *   );
+ * @endcode
+ *
  * @DataProducer(
  *   id = "entity_query",
  *   name = @Translation("Load entities"),
- *   description = @Translation("Loads entities."),
+ *   description = @Translation("Returns entity IDs for a given query"),
  *   produces = @ContextDefinition("string",
  *     label = @Translation("Entity IDs"),
  *     multiple = TRUE

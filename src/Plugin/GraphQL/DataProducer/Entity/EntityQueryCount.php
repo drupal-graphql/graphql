@@ -13,6 +13,40 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  * same way as entity query. Same filters are applied, just skips the offset and
  * limit, and turns the query into count query.
  *
+ * Example for mapping this dataproducer to the schema:
+ * @code
+ *   $defaultSorting = [
+ *     [
+ *       'field' => 'created',
+ *       'direction' => 'DESC',
+ *     ],
+ *   ];
+ *   $registry->addFieldResolver('Query', 'jobApplicationsByUserIdCount',
+ *     $builder->compose(
+ *       $builder->fromArgument('id'),
+ *       $builder->callback(function ($uid) {
+ *         $conditions = [
+ *           [
+ *             'field' => 'uid',
+ *             'value' => [$uid],
+ *           ],
+ *         ];
+ *         return $conditions;
+ *       }),
+ *       $builder->produce('entity_query_count', [
+ *         'type' => $builder->fromValue('node'),
+ *         'conditions' => $builder->fromParent(),
+ *         'offset' => $builder->fromArgument('offset'),
+ *         'limit' => $builder->fromArgument('limit'),
+ *         'language' => $builder->fromArgument('language'),
+ *         'allowed_filters' => $builder->fromValue(['uid']),
+ *         'bundles' => $builder->fromValue(['job_application']),
+ *         'sorts' => $builder->fromArgumentWithDefaultValue('sorting', $defaultSorting),
+ *       ])
+ *     )
+ *   );
+ * @endcode
+ *
  * @DataProducer(
  *   id = "entity_query_count",
  *   name = @Translation("Load entities"),
