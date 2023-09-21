@@ -19,11 +19,11 @@ jobs:
         include:
           # Extra runs to also test on latest Drupal 10.
           - php-versions: '8.1'
-            drupal-core: '10.0.x'
+            drupal-core: '10.1.x'
             phpstan: '0'
           # We only need to run PHPStan once on the latest PHP version.
           - php-versions: '8.2'
-            drupal-core: '10.0.x'
+            drupal-core: '10.1.x'
             phpstan: '1'
     steps:
       - name: Checkout Drupal core
