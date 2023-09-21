@@ -21,6 +21,20 @@ class MenuTest extends GraphQLTestBase {
   protected $menuLinkManager;
 
   /**
+   * Test menu.
+   *
+   * @var \Drupal\system\Entity\Menu
+   */
+  protected $menu;
+
+  /**
+   * Test link tree array.
+   *
+   * @var \Drupal\Core\Menu\MenuLinkTreeElement[]
+   */
+  protected $linkTree;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
@@ -57,7 +71,6 @@ class MenuTest extends GraphQLTestBase {
     $link = MenuLinkContent::create($parent);
     $link->save();
     $links['parent'] = $link->getPluginId();
-    $this->testLink = $link;
 
     $child_1 = $base_options + [
       'link' => ['uri' => 'internal:/menu-test/hierarchy/parent/child'],
@@ -91,8 +104,8 @@ class MenuTest extends GraphQLTestBase {
     $link->save();
     $links['child-2'] = $link->getPluginId();
 
-    $this->menuLinkTree = $this->container->get('menu.link_tree');
-    $this->linkTree = $this->menuLinkTree->load('menu_test', new MenuTreeParameters());
+    $menuLinkTree = $this->container->get('menu.link_tree');
+    $this->linkTree = $menuLinkTree->load('menu_test', new MenuTreeParameters());
   }
 
   /**

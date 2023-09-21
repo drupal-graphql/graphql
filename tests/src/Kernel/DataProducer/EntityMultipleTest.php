@@ -4,8 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 
@@ -41,18 +39,6 @@ class EntityMultipleTest extends GraphQLTestBase {
    */
   public function setUp(): void {
     parent::setUp();
-
-    $this->entity = $this->getMockBuilder(NodeInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->user = $this->getMockBuilder(UserInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
 
     $content_type = NodeType::create([
       'type' => 'lorem',

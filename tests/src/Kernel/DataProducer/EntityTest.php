@@ -25,6 +25,41 @@ class EntityTest extends GraphQLTestBase {
   protected $node;
 
   /**
+   * Mocked test entity.
+   *
+   * @var \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $entity;
+
+  /**
+   * Mocked test entity interface.
+   *
+   * @var \Drupal\Core\Entity\EntityInterface
+   */
+  protected $entityInterface;
+
+  /**
+   * Mocked test user.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
+   * Translated test entity.
+   *
+   * @var \Drupal\node\NodeInterface
+   */
+  protected $translationFr;
+
+  /**
+   * Translated test entity.
+   *
+   * @var \Drupal\node\NodeInterface
+   */
+  protected $translationDe;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
@@ -34,7 +69,7 @@ class EntityTest extends GraphQLTestBase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
+    $this->entityInterface = $this->getMockBuilder(EntityInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -64,11 +99,11 @@ class EntityTest extends GraphQLTestBase {
     ]);
     $this->node->save();
 
-    $this->translation_fr = $this->node->addTranslation('fr', ['title' => 'sit amet fr']);
-    $this->translation_fr->save();
+    $this->translationFr = $this->node->addTranslation('fr', ['title' => 'sit amet fr']);
+    $this->translationFr->save();
 
-    $this->translation_de = $this->node->addTranslation('de', ['title' => 'sit amet de']);
-    $this->translation_de->save();
+    $this->translationDe = $this->node->addTranslation('de', ['title' => 'sit amet de']);
+    $this->translationDe->save();
 
     \Drupal::service('content_translation.manager')->setEnabled('node', 'lorem', TRUE);
   }
@@ -103,7 +138,7 @@ class EntityTest extends GraphQLTestBase {
 
     $this->assertNull($this->executeDataProducer('entity_changed', [
       'format' => 'Y-m-d',
-      'entity' => $this->entity_interface,
+      'entity' => $this->entityInterface,
     ]));
   }
 
@@ -122,7 +157,7 @@ class EntityTest extends GraphQLTestBase {
 
     $this->assertNull($this->executeDataProducer('entity_created', [
       'format' => 'Y-m-d',
-      'entity' => $this->entity_interface,
+      'entity' => $this->entityInterface,
     ]));
   }
 
@@ -199,7 +234,7 @@ class EntityTest extends GraphQLTestBase {
     ]));
 
     $this->assertNull($this->executeDataProducer('entity_owner', [
-      'entity' => $this->entity_interface,
+      'entity' => $this->entityInterface,
     ]));
   }
 
@@ -229,7 +264,7 @@ class EntityTest extends GraphQLTestBase {
     ]));
 
     $this->assertNull($this->executeDataProducer('entity_published', [
-      'entity' => $this->entity_interface,
+      'entity' => $this->entityInterface,
     ]));
   }
 
