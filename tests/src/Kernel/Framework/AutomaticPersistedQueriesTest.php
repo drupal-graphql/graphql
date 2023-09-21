@@ -13,6 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 class AutomaticPersistedQueriesTest extends GraphQLTestBase {
 
   /**
+   * Test plugin.
+   *
+   * @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface
+   */
+  protected $pluginApq;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -32,7 +39,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.persisted_query');
 
-    $this->plugin_apq = $manager->createInstance('automatic_persisted_query');
+    $this->pluginApq = $manager->createInstance('automatic_persisted_query');
   }
 
   /**
@@ -42,7 +49,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     // Before adding the persisted query plugins to the server, we want to make
     // sure that there are no existing plugins already there.
     $this->server->removeAllPersistedQueryInstances();
-    $this->server->addPersistedQueryInstance($this->plugin_apq);
+    $this->server->addPersistedQueryInstance($this->pluginApq);
     $this->server->save();
 
     $endpoint = $this->server->get('endpoint');

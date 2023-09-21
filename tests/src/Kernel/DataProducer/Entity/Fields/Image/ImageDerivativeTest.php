@@ -25,7 +25,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
    *
    * @var string
    */
-  protected $file_uri;
+  protected $fileUri;
 
   /**
    * The file entity mock.
@@ -46,7 +46,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
    *
    * @var \Drupal\file\FileInterface
    */
-  protected $file_not_accessible;
+  protected $fileNotAccessible;
 
   /**
    * {@inheritdoc}
@@ -54,13 +54,13 @@ class ImageDerivativeTest extends GraphQLTestBase {
   public function setUp(): void {
     parent::setUp();
 
-    $this->file_uri = 'public://test.jpg';
+    $this->fileUri = 'public://test.jpg';
 
     $this->file = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->file->method('getFileUri')->willReturn($this->file_uri);
+    $this->file->method('getFileUri')->willReturn($this->fileUri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
     @$this->file->width = 600;
     @$this->file->height = 400;
@@ -77,11 +77,11 @@ class ImageDerivativeTest extends GraphQLTestBase {
     $this->style->addImageEffect($effect);
     $this->style->save();
 
-    $this->file_not_accessible = $this->getMockBuilder(FileInterface::class)
+    $this->fileNotAccessible = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->file_not_accessible->method('access')->willReturn((new AccessResultForbidden())->addCacheTags(['test_tag_forbidden']));
+    $this->fileNotAccessible->method('access')->willReturn((new AccessResultForbidden())->addCacheTags(['test_tag_forbidden']));
   }
 
   /**
@@ -97,7 +97,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
 
     $this->assertEquals(
       [
-        'url' => $this->style->buildUrl($this->file_uri),
+        'url' => $this->style->buildUrl($this->fileUri),
         'width' => 300,
         'height' => 200,
       ],
@@ -111,7 +111,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
     // Test that we don't get the derivative if we don't have access to the
     // original file, but we still get the access result cache tags.
     $result = $this->executeDataProducer('image_derivative', [
-      'entity' => $this->file_not_accessible,
+      'entity' => $this->fileNotAccessible,
       'style' => 'test_style',
     ]);
 

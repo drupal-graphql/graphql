@@ -26,7 +26,7 @@ class ImageUrlTest extends GraphQLTestBase {
    *
    * @var \Drupal\file\FileInterface
    */
-  protected $file_not_accessible;
+  protected $fileNotAccessible;
 
   /**
    * The generated file URI.
@@ -50,11 +50,11 @@ class ImageUrlTest extends GraphQLTestBase {
     $this->file->method('getFileUri')->willReturn($this->fileUri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
 
-    $this->file_not_accessible = $this->getMockBuilder(FileInterface::class)
+    $this->fileNotAccessible = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->file_not_accessible->method('access')->willReturn((new AccessResultForbidden())->addCacheTags(['test_tag_forbidden']));
+    $this->fileNotAccessible->method('access')->willReturn((new AccessResultForbidden())->addCacheTags(['test_tag_forbidden']));
   }
 
   /**
@@ -73,7 +73,7 @@ class ImageUrlTest extends GraphQLTestBase {
     // Test that we do not get a file we don't have access to, but the cache
     // tags are still added.
     $result = $this->executeDataProducer('image_url', [
-      'entity' => $this->file_not_accessible,
+      'entity' => $this->fileNotAccessible,
     ]);
 
     $this->assertNull($result);

@@ -4,8 +4,6 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\user\UserInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
 
