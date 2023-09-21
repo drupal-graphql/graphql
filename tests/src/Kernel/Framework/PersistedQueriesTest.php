@@ -46,11 +46,11 @@ GQL;
     $this->mockResolver('Link', 'title', 'Ecosia');
 
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
-    $manager = $this->container->get('plugin.manager.graphql.persisted_query');
+    /*$manager = $this->container->get('plugin.manager.graphql.persisted_query');
 
     $this->plugin_one = $manager->createInstance('persisted_query_plugin_one');
     $this->plugin_two = $manager->createInstance('persisted_query_plugin_two');
-    $this->plugin_three = $manager->createInstance('persisted_query_plugin_three');
+    $this->plugin_three = $manager->createInstance('persisted_query_plugin_three');*/
   }
 
   /**

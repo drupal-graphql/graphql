@@ -15,11 +15,31 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class ImageUrlTest extends GraphQLTestBase {
 
   /**
+   * The file entity mock.
+   *
+   * @var \Drupal\file\FileInterface
+   */
+  protected $file;
+
+  /**
+   * A file entity mock that returns FALSE on access checking.
+   *
+   * @var \Drupal\file\FileInterface
+   */
+  protected $file_not_accessible;
+
+  /**
+   * The generated file URI.
+   *
+   * @var string
+   */
+  protected $fileUri;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
 
     $this->fileUri = \Drupal::service('file_url_generator')->generateAbsoluteString('public://test.jpg');
 

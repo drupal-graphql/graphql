@@ -42,18 +42,6 @@ class EntityMultipleTest extends GraphQLTestBase {
   public function setUp(): void {
     parent::setUp();
 
-    $this->entity = $this->getMockBuilder(NodeInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->user = $this->getMockBuilder(UserInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
     $content_type = NodeType::create([
       'type' => 'lorem',
       'name' => 'ipsum',

@@ -21,6 +21,34 @@ class ImageDerivativeTest extends GraphQLTestBase {
   protected static $modules = ['image', 'file'];
 
   /**
+   * The file system URI under test.
+   *
+   * @var string
+   */
+  protected $file_uri;
+
+  /**
+   * The file entity mock.
+   *
+   * @var \Drupal\file\FileInterface
+   */
+  protected $file;
+
+  /**
+   * The image style for testing.
+   *
+   * @var \Drupal\image\Entity\ImageStyle
+   */
+  protected $style;
+
+  /**
+   * A file entity mock that returns FALSE on access checking.
+   *
+   * @var \Drupal\file\FileInterface
+   */
+  protected $file_not_accessible;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
@@ -34,8 +62,8 @@ class ImageDerivativeTest extends GraphQLTestBase {
 
     $this->file->method('getFileUri')->willReturn($this->file_uri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
-    $this->file->width = 600;
-    $this->file->height = 400;
+    @$this->file->width = 600;
+    @$this->file->height = 400;
 
     $this->style = ImageStyle::create(['name' => 'test_style']);
     $effect = [
