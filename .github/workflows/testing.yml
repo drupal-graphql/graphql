@@ -7,7 +7,7 @@ on:
 jobs:
   drupal:
     name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       extensions: mbstring, xml, pdo_sqlite, gd, opcache
     strategy:
@@ -82,19 +82,13 @@ jobs:
           composer --no-interaction run-script drupal-phpunit-upgrade
           composer config --no-plugins allow-plugins.phpstan/extension-installer true
 
-      - name: Install GraphQL, PHPStan, Coder dependencies
+      - name: Install GraphQL dependencies
         # Pin the exact Coder version to upgrade manually when we want to.
-        run: composer --no-interaction --no-progress --update-with-all-dependencies require \
-          webonyx/graphql-php:^14.8 \
-          drupal/typed_data:^1.0 \
-          drupal/redirect:^1.0 \
-          phpstan/phpstan:^1.10.32 \
-          mglaman/phpstan-drupal:^1.1.2 \
-          phpstan/phpstan-deprecation-rules:^1.0.0 \
-          jangregor/phpstan-prophecy:^1.0.0 \
-          phpstan/phpstan-phpunit:^1.0.0 \
-          phpstan/extension-installer:^1.0 \
-          drupal/coder:8.3.21
+        run: |
+          composer --no-interaction --no-progress require \
+            webonyx/graphql-php:^14.8 \
+            drupal/typed_data:^1.0 \
+            drupal/redirect:^1.0
 
       - name: Run PHPUnit
         run: |
@@ -103,11 +97,23 @@ jobs:
         env:
           SIMPLETEST_DB: "sqlite://localhost/:memory:"
 
+      - name: Install PHPStan and Coder dependencies
+        if: ${{ matrix.phpstan }} == "1"
+        # Pin the exact Coder version to upgrade manually when we want to.
+        run: |
+          composer --no-interaction --no-progress require \
+            phpstan/phpstan:^1.10.32 \
+            mglaman/phpstan-drupal:^1.1.2 \
+            phpstan/phpstan-deprecation-rules:^1.0.0 \
+            jangregor/phpstan-prophecy:^1.0.0 \
+            phpstan/phpstan-phpunit:^1.0.0 \
+            phpstan/extension-installer:^1.0
+          composer --no-interaction --no-progress --with-all-dependencies upgrade drupal/coder:8.3.21
+
       - name: Run PHPStan
-        # phpstan-drupal bug, so we remove 1 stub file
-        # https://github.com/mglaman/phpstan-drupal/issues/509
-        run: if [[ ${{ matrix.phpstan }} == "1" ]]; then rm vendor/mglaman/phpstan-drupal/stubs/Drupal/Core/Field/FieldItemList.stub && cd modules/graphql && ../../vendor/bin/phpstan analyse; fi
+        if: ${{ matrix.phpstan }} == "1"
+        run: cd modules/graphql && ../../vendor/bin/phpstan analyse
 
       - name: Run PHPCS
-        run: |
-          cd modules/graphql && ../../vendor/bin/phpcs -p
+        if: ${{ matrix.phpstan }} == "1"
+        run: cd modules/graphql && ../../vendor/bin/phpcs -p
