@@ -234,6 +234,26 @@ GQL;
   /**
    * @covers ::cond
    */
+  public function testSingleCond(): void {
+    $this->mockResolver('Query', 'me', $this->builder->cond([
+      [
+        $this->builder->fromValue(FALSE),
+        $this->builder->fromValue('This should resolve into null.'),
+      ],
+    ]));
+
+    $query = <<<GQL
+      query {
+        me
+      }
+GQL;
+
+    $this->assertResults($query, [], ['me' => NULL]);
+  }
+
+  /**
+   * @covers ::cond
+   */
   public function testSimpleCond(): void {
     $this->mockResolver('Query', 'tree', $this->builder->fromValue([
       'name' => 'some tree',
