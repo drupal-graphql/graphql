@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use GraphQL\Deferred;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
+use GraphQL\Deferred;
 
 /**
  * Tests that the resolver builder behaves correctly.

@@ -2,14 +2,14 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
+use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Resolver\Value;
+use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
-use Drupal\graphql\Entity\Server;
-use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\Tests\RandomGeneratorTrait;
 
 /**
