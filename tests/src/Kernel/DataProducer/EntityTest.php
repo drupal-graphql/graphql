@@ -2,15 +2,15 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\user\UserInterface;
-use Drupal\node\Entity\NodeType;
-use Drupal\node\Entity\Node;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTestBundle;
+use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeInterface;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Data producers Entity test class.

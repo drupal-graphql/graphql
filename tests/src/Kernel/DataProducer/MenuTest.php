@@ -2,11 +2,11 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\system\Entity\Menu;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\system\Entity\Menu;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Data producers Menu test class.
