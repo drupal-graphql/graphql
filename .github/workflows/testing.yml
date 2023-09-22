@@ -84,7 +84,7 @@ jobs:
 
       - name: Install GraphQL, PHPStan, Coder dependencies
         # Pin the exact Coder version to upgrade manually when we want to.
-        run: composer --no-interaction --no-progress require \
+        run: composer --no-interaction --no-progress --update-with-all-dependencies require \
           webonyx/graphql-php:^14.8 \
           drupal/typed_data:^1.0 \
           drupal/redirect:^1.0 \
