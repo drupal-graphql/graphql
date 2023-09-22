@@ -83,7 +83,6 @@ jobs:
           composer config --no-plugins allow-plugins.phpstan/extension-installer true
 
       - name: Install GraphQL dependencies
-        # Pin the exact Coder version to upgrade manually when we want to.
         run: |
           composer --no-interaction --no-progress require \
             webonyx/graphql-php:^14.8 \
