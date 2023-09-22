@@ -2,14 +2,14 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
-use GraphQL\Language\Parser;
-use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
+use GraphQL\Language\Parser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

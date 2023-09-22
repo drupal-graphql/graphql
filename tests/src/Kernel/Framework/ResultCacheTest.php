@@ -2,15 +2,15 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Render\RenderContext;
+use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Prophecy\Argument;
-use Drupal\graphql\Entity\Server;
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use GraphQL\Deferred;
+use Prophecy\Argument;
 
 /**
  * Test query result caching.

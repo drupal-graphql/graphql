@@ -6,9 +6,9 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\node\Entity\NodeType;
 use Drupal\graphql\GraphQL\ResolverBuilder;
+use Drupal\node\Entity\NodeType;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Test the entity_definition data producer and friends.
