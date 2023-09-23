@@ -3,6 +3,8 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -45,6 +47,13 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
   protected $redirectRepository;
 
   /**
+   * Language manager for retrieving the default langcode.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -55,6 +64,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
       $plugin_id,
       $plugin_definition,
       $container->get('path.validator'),
+      $container->get('language_manager'),
       $container->get('redirect.repository', ContainerInterface::NULL_ON_INVALID_REFERENCE)
     );
   }
@@ -70,6 +80,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    *   The plugin definition.
    * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
    * @param \Drupal\redirect\RedirectRepository|null $redirectRepository
    *
    * @codeCoverageIgnore
@@ -79,10 +91,12 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
     $pluginId,
     $pluginDefinition,
     PathValidatorInterface $pathValidator,
+    LanguageManagerInterface $languageManager,
     ?RedirectRepository $redirectRepository = NULL
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->pathValidator = $pathValidator;
+    $this->languageManager = $languageManager;
     $this->redirectRepository = $redirectRepository;
   }
 
@@ -95,7 +109,8 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @return \Drupal\Core\Url|null
    */
   public function resolve($path, RefinableCacheableDependencyInterface $metadata) {
-    $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, []) : NULL;
+    $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
+    $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, [], $langcode) : NULL;
     if ($redirect !== NULL) {
       $url = $redirect->getRedirectUrl();
     }
