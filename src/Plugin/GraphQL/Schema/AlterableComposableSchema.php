@@ -7,9 +7,10 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
-use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
+use Drupal\graphql\GraphQL\Utility\AST;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use GraphQL\Language\Parser;
+use GraphQL\Language\Source;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -112,29 +113,41 @@ class AlterableComposableSchema extends ComposableSchema {
    * @see \Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema::getSchemaDocument()
    */
   protected function getSchemaDocument(array $extensions = []) {
-    // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "schema:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
+    $baseDefinition = $this->getSchemaDefinition();
+    if (!$baseDefinition instanceof Source) {
+      @trigger_error('Returning a ' . get_debug_type($baseDefinition) . ' from `getSchemaDefinition` is deprecated in graphql:4.6 and is disallowed from graphql:5.0.0. Return \GraphQL\Language\Source instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+      $baseDefinition = new Source($baseDefinition);
     }
+    $sources = [$baseDefinition->body];
 
-    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
-      return $extension->getBaseDefinition();
-    }, $extensions), function ($definition) {
-      return !empty($definition);
-    });
-    $schema = array_merge([$this->getSchemaDefinition()], $extensions);
+    foreach ($extensions as $id => $extension) {
+      $definition = $extension->getBaseDefinition();
+      if (!$definition instanceof Source && $definition !== NULL) {
+        @trigger_error('Returning a ' . get_debug_type($definition) . ' from `getBaseDefinition` is deprecated in graphql:4.6 and is disallowed from graphql:5.0.0. Return \GraphQL\Language\Source|NULL instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+        $definition = new Source($definition);
+      }
+
+      if (empty($definition)) {
+        continue;
+      }
+
+      $sources[$id] = $definition->body;
+    }
     // Event in order to alter the schema data.
-    $event = new AlterSchemaDataEvent($schema);
+    $event = new AlterSchemaDataEvent($sources);
     $this->dispatcher->dispatch(
       $event,
       AlterSchemaDataEvent::EVENT_NAME
     );
-    $ast = Parser::parse(implode("\n\n", $event->getSchemaData()));
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    $documents = [];
+    foreach ($event->getSchemaData() as $schemaDatum) {
+      if (empty($schemaDatum)) {
+        continue;
+      }
+      $documents[] = Parser::parse($schemaDatum);
     }
-    return $ast;
+
+    return AST::concatAST($documents);
   }
 
   /**
@@ -154,30 +167,33 @@ class AlterableComposableSchema extends ComposableSchema {
    * @see \Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema::getSchemaDocument()
    */
   protected function getExtensionDocument(array $extensions = []) {
-    // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "extension:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
+    foreach ($extensions as $id => $extension) {
+      $definition = $extension->getExtensionDefinition();
+      if (!$definition instanceof Source && $definition !== NULL) {
+        @trigger_error('Returning a ' . get_debug_type($definition) . ' from `getExtensionDefinition` is deprecated in graphql:4.6 and is disallowed from graphql:5.0.0. Return \GraphQL\Language\Source|NULL instead. See https://www.drupal.org/node/', E_USER_DEPRECATED);
+        $definition = new Source($definition);
+      }
+
+      if (empty($definition)) {
+        continue;
+      }
+
+      $sources[$id] = $definition->body;
     }
 
-    $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
-      return $extension->getExtensionDefinition();
-    }, $extensions), function ($definition) {
-      return !empty($definition);
-    });
 
     // Event in order to alter the schema extension data.
-    $event = new AlterSchemaExtensionDataEvent($extensions);
+    $event = new AlterSchemaExtensionDataEvent($sources);
     $this->dispatcher->dispatch(
       $event,
       AlterSchemaExtensionDataEvent::EVENT_NAME
     );
-    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData())) : NULL;
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    $documents = [];
+    foreach ($event->getSchemaExtensionData() as $schemaDatum) {
+      $documents[] = Parser::parse($schemaDatum);
     }
 
-    return $ast;
+    return AST::concatAST($documents);
   }
 
 }

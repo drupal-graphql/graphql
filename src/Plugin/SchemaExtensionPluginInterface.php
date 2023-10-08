@@ -22,7 +22,7 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
   /**
    * Retrieves the base schema definition.
    *
-   * @return string|null
+   * @return \GraphQL\Language\Source|string|null
    *   The base schema definition.
    */
   public function getBaseDefinition();
@@ -30,7 +30,7 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
   /**
    * Retrieves the extension schema definition.
    *
-   * @return string|null
+   * @return \GraphQL\Language\Source|string|null
    *   The extension schema definition.
    */
   public function getExtensionDefinition();
