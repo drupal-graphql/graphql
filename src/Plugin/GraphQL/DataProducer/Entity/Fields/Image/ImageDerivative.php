@@ -101,8 +101,6 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
       $width = $entity->width;
       $height = $entity->height;
 
-      // @todo Remove hard-coded properties and only rely on image factory.
-      // @phpstan-ignore-next-line
       if (empty($width) || empty($height)) {
         /** @var \Drupal\Core\Image\ImageInterface $image */
         $image = \Drupal::service('image.factory')->get($entity->getFileUri());
