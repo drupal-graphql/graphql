@@ -104,10 +104,10 @@ class SubRequestBuffer extends BufferBase {
       }, $buffer);
     });
 
-    if ($session = $current->getSession()) {
-      $request->setSession($session);
+    if ($current->hasSession()) {
+      $request->setSession($current->getSession());
     }
-    
+
     return $request;
   }
 
