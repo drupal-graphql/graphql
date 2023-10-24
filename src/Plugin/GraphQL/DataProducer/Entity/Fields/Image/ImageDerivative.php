@@ -89,7 +89,7 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
    * @return array|null
    */
   public function resolve(FileInterface $entity = NULL, $style, RefinableCacheableDependencyInterface $metadata) {
-    // Return if we dont have an entity.
+    // Return if we don't have an entity.
     if (!$entity) {
       return NULL;
     }
