@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
@@ -199,7 +200,30 @@ class EntityTest extends GraphQLTestBase {
       ->method('label')
       ->willReturn('Dummy label');
 
+    $this->entity->expects($this->exactly(2))
+      ->method('access')
+      ->willReturnCallback(static function (): AccessResult {
+        static $counter = 0;
+        switch ($counter) {
+          case 0:
+            $counter++;
+            return AccessResult::allowed();
+
+          case 1:
+            $counter++;
+            return AccessResult::forbidden();
+
+          default:
+            throw new \LogicException('The access() method should not have been called more than twice.');
+        }
+      })
+      ->with('view label', NULL, TRUE);
+
     $this->assertEquals('Dummy label', $this->executeDataProducer('entity_label', [
+      'entity' => $this->entity,
+    ]));
+
+    $this->assertNull($this->executeDataProducer('entity_label', [
       'entity' => $this->entity,
     ]));
   }
