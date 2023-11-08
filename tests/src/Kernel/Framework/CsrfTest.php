@@ -155,26 +155,36 @@ GQL;
       [['CONTENT_TYPE' => 'multipart/form-data']],
       // The custom Apollo-Require-Preflight header overrules any evil Origin
       // header.
-      [[
-        'CONTENT_TYPE' => 'multipart/form-data',
-        'HTTP_APOLLO_REQUIRE_PREFLIGHT' => 'test',
-        'HTTP_ORIGIN' => 'https://evil.example.com',
-      ]],
+      [
+        [
+          'CONTENT_TYPE' => 'multipart/form-data',
+          'HTTP_APOLLO_REQUIRE_PREFLIGHT' => 'test',
+          'HTTP_ORIGIN' => 'https://evil.example.com',
+        ],
+      ],
       // The Origin header alone with the correct domain is allowed.
-      [[
-        'CONTENT_TYPE' => 'multipart/form-data',
-        'HTTP_ORIGIN' => 'https://example.com',
-      ]],
+      [
+        [
+          'CONTENT_TYPE' => 'multipart/form-data',
+          'HTTP_ORIGIN' => 'https://example.com',
+        ],
+      ],
       // The Origin header with an allowed domain.
-      [[
-        'CONTENT_TYPE' => 'multipart/form-data',
-        'HTTP_ORIGIN' => 'https://allowed.example.com',
-      ], ['https://allowed.example.com']],
+      [
+        [
+          'CONTENT_TYPE' => 'multipart/form-data',
+          'HTTP_ORIGIN' => 'https://allowed.example.com',
+        ],
+        ['https://allowed.example.com'],
+      ],
       // The Origin header with any allowed domain.
-      [[
-        'CONTENT_TYPE' => 'multipart/form-data',
-        'HTTP_ORIGIN' => 'https://allowed.example.com',
-      ], ['*']],
+      [
+        [
+          'CONTENT_TYPE' => 'multipart/form-data',
+          'HTTP_ORIGIN' => 'https://allowed.example.com',
+        ],
+        ['*'],
+      ],
     ];
   }
 

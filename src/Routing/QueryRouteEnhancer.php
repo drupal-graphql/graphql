@@ -92,7 +92,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
       return;
     }
 
-    /** @phpstan-ignore-next-line */
+    // @phpstan-ignore-next-line
     $content_format = method_exists($request, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
     if ($content_format === NULL) {
       // Symfony before 5.4 does not detect "multipart/form-data", check for it
@@ -116,7 +116,11 @@ class QueryRouteEnhancer implements EnhancerInterface {
     if ($content_format === "form") {
       // If the client set a custom header then we can be sure CORS was
       // respected.
-      $custom_headers = ['Apollo-Require-Preflight', 'X-Apollo-Operation-Name', 'x-graphql-yoga-csrf'];
+      $custom_headers = [
+        'Apollo-Require-Preflight',
+        'X-Apollo-Operation-Name',
+        'x-graphql-yoga-csrf',
+      ];
       foreach ($custom_headers as $custom_header) {
         if ($request->headers->has($custom_header)) {
           return;
@@ -133,7 +137,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
       if (!empty($this->corsOptions['enabled'])) {
         $cors_service = new CorsService($this->corsOptions);
         // Drupal 9 compatibility, method name has changed in Drupal 10.
-        /** @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         if ($cors_service->isActualRequestAllowed($request)) {
           return;
         }
