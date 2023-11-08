@@ -23,7 +23,13 @@ class EntityLabel extends FieldPluginBase {
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
     if ($value instanceof EntityInterface) {
-      yield $value->label();
+      /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
+      $accessResult = $value->access('view label', NULL, TRUE);
+      $context->addCacheableDependency($accessResult);
+      if ($accessResult->isAllowed()) {
+        yield $value->label();
+      }
+      yield NULL;
     }
   }
 
