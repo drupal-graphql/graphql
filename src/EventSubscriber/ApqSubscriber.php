@@ -4,8 +4,8 @@ namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\graphql\Event\OperationEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use GraphQL\Error\Error;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Save persisted queries to cache.
