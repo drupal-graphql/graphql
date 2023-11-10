@@ -3,6 +3,7 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
@@ -298,7 +299,7 @@ class EntityTest extends GraphQLTestBase {
   public function testResolveAccess(): void {
     $this->entity->expects($this->any())
       ->method('access')
-      ->willReturn(FALSE);
+      ->willReturn(new AccessResultForbidden());
 
     $this->assertFalse($this->executeDataProducer('entity_access', [
       'entity' => $this->entity,
