@@ -72,7 +72,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
 
     // Post query to endpoint with a not matching hash.
     $content = json_encode(['query' => $query] + $parameters);
-    $request = Request::create($endpoint, 'POST', [], [], [], [], $content);
+    $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $content);
     $result = $this->container->get('http_kernel')->handle($request);
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame([
@@ -88,7 +88,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     $parameters['extensions']['persistedQuery']['sha256Hash'] = hash('sha256', $query);
 
     $content = json_encode(['query' => $query] + $parameters);
-    $request = Request::create($endpoint, 'POST', [], [], [], [], $content);
+    $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $content);
     $result = $this->container->get('http_kernel')->handle($request);
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame(['data' => ['field_one' => 'this is the field one']], json_decode($result->getContent(), TRUE));

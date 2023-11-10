@@ -56,7 +56,7 @@ trait HttpRequestTrait {
       $request = Request::create($endpoint, $method, $data);
     }
     else {
-      $request = Request::create($endpoint, $method, [], [], [], [], json_encode($data));
+      $request = Request::create($endpoint, $method, [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($data));
     }
 
     return $this->container->get('http_kernel')->handle($request);
@@ -81,7 +81,7 @@ trait HttpRequestTrait {
 
     $queries = json_encode($queries);
     $endpoint = $this->server->get('endpoint');
-    $request = Request::create($endpoint, 'POST', [], [], [], [], $queries);
+    $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $queries);
     return $this->container->get('http_kernel')->handle($request);
   }
 
