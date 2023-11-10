@@ -27,7 +27,7 @@ trait HttpRequestTrait {
    *   The server instance.
    * @param array $variables
    *   Query variables.
-   * @param array|null $extensions
+   * @param array $extensions
    *   The query extensions.
    * @param bool $persisted
    *   Flag if the query is actually the identifier of a persisted query.
@@ -41,18 +41,14 @@ trait HttpRequestTrait {
    */
   protected function query(
     string $query,
-    $server = NULL,
+    ?Server $server = NULL,
     array $variables = [],
-    array $extensions = NULL,
-    $persisted = FALSE,
+    array $extensions = [],
+    bool $persisted = FALSE,
     string $method = Request::METHOD_GET,
     string $operationName = ''
   ) {
     $server = $server ?: $this->server;
-    if (!($server instanceof Server)) {
-      throw new \LogicException('Invalid server.');
-    }
-
     $endpoint = $this->server->get('endpoint');
     $extensions = !empty($extensions) ? ['extensions' => $extensions] : [];
     // If the persisted flag is true, then instead of sending the full query to
