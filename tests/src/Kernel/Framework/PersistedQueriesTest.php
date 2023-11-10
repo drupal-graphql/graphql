@@ -66,7 +66,7 @@ GQL;
     }
     $this->server->save();
 
-    $result = $this->query($queryId, NULL, [], NULL, TRUE);
+    $result = $this->query($queryId, NULL, [], [], TRUE);
 
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame($expected, json_decode($result->getContent(), TRUE));

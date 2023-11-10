@@ -11,6 +11,7 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Deferred;
 use Prophecy\Argument;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Test query result caching.
@@ -383,6 +384,36 @@ GQL;
 
     $result = $this->query($query);
     $this->assertEquals(200, $result->getStatusCode());
+  }
+
+  /**
+   * Ensure that a different operation name does not get a cached result.
+   */
+  public function testOperationNameCaching(): void {
+    $dummy = $this->getMockBuilder(Server::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['id'])
+      ->getMock();
+
+    // The dataproducer should be called twice because 2 differently named
+    // queries are not cached.
+    $dummy->expects($this->exactly(2))
+      ->method('id')
+      ->willReturn('test');
+
+    // Use the same resolver for both fields.
+    foreach (['root', 'leakA'] as $field_name) {
+      $this->mockResolver('Query', $field_name,
+        function () use ($dummy) {
+          return $dummy->id();
+        }
+      );
+    }
+
+    // First call is uncached.
+    $this->query('query one { root } query two { leakA }', NULL, [], [], FALSE, Request::METHOD_GET, 'one');
+    // Second call is uncached.
+    $this->query('query one { root } query two { leakA }', NULL, [], [], FALSE, Request::METHOD_GET, 'two');
   }
 
 }
