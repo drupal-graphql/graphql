@@ -37,7 +37,15 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function query($query, $server = NULL, array $variables = [], array $extensions = NULL, $persisted = FALSE, string $method = Request::METHOD_GET) {
+  protected function query(
+    string $query,
+    $server = NULL,
+    array $variables = [],
+    array $extensions = NULL,
+    $persisted = FALSE,
+    string $method = Request::METHOD_GET,
+    string $operationName = ''
+  ) {
     $server = $server ?: $this->server;
     if (!($server instanceof Server)) {
       throw new \LogicException('Invalid server.');
@@ -52,6 +60,9 @@ trait HttpRequestTrait {
       $query_key => $query,
       'variables' => $variables,
     ] + $extensions;
+    if ($operationName) {
+      $data['operationName'] = $operationName;
+    }
     if ($method === Request::METHOD_GET) {
       $request = Request::create($endpoint, $method, $data);
     }
