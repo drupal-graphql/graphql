@@ -33,6 +33,8 @@ trait HttpRequestTrait {
    *   Flag if the query is actually the identifier of a persisted query.
    * @param string $method
    *   Method, GET or POST.
+   * @param string $operationName
+   *   Optional operation name if $query contains multiple operations.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
