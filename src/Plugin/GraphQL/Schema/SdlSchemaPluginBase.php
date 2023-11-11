@@ -174,7 +174,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     });
 
     $schema = array_merge([$this->getSchemaDefinition()], $extensions);
-    $ast = Parser::parse(implode("\n\n", $schema));
+    $ast = Parser::parse(implode("\n\n", $schema), ['noLocation' => TRUE]);
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
@@ -205,7 +205,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions), ['noLocation' => TRUE]) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
