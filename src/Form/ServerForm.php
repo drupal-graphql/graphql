@@ -247,7 +247,7 @@ class ServerForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state): void {
     // Translate the debug flag from individual checkboxes to the enum value
     // that the GraphQL library expects.
     $debug_flag = $form_state->getValue('debug_flag');
