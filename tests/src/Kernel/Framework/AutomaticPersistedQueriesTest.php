@@ -13,6 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 class AutomaticPersistedQueriesTest extends GraphQLTestBase {
 
   /**
+   * Test plugin.
+   *
+   * @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface
+   */
+  protected $pluginApq;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -32,7 +39,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.persisted_query');
 
-    $this->plugin_apq = $manager->createInstance('automatic_persisted_query');
+    $this->pluginApq = $manager->createInstance('automatic_persisted_query');
   }
 
   /**
@@ -42,7 +49,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     // Before adding the persisted query plugins to the server, we want to make
     // sure that there are no existing plugins already there.
     $this->server->removeAllPersistedQueryInstances();
-    $this->server->addPersistedQueryInstance($this->plugin_apq);
+    $this->server->addPersistedQueryInstance($this->pluginApq);
     $this->server->save();
 
     $endpoint = $this->server->get('endpoint');
@@ -65,7 +72,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
 
     // Post query to endpoint with a not matching hash.
     $content = json_encode(['query' => $query] + $parameters);
-    $request = Request::create($endpoint, 'POST', [], [], [], [], $content);
+    $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $content);
     $result = $this->container->get('http_kernel')->handle($request);
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame([
@@ -81,7 +88,7 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     $parameters['extensions']['persistedQuery']['sha256Hash'] = hash('sha256', $query);
 
     $content = json_encode(['query' => $query] + $parameters);
-    $request = Request::create($endpoint, 'POST', [], [], [], [], $content);
+    $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $content);
     $result = $this->container->get('http_kernel')->handle($request);
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame(['data' => ['field_one' => 'this is the field one']], json_decode($result->getContent(), TRUE));

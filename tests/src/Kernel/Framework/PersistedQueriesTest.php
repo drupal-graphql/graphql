@@ -44,13 +44,6 @@ GQL;
     $this->mockResolver('Query', 'field_three', []);
     $this->mockResolver('Link', 'url', 'https://www.ecosia.org');
     $this->mockResolver('Link', 'title', 'Ecosia');
-
-    /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
-    $manager = $this->container->get('plugin.manager.graphql.persisted_query');
-
-    $this->plugin_one = $manager->createInstance('persisted_query_plugin_one');
-    $this->plugin_two = $manager->createInstance('persisted_query_plugin_two');
-    $this->plugin_three = $manager->createInstance('persisted_query_plugin_three');
   }
 
   /**
@@ -62,13 +55,18 @@ GQL;
     // Before adding the persisted query plugins to the server, we want to make
     // sure that there are no existing plugins already there.
     $this->server->removeAllPersistedQueryInstances();
+
+    /** @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $manager */
+    $manager = $this->container->get('plugin.manager.graphql.persisted_query');
+
     foreach ($instanceIds as $index => $instanceId) {
-      $this->{$instanceId}->setWeight($index);
-      $this->server->addPersistedQueryInstance($this->{$instanceId});
+      $plugin = $manager->createInstance("persisted_query_$instanceId");
+      $plugin->setWeight($index);
+      $this->server->addPersistedQueryInstance($plugin);
     }
     $this->server->save();
 
-    $result = $this->query($queryId, NULL, [], NULL, TRUE);
+    $result = $this->query($queryId, NULL, [], [], TRUE);
 
     $this->assertSame(200, $result->getStatusCode());
     $this->assertSame($expected, json_decode($result->getContent(), TRUE));

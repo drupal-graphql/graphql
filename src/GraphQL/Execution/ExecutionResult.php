@@ -2,9 +2,9 @@
 
 namespace Drupal\graphql\GraphQL\Execution;
 
-use GraphQL\Executor\ExecutionResult as LibraryExecutionResult;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
+use GraphQL\Executor\ExecutionResult as LibraryExecutionResult;
 
 /**
  * Expand the upstream ExecutionResult to make it Drupal cachable.

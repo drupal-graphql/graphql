@@ -14,8 +14,8 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\DataProducerPluginCachingInterface;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
-use Symfony\Component\HttpFoundation\RequestStack;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * A proxy class that lazy resolves data producers and has a result cache.
