@@ -356,6 +356,7 @@ class Executor implements ExecutorImplementation {
       'query' => DocumentSerializer::serializeDocument($this->document),
       'variables' => $variables,
       'extensions' => $extensions,
+      'operation' => $this->operation,
     ]));
 
     return $hash;

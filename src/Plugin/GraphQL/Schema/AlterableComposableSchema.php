@@ -2,14 +2,14 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
-use GraphQL\Language\Parser;
-use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
+use GraphQL\Language\Parser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -130,7 +130,10 @@ class AlterableComposableSchema extends ComposableSchema {
       $event,
       AlterSchemaDataEvent::EVENT_NAME
     );
-    $ast = Parser::parse(implode("\n\n", $event->getSchemaData()));
+    // For caching and parsing big schemas we need to disable the creation of
+    // location nodes in the AST object to prevent serialization and memory
+    // errors. See https://github.com/webonyx/graphql-php/issues/1164
+    $ast = Parser::parse(implode("\n\n", $event->getSchemaData()), ['noLocation' => TRUE]);
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
@@ -172,7 +175,7 @@ class AlterableComposableSchema extends ComposableSchema {
       $event,
       AlterSchemaExtensionDataEvent::EVENT_NAME
     );
-    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData())) : NULL;
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData()), ['noLocation' => TRUE]) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }

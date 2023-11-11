@@ -87,7 +87,7 @@ services:
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
-    arguments: ['@request_stack']
+    arguments: ['%cors.config%']
     tags:
       - { name: route_enhancer }
 

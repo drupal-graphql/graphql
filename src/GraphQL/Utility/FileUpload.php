@@ -8,6 +8,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\ImageFactory;
@@ -20,10 +21,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
-use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
