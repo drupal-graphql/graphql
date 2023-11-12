@@ -14,12 +14,19 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class RoutingTest extends GraphQLTestBase {
 
   /**
+   * The redirect storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $redirectStorage;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
     'redirect',
-    'views',
     'path_alias',
+    'views',
   ];
 
   /**
@@ -30,6 +37,8 @@ class RoutingTest extends GraphQLTestBase {
 
     $this->installEntitySchema('redirect');
     $this->installConfig(['redirect']);
+
+    $this->redirectStorage = $this->container->get('entity_type.manager')->getStorage('redirect');
   }
 
   /**
@@ -78,6 +87,35 @@ class RoutingTest extends GraphQLTestBase {
     ]);
 
     $this->assertNull($result, 'Route to external URL should not be found.');
+  }
+
+  /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteLoad::resolve
+   */
+  public function testRedirectRouteLoad(): void {
+    /** @var \Drupal\redirect\Entity\Redirect $redirect */
+    $redirect = $this->redirectStorage->create();
+    $redirect->setSource('redirect-url');
+    $redirect->setRedirect('user/logout');
+    $redirect->save();
+
+    $result = $this->executeDataProducer('route_load', [
+      'path' => '/redirect-url',
+    ]);
+
+    $this->assertNotNull($result);
+    $this->assertEquals('user.logout', $result->getRouteName());
+
+    $redirect->setLanguage('de');
+    $redirect->save();
+
+    $result = $this->executeDataProducer('route_load', [
+      'path' => '/redirect-url',
+      'language' => 'de',
+    ]);
+
+    $this->assertNotNull($result);
+    $this->assertEquals('user.logout', $result->getRouteName());
   }
 
   /**
