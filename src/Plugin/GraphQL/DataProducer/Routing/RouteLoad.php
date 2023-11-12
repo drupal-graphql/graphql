@@ -98,7 +98,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
-   *
+   */
   public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
     $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, [], $language) : NULL;
     if ($redirect !== NULL) {
