@@ -19,6 +19,7 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Utils\BuildSchema;
 use GraphQL\Utils\SchemaExtender;
+use GraphQL\Utils\SchemaPrinter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -119,13 +120,14 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     $extensions = $this->getExtensions();
     $resolver = [$registry, 'resolveType'];
     $document = $this->getSchemaDocument($extensions);
+    $options = ['assumeValid' => TRUE];
     $schema = BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $resolver;
       }
 
       return $config;
-    });
+    }, $options);
 
     if (empty($extensions)) {
       return $schema;
@@ -136,7 +138,20 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     if ($extendSchema = $this->getExtensionDocument($extensions)) {
-      return SchemaExtender::extend($schema, $extendSchema);
+      // Generate the AST from the extended schema and
+      // save it to the cache. This is important, because the Drupal
+      // graphql module is not caching the extended schema.
+      // During schema extension, a very expensive function
+      // \GraphQL\Type\Schema::getTypeMap() is called.
+      $document = $this->getExtensionSchemaAst($schema, $extendSchema);
+      $options = ['assumeValid' => TRUE];
+      $extended_schema = BuildSchema::build($document, function ($config, TypeDefinitionNode $type) use ($resolver) {
+        if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
+          $config['resolveType'] = $resolver;
+        }
+        return $config;
+      }, $options);
+      return $extended_schema;
     }
 
     return $schema;
@@ -240,6 +255,36 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     return file_get_contents($file) ?: NULL;
+  }
+
+  /**
+   * Retrieves the extension schema AST from cache if possible.
+   *
+   * @param mixed $schema
+   *   The schema.
+   * @param mixed $extendSchema
+   *   The extended schema.
+   *
+   * @return \GraphQL\Language\AST\DocumentNode
+   *
+   * @throws \GraphQL\Error\Error
+   * @throws \GraphQL\Error\SyntaxError
+   */
+  public function getExtensionSchemaAst($schema, $extendSchema) {
+    $cid = "schema_extension:{$this->getPluginId()}";
+    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
+      return $cache->data;
+    }
+
+    $schema = SchemaExtender::extend($schema, $extendSchema);
+    $schema_string = SchemaPrinter::doPrint($schema);
+    $options = ['noLocation' => TRUE];
+    $ast = Parser::parse($schema_string, $options);
+    if (empty($this->inDevelopment)) {
+      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+    }
+
+    return $ast;
   }
 
 }
