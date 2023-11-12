@@ -27,7 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     ),
  *     "language" = @ContextDefinition("string",
  *       label = @Translation("Language"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = "und"
  *     )
  *   }
  * )
@@ -99,7 +100,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    *
    * @return \Drupal\Core\Url|null
    */
-  public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($path, string $language, RefinableCacheableDependencyInterface $metadata) {
     $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, [], $language) : NULL;
     if ($redirect !== NULL) {
       $url = $redirect->getRedirectUrl();
