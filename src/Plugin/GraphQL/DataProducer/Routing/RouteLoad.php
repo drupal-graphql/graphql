@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Language\Language;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -27,7 +28,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     ),
  *     "language" = @ContextDefinition("string",
  *       label = @Translation("Language"),
- *       required = FALSE
+ *       required = FALSE,
+ *       default_value = "und"
  *     )
  *   }
  * )
@@ -94,12 +96,13 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * Resolver.
    *
    * @param string $path
-   * @param string $language
+   * @param string|null $language
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
    */
-  public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve($path, ?string $language, RefinableCacheableDependencyInterface $metadata) {
+    $language = $language ?? Language::LANGCODE_NOT_SPECIFIED;
     $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, [], $language) : NULL;
     if ($redirect !== NULL) {
       $url = $redirect->getRedirectUrl();
