@@ -3,16 +3,20 @@
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\PageCache\ChainRequestPolicy;
+use Drupal\Core\PageCache\RequestPolicy\NoSessionOpen;
+use Drupal\graphql\Cache\RequestPolicy\GetOnly;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\graphql\Traits\DataProducerExecutionTrait;
-use Drupal\Tests\graphql\Traits\MockingTrait;
 use Drupal\Tests\graphql\Traits\HttpRequestTrait;
+use Drupal\Tests\graphql\Traits\MockingTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Provides helper methods for kernel tests in GraphQL module.
@@ -25,6 +29,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use SchemaPrinterTrait;
   use MockingTrait;
   use UserCreationTrait;
+  use ProphecyTrait;
 
   /**
    * The server under test.
@@ -85,6 +90,26 @@ abstract class GraphQLTestBase extends KernelTestBase {
     ])->save();
 
     $this->builder = new ResolverBuilder();
+  }
+
+  /**
+   * Configures core's cache policy.
+   *
+   * Modifies the DefaultRequestPolicy classes, which always add in the
+   * CommandLineOrUnsafeMethod policy which will always result in DENY in a
+   * Kernel test because we're running via the command line.
+   *
+   * @param int $max_age
+   *   Max age to cache responses.
+   */
+  protected function configureCachePolicy(int $max_age = 900): void {
+    $this->container->set('dynamic_page_cache_request_policy', (new ChainRequestPolicy())
+      ->addPolicy(new GetOnly()));
+    $this->container->set('page_cache_request_policy', (new ChainRequestPolicy())
+      ->addPolicy(new NoSessionOpen($this->container->get('session_configuration')))
+      ->addPolicy(new GetOnly()));
+    // Turn on caching.
+    $this->config('system.performance')->set('cache.page.max_age', $max_age)->save();
   }
 
   /**

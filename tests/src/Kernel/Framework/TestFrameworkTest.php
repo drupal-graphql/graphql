@@ -2,9 +2,9 @@
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\Core\Cache\CacheableDependencyInterface;
 
 /**
  * Test the test framework.
@@ -26,7 +26,7 @@ GQL;
     $this->setUpSchema($schema);
 
     $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->setMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $cacheable->expects($this->any())
@@ -92,7 +92,7 @@ GQL;
         query: Query
         mutation: Mutation
       }
-      
+
       type Query {
         root: Boolean
       }
@@ -141,7 +141,7 @@ GQL;
       schema {
         query: Query
       }
-      
+
       type Query {
         root: [Token]
       }
@@ -178,7 +178,7 @@ GQL;
           ... on Number {
             number: value
           }
-          
+
           ... on Word {
             word:value
           }
@@ -202,7 +202,7 @@ GQL;
       schema {
         query: Query
       }
-      
+
       type Query {
         root: [Token]
       }

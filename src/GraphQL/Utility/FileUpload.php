@@ -8,8 +8,10 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\RenderContext;
@@ -19,8 +21,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Service to manage file uploads within GraphQL mutations.
@@ -48,7 +51,7 @@ class FileUpload {
   /**
    * The mime type guesser service.
    *
-   * @var \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface
+   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
    */
   protected $mimeTypeGuesser;
 
@@ -95,6 +98,20 @@ class FileUpload {
   protected $renderer;
 
   /**
+   * The event dispatcher service.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
+   * The image factory service.
+   *
+   * @var \Drupal\Core\Image\ImageFactory
+   */
+  protected $imageFactory;
+
+  /**
    * Constructor.
    */
   public function __construct(
@@ -106,7 +123,9 @@ class FileUpload {
     Token $token,
     LockBackendInterface $lock,
     ConfigFactoryInterface $config_factory,
-    RendererInterface $renderer
+    RendererInterface $renderer,
+    EventDispatcherInterface $eventDispatcher,
+    ImageFactory $image_factory
   ) {
     /** @var \Drupal\file\FileStorageInterface $file_storage */
     $file_storage = $entityTypeManager->getStorage('file');
@@ -119,6 +138,8 @@ class FileUpload {
     $this->lock = $lock;
     $this->systemFileConfig = $config_factory->get('system.file');
     $this->renderer = $renderer;
+    $this->eventDispatcher = $eventDispatcher;
+    $this->imageFactory = $image_factory;
   }
 
   /**
@@ -127,14 +148,14 @@ class FileUpload {
    * @param array $settings
    *   The file field settings.
    *
-   * @return int
+   * @return float
    *   Max upload size.
    */
-  protected function getMaxUploadSize(array $settings) {
+  protected function getMaxUploadSize(array $settings): float {
     // Cap the upload size according to the PHP limit.
-    $max_filesize = Bytes::toInt(Environment::getUploadMaxSize());
+    $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
     if (!empty($settings['max_filesize'])) {
-      $max_filesize = min($max_filesize, Bytes::toInt($settings['max_filesize']));
+      $max_filesize = min($max_filesize, Bytes::toNumber($settings['max_filesize']));
     }
     return $max_filesize;
   }
@@ -240,7 +261,7 @@ class FileUpload {
       $file = $this->fileStorage->create([]);
       $file->setOwnerId($this->currentUser->id());
       $file->setFilename($prepared_filename);
-      $file->setMimeType($this->mimeTypeGuesser->guess($prepared_filename));
+      $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
       $file->setFileUri($temp_file_path);
       // Set the size. This is done in File::preSave() but we validate the file
       // before it is saved.
@@ -248,6 +269,11 @@ class FileUpload {
 
       // Validate against file_validate() first with the temporary path.
       $errors = file_validate($file, $validators);
+      $maxResolution = $settings['max_resolution'] ?? 0;
+      $minResolution = $settings['min_resolution'] ?? 0;
+      if (!empty($maxResolution) || !empty($minResolution)) {
+        $errors += $this->validateFileImageResolution($file, $maxResolution, $minResolution);
+      }
 
       if (!empty($errors)) {
         $response->addViolations($errors);
@@ -360,6 +386,84 @@ class FileUpload {
   }
 
   /**
+   * Copy of file_validate_image_resolution() without creating messages.
+   *
+   * Verifies that image dimensions are within the specified maximum and
+   * minimum.
+   *
+   * Non-image files will be ignored. If an image toolkit is available the image
+   * will be scaled to fit within the desired maximum dimensions.
+   *
+   * @param \Drupal\file\FileInterface $file
+   *   A file entity. This function may resize the file affecting its size.
+   * @param string|int $maximum_dimensions
+   *   (optional) A string in the form WIDTHxHEIGHT; for example, '640x480' or
+   *   '85x85'. If an image toolkit is installed, the image will be resized down
+   *   to these dimensions. A value of zero (the default) indicates no
+   *   restriction on size, so no resizing will be attempted.
+   * @param string|int $minimum_dimensions
+   *   (optional) A string in the form WIDTHxHEIGHT. This will check that the
+   *   image meets a minimum size. A value of zero (the default) indicates that
+   *   there is no restriction on size.
+   *
+   * @return array
+   *   An empty array if the file meets the specified dimensions, was resized
+   *   successfully to meet those requirements or is not an image. If the image
+   *   does not meet the requirements or an attempt to resize it fails, an array
+   *   containing the error message will be returned.
+   */
+  protected function validateFileImageResolution(FileInterface $file, $maximum_dimensions = 0, $minimum_dimensions = 0): array {
+    $errors = [];
+
+    // Check first that the file is an image.
+    /** @var \Drupal\Core\Image\ImageInterface $image */
+    $image = $this->imageFactory->get($file->getFileUri());
+
+    if ($image->isValid()) {
+      $scaling = FALSE;
+      if ($maximum_dimensions) {
+        // Check that it is smaller than the given dimensions.
+        [$width, $height] = explode('x', $maximum_dimensions);
+        if ($image->getWidth() > $width || $image->getHeight() > $height) {
+          // Try to resize the image to fit the dimensions.
+          if ($image->scale((int) $width, (int) $height)) {
+            $scaling = TRUE;
+            $image->save();
+          }
+          else {
+            $errors[] = $this->t('The image exceeds the maximum allowed dimensions and an attempt to resize it failed.');
+          }
+        }
+      }
+
+      if ($minimum_dimensions) {
+        // Check that it is larger than the given dimensions.
+        [$width, $height] = explode('x', $minimum_dimensions);
+        if ($image->getWidth() < $width || $image->getHeight() < $height) {
+          if ($scaling) {
+            $errors[] = $this->t('The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.',
+              [
+                '%dimensions' => $minimum_dimensions,
+                '%width' => $image->getWidth(),
+                '%height' => $image->getHeight(),
+              ]);
+          }
+          else {
+            $errors[] = $this->t('The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
+              [
+                '%dimensions' => $minimum_dimensions,
+                '%width' => $image->getWidth(),
+                '%height' => $image->getHeight(),
+              ]);
+          }
+        }
+      }
+    }
+
+    return $errors;
+  }
+
+  /**
    * Prepares the filename to strip out any malicious extensions.
    *
    * @param string $filename
@@ -378,13 +482,15 @@ class FileUpload {
         // valid extensions, munge the filename to protect against possible
         // malicious extension hiding within an unknown file type. For example,
         // "filename.html.foo".
-        $filename = file_munge_filename($filename, $validators['file_validate_extensions'][0]);
+        $event = new FileUploadSanitizeNameEvent($filename, $validators['file_validate_extensions'][0]);
+        $this->eventDispatcher->dispatch($event);
+        $filename = $event->getFilename();
       }
 
       // Rename potentially executable files, to help prevent exploits (i.e.
       // will rename filename.php.foo and filename.php to filename._php._foo.txt
       // and filename._php.txt, respectively).
-      if (preg_match(FILE_INSECURE_EXTENSION_REGEX, $filename)) {
+      if (preg_match(FileSystemInterface::INSECURE_EXTENSION_REGEX, $filename)) {
         // If the file will be rejected anyway due to a disallowed extension, it
         // should not be renamed; rather, we'll let file_validate_extensions()
         // reject it below.
@@ -401,7 +507,10 @@ class FileUpload {
             // URI.
             $filename .= '.txt';
           }
-          $filename = file_munge_filename($filename, $validators['file_validate_extensions'][0] ?? '');
+
+          $event = new FileUploadSanitizeNameEvent($filename, $validators['file_validate_extensions'][0] ?? '');
+          $this->eventDispatcher->dispatch($event);
+          $filename = $event->getFilename();
 
           // The .txt extension may not be in the allowed list of extensions. We
           // have to add it here or else the file upload will fail.
@@ -461,9 +570,9 @@ class FileUpload {
     ];
 
     // Cap the upload size according to the PHP limit.
-    $max_filesize = Bytes::toInt(Environment::getUploadMaxSize());
+    $max_filesize = Bytes::toNumber(Environment::getUploadMaxSize());
     if (!empty($settings['max_filesize'])) {
-      $max_filesize = min($max_filesize, Bytes::toInt($settings['max_filesize']));
+      $max_filesize = min($max_filesize, Bytes::toNumber($settings['max_filesize']));
     }
 
     // There is always a file size limit due to the PHP server limit.

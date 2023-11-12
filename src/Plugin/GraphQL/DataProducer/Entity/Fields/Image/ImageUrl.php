@@ -3,6 +3,7 @@
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
@@ -37,6 +38,13 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
   protected $renderer;
 
   /**
+   * The file URL generator service.
+   *
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   */
+  protected $fileUrlGenerator;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -46,7 +54,8 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('file_url_generator')
     );
   }
 
@@ -61,6 +70,8 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
    *   The plugin definition.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   *   The file URL generator service.
    *
    * @codeCoverageIgnore
    */
@@ -68,10 +79,12 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
     array $configuration,
     $pluginId,
     $pluginDefinition,
-    RendererInterface $renderer
+    RendererInterface $renderer,
+    FileUrlGeneratorInterface $fileUrlGenerator
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->renderer = $renderer;
+    $this->fileUrlGenerator = $fileUrlGenerator;
   }
 
   /**
@@ -92,7 +105,7 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
       // incorporated into the response.
       $context = new RenderContext();
       $url = $this->renderer->executeInRenderContext($context, function () use ($entity) {
-        return file_create_url($entity->getFileUri());
+        return $this->fileUrlGenerator->generateAbsoluteString($entity->getFileUri());
       });
 
       if (!$context->isEmpty()) {

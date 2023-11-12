@@ -2,12 +2,10 @@
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\node\NodeInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\user\UserInterface;
-use Drupal\node\Entity\NodeType;
 use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeInterface;
+use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Data producers Entity multiple test class.
@@ -41,18 +39,6 @@ class EntityMultipleTest extends GraphQLTestBase {
    */
   public function setUp(): void {
     parent::setUp();
-
-    $this->entity = $this->getMockBuilder(NodeInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->entity_interface = $this->getMockBuilder(EntityInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->user = $this->getMockBuilder(UserInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
 
     $content_type = NodeType::create([
       'type' => 'lorem',
@@ -109,6 +95,20 @@ class EntityMultipleTest extends GraphQLTestBase {
       $this->node1->id(),
       $this->node2->id(),
     ], $nids);
+  }
+
+  /**
+   * Make sure that passing a NULL id does not produce any warnings.
+   */
+  public function testResolveEntityLoadWithNullId(): void {
+    $result = $this->executeDataProducer('entity_load_multiple', [
+      'type' => $this->node1->getEntityTypeId(),
+      'ids' => [NULL],
+      'access' => TRUE,
+      'access_operation' => 'view',
+    ]);
+
+    $this->assertSame([], $result);
   }
 
 }

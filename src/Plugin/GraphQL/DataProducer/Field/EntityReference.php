@@ -145,11 +145,13 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * @param string|null $accessOperation
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *
-   * @return \GraphQL\Deferred|null
+   * @return \GraphQL\Deferred|array
+   *   A promise that will return referenced entities or empty array if there
+   *   aren't any.
    */
   public function resolve(EntityInterface $entity, $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
-      return NULL;
+      return [];
     }
 
     $definition = $entity->getFieldDefinition($field);
@@ -166,7 +168,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
       });
     }
 
-    return NULL;
+    return [];
   }
 
 }

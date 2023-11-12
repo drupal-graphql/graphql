@@ -94,22 +94,21 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * Resolver.
    *
    * @param string $path
-   * @param string|null $language
-   *   The language code of the redirect.
+   * @param string $language
    * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
    * @return \Drupal\Core\Url|null
-   */
-  public function resolve(string $path, ?string $language, RefinableCacheableDependencyInterface $metadata) {
-    if ($this->redirectRepository) {
-      /** @var \Drupal\redirect\Entity\Redirect|null $redirect */
-      $redirect = $this->redirectRepository->findMatchingRedirect($path, [], $language);
-      if ($redirect) {
-        return $redirect->getRedirectUrl();
-      }
+   *
+  public function resolve($path, $language, RefinableCacheableDependencyInterface $metadata) {
+    $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, [], $language) : NULL;
+    if ($redirect !== NULL) {
+      $url = $redirect->getRedirectUrl();
+    }
+    else {
+      $url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($path);
     }
 
-    if (($url = $this->pathValidator->getUrlIfValidWithoutAccessCheck($path)) && $url->isRouted() && $url->access()) {
+    if ($url && $url->isRouted() && $url->access()) {
       return $url;
     }
 

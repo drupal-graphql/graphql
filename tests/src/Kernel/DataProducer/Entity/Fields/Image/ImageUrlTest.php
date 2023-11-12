@@ -15,27 +15,46 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class ImageUrlTest extends GraphQLTestBase {
 
   /**
+   * The file entity mock.
+   *
+   * @var \Drupal\file\FileInterface
+   */
+  protected $file;
+
+  /**
+   * A file entity mock that returns FALSE on access checking.
+   *
+   * @var \Drupal\file\FileInterface
+   */
+  protected $fileNotAccessible;
+
+  /**
+   * The generated file URI.
+   *
+   * @var string
+   */
+  protected $fileUri;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
-    $this->dataProducerManager = $this->container->get('plugin.manager.graphql.data_producer');
 
-    $this->file_uri = 'public://test.jpg';
-    $this->file_url = file_create_url($this->file_uri);
+    $this->fileUri = \Drupal::service('file_url_generator')->generateAbsoluteString('public://test.jpg');
 
     $this->file = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->file->method('getFileUri')->willReturn($this->file_uri);
+    $this->file->method('getFileUri')->willReturn($this->fileUri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
 
-    $this->file_not_accessible = $this->getMockBuilder(FileInterface::class)
+    $this->fileNotAccessible = $this->getMockBuilder(FileInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->file_not_accessible->method('access')->willReturn((new AccessResultForbidden())->addCacheTags(['test_tag_forbidden']));
+    $this->fileNotAccessible->method('access')->willReturn((new AccessResultForbidden())->addCacheTags(['test_tag_forbidden']));
   }
 
   /**
@@ -47,14 +66,14 @@ class ImageUrlTest extends GraphQLTestBase {
       'entity' => $this->file,
     ]);
 
-    $this->assertEquals($this->file_url, $result);
+    $this->assertEquals($this->fileUri, $result);
 
     // @todo Add cache checks.
     // $this->assertContains('test_tag', $metadata->getCacheTags());
     // Test that we do not get a file we don't have access to, but the cache
     // tags are still added.
     $result = $this->executeDataProducer('image_url', [
-      'entity' => $this->file_not_accessible,
+      'entity' => $this->fileNotAccessible,
     ]);
 
     $this->assertNull($result);

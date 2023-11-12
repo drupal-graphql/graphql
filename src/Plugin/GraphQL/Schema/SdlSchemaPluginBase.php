@@ -174,7 +174,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     });
 
     $schema = array_merge([$this->getSchemaDefinition()], $extensions);
-    $ast = Parser::parse(implode("\n\n", $schema));
+    // For caching and parsing big schemas we need to disable the creation of
+    // location nodes in the AST object to prevent serialization and memory
+    // errors. See https://github.com/webonyx/graphql-php/issues/1164
+    $ast = Parser::parse(implode("\n\n", $schema), ['noLocation' => TRUE]);
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
@@ -205,7 +208,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       return !empty($definition);
     });
 
-    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions)) : NULL;
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $extensions), ['noLocation' => TRUE]) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }

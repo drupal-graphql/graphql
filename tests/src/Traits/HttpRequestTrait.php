@@ -27,29 +27,46 @@ trait HttpRequestTrait {
    *   The server instance.
    * @param array $variables
    *   Query variables.
-   * @param array|null $extensions
+   * @param array $extensions
    *   The query extensions.
    * @param bool $persisted
    *   Flag if the query is actually the identifier of a persisted query.
+   * @param string $method
+   *   Method, GET or POST.
+   * @param string $operationName
+   *   Optional operation name if $query contains multiple operations.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function query($query, $server = NULL, array $variables = [], array $extensions = NULL, $persisted = FALSE) {
+  protected function query(
+    string $query,
+    ?Server $server = NULL,
+    array $variables = [],
+    array $extensions = [],
+    bool $persisted = FALSE,
+    string $method = Request::METHOD_GET,
+    string $operationName = ''
+  ) {
     $server = $server ?: $this->server;
-    if (!($server instanceof Server)) {
-      throw new \LogicException('Invalid server.');
-    }
-
     $endpoint = $this->server->get('endpoint');
     $extensions = !empty($extensions) ? ['extensions' => $extensions] : [];
     // If the persisted flag is true, then instead of sending the full query to
     // the server we only send the query id.
     $query_key = $persisted ? 'queryId' : 'query';
-    $request = Request::create($endpoint, 'GET', [
+    $data = [
       $query_key => $query,
       'variables' => $variables,
-    ] + $extensions);
+    ] + $extensions;
+    if ($operationName) {
+      $data['operationName'] = $operationName;
+    }
+    if ($method === Request::METHOD_GET) {
+      $request = Request::create($endpoint, $method, $data);
+    }
+    else {
+      $request = Request::create($endpoint, $method, [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($data));
+    }
 
     return $this->container->get('http_kernel')->handle($request);
   }
@@ -73,7 +90,7 @@ trait HttpRequestTrait {
 
     $queries = json_encode($queries);
     $endpoint = $this->server->get('endpoint');
-    $request = Request::create($endpoint, 'POST', [], [], [], [], $queries);
+    $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $queries);
     return $this->container->get('http_kernel')->handle($request);
   }
 

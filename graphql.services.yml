@@ -39,6 +39,14 @@ services:
     tags:
       - { name: cache.context }
 
+  # Cache bin for the persisted queries.
+  cache.graphql.apq:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [graphql_apq]
+
   # Cache bin for the parsed sdl ast.
   cache.graphql.ast:
     class: Drupal\Core\Cache\CacheBackendInterface
@@ -68,10 +76,18 @@ services:
     class: Drupal\graphql\GraphQL\Execution\ExecutorFactory
     arguments: ['@service_container']
 
+  # Deny caching of POST requests in the dynamic and standard page cache.
+  graphql.request_policy.deny_query:
+    public: false
+    class: Drupal\graphql\Cache\RequestPolicy\GetOnly
+    tags:
+      - { name: page_cache_request_policy }
+      - { name: dynamic_page_cache_request_policy }
+
   # Upcasting for graphql query request parameters.
   graphql.route_enhancer.query:
     class: Drupal\graphql\Routing\QueryRouteEnhancer
-    arguments: ['@request_stack']
+    arguments: ['%cors.config%']
     tags:
       - { name: route_enhancer }
 
@@ -105,6 +121,13 @@ services:
   graphql.operation_subscriber:
     class: Drupal\graphql\EventSubscriber\OperationSubscriber
     arguments: ['@module_handler', '@language_manager', '@string_translation', '@current_user', '@?language_negotiator']
+    tags:
+      - { name: event_subscriber }
+
+  # Cache the queries to be persistent.
+  graphql.apq_subscriber:
+    class: Drupal\graphql\EventSubscriber\ApqSubscriber
+    arguments: ['@cache.graphql.apq']
     tags:
       - { name: event_subscriber }
 
@@ -159,6 +182,8 @@ services:
       - '@lock'
       - '@config.factory'
       - '@renderer'
+      - '@event_dispatcher'
+      - '@image.factory'
 
   plugin.manager.graphql.persisted_query:
     class: Drupal\graphql\Plugin\PersistedQueryPluginManager
