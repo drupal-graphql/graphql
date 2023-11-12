@@ -356,6 +356,7 @@ class Executor implements ExecutorImplementation {
       'query' => DocumentSerializer::serializeDocument($this->document),
       'variables' => $variables,
       'extensions' => $extensions,
+      'operation' => $this->operation,
     ]));
 
     return $hash;
@@ -443,12 +444,7 @@ class Executor implements ExecutorImplementation {
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
   protected function maxAgeToExpire($maxAge) {
-    /* @todo Can be removed when D9 support is dropped. In D9
-     * \Drupal\Core\Http\RequestStack is used here for forward compatibility,
-     * but phpstan thinks it's \Symfony\Component\HttpFoundation\RequestStack
-     * which doesn't have getMainRequest(), but in Drupal10 (Symfony 6) it has.
-     */
-    /* @phpstan-ignore-next-line */
+    // @todo Can be removed when D9 support is dropped.
     $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }
