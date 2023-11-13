@@ -130,7 +130,10 @@ class AlterableComposableSchema extends ComposableSchema {
       $event,
       AlterSchemaDataEvent::EVENT_NAME
     );
-    $ast = Parser::parse(implode("\n\n", $event->getSchemaData()));
+    // For caching and parsing big schemas we need to disable the creation of
+    // location nodes in the AST object to prevent serialization and memory
+    // errors. See https://github.com/webonyx/graphql-php/issues/1164
+    $ast = Parser::parse(implode("\n\n", $event->getSchemaData()), ['noLocation' => TRUE]);
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
@@ -172,7 +175,7 @@ class AlterableComposableSchema extends ComposableSchema {
       $event,
       AlterSchemaExtensionDataEvent::EVENT_NAME
     );
-    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData())) : NULL;
+    $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData()), ['noLocation' => TRUE]) : NULL;
     if (empty($this->inDevelopment)) {
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
