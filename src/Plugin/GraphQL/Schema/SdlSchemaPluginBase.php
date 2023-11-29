@@ -141,8 +141,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * Create a GraphQL schema object from the given AST document.
+   *
+   * This method is private for now as the build/cache approach might change.
    */
-  protected function buildSchema(DocumentNode $astDocument, ResolverRegistryInterface $registry): Schema {
+  private function buildSchema(DocumentNode $astDocument, ResolverRegistryInterface $registry): Schema {
     $resolver = [$registry, 'resolveType'];
     // Performance: only validate the schema in development mode, skip it in
     // production on every request.
@@ -202,8 +204,10 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * Returns the full AST combination of parsed schema with extensions, cached.
+   *
+   * This method is private for now as the build/cache approach might change.
    */
-  protected function getFullSchemaDocument(Schema $schema, array $extensions): ?DocumentNode {
+  private function getFullSchemaDocument(Schema $schema, array $extensions): ?DocumentNode {
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "full:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
