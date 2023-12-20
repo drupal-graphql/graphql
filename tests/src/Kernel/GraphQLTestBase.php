@@ -82,7 +82,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
     ConfigurableLanguage::create([
       'id' => 'fr',
       'weight' => 1,
-      'label' => 'french',
+      'label' => 'French',
     ])->save();
 
     ConfigurableLanguage::create([
