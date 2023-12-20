@@ -157,12 +157,6 @@ class AlterableComposableSchema extends ComposableSchema {
    * @see \Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema::getSchemaDocument()
    */
   protected function getExtensionDocument(array $extensions = []) {
-    // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "extension:{$this->getPluginId()}";
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
-    }
-
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
       return $extension->getExtensionDefinition();
     }, $extensions), function ($definition) {
@@ -176,10 +170,8 @@ class AlterableComposableSchema extends ComposableSchema {
       AlterSchemaExtensionDataEvent::EVENT_NAME
     );
     $ast = !empty($extensions) ? Parser::parse(implode("\n\n", $event->getSchemaExtensionData()), ['noLocation' => TRUE]) : NULL;
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
-    }
 
+    // No AST caching here as that will be done in getFullSchemaDocument().
     return $ast;
   }
 
