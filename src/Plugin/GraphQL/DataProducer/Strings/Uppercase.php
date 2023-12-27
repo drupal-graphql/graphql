@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\graphql\Plugin\GraphQL\DataProducer\String;
+namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Strings;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 

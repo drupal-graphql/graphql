@@ -12,7 +12,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 class StringTest extends GraphQLTestBase {
 
   /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Strings\Uppercase::resolve
    *
    * @dataProvider uppercaseProvider
    */
