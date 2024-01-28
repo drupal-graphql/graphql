@@ -193,6 +193,9 @@ class FileUpload {
     switch ($uploaded_file->getError()) {
       case UPLOAD_ERR_INI_SIZE:
       case UPLOAD_ERR_FORM_SIZE:
+        // @todo Drupal 9 compatibility, needs to be converted to ByteSizeMarkup
+        // later.
+        // @phpstan-ignore-next-line
         $maxUploadSize = format_size($this->getMaxUploadSize($settings));
         $response->addViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', [
           '@file' => $uploaded_file->getClientOriginalName(),
@@ -268,6 +271,9 @@ class FileUpload {
       $file->setSize(@filesize($temp_file_path));
 
       // Validate against file_validate() first with the temporary path.
+      // @todo Drupal 9 compatibility, needs to be converted to file validate
+      // service later.
+      // @phpstan-ignore-next-line
       $errors = file_validate($file, $validators);
       $maxResolution = $settings['max_resolution'] ?? 0;
       $minResolution = $settings['min_resolution'] ?? 0;
@@ -499,6 +505,9 @@ class FileUpload {
           /** @var \Drupal\file\FileInterface $file */
           $file = $this->fileStorage->create([]);
           $file->setFilename($filename);
+          // @todo Drupal 9 compatibility, needs to be converted to file
+          // validator service later.
+          // @phpstan-ignore-next-line
           $passes_validation = empty(file_validate_extensions($file, $validators['file_validate_extensions'][0]));
         }
         if (empty($validators['file_validate_extensions'][0]) || $passes_validation) {

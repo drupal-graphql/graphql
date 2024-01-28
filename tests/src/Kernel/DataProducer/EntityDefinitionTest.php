@@ -211,7 +211,7 @@ class EntityDefinitionTest extends GraphQLTestBase {
         [
           'id' => 'created',
           'label' => 'Authored on',
-          'description' => 'The time that the node was created.',
+          'description' => 'The date and time that the content was created.',
           'type' => 'created',
           'required' => FALSE,
           'multiple' => FALSE,
@@ -496,6 +496,11 @@ GQL;
         'entity_form_display_context' => $builder->fromContext('entity_form_display'),
       ])
     );
+
+    // @todo Different description between Drupal 9 and 10, can be removed when
+    // Drupal 9 support is dropped.
+    $this->fullDefinitionResult['entityDefinition']['fields'][11]['description'] =
+      $this->container->get('entity_field.manager')->getBaseFieldDefinitions('node')['created']->getDescription();
   }
 
   /**
