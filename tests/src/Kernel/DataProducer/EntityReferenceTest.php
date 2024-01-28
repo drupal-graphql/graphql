@@ -9,14 +9,26 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 // @todo Drupal 9 compatibility: use the deprecated trait for Drupal 9.
 if (strpos(\Drupal::VERSION, '9') === 0) {
+
+  /**
+   * Helper trait for compatibility with Drupal 9.
+   *
+   * @phpcs:disable Drupal.Classes.ClassFileName.NoMatch
+   */
   trait EntityReferenceFieldCreationTrait {
     // @phpstan-ignore-next-line
     use \Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+
   }
 }
 else {
+
+  /**
+   * Helper trait for compatibility with Drupal 10.
+   */
   trait EntityReferenceFieldCreationTrait {
     use \Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+
   }
 }
 
