@@ -5,8 +5,32 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+
+// @todo Drupal 9 compatibility: use the deprecated trait for Drupal 9.
+if (strpos(\Drupal::VERSION, '9') === 0) {
+
+  /**
+   * Helper trait for compatibility with Drupal 9.
+   *
+   * @phpcs:disable Drupal.Classes.ClassFileName.NoMatch
+   */
+  trait EntityReferenceFieldCreationTrait {
+    // @phpstan-ignore-next-line
+    use \Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+
+  }
+}
+else {
+
+  /**
+   * Helper trait for compatibility with Drupal 10.
+   */
+  trait EntityReferenceFieldCreationTrait {
+    use \Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+
+  }
+}
 
 /**
  * Tests the entity_reference data producers.
@@ -14,7 +38,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  * @group graphql
  */
 class EntityReferenceTest extends GraphQLTestBase {
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * Test node that will be referenced.
