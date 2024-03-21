@@ -1,0 +1,5 @@
+query ($id: Int!) {
+  article(id: $id) {
+    title
+  }
+}
