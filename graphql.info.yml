@@ -2,7 +2,7 @@ name: GraphQL
 type: module
 description: 'Base module for integrating GraphQL with Drupal.'
 package: GraphQL
-configure: graphql.config_page
+configure: entity.graphql_server.collection
 core_version_requirement: ^10.2 || ^11
 dependencies:
   - typed_data:typed_data
