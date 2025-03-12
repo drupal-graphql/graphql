@@ -80,7 +80,26 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
       }));
     }
 
-    return $this->extensions[$id];
+    return self::sortByPriority($this->extensions[$id]);
+  }
+
+  /**
+   * Sorts the given schema extension plugins by priority.
+   *
+   * @param \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[] $extensions
+   *   The schema extension plugins to sort.
+   *
+   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   *   The sorted schema extension plugins.
+   */
+  public static function sortByPriority(array $extensions): array {
+    usort($extensions, function (SchemaExtensionPluginInterface $a, SchemaExtensionPluginInterface $b) {
+      $priority_a = $a->getPluginDefinition()['priority'] ?? 0;
+      $priority_b = $b->getPluginDefinition()['priority'] ?? 0;
+      return $priority_b <=> $priority_a;
+    });
+
+    return $extensions;
   }
 
 }

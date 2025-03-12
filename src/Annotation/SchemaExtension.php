@@ -42,6 +42,15 @@ class SchemaExtension extends Plugin {
   public $schema;
 
   /**
+   * The priority of the extension.
+   *
+   * Plugins with higher priority will be executed first.
+   *
+   * @var int
+   */
+  public $priority = 0;
+
+  /**
    * SchemaExtension constructor.
    *
    * @param mixed $values

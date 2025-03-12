@@ -29,9 +29,13 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
    * {@inheritdoc}
    */
   protected function getExtensions() {
-    return array_map(function ($id) {
+    $extensions = array_map(function ($id) {
       return $this->extensionManager->createInstance($id);
     }, array_filter($this->getConfiguration()['extensions']));
+
+    // Order the extensions by priority so that higher priority extensions are
+    // processed first.
+    return $this->extensionManager->sortByPriority($extensions);
   }
 
   /**

@@ -1,0 +1,7 @@
+type: module
+name: GraphQL schema extension test
+description: Test module for GraphQL schema extension plugins.
+package: Testing
+hidden: TRUE
+dependencies:
+  - graphql:graphql
