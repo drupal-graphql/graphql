@@ -50,11 +50,15 @@ graphql.schema.composable:
   type: mapping
   label: 'Composable schema'
   mapping:
-    extensions:
-      label: Enabled extensions
-      type: sequence
-      sequence:
-        type: boolean
+    composable:
+      type: mapping
+      label: 'Composition'
+      mapping:
+        extensions:
+          label: Enabled extensions
+          type: sequence
+          sequence:
+            type: string
 
 graphql.default_persisted_query_configuration:
   type: mapping

@@ -2,6 +2,7 @@
 
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -179,7 +180,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   protected function getSchemaDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "schema:{$this->getPluginId()}";
+    $cid = $this->getCacheId('schema');
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
@@ -209,7 +210,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   private function getFullSchemaDocument(Schema $schema, array $extensions): ?DocumentNode {
     // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "full:{$this->getPluginId()}";
+    $cid = $this->getCacheId('full');
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }
@@ -275,6 +276,28 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     }
 
     return file_get_contents($file) ?: NULL;
+  }
+
+  /**
+   * Returns a cache ID for the given type.
+   *
+   * @param string $type
+   *   The cache type, e.g. 'schema' or 'full'.
+   *
+   * @return string
+   *   The cache ID.
+   */
+  protected function getCacheId(string $type): string {
+    // Configurable schema plugins should be cached per server since the schema
+    // depends on the server configuration.
+    if ($this instanceof ConfigurableInterface) {
+      $server_id = $this->getConfiguration()['server_id'] ?? NULL;
+      if ($server_id) {
+        return "{$type}:{$this->getPluginId()}:{$server_id}";
+      }
+      @trigger_error('Retrieving a GraphQL schema from a configurable schema plugin instance without setting the "server_id" in the plugin configuration is deprecated in graphql:4.11.0 and will cause an InvalidPluginDefinitionException to be thrown from graphql:5.0.0. Ensure to always pass this configuration value so that the schema can be properly cached per server. See https://www.drupal.org/project/graphql/issues/3491736', E_USER_DEPRECATED);
+    }
+    return "{$type}:{$this->getPluginId()}";
   }
 
 }

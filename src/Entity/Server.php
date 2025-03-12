@@ -94,7 +94,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public $label;
 
   /**
-   * The server's schema.
+   * The ID of the schema plugin used by this server.
    *
    * @var string
    */
@@ -235,10 +235,14 @@ class Server extends ConfigEntityBase implements ServerInterface {
     $manager = \Drupal::service('plugin.manager.graphql.schema');
     $schema = $this->get('schema');
 
+    // Make sure the server ID is passed to the schema plugin so it can include
+    // it in its cache keys.
+    $plugin_config = ['server_id' => $this->id()];
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    $plugin = $manager->createInstance($schema);
+    $plugin = $manager->createInstance($schema, $plugin_config);
     if ($plugin instanceof ConfigurableInterface && $config = $this->get('schema_configuration')) {
-      $plugin->setConfiguration($config[$schema] ?? []);
+      $schema_config = $config[$schema] ?? [];
+      $plugin->setConfiguration($schema_config + $plugin_config);
     }
 
     // Create the server config.
