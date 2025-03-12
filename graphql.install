@@ -6,6 +6,7 @@
  */
 
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use GraphQL\Error\DebugFlag;
 
 /**
@@ -38,7 +39,7 @@ function graphql_uninstall(): void {
   $languageTypes = $configFactory->getEditable('language.types');
   if ($negotiation = $languageTypes->get('negotiation')) {
     foreach (array_keys($negotiation) as $type) {
-      unset($negotiation[$type]['enabled']['language-graphql']);
+      unset($negotiation[$type]['enabled'][OperationLanguageNegotiation::METHOD_ID]);
     }
     $languageTypes->set('negotiation', $negotiation)->save();
   }
