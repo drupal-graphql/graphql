@@ -413,9 +413,8 @@ class EntityTest extends GraphQLTestBase {
       'id' => 0,
     ]);
 
-    // @todo Add metadata check.
-    // $this->assertContains('node_list', $metadata->getCacheTags());
     $this->assertNull($result);
+    $this->assertContains('node_list', $this->fieldContext->getCacheTags());
   }
 
   /**
@@ -428,9 +427,8 @@ class EntityTest extends GraphQLTestBase {
       'bundles' => ['otherbundle'],
     ]);
 
-    // @todo Add metadata check.
-    // $this->assertContains('node:1', $metadata->getCacheTags());
     $this->assertNull($result);
+    $this->assertContains('node:1', $this->fieldContext->getCacheTags());
   }
 
   /**
@@ -468,9 +466,8 @@ class EntityTest extends GraphQLTestBase {
       'mode' => 'default',
     ]);
 
-    // @todo Add metadata check.
-    // $this->assertContains('node:1', $metadata->getCacheTags());
     $this->assertMatchesRegularExpression('#<a href="/node/1" rel="bookmark">\s*<span>' . $this->node->getTitle() . '</span>#', $result);
+    $this->assertContains('node:1', $this->fieldContext->getCacheTags());
   }
 
 }
