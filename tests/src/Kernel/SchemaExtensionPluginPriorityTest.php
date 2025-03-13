@@ -108,7 +108,10 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
 
     $schemaPlugin->expects(static::any())
       ->method('getConfiguration')
-      ->willReturn(['extensions' => $extensions]);
+      ->willReturn([
+        'extensions' => $extensions,
+        'server_id' => 'test',
+      ]);
 
     $registry = new ResolverRegistry();
     $schemaPlugin->expects($this->any())
