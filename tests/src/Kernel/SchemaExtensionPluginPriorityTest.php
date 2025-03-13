@@ -61,7 +61,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
   /**
    * Data provider for testComposableSchemaExtensionOverriding().
    */
-  public function composableSchemaExtensionOverridingProvider(): array {
+  public static function composableSchemaExtensionOverridingProvider(): array {
     return [
       // When a single extension is used in a schema, no overriding takes place.
       [
