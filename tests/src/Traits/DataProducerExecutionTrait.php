@@ -2,15 +2,19 @@
 
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\graphql\GraphQL\Execution\FieldContext;
+use Drupal\Tests\graphql\Kernel\TestFieldContext;
 use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
-use Prophecy\Argument;
 
 /**
  * Helper trait for testing data producers.
  */
 trait DataProducerExecutionTrait {
+
+  /**
+   * A mock of the field context that can be used to check cache metadata.
+   */
+  protected TestFieldContext $fieldContext;
 
   /**
    * @param string $id
@@ -28,16 +32,9 @@ trait DataProducerExecutionTrait {
       $plugin->setContextValue($key, $value);
     }
 
-    $context = $this->prophesize(FieldContext::class);
-    $context->addCacheableDependency(Argument::any())->willReturn($context->reveal());
-    $context->addCacheContexts(Argument::any())->willReturn($context->reveal());
-    $context->addCacheTags(Argument::any())->willReturn($context->reveal());
-    $context->mergeCacheMaxAge(Argument::any())->willReturn($context->reveal());
-    $context->getContextValue(Argument::any(), Argument::any())->willReturn(NULL);
-    $context->setContextValue(Argument::any(), Argument::any())->willReturn(FALSE);
-    $context->hasContextValue(Argument::any())->willReturn(FALSE);
+    $this->fieldContext = new TestFieldContext();
 
-    $result = $plugin->resolveField($context->reveal());
+    $result = $plugin->resolveField($this->fieldContext);
     if (!$result instanceof SyncPromise) {
       return $result;
     }

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
-use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\Entity\Menu;
 
@@ -60,38 +59,23 @@ class MenuLinksCacheTest extends GraphQLTestBase {
    * Tests that the cache context is correctly set for different users.
    */
   public function testAccessCacheContext(): void {
-    $manager = $this->container->get('plugin.manager.graphql.data_producer');
-
-    /** @var \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin */
-    $plugin = $manager->createInstance('menu_links');
-    $plugin->setContextValue('menu', $this->menu);
-
     // Test as anonymous user, list of links must be empty.
-    $field_context = new TestFieldContext();
-    $result = $plugin->resolveField($field_context);
+    $result = $this->executeDataProducer('menu_links', [
+      'menu' => $this->menu,
+    ]);
+
     $this->assertEmpty($result);
-    $this->assertSame('user', $field_context->getCacheContexts()[0]);
+    $this->assertSame('user', $this->fieldContext->getCacheContexts()[0]);
 
     // Test as super_admin user, list of links must contain the test link.
     $super_admin = $this->createUser(['access content'], 'super_admin');
     $this->setCurrentUser($super_admin);
-    $field_context = new TestFieldContext();
-    $result = $plugin->resolveField($field_context);
+    $result = $this->executeDataProducer('menu_links', [
+      'menu' => $this->menu,
+    ]);
     $menu_item = reset($result);
     $this->assertSame('Menu link test', $menu_item->link->getTitle());
-    $this->assertSame('user', $field_context->getCacheContexts()[0]);
+    $this->assertSame('user', $this->fieldContext->getCacheContexts()[0]);
   }
-
-}
-
-/**
- * Helper class for mocking during this test.
- */
-class TestFieldContext extends FieldContext {
-
-  /**
-   * Empty constructor override, we don't need it.
-   */
-  public function __construct() {}
 
 }

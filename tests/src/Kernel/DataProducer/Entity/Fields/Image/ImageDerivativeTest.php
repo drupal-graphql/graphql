@@ -30,7 +30,7 @@ class ImageDerivativeTest extends GraphQLTestBase {
   /**
    * The file entity mock.
    *
-   * @var \Drupal\file\FileInterface
+   * @var \Drupal\file\FileInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $file;
 
@@ -62,11 +62,6 @@ class ImageDerivativeTest extends GraphQLTestBase {
 
     $this->file->method('getFileUri')->willReturn($this->fileUri);
     $this->file->method('access')->willReturn((new AccessResultAllowed())->addCacheTags(['test_tag']));
-    // @todo Remove hard-coded properties and only rely on image factory.
-    // @phpstan-ignore-next-line
-    @$this->file->width = 600;
-    // @phpstan-ignore-next-line
-    @$this->file->height = 400;
 
     $this->style = ImageStyle::create(['name' => 'test_style']);
     $effect = [
@@ -107,10 +102,9 @@ class ImageDerivativeTest extends GraphQLTestBase {
       $result
     );
 
-    // @todo Add cache checks.
-    // $this->assertContains('config:image.style.test_style',
-    // $metadata->getCacheTags());
-    // $this->assertContains('test_tag', $metadata->getCacheTags());
+    $this->assertContains('config:image.style.test_style', $this->fieldContext->getCacheTags());
+    $this->assertContains('test_tag', $this->fieldContext->getCacheTags());
+
     // Test that we don't get the derivative if we don't have access to the
     // original file, but we still get the access result cache tags.
     $result = $this->executeDataProducer('image_derivative', [
@@ -119,10 +113,19 @@ class ImageDerivativeTest extends GraphQLTestBase {
     ]);
 
     $this->assertNull($result);
+    $this->assertContains('test_tag_forbidden', $this->fieldContext->getCacheTags());
+  }
 
-    // @todo Add cache checks.
-    // $this->assertContains('test_tag_forbidden',
-    // $metadata->getCacheTags());
+  /**
+   * Test that a SVG file is not processed.
+   */
+  public function testSvg(): void {
+    $this->file->method('getMimeType')->willReturn('image/svg+xml');
+    $result = $this->executeDataProducer('image_derivative', [
+      'entity' => $this->file,
+      'style' => 'test_style',
+    ]);
+    $this->assertNull($result);
   }
 
 }

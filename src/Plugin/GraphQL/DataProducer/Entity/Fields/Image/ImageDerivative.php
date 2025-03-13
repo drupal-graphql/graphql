@@ -89,32 +89,26 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
    * @return array|null
    */
   public function resolve(?FileInterface $entity, $style, RefinableCacheableDependencyInterface $metadata) {
-    // Return if we don't have an entity.
-    if (!$entity) {
+    // Return if we don't have an entity or if it is an SVG image where image
+    // styles don't apply.
+    if (!$entity || $entity->getMimeType() == 'image/svg+xml') {
       return NULL;
     }
 
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
-      // @phpstan-ignore-next-line
-      $width = $entity->width;
-      // @phpstan-ignore-next-line
-      $height = $entity->height;
-
-      if ($width == NULL || $height == NULL) {
-        /** @var \Drupal\Core\Image\ImageInterface $image */
-        $image = \Drupal::service('image.factory')->get($entity->getFileUri());
-        if ($image->isValid()) {
-          $width = $image->getWidth();
-          $height = $image->getHeight();
-        }
+      /** @var \Drupal\Core\Image\ImageInterface $image */
+      $image = \Drupal::service('image.factory')->get($entity->getFileUri());
+      if ($image->isValid()) {
+        $width = $image->getWidth();
+        $height = $image->getHeight();
       }
 
       // Determine the dimensions of the styled image.
       $dimensions = [
-        'width' => $width,
-        'height' => $height,
+        'width' => $width ?? 0,
+        'height' => $height ?? 0,
       ];
 
       $image_style->transformDimensions($dimensions, $entity->getFileUri());
