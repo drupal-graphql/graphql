@@ -1,0 +1,64 @@
+{% import '@lib/di.twig' as di %}
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\{{ machine_name }}\Plugin\GraphQL\SchemaExtension;
+
+{% apply sort_namespaces %}
+use Drupal\graphql\GraphQL\ResolverBuilder;
+use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
+  {% if services %}
+{{ di.use(services) }}
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+  {% endif %}
+{% endapply %}
+
+/**
+ * The '{{ plugin_id }}' schema extension.
+ *
+ * @SchemaExtension(
+ *   id = "{{ plugin_id }}",
+ *   name = @Translation("{{ plugin_label }}"),
+{% if plugin_description %} *   description = @Translation("{{ plugin_description }}"),
+{% endif %}
+ *   schema = "{{ schema }}",
+ * )
+ */
+final class {{ class }} extends SdlSchemaExtensionPluginBase {
+
+{% if services %}
+  public function __construct(
+    array $configuration,
+    $pluginId,
+    $pluginDefinition,
+{{ di.signature(services) }}
+  ) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new self(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+{{ di.container(services) }}
+    );
+  }
+
+{% endif %}
+  /**
+   * {@inheritdoc}
+   */
+  public function registerResolvers(ResolverRegistryInterface $registry): void {
+    $builder = new ResolverBuilder();
+
+    // Register your resolvers here.
+  }
+
+}
