@@ -4,7 +4,6 @@ namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\graphql\Event\OperationEvent;
-use GraphQL\Error\Error;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -41,7 +40,8 @@ class ApqSubscriber implements EventSubscriberInterface {
     if (!array_key_exists('automatic_persisted_query', $event->getContext()->getServer()->getPersistedQueryInstances() ?? [])) {
       return;
     }
-    $query = $event->getContext()->getOperation()->query;
+    // We only need to set cache tags here, the rest is done in
+    // AutomaticPersistedQuery.
     $queryHash = $event->getContext()->getOperation()->extensions['persistedQuery']['sha256Hash'] ?? '';
 
     if (is_string($queryHash) && $queryHash !== '') {
@@ -50,15 +50,6 @@ class ApqSubscriber implements EventSubscriberInterface {
       $event->getContext()->addCacheContexts(
         ['url.query_args:variables', 'url.query_args:extensions']
       );
-
-      // If we have a query and the hash matches then can cache it.
-      if (is_string($query)) {
-        $computedQueryHash = hash('sha256', $query);
-        if ($queryHash !== $computedQueryHash) {
-          throw new Error('Provided sha does not match query');
-        }
-        $this->cache->set($queryHash, $query);
-      }
     }
   }
 

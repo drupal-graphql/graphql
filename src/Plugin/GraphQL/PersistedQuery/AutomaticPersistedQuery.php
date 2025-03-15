@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
+use GraphQL\Error\Error;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -64,6 +65,19 @@ class AutomaticPersistedQuery extends PersistedQueryPluginBase implements Contai
   public function getQuery($id, OperationParams $operation) {
     if ($query = $this->cache->get($id)) {
       return $query->data;
+    }
+    // Cache miss - store the query in cache.
+    $query = $operation->query;
+    $queryHash = $operation->extensions['persistedQuery']['sha256Hash'] ?? '';
+
+    if (is_string($queryHash) && $queryHash !== '' && is_string($query)) {
+      // If we have a query and the hash matches then we can cache it.
+      $computedQueryHash = hash('sha256', $query);
+      if ($queryHash !== $computedQueryHash) {
+        throw new Error('Provided sha does not match query');
+      }
+      $this->cache->set($queryHash, $query);
+      return $query;
     }
     // Preventing page cache for this request. Otherwise, we would need to add
     // a cache tag to the response and flush it when we add the persisted

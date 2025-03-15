@@ -55,9 +55,6 @@ class AlterableSchemaTest extends GraphQLTestBase {
       'errors' => [
         0 => [
           'message' => 'Field "alterableQuery" argument "id" of type "Int!" is required but not provided.',
-          'extensions' => [
-            'category' => 'graphql',
-          ],
           'locations' => [
             0 => [
               'line' => 1,
@@ -81,9 +78,6 @@ class AlterableSchemaTest extends GraphQLTestBase {
       'errors' => [
         0 => [
           'message' => 'Internal server error',
-          'extensions' => [
-            'category' => 'internal',
-          ],
           'locations' => [
             0 => [
               'line' => 1,
@@ -115,9 +109,6 @@ class AlterableSchemaTest extends GraphQLTestBase {
       'errors' => [
         0 => [
           'message' => 'Internal server error',
-          'extensions' => [
-            'category' => 'internal',
-          ],
           'locations' => [
             0 => [
               'line' => 1,

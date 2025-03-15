@@ -251,7 +251,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     $server->setDebugFlag($this->get('debug_flag'));
     $server->setQueryBatching(!!$this->get('batching'));
     $server->setValidationRules($this->getValidationRules());
-    $server->setPersistentQueryLoader($this->getPersistedQueryLoader());
+    $server->setPersistedQueryLoader($this->getPersistedQueryLoader());
     $server->setContext($this->getContext($plugin, $params));
     $server->setFieldResolver($this->getFieldResolver($registry));
     $server->setSchema($plugin->getSchema($registry));
@@ -521,8 +521,6 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getValidationRules() {
     return function (OperationParams $params, DocumentNode $document, $operation) {
-      // queryId is not documented properly in the library, it can be NULL.
-      // @phpstan-ignore-next-line
       if (isset($params->queryId)) {
         // Assume that pre-parsed documents are already validated. This allows
         // us to store pre-validated query documents e.g. for persisted queries
@@ -530,12 +528,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
         return [];
       }
 
-      // PHPStan thinks this is unreachable code because of the wrongly
-      // documented $params->queryId.
-      // @phpstan-ignore-next-line
       $rules = array_values(DocumentValidator::defaultRules());
       if ($this->getDisableIntrospection()) {
-        $rules[] = new DisableIntrospection();
+        $rules[] = new DisableIntrospection(DisableIntrospection::ENABLED);
       }
       if ($this->getQueryDepth()) {
         $rules[] = new QueryDepth($this->getQueryDepth());

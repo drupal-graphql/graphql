@@ -152,7 +152,7 @@ class Validator implements ValidatorInterface {
       try {
         $type = $schema->getType($type_name);
       }
-      catch (Error $_) {
+      catch (InvariantViolation $_) {
         $type = NULL;
       }
 

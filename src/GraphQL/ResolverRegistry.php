@@ -165,7 +165,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @todo This should be added to ResolverRegistryInterface in 5.0.0.
    */
   public function getFieldResolverWithInheritance(Type $type, string $fieldName) : ?ResolverInterface {
-    if ($resolver = $this->getFieldResolver($type->name, $fieldName)) {
+    if ($resolver = $this->getFieldResolver($type->toString(), $fieldName)) {
       return $resolver;
     }
 
@@ -223,7 +223,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * @return callable|null
    */
   protected function getRuntimeTypeResolver($value, ResolveContext $context, ResolveInfo $info) {
-    return $this->getTypeResolver(Type::getNamedType($info->returnType)->name);
+    return $this->getTypeResolver(Type::getNamedType($info->returnType)->toString());
   }
 
   /**

@@ -75,9 +75,6 @@ GQL;
       'errors' => [
         [
           'message' => 'Internal server error',
-          'extensions' => [
-            'category' => 'internal',
-          ],
           'locations' => [
             [
               'line' => 1,
@@ -98,8 +95,13 @@ GQL;
     $this->assertSame($details['$operation']['variables'], []);
     $this->assertCount(1, $details['$result->errors']);
     $this->assertSame(
-      $details['$result->errors'][0]['message'],
-      'Cannot return null for non-nullable field "Query.resolvesToNull".'
+      $details['$result->errors'][0],
+      'Cannot return null for non-nullable field "Query.resolvesToNull".
+
+GraphQL request (1:9)
+1: query { resolvesToNull }
+           ^
+'
     );
     $this->assertStringContainsString(
       'For error #0: GraphQL\Error\InvariantViolation: Cannot return null for non-nullable field "Query.resolvesToNull".',
@@ -118,9 +120,6 @@ GQL;
       'errors' => [
         [
           'message' => 'Internal server error',
-          'extensions' => [
-            'category' => 'internal',
-          ],
           'locations' => [
             [
               'line' => 1,
@@ -140,7 +139,12 @@ GQL;
     $this->assertSame($details['$operation']['query'], 'query { throwsException }');
     $this->assertSame($details['$operation']['variables'], []);
     $this->assertCount(1, $details['$result->errors']);
-    $this->assertSame($details['$result->errors'][0]['message'], 'BOOM!');
+    $this->assertSame($details['$result->errors'][0], 'BOOM!
+
+GraphQL request (1:9)
+1: query { throwsException }
+           ^
+');
     $this->assertStringContainsString(
       'For error #0: Exception: BOOM!',
       $loggerCall['context']['previous']
@@ -157,10 +161,7 @@ GQL;
     $this->assertSame([
       'errors' => [
         0 => [
-          'message' => 'Field "takesIntArgument" argument "id" requires type Int!, found "boom".',
-          'extensions' => [
-            'category' => 'graphql',
-          ],
+          'message' => 'Int cannot represent non-integer value: "boom"',
           'locations' => [
             0 => [
               'line' => 1,

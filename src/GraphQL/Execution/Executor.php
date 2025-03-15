@@ -326,7 +326,9 @@ class Executor implements ExecutorImplementation {
             // JsonSerializable and strips some data out during the
             // serialization.
             '$result->data' => $result->data,
-            '$result->errors' => $result->errors,
+            '$result->errors' => array_map(function ($error) {
+              return (string) $error;
+            }, $result->errors),
             '$result->extensions' => $result->extensions,
           ], JSON_PRETTY_PRINT),
           'previous' => implode('\n\n', $previousErrors),

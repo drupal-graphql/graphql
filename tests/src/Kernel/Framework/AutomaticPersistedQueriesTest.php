@@ -71,7 +71,6 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
       'errors' => [
         [
           'message' => 'PersistedQueryNotFound',
-          'extensions' => ['category' => 'request'],
         ],
       ],
     ], json_decode($result->getContent(), TRUE));
@@ -84,7 +83,6 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
       'errors' => [
         [
           'message' => 'Provided sha does not match query',
-          'extensions' => ['category' => 'graphql'],
         ],
       ],
     ], json_decode($result->getContent(), TRUE));
