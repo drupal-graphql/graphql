@@ -93,7 +93,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
    *   The sorted schema extension plugins.
    */
   public static function sortByPriority(array $extensions): array {
-    usort($extensions, function (SchemaExtensionPluginInterface $a, SchemaExtensionPluginInterface $b) {
+    uasort($extensions, function (SchemaExtensionPluginInterface $a, SchemaExtensionPluginInterface $b) {
       $priority_a = $a->getPluginDefinition()['priority'] ?? 0;
       $priority_b = $b->getPluginDefinition()['priority'] ?? 0;
       return $priority_b <=> $priority_a;

@@ -34,7 +34,11 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
     $extensions = $schemaExtensionPluginManager->getExtensions('composable');
 
     // Check that the returned extensions are ordered by priority.
-    $expected_order = ['high_priority_test', 'test', 'low_priority_test'];
+    $expected_order = [
+      'high_priority_test' => 'high_priority_test',
+      'test' => 'test',
+      'low_priority_test' => 'low_priority_test',
+    ];
     $actual_order = array_map(static fn ($extension) => $extension->getPluginId(), $extensions);
     static::assertEquals($expected_order, $actual_order);
   }
