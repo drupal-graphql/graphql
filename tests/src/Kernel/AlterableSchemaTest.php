@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\Tests\graphql\Kernel\Schema\AlterableComposableTestSchema;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\graphql\Plugin\GraphQL\Schema\AlterableComposableSchema;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 
@@ -135,7 +135,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
     /** @var \PHPUnit\Framework\MockObject\MockObject $extensionManager */
     $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['getExtensions'])
+      ->onlyMethods(['getExtensions', 'createInstance'])
       ->getMock();
 
     // Adds extra extension in order to test alter extension data event.
@@ -170,9 +170,12 @@ class AlterableSchemaTest extends GraphQLTestBase {
     $extensionManager->expects(static::any())
       ->method('getExtensions')
       ->willReturn($extensions);
+    $extensionManager->expects(static::any())
+      ->method('createInstance')
+      ->willReturn($extensions['graphql_alterable_schema_test']);
 
     // Replace mock schema with our own implementation.
-    $this->schema = $this->getMockBuilder(AlterableComposableTestSchema::class)
+    $this->schema = $this->getMockBuilder(AlterableComposableSchema::class)
       ->setConstructorArgs([
         [],
         $id,
@@ -183,7 +186,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
         ['development' => FALSE],
         $this->container->get('event_dispatcher'),
       ])
-      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry'])
+      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry', 'getConfiguration'])
       ->getMock();
 
     $this->schema->expects(static::any())
@@ -194,6 +197,9 @@ class AlterableSchemaTest extends GraphQLTestBase {
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
       ->willReturn($this->registry);
+    $this->schema->expects($this->any())
+      ->method('getConfiguration')
+      ->willReturn(['extensions' => ['graphql_alterable_schema_test' => 'graphql_alterable_schema_test']]);
   }
 
 }
