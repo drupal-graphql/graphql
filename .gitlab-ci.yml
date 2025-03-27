@@ -23,6 +23,7 @@ variables:
 
 phpstan (custom):
   extends: phpstan
+  allow_failure: false
   rules:
     - when: on_success
   needs:

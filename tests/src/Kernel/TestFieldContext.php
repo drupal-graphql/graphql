@@ -14,4 +14,25 @@ class TestFieldContext extends FieldContext {
    */
   public function __construct() {}
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getContextValue($name) {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setContextValue($name, $value) {
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasContextValue($name) {
+    return FALSE;
+  }
+
 }
