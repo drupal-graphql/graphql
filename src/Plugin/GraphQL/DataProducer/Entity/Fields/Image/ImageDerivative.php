@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderContext;
@@ -36,10 +39,8 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * The rendering service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * {@inheritdoc}
@@ -57,22 +58,11 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * ImageDerivative constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   *
-   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,
-    $pluginId,
-    $pluginDefinition,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
     RendererInterface $renderer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -82,13 +72,9 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
   /**
    * Resolver.
    *
-   * @param \Drupal\file\FileInterface|null $entity
-   * @param string $style
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *
    * @return array|null
    */
-  public function resolve(?FileInterface $entity, $style, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(?FileInterface $entity, string $style, RefinableCacheableDependencyInterface $metadata): ?array {
     // Return if we don't have an entity or if it is an SVG image where image
     // styles don't apply.
     if (!$entity || $entity->getMimeType() == 'image/svg+xml') {

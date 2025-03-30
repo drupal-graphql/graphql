@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_resolver_builder_test\TypedData\Definition;
 
 use Drupal\Core\TypedData\ComplexDataDefinitionBase;

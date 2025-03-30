@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use GraphQL\Type\Schema;
 
 /**
  * Defines a schema plugin that returns a GraphQL schema part.
@@ -23,7 +26,7 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
    * @return \GraphQL\Type\Schema
    *   The schema.
    */
-  public function getSchema(ResolverRegistryInterface $registry);
+  public function getSchema(ResolverRegistryInterface $registry): Schema;
 
   /**
    * Retrieves the resolver registry.
@@ -33,6 +36,6 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
    * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
    *   The resolver registry.
    */
-  public function getResolverRegistry();
+  public function getResolverRegistry(): ResolverRegistryInterface;
 
 }

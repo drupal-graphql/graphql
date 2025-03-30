@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -23,7 +25,7 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    *   The actual GraphQL query, or NULL if this plugin does not support a query
    *   with that ID.
    */
-  public function getQuery($id, OperationParams $operation);
+  public function getQuery(string $id, OperationParams $operation): ?string;
 
   /**
    * Returns the label for use on the administration pages.
@@ -31,7 +33,7 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    * @return string
    *   The administration label.
    */
-  public function label();
+  public function label(): string;
 
   /**
    * Returns the plugin's description.
@@ -39,7 +41,7 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    * @return string
    *   The plugin description.
    */
-  public function getDescription();
+  public function getDescription(): string;
 
   /**
    * Returns the weight of this plugin instance.
@@ -47,7 +49,7 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    * @return int
    *   The default weight for the given stage.
    */
-  public function getWeight();
+  public function getWeight(): int;
 
   /**
    * Sets the weight for this plugin instance.
@@ -55,6 +57,6 @@ interface PersistedQueryPluginInterface extends ConfigurableInterface, PluginIns
    * @param int $weight
    *   The weight.
    */
-  public function setWeight($weight);
+  public function setWeight(int $weight): void;
 
 }

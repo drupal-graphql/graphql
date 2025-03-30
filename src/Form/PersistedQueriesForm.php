@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Form;
 
 use Drupal\Component\Utility\Html;
@@ -17,22 +19,21 @@ class PersistedQueriesForm extends EntityForm {
 
   /**
    * Plugin manager for persisted query plugins.
-   *
-   * @var \Drupal\graphql\Plugin\PersistedQueryPluginManager
    */
-  protected $persistedQueryPluginManager;
+  protected PersistedQueryPluginManager $persistedQueryPluginManager;
 
   /**
    * The entity being used by this form.
    *
-   * @var \Drupal\graphql\Entity\Server
+   * We cannot type-hint this property because it is defined in the parent
+   * class, hence the PHPCS ignore.
+   *
+   * @var \Drupal\graphql\Entity\ServerInterface
    */
-  protected $entity;
+  protected $entity; // phpcs:ignore
 
   /**
    * PersistedQueriesForm constructor.
-   *
-   * @param \Drupal\graphql\Plugin\PersistedQueryPluginManager $persistedQueryPluginManager
    */
   public function __construct(PersistedQueryPluginManager $persistedQueryPluginManager) {
     $this->persistedQueryPluginManager = $persistedQueryPluginManager;
@@ -60,7 +61,7 @@ class PersistedQueriesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
 
-    /** @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface[] $plugins */
+    /** @var array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins */
     $plugins = $this->entity->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
@@ -195,9 +196,9 @@ class PersistedQueriesForm extends EntityForm {
   /**
    * Returns an array with all the available persisted query plugins.
    *
-   * @return \Drupal\graphql\Plugin\PersistedQueryPluginInterface[]
+   * @return array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface>
    */
-  protected function getAllPersistedQueryPlugins() {
+  protected function getAllPersistedQueryPlugins(): array {
     $plugins = [];
     foreach ($this->persistedQueryPluginManager->getDefinitions() as $id => $definition) {
       $plugins[$id] = $this->persistedQueryPluginManager->createInstance($id);

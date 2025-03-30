@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -13,25 +15,18 @@ class SourceContext implements ResolverInterface {
 
   /**
    * Name of the context.
-   *
-   * @var string
    */
-  protected $name;
+  protected string $name;
 
   /**
    * Source resolver.
-   *
-   * @var mixed
    */
-  protected $source;
+  protected mixed $source;
 
   /**
    * SourceContext constructor.
-   *
-   * @param string $name
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $source
    */
-  public function __construct($name, ?ResolverInterface $source = NULL) {
+  public function __construct(string $name, ?ResolverInterface $source = NULL) {
     $this->name = $name;
     $this->source = $source;
   }
@@ -39,7 +34,7 @@ class SourceContext implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $source = $this->source ?? new ParentValue();
     $context = $source->resolve($value, $args, $context, $info, $field);
     $field->setContextValue($this->name, $context);

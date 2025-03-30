@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -13,15 +15,11 @@ class PermissionProvider {
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * PermissionProvider constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
@@ -32,7 +30,7 @@ class PermissionProvider {
    */
   public function permissions(): array {
     $storage = $this->entityTypeManager->getStorage('graphql_server');
-    /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
+    /** @var array<\Drupal\graphql\Entity\ServerInterface> $servers */
     $servers = $storage->loadMultiple();
     $permissions = [];
 

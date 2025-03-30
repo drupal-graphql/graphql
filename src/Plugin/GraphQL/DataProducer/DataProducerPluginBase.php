@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Component\Plugin\Exception\ContextException;
@@ -46,7 +48,7 @@ abstract class DataProducerPluginBase extends PluginBase implements DataProducer
   /**
    * {@inheritdoc}
    */
-  public function resolveField(FieldContext $field) {
+  public function resolveField(FieldContext $field): mixed {
     if (!method_exists($this, 'resolve')) {
       throw new \LogicException('Missing data producer resolve method.');
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -16,56 +18,32 @@ class DataProducerPluginManager extends DefaultPluginManager {
 
   /**
    * The request stack later used to get the request time.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The cache context manager for calculating cache keys.
-   *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager
    */
-  protected $contextsManager;
+  protected CacheContextsManager $contextsManager;
 
   /**
    * The cache backend to cache results in.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $resultCacheBackend;
+  protected CacheBackendInterface $resultCacheBackend;
 
   /**
    * DataProducerPluginManager constructor.
-   *
-   * @param bool|string $pluginSubdirectory
-   *   The plugin's subdirectory.
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
-   * @param \Drupal\Core\Cache\CacheBackendInterface $resultCacheBackend
-   * @param string|null $pluginInterface
-   *   The interface each plugin should implement.
-   * @param string $pluginAnnotationName
-   *   The name of the annotation that contains the plugin definition.
-   * @param array $config
-   *   The configuration service parameter.
    */
   public function __construct(
-    $pluginSubdirectory,
+    bool|string $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $definitionCacheBackend,
     RequestStack $requestStack,
     CacheContextsManager $contextsManager,
     CacheBackendInterface $resultCacheBackend,
-    $pluginInterface,
-    $pluginAnnotationName,
+    ?string $pluginInterface,
+    string $pluginAnnotationName,
     array $config,
   ) {
     parent::__construct(
@@ -89,14 +67,8 @@ class DataProducerPluginManager extends DefaultPluginManager {
    * Creates a data producer proxy that lazy forwards resolve requests.
    *
    * The data producer with the given ID is wrapped.
-   *
-   * @param string $id
-   * @param array $mapping
-   * @param array $config
-   *
-   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    */
-  public function proxy($id, array $mapping = [], array $config = []) {
+  public function proxy(string $id, array $mapping = [], array $config = []): DataProducerProxy {
     return new DataProducerProxy(
       $id,
       $mapping,

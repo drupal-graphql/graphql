@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -34,14 +36,8 @@ class EntityLabel extends DataProducerPluginBase implements DataProducerPluginCa
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
-   *
-   * @return string|null
    */
-  public function resolve(EntityInterface $entity, ?AccountInterface $accessUser, FieldContext $context) {
+  public function resolve(EntityInterface $entity, ?AccountInterface $accessUser, FieldContext $context): ?string {
     /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
     $accessResult = $entity->access('view label', $accessUser, TRUE);
     $context->addCacheableDependency($accessResult);

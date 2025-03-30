@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -20,8 +22,6 @@ class Callback implements ResolverInterface {
 
   /**
    * Callback constructor.
-   *
-   * @param callable $callback
    */
   public function __construct(callable $callback) {
     $this->callback = $callback;
@@ -30,7 +30,7 @@ class Callback implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $result = ($this->callback)($value, $args, $context, $info, $field);
     return $result;
   }

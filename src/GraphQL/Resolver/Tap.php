@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -13,15 +15,11 @@ class Tap implements ResolverInterface {
 
   /**
    * Resolver to tap.
-   *
-   * @var mixed
    */
-  protected $resolver;
+  protected mixed $resolver;
 
   /**
    * Tap constructor.
-   *
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    */
   public function __construct(ResolverInterface $resolver) {
     $this->resolver = $resolver;
@@ -30,7 +28,7 @@ class Tap implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $this->resolver->resolve($value, $args, $context, $info, $field);
     return $value;
   }

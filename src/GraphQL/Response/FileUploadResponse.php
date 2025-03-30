@@ -14,9 +14,9 @@ class FileUploadResponse extends Response {
   /**
    * The file entities in case of successful file upload.
    *
-   * @var \Drupal\file\FileInterface[]
+   * @var array<\Drupal\file\FileInterface>
    */
-  protected $fileEntities = [];
+  protected array $fileEntities = [];
 
   /**
    * Sets file entity.
@@ -31,7 +31,7 @@ class FileUploadResponse extends Response {
   /**
    * Sets file entities.
    *
-   * @param \Drupal\file\FileInterface[] $fileEntities
+   * @param array<\Drupal\file\FileInterface> $fileEntities
    *   File entities.
    */
   public function setFileEntities(array $fileEntities): void {
@@ -51,7 +51,7 @@ class FileUploadResponse extends Response {
   /**
    * Get the file entities.
    *
-   * @return \Drupal\file\FileInterface[]
+   * @return array<\Drupal\file\FileInterface>
    *   File entities.
    */
   public function getFileEntities(): array {

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
@@ -44,11 +47,9 @@ class EntityUrl extends DataProducerPluginBase {
    * @param array|null $options
    *   The options to provided to the URL generator.
    *
-   * @return \Drupal\Core\Url
-   *
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function resolve(EntityInterface $entity, ?string $rel, ?array $options) {
+  public function resolve(EntityInterface $entity, ?string $rel, ?array $options): Url {
     return $entity->toUrl($rel ?? 'canonical', $options ?? []);
   }
 

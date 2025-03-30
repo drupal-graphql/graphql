@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
@@ -15,35 +17,29 @@ class Schema extends Plugin {
 
   /**
    * The plugin ID.
-   *
-   * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * The schema name.
-   *
-   * @var string
    */
-  public $name;
+  public string $name;
 
   /**
    * The component description.
-   *
-   * @var string
    */
-  public $description = '';
+  public string $description = '';
 
   /**
    * Schema constructor.
    *
-   * @param mixed $values
+   * @param array $values
    *   The plugin annotation values.
    *
    * @throws \Doctrine\Common\Annotations\AnnotationException
    *   In case of missing required values.
    */
-  public function __construct($values) {
+  public function __construct(array $values) {
     if (!array_key_exists('id', $values) || !$values['id']) {
       throw new AnnotationException('The plugin is missing an "id" property.');
     }

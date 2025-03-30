@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql;
 
 use Drupal\Core\Authentication\AuthenticationCollectorInterface;
@@ -13,17 +15,13 @@ class RouteProvider {
 
   /**
    * The authentication collector service.
-   *
-   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
    */
-  protected $authenticationCollector;
+  protected AuthenticationCollectorInterface $authenticationCollector;
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * RouteProvider constructor.
@@ -43,7 +41,7 @@ class RouteProvider {
    */
   public function routes(): array {
     $storage = $this->entityTypeManager->getStorage('graphql_server');
-    /** @var \Drupal\graphql\Entity\ServerInterface[] $servers */
+    /** @var array<\Drupal\graphql\Entity\ServerInterface> $servers */
     $servers = $storage->loadMultiple();
     $routes = [];
 

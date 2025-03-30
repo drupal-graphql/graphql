@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
@@ -15,24 +17,18 @@ class DataProducer extends Plugin {
 
   /**
    * The plugin ID.
-   *
-   * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * The component name.
-   *
-   * @var string
    */
-  public $name;
+  public string $name;
 
   /**
    * The component description.
-   *
-   * @var string
    */
-  public $description = '';
+  public string $description = '';
 
   /**
    * DataProducer constructor.

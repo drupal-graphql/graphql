@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -32,17 +35,13 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
 
   /**
    * The rendering service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * The file URL generator service.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
@@ -61,24 +60,11 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
 
   /**
    * ImageUrl constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
-   *   The file URL generator service.
-   *
-   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,
-    $pluginId,
-    $pluginDefinition,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
     RendererInterface $renderer,
     FileUrlGeneratorInterface $fileUrlGenerator,
   ) {
@@ -89,13 +75,8 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\file\FileInterface $entity
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *
-   * @return string|null
    */
-  public function resolve(FileInterface $entity, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(FileInterface $entity, RefinableCacheableDependencyInterface $metadata): ?string {
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed()) {

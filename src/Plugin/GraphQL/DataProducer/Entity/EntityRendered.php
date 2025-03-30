@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
@@ -38,17 +41,13 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * {@inheritdoc}
@@ -67,24 +66,11 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
 
   /**
    * EntityRendered constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   *
-   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,
-    $pluginId,
-    $pluginDefinition,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     RendererInterface $renderer,
   ) {
@@ -95,14 +81,8 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param string|null $mode
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *
-   * @return string
    */
-  public function resolve(EntityInterface $entity, $mode, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(EntityInterface $entity, ?string $mode, RefinableCacheableDependencyInterface $metadata): string {
     $mode = $mode ?? 'full';
     $builder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
     $view = $builder->view($entity, $mode, $entity->language()->getId());

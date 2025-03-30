@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -35,12 +37,12 @@ class SchemaPluginManager extends DefaultPluginManager {
    *   The configuration service parameter.
    */
   public function __construct(
-    $pluginSubdirectory,
+    bool|string $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $cacheBackend,
-    $pluginInterface,
-    $pluginAnnotationName,
+    ?string $pluginInterface,
+    string $pluginAnnotationName,
     array $config,
   ) {
     parent::__construct(

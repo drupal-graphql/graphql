@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -49,7 +51,7 @@ class EntityAccess extends DataProducerPluginBase {
    * @return bool
    *   TRUE when access to the entity is allowed, FALSE otherwise.
    */
-  public function resolve(EntityInterface $entity, ?string $operation, ?AccountInterface $user, FieldContext $context) {
+  public function resolve(EntityInterface $entity, ?string $operation, ?AccountInterface $user, FieldContext $context): bool {
     $result = $entity->access($operation ?? 'view', $user, TRUE);
     $context->addCacheableDependency($result);
     return $result->isAllowed();

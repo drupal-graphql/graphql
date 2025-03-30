@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Utility;
 
 use GraphQL\Deferred;
@@ -13,10 +15,8 @@ class DeferredUtility {
 
   /**
    * The promise adapter.
-   *
-   * @var \GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter|null
    */
-  public static $promiseAdapter;
+  public static ?SyncPromiseAdapter $promiseAdapter = NULL;
 
   /**
    * Return the singleton promise adapter.
@@ -24,7 +24,7 @@ class DeferredUtility {
    * @return \GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter
    *   The singleton promise adapter.
    */
-  public static function promiseAdapter() {
+  public static function promiseAdapter(): SyncPromiseAdapter {
     if (!isset(static::$promiseAdapter)) {
       static::$promiseAdapter = new SyncPromiseAdapter();
     }
@@ -34,13 +34,8 @@ class DeferredUtility {
 
   /**
    * Execute a callback after a value is resolved.
-   *
-   * @param mixed $value
-   * @param callable $callback
-   *
-   * @return mixed
    */
-  public static function applyFinally($value, callable $callback) {
+  public static function applyFinally(mixed $value, callable $callback): mixed {
     if ($value instanceof SyncPromise) {
       // Recursively apply this function to deferred results.
       $value->then(function ($inner) use ($callback) {
@@ -56,13 +51,8 @@ class DeferredUtility {
 
   /**
    * Execute a callback after a value is resolved and return the result.
-   *
-   * @param mixed $value
-   * @param callable $callback
-   *
-   * @return \GraphQL\Executor\Promise\Adapter\SyncPromise|mixed
    */
-  public static function returnFinally($value, callable $callback) {
+  public static function returnFinally(mixed $value, callable $callback): mixed {
     if ($value instanceof SyncPromise) {
       return $value->then(function ($value) use ($callback) {
         return $callback($value);
@@ -86,7 +76,7 @@ class DeferredUtility {
    *   The deferred result or the unchanged input array if it does not contain
    *   any promises.
    */
-  public static function waitAll(array $values) {
+  public static function waitAll(array $values): Deferred|array {
     if (static::containsDeferred($values)) {
       return new Deferred(function () use ($values) {
         $adapter = static::promiseAdapter();
@@ -112,7 +102,7 @@ class DeferredUtility {
    * @return bool
    *   TRUE if there are any deferred values in the given array.
    */
-  public static function containsDeferred(array $values) {
+  public static function containsDeferred(array $values): bool {
     foreach ($values as $value) {
       if ($value instanceof SyncPromise) {
         return TRUE;

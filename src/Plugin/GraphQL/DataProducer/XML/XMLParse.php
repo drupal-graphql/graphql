@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -28,10 +30,8 @@ class XMLParse extends DataProducerPluginBase {
    *
    * @param string $input
    *   The source input.
-   *
-   * @return \DOMElement
    */
-  public function resolve($input) {
+  public function resolve(string $input): \DOMElement {
     $document = new \DOMDocument();
     libxml_use_internal_errors(TRUE);
     $document->loadHTML($input);

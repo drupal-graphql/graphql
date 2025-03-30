@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink;
 
 use Drupal\Component\Utility\NestedArray;
@@ -32,13 +34,8 @@ class MenuLinkAttribute extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   * @param string $attribute
-   *
-   * @return mixed
    */
-  public function resolve(MenuLinkInterface $link, $attribute) {
+  public function resolve(MenuLinkInterface $link, string $attribute): string {
     $options = $link->getOptions();
     // Certain attributes like class can be arrays. Check for that and implode
     // them.

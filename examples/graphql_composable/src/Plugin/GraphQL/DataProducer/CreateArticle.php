@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -33,10 +35,8 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
 
   /**
    * {@inheritdoc}
@@ -78,7 +78,7 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    *
    * @throws \Exception
    */
-  public function resolve(array $data) {
+  public function resolve(array $data): ArticleResponse {
     $response = new ArticleResponse();
     if ($this->currentUser->hasPermission("create article content")) {
       $values = [

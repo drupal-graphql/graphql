@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -15,10 +17,8 @@ class MenuLinksCacheTest extends GraphQLTestBase {
 
   /**
    * Test menu.
-   *
-   * @var \Drupal\system\Entity\Menu
    */
-  protected $menu;
+  protected Menu $menu;
 
   /**
    * {@inheritdoc}

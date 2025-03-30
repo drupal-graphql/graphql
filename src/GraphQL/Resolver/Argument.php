@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -13,24 +15,20 @@ class Argument implements ResolverInterface {
 
   /**
    * Name of the argument.
-   *
-   * @var string
    */
-  protected $name;
+  protected string $name;
 
   /**
    * Argument constructor.
-   *
-   * @param string $name
    */
-  public function __construct($name) {
+  public function __construct(string $name) {
     $this->name = $name;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     return $args[$this->name] ?? NULL;
   }
 

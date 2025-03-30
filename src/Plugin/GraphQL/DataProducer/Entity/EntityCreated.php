@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -31,13 +33,8 @@ class EntityCreated extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param string|null $format
-   *
-   * @return string|null
    */
-  public function resolve(EntityInterface $entity, $format = NULL) {
+  public function resolve(EntityInterface $entity, ?string $format = NULL): ?string {
     // `getCreatedTime` is on NodeInterface which feels weird, since there
     // is a generic `EntityInterface`. Checking for method existence for now.
     if (method_exists($entity, 'getCreatedTime')) {

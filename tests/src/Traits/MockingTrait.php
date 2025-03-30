@@ -1,16 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\graphql\Entity\Server;
+use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\GraphQL\Resolver\Callback;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\Resolver\Value;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\graphql\Plugin\DataProducerPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
+use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 /**
  * Contains helpers for setting up mock servers and schemas for testing.
@@ -19,29 +26,29 @@ trait MockingTrait {
   use RandomGeneratorTrait;
 
   /**
-   * @var \Drupal\graphql\Entity\ServerInterface
+   * The server under test.
    */
-  protected $server;
+  protected ServerInterface $server;
 
   /**
-   * @var \Drupal\graphql\GraphQL\ResolverRegistry
+   * The resolver registry.
    */
-  protected $registry;
+  protected ResolverRegistry $registry;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\graphql\Plugin\SchemaPluginInterface
+   * The schema plugin under test.
    */
-  protected $schema;
+  protected MockObject&SchemaPluginInterface $schema;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\graphql\Plugin\SchemaPluginManager
+   * The schema plugin manager.
    */
-  protected $schemaPluginManager;
+  protected MockObject&SchemaPluginManager $schemaPluginManager;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\graphql\Plugin\DataProducerPluginManager
+   * The data producer plugin manager.
    */
-  protected $dataProducerPluginManager;
+  protected MockObject&DataProducerPluginManager $dataProducerPluginManager;
 
   /**
    * Turn a value into a result promise.
@@ -52,7 +59,7 @@ trait MockingTrait {
    * @return \PHPUnit\Framework\MockObject\Stub\ReturnCallback
    *   The return callback promise.
    */
-  protected function toPromise($value) {
+  protected function toPromise(mixed $value): ReturnCallback {
     // @phpstan-ignore-next-line
     return $this->returnCallback(is_callable($value) ? $value : function () use ($value) {
       yield $value;
@@ -70,7 +77,7 @@ trait MockingTrait {
    * @return \PHPUnit\Framework\MockObject\Stub\ReturnCallback
    *   The return callback promise.
    */
-  protected function toBoundPromise($value, $scope) {
+  protected function toBoundPromise(mixed $value, mixed $scope): ReturnCallback {
     return $this->toPromise(is_callable($value) ? \Closure::bind($value, $scope, $scope) : $value);
   }
 
@@ -82,8 +89,9 @@ trait MockingTrait {
    * @param string $id
    *   Schema id.
    * @param array $values
+   *   Server entity values.
    */
-  protected function setUpSchema($schema, $id = 'test', array $values = []): void {
+  protected function setUpSchema(string $schema, string $id = 'test', array $values = []): void {
     $this->mockSchema($id, $schema);
     $this->mockSchemaPluginManager($id);
     $this->createTestServer($id, '/graphql/' . $id, $values);
@@ -98,13 +106,9 @@ trait MockingTrait {
   /**
    * Create test server.
    *
-   * @param string $schema
-   * @param string $endpoint
-   * @param array $values
-   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createTestServer($schema, $endpoint, array $values = []): void {
+  protected function createTestServer(string $schema, string $endpoint, array $values = []): void {
     $this->server = Server::create([
       'schema' => $schema,
       'name' => $this->randomMachineName(),
@@ -121,10 +125,10 @@ trait MockingTrait {
    *   The schema id.
    * @param string $schema
    *   The schema.
-   * @param \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[] $extensions
+   * @param array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface> $extensions
    *   An array of schema extension plugins.
    */
-  protected function mockSchema($id, $schema, array $extensions = []): void {
+  protected function mockSchema(string $id, string $schema, array $extensions = []): void {
     /** @var \PHPUnit\Framework\MockObject\MockObject $extensionManager */
     $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
       ->disableOriginalConstructor()
@@ -160,10 +164,8 @@ trait MockingTrait {
 
   /**
    * Mock schema plugin manager.
-   *
-   * @param string $id
    */
-  protected function mockSchemaPluginManager($id): void {
+  protected function mockSchemaPluginManager(string $id): void {
     $this->schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -190,7 +192,7 @@ trait MockingTrait {
    * @param mixed|\Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    *   Resolver.
    */
-  protected function mockResolver($type, $field, $resolver = NULL): void {
+  protected function mockResolver(string $type, string $field, mixed $resolver = NULL): void {
     if (is_callable($resolver)) {
       $resolver = new Callback($resolver);
     }
@@ -210,7 +212,7 @@ trait MockingTrait {
    * @param callable $resolver
    *   Type resolver.
    */
-  protected function mockTypeResolver($type, callable $resolver): void {
+  protected function mockTypeResolver(string $type, callable $resolver): void {
     $this->registry->addTypeResolver($type, $resolver);
   }
 

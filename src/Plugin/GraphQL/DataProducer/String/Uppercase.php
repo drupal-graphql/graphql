@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\String;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -25,12 +27,8 @@ class Uppercase extends DataProducerPluginBase {
 
   /**
    * Value resolver.
-   *
-   * @param string $string
-   *
-   * @return string
    */
-  public function resolve($string) {
+  public function resolve(string $string): string {
     return strtoupper($string);
   }
 

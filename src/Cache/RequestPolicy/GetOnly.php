@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Cache\RequestPolicy;
 
 use Drupal\Core\PageCache\RequestPolicyInterface;

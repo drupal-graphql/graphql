@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Routing;
 
 use Asm89\Stack\CorsService;
@@ -19,10 +21,8 @@ class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
    * The CORS options for Origin header checking.
-   *
-   * @var array
    */
-  protected $corsOptions;
+  protected array $corsOptions;
 
   /**
    * Constructor.
@@ -36,10 +36,8 @@ class QueryRouteEnhancer implements EnhancerInterface {
    *
    * @param \Symfony\Component\Routing\Route $route
    *   The current route.
-   *
-   * @return bool
    */
-  public function applies(Route $route) {
+  public function applies(Route $route): bool {
     return $route->hasDefault('_graphql');
   }
 
@@ -80,7 +78,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
    *    In case the headers indicated a preflight was not performed.
    */
-  protected function assertValidPostRequestHeaders(Request $request) : void {
+  protected function assertValidPostRequestHeaders(Request $request): void {
     $content_type = $request->headers->get('content-type');
     if ($content_type === NULL) {
       throw new BadRequestHttpException("GraphQL requests must specify a valid content type header.");
@@ -155,7 +153,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
    * @return array
    *   The normalized query parameters.
    */
-  protected function extractQuery(Request $request) {
+  protected function extractQuery(Request $request): array {
     return JsonHelper::decodeParams($request->query->all());
   }
 
@@ -168,7 +166,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
    * @return array
    *   The normalized body parameters.
    */
-  protected function extractBody(Request $request) {
+  protected function extractBody(Request $request): array {
     $values = [];
 
     // Extract the request content.
@@ -194,7 +192,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
    * @return array
    *   The query parameters with added file uploads.
    */
-  protected function extractMultipart(Request $request, array $values) {
+  protected function extractMultipart(Request $request, array $values): array {
     // The request body parameters might contain file upload mutations. We treat
     // them according to the graphql multipart request specification.
     //

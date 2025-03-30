@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\PersistedQuery;
 
 use Drupal\Core\Plugin\PluginBase;
@@ -34,7 +36,7 @@ abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQ
   /**
    * {@inheritdoc}
    */
-  public function label() {
+  public function label(): string {
     $plugin_definition = $this->getPluginDefinition();
     return $plugin_definition['label'];
   }
@@ -42,7 +44,7 @@ abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQ
   /**
    * {@inheritdoc}
    */
-  public function getDescription() {
+  public function getDescription(): string {
     $plugin_definition = $this->getPluginDefinition();
     return $plugin_definition['description'] ?? '';
   }
@@ -50,7 +52,7 @@ abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQ
   /**
    * {@inheritdoc}
    */
-  public function getWeight() {
+  public function getWeight(): int {
     if (isset($this->configuration['weight'])) {
       return $this->configuration['weight'];
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Component\Datetime\TimeInterface;
@@ -30,157 +32,63 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Executor implements ExecutorImplementation {
 
   /**
-   * The schema plugin manager.
-   *
-   * @var \Drupal\graphql\Plugin\SchemaPluginManager
-   */
-  protected $pluginManager;
-
-  /**
-   * The cache backend for caching query results.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cacheBackend;
-
-  /**
-   * The cache contexts manager service.
-   *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager
-   */
-  protected $contextsManager;
-
-  /**
-   * The date/time service.
-   */
-  protected TimeInterface $time;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  protected $dispatcher;
-
-  /**
-   * The adapter for promises.
-   *
-   * @var \GraphQL\Executor\Promise\PromiseAdapter
-   */
-  protected $adapter;
-
-  /**
-   * Represents the GraphQL schema document.
-   *
-   * @var \GraphQL\Language\AST\DocumentNode
-   */
-  protected $document;
-
-  /**
-   * The context to pass down during field resolving.
-   *
-   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
-   */
-  protected $context;
-
-  /**
-   * The root of the GraphQL execution tree.
-   *
-   * @var mixed
-   */
-  protected $root;
-
-  /**
-   * Variables.
-   *
-   * @var array
-   */
-  protected $variables;
-
-  /**
-   * The parsed GraphQL schema.
-   *
-   * @var \GraphQL\Type\Schema
-   */
-  protected $schema;
-
-  /**
-   * The operation to be performed.
-   *
-   * @var string
-   */
-  protected $operation;
-
-  /**
-   * The resolver to get results for the query.
-   *
-   * @var callable
-   */
-  protected $resolver;
-
-  /**
-   * Executor constructor.
-   *
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
-   *   The cache contexts manager service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend for caching query results.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The date/time service.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-   *   The event dispatcher.
-   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Type\Schema $schema
-   * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param mixed $root
-   * @param mixed $variables
-   * @param string $operation
-   * @param callable $resolver
+   * Constructor.
    */
   public function __construct(
-    CacheContextsManager $contextsManager,
-    CacheBackendInterface $cacheBackend,
-    TimeInterface $time,
-    EventDispatcherInterface $dispatcher,
-    PromiseAdapter $adapter,
-    Schema $schema,
-    DocumentNode $document,
-    ResolveContext $context,
-    $root,
-    $variables,
-    $operation,
-    callable $resolver,
-  ) {
-    $this->contextsManager = $contextsManager;
-    $this->cacheBackend = $cacheBackend;
-    $this->time = $time;
-    $this->dispatcher = $dispatcher;
-
-    $this->adapter = $adapter;
-    $this->document = $document;
-    $this->context = $context;
-    $this->root = $root;
-    $this->variables = $variables;
-    $this->schema = $schema;
-    $this->operation = $operation;
-    $this->resolver = $resolver;
-  }
+    /**
+     * The cache contexts manager service.
+     */
+    protected CacheContextsManager $contextsManager,
+    /**
+     * The cache backend for caching query results.
+     */
+    protected CacheBackendInterface $cacheBackend,
+    /**
+     * The date/time service.
+     */
+    protected TimeInterface $time,
+    /**
+     * The event dispatcher.
+     */
+    protected EventDispatcherInterface $dispatcher,
+    /**
+     * The adapter for promises.
+     */
+    protected PromiseAdapter $adapter,
+    /**
+     * The parsed GraphQL schema.
+     */
+    protected Schema $schema,
+    /**
+     * Represents the GraphQL schema document.
+     */
+    protected DocumentNode $document,
+    /**
+     * The context to pass down during field resolving.
+     */
+    protected ResolveContext $context,
+    /**
+     * The root of the GraphQL execution tree.
+     */
+    protected mixed $root,
+    /**
+     * Variables.
+     */
+    protected array $variables,
+    /**
+     * The operation to be performed.
+     */
+    protected ?string $operation,
+    /**
+     * The resolver to get results for the query.
+     *
+     * @var callable
+     */
+    protected $resolver,
+  ) {}
 
   /**
    * Constructs an object from a services container.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
-   * @param \GraphQL\Type\Schema $schema
-   * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param mixed $root
-   * @param mixed $variables
-   * @param string $operation
-   * @param callable $resolver
-   *
-   * @return \Drupal\graphql\GraphQL\Execution\Executor
    */
   public static function create(
     ContainerInterface $container,
@@ -188,11 +96,11 @@ class Executor implements ExecutorImplementation {
     Schema $schema,
     DocumentNode $document,
     ResolveContext $context,
-    $root,
-    $variables,
-    $operation,
+    mixed $root,
+    array $variables,
+    ?string $operation,
     callable $resolver,
-  ) {
+  ): static {
     return new static(
       $container->get('cache_contexts_manager'),
       $container->get('cache.graphql.results'),
@@ -232,12 +140,8 @@ class Executor implements ExecutorImplementation {
 
   /**
    * Try to return cached results, otherwise resolve the query.
-   *
-   * @param string $prefix
-   *
-   * @return \GraphQL\Executor\Promise\Promise
    */
-  protected function doExecuteCached($prefix) {
+  protected function doExecuteCached(string $prefix): Promise {
     if ($result = $this->cacheRead($prefix)) {
       return $this->adapter->createFulfilled($result);
     }
@@ -259,10 +163,8 @@ class Executor implements ExecutorImplementation {
 
   /**
    * Get query results on a cache miss.
-   *
-   * @return \GraphQL\Executor\Promise\Promise
    */
-  protected function doExecuteUncached() {
+  protected function doExecuteUncached(): Promise {
     $executor = ReferenceExecutor::create(
       $this->adapter,
       $this->schema,
@@ -288,10 +190,7 @@ class Executor implements ExecutorImplementation {
   }
 
   /**
-   * Logs unsafe errors if any.
-   *
-   * @param \GraphQL\Server\OperationParams $operation
-   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
+   * Logs internal unsafe errors if there are any (not shown to clients).
    */
   protected function logUnsafeErrors(OperationParams $operation, ExecutionResult $result): void {
     $hasUnsafeErrors = FALSE;
@@ -339,10 +238,8 @@ class Executor implements ExecutorImplementation {
 
   /**
    * Calculates the cache prefix from context for the current query.
-   *
-   * @return string
    */
-  protected function cachePrefix() {
+  protected function cachePrefix(): string {
     // Sorting the variables and extensions will cause fewer cache vectors.
     // @todo Should we try to sort these recursively?
     $variables = $this->variables ?: [];
@@ -364,24 +261,16 @@ class Executor implements ExecutorImplementation {
 
   /**
    * Calculate the cache suffix for the current contexts.
-   *
-   * @param array $contexts
-   *
-   * @return string
    */
-  protected function cacheSuffix(array $contexts = []) {
+  protected function cacheSuffix(array $contexts = []): string {
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
     return hash('sha256', serialize($keys));
   }
 
   /**
    * Lookup cached results by contexts for this query.
-   *
-   * @param string $prefix
-   *
-   * @return \GraphQL\Executor\ExecutionResult|null
    */
-  protected function cacheRead($prefix) {
+  protected function cacheRead(string $prefix): ?ExecutionResult {
     if (($cache = $this->cacheBackend->get("contexts:$prefix"))) {
       $suffix = $this->cacheSuffix($cache->data ?? []);
       if (($cache = $this->cacheBackend->get("result:$prefix:$suffix"))) {
@@ -396,13 +285,8 @@ class Executor implements ExecutorImplementation {
 
   /**
    * Store results in cache.
-   *
-   * @param string $prefix
-   * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
-   *
-   * @return \Drupal\graphql\GraphQL\Execution\Executor
    */
-  protected function cacheWrite($prefix, CacheableExecutionResult $result) {
+  protected function cacheWrite(string $prefix, CacheableExecutionResult $result): static {
     $contexts = $result->getCacheContexts();
     $expire = $this->maxAgeToExpire($result->getCacheMaxAge());
     $tags = $result->getCacheTags();
@@ -436,14 +320,12 @@ class Executor implements ExecutorImplementation {
   /**
    * Maps a cache max age value to an "expire" value for the Cache API.
    *
-   * @param int $maxAge
-   *
    * @return int
    *   A corresponding "expire" value.
    *
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
-  protected function maxAgeToExpire($maxAge) {
+  protected function maxAgeToExpire(int $maxAge): int {
     $time = $this->time->getRequestTime();
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }

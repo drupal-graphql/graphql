@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\MenuLink\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;

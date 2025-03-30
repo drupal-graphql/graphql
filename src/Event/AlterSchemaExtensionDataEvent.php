@@ -13,17 +13,13 @@ class AlterSchemaExtensionDataEvent extends Event {
 
   /**
    * Event fired to alter schema extension data.
-   *
-   * @var string
    */
   const EVENT_NAME = 'graphql.sdl.alter_schema_extension';
 
   /**
    * The schema array data.
-   *
-   * @var array
    */
-  protected $schemaExtensionData;
+  protected array $schemaExtensionData;
 
   /**
    * AlterSchemaExtensionDataEvent constructor.

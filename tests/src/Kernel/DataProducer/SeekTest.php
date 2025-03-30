@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -20,10 +22,10 @@ class SeekTest extends GraphQLTestBase {
    *   The test list to seek in.
    * @param int $position
    *   The position in the list to retrieve.
-   * @param mixed $expected
+   * @param int|array|null $expected
    *   The expected result returned by the data producer.
    */
-  public function testSeek(array $input, int $position, $expected): void {
+  public function testSeek(array $input, int $position, int|array|null $expected): void {
     $result = $this->executeDataProducer('seek', [
       'input' => $input,
       'position' => $position,
@@ -34,8 +36,6 @@ class SeekTest extends GraphQLTestBase {
 
   /**
    * Data provider for testSeek().
-   *
-   * @return array
    */
   public static function seekProvider(): array {
     return [

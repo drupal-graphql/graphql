@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL;
 
 use Drupal\graphql\Entity\ServerInterface;
@@ -15,10 +17,10 @@ interface ValidatorInterface {
    * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server to validate.
    *
-   * @return \GraphQL\Error\Error[]
+   * @return array<\GraphQL\Error\Error>
    *   An array of validation errors.
    */
-  public function validateSchema(ServerInterface $server) : array;
+  public function validateSchema(ServerInterface $server): array;
 
   /**
    * Get a list of missing resolvers.
@@ -36,7 +38,7 @@ interface ValidatorInterface {
    * @return array
    *   An array keyed by type containing arrays of field names.
    */
-  public function getMissingResolvers(ServerInterface $server, array $ignore_types = []) : array;
+  public function getMissingResolvers(ServerInterface $server, array $ignore_types = []): array;
 
   /**
    * Get a list of orphaned resolvers.
@@ -52,6 +54,6 @@ interface ValidatorInterface {
    * @return array
    *   An array keyed by type containing arrays of field names.
    */
-  public function getOrphanedResolvers(ServerInterface $server, array $ignore_types = []) : array;
+  public function getOrphanedResolvers(ServerInterface $server, array $ignore_types = []): array;
 
 }

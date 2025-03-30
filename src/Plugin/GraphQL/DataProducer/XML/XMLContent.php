@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -28,10 +30,8 @@ class XMLContent extends DataProducerPluginBase {
    *
    * @param \DOMElement $dom
    *   The source (root) DOM element.
-   *
-   * @return string
    */
-  public function resolve(\DOMElement $dom) {
+  public function resolve(\DOMElement $dom): string {
     return implode('', array_map(function ($child) {
       if ($child instanceof \DOMText) {
         return $child->nodeValue;

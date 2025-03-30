@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -27,16 +29,14 @@ class EntityDefinitionTest extends GraphQLTestBase {
   /**
    * Default cache tags that should be included with the response.
    *
-   * @var string[]
+   * @var array<string>
    */
-  protected $defaultCacheTags = ['config:core.entity_form_display.node.article.default'];
+  protected array $defaultCacheTags = ['config:core.entity_form_display.node.article.default'];
 
   /**
    * Expected entity definition response for all fields.
-   *
-   * @var array
    */
-  protected $fullDefinitionResult = [
+  protected array $fullDefinitionResult = [
     'entityDefinition' =>
     [
       'label' => 'Content',

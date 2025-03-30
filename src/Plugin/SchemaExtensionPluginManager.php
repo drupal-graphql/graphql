@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -18,9 +20,9 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
   /**
    * Static cache of plugin instances per schema plugin.
    *
-   * @var \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[][]
+   * @var array<array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>>
    */
-  protected $extensions;
+  protected array $extensions;
 
   /**
    * SchemaExtensionPluginManager constructor.
@@ -42,12 +44,12 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
    *   The configuration service parameter.
    */
   public function __construct(
-    $pluginSubdirectory,
+    bool|string $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $cacheBackend,
-    $pluginInterface,
-    $pluginAnnotationName,
+    ?string $pluginInterface,
+    string $pluginAnnotationName,
     array $config,
   ) {
     parent::__construct(
@@ -69,9 +71,9 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
    * @param string $id
    *   The id of the schema plugin to retrieve the extensions for.
    *
-   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   * @return array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
    */
-  public function getExtensions($id) {
+  public function getExtensions(string $id): array {
     if (!isset($this->extensions[$id])) {
       $this->extensions[$id] = array_map(function ($definition) {
         return $this->createInstance($definition['id']);
@@ -86,10 +88,10 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
   /**
    * Sorts the given schema extension plugins by priority.
    *
-   * @param \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[] $extensions
+   * @param array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface> $extensions
    *   The schema extension plugins to sort.
    *
-   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   * @return array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
    *   The sorted schema extension plugins.
    */
   public static function sortByPriority(array $extensions): array {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -15,10 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class VoyagerController implements ContainerInjectionInterface {
   /**
    * The introspection service.
-   *
-   * @var \Drupal\graphql\GraphQL\Utility\Introspection
    */
-  protected $introspection;
+  protected Introspection $introspection;
 
   /**
    * {@inheritdoc}
@@ -50,7 +50,7 @@ class VoyagerController implements ContainerInjectionInterface {
    * @return array
    *   The render array.
    */
-  public function viewVoyager(ServerInterface $graphql_server) {
+  public function viewVoyager(ServerInterface $graphql_server): array {
     $introspectionData = $this->introspection->introspect($graphql_server);
 
     return [

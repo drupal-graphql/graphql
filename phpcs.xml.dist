@@ -15,11 +15,29 @@
       <property name="caseSensitive" value="true"/>
     </properties>
   </rule>
-
-  <!-- We want to document the return type on the base class even when there is
-    no return statement on the default implementation. -->
-  <rule ref="Drupal.Commenting.FunctionComment.InvalidNoReturn">
+  <rule ref="SlevomatCodingStandard.TypeHints">
+    <!-- Class constant type hints don't work with arrays in PHP 8.1. -->
+    <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint"/>
+    <!-- We don't want to specify the traversable array type on hooks for example, ignore for now. -->
+    <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
+    <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification"/>
+    <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
+    <!-- Disable deprecated sniff. -->
+    <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>
+  </rule>
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
+    <severity>5</severity>
+  </rule>
+  <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint">
+    <!-- We need the mixed type hint in some cases. -->
+    <exclude-pattern>src/Entity/Server.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Buffers/BufferBase.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/Execution/FieldContext.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/Execution/ResolveContext.php</exclude-pattern>
+    <exclude-pattern>src/Plugin/GraphQL/DataProducer/Utility/Seek.php</exclude-pattern>
+    <exclude-pattern>src/SubRequestResponse.php</exclude-pattern>
+    <exclude-pattern>tests/src/Traits/QueryResultAssertionTrait.php</exclude-pattern>
+    <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
   </rule>
 
   <rule ref="Drupal.Commenting.DocComment.MissingShort">

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -28,12 +30,8 @@ class EntityPublished extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *
-   * @return bool|null
    */
-  public function resolve(EntityInterface $entity) {
+  public function resolve(EntityInterface $entity): ?bool {
     if ($entity instanceof EntityPublishedInterface) {
       return $entity->isPublished();
     }

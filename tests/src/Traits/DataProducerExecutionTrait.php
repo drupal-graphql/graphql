@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Tests\graphql\Kernel\TestFieldContext;
@@ -17,12 +19,9 @@ trait DataProducerExecutionTrait {
   protected TestFieldContext $fieldContext;
 
   /**
-   * @param string $id
-   * @param array $contexts
-   *
-   * @return mixed
+   * Executes the given data producer by ID.
    */
-  protected function executeDataProducer($id, array $contexts = []) {
+  protected function executeDataProducer(string $id, array $contexts = []): mixed {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.data_producer');
 

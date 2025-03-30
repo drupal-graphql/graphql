@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink;
 
 use Drupal\Core\Menu\MenuLinkInterface;
@@ -28,12 +30,8 @@ class MenuLinkLabel extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   *
-   * @return mixed
    */
-  public function resolve(MenuLinkInterface $link) {
+  public function resolve(MenuLinkInterface $link): string {
     return $link->getTitle();
   }
 

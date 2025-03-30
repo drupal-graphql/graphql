@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;

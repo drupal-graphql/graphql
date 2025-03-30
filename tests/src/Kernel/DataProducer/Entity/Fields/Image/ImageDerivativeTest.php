@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer\Entity\Fields\Image;
 
 use Drupal\Core\Access\AccessResultAllowed;
@@ -7,6 +9,7 @@ use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Test class for the ImageDerivative data producer.
@@ -22,31 +25,23 @@ class ImageDerivativeTest extends GraphQLTestBase {
 
   /**
    * The file system URI under test.
-   *
-   * @var string
    */
-  protected $fileUri;
+  protected string $fileUri;
 
   /**
    * The file entity mock.
-   *
-   * @var \Drupal\file\FileInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $file;
+  protected FileInterface&MockObject $file;
 
   /**
    * The image style for testing.
-   *
-   * @var \Drupal\image\Entity\ImageStyle
    */
-  protected $style;
+  protected ImageStyle $style;
 
   /**
    * A file entity mock that returns FALSE on access checking.
-   *
-   * @var \Drupal\file\FileInterface
    */
-  protected $fileNotAccessible;
+  protected FileInterface&MockObject $fileNotAccessible;
 
   /**
    * {@inheritdoc}

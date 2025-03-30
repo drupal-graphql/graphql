@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Utility;
 
 use Drupal\Component\Render\PlainTextOutput;
@@ -7,6 +9,7 @@ use Drupal\Component\Utility\Bytes;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
@@ -21,6 +24,7 @@ use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
+use Drupal\file\FileStorageInterface;
 use Drupal\file\Validation\FileValidatorInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -38,85 +42,61 @@ class FileUpload {
 
   /**
    * The file storage where we will create new file entities from.
-   *
-   * @var \Drupal\file\FileStorageInterface
    */
-  protected $fileStorage;
+  protected FileStorageInterface $fileStorage;
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $currentUser;
+  protected AccountProxyInterface $currentUser;
 
   /**
    * The mime type guesser service.
-   *
-   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
    */
-  protected $mimeTypeGuesser;
+  protected MimeTypeGuesserInterface $mimeTypeGuesser;
 
   /**
    * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
    */
-  protected $fileSystem;
+  protected FileSystemInterface $fileSystem;
 
   /**
    * GraphQL logger channel.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
-  protected $logger;
+  protected LoggerChannelInterface $logger;
 
   /**
    * The token replacement instance for tokens in file directory paths.
-   *
-   * @var \Drupal\Core\Utility\Token
    */
-  protected $token;
+  protected Token $token;
 
   /**
    * The lock service to prevent duplicate file uploads to the same destination.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface
    */
-  protected $lock;
+  protected LockBackendInterface $lock;
 
   /**
    * The file system configuration to determine if we allow insecure uploads.
-   *
-   * @var \Drupal\Core\Config\ImmutableConfig
    */
-  protected $systemFileConfig;
+  protected ImmutableConfig $systemFileConfig;
 
   /**
    * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * The event dispatcher service.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
-  protected $eventDispatcher;
+  protected EventDispatcherInterface $eventDispatcher;
 
   /**
    * The image factory service.
-   *
-   * @var \Drupal\Core\Image\ImageFactory
    */
-  protected $imageFactory;
+  protected ImageFactory $imageFactory;
 
   /**
    * The file validator service.
-   *
-   * @var \Drupal\file\Validation\FileValidatorInterface
    */
   protected FileValidatorInterface $fileValidator;
 
@@ -341,7 +321,7 @@ class FileUpload {
   /**
    * Validates uploaded files, saves them and returns a file upload response.
    *
-   * @param \Symfony\Component\HttpFoundation\File\UploadedFile[] $uploaded_files
+   * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile> $uploaded_files
    *   The file entities to upload.
    * @param array $settings
    *   File settings as specified in regular file field config. Contains keys:
@@ -434,7 +414,7 @@ class FileUpload {
    *   does not meet the requirements or an attempt to resize it fails, an array
    *   containing the error message will be returned.
    */
-  protected function validateFileImageResolution(FileInterface $file, $maximum_dimensions = 0, $minimum_dimensions = 0): array {
+  protected function validateFileImageResolution(FileInterface $file, string|int $maximum_dimensions = 0, string|int $minimum_dimensions = 0): array {
     $errors = [];
 
     // Check first that the file is an image.

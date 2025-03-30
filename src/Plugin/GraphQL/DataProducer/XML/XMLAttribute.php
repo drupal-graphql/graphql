@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -33,10 +35,8 @@ class XMLAttribute extends DataProducerPluginBase {
    *   The source (root) DOM element.
    * @param string $name
    *   The name of the attribute.
-   *
-   * @return string
    */
-  public function resolve(\DOMElement $dom, $name) {
+  public function resolve(\DOMElement $dom, string $name): string {
     return $dom->getAttribute($name);
   }
 

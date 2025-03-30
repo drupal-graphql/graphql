@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Utility;
 
 /**
@@ -16,7 +18,7 @@ class JsonHelper {
    * @return array
    *   The decoded values.
    */
-  public static function decodeParams(array $values = []) {
+  public static function decodeParams(array $values = []): array {
     return array_map(function ($value) {
       if (!is_string($value)) {
         return $value;

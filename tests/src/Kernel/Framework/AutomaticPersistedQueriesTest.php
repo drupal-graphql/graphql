@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -21,10 +24,8 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
 
   /**
    * Test plugin.
-   *
-   * @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface
    */
-  protected $pluginApq;
+  protected PersistedQueryPluginInterface $pluginApq;
 
   /**
    * {@inheritdoc}

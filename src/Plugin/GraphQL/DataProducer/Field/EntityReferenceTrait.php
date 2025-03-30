@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -34,7 +36,7 @@ trait EntityReferenceTrait {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return array<\Drupal\Core\Entity\EntityInterface>
    *   The list of references entities.
    */
   protected function getReferencedEntities(string $type, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, \Closure $resolver, FieldContext $context): array {
@@ -66,12 +68,12 @@ trait EntityReferenceTrait {
   /**
    * Get the referenced entities in the specified language.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param array<\Drupal\Core\Entity\EntityInterface> $entities
    *   Entities to process.
    * @param string $language
    *   Language to be respected for retrieved entities.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return array<\Drupal\Core\Entity\EntityInterface>
    *   Translated entities.
    */
   private function getTranslated(array $entities, string $language): array {
@@ -87,7 +89,7 @@ trait EntityReferenceTrait {
   /**
    * Filter out not accessible entities.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param array<\Drupal\Core\Entity\EntityInterface> $entities
    *   Entities to filter.
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
    *   User entity to check access for. Default is null.
@@ -96,7 +98,7 @@ trait EntityReferenceTrait {
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return array<\Drupal\Core\Entity\EntityInterface>
    *   Filtered entities.
    */
   private function filterAccessible(array $entities, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): array {

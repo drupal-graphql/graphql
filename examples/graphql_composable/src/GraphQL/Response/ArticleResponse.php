@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_composable\GraphQL\Response;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -12,10 +14,8 @@ class ArticleResponse extends Response {
 
   /**
    * The article to be served.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $article;
+  protected ?EntityInterface $article;
 
   /**
    * Sets the content.

@@ -11,6 +11,7 @@
   },
   "require-dev": {
     "drupal/coder": "8.3.26",
+    "slevomat/coding-standard": "^8.16",
     "drupal/redirect": "^1.0",
     "phpstan/phpstan": "^1.11.2",
     "mglaman/phpstan-drupal": "^1.1.2",

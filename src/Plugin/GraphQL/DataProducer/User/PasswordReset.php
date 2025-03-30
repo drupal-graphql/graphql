@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 
 use Drupal\Core\Logger\LoggerChannelInterface;
@@ -32,17 +34,13 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
 
   /**
    * The current request.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
    */
-  protected $currentRequest;
+  protected Request $currentRequest;
 
   /**
    * The logger service.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
-  protected $logger;
+  protected LoggerChannelInterface $logger;
 
   /**
    * {@inheritdoc}

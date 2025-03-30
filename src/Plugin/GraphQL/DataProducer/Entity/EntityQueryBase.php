@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityTypeManager;
@@ -39,17 +41,13 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManager
    */
-  protected $entityTypeManager;
+  protected EntityTypeManager $entityTypeManager;
 
   /**
    * The current user proxy.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $currentUser;
+  protected AccountProxyInterface $currentUser;
 
   /**
    * {@inheritdoc}
@@ -101,9 +99,9 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
    *   List of conditions to filter the entities.
    * @param array $allowedFilters
    *   List of fields to be used in conditions to restrict access to data.
-   * @param string[] $languages
+   * @param array<string> $languages
    *   Languages for queried entities.
-   * @param string[] $bundles
+   * @param array<string> $bundles
    *   List of bundles to be filtered.
    * @param bool $access
    *   Whether entity query should check access.

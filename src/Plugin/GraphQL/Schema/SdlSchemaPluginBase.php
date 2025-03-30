@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -33,31 +35,23 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
   /**
    * The cache bin for caching the parsed SDL.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $astCache;
+  protected CacheBackendInterface $astCache;
 
   /**
    * Whether the system is currently in development mode.
-   *
-   * @var bool
    */
-  protected $inDevelopment;
+  protected bool $inDevelopment;
 
   /**
    * The schema extension plugin manager.
-   *
-   * @var \Drupal\graphql\Plugin\SchemaExtensionPluginManager
    */
-  protected $extensionManager;
+  protected SchemaExtensionPluginManager $extensionManager;
 
   /**
    * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * {@inheritdoc}
@@ -98,7 +92,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   public function __construct(
     array $configuration,
-    $pluginId,
+    string $pluginId,
     array $pluginDefinition,
     CacheBackendInterface $astCache,
     ModuleHandlerInterface $moduleHandler,
@@ -119,7 +113,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \GraphQL\Error\Error
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getSchema(ResolverRegistryInterface $registry) {
+  public function getSchema(ResolverRegistryInterface $registry): Schema {
     $extensions = $this->getExtensions();
     $document = $this->getSchemaDocument($extensions);
     $schema = $this->buildSchema($document, $registry);
@@ -161,16 +155,14 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
-   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   * @return array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
    */
-  protected function getExtensions() {
+  protected function getExtensions(): array {
     return $this->extensionManager->getExtensions($this->getPluginId());
   }
 
   /**
    * Retrieves the parsed AST of the schema definition.
-   *
-   * @param array $extensions
    *
    * @return \GraphQL\Language\AST\DocumentNode
    *   The parsed schema document.
@@ -178,7 +170,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \GraphQL\Error\SyntaxError
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getSchemaDocument(array $extensions = []) {
+  protected function getSchemaDocument(array $extensions = []): DocumentNode {
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = $this->getCacheId('schema');
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
@@ -233,14 +225,12 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   /**
    * Retrieves the parsed AST of the schema extension definitions.
    *
-   * @param array $extensions
-   *
    * @return \GraphQL\Language\AST\DocumentNode|null
    *   The parsed schema document.
    *
    * @throws \GraphQL\Error\SyntaxError
    */
-  protected function getExtensionDocument(array $extensions = []) {
+  protected function getExtensionDocument(array $extensions = []): ?DocumentNode {
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
       return $extension->getExtensionDefinition();
     }, $extensions), function ($definition) {
@@ -260,7 +250,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getSchemaDefinition() {
+  protected function getSchemaDefinition(): string {
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);

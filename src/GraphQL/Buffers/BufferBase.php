@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Buffers;
 
 /**
@@ -10,40 +12,40 @@ abstract class BufferBase {
   /**
    * The the array of buffers.
    *
-   * @var \SplObjectStorage<object, object>[]
+   * @var array<\SplObjectStorage<object, object>>
    */
-  protected $buffers = [];
+  protected array $buffers = [];
 
   /**
    * The array of result sets.
    *
-   * @var \SplObjectStorage<object, object>[]
+   * @var array<\SplObjectStorage<object, object>>
    */
-  protected $results = [];
+  protected array $results = [];
 
   /**
    * Returns the bucket name for grouping items together.
    *
-   * @param object $item
+   * @param \ArrayObject<string, mixed> $item
    *   The item to get the buffer id for.
    *
    * @return string
    *   The buffer id.
    */
-  protected function getBufferId($item) {
+  protected function getBufferId(\ArrayObject $item): string {
     return "";
   }
 
   /**
    * Helper function to create a resolver for a singular buffer.
    *
-   * @param object $item
+   * @param \ArrayObject<string, mixed> $item
    *   The item to add to the buffer.
    *
    * @return \Closure
    *   The callback to invoke to load the result for this buffer item.
    */
-  public function createBufferResolver($item) {
+  public function createBufferResolver(\ArrayObject $item): \Closure {
     $bufferId = $this->getBufferId($item);
     if (!isset($this->buffers[$bufferId])) {
       $this->buffers[$bufferId] = new \SplObjectStorage();
@@ -63,7 +65,7 @@ abstract class BufferBase {
   /**
    * Creates a callback to invoke to load the result for this buffer item.
    *
-   * @param object $item
+   * @param \ArrayObject<string, mixed> $item
    *   The item to add to create the resolver for.
    * @param \SplObjectStorage<object, object> $buffer
    *   The buffer.
@@ -73,7 +75,7 @@ abstract class BufferBase {
    * @return \Closure
    *   The callback to invoke to load the result for this buffer item.
    */
-  protected function createResolver($item, \SplObjectStorage $buffer, \SplObjectStorage $result) {
+  protected function createResolver(\ArrayObject $item, \SplObjectStorage $buffer, \SplObjectStorage $result): \Closure {
     // Return the closure that will resolve and return the result for the item.
     return function () use ($item, $buffer, $result) {
       return $this->resolveItem($item, $buffer, $result);
@@ -83,7 +85,7 @@ abstract class BufferBase {
   /**
    * Returns the result of the given item after processing the buffer if needed.
    *
-   * @param object $item
+   * @param \ArrayObject<string, mixed> $item
    *   The buffer item to retrieve the result for.
    * @param \SplObjectStorage<object, object> $buffer
    *   The buffer.
@@ -93,7 +95,7 @@ abstract class BufferBase {
    * @return mixed
    *   The result of resolving the given buffer item.
    */
-  protected function resolveItem($item, \SplObjectStorage $buffer, \SplObjectStorage $result) {
+  protected function resolveItem(\ArrayObject $item, \SplObjectStorage $buffer, \SplObjectStorage $result): mixed {
     if ($buffer->contains($item)) {
       $results = $this->resolveBuffer($buffer);
 
@@ -119,7 +121,7 @@ abstract class BufferBase {
    *   The resolved results for the given buffer, keyed by the corresponding
    *   buffer items.
    */
-  protected function resolveBuffer(\SplObjectStorage $buffer) {
+  protected function resolveBuffer(\SplObjectStorage $buffer): \SplObjectStorage {
     // Convert the buffer to an array that we can later use to map the results
     // to the correct batch items.
     $buffer = iterator_to_array($buffer, FALSE);
@@ -145,8 +147,6 @@ abstract class BufferBase {
    * @return array
    *   The resolved/loaded items.
    */
-  protected function resolveBufferArray(array $buffer) {
-    throw new \LogicException('Method not implemented.');
-  }
+  abstract protected function resolveBufferArray(array $buffer): array;
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\TypedData;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -41,15 +43,8 @@ class PropertyPath extends DataProducerPluginBase {
 
   /**
    * Resolve the property path.
-   *
-   * @param string $path
-   * @param mixed $value
-   * @param string|null $type
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *
-   * @return mixed
    */
-  public function resolve($path, $value, $type, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(string $path, mixed $value, ?string $type, RefinableCacheableDependencyInterface $metadata): mixed {
     if (!($value instanceof TypedDataInterface) && !empty($type)) {
       $manager = $this->getTypedDataManager();
       $definition = $manager->createDataDefinition($type);

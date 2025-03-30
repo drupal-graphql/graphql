@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Logger\RfcLoggerTrait;
@@ -17,10 +19,8 @@ class LoggerTest extends GraphQLTestBase implements LoggerInterface {
 
   /**
    * Loggers calls.
-   *
-   * @var array
    */
-  protected $loggerCalls = [];
+  protected array $loggerCalls = [];
 
   /**
    * {@inheritdoc}
@@ -42,7 +42,7 @@ GQL;
     $this->setUpSchema($schema);
 
     $this->mockResolver('Query', 'resolvesToNull', NULL);
-    $this->mockResolver('Query', 'throwsException', function () {
+    $this->mockResolver('Query', 'throwsException', function (): void {
       throw new \Exception('BOOM!');
     });
     $this->mockResolver('Query', 'takesIntArgument');

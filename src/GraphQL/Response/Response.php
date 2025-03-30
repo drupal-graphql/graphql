@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\GraphQL\Response;
 
+use Drupal\Component\Render\MarkupInterface;
+
 /**
  * Base class for responses containing the violations.
  */
@@ -11,15 +13,13 @@ class Response implements ResponseInterface {
 
   /**
    * List of violations.
-   *
-   * @var array
    */
-  protected $violations = [];
+  protected array $violations = [];
 
   /**
    * {@inheritdoc}
    */
-  public function addViolation($message, array $properties = []): void {
+  public function addViolation(string|MarkupInterface $message, array $properties = []): void {
     $properties['message'] = (string) $message;
     $this->violations[] = $properties;
   }

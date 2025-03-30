@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Traits;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -14,14 +16,9 @@ use GraphQL\Server\OperationParams;
 trait QueryResultAssertionTrait {
 
   /**
-   * @var \Drupal\graphql\Entity\ServerInterface
+   * The renderer service.
    */
-  protected $server;
-
-  /**
-   * @var \Drupal\Core\Render\RendererInterface|null
-   */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * Return the default cache max age for this test case.
@@ -29,23 +26,23 @@ trait QueryResultAssertionTrait {
    * @return int
    *   The default max age value.
    */
-  abstract protected function defaultCacheMaxAge();
+  abstract protected function defaultCacheMaxAge(): int;
 
   /**
    * Return the default cache cache tags for this test case.
    *
-   * @return string[]
+   * @return array<string>
    *   The default cache tags.
    */
-  abstract protected function defaultCacheTags();
+  abstract protected function defaultCacheTags(): array;
 
   /**
    * Return the default cache contexts for this test case.
    *
-   * @return string[]
+   * @return array<string>
    *   The default cache contexts.
    */
-  abstract protected function defaultCacheContexts();
+  abstract protected function defaultCacheContexts(): array;
 
   /**
    * The default cache metadata object.
@@ -53,7 +50,7 @@ trait QueryResultAssertionTrait {
    * @return \Drupal\Core\Cache\CacheableMetadata
    *   The cache metadata object.
    */
-  protected function defaultCacheMetaData() {
+  protected function defaultCacheMetaData(): CacheableMetadata {
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge($this->defaultCacheMaxAge());
     $metadata->setCacheTags($this->defaultCacheTags());
@@ -67,7 +64,7 @@ trait QueryResultAssertionTrait {
    * @return \Drupal\Core\Cache\CacheableMetadata
    *   The cache metadata object.
    */
-  protected function defaultMutationCacheMetaData() {
+  protected function defaultMutationCacheMetaData(): CacheableMetadata {
     $metadata = new CacheableMetadata();
     $metadata->setCacheMaxAge(0);
     $metadata->setCacheTags($this->defaultCacheTags());
@@ -87,7 +84,7 @@ trait QueryResultAssertionTrait {
    * @param \Drupal\Core\Cache\CacheableMetadata|null $metadata
    *   The expected cache metadata object.
    */
-  protected function assertResults($query, array $variables, array $expected, ?CacheableMetadata $metadata = NULL): void {
+  protected function assertResults(string $query, array $variables, array $expected, ?CacheableMetadata $metadata = NULL): void {
     $context = new RenderContext();
     $result = $this->getRenderer()->executeInRenderContext(
       $context,
@@ -114,12 +111,12 @@ trait QueryResultAssertionTrait {
    *   The query string.
    * @param array $variables
    *   The query variables.
-   * @param mixed $expected
+   * @param array $expected
    *   The expected error messages.
    * @param \Drupal\Core\Cache\CacheableMetadata $metadata
    *   The expected cache metadata object.
    */
-  protected function assertErrors($query, array $variables, $expected, CacheableMetadata $metadata): void {
+  protected function assertErrors(string $query, array $variables, array $expected, CacheableMetadata $metadata): void {
     $context = new RenderContext();
     $result = $this->getRenderer()->executeInRenderContext(
       $context,
@@ -148,7 +145,7 @@ trait QueryResultAssertionTrait {
    *
    * @internal
    */
-  private function assertResultData(ExecutionResult $result, $expected): void {
+  private function assertResultData(ExecutionResult $result, mixed $expected): void {
     $data = $result->toArray();
     $this->assertArrayHasKey('data', $data, 'No result data.');
     $this->assertEquals($expected, $data['data'], 'Unexpected query result.');
@@ -240,7 +237,7 @@ trait QueryResultAssertionTrait {
    * @return \Drupal\Core\Render\RendererInterface
    *   The renderer service for the test.
    */
-  private function getRenderer() : RendererInterface {
+  private function getRenderer(): RendererInterface {
     if (!isset($this->renderer)) {
       $this->renderer = \Drupal::service('renderer');
     }

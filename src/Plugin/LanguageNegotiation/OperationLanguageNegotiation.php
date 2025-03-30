@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\LanguageNegotiation;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class for identifying language based on a graphql query.
@@ -25,17 +28,13 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
 
   /**
    * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The current execution context.
-   *
-   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext|null
    */
-  protected static $context;
+  protected static ?ResolveContext $context = NULL;
 
   /**
    * {@inheritdoc}
@@ -50,8 +49,6 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
 
   /**
    * Set the current resolve context statically which contains the language.
-   *
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
    */
   public static function setContext(?ResolveContext $context = NULL): void {
     static::$context = $context;

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
@@ -26,12 +29,8 @@ class EntityLanguage extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *
-   * @return \Drupal\Core\Language\LanguageInterface
    */
-  public function resolve(EntityInterface $entity) {
+  public function resolve(EntityInterface $entity): LanguageInterface {
     return $entity->language();
   }
 

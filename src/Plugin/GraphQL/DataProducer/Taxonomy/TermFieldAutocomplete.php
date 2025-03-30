@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
 use Drupal\Core\Database\Connection;
@@ -60,38 +62,28 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
 
   /**
    * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
    */
-  protected $database;
+  protected Connection $database;
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The term storage.
-   *
-   * @var \Drupal\taxonomy\TermStorageInterface|null
    */
-  protected $termStorage;
+  protected ?TermStorageInterface $termStorage = NULL;
 
   /**
    * The term type.
-   *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface|null
    */
-  protected $termType;
+  protected ?ContentEntityTypeInterface $termType = NULL;
 
   /**
    * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * {@inheritdoc}
@@ -216,7 +208,7 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
    * @param string $field
    *   Field name to get the vocabularies for.
    *
-   * @return string[]
+   * @return ?array<string>
    *   Vocabularies configured for the field in case it is a term field, null
    *   otherwise.
    */

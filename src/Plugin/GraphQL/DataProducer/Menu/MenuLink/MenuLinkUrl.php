@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink;
 
 use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Url;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
@@ -28,12 +31,8 @@ class MenuLinkUrl extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   *
-   * @return \Drupal\Core\Url
    */
-  public function resolve(MenuLinkInterface $link) {
+  public function resolve(MenuLinkInterface $link): Url {
     return $link->getUrlObject();
   }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\SchemaExtension;
 
 use Drupal\graphql\GraphQL\ResolverBuilder;
@@ -27,8 +29,7 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
-   * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
+   * Mapping of page fields.
    */
   protected function addPageFields(ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Page', 'id',
@@ -47,8 +48,7 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
-   * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
+   * Mapping of page query fields.
    */
   protected function addQueryFields(ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Query', 'page',

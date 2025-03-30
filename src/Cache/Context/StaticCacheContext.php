@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 
 /**
- * Helper class, not sure for what.
- *
- * @todo This class and service seems unused, can we remove it?
+ * This class is used for the global language cache context.
  */
 class StaticCacheContext implements CalculatedCacheContextInterface {
 
@@ -16,6 +16,7 @@ class StaticCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
+    // @phpstan-ignore-next-line
     return t('Static');
   }
 

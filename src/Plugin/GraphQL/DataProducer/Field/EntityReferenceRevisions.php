@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -65,17 +67,13 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManager
    */
-  protected $entityTypeManager;
+  protected EntityTypeManager $entityTypeManager;
 
   /**
    * The entity revision buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
    */
-  protected $entityRevisionBuffer;
+  protected EntityRevisionBuffer $entityRevisionBuffer;
 
   /**
    * {@inheritdoc}
@@ -146,7 +144,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
    *   A promise that will return referenced entities or empty array if there
    *   aren't any.
    */
-  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context) {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): Deferred|array {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return [];
     }

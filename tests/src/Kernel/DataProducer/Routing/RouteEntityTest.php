@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer\Routing;
 
 use Drupal\Core\Url;
@@ -17,87 +19,63 @@ class RouteEntityTest extends GraphQLTestBase {
 
   /**
    * Published test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $publishedNode;
+  protected Node $publishedNode;
 
   /**
    * French translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationFrPublished;
+  protected Node $translationFrPublished;
 
   /**
    * German translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationDePublished;
+  protected Node $translationDePublished;
 
   /**
    * Unpublished test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $unpublishedNode;
+  protected Node $unpublishedNode;
 
   /**
    * French translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationFrUnpublished;
+  protected Node $translationFrUnpublished;
 
   /**
    * German translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationDeUnpublished;
+  protected Node $translationDeUnpublished;
 
   /**
    * Unpublished test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $unpublishedToPublishedNode;
+  protected Node $unpublishedToPublishedNode;
 
   /**
    * Published french translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationFrUnpublishedToPublished;
+  protected Node $translationFrUnpublishedToPublished;
 
   /**
    * Published German translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationDeUnpublishedToPublished;
+  protected Node $translationDeUnpublishedToPublished;
 
   /**
    * Published test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $publishedToUnpublishedNode;
+  protected Node $publishedToUnpublishedNode;
 
   /**
    * Unpublished french translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationFrPublishedToUnpublished;
+  protected Node $translationFrPublishedToUnpublished;
 
   /**
    * Unpublished German translation of test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $translationDePublishedToUnpublished;
+  protected Node $translationDePublishedToUnpublished;
 
   /**
    * {@inheritdoc}

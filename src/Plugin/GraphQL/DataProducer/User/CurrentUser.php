@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -24,10 +26,8 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
 
   /**
    * {@inheritdoc}

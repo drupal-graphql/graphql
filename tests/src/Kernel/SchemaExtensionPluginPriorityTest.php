@@ -51,6 +51,11 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
    * lower priority on the overriding plugin so that it will be processed after
    * the plugin it is overriding.
    *
+   * @param array<int, string> $extensions
+   *   The schema extension plugins to use.
+   * @param string $expected_result
+   *   The expected result of the resolver.
+   *
    * @dataProvider composableSchemaExtensionOverridingProvider
    */
   public function testComposableSchemaExtensionOverriding(array $extensions, string $expected_result): void {
@@ -64,6 +69,9 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
 
   /**
    * Data provider for testComposableSchemaExtensionOverriding().
+   *
+   * @return array<int, array<int, array<int, string>|string>>
+   *   The test cases.
    */
   public static function composableSchemaExtensionOverridingProvider(): array {
     return [
@@ -131,10 +139,10 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
    *   The resolver to execute.
    *
-   * @return mixed
+   * @return string
    *   The result of the resolver.
    */
-  protected function resolve(ResolverInterface $resolver) {
+  protected function resolve(ResolverInterface $resolver): string {
     $resolveContext = $this->getMockBuilder(ResolveContext::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -144,7 +152,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
     $fieldContext = $this->getMockBuilder(FieldContext::class)
       ->disableOriginalConstructor()
       ->getMock();
-    return $resolver->resolve(NULL, NULL, $resolveContext, $resolveInfo, $fieldContext);
+    return $resolver->resolve(NULL, [], $resolveContext, $resolveInfo, $fieldContext);
   }
 
 }

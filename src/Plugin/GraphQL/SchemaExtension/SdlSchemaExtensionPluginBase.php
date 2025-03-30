@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\SchemaExtension;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
@@ -16,10 +18,8 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
 
   /**
    * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * {@inheritdoc}
@@ -51,7 +51,7 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    */
   public function __construct(
     array $configuration,
-    $pluginId,
+    string $pluginId,
     array $pluginDefinition,
     ModuleHandlerInterface $moduleHandler,
   ) {
@@ -64,7 +64,7 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getBaseDefinition() {
+  public function getBaseDefinition(): ?string {
     return $this->loadDefinitionFile('base');
   }
 
@@ -73,7 +73,7 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getExtensionDefinition() {
+  public function getExtensionDefinition(): ?string {
     return $this->loadDefinitionFile('extension');
   }
 
@@ -88,7 +88,7 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function loadDefinitionFile($type) {
+  protected function loadDefinitionFile(string $type): ?string {
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);

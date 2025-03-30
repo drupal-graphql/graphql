@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -43,17 +45,13 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManager
    */
-  protected $entityTypeManager;
+  protected EntityTypeManager $entityTypeManager;
 
   /**
    * The entity field manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManager
    */
-  protected $entityFieldManager;
+  protected EntityFieldManager $entityFieldManager;
 
   /**
    * {@inheritdoc}

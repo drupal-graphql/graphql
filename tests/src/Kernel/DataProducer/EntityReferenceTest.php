@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -18,17 +20,13 @@ class EntityReferenceTest extends GraphQLTestBase {
 
   /**
    * Test node that will be referenced.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $referencedNode;
+  protected Node $referencedNode;
 
   /**
    * Test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
-  protected $node;
+  protected Node $node;
 
   /**
    * {@inheritdoc}

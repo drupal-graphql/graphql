@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\Core\Cache\Cache;
@@ -14,6 +16,7 @@ use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
 use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\graphql\Cache\RequestPolicy\GetOnly;
+use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -33,10 +36,8 @@ abstract class GraphQLTestBase extends KernelTestBase {
 
   /**
    * The server under test.
-   *
-   * @var \Drupal\graphql\Entity\Server|null
    */
-  protected $server;
+  protected ServerInterface $server;
 
   /**
    * {@inheritdoc}
@@ -57,9 +58,9 @@ abstract class GraphQLTestBase extends KernelTestBase {
   ];
 
   /**
-   * @var \Drupal\graphql\GraphQL\ResolverBuilder
+   * The resolver builder.
    */
-  protected $builder;
+  protected ResolverBuilder $builder;
 
   /**
    * {@inheritdoc}
@@ -126,7 +127,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * Returns the default cache tags used in assertions for this test.
    *
-   * @return string[]
+   * @return array<string>
    *   The list of cache tags.
    */
   protected function defaultCacheTags(): array {
@@ -141,7 +142,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * Returns the default cache contexts used in assertions for this test.
    *
-   * @return string[]
+   * @return array<string>
    *   The list of cache contexts.
    */
   protected function defaultCacheContexts(): array {
@@ -151,7 +152,7 @@ abstract class GraphQLTestBase extends KernelTestBase {
   /**
    * Provides the user permissions that the test user is set up with.
    *
-   * @return string[]
+   * @return array<string>
    *   List of user permissions.
    */
   protected function userPermissions(): array {

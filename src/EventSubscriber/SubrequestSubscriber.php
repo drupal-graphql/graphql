@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -20,11 +22,6 @@ class SubrequestSubscriber implements EventSubscriberInterface {
 
   /**
    * Constructs a SubrequestSubscriber object.
-   *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   * @param \Drupal\language\LanguageNegotiatorInterface $languageNegotiator
    */
   public function __construct(LanguageManagerInterface $languageManager, TranslatorInterface $translator, AccountInterface $currentUser, ?LanguageNegotiatorInterface $languageNegotiator = NULL) {
     $this->languageManager = $languageManager;

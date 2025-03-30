@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Lock\LockBackendInterface;
@@ -22,10 +24,8 @@ class UploadFileServiceTest extends GraphQLTestBase {
 
   /**
    * The FileUpload object we want to test, gets prepared in setUp().
-   *
-   * @var \Drupal\graphql\GraphQL\Utility\FileUpload
    */
-  protected $uploadService;
+  protected FileUpload $uploadService;
 
   /**
    * Gets the file path of the source file.

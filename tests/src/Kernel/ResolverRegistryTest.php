@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\ResolverRegistry;
@@ -49,7 +51,7 @@ GQL;
   /**
    * @covers ::getAllFieldResolvers
    */
-  public function testGetAllFieldResolvers() : void {
+  public function testGetAllFieldResolvers(): void {
     $transportation_resolver = $this->builder->fromValue('Ford Model T');
     $this->mockResolver('Query', 'transportation', $transportation_resolver);
     $car_resolver = $this->builder->fromParent();
@@ -71,7 +73,7 @@ GQL;
   /**
    * @covers ::getFieldResolverWithInheritance
    */
-  public function testGetFieldResolverWithInheritanceTraversesSingleInheritance() : void {
+  public function testGetFieldResolverWithInheritanceTraversesSingleInheritance(): void {
     $expected_resolver = $this->builder->fromValue('Car');
     $this->mockResolver('Car', 'model', $expected_resolver);
 
@@ -89,7 +91,7 @@ GQL;
   /**
    * @covers ::getFieldResolverWithInheritance
    */
-  public function testGetFieldResolverWithInheritanceTraversesMultipleInheritance() : void {
+  public function testGetFieldResolverWithInheritanceTraversesMultipleInheritance(): void {
     $expected_resolver = $this->builder->fromValue('Vehicle');
     $this->mockResolver('Vehicle', 'model', $expected_resolver);
 
@@ -107,7 +109,7 @@ GQL;
   /**
    * @covers ::getFieldResolverWithInheritance
    */
-  public function testGetFieldResolverWithInheritanceGivesPrecedenceToType() : void {
+  public function testGetFieldResolverWithInheritanceGivesPrecedenceToType(): void {
     $this->mockResolver('Vehicle', 'model', $this->builder->fromValue('Vehicle'));
     $expected_resolver = $this->builder->fromValue('Cabrio');
     $this->mockResolver('Cabrio', 'model', $expected_resolver);

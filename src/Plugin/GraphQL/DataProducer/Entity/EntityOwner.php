@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\user\EntityOwnerInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Returns the user that owns the entity.
@@ -28,12 +31,8 @@ class EntityOwner extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *
-   * @return \Drupal\user\UserInterface|null
    */
-  public function resolve(EntityInterface $entity) {
+  public function resolve(EntityInterface $entity): ?UserInterface {
     if ($entity instanceof EntityOwnerInterface) {
       return $entity->getOwner();
     }

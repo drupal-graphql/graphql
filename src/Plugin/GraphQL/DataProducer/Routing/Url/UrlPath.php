@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\Url;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -29,13 +31,8 @@ class UrlPath extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Url $url
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
-   *
-   * @return string
    */
-  public function resolve(Url $url, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(Url $url, RefinableCacheableDependencyInterface $metadata): string {
     $url = $url->toString(TRUE);
     $metadata->addCacheableDependency($url);
 

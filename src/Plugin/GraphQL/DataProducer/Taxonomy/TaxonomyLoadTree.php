@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -67,17 +69,13 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
    */
-  protected $entityBuffer;
+  protected EntityBuffer $entityBuffer;
 
   /**
    * {@inheritdoc}
@@ -158,7 +156,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     $resolver = $this->entityBuffer->add('taxonomy_term', $term_ids);
 
     return new Deferred(function () use ($language, $resolver, $context, $access, $accessUser, $accessOperation) {
-      /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
+      /** @var array<\Drupal\Core\Entity\EntityInterface> $entities */
       $entities = $resolver();
       if (!$entities) {
         // If there is no entity with this id, add the list cache tags so that

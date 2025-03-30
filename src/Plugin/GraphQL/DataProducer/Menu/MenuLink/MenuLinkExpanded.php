@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink;
 
 use Drupal\Core\Menu\MenuLinkInterface;
@@ -28,12 +30,8 @@ class MenuLinkExpanded extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   *
-   * @return bool
    */
-  public function resolve(MenuLinkInterface $link) {
+  public function resolve(MenuLinkInterface $link): bool {
     return $link->isExpanded();
   }
 

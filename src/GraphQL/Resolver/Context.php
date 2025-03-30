@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -14,25 +16,18 @@ class Context implements ResolverInterface {
 
   /**
    * Name of the context.
-   *
-   * @var mixed
    */
-  protected $name;
+  protected mixed $name;
 
   /**
    * An arbitrary default value in case the context is not set.
-   *
-   * @var mixed
    */
-  protected $default;
+  protected mixed $default;
 
   /**
    * Context constructor.
-   *
-   * @param string $name
-   * @param mixed $default
    */
-  public function __construct($name, $default = NULL) {
+  public function __construct(string $name, mixed $default = NULL) {
     $this->name = $name;
     $this->default = $default;
   }
@@ -40,7 +35,7 @@ class Context implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $output = $field->getContextValue($this->name);
     if (!isset($output) && !$field->hasContextValue($this->name)) {
       $output = $this->default;

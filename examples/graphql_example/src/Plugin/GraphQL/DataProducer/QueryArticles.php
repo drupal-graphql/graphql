@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\DataProducer;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -33,12 +36,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
-  const MAX_LIMIT = 100;
+  const int MAX_LIMIT = 100;
 
   /**
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * The entity type manager.
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -55,22 +58,12 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
   /**
-   * Articles constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *
-   * @codeCoverageIgnore
+   * Constructor.
    */
   public function __construct(
     array $configuration,
-    $pluginId,
-    $pluginDefinition,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
@@ -78,15 +71,11 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
   /**
-   * @param int $offset
-   * @param int $limit
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
    *
-   * @return \Drupal\graphql_examples\Wrappers\QueryConnection
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function resolve($offset, $limit, RefinableCacheableDependencyInterface $metadata) {
+  public function resolve(int $offset, int $limit, RefinableCacheableDependencyInterface $metadata): QueryConnection {
     if ($limit > static::MAX_LIMIT) {
       throw new UserError(sprintf('Exceeded maximum query limit: %s.', static::MAX_LIMIT));
     }

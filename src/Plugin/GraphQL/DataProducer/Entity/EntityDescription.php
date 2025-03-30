@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityDescriptionInterface;
@@ -27,12 +29,8 @@ class EntityDescription extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *
-   * @return string|null
    */
-  public function resolve(EntityInterface $entity) {
+  public function resolve(EntityInterface $entity): ?string {
     if ($entity instanceof EntityDescriptionInterface) {
       return $entity->getDescription();
     }

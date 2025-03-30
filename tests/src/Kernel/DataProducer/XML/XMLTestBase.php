@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer\XML;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -23,10 +25,8 @@ class XMLTestBase extends GraphQLTestBase {
 
   /**
    * Returns the source of the test document.
-   *
-   * @return bool|string
    */
-  public function getDocumentSource() {
+  public function getDocumentSource(): bool|string {
     return file_get_contents(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/xml/test.xml');
   }
 

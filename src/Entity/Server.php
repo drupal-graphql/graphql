@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Entity;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -7,7 +9,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
+use Drupal\graphql\GraphQL\Execution\ExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
@@ -15,8 +17,6 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Error\DebugFlag;
-use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
 use GraphQL\Executor\Executor;
 use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\Language\AST\DocumentNode;
@@ -81,114 +81,91 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
   /**
    * The server's machine-readable name.
-   *
-   * @var string
    */
-  public $name;
+  public string $name;
 
   /**
    * The server's human-readable name.
-   *
-   * @var string
    */
-  public $label;
+  public ?string $label;
 
   /**
    * The ID of the schema plugin used by this server.
-   *
-   * @var string
    */
-  public $schema;
+  public string $schema;
 
   /**
    * Schema configuration.
-   *
-   * @var array
    */
-  public $schema_configuration = [];
+  public array $schema_configuration = [];
 
   /**
    * The debug settings for this server.
    *
-   * @var int
    * @see \GraphQL\Error\DebugFlag
    */
-  public $debug_flag = DebugFlag::NONE;
+  public int $debug_flag = DebugFlag::NONE;
 
   /**
    * Whether the server should cache its results.
-   *
-   * @var bool
    */
-  public $caching = TRUE;
+  public bool $caching = TRUE;
 
   /**
    * Whether the server allows query batching.
-   *
-   * @var bool
    */
-  public $batching = TRUE;
+  public bool $batching = TRUE;
 
   /**
    * Whether to disable query introspection.
-   *
-   * @var bool
    */
-  public $disable_introspection = FALSE;
+  public bool $disable_introspection = FALSE;
 
   /**
    * The maximum allowed query complexity. NULL means unlimited.
-   *
-   * @var int|null
    */
-  public $query_complexity = NULL;
+  public ?int $query_complexity = NULL;
 
   /**
    * The maximum allowed query depth. NULL means unlimited.
-   *
-   * @var int|null
    */
-  public $query_depth = NULL;
+  public ?int $query_depth = NULL;
 
   /**
    * The server's endpoint.
-   *
-   * @var string
    */
-  public $endpoint;
+  public string $endpoint;
 
   /**
    * Persisted query plugins configuration.
-   *
-   * @var array
    */
-  public $persisted_queries_settings = [];
+  public array $persisted_queries_settings = [];
 
   /**
    * Persisted query plugin instances available on this server.
    *
    * @var array|null
    */
-  protected $persisted_query_instances = NULL;
+  protected ?array $persisted_query_instances = NULL;
 
   /**
    * The sorted persisted query plugin instances available on this server.
    *
    * @var array|null
    */
-  protected $sorted_persisted_query_instances = NULL;
+  protected ?array $sorted_persisted_query_instances = NULL;
 
   /**
    * {@inheritdoc}
    */
   public function id() {
-    return $this->name;
+    return $this->name ?? NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function executeOperation(OperationParams $operation) {
+  public function executeOperation(OperationParams $operation): ExecutionResult {
     $previous = Executor::getImplementationFactory();
     Executor::setImplementationFactory([
       \Drupal::service('graphql.executor'),
@@ -201,8 +178,8 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
       // In case execution fails before the execution stage, we have to wrap the
       // result object here.
-      if (!($result instanceof CacheableExecutionResult)) {
-        $result = new CacheableExecutionResult($result->data, $result->errors, $result->extensions);
+      if (!($result instanceof ExecutionResult)) {
+        $result = new ExecutionResult($result->data, $result->errors, $result->extensions);
         $result->mergeCacheMaxAge(0);
       }
     }
@@ -216,7 +193,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * {@inheritdoc}
    */
-  public function executeBatch($operations) {
+  public function executeBatch($operations): array {
     // We can't leverage parallel processing of batched queries because of the
     // contextual properties of Drupal (e.g. language manager, current user).
     return array_map(function (OperationParams $operation) {
@@ -229,7 +206,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function configuration() {
+  public function configuration(): ServerConfig {
     $params = \Drupal::getContainer()->getParameter('graphql.config');
     /** @var \Drupal\graphql\Plugin\SchemaPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.graphql.schema');
@@ -281,7 +258,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return mixed|callable
    *   The root value for query execution or a callable factory.
    */
-  protected function getRootValue() {
+  protected function getRootValue(): mixed {
     return NULL;
   }
 
@@ -313,11 +290,12 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @param \Drupal\graphql\Plugin\SchemaPluginInterface $schema
    *   The schema plugin instance.
    * @param array $config
+   *   The GraphQL module configuration.
    *
    * @return mixed|callable
    *   The context object for query execution or a callable factory.
    */
-  protected function getContext(SchemaPluginInterface $schema, array $config) {
+  protected function getContext(SchemaPluginInterface $schema, array $config): mixed {
     // Each document (e.g. in a batch query) gets its own resolve context. This
     // allows us to collect the cache metadata and contextual values (e.g.
     // inheritance for language) for each query separately.
@@ -347,57 +325,20 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
    *   The resolver registry.
    *
-   * @return null|callable
+   * @return callable|null
    *   The default field resolver.
    */
-  protected function getFieldResolver(ResolverRegistryInterface $registry) {
-    return function ($value, $args, ResolveContext $context, ResolveInfo $info) use ($registry) {
+  protected function getFieldResolver(ResolverRegistryInterface $registry): ?callable {
+    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($registry) {
       $field = new FieldContext($context, $info);
       $result = $registry->resolveField($value, $args, $context, $info, $field);
-      return DeferredUtility::applyFinally($result, function ($result) use ($field, $context) {
+      return DeferredUtility::applyFinally($result, function ($result) use ($field, $context): void {
         if ($result instanceof CacheableDependencyInterface) {
           $field->addCacheableDependency($result);
         }
 
         $context->addCacheableDependency($field);
       });
-    };
-  }
-
-  /**
-   * Returns the error formatter.
-   *
-   * Allows to replace the default error formatter with a custom one. It is
-   * essential when there is a need to adjust error format, for instance
-   * to add an additional fields or remove some of the default ones.
-   *
-   * @return mixed|callable
-   *   The error formatter.
-   *
-   * @see \GraphQL\Error\FormattedError::prepareFormatter
-   */
-  protected function getErrorFormatter() {
-    return function (Error $error) {
-      return FormattedError::createFromException($error);
-    };
-  }
-
-  /**
-   * Returns the error handler.
-   *
-   * @todo Handle this through configurable plugins on the server.
-   *
-   * Allows to replace the default error handler with a custom one. For example
-   * when there is a need to handle specific errors differently.
-   *
-   * @return mixed|callable
-   *   The error handler.
-   *
-   * @see \GraphQL\Executor\ExecutionResult::toArray
-   */
-  protected function getErrorHandler() {
-    return function (array $errors, callable $formatter) {
-      return array_map($formatter, $errors);
     };
   }
 
@@ -436,7 +377,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPersistedQueryInstances() {
+  public function getPersistedQueryInstances(): array {
     if (!is_null($this->persisted_query_instances)) {
       return $this->persisted_query_instances;
     }
@@ -452,13 +393,13 @@ class Server extends ConfigEntityBase implements ServerInterface {
       }
     }
 
-    return $this->persisted_query_instances;
+    return $this->persisted_query_instances ?? [];
   }
 
   /**
    * {@inheritDoc}
    */
-  public function getSortedPersistedQueryInstances() {
+  public function getSortedPersistedQueryInstances(): array {
     if (!is_null($this->sorted_persisted_query_instances)) {
       return $this->sorted_persisted_query_instances;
     }
@@ -477,7 +418,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return callable
    *   The persisted query loader.
    */
-  protected function getPersistedQueryLoader() {
+  protected function getPersistedQueryLoader(): callable {
     return function ($id, OperationParams $params) {
       $sortedPersistedQueryInstances = $this->getSortedPersistedQueryInstances();
       if (!empty($sortedPersistedQueryInstances)) {
@@ -519,7 +460,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @return array|callable
    *   The validation rules or a callable factory.
    */
-  protected function getValidationRules() {
+  protected function getValidationRules(): array|callable {
     return function (OperationParams $params, DocumentNode $document, $operation) {
       if (isset($params->queryId)) {
         // Assume that pre-parsed documents are already validated. This allows

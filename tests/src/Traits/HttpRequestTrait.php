@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Traits;
 
-use Drupal\graphql\Entity\Server;
 use Drupal\graphql\Entity\ServerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Test trait for the GraphQL HTTP interface.
@@ -13,17 +15,15 @@ trait HttpRequestTrait {
 
   /**
    * The default server.
-   *
-   * @var \Drupal\graphql\Entity\Server
    */
-  protected $server;
+  protected ServerInterface $server;
 
   /**
    * Issue a simple query over http.
    *
    * @param string|null $query
    *   The query string. Can be omitted when testing auto persisted queries.
-   * @param \Drupal\graphql\Entity\Server|null $server
+   * @param \Drupal\graphql\Entity\ServerInterface|null $server
    *   The server instance.
    * @param array $variables
    *   Query variables.
@@ -41,13 +41,13 @@ trait HttpRequestTrait {
    */
   protected function query(
     ?string $query,
-    ?Server $server = NULL,
+    ?ServerInterface $server = NULL,
     array $variables = [],
     array $extensions = [],
     bool $persisted = FALSE,
     string $method = Request::METHOD_GET,
     string $operationName = '',
-  ) {
+  ): Response {
     $server = $server ?: $this->server;
     $endpoint = $this->server->get('endpoint');
     $extensions = !empty($extensions) ? ['extensions' => $extensions] : [];
@@ -76,7 +76,7 @@ trait HttpRequestTrait {
   /**
    * Simulate batched queries over http.
    *
-   * @param array[] $queries
+   * @param array<array> $queries
    *   A set of queries to be executed in one go.
    * @param \Drupal\graphql\Entity\ServerInterface $server
    *   The server instance.
@@ -84,11 +84,8 @@ trait HttpRequestTrait {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The http response object.
    */
-  protected function batchedQueries(array $queries, ?ServerInterface $server = NULL) {
+  protected function batchedQueries(array $queries, ?ServerInterface $server = NULL): Response {
     $server = $server ?: $this->server;
-    if (!($server instanceof Server)) {
-      throw new \LogicException('Invalid server.');
-    }
 
     $queries = json_encode($queries);
     $endpoint = $this->server->get('endpoint');

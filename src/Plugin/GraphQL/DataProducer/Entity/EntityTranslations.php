@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -52,10 +55,8 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
 
   /**
    * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * {@inheritdoc}
@@ -72,20 +73,9 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
-   * EntityTranslation constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
-   *
-   * @codeCoverageIgnore
+   * EntityTranslations constructor.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityRepositoryInterface $entityRepository) {
+  public function __construct(array $configuration, string $pluginId, PluginDefinitionInterface|array $pluginDefinition, EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityRepository = $entityRepository;
   }
@@ -93,15 +83,9 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
   /**
    * Resolver.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param bool|null $access
-   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
-   * @param string|null $accessOperation
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
-   *
    * @return array|null
    */
-  public function resolve(EntityInterface $entity, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(EntityInterface $entity, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?array {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $languages = $entity->getTranslationLanguages();
 

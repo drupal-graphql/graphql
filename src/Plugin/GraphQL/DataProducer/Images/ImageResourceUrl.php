@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Images;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -25,12 +27,8 @@ class ImageResourceUrl extends DataProducerPluginBase {
 
   /**
    * Simply checks the url property in a given derivative result.
-   *
-   * @param array $derivative
-   *
-   * @return mixed
    */
-  public function resolve(array $derivative) {
+  public function resolve(array $derivative): string {
     return $derivative['url'] ?? '';
   }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -21,24 +23,18 @@ class ExplorerController implements ContainerInjectionInterface {
 
   /**
    * The URL generator service.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
    */
-  protected $urlGenerator;
+  protected UrlGeneratorInterface $urlGenerator;
 
   /**
    * The introspection service.
-   *
-   * @var \Drupal\graphql\GraphQL\Utility\Introspection
    */
-  protected $introspection;
+  protected Introspection $introspection;
 
   /**
    * The schema plugin manager.
-   *
-   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
-  protected $pluginManager;
+  protected SchemaPluginManager $pluginManager;
 
   /**
    * {@inheritdoc}
@@ -82,7 +78,7 @@ class ExplorerController implements ContainerInjectionInterface {
    * @return array
    *   The render array.
    */
-  public function viewExplorer(ServerInterface $graphql_server, Request $request) {
+  public function viewExplorer(ServerInterface $graphql_server, Request $request): array {
     $url = $this->urlGenerator->generate("graphql.query.{$graphql_server->id()}");
     $introspectionData = $this->introspection->introspect($graphql_server);
 

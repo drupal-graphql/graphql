@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -11,10 +13,8 @@ class EntityBuffer extends BufferBase {
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * EntityBuffer constructor.
@@ -37,7 +37,7 @@ class EntityBuffer extends BufferBase {
    * @return \Closure
    *   The callback to invoke to load the result for this buffer item.
    */
-  public function add($type, $id) {
+  public function add(string $type, array|int|string $id): \Closure {
     $item = new \ArrayObject([
       'type' => $type,
       'id' => $id,
@@ -49,14 +49,14 @@ class EntityBuffer extends BufferBase {
   /**
    * {@inheritdoc}
    */
-  protected function getBufferId($item) {
+  protected function getBufferId(\ArrayObject $item): string {
     return $item['type'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function resolveBufferArray(array $buffer) {
+  public function resolveBufferArray(array $buffer): array {
     $type = reset($buffer)['type'];
     $ids = array_map(function (\ArrayObject $item) {
       return (array) $item['id'];

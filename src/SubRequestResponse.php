@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -14,10 +16,8 @@ class SubRequestResponse extends Response implements RefinableCacheableDependenc
 
   /**
    * The request result.
-   *
-   * @var mixed
    */
-  protected $result;
+  protected mixed $result;
 
   /**
    * SubrequestResponse constructor.
@@ -29,7 +29,7 @@ class SubRequestResponse extends Response implements RefinableCacheableDependenc
    * @param array $headers
    *   An array of response headers.
    */
-  public function __construct($result, $status = 200, array $headers = []) {
+  public function __construct(mixed $result, int $status = 200, array $headers = []) {
     parent::__construct('', $status, $headers);
     $this->result = $result;
   }
@@ -40,7 +40,7 @@ class SubRequestResponse extends Response implements RefinableCacheableDependenc
    * @return mixed
    *   The request result.
    */
-  public function getResult() {
+  public function getResult(): mixed {
     return $this->result;
   }
 

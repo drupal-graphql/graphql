@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
@@ -17,7 +19,7 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
    *   The resolver registry.
    */
-  public function registerResolvers(ResolverRegistryInterface $registry);
+  public function registerResolvers(ResolverRegistryInterface $registry): void;
 
   /**
    * Retrieves the base schema definition.
@@ -25,7 +27,7 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
    * @return string|null
    *   The base schema definition.
    */
-  public function getBaseDefinition();
+  public function getBaseDefinition(): ?string;
 
   /**
    * Retrieves the extension schema definition.
@@ -33,6 +35,6 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
    * @return string|null
    *   The extension schema definition.
    */
-  public function getExtensionDefinition();
+  public function getExtensionDefinition(): ?string;
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_menu_links_test\Access;
 
 use Drupal\Core\Access\AccessResult;

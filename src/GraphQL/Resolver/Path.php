@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -24,33 +26,23 @@ class Path implements ResolverInterface {
 
   /**
    * Name of the context.
-   *
-   * @var string|\Drupal\Core\TypedData\DataDefinitionInterface
    */
-  protected $type;
+  protected string|DataDefinitionInterface $type;
 
   /**
    * Source resolver.
-   *
-   * @var mixed
    */
-  protected $path;
+  protected mixed $path;
 
   /**
    * Resolver.
-   *
-   * @var mixed
    */
-  protected $value;
+  protected mixed $value;
 
   /**
    * Path constructor.
-   *
-   * @param string $type
-   * @param mixed $path
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $value
    */
-  public function __construct($type, $path, ?ResolverInterface $value = NULL) {
+  public function __construct(string $type, mixed $path, ?ResolverInterface $value = NULL) {
     $this->type = $type;
     $this->path = $path;
     $this->value = $value;
@@ -59,7 +51,7 @@ class Path implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $value = $this->value ?? new ParentValue();
     $value = $value->resolve($value, $args, $context, $info, $field);
     $metadata = new BubbleableMetadata();

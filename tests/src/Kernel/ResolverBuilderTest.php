@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
@@ -50,17 +52,14 @@ GQL;
    * @covers ::produce
    *
    * @dataProvider builderProducingProvider
-   *
-   * @param string $input
-   * @param string $expected
    */
-  public function testBuilderProducing($input, $expected): void {
+  public function testBuilderProducing(string $input, string $expected): void {
     $plugin = $this->builder->produce($input, []);
     $this->assertInstanceOf($expected, $plugin);
   }
 
   /**
-   * @return array
+   * Data provider for testBuilderProducing().
    */
   public static function builderProducingProvider(): array {
     return [

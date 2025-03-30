@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -13,29 +15,14 @@ class PersistedQueryPluginManager extends DefaultPluginManager {
 
   /**
    * PersistedQueryPluginManager constructor.
-   *
-   * @param bool|string $pluginSubdirectory
-   *   The plugin's subdirectory.
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
-   * @param string|null $pluginInterface
-   *   The interface each plugin should implement.
-   * @param string $pluginAnnotationName
-   *   The name of the annotation that contains the plugin definition.
-   * @param array $config
-   *   The configuration service parameter.
    */
   public function __construct(
-    $pluginSubdirectory,
+    bool|string $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $definitionCacheBackend,
-    $pluginInterface,
-    $pluginAnnotationName,
+    ?string $pluginInterface,
+    string $pluginAnnotationName,
     array $config,
   ) {
     parent::__construct(

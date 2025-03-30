@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\node\Entity\Node;
@@ -13,14 +15,9 @@ use Drupal\node\Entity\NodeType;
 class EntityBufferTest extends GraphQLTestBase {
 
   /**
-   * @var string[]
+   * @var array<string>
    */
-  protected $nodeIds = [];
-
-  /**
-   * @var \PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $entityBuffer;
+  protected array $nodeIds = [];
 
   /**
    * {@inheritdoc}

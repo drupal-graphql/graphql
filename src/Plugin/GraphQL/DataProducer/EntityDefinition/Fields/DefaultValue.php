@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -33,7 +35,7 @@ class DefaultValue extends DataProducerPluginBase {
    * @return string|bool|int|null
    *   The default value.
    */
-  public function resolve(FieldDefinitionInterface $entity_definition_field) {
+  public function resolve(FieldDefinitionInterface $entity_definition_field): string|bool|int|null {
     $default_value = $entity_definition_field->getDefaultValueLiteral();
     switch ($entity_definition_field->getType()) {
       case 'list_integer':

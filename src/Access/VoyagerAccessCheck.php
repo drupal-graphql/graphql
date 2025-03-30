@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\graphql\Entity\ServerInterface;
@@ -23,7 +26,7 @@ class VoyagerAccessCheck implements AccessInterface {
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function access(AccountInterface $account, ServerInterface $graphql_server) {
+  public function access(AccountInterface $account, ServerInterface $graphql_server): AccessResultInterface {
     if ($account->hasPermission('bypass graphql access')) {
       return AccessResult::allowed();
     }

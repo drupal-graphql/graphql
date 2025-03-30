@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Utility;
 
 use Drupal\graphql\Entity\ServerInterface;
@@ -20,7 +22,7 @@ class Introspection {
    * @return array
    *   The introspection result as an array.
    */
-  public function introspect(ServerInterface $server) {
+  public function introspect(ServerInterface $server): array {
     $operation = new OperationParams();
     $operation->query = IntrospectionType::getIntrospectionQuery(['descriptions' => TRUE]);
 

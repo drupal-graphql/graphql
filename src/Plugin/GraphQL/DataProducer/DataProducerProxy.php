@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Cache\Cache;
@@ -14,6 +16,7 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\DataProducerPluginCachingInterface;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -24,75 +27,49 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * The plugin config.
-   *
-   * @var array
    */
-  protected $config;
+  protected array $config;
 
   /**
    * The plugin id.
-   *
-   * @var string
    */
-  protected $id;
+  protected string $id;
 
   /**
    * The plugin manager.
-   *
-   * @var \Drupal\graphql\Plugin\DataProducerPluginManager
    */
-  protected $pluginManager;
+  protected DataProducerPluginManager $pluginManager;
 
   /**
    * The request stack for looking up request time.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The cache context manager for cache keys.
-   *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager
    */
-  protected $contextsManager;
+  protected CacheContextsManager $contextsManager;
 
   /**
    * The cache backend for results.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $cacheBackend;
+  protected CacheBackendInterface $cacheBackend;
 
   /**
    * The mapping of names to resolvers.
-   *
-   * @var array
    */
-  protected $mapping = [];
+  protected array $mapping = [];
 
   /**
    * If results should be cached.
-   *
-   * @var bool
    */
-  protected $cached = FALSE;
+  protected bool $cached = FALSE;
 
   /**
    * Construct DataProducerProxy object.
-   *
-   * @param string $id
-   *   DataProducer plugin id.
-   * @param array $mapping
-   * @param array $config
-   *   Plugin configuration.
-   * @param \Drupal\graphql\Plugin\DataProducerPluginManager $pluginManager
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    */
   public function __construct(
-    $id,
+    string $id,
     array $mapping,
     array $config,
     DataProducerPluginManager $pluginManager,
@@ -111,14 +88,8 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * Create a new data producer proxy.
-   *
-   * @param string $id
-   * @param array $mapping
-   * @param array $config
-   *
-   * @return mixed
    */
-  public static function create($id, array $mapping = [], array $config = []) {
+  public static function create(string $id, array $mapping = [], array $config = []): mixed {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
     return $manager->proxy($id, $mapping, $config);
   }
@@ -126,12 +97,9 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Store a resolver for a given name.
    *
-   * @param string $name
-   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $mapping
-   *
    * @return $this
    */
-  public function map($name, ResolverInterface $mapping) {
+  public function map(string $name, ResolverInterface $mapping) {
     $this->mapping[$name] = $mapping;
     return $this;
   }
@@ -139,11 +107,9 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Set the cached flag.
    *
-   * @param bool $cached
-   *
    * @return $this
    */
-  public function cached($cached = TRUE) {
+  public function cached(bool $cached = TRUE) {
     $this->cached = $cached;
     return $this;
   }
@@ -151,17 +117,9 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Resolve field value.
    *
-   * @param mixed $value
-   * @param mixed $args
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
-   *
-   * @return mixed
-   *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
 
     return DeferredUtility::returnFinally($plugin, function (DataProducerPluginInterface $plugin) use ($context, $field) {
@@ -185,18 +143,10 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Instantiate the actual data producer and populate it with context values.
    *
-   * @param mixed $value
-   * @param mixed $args
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
-   *
-   * @return \GraphQL\Deferred|\Drupal\graphql\Plugin\DataProducerPluginInterface
-   *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Exception
    */
-  protected function prepare($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  protected function prepare(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): Deferred|DataProducerPluginInterface {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($this->id, $this->config);
     $contexts = $plugin->getContextDefinitions();
@@ -227,30 +177,18 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * Invoke the data producer directly.
-   *
-   * @param \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
-   *
-   * @return mixed
    */
-  protected function resolveUncached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field) {
+  protected function resolveUncached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field): mixed {
     $output = $plugin->resolveField($field);
-    return DeferredUtility::applyFinally($output, function () use ($plugin, $field) {
+    return DeferredUtility::applyFinally($output, function () use ($plugin, $field): void {
       $field->addCacheableDependency($plugin);
     });
   }
 
   /**
    * Try to return a value from cache, otherwise invoke data producer.
-   *
-   * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
-   *
-   * @return mixed
    */
-  protected function resolveCached(DataProducerPluginCachingInterface $plugin, ResolveContext $context, FieldContext $field) {
+  protected function resolveCached(DataProducerPluginCachingInterface $plugin, ResolveContext $context, FieldContext $field): mixed {
     $prefix = $this->edgeCachePrefix($plugin);
     if ($cache = $this->cacheRead($prefix)) {
       [$value, $metadata] = $cache;
@@ -259,19 +197,15 @@ class DataProducerProxy implements ResolverInterface {
     }
 
     $output = $this->resolveUncached($plugin, $context, $field);
-    return DeferredUtility::applyFinally($output, function ($value) use ($field, $prefix) {
+    return DeferredUtility::applyFinally($output, function ($value) use ($field, $prefix): void {
       $this->cacheWrite($prefix, $value, $field);
     });
   }
 
   /**
    * Calculates a cache prefix.
-   *
-   * @param \Drupal\graphql\Plugin\DataProducerPluginCachingInterface $plugin
-   *
-   * @return string
    */
-  protected function edgeCachePrefix(DataProducerPluginCachingInterface $plugin) {
+  protected function edgeCachePrefix(DataProducerPluginCachingInterface $plugin): string {
     try {
       $prefix = $plugin->edgeCachePrefix();
     }
@@ -287,11 +221,9 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Cache lookup.
    *
-   * @param string $prefix
-   *
    * @return array|null
    */
-  protected function cacheRead($prefix) {
+  protected function cacheRead(string $prefix): ?array {
     if ($cache = $this->cacheBackend->get("$prefix:context")) {
       $keys = !empty($cache->data) ? $this->contextsManager->convertTokensToKeys($cache->data)->getKeys() : [];
       $keys = serialize($keys);
@@ -306,12 +238,8 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * Store result values in cache.
-   *
-   * @param string $prefix
-   * @param mixed $value
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
    */
-  protected function cacheWrite($prefix, $value, FieldContext $field): void {
+  protected function cacheWrite(string $prefix, mixed $value, FieldContext $field): void {
     // Bail out early if the field context is already uncacheable.
     if ($field->getCacheMaxAge() === 0) {
       return;
@@ -355,14 +283,12 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Maps a cache max age value to an "expire" value for the Cache API.
    *
-   * @param int $maxAge
-   *
    * @return int
    *   A corresponding "expire" value.
    *
    * @see \Drupal\Core\Cache\CacheBackendInterface::set()
    */
-  protected function maxAgeToExpire($maxAge) {
+  protected function maxAgeToExpire(int $maxAge): int {
     $time = $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
     return ($maxAge === Cache::PERMANENT) ? Cache::PERMANENT : (int) $time + $maxAge;
   }

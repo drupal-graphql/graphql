@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -15,15 +17,11 @@ class Composite implements ResolverInterface {
 
   /**
    * DataProducerProxy objects.
-   *
-   * @var array
    */
-  protected $resolvers = [];
+  protected array $resolvers = [];
 
   /**
    * Composite constructor.
-   *
-   * @param array $resolvers
    */
   public function __construct(array $resolvers) {
     $this->resolvers = $resolvers;
@@ -42,7 +40,7 @@ class Composite implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $resolvers = $this->resolvers;
     while ($resolver = array_shift($resolvers)) {
       $value = $resolver->resolve($value, $args, $context, $info, $field);

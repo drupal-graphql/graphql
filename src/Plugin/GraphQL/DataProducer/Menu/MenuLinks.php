@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -38,10 +40,8 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * The menu link tree.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
    */
-  protected $menuLinkTree;
+  protected MenuLinkTreeInterface $menuLinkTree;
 
   /**
    * {@inheritdoc}
@@ -59,19 +59,8 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * MenuItems constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
-   *   The menu link tree service.
-   *
-   * @codeCoverageIgnore
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, MenuLinkTreeInterface $menuLinkTree) {
+  public function __construct(array $configuration, string $pluginId, array $pluginDefinition, MenuLinkTreeInterface $menuLinkTree) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->menuLinkTree = $menuLinkTree;
   }
@@ -84,10 +73,10 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The context to add caching information to.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return array<\Drupal\Core\Menu\MenuLinkTreeElement>
    *   The list of menu links that are enabled and accessible.
    */
-  public function resolve(MenuInterface $menu, FieldContext $context) {
+  public function resolve(MenuInterface $menu, FieldContext $context): array {
     // Ensure the cache is invalidated when the menu changes.
     $context->addCacheableDependency($menu);
     $tree = $this->menuLinkTree->load($menu->id(), new MenuTreeParameters());

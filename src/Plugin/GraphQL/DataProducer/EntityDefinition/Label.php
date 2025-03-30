@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
 use Drupal\Core\Entity\EntityTypeInterface;

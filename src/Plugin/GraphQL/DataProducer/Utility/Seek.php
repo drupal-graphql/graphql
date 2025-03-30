@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Utility;
 
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -38,7 +40,7 @@ class Seek extends DataProducerPluginBase {
    * @return mixed
    *   The element at the specified position.
    */
-  public function resolve(array $input, $position) {
+  public function resolve(array $input, int $position): mixed {
     $array_object = new \ArrayObject($input);
     $iterator = $array_object->getIterator();
     try {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -66,24 +68,18 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * The entity buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
    */
-  protected $entityBuffer;
+  protected EntityBuffer $entityBuffer;
 
   /**
    * {@inheritdoc}
@@ -103,25 +99,10 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * Constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param array $pluginDefinition
-   *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
-   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
-   *   The entity buffer service.
-   *
-   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,
-    $pluginId,
+    string $pluginId,
     array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
@@ -137,19 +118,27 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
    * Resolve entity references in the given field name.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The parent entity with the reference field.
    * @param string $field
+   *   Name of the entity reference field.
    * @param string|null $language
-   * @param array|null $bundles
+   *   In which language to load the referenced entities.
+   * @param array<int, string>|null $bundles
+   *   Filter for entity bundles in the reference field.
    * @param bool|null $access
+   *   Whether to check access to the referenced entities.
    * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   The user to check access for.
    * @param string|null $accessOperation
+   *   For example "view".
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The GraphQL field context.
    *
    * @return \GraphQL\Deferred|array
    *   A promise that will return referenced entities or empty array if there
    *   aren't any.
    */
-  public function resolve(EntityInterface $entity, $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(EntityInterface $entity, string $field, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): Deferred|array {
     if (!$entity instanceof FieldableEntityInterface || !$entity->hasField($field)) {
       return [];
     }

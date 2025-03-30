@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -8,6 +10,7 @@ use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,10 +30,8 @@ class AlterableComposableSchema extends ComposableSchema {
 
   /**
    * The event dispatcher service.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
-  protected $dispatcher;
+  protected EventDispatcherInterface $dispatcher;
 
   /**
    * {@inheritdoc}
@@ -74,7 +75,7 @@ class AlterableComposableSchema extends ComposableSchema {
    */
   public function __construct(
     array $configuration,
-    $pluginId,
+    string $pluginId,
     array $pluginDefinition,
     CacheBackendInterface $astCache,
     ModuleHandlerInterface $moduleHandler,
@@ -111,7 +112,7 @@ class AlterableComposableSchema extends ComposableSchema {
    *
    * @see \Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema::getSchemaDocument()
    */
-  protected function getSchemaDocument(array $extensions = []) {
+  protected function getSchemaDocument(array $extensions = []): DocumentNode {
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = "schema:{$this->getPluginId()}";
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
@@ -156,7 +157,7 @@ class AlterableComposableSchema extends ComposableSchema {
    *
    * @see \Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema::getSchemaDocument()
    */
-  protected function getExtensionDocument(array $extensions = []) {
+  protected function getExtensionDocument(array $extensions = []): ?DocumentNode {
     $extensions = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
       return $extension->getExtensionDefinition();
     }, $extensions), function ($definition) {

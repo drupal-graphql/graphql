@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin;
 
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
@@ -17,11 +19,7 @@ interface DataProducerPluginInterface extends ContextAwarePluginInterface, Cache
 
   /**
    * Resolves the queried field with the given context.
-   *
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
-   *
-   * @return \GraphQL\Deferred|mixed
    */
-  public function resolveField(FieldContext $field);
+  public function resolveField(FieldContext $field): mixed;
 
 }

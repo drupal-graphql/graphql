@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\PersistedQuery;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -24,17 +26,13 @@ class AutomaticPersistedQuery extends PersistedQueryPluginBase implements Contai
 
   /**
    * The cache to store persisted queries.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $cache;
+  protected CacheBackendInterface $cache;
 
   /**
    * Page cache kill switch.
-   *
-   * @var \Drupal\Core\PageCache\ResponsePolicy\KillSwitch
    */
-  protected $pageCacheKillSwitch;
+  protected KillSwitch $pageCacheKillSwitch;
 
   /**
    * {@inheritdoc}
@@ -62,7 +60,7 @@ class AutomaticPersistedQuery extends PersistedQueryPluginBase implements Contai
   /**
    * {@inheritdoc}
    */
-  public function getQuery($id, OperationParams $operation) {
+  public function getQuery($id, OperationParams $operation): ?string {
     if ($query = $this->cache->get($id)) {
       return $query->data;
     }

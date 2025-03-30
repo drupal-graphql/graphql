@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -17,17 +19,13 @@ class DefaultValue implements ResolverInterface {
 
   /**
    * The initial value.
-   *
-   * @var \Drupal\graphql\GraphQL\Resolver\ResolverInterface
    */
-  protected $value;
+  protected ResolverInterface $value;
 
   /**
    * The fallback value in case the initial value resolves to NULL.
-   *
-   * @var \Drupal\graphql\GraphQL\Resolver\ResolverInterface
    */
-  protected $default;
+  protected ResolverInterface $default;
 
   /**
    * DefaultValue constructor.
@@ -45,13 +43,7 @@ class DefaultValue implements ResolverInterface {
   /**
    * {@inheritDoc}
    */
-  public function resolve(
-    $value,
-    $args,
-    ResolveContext $context,
-    ResolveInfo $info,
-    FieldContext $field,
-  ) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $result = $this->value->resolve($value, $args, $context, $info, $field);
     if ($result === NULL) {
       return $this->default->resolve($value, $args, $context, $info, $field);

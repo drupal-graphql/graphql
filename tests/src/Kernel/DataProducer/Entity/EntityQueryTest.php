@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer\Entity;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;

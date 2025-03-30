@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Form;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -28,17 +30,13 @@ class ServerForm extends EntityForm {
 
   /**
    * The request context.
-   *
-   * @var \Drupal\Core\Routing\RequestContext
    */
-  protected $requestContext;
+  protected RequestContext $requestContext;
 
   /**
    * The schema plugin manager.
-   *
-   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
-  protected $schemaManager;
+  protected SchemaPluginManager $schemaManager;
 
   /**
    * ServerForm constructor.
@@ -76,7 +74,7 @@ class ServerForm extends EntityForm {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The ajax response.
    */
-  public function ajaxSchemaConfigurationForm(array $form) {
+  public function ajaxSchemaConfigurationForm(array $form): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new ReplaceCommand('#edit-schema-configuration-plugin-wrapper', $form['schema_configuration']));
 

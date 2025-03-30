@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
@@ -19,17 +22,13 @@ class Validator implements ValidatorInterface {
 
   /**
    * The schema plugin manager.
-   *
-   * @var \Drupal\graphql\Plugin\SchemaPluginManager
    */
-  protected $pluginManager;
+  protected SchemaPluginManager $pluginManager;
 
   /**
    * GraphQL logger channel.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
-  protected $logger;
+  protected LoggerChannelInterface $logger;
 
   /**
    * ValidateResolverController constructor.
@@ -58,7 +57,7 @@ class Validator implements ValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function getMissingResolvers(ServerInterface $server, array $ignore_types = []) : array {
+  public function getMissingResolvers(ServerInterface $server, array $ignore_types = []): array {
     $plugin = $this->getSchemaPlugin($server);
     $resolver_registry = $plugin->getResolverRegistry();
 
@@ -116,7 +115,7 @@ class Validator implements ValidatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOrphanedResolvers(ServerInterface $server, array $ignore_types = []) : array {
+  public function getOrphanedResolvers(ServerInterface $server, array $ignore_types = []): array {
     $plugin = $this->getSchemaPlugin($server);
     $resolver_registry = $plugin->getResolverRegistry();
 
@@ -192,7 +191,7 @@ class Validator implements ValidatorInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    *   Thrown when no schema plugin is defined for the server.
    */
-  private function getSchemaPlugin(ServerInterface $server) : SchemaPluginInterface {
+  private function getSchemaPlugin(ServerInterface $server): SchemaPluginInterface {
     $schema_name = $server->get('schema');
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($schema_name);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -17,17 +19,13 @@ class SubrequestExtractionController extends ControllerBase {
 
   /**
    * The symfony request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * {@inheritdoc}
@@ -66,7 +64,7 @@ class SubrequestExtractionController extends ControllerBase {
    * @return \Drupal\graphql\SubRequestResponse
    *   The sub-request response object.
    */
-  public function extract() {
+  public function extract(): SubRequestResponse {
     $request = $this->requestStack->getCurrentRequest();
     $callback = $request->attributes->get('_graphql_subrequest');
 

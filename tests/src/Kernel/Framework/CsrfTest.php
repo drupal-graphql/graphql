@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -15,10 +17,8 @@ class CsrfTest extends GraphQLTestBase {
 
   /**
    * Helper state variable that will be flipped when the test mutation executes.
-   *
-   * @var bool
    */
-  protected $mutationTriggered = FALSE;
+  protected bool $mutationTriggered = FALSE;
 
   /**
    * {@inheritdoc}

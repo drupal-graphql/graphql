@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
@@ -15,24 +17,18 @@ class PersistedQuery extends Plugin {
 
   /**
    * The plugin ID.
-   *
-   * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * The component label.
-   *
-   * @var string
    */
-  public $label;
+  public string $label;
 
   /**
    * The component description.
-   *
-   * @var string
    */
-  public $description = '';
+  public string $description = '';
 
   /**
    * PersistedQuery constructor.

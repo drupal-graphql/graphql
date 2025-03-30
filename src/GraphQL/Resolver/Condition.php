@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Resolver;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -18,15 +20,11 @@ class Condition implements ResolverInterface {
 
   /**
    * List of condition and their corresponding resolvers.
-   *
-   * @var array
    */
-  protected $branches;
+  protected array $branches;
 
   /**
    * Condition constructor.
-   *
-   * @param array $branches
    */
   public function __construct(array $branches) {
     $this->branches = $branches;
@@ -35,7 +33,7 @@ class Condition implements ResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolve($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $branches = $this->branches;
     while ($branch = array_shift($branches)) {
       [$condition, $resolver] = array_pad($branch, 2, NULL);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Config;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -16,24 +18,16 @@ class LanguageConfigOverride implements ConfigFactoryOverrideInterface {
 
   /**
    * The config storage service.
-   *
-   * @var \Drupal\Core\Config\StorageInterface
    */
-  protected $baseStorage;
+  protected StorageInterface $baseStorage;
 
   /**
    * The negotiator manager service.
-   *
-   * @var \Drupal\language\LanguageNegotiationMethodManager|null
    */
-  protected $negotiatorManager;
+  protected ?LanguageNegotiationMethodManager $negotiatorManager = NULL;
 
   /**
-   * GraphQLConfigOverrides constructor.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   The config storage service.
-   * @param \Drupal\language\LanguageNegotiationMethodManager|null $negotiatorManager
+   * Constructor.
    */
   public function __construct(StorageInterface $storage, ?LanguageNegotiationMethodManager $negotiatorManager = NULL) {
     $this->baseStorage = $storage;

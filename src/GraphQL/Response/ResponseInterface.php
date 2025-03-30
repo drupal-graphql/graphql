@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\GraphQL\Response;
 
+use Drupal\Component\Render\MarkupInterface;
+
 /**
  * Response interface used for GraphQL responses.
  */
@@ -17,12 +19,12 @@ interface ResponseInterface {
    * @param array $properties
    *   Other properties related to the violation.
    */
-  public function addViolation($message, array $properties = []): void;
+  public function addViolation(string|MarkupInterface $message, array $properties = []): void;
 
   /**
    * Adds multiple violations.
    *
-   * @param string[]|\Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+   * @param array<string>|array<\Drupal\Component\Render\MarkupInterface> $messages
    *   Violation messages.
    * @param array $properties
    *   Other properties related to the violation.
@@ -32,7 +34,7 @@ interface ResponseInterface {
   /**
    * Gets the violations.
    *
-   * @return array
+   * @return array<string>|array<\Drupal\Component\Render\MarkupInterface>
    *   Violations.
    */
   public function getViolations(): array;

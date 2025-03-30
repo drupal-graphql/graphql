@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +26,8 @@ class AutomaticPersistedQueriesDynamicPageCacheTest extends GraphQLTestBase {
 
   /**
    * Test plugin.
-   *
-   * @var \Drupal\graphql\Plugin\PersistedQueryPluginInterface
    */
-  protected $pluginApq;
+  protected PersistedQueryPluginInterface $pluginApq;
 
   /**
    * {@inheritdoc}

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
@@ -39,18 +42,14 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
 
   /**
    * The entity buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
    */
-  protected $entityBuffer;
+  protected EntityBuffer $entityBuffer;
 
   /**
    * {@inheritdoc}
@@ -69,24 +68,11 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
 
   /**
    * RouteEntity constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param mixed $pluginDefinition
-   *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The language manager service.
-   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
-   *   The entity buffer service.
-   *
-   * @codeCoverageIgnore
    */
   public function __construct(
     array $configuration,
-    $pluginId,
-    $pluginDefinition,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityBuffer $entityBuffer,
   ) {
@@ -98,14 +84,14 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
   /**
    * Resolver.
    *
-   * @param \Drupal\Core\Url|mixed $url
+   * @param \Drupal\Core\Url|string $url
    *   The URL to get the route entity from.
    * @param string|null $language
    *   The language code to get a translation of the entity.
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The GraphQL field context.
    */
-  public function resolve($url, ?string $language, FieldContext $context): ?Deferred {
+  public function resolve(Url|string $url, ?string $language, FieldContext $context): ?Deferred {
     if ($url instanceof Url) {
       [, $type] = explode('.', $url->getRouteName());
       $parameters = $url->getRouteParameters();

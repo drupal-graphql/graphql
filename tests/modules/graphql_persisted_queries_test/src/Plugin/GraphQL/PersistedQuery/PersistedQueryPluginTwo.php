@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_persisted_queries_test\Plugin\GraphQL\PersistedQuery;
 
 use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
@@ -20,13 +22,16 @@ class PersistedQueryPluginTwo extends PersistedQueryPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuery($id, OperationParams $operation) {
+  public function getQuery($id, OperationParams $operation): ?string {
     $queryMap = $this->queryMap();
     return $queryMap[$id] ?? NULL;
   }
 
   /**
    * Map between persisted query IDs and corresponding GraphQL queries.
+   *
+   * @return array<string, string>
+   *   The query map.
    */
   protected function queryMap(): array {
     return [

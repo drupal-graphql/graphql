@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -61,24 +63,18 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * The entity buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer
    */
-  protected $entityBuffer;
+  protected EntityUuidBuffer $entityBuffer;
 
   /**
    * {@inheritdoc}
@@ -97,26 +93,11 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
   }
 
   /**
-   * EntityLoad constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param array $pluginDefinition
-   *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
-   * @param \Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer $entityBuffer
-   *   The entity buffer service.
-   *
-   * @codeCoverageIgnore
+   * Constructor.
    */
   public function __construct(
     array $configuration,
-    $pluginId,
+    string $pluginId,
     array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
@@ -130,19 +111,8 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
 
   /**
    * Resolver.
-   *
-   * @param string $type
-   * @param string $uuid
-   * @param string|null $language
-   * @param array|null $bundles
-   * @param bool|null $access
-   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
-   * @param string|null $accessOperation
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
-   *
-   * @return \GraphQL\Deferred
    */
-  public function resolve($type, $uuid, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(string $type, string $uuid, ?string $language, ?array $bundles, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): Deferred {
     $resolver = $this->entityBuffer->add($type, $uuid);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {

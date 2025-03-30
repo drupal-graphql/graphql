@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree;
 
+use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
@@ -28,12 +31,8 @@ class MenuTreeLink extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
    */
-  public function resolve(MenuLinkTreeElement $element) {
+  public function resolve(MenuLinkTreeElement $element): MenuLinkInterface {
     return $element->link;
   }
 

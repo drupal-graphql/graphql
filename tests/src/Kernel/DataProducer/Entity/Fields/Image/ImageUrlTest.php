@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer\Entity\Fields\Image;
 
 use Drupal\Core\Access\AccessResultAllowed;
@@ -16,24 +18,18 @@ class ImageUrlTest extends GraphQLTestBase {
 
   /**
    * The file entity mock.
-   *
-   * @var \Drupal\file\FileInterface
    */
-  protected $file;
+  protected FileInterface $file;
 
   /**
    * A file entity mock that returns FALSE on access checking.
-   *
-   * @var \Drupal\file\FileInterface
    */
-  protected $fileNotAccessible;
+  protected FileInterface $fileNotAccessible;
 
   /**
    * The generated file URI.
-   *
-   * @var string
    */
-  protected $fileUri;
+  protected string $fileUri;
 
   /**
    * {@inheritdoc}

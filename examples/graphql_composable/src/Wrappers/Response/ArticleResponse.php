@@ -14,10 +14,8 @@ class ArticleResponse extends Response {
 
   /**
    * The article to be served.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $article;
+  protected ?EntityInterface $article;
 
   /**
    * Sets the content.

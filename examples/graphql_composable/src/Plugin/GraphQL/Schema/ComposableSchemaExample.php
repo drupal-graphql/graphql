@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_composable\Plugin\GraphQL\Schema;
 
 use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;

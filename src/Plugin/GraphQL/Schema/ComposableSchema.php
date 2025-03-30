@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\Schema;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -21,14 +23,14 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
   /**
    * {@inheritdoc}
    */
-  public function getResolverRegistry() {
+  public function getResolverRegistry(): ResolverRegistry {
     return new ResolverRegistry();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getExtensions() {
+  protected function getExtensions(): array {
     $extensions = array_map(function ($id) {
       return $this->extensionManager->createInstance($id);
     }, array_filter($this->getConfiguration()['extensions']));
@@ -41,7 +43,7 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
   /**
    * {@inheritdoc}
    */
-  protected function getSchemaDefinition() {
+  protected function getSchemaDefinition(): string {
     return <<<GQL
       type Schema {
         query: Query

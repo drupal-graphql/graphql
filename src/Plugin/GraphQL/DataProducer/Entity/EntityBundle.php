@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -26,12 +28,8 @@ class EntityBundle extends DataProducerPluginBase {
 
   /**
    * Resolver.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *
-   * @return string
    */
-  public function resolve(EntityInterface $entity) {
+  public function resolve(EntityInterface $entity): string {
     return $entity->bundle();
   }
 

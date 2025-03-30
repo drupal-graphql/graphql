@@ -41,14 +41,14 @@ class ServerConfigurationTest extends GraphQLTestBase {
   /**
    * Test servers.
    *
-   * @var \Drupal\graphql\Entity\ServerInterface[]
+   * @var array<\Drupal\graphql\Entity\ServerInterface>
    */
   protected array $servers;
 
   /**
    * Mocked schema extension plugins.
    *
-   * @var \Drupal\graphql\Plugin\SchemaExtensionPluginInterface[]
+   * @var array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
    */
   protected array $extensionPlugins;
 
@@ -158,7 +158,7 @@ class ServerConfigurationTest extends GraphQLTestBase {
   /**
    * Returns a mocked schema plugin manager.
    *
-   * @param string[] $ids
+   * @param array<string> $ids
    *   The IDs of the schema plugins that the manager should return.
    */
   protected function mockPluginManager(array $ids): SchemaPluginManager|MockObject {

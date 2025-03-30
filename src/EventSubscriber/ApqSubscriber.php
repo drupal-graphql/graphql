@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -13,10 +15,8 @@ class ApqSubscriber implements EventSubscriberInterface {
 
   /**
    * The cache to store persisted queries.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $cache;
+  protected CacheBackendInterface $cache;
 
   /**
    * Constructs a ApqSubscriber object.
@@ -37,7 +37,7 @@ class ApqSubscriber implements EventSubscriberInterface {
    * @throws \GraphQL\Error\Error
    */
   public function onBeforeOperation(OperationEvent $event): void {
-    if (!array_key_exists('automatic_persisted_query', $event->getContext()->getServer()->getPersistedQueryInstances() ?? [])) {
+    if (!array_key_exists('automatic_persisted_query', $event->getContext()->getServer()->getPersistedQueryInstances())) {
       return;
     }
     // We only need to set cache tags here, the rest is done in

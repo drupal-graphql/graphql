@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -20,18 +22,18 @@ class ResolverRegistry implements ResolverRegistryInterface {
    *
    * Contains a nested list of callables, keyed by type and field name.
    *
-   * @var callable[]
+   * @var array<callable>
    */
-  protected $fieldResolvers = [];
+  protected array $fieldResolvers = [];
 
   /**
    * List of type resolvers for abstract types.
    *
    * Contains a list of callables keyed by the name of the abstract type.
    *
-   * @var callable[]
+   * @var array<callable>
    */
-  protected $typeResolvers = [];
+  protected array $typeResolvers = [];
 
   /**
    * The default field resolver.
@@ -53,9 +55,6 @@ class ResolverRegistry implements ResolverRegistryInterface {
 
   /**
    * ResolverRegistry constructor.
-   *
-   * @param callable|null $defaultFieldResolver
-   * @param callable|null $defaultTypeResolver
    */
   public function __construct(?callable $defaultFieldResolver = NULL, ?callable $defaultTypeResolver = NULL) {
     $this->defaultFieldResolver = $defaultFieldResolver ?: [
@@ -71,13 +70,9 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolveField($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  public function resolveField(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     // First, check if there is a resolver registered for this field.
     if ($resolver = $this->getRuntimeFieldResolver($value, $args, $context, $info)) {
-      if (!$resolver instanceof ResolverInterface) {
-        throw new \LogicException(sprintf('Field resolver for field %s on type %s is not callable.', $info->fieldName, $info->parentType->name));
-      }
-
       return $resolver->resolve($value, $args, $context, $info, $field);
     }
 
@@ -87,13 +82,9 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolveType($value, ResolveContext $context, ResolveInfo $info) {
+  public function resolveType(mixed $value, ResolveContext $context, ResolveInfo $info): ?string {
     // First, check if there is a resolver registered for this abstract type.
     if ($resolver = $this->getRuntimeTypeResolver($value, $context, $info)) {
-      if (!is_callable($resolver)) {
-        throw new \LogicException(sprintf('Type resolver for type %s is not callable.', $info->parentType->name));
-      }
-
       if (($type = $resolver($value, $context, $info)) !== NULL) {
         return $type;
       }
@@ -105,7 +96,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function addFieldResolver($type, $field, ResolverInterface $resolver) {
+  public function addFieldResolver(string $type, string $field, ResolverInterface $resolver): static {
     $this->fieldResolvers[$type][$field] = $resolver;
     return $this;
   }
@@ -113,26 +104,26 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldResolver($type, $field) {
+  public function getFieldResolver(string $type, string $field): ?ResolverInterface {
     return $this->fieldResolvers[$type][$field] ?? NULL;
   }
 
   /**
    * Return all field resolvers in the registry.
    *
-   * @return callable[]
+   * @return array<callable>
    *   A nested list of callables, keyed by type and field name.
    *
    * @todo This should be added to ResolverRegistryInterface in 5.0.0.
    */
-  public function getAllFieldResolvers() : array {
+  public function getAllFieldResolvers(): array {
     return $this->fieldResolvers;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addTypeResolver($abstract, callable $resolver) {
+  public function addTypeResolver(string $abstract, callable $resolver): static {
     $this->typeResolvers[$abstract] = $resolver;
     return $this;
   }
@@ -140,7 +131,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTypeResolver($type) {
+  public function getTypeResolver(string $type): ?callable {
     return $this->typeResolvers[$type] ?? NULL;
   }
 
@@ -164,7 +155,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    *
    * @todo This should be added to ResolverRegistryInterface in 5.0.0.
    */
-  public function getFieldResolverWithInheritance(Type $type, string $fieldName) : ?ResolverInterface {
+  public function getFieldResolverWithInheritance(Type $type, string $fieldName): ?ResolverInterface {
     if ($resolver = $this->getFieldResolver($type->toString(), $fieldName)) {
       return $resolver;
     }
@@ -186,56 +177,29 @@ class ResolverRegistry implements ResolverRegistryInterface {
 
   /**
    * Returns the field resolver that should be used at runtime.
-   *
-   * @param mixed $value
-   * @param string $args
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *
-   * @return callable|null
    */
-  protected function getRuntimeFieldResolver($value, $args, ResolveContext $context, ResolveInfo $info) {
+  protected function getRuntimeFieldResolver(mixed $value, array $args, ResolveContext $context, ResolveInfo $info): ?ResolverInterface {
     return $this->getFieldResolverWithInheritance($info->parentType, $info->fieldName);
   }
 
   /**
    * Resolves a default value for a field.
-   *
-   * @param mixed $value
-   * @param mixed $args
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
-   *
-   * @return mixed|null
    */
-  protected function resolveFieldDefault($value, $args, ResolveContext $context, ResolveInfo $info, FieldContext $field) {
+  protected function resolveFieldDefault(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     return Executor::defaultFieldResolver($value, $args, $context, $info);
   }
 
   /**
    * Returns the type resolver that should be used on runtime.
-   *
-   * @param mixed $value
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *
-   * @return callable|null
    */
-  protected function getRuntimeTypeResolver($value, ResolveContext $context, ResolveInfo $info) {
+  protected function getRuntimeTypeResolver(mixed $value, ResolveContext $context, ResolveInfo $info): ?callable {
     return $this->getTypeResolver(Type::getNamedType($info->returnType)->toString());
   }
 
   /**
    * Returns NULL as default type.
-   *
-   * @param mixed $value
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
-   *
-   * @return null
    */
-  protected function resolveTypeDefault($value, ResolveContext $context, ResolveInfo $info) {
+  protected function resolveTypeDefault(mixed $value, ResolveContext $context, ResolveInfo $info): ?string {
     return NULL;
   }
 

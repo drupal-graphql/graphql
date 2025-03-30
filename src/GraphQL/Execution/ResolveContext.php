@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -17,67 +19,47 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * The GraphQL server configuration.
-   *
-   * @var \Drupal\graphql\Entity\ServerInterface
    */
-  protected $server;
+  protected ServerInterface $server;
 
   /**
    * Configuration.
-   *
-   * @var array
    */
-  protected $config;
+  protected array $config;
 
   /**
    * List of available contexts keyed by path and context name.
-   *
-   * @var array
    */
-  protected $contexts;
+  protected array $contexts;
 
   /**
    * The operation parameters to perform.
-   *
-   * @var \GraphQL\Server\OperationParams
    */
-  protected $operation;
+  protected OperationParams $operation;
 
   /**
    * The parsed schema document.
-   *
-   * @var \GraphQL\Language\AST\DocumentNode
    */
-  protected $document;
+  protected DocumentNode $document;
 
   /**
    * Type.
-   *
-   * @var string
    */
-  protected $type;
+  protected string $type;
 
   /**
    * The context language.
-   *
-   * @var string
    */
-  protected $language;
+  protected ?string $language = NULL;
 
   /**
    * ResolveContext constructor.
-   *
-   * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \GraphQL\Server\OperationParams $operation
-   * @param \GraphQL\Language\AST\DocumentNode $document
-   * @param string $type
-   * @param array $config
    */
   public function __construct(
     ServerInterface $server,
     OperationParams $operation,
     DocumentNode $document,
-    $type,
+    string $type,
     array $config,
   ) {
     $this->addCacheContexts(['user.permissions']);
@@ -91,35 +73,27 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * Returns the GraphQL server config entity.
-   *
-   * @return \Drupal\graphql\Entity\ServerInterface
    */
-  public function getServer() {
+  public function getServer(): ServerInterface {
     return $this->server;
   }
 
   /**
    * Returns the current operation parameters.
-   *
-   * @return \GraphQL\Server\OperationParams
    */
-  public function getOperation() {
+  public function getOperation(): OperationParams {
     return $this->operation;
   }
 
   /**
    * Returns the parsed GraphQL schema.
-   *
-   * @return \GraphQL\Language\AST\DocumentNode
    */
-  public function getDocument() {
+  public function getDocument(): DocumentNode {
     return $this->document;
   }
 
   /**
    * Returns the type.
-   *
-   * @return string
    */
   public function getType(): string {
     return $this->type;
@@ -127,21 +101,17 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * Returns the current context language.
-   *
-   * @return string
    */
-  public function getContextLanguage() {
+  public function getContextLanguage(): ?string {
     return $this->language;
   }
 
   /**
    * Sets the current context language.
    *
-   * @param string $language
-   *
    * @return $this
    */
-  public function setContextLanguage($language) {
+  public function setContextLanguage(string $language) {
     $this->language = $language;
     return $this;
   }
@@ -161,7 +131,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    *
    * @return $this
    */
-  public function setContextValue(ResolveInfo $info, $name, $value) {
+  public function setContextValue(ResolveInfo $info, string $name, mixed $value) {
     $key = implode('.', $info->path);
     $this->contexts[$key][$name] = $value;
 
@@ -181,7 +151,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @return mixed
    *   The current value of the given context or NULL if it's not set.
    */
-  public function getContextValue(ResolveInfo $info, $name) {
+  public function getContextValue(ResolveInfo $info, string $name): mixed {
     $path = $info->path;
 
     do {
@@ -209,7 +179,7 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
    * @return bool
    *   TRUE if the context exists, FALSE Otherwise.
    */
-  public function hasContextValue(ResolveInfo $info, $name) {
+  public function hasContextValue(ResolveInfo $info, string $name): bool {
     $path = $info->path;
 
     do {

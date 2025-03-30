@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
@@ -15,24 +17,19 @@ use Drupal\node\NodeInterface;
 class EntityMultipleTest extends GraphQLTestBase {
 
   /**
-   * @var \Drupal\graphql\Plugin\DataProducerPluginManager
+   * Published test node.
    */
-  protected $dataProducerManager;
+  protected NodeInterface $node1;
 
   /**
-   * @var \Drupal\node\NodeInterface
+   * Published test node.
    */
-  protected $node1;
+  protected NodeInterface $node2;
 
   /**
-   * @var \Drupal\node\NodeInterface
+   * Unpublished test node.
    */
-  protected $node2;
-
-  /**
-   * @var \Drupal\node\NodeInterface
-   */
-  protected $node3;
+  protected NodeInterface $node3;
 
   /**
    * {@inheritdoc}

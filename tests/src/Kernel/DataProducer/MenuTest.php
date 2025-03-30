@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Menu\MenuLinkTreeElement;
@@ -16,23 +18,16 @@ use Drupal\system\Entity\Menu;
 class MenuTest extends GraphQLTestBase {
 
   /**
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
-   */
-  protected $menuLinkManager;
-
-  /**
    * Test menu.
-   *
-   * @var \Drupal\system\Entity\Menu
    */
-  protected $menu;
+  protected Menu $menu;
 
   /**
    * Test link tree array.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @var array<\Drupal\Core\Menu\MenuLinkTreeElement>
    */
-  protected $linkTree;
+  protected array $linkTree;
 
   /**
    * {@inheritdoc}
@@ -41,7 +36,6 @@ class MenuTest extends GraphQLTestBase {
     parent::setUp();
 
     $this->installEntitySchema('menu_link_content');
-    $this->menuLinkManager = $this->container->get('plugin.manager.menu.link');
 
     $this->menu = Menu::create([
       'id' => 'menu_test',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -62,24 +64,18 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
   /**
    * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * The entity buffer service.
-   *
-   * @var \Drupal\graphql\GraphQL\Buffers\EntityBuffer
    */
-  protected $entityBuffer;
+  protected EntityBuffer $entityBuffer;
 
   /**
    * {@inheritdoc}
@@ -98,26 +94,11 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
   }
 
   /**
-   * EntityLoad constructor.
-   *
-   * @param array $configuration
-   *   The plugin configuration array.
-   * @param string $pluginId
-   *   The plugin id.
-   * @param array $pluginDefinition
-   *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository service.
-   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
-   *   The entity buffer service.
-   *
-   * @codeCoverageIgnore
+   * Constructor.
    */
   public function __construct(
     array $configuration,
-    $pluginId,
+    string $pluginId,
     array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
     EntityRepositoryInterface $entityRepository,
@@ -131,26 +112,15 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
   /**
    * Resolver.
-   *
-   * @param string $type
-   * @param array $ids
-   * @param string|null $language
-   * @param array|null $bundles
-   * @param bool $access
-   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
-   * @param string|null $accessOperation
-   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
-   *
-   * @return \GraphQL\Deferred
    */
-  public function resolve($type, array $ids, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context) {
+  public function resolve(string $type, array $ids, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): Deferred {
     // Remove any NULL IDs.
     $ids = array_filter($ids);
 
     $resolver = $this->entityBuffer->add($type, $ids);
 
     return new Deferred(function () use ($type, $language, $bundles, $resolver, $context, $access, $accessUser, $accessOperation) {
-      /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
+      /** @var array<\Drupal\Core\Entity\EntityInterface> $entities */
       $entities = $resolver();
       if (!$entities) {
         // If there is no entity with this id, add the list cache tags so that

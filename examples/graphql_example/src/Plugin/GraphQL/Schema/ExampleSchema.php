@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_examples\Plugin\GraphQL\Schema;
 
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
+use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql_examples\Wrappers\QueryConnection;
 
@@ -18,7 +21,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getResolverRegistry() {
+  public function getResolverRegistry(): ResolverRegistryInterface {
     $builder = new ResolverBuilder();
     $registry = new ResolverRegistry();
 
@@ -32,8 +35,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
-   * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
+   * Mapping of article fields.
    */
   protected function addArticleFields(ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Article', 'id',
@@ -61,8 +63,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
   }
 
   /**
-   * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
-   * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
+   * Mapping of query fields.
    */
   protected function addQueryFields(ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Query', 'article',
@@ -80,11 +81,9 @@ class ExampleSchema extends SdlSchemaPluginBase {
   }
 
   /**
-   * @param string $type
-   * @param \Drupal\graphql\GraphQL\ResolverRegistry $registry
-   * @param \Drupal\graphql\GraphQL\ResolverBuilder $builder
+   * Mapping of query connection fields.
    */
-  protected function addConnectionFields($type, ResolverRegistry $registry, ResolverBuilder $builder): void {
+  protected function addConnectionFields(string $type, ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver($type, 'total',
       $builder->callback(function (QueryConnection $connection) {
         return $connection->total();

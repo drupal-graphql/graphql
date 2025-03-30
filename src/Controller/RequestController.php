@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\Cache\CacheableJsonResponse;
@@ -15,10 +17,8 @@ class RequestController implements ContainerInjectionInterface {
 
   /**
    * The service configuration parameters.
-   *
-   * @var array
    */
-  protected $parameters;
+  protected array $parameters;
 
   /**
    * {@inheritdoc}
@@ -46,7 +46,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @param \Drupal\graphql\Entity\ServerInterface $graphql_server
    *   The server instance.
-   * @param \GraphQL\Server\OperationParams|\GraphQL\Server\OperationParams[] $operations
+   * @param \GraphQL\Server\OperationParams|array<\GraphQL\Server\OperationParams> $operations
    *   The graphql operation(s) to execute.
    *
    * @return \Drupal\Core\Cache\CacheableJsonResponse
@@ -54,7 +54,7 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @throws \Exception
    */
-  public function handleRequest(ServerInterface $graphql_server, $operations) {
+  public function handleRequest(ServerInterface $graphql_server, OperationParams|array $operations): CacheableJsonResponse {
     if (is_array($operations)) {
       return $this->handleBatch($graphql_server, $operations);
     }
@@ -66,14 +66,9 @@ class RequestController implements ContainerInjectionInterface {
   /**
    * Execute a single operation and turn that into a cacheable response.
    *
-   * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \GraphQL\Server\OperationParams $operation
-   *
-   * @return \Drupal\Core\Cache\CacheableJsonResponse
-   *
    * @throws \Exception
    */
-  protected function handleSingle(ServerInterface $server, OperationParams $operation) {
+  protected function handleSingle(ServerInterface $server, OperationParams $operation): CacheableJsonResponse {
     $result = $server->executeOperation($operation);
     $response = new CacheableJsonResponse($result);
     $response->addCacheableDependency($result);
@@ -84,13 +79,13 @@ class RequestController implements ContainerInjectionInterface {
    * Execute multiple operations as batch and turn that into cacheable response.
    *
    * @param \Drupal\graphql\Entity\ServerInterface $server
-   * @param \GraphQL\Server\OperationParams[] $operations
-   *
-   * @return \Drupal\Core\Cache\CacheableJsonResponse
+   *   The graphql server.
+   * @param array<\GraphQL\Server\OperationParams> $operations
+   *   The list of operations to execute.
    *
    * @throws \Exception
    */
-  protected function handleBatch(ServerInterface $server, array $operations) {
+  protected function handleBatch(ServerInterface $server, array $operations): CacheableJsonResponse {
     $result = $server->executeBatch($operations);
     $response = new CacheableJsonResponse($result);
 

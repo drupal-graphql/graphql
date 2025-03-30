@@ -5,6 +5,8 @@
  * Primary module hooks for GraphQL module.
  */
 
+declare(strict_types=1);
+
 /**
  * Implements hook_help().
  */

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Traits;
 
 /**
@@ -13,7 +15,7 @@ trait QueryFileTrait {
    * @return string
    *   The path to the collection of test query files.
    */
-  protected function getQueriesDirectory() {
+  protected function getQueriesDirectory(): string {
     return \Drupal::service('extension.list.module')->getPath(explode('\\', get_class($this))[2]) . '/tests/queries';
   }
 
@@ -26,7 +28,7 @@ trait QueryFileTrait {
    * @return string
    *   The graphql query string.
    */
-  public function getQueryFromFile($queryFile) {
+  public function getQueryFromFile(string $queryFile): string {
     return file_get_contents($this->getQueriesDirectory() . '/' . $queryFile);
   }
 

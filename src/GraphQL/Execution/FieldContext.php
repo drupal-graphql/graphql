@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Execution;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -14,23 +16,16 @@ class FieldContext implements RefinableCacheableDependencyInterface {
 
   /**
    * The context that has been passed down.
-   *
-   * @var \Drupal\graphql\GraphQL\Execution\ResolveContext
    */
-  protected $context;
+  protected ResolveContext $context;
 
   /**
    * Schema type information of the current field.
-   *
-   * @var \GraphQL\Type\Definition\ResolveInfo
    */
-  protected $info;
+  protected ResolveInfo $info;
 
   /**
    * FieldContext constructor.
-   *
-   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
-   * @param \GraphQL\Type\Definition\ResolveInfo $info
    */
   public function __construct(ResolveContext $context, ResolveInfo $info) {
     $this->addCacheContexts(['user.permissions']);
@@ -40,30 +35,24 @@ class FieldContext implements RefinableCacheableDependencyInterface {
 
   /**
    * Returns the current field name.
-   *
-   * @return string
    */
-  public function getFieldName() {
+  public function getFieldName(): string {
     return $this->info->fieldName;
   }
 
   /**
    * Returns the language set as context.
-   *
-   * @return string
    */
-  public function getContextLanguage() {
+  public function getContextLanguage(): string {
     return $this->context->getContextLanguage();
   }
 
   /**
    * Sets the context language.
    *
-   * @param string $language
-   *
    * @return $this
    */
-  public function setContextLanguage($language) {
+  public function setContextLanguage(string $language) {
     $this->context->setContextLanguage($language);
     return $this;
   }
@@ -81,7 +70,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    *
    * @return $this
    */
-  public function setContextValue($name, $value) {
+  public function setContextValue(string $name, mixed $value) {
     $this->context->setContextValue($this->info, $name, $value);
     return $this;
   }
@@ -98,7 +87,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    *   The current value of the given context or the given default value if the
    *   context wasn't set.
    */
-  public function getContextValue($name) {
+  public function getContextValue(string $name): mixed {
     return $this->context->getContextValue($this->info, $name);
   }
 
@@ -113,7 +102,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
    * @return bool
    *   TRUE if the context exists, FALSE Otherwise.
    */
-  public function hasContextValue($name) {
+  public function hasContextValue(string $name): bool {
     return $this->context->hasContextValue($this->info, $name);
   }
 

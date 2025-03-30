@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -16,15 +18,13 @@ class ValidationController implements ContainerInjectionInterface {
 
   /**
    * The schema plugin manager.
-   *
-   * @var \Drupal\graphql\GraphQL\ValidatorInterface
    */
-  protected $validator;
+  protected ValidatorInterface $validator;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) : self {
+  public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('graphql.validator')
     );
@@ -49,7 +49,7 @@ class ValidationController implements ContainerInjectionInterface {
    * @return array
    *   The render array.
    */
-  public function report(ServerInterface $graphql_server) {
+  public function report(ServerInterface $graphql_server): array {
     $build = [
       'validation' => [
         '#type' => 'table',

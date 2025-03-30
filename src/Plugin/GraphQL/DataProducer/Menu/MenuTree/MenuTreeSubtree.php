@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree;
 
 use Drupal\Core\Menu\MenuLinkTreeElement;
@@ -30,11 +32,9 @@ class MenuTreeSubtree extends DataProducerPluginBase {
   /**
    * Resolver.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return array<\Drupal\Core\Menu\MenuLinkTreeElement>
    */
-  public function resolve(MenuLinkTreeElement $element) {
+  public function resolve(MenuLinkTreeElement $element): array {
     return array_filter($element->subtree, function (MenuLinkTreeElement $item) {
       return $item->link->isEnabled();
     });

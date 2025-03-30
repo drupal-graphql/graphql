@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Access\AccessResult;
@@ -13,6 +15,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Data producers Entity test class.
@@ -22,44 +25,34 @@ use Drupal\user\UserInterface;
 class EntityTest extends GraphQLTestBase {
 
   /**
-   * @var \Drupal\node\NodeInterface
+   * Test node.
    */
-  protected $node;
+  protected NodeInterface $node;
 
   /**
    * Mocked test entity.
-   *
-   * @var \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entity;
+  protected NodeInterface|MockObject $entity;
 
   /**
    * Mocked test entity interface.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
    */
-  protected $entityInterface;
+  protected EntityInterface $entityInterface;
 
   /**
    * Mocked test user.
-   *
-   * @var \Drupal\user\UserInterface
    */
-  protected $user;
+  protected UserInterface $user;
 
   /**
    * Translated test entity.
-   *
-   * @var \Drupal\node\NodeInterface
    */
-  protected $translationFr;
+  protected NodeInterface $translationFr;
 
   /**
    * Translated test entity.
-   *
-   * @var \Drupal\node\NodeInterface
    */
-  protected $translationDe;
+  protected NodeInterface $translationDe;
 
   /**
    * {@inheritdoc}

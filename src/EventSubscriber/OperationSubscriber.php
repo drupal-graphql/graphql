@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -20,19 +22,11 @@ class OperationSubscriber implements EventSubscriberInterface {
 
   /**
    * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * Constructs a OperationSubscriber object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   * @param \Drupal\language\LanguageNegotiatorInterface $languageNegotiator
    */
   public function __construct(ModuleHandlerInterface $moduleHandler, LanguageManagerInterface $languageManager, TranslatorInterface $translator, AccountInterface $currentUser, ?LanguageNegotiatorInterface $languageNegotiator = NULL) {
     $this->moduleHandler = $moduleHandler;

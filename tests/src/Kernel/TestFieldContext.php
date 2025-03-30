@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Execution\FieldContext;
@@ -17,7 +19,7 @@ class TestFieldContext extends FieldContext {
   /**
    * {@inheritdoc}
    */
-  public function getContextValue($name) {
+  public function getContextValue($name): mixed {
     return NULL;
   }
 
@@ -31,7 +33,7 @@ class TestFieldContext extends FieldContext {
   /**
    * {@inheritdoc}
    */
-  public function hasContextValue($name) {
+  public function hasContextValue($name): bool {
     return FALSE;
   }
 

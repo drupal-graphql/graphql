@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql_examples\Wrappers;
 
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -11,23 +13,21 @@ use GraphQL\Deferred;
 class QueryConnection {
 
   /**
-   * @var \Drupal\Core\Entity\Query\QueryInterface
+   * The entity query object.
    */
-  protected $query;
+  protected QueryInterface $query;
 
   /**
    * QueryConnection constructor.
-   *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
    */
   public function __construct(QueryInterface $query) {
     $this->query = $query;
   }
 
   /**
-   * @return int
+   * Returns the total number of entities.
    */
-  public function total() {
+  public function total(): int {
     $query = clone $this->query;
     $query->range(NULL, NULL)->count();
     /** @var int */
@@ -35,9 +35,9 @@ class QueryConnection {
   }
 
   /**
-   * @return array|\GraphQL\Deferred
+   * Returns a callback that resolves in a deferred fashion.
    */
-  public function items() {
+  public function items(): array|Deferred {
     $result = $this->query->execute();
     if (empty($result)) {
       return [];

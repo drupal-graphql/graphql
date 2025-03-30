@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Validator;
@@ -16,7 +18,7 @@ class ValidatorTest extends GraphQLTestBase {
   /**
    * @covers ::getMissingResolvers
    */
-  public function testGetMissingResolversCatchesMissingFieldsOnTypes() : void {
+  public function testGetMissingResolversCatchesMissingFieldsOnTypes(): void {
     $schema = <<<GQL
       type Query {
         me: String
@@ -39,7 +41,7 @@ GQL;
    * Interfaces are ignored because the implementing types are used to check
    * whether a resolver is present.
    */
-  public function testGetMissingResolversIgnoresMissingFieldsOnInterfaces() : void {
+  public function testGetMissingResolversIgnoresMissingFieldsOnInterfaces(): void {
     $schema = <<<GQL
       type Query {
         me: Actor
@@ -65,7 +67,7 @@ GQL;
   /**
    * @covers ::getMissingResolvers
    */
-  public function testGetMissingResolversCanIgnoreTypes() : void {
+  public function testGetMissingResolversCanIgnoreTypes(): void {
     $schema = <<<GQL
       type Query {
         me: User
@@ -87,7 +89,7 @@ GQL;
   /**
    * @covers ::getOrphanedResolvers
    */
-  public function testGetOrphanedResolversDetectsUnfieldableObjectResolvers() : void {
+  public function testGetOrphanedResolversDetectsUnfieldableObjectResolvers(): void {
     $schema = <<<GQL
       type Query {
         me: Actor
@@ -110,7 +112,7 @@ GQL;
   /**
    * @covers ::getOrphanedResolvers
    */
-  public function testGetOrphanedResolversDetectsNonExistentResolvers() : void {
+  public function testGetOrphanedResolversDetectsNonExistentResolvers(): void {
     $schema = <<<GQL
       type Query {
         me: String!
@@ -129,7 +131,7 @@ GQL;
   /**
    * @covers ::getOrphanedResolvers
    */
-  public function testGetOrphanedResolversDetectsOrphanedObjectFieldResolvers() : void {
+  public function testGetOrphanedResolversDetectsOrphanedObjectFieldResolvers(): void {
     $schema = <<<GQL
       type Query {
         me: User
@@ -152,7 +154,7 @@ GQL;
   /**
    * @covers ::getOrphanedResolvers
    */
-  public function testGetOrphanedResolversDetectsOrphanedInterfaceFieldResolvers() : void {
+  public function testGetOrphanedResolversDetectsOrphanedInterfaceFieldResolvers(): void {
     $schema = <<<GQL
       type Query {
         me: Actor
@@ -179,7 +181,7 @@ GQL;
   /**
    * @covers ::getOrphanedResolvers
    */
-  public function testGetOrphanedResolversDetectsOrphanedInputObjectFieldResolvers() : void {
+  public function testGetOrphanedResolversDetectsOrphanedInputObjectFieldResolvers(): void {
     $schema = <<<GQL
       type Mutation {
         createFakeObject(input: FakeInput!): User
@@ -205,7 +207,7 @@ GQL;
   /**
    * @covers ::getOrphanedResolvers
    */
-  public function testGetOrphanedResolversDetectsCanIgnoreTypes() : void {
+  public function testGetOrphanedResolversDetectsCanIgnoreTypes(): void {
     $schema = <<<GQL
       type Query {
         me: Actor

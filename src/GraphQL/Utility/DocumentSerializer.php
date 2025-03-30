@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\GraphQL\Utility;
 
 use GraphQL\Language\AST\DocumentNode;
@@ -12,23 +14,15 @@ class DocumentSerializer {
 
   /**
    * Turn the AST document to a serializable array.
-   *
-   * @param \GraphQL\Language\AST\DocumentNode $document
-   *
-   * @return array
    */
-  public static function serializeDocument(DocumentNode $document) {
+  public static function serializeDocument(DocumentNode $document): array {
     return static::sanitizeRecursive(AST::toArray($document));
   }
 
   /**
    * Recursively turn AST items into a serializable array.
-   *
-   * @param array $item
-   *
-   * @return array
    */
-  public static function sanitizeRecursive(array $item) {
+  public static function sanitizeRecursive(array $item): array {
     unset($item['loc']);
 
     foreach ($item as &$value) {

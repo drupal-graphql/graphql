@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityChangedInterface;
@@ -33,14 +35,9 @@ class EntityChanged extends DataProducerPluginBase {
   /**
    * Resolver.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   * @param string|null $format
-   *
-   * @return string|null
-   *
    * @throws \Exception
    */
-  public function resolve(EntityInterface $entity, $format = NULL) {
+  public function resolve(EntityInterface $entity, ?string $format = NULL): ?string {
     if ($entity instanceof EntityChangedInterface) {
       $datetime = new \DateTime();
       $datetime->setTimestamp($entity->getChangedTime());
