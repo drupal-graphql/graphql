@@ -13,7 +13,6 @@ use Drupal\Core\Utility\Error as ErrorUtil;
 use Drupal\graphql\Event\OperationEvent;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
 use Drupal\graphql\GraphQL\Utility\DocumentSerializer;
-use GraphQL\Error\ClientAware;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Executor\ExecutorImplementation;
 use GraphQL\Executor\Promise\Promise;
@@ -200,7 +199,7 @@ class Executor implements ExecutorImplementation {
       // Don't log errors intended for clients, only log those that
       // a client would not be able to solve, they'd require work from
       // a server developer.
-      if ($error instanceof ClientAware && $error->isClientSafe()) {
+      if ($error->isClientSafe()) {
         continue;
       }
 

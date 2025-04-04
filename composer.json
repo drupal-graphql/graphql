@@ -10,14 +10,14 @@
     "webonyx/graphql-php": "^15.19.1"
   },
   "require-dev": {
-    "drupal/coder": "8.3.26",
+    "drupal/coder": "8.3.28",
     "slevomat/coding-standard": "^8.16",
     "drupal/redirect": "^1.0",
-    "phpstan/phpstan": "^1.11.2",
-    "mglaman/phpstan-drupal": "^1.1.2",
-    "phpstan/phpstan-deprecation-rules": "^1.0.0",
-    "jangregor/phpstan-prophecy": "^1.0.0",
-    "phpstan/phpstan-phpunit": "^1.0.0",
+    "phpstan/phpstan": "^2.1.11 || ^1",
+    "mglaman/phpstan-drupal": "^2.0.2 || ^1",
+    "phpstan/phpstan-deprecation-rules": "^2 || ^1",
+    "jangregor/phpstan-prophecy": "^2 || ^1",
+    "phpstan/phpstan-phpunit": "^2 || ^1",
     "phpstan/extension-installer": "^1.0"
   },
   "minimum-stability": "dev"

@@ -72,7 +72,6 @@ class RoutingTest extends GraphQLTestBase {
     $redirect->setRedirect($nodeUrl);
     $redirect->save();
 
-    /** @var \Drupal\Core\Url $result */
     $result = $this->executeDataProducer('route_load', [
       'path' => 'internal-url',
     ]);

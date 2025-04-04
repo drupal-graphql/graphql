@@ -12,6 +12,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 
 /**
+ * A schema that is composed of extensions, each adding to the schema.
+ *
  * @Schema(
  *   id = "composable",
  *   name = "Composable schema"

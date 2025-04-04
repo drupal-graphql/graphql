@@ -8,14 +8,13 @@ use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
 use GraphQL\Server\OperationParams;
 
 /**
+ * Test persisted plugin.
+ *
  * @PersistedQuery(
  *   id = "persisted_query_plugin_three",
  *   label = "Persisted Query Three",
  *   description = "This is the third persisted query plugin"
  * )
- *
- * Class PersistedQueryPluginThree
- * @package Drupal\graphql_persisted_queries_test\Plugin\GraphQL\PersistedQuery
  */
 class PersistedQueryPluginThree extends PersistedQueryPluginBase {
 

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\graphql\GraphQL\ResolverRegistry;
-
 /**
  * Tests that the resolver registry behaves correctly.
  *
@@ -41,11 +39,6 @@ class ResolverRegistryTest extends GraphQLTestBase {
 GQL;
 
     $this->setUpSchema($schema);
-
-    // Our mocking trait sets up the ResolverRegistry that we're interested in
-    // testing for us. This assertion guards against the mock implementation
-    // invalidating that and this test becoming useless.
-    self::assertInstanceOf(ResolverRegistry::class, $this->registry);
   }
 
   /**

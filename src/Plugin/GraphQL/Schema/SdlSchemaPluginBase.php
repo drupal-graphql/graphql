@@ -155,6 +155,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   }
 
   /**
+   * Returns the list of schema extension plugins.
+   *
    * @return array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
    */
   protected function getExtensions(): array {
@@ -281,11 +283,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Configurable schema plugins should be cached per server since the schema
     // depends on the server configuration.
     if ($this instanceof ConfigurableInterface) {
-      $server_id = $this->getConfiguration()['server_id'] ?? NULL;
-      if ($server_id) {
-        return "{$type}:{$this->getPluginId()}:{$server_id}";
-      }
-      @trigger_error('Retrieving a GraphQL schema from a configurable schema plugin instance without setting the "server_id" in the plugin configuration is deprecated in graphql:4.11.0 and will cause an InvalidPluginDefinitionException to be thrown from graphql:5.0.0. Ensure to always pass this configuration value so that the schema can be properly cached per server. See https://www.drupal.org/project/graphql/issues/3491736', E_USER_DEPRECATED);
+      $server_id = $this->getConfiguration()['server_id'];
+      return "{$type}:{$this->getPluginId()}:{$server_id}";
     }
     return "{$type}:{$this->getPluginId()}";
   }

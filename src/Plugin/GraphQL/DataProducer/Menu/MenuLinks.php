@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
@@ -88,7 +87,7 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
 
     return array_filter($this->menuLinkTree->transform($tree, $manipulators), function (MenuLinkTreeElement $item) use ($context) {
       $context->addCacheableDependency($item->access);
-      return $item->link instanceof MenuLinkInterface && $item->link->isEnabled() && $item->access->isAllowed();
+      return $item->link->isEnabled() && $item->access->isAllowed();
     });
   }
 

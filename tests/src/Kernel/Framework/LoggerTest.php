@@ -52,9 +52,6 @@ GQL;
 
   /**
    * {@inheritdoc}
-   *
-   * @todo For some reason, PHPStan wants to see a type hint for the level here,
-   * which is not correct.
    */
   public function log($level, string|\Stringable $message, array $context = []): void {
     $this->loggerCalls[] = [

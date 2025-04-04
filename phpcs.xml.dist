@@ -34,39 +34,11 @@
     <exclude-pattern>src/GraphQL/Buffers/BufferBase.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Execution/FieldContext.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Execution/ResolveContext.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/Utility/FileUpload.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Utility/Seek.php</exclude-pattern>
     <exclude-pattern>src/SubRequestResponse.php</exclude-pattern>
     <exclude-pattern>tests/src/Traits/QueryResultAssertionTrait.php</exclude-pattern>
     <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
-  </rule>
-
-  <rule ref="Drupal.Commenting.DocComment.MissingShort">
-    <exclude-pattern>src/Plugin/GraphQL/Schema/SdlSchemaPluginBase.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/GraphQL/Schema/ComposableSchema.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/DataProducerPluginManager.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/PersistedQueryPluginInterface.php</exclude-pattern>
-    <exclude-pattern>src/Plugin/DataProducerPluginCachingInterface.php</exclude-pattern>
-    <exclude-pattern>src/Controller/RequestController.php</exclude-pattern>
-    <exclude-pattern>examples/graphql_example/src/Wrappers/QueryConnection.php</exclude-pattern>
-    <exclude-pattern>examples/graphql_example/src/Plugin/GraphQL/DataProducer/QueryArticles.php</exclude-pattern>
-    <exclude-pattern>examples/graphql_example/src/Plugin/GraphQL/Schema/ExampleSchema.php</exclude-pattern>
-    <exclude-pattern>examples/graphql_example/src/Plugin/GraphQL/SchemaExtension/ExampleSchemaExtension.php</exclude-pattern>
-    <exclude-pattern>examples/graphql_composable/src/Plugin/GraphQL/Schema/ComposableSchemaExample.php</exclude-pattern>
-    <exclude-pattern>examples/graphql_composable/src/Plugin/GraphQL/SchemaExtension/ComposableSchemaExampleExtension.php</exclude-pattern>
-    <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
-    <exclude-pattern>tests/src/Traits/QueryResultAssertionTrait.php</exclude-pattern>
-    <exclude-pattern>tests/src/Traits/DataProducerExecutionTrait.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/ResolverBuilderTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/EntityBufferTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/DataProducer/MenuTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/DataProducer/EntityMultipleTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/DataProducer/EntityTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/EntityUuidBufferTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/Framework/PersistedQueriesTest.php</exclude-pattern>
-    <exclude-pattern>tests/src/Kernel/GraphQLTestBase.php</exclude-pattern>
-    <exclude-pattern>tests/modules/graphql_persisted_queries_test/src/Plugin/GraphQL/PersistedQuery/PersistedQueryPluginThree.php</exclude-pattern>
-    <exclude-pattern>tests/modules/graphql_persisted_queries_test/src/Plugin/GraphQL/PersistedQuery/PersistedQueryPluginOne.php</exclude-pattern>
-    <exclude-pattern>tests/modules/graphql_persisted_queries_test/src/Plugin/GraphQL/PersistedQuery/PersistedQueryPluginTwo.php</exclude-pattern>
   </rule>
 
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamComment">

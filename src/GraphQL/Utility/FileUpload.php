@@ -13,6 +13,7 @@ use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -235,10 +236,7 @@ class FileUpload {
     $file_uri = "{$destination}/{$prepared_filename}";
 
     $temp_file_path = $uploaded_file->getRealPath();
-
-    // Drupal 10.3 compatibility: use the deprecated constant for now.
-    // @phpstan-ignore-next-line as it is deprecated in D12.
-    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileSystemInterface::EXISTS_RENAME);
+    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileExists::Rename);
 
     // Lock based on the prepared file URI.
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
@@ -286,9 +284,7 @@ class FileUpload {
       // FileSystemInterface::EXISTS_ERROR as the file location has already been
       // determined above in FileSystem::getDestinationFilename().
       try {
-        // Drupal 10.3 compatibility: use the deprecated constant for now.
-        // @phpstan-ignore-next-line as it is deprecated in D12.
-        $this->fileSystem->move($temp_file_path, $file_uri, FileSystemInterface::EXISTS_ERROR);
+        $this->fileSystem->move($temp_file_path, $file_uri, FileExists::Rename);
       }
       catch (FileException $e) {
         $response->addViolation($this->t('Unknown error while uploading the file "@file".', [
@@ -321,7 +317,7 @@ class FileUpload {
   /**
    * Validates uploaded files, saves them and returns a file upload response.
    *
-   * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile> $uploaded_files
+   * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile|mixed> $uploaded_files
    *   The file entities to upload.
    * @param array $settings
    *   File settings as specified in regular file field config. Contains keys:

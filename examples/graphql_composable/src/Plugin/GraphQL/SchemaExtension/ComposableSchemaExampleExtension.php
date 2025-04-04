@@ -11,6 +11,8 @@ use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 
 /**
+ * Example schema plugin for extending the composable schema.
+ *
  * @SchemaExtension(
  *   id = "composable_extension",
  *   name = "Composable Example extension",

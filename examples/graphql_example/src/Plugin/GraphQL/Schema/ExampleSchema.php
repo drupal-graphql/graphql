@@ -11,6 +11,8 @@ use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 use Drupal\graphql_examples\Wrappers\QueryConnection;
 
 /**
+ * Example schema plugin that maps article data.
+ *
  * @Schema(
  *   id = "example",
  *   name = "Example schema"

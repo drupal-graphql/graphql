@@ -15,6 +15,8 @@ use GraphQL\Error\UserError;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Example data producer that loads a list of articles.
+ *
  * @DataProducer(
  *   id = "query_articles",
  *   name = @Translation("Load articles"),
@@ -71,9 +73,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
   /**
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * Resolves the query by preparing an entity query for executing later.
    */
   public function resolve(int $offset, int $limit, RefinableCacheableDependencyInterface $metadata): QueryConnection {
     if ($limit > static::MAX_LIMIT) {

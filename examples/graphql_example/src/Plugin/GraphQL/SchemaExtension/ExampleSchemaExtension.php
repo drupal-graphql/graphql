@@ -9,6 +9,8 @@ use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 
 /**
+ * Example schema extension that adds to the mapping.
+ *
  * @SchemaExtension(
  *   id = "example_extension",
  *   name = "Example extension",

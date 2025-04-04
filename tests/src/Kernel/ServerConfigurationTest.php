@@ -78,7 +78,6 @@ class ServerConfigurationTest extends GraphQLTestBase {
     // Replace the schema plugin manager with a mocked version that returns the
     // requested mocked schema extension plugins.
     $schemaPluginManager = $this->mockPluginManager(array_keys(self::TEST_SCHEMAS));
-    // @phpstan-ignore-next-line PHPStan doesn't find this method on the parent.
     $schemaPluginManager->method('createInstance')
       ->willReturnCallback(fn ($pluginId, $pluginConfig) => match ([$pluginId, $pluginConfig['server_id']]) {
         ['composable', $this->servers['node']->id()] => $this->extensionPlugins['node'],

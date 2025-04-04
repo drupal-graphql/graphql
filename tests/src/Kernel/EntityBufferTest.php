@@ -15,11 +15,6 @@ use Drupal\node\Entity\NodeType;
 class EntityBufferTest extends GraphQLTestBase {
 
   /**
-   * @var array<string>
-   */
-  protected array $nodeIds = [];
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -36,7 +31,6 @@ class EntityBufferTest extends GraphQLTestBase {
         'type' => 'test',
       ]);
       $node->save();
-      $this->nodeIds[] = $node->id();
     }
 
     $schema = <<<GQL

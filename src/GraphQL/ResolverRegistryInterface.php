@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\Type;
 
 /**
  * Defines a registry to resolve any field in the GraphQL schema tree.
@@ -30,9 +31,37 @@ interface ResolverRegistryInterface {
   public function addFieldResolver(string $type, string $field, ResolverInterface $resolver): static;
 
   /**
+   * Get a field resolver for the type or any of the interfaces it implements.
+   *
+   * This allows common functionality (such as for Edge's or Connections) to be
+   * implemented for an interface and re-used on any concrete type that extends
+   * it.
+   *
+   * This should be used instead of `getFieldResolver` unless you're certain you
+   * want the resolver only for the specific type.
+   *
+   * @param \GraphQL\Type\Definition\Type $type
+   *   The type to find a resolver for.
+   * @param string $fieldName
+   *   The name of the field to find a resolver for.
+   *
+   * @return \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null
+   *   The defined resolver for the field or NULL if none exists.
+   */
+  public function getFieldResolverWithInheritance(Type $type, string $fieldName): ?ResolverInterface;
+
+  /**
    * Return the field resolver for a given type and field name.
    */
   public function getFieldResolver(string $type, string $field): ?ResolverInterface;
+
+  /**
+   * Return all field resolvers in the registry.
+   *
+   * @return array<string, array<string, \Drupal\graphql\GraphQL\Resolver\ResolverInterface>>
+   *   A nested list of resolvers, keyed by type and field name.
+   */
+  public function getAllFieldResolvers(): array;
 
   /**
    * Add a type resolver.

@@ -148,10 +148,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ->method('getBaseDefinition')
       ->willReturn('');
 
-    // Different extension definition for different tests.
-    // PHPUnit compatibility: remove once support for Drupal 10.2 is dropped.
-    $methodName = method_exists($this, 'name') ? 'name' : 'getName';
-    switch ($this->$methodName()) {
+    switch ($this->name()) {
       case 'testEmptySchemaExtensionAlteredQueryResultPropertyAdded':
         $extensionDefinition = '';
         break;
@@ -179,7 +176,10 @@ class AlterableSchemaTest extends GraphQLTestBase {
     // Replace mock schema with our own implementation.
     $this->schema = $this->getMockBuilder(AlterableComposableSchema::class)
       ->setConstructorArgs([
-        [],
+        [
+          'extensions' => ['graphql_alterable_schema_test' => 'graphql_alterable_schema_test'],
+          'server_id' => 'test_server',
+        ],
         $id,
         [],
         $this->container->get('cache.graphql.ast'),
@@ -188,7 +188,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
         ['development' => FALSE],
         $this->container->get('event_dispatcher'),
       ])
-      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry', 'getConfiguration'])
+      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry'])
       ->getMock();
 
     $this->schema->expects(static::any())
@@ -199,9 +199,6 @@ class AlterableSchemaTest extends GraphQLTestBase {
     $this->schema->expects($this->any())
       ->method('getResolverRegistry')
       ->willReturn($this->registry);
-    $this->schema->expects($this->any())
-      ->method('getConfiguration')
-      ->willReturn(['extensions' => ['graphql_alterable_schema_test' => 'graphql_alterable_schema_test']]);
   }
 
 }
