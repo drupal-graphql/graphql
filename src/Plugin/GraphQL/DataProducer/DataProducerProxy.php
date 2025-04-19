@@ -88,6 +88,9 @@ class DataProducerProxy implements ResolverInterface {
 
   /**
    * Create a new data producer proxy.
+   *
+   * @return mixed
+   *   A new data producer proxy instance created via the plugin manager.
    */
   public static function create(string $id, array $mapping = [], array $config = []): mixed {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
@@ -118,6 +121,9 @@ class DataProducerProxy implements ResolverInterface {
    * Resolve field value.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *
+   * @return mixed
+   *   The resolved field value from the data producer plugin.
    */
   public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $plugin = $this->prepare($value, $args, $context, $info, $field);
@@ -222,6 +228,8 @@ class DataProducerProxy implements ResolverInterface {
    * Cache lookup.
    *
    * @return array|null
+   *   The cached data containing value and metadata, or NULL if no cache entry
+   *   found.
    */
   protected function cacheRead(string $prefix): ?array {
     if ($cache = $this->cacheBackend->get("$prefix:context")) {

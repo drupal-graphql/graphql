@@ -36,6 +36,10 @@ class EntityLabel extends DataProducerPluginBase implements DataProducerPluginCa
 
   /**
    * Resolver.
+   *
+   * @return string|null
+   *   The entity label, or NULL if access to the entity label is denied for the
+   *   given user.
    */
   public function resolve(EntityInterface $entity, ?AccountInterface $accessUser, FieldContext $context): ?string {
     /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */

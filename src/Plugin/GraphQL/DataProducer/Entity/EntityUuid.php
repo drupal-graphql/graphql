@@ -28,6 +28,9 @@ class EntityUuid extends DataProducerPluginBase {
 
   /**
    * Resolver.
+   *
+   * @return string|null
+   *   The entity UUID, or NULL if the entity doesn't have a UUID.
    */
   public function resolve(EntityInterface $entity): ?string {
     return $entity->uuid();

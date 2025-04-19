@@ -197,6 +197,7 @@ class PersistedQueriesForm extends EntityForm {
    * Returns an array with all the available persisted query plugins.
    *
    * @return array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface>
+   *   All persisted query plugins available through plugins.
    */
   protected function getAllPersistedQueryPlugins(): array {
     $plugins = [];

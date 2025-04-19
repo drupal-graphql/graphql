@@ -36,6 +36,11 @@ class EntityChanged extends DataProducerPluginBase {
    * Resolver.
    *
    * @throws \Exception
+   *   When there are date handling errors.
+   *
+   * @return string|null
+   *   The formatted entity changed timestamp, or NULL if the entity does not
+   *   implement EntityChangedInterface.
    */
   public function resolve(EntityInterface $entity, ?string $format = NULL): ?string {
     if ($entity instanceof EntityChangedInterface) {

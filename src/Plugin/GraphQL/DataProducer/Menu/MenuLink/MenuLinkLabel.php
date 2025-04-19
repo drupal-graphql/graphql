@@ -30,6 +30,9 @@ class MenuLinkLabel extends DataProducerPluginBase {
 
   /**
    * Resolver.
+   *
+   * @return string
+   *   The menu link title.
    */
   public function resolve(MenuLinkInterface $link): string {
     return $link->getTitle();

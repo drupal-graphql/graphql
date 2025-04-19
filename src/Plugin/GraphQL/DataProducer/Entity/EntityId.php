@@ -28,6 +28,9 @@ class EntityId extends DataProducerPluginBase {
 
   /**
    * Resolver.
+   *
+   * @return int|string|null
+   *   The entity ID as integer or string, null if the entity has no ID yet.
    */
   public function resolve(EntityInterface $entity): int|string|null {
     return $entity->id();

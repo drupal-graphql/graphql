@@ -72,6 +72,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
    *   The id of the schema plugin to retrieve the extensions for.
    *
    * @return array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
+   *   An array of schema extension plugin instances sorted by priority.
    */
   public function getExtensions(string $id): array {
     if (!isset($this->extensions[$id])) {

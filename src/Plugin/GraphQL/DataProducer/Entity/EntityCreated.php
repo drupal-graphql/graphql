@@ -33,6 +33,10 @@ class EntityCreated extends DataProducerPluginBase {
 
   /**
    * Resolver.
+   *
+   * @return string|null
+   *   The formatted entity creation timestamp, or NULL if the entity does not
+   *   support creation time.
    */
   public function resolve(EntityInterface $entity, ?string $format = NULL): ?string {
     // `getCreatedTime` is on NodeInterface which feels weird, since there

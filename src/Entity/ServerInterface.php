@@ -17,6 +17,12 @@ interface ServerInterface extends ConfigEntityInterface {
 
   /**
    * Execute an operation on this server.
+   *
+   * @param \GraphQL\Server\OperationParams $operation
+   *   The operation parameters.
+   *
+   * @return \Drupal\graphql\GraphQL\Execution\ExecutionResult
+   *   The execution result.
    */
   public function executeOperation(OperationParams $operation): ExecutionResult;
 
@@ -24,8 +30,10 @@ interface ServerInterface extends ConfigEntityInterface {
    * Execute multiple operations as batch on this server.
    *
    * @param array<\GraphQL\Server\OperationParams> $operations
+   *   A list of operations to execute in the batch.
    *
    * @return array<\Drupal\graphql\GraphQL\Execution\ExecutionResult>
+   *   The execution results for each operation.
    */
   public function executeBatch(array $operations): array;
 
@@ -59,6 +67,7 @@ interface ServerInterface extends ConfigEntityInterface {
    * Returns the current persisted queries set, sorted by the plugins weight.
    *
    * @return array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface>
+   *   The persisted query plugin instances, sorted by weight.
    */
   public function getPersistedQueryInstances(): array;
 

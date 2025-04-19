@@ -43,11 +43,15 @@ class EntityUrl extends DataProducerPluginBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to create a canonical URL for.
    * @param string|null $rel
-   *   The link relationship type, for example: canonical or edit-form.
+   *   The link relation type, for example: canonical or edit-form.
    * @param array|null $options
    *   The options to provided to the URL generator.
    *
    * @throws \Drupal\Core\Entity\EntityMalformedException
+   *   When the entity cannot provide a URL.
+   *
+   * @return \Drupal\Core\Url
+   *   The URL object for the entity with the given relation.
    */
   public function resolve(EntityInterface $entity, ?string $rel, ?array $options): Url {
     return $entity->toUrl($rel ?? 'canonical', $options ?? []);

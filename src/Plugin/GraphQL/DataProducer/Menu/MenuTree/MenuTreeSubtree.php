@@ -33,6 +33,7 @@ class MenuTreeSubtree extends DataProducerPluginBase {
    * Resolver.
    *
    * @return array<\Drupal\Core\Menu\MenuLinkTreeElement>
+   *   An array of enabled menu link tree elements in the subtree.
    */
   public function resolve(MenuLinkTreeElement $element): array {
     return array_filter($element->subtree, function (MenuLinkTreeElement $item) {

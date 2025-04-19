@@ -27,6 +27,12 @@ class Uppercase extends DataProducerPluginBase {
 
   /**
    * Value resolver.
+   *
+   * @param string $string
+   *   The input string to convert to uppercase.
+   *
+   * @return string
+   *   The input string converted to uppercase.
    */
   public function resolve(string $string): string {
     return strtoupper($string);

@@ -19,6 +19,12 @@ interface DataProducerPluginInterface extends ContextAwarePluginInterface, Cache
 
   /**
    * Resolves the queried field with the given context.
+   *
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field
+   *   The field context that is passed down from the parent.
+   *
+   * @return mixed
+   *   The resolved field value based on the plugin's implementation.
    */
   public function resolveField(FieldContext $field): mixed;
 

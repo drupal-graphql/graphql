@@ -38,6 +38,7 @@ class XMLXpath extends DataProducerPluginBase {
    *   The xpath query.
    *
    * @return array<\DOMElement>
+   *   Array of DOM elements matching the xpath query.
    */
   public function resolve(\DOMElement $dom, string $query): array {
     $xpath = new \DOMXPath($dom->ownerDocument);

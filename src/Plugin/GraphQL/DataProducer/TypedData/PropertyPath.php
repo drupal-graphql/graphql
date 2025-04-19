@@ -43,6 +43,19 @@ class PropertyPath extends DataProducerPluginBase {
 
   /**
    * Resolve the property path.
+   *
+   * @param string $path
+   *   The property path to resolve.
+   * @param mixed $value
+   *   The root value to resolve the path from.
+   * @param string|null $type
+   *   The type of the value to start from, it will be used to get the
+   *   corresponding type data definition and wrap the value in it.
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *   The refinable metadata object.
+   *
+   * @return mixed
+   *   The resolved value at the given property path, or NULL if not found.
    */
   public function resolve(string $path, mixed $value, ?string $type, RefinableCacheableDependencyInterface $metadata): mixed {
     if (!($value instanceof TypedDataInterface) && !empty($type)) {
