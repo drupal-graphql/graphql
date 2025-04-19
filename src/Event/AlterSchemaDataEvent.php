@@ -27,7 +27,7 @@ class AlterSchemaDataEvent extends Event {
    * @param array $schemaData
    *   The schema data reference.
    */
-  public function __construct(array &$schemaData) {
+  public function __construct(array $schemaData) {
     $this->schemaData = $schemaData;
   }
 

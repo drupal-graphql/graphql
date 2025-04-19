@@ -114,6 +114,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
         $this->container->get('module_handler'),
         $this->container->get('plugin.manager.graphql.schema_extension'),
         ['development' => FALSE],
+        $this->container->get('event_dispatcher'),
       ])
       ->onlyMethods(['getConfiguration', 'getResolverRegistry'])
       ->getMock();

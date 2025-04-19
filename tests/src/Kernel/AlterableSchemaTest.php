@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\ResolverRegistry;
-use Drupal\graphql\Plugin\GraphQL\Schema\AlterableComposableSchema;
+use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 
@@ -174,7 +174,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ->willReturn($extensions['graphql_alterable_schema_test']);
 
     // Replace mock schema with our own implementation.
-    $this->schema = $this->getMockBuilder(AlterableComposableSchema::class)
+    $this->schema = $this->getMockBuilder(ComposableSchema::class)
       ->setConstructorArgs([
         [
           'extensions' => ['graphql_alterable_schema_test' => 'graphql_alterable_schema_test'],
