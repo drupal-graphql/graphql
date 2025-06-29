@@ -10,7 +10,7 @@
     "webonyx/graphql-php": "^15.19.1"
   },
   "require-dev": {
-    "drupal/coder": "8.3.29",
+    "drupal/coder": "8.3.30",
     "slevomat/coding-standard": "^8.16",
     "drupal/redirect": "^1.0",
     "phpstan/phpstan": "^2.1.11 || ^1",
