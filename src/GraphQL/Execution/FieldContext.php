@@ -43,7 +43,7 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   /**
    * Returns the language set as context.
    */
-  public function getContextLanguage(): string {
+  public function getContextLanguage(): ?string {
     return $this->context->getContextLanguage();
   }
 
