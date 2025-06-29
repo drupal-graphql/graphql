@@ -35,7 +35,7 @@ class MenuLinkAttribute extends DataProducerPluginBase {
   /**
    * Resolver.
    */
-  public function resolve(MenuLinkInterface $link, string $attribute): string {
+  public function resolve(MenuLinkInterface $link, string $attribute): ?string {
     $options = $link->getOptions();
     // Certain attributes like class can be arrays. Check for that and implode
     // them.
