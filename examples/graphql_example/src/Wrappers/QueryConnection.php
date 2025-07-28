@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\graphql_examples\Wrappers;
 
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use GraphQL\Deferred;
 
 /**
@@ -18,10 +19,16 @@ class QueryConnection {
   protected QueryInterface $query;
 
   /**
+   * The entity buffer service.
+   */
+  protected EntityBuffer $entityBuffer;
+
+  /**
    * QueryConnection constructor.
    */
-  public function __construct(QueryInterface $query) {
+  public function __construct(QueryInterface $query, EntityBuffer $entityBuffer) {
     $this->query = $query;
+    $this->entityBuffer = $entityBuffer;
   }
 
   /**
@@ -43,8 +50,7 @@ class QueryConnection {
       return [];
     }
 
-    $buffer = \Drupal::service('graphql.buffer.entity');
-    $callback = $buffer->add($this->query->getEntityTypeId(), array_values($result));
+    $callback = $this->entityBuffer->add($this->query->getEntityTypeId(), array_values($result));
     return new Deferred(function () use ($callback) {
       return $callback();
     });

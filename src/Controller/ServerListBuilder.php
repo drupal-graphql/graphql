@@ -6,7 +6,10 @@ namespace Drupal\graphql\Controller;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Admin page controller that shows the list of configured GraphQL servers.
@@ -16,6 +19,20 @@ use Drupal\Core\Url;
  * @codeCoverageIgnore
  */
 class ServerListBuilder extends ConfigEntityListBuilder {
+
+  /**
+   * Proxy for the current user.
+   */
+  protected AccountProxyInterface $currentUser;
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    $instance = parent::createInstance($container, $entity_type);
+    $instance->currentUser = $container->get('current_user');
+    return $instance;
+  }
 
   /**
    * {@inheritdoc}
@@ -42,7 +59,7 @@ class ServerListBuilder extends ConfigEntityListBuilder {
     $operations = parent::getDefaultOperations($entity);
     $id = $entity->id();
 
-    if (\Drupal::currentUser()->hasPermission('use graphql explorer')) {
+    if ($this->currentUser->hasPermission('use graphql explorer')) {
       $operations['explorer'] = [
         'title' => 'Explorer',
         'weight' => 10,
@@ -50,7 +67,7 @@ class ServerListBuilder extends ConfigEntityListBuilder {
       ];
     }
 
-    if (\Drupal::currentUser()->hasPermission('use graphql voyager')) {
+    if ($this->currentUser->hasPermission('use graphql voyager')) {
       $operations['voyager'] = [
         'title' => 'Voyager',
         'weight' => 10,
@@ -58,7 +75,7 @@ class ServerListBuilder extends ConfigEntityListBuilder {
       ];
     }
 
-    if (\Drupal::currentUser()->hasPermission("administer graphql configuration")) {
+    if ($this->currentUser->hasPermission("administer graphql configuration")) {
       $operations['persisted_queries'] = [
         'title' => 'Persisted queries',
         'weight' => 10,

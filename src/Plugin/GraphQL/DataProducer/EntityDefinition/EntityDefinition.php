@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
+use Drupal\Core\Entity\EntityTypeBundleInfo;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -40,11 +41,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityDefinition extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManager $entityTypeManager;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -54,7 +50,8 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.bundle.info'),
+      $container->get('entity_type.manager'),
     );
   }
 
@@ -67,7 +64,9 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
    *   The plugin id.
    * @param array $plugin_definition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfo $entityTypeBundleInfo
+   *   Information about entity type bundles.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
    *
    * @codeCoverageIgnore
@@ -76,10 +75,10 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    EntityTypeManager $entity_type_manager,
+    protected EntityTypeBundleInfo $entityTypeBundleInfo,
+    protected EntityTypeManager $entityTypeManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -107,7 +106,7 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
     FieldContext $field_context,
   ): EntityTypeInterface {
     if ($bundle) {
-      $bundle_info = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type);
+      $bundle_info = $this->entityTypeBundleInfo->getBundleInfo($entity_type);
       if (isset($bundle_info[$bundle])) {
         $bundle_context = $bundle_info[$bundle];
         $bundle_context['key'] = $bundle;

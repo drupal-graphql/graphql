@@ -6,6 +6,7 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\Fields\Image;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
@@ -38,11 +39,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ImageDerivative extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The rendering service.
-   */
-  protected RendererInterface $renderer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -52,7 +48,8 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
       $configuration,
       $pluginId,
       $pluginDefinition,
-      $container->get('renderer')
+      $container->get('image.factory'),
+      $container->get('renderer'),
     );
   }
 
@@ -63,10 +60,10 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
     array $configuration,
     string $pluginId,
     PluginDefinitionInterface|array $pluginDefinition,
-    RendererInterface $renderer,
+    protected ImageFactory $imageFactory,
+    protected RendererInterface $renderer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->renderer = $renderer;
   }
 
   /**
@@ -85,7 +82,7 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
       /** @var \Drupal\Core\Image\ImageInterface $image */
-      $image = \Drupal::service('image.factory')->get($entity->getFileUri());
+      $image = $this->imageFactory->get($entity->getFileUri());
       if ($image->isValid()) {
         $width = $image->getWidth();
         $height = $image->getHeight();

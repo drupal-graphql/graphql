@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Utility\Error as ErrorUtil;
 use Drupal\graphql\Event\OperationEvent;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult as CacheableExecutionResult;
@@ -50,6 +51,10 @@ class Executor implements ExecutorImplementation {
      * The event dispatcher.
      */
     protected EventDispatcherInterface $dispatcher,
+    /**
+     * The logger factory.
+     */
+    protected LoggerChannelFactoryInterface $loggerFactory,
     /**
      * The adapter for promises.
      */
@@ -105,6 +110,7 @@ class Executor implements ExecutorImplementation {
       $container->get('cache.graphql.results'),
       $container->get('datetime.time'),
       $container->get('event_dispatcher'),
+      $container->get('logger.factory'),
       $adapter,
       $schema,
       $document,
@@ -215,7 +221,7 @@ class Executor implements ExecutorImplementation {
     }
 
     if ($hasUnsafeErrors) {
-      \Drupal::logger('graphql')->error(
+      $this->loggerFactory->get('graphql')->error(
         "There were errors during a GraphQL execution.\nOperation details:\n<pre>\n{details}\n</pre>\nPrevious errors:\n<pre>\n{previous}\n</pre>",
         [
           'details' => json_encode([

@@ -33,16 +33,6 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
   use StringTranslationTrait;
 
   /**
-   * The current request.
-   */
-  protected Request $currentRequest;
-
-  /**
-   * The logger service.
-   */
-  protected LoggerChannelInterface $logger;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -54,6 +44,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $container,
       $request_stack->getCurrentRequest(),
       $logger
     );
@@ -68,7 +59,9 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Component\HttpFoundation\Request $current_request
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container, necessary for creating a UserAuthenticationController.
+   * @param \Symfony\Component\HttpFoundation\Request $currentRequest
    *   The current request.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The logger service.
@@ -77,12 +70,11 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    Request $current_request,
-    LoggerChannelInterface $logger,
+    protected ContainerInterface $container,
+    protected Request $currentRequest,
+    protected LoggerChannelInterface $logger,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->currentRequest = $current_request;
-    $this->logger = $logger;
   }
 
   /**
@@ -101,7 +93,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
 
     // Drupal does not have a user authentication service so we need to use the
     // authentication controller instead.
-    $controller = UserAuthenticationController::create(\Drupal::getContainer());
+    $controller = UserAuthenticationController::create($this->container);
     // Build up an authentication request for controller out of current request
     // but replace the request body with proper content. This way most of the
     // data are reused including the client's IP which is needed for flood

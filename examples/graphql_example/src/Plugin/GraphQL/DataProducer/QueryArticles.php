@@ -8,6 +8,7 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\graphql_examples\Wrappers\QueryConnection;
 use Drupal\node\Entity\Node;
@@ -46,6 +47,11 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
+   * The entity buffer service.
+   */
+  protected EntityBuffer $entityBuffer;
+
+  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -55,7 +61,8 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('graphql.buffer.entity')
     );
   }
 
@@ -67,9 +74,11 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
     string $pluginId,
     PluginDefinitionInterface|array $pluginDefinition,
     EntityTypeManagerInterface $entityTypeManager,
+    EntityBuffer $entityBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->entityTypeManager = $entityTypeManager;
+    $this->entityBuffer = $entityBuffer;
   }
 
   /**
@@ -98,7 +107,7 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
     $metadata->addCacheTags($entityType->getListCacheTags());
     $metadata->addCacheContexts($entityType->getListCacheContexts());
 
-    return new QueryConnection($query);
+    return new QueryConnection($query, $this->entityBuffer);
   }
 
 }
