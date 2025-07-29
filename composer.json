@@ -11,14 +11,9 @@
   },
   "require-dev": {
     "drupal/coder": "8.3.30",
-    "slevomat/coding-standard": "^8.16",
     "drupal/redirect": "^1.0",
-    "phpstan/phpstan": "^2.1.11 || ^1",
-    "mglaman/phpstan-drupal": "^2.0.2 || ^1",
     "phpstan/phpstan-deprecation-rules": "^2 || ^1",
-    "jangregor/phpstan-prophecy": "^2 || ^1",
-    "phpstan/phpstan-phpunit": "^2 || ^1",
-    "phpstan/extension-installer": "^1.0"
+    "jangregor/phpstan-prophecy": "^2 || ^1"
   },
   "minimum-stability": "dev"
 }

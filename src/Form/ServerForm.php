@@ -201,14 +201,14 @@ class ServerForm extends EntityForm {
       '#title' => $this->t('Max query depth'),
       '#type' => 'number',
       '#default_value' => $server->get('query_depth'),
-      '#description' => $this->t('Security rule: The maximum allowed depth of nested queries. Leave empty to set unlimited.'),
+      '#description' => $this->t('Security rule: The maximum allowed depth of nested queries. Set to 0 to set unlimited.'),
     ];
 
     $form['validation']['query_complexity'] = [
       '#title' => $this->t('Max query complexity'),
       '#default_value' => $server->get('query_complexity'),
       '#type' => 'number',
-      '#description' => $this->t('Security rule: The maximum allowed complexity of a query. Leave empty to set unlimited.'),
+      '#description' => $this->t('Security rule: The maximum allowed complexity of a query. Set to 0 to set unlimited.'),
     ];
 
     $debug_flags = $server->get('debug_flag') ?? 0;
@@ -251,6 +251,15 @@ class ServerForm extends EntityForm {
     $debug_flag = $form_state->getValue('debug_flag');
     if (is_array($debug_flag)) {
       $form_state->setValue('debug_flag', array_sum($debug_flag));
+    }
+    // Users can submit the empty string for these integer fields, so we always
+    // cast them to int here.
+    $cast_int_fields = [
+      'query_depth',
+      'query_complexity',
+    ];
+    foreach ($cast_int_fields as $field) {
+      $form_state->setValue($field, (int) $form_state->getValue($field));
     }
     parent::copyFormValuesToEntity($entity, $form, $form_state);
   }
