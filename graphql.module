@@ -28,19 +28,3 @@ EOT;
 
   return $help;
 }
-
-/**
- * Implements hook_theme().
- */
-function graphql_theme(): array {
-  return [
-    'page__graphql_explorer' => [
-      'render element' => 'elements',
-      'base hook' => 'block',
-    ],
-    'page__graphql_voyager' => [
-      'render element' => 'elements',
-      'base hook' => 'block',
-    ],
-  ];
-}
