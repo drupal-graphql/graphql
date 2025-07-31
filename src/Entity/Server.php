@@ -324,9 +324,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     return function (OperationParams $params, DocumentNode $document, $type) use ($schema, $config) {
       $context = new ResolveContext($this, $params, $document, $type, $config);
       $context->addCacheTags(['graphql_response']);
-      if ($this instanceof CacheableDependencyInterface) {
-        $context->addCacheableDependency($this);
-      }
+      $context->addCacheableDependency($this);
 
       if ($schema instanceof CacheableDependencyInterface) {
         $context->addCacheableDependency($schema);

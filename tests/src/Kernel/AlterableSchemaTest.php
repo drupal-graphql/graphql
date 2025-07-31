@@ -156,9 +156,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ->willReturn('');
 
     // Different extension definition for different tests.
-    // PHPUnit compatibility: remove once support for Drupal 10.2 is dropped.
-    $methodName = method_exists($this, 'name') ? 'name' : 'getName';
-    switch ($this->$methodName()) {
+    switch ($this->name()) {
       case 'testEmptySchemaExtensionAlteredQueryResultPropertyAdded':
         $extensionDefinition = '';
         break;

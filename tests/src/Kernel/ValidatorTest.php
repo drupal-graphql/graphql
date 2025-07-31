@@ -34,10 +34,11 @@ GQL;
   }
 
   /**
-   * @covers ::getMissingResolvers
+   * Interfaces are ignored.
    *
-   * Interfaces are ignored because the implementing types are used to check
-   * whether a resolver is present.
+   * The implementing types are used to check whether a resolver is present.
+   *
+   * @covers ::getMissingResolvers
    */
   public function testGetMissingResolversIgnoresMissingFieldsOnInterfaces() : void {
     $schema = <<<GQL

@@ -131,6 +131,8 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
     }
 
     // Ensure that desired access checking is performed on the query.
+    // Not sure why PHPStan complains about this?
+    // @phpstan-ignore-next-line
     $query->accessCheck($access);
 
     // Filter entities only of given bundles, if desired.

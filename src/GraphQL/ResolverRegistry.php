@@ -90,6 +90,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
   public function resolveType($value, ResolveContext $context, ResolveInfo $info) {
     // First, check if there is a resolver registered for this abstract type.
     if ($resolver = $this->getRuntimeTypeResolver($value, $context, $info)) {
+      /** @var callable|null $resolver */
       if (!is_callable($resolver)) {
         throw new \LogicException(sprintf('Type resolver for type %s is not callable.', $info->parentType->name));
       }

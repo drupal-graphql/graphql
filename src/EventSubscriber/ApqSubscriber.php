@@ -52,6 +52,7 @@ class ApqSubscriber implements EventSubscriberInterface {
       );
 
       // If we have a query and the hash matches then can cache it.
+      // @phpstan-ignore-next-line
       if (is_string($query)) {
         $computedQueryHash = hash('sha256', $query);
         if ($queryHash !== $computedQueryHash) {

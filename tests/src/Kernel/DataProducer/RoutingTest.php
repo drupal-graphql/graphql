@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -15,10 +18,8 @@ class RoutingTest extends GraphQLTestBase {
 
   /**
    * The redirect storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $redirectStorage;
+  protected EntityStorageInterface $redirectStorage;
 
   /**
    * {@inheritdoc}
@@ -71,7 +72,6 @@ class RoutingTest extends GraphQLTestBase {
     $redirect->setRedirect($nodeUrl);
     $redirect->save();
 
-    /** @var \Drupal\Core\Url $result */
     $result = $this->executeDataProducer('route_load', [
       'path' => 'internal-url',
     ]);

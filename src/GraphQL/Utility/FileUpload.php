@@ -341,7 +341,7 @@ class FileUpload {
   /**
    * Validates uploaded files, saves them and returns a file upload response.
    *
-   * @param \Symfony\Component\HttpFoundation\File\UploadedFile[] $uploaded_files
+   * @param array<\Symfony\Component\HttpFoundation\File\UploadedFile|mixed> $uploaded_files
    *   The file entities to upload.
    * @param array $settings
    *   File settings as specified in regular file field config. Contains keys:

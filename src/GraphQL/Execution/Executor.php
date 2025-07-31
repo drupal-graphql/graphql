@@ -301,6 +301,7 @@ class Executor implements ExecutorImplementation {
       // Don't log errors intended for clients, only log those that
       // a client would not be able to solve, they'd require work from
       // a server developer.
+      /** @var \Exception $error */
       if ($error instanceof ClientAware && $error->isClientSafe()) {
         continue;
       }
