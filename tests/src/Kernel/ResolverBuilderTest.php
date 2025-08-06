@@ -70,6 +70,31 @@ GQL;
   }
 
   /**
+   * @covers ::produce
+   */
+  public function testBuilderProducingDeferredArgument(): void {
+    $this->mockResolver('Query', 'tree', $this->builder->fromValue([]));
+
+    $this->mockResolver('Tree', 'name', $this->builder->produce('uppercase')
+      ->map('string', $this->builder->fromValue(
+          new Deferred(function () {
+            return 'Some tree name';
+          })
+        )
+      ));
+
+    $query = <<<GQL
+      query {
+        tree {
+          name
+        }
+      }
+GQL;
+
+    $this->assertResults($query, [], ['tree' => ['name' => 'SOME TREE NAME']]);
+  }
+
+  /**
    * @covers ::fromValue
    */
   public function testFromValue(): void {

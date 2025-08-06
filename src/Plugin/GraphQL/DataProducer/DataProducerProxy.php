@@ -16,7 +16,6 @@ use Drupal\graphql\GraphQL\Utility\DeferredUtility;
 use Drupal\graphql\Plugin\DataProducerPluginCachingInterface;
 use Drupal\graphql\Plugin\DataProducerPluginInterface;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
-use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -152,7 +151,7 @@ class DataProducerProxy implements ResolverInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Exception
    */
-  protected function prepare(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): Deferred|DataProducerPluginInterface {
+  protected function prepare(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     /** @var \Drupal\graphql\Plugin\DataProducerPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($this->id, $this->config);
     $contexts = $plugin->getContextDefinitions();
