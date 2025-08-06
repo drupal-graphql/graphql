@@ -249,8 +249,8 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'status' => TRUE,
           'defaultValue' => '1',
           'isReference' => FALSE,
-          'isHidden' => FALSE,
-          'weight' => 15,
+          'isHidden' => TRUE,
+          'weight' => 0,
         ],
         14 =>
         [
@@ -264,8 +264,8 @@ class EntityDefinitionTest extends GraphQLTestBase {
           'status' => TRUE,
           'defaultValue' => '',
           'isReference' => FALSE,
-          'isHidden' => FALSE,
-          'weight' => 16,
+          'isHidden' => TRUE,
+          'weight' => 0,
         ],
         15 =>
         [
@@ -364,6 +364,10 @@ class EntityDefinitionTest extends GraphQLTestBase {
       'targetEntityType' => 'node',
       'bundle' => 'article',
       'mode' => 'default',
+      'hidden' => [
+        'promote' => TRUE,
+        'sticky' => TRUE,
+      ],
     ]);
     $form_display->save();
 
@@ -496,6 +500,12 @@ GQL;
         'entity_form_display_context' => $builder->fromContext('entity_form_display'),
       ])
     );
+
+    // @todo Different field settings starting with Drupal 11.3, get them fresh
+    // from the service.
+    $base_field_definitions = $this->container->get('entity_field.manager')->getBaseFieldDefinitions('node');
+    $this->fullDefinitionResult['entityDefinition']['fields'][13]['defaultValue'] =
+      (string) $base_field_definitions['promote']->getDefaultValueLiteral()[0]['value'];
   }
 
   /**
