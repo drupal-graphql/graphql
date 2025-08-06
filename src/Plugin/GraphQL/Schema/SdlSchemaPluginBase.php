@@ -309,7 +309,8 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Configurable schema plugins should be cached per server since the schema
     // depends on the server configuration.
     if ($this instanceof ConfigurableInterface) {
-      $server_id = $this->getConfiguration()['server_id'];
+      $configuration = $this->getConfiguration();
+      $server_id = $configuration['server_id'] ?? 'default';
       return "{$type}:{$this->getPluginId()}:{$server_id}";
     }
     return "{$type}:{$this->getPluginId()}";

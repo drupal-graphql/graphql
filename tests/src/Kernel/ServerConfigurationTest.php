@@ -140,7 +140,7 @@ class ServerConfigurationTest extends GraphQLTestBase {
         ['development' => FALSE],
         $this->container->get('event_dispatcher'),
       ])
-      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry'])
+      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry', 'getConfiguration'])
       ->getMock();
 
     $mock->expects(static::any())
@@ -151,6 +151,13 @@ class ServerConfigurationTest extends GraphQLTestBase {
     $mock->expects($this->any())
       ->method('getResolverRegistry')
       ->willReturn($registry);
+
+    $mock->expects($this->any())
+      ->method('getConfiguration')
+      ->willReturn([
+        'extensions' => [$id => $id],
+        'server_id' => $id,
+      ]);
 
     return $mock;
   }

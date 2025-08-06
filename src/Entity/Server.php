@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Entity;
 
-use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -203,17 +202,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     $params = \Drupal::getContainer()->getParameter('graphql.config');
     /** @var \Drupal\graphql\Plugin\SchemaPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.graphql.schema');
-    $schema = $this->get('schema');
-
-    // Make sure the server ID is passed to the schema plugin so it can include
-    // it in its cache keys.
-    $plugin_config = ['server_id' => $this->id()];
-    /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
-    $plugin = $manager->createInstance($schema, $plugin_config);
-    if ($plugin instanceof ConfigurableInterface && $config = $this->get('schema_configuration')) {
-      $schema_config = $config[$schema] ?? [];
-      $plugin->setConfiguration($schema_config + $plugin_config);
-    }
+    $plugin = $manager->getInstanceFromServer($this);
 
     // Create the server config.
     $registry = $plugin->getResolverRegistry();

@@ -7,6 +7,7 @@ namespace Drupal\graphql\Plugin;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\graphql\Entity\ServerInterface;
 
 /**
  * Manager that collects and exposes GraphQL schema plugins.
@@ -56,6 +57,17 @@ class SchemaPluginManager extends DefaultPluginManager {
     $this->alterInfo('graphql_schema');
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($cacheBackend, 'graphql_schema', ['graphql_schema']);
+  }
+
+  /**
+   * Helper function to initialize a schema plugin with server configuration.
+   */
+  public function getInstanceFromServer(ServerInterface $server): SchemaPluginInterface {
+    $schema_name = $server->get('schema');
+    $schema_config = $server->get('schema_configuration') ?? [];
+    $config = $schema_config[$schema_name] ?? [];
+    $config['server_id'] = $server->id();
+    return $this->createInstance($schema_name, $config);
   }
 
 }

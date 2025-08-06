@@ -169,6 +169,7 @@ trait MockingTrait {
   protected function mockSchemaPluginManager(string $id): void {
     $this->schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)
       ->disableOriginalConstructor()
+      ->onlyMethods(['getDefinitions', 'createInstance'])
       ->getMock();
 
     $this->schemaPluginManager->expects($this->any())
