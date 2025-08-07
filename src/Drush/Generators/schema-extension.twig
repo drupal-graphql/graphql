@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace Drupal\{{ machine_name }}\Plugin\GraphQL\SchemaExtension;
 
 {% apply sort_namespaces %}
+use Drupal\graphql\Attribute\SchemaExtension;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
@@ -18,15 +19,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The '{{ plugin_id }}' schema extension.
- *
- * @SchemaExtension(
- *   id = "{{ plugin_id }}",
- *   name = @Translation("{{ plugin_label }}"),
-{% if plugin_description %} *   description = @Translation("{{ plugin_description }}"),
-{% endif %}
- *   schema = "{{ schema }}",
- * )
  */
+#[SchemaExtension(
+  id: "{{ plugin_id }}",
+  name: "{{ plugin_label }}",
+{% if plugin_description %}  description: "{{ plugin_description }}",
+{% endif %}
+  schema: "{{ schema }}"
+)]
 final class {{ class }} extends SdlSchemaExtensionPluginBase {
 
 {% if services %}

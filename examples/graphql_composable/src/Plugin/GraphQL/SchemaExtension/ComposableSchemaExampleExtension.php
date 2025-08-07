@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\graphql_composable\Plugin\GraphQL\SchemaExtension;
 
+use Drupal\graphql\Attribute\SchemaExtension;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\GraphQL\Response\ResponseInterface;
@@ -12,14 +13,13 @@ use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 
 /**
  * Example schema plugin for extending the composable schema.
- *
- * @SchemaExtension(
- *   id = "composable_extension",
- *   name = "Composable Example extension",
- *   description = "A simple extension that adds node related fields.",
- *   schema = "composable_example"
- * )
  */
+#[SchemaExtension(
+  id: "composable_extension",
+  name: "Composable Example extension",
+  description: "A simple extension that adds node related fields.",
+  schema: "composable_example"
+)]
 class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
 
   /**

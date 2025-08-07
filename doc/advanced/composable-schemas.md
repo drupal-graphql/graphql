@@ -13,17 +13,20 @@ A new schema extension can be inserted inside a new module so that it can extend
 ```php
 <?php
 namespace Drupal\graphql_examples\Plugin\GraphQL\SchemaExtension;
+use Drupal\graphql\Attribute\SchemaExtension;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
+
 /**
- * @SchemaExtension(
- *   id = "example_extension",
- *   name = "Example extension",
- *   description = "A simple extension that adds node related fields.",
- *   schema = "example"
- * )
+ * Example extension.
  */
+#[SchemaExtension(
+  id: "example_extension",
+  name: "Example extension",
+  description: "A simple extension that adds node related fields.",
+  schema: "example"
+)]
 class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
 }
 ```
@@ -60,17 +63,20 @@ We can now add our resolvers to the Extension class created previously so that o
 ```php
 <?php
 namespace Drupal\graphql_examples\Plugin\GraphQL\SchemaExtension;
+use Drupal\graphql\Attribute\SchemaExtension;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
+
 /**
- * @SchemaExtension(
- *   id = "example_extension",
- *   name = "Example extension",
- *   description = "A simple extension that adds node related fields.",
- *   schema = "example"
- * )
+ * Example extension.
  */
+#[SchemaExtension(
+  id: "example_extension",
+  name: "Example extension",
+  description: "A simple extension that adds node related fields.",
+  schema: "example"
+)]
 class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
   /**
    * {@inheritdoc}
