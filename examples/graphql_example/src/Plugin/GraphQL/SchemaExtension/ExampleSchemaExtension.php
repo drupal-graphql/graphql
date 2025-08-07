@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\graphql_examples\Plugin\GraphQL\SchemaExtension;
 
+use Drupal\graphql\Attribute\SchemaExtension;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 
 /**
  * Example schema extension that adds to the mapping.
- *
- * @SchemaExtension(
- *   id = "example_extension",
- *   name = "Example extension",
- *   description = "A simple extension that adds node related fields.",
- *   schema = "example"
- * )
  */
+#[SchemaExtension(
+  id: "example_extension",
+  name: "Example extension",
+  description: "A simple extension that adds node related fields.",
+  schema: "example"
+)]
 class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
 
   /**

@@ -22,6 +22,7 @@ class PersistedQueryPluginManager extends DefaultPluginManager {
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $definitionCacheBackend,
     ?string $pluginInterface,
+    string $pluginAttributeName,
     string $pluginAnnotationName,
     array $config,
   ) {
@@ -30,6 +31,7 @@ class PersistedQueryPluginManager extends DefaultPluginManager {
       $namespaces,
       $moduleHandler,
       $pluginInterface,
+      $pluginAttributeName,
       $pluginAnnotationName
     );
 

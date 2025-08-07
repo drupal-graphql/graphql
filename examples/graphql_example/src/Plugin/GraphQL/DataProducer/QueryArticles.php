@@ -8,6 +8,8 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\graphql_examples\Wrappers\QueryConnection;
@@ -17,26 +19,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Example data producer that loads a list of articles.
- *
- * @DataProducer(
- *   id = "query_articles",
- *   name = @Translation("Load articles"),
- *   description = @Translation("Loads a list of articles."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Article connection")
- *   ),
- *   consumes = {
- *     "offset" = @ContextDefinition("integer",
- *       label = @Translation("Offset"),
- *       required = FALSE
- *     ),
- *     "limit" = @ContextDefinition("integer",
- *       label = @Translation("Limit"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "query_articles",
+  name: "Load articles",
+  description: "Loads a list of articles.",
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: "Article connection"
+  ),
+  consumes: [
+    "offset" => new ContextDefinition(
+      data_type: "integer",
+      label: "Offset",
+      required: FALSE
+    ),
+    "limit" => new ContextDefinition(
+      data_type: "integer",
+      label: "Limit",
+      required: FALSE
+    ),
+  ]
+)]
 class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   const int MAX_LIMIT = 100;

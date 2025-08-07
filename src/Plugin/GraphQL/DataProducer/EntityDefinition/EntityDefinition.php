@@ -8,36 +8,41 @@ use Drupal\Core\Entity\EntityTypeBundleInfo;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Gets entity definition for a given entity type.
- *
- * @DataProducer(
- *   id = "entity_definition",
- *   name = @Translation("Entity definition"),
- *   description = @Translation("Return entity definitions for given entity type."),
- *   consumes = {
- *     "entity_type" = @ContextDefinition("string",
- *       label = @Translation("Entity type")
- *     ),
- *     "bundle" = @ContextDefinition("string",
- *       label = @Translation("Bundle"),
- *       required = FALSE
- *     ),
- *     "field_types" = @ContextDefinition("string",
- *       label = @Translation("Field types (ALL, BASE_FIELDS, FIELD_CONFIG)"),
- *       default = "ALL",
- *       required = FALSE
- *     )
- *   },
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Entity definition")
- *   )
- * )
  */
+#[DataProducer(
+  id: "entity_definition",
+  name: "Entity definition",
+  description: "Return entity definitions for given entity type.",
+  consumes: [
+    "entity_type" => new ContextDefinition(
+      data_type: "string",
+      label: "Entity type"
+    ),
+    "bundle" => new ContextDefinition(
+      data_type: "string",
+      label: "Bundle",
+      required: FALSE
+    ),
+    "field_types" => new ContextDefinition(
+      data_type: "string",
+      label: "Field types (ALL, BASE_FIELDS, FIELD_CONFIG)",
+      default_value: "ALL",
+      required: FALSE
+    ),
+  ],
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: "Entity definition"
+  )
+)]
 class EntityDefinition extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\graphql_examples\Plugin\GraphQL\Schema;
 
+use Drupal\graphql\Attribute\Schema;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
@@ -12,12 +13,11 @@ use Drupal\graphql_examples\Wrappers\QueryConnection;
 
 /**
  * Example schema plugin that maps article data.
- *
- * @Schema(
- *   id = "example",
- *   name = "Example schema"
- * )
  */
+#[Schema(
+  id: "example",
+  name: "Example schema"
+)]
 class ExampleSchema extends SdlSchemaPluginBase {
 
   /**

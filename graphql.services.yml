@@ -140,6 +140,7 @@ services:
       - '@module_handler'
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\SchemaPluginInterface'
+      - '\Drupal\graphql\Attribute\Schema'
       - '\Drupal\graphql\Annotation\Schema'
       - '%graphql.config%'
 
@@ -152,6 +153,7 @@ services:
       - '@module_handler'
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\SchemaExtensionPluginInterface'
+      - '\Drupal\graphql\Attribute\SchemaExtension'
       - '\Drupal\graphql\Annotation\SchemaExtension'
       - '%graphql.config%'
 
@@ -166,6 +168,7 @@ services:
       - '@cache_contexts_manager'
       - '@cache.graphql.results'
       - '\Drupal\graphql\Plugin\DataProducerPluginInterface'
+      - '\Drupal\graphql\Attribute\DataProducer'
       - '\Drupal\graphql\Annotation\DataProducer'
       - '%graphql.config%'
 
@@ -194,6 +197,7 @@ services:
       - '@module_handler'
       - '@cache.graphql.definitions'
       - '\Drupal\graphql\Plugin\PersistedQueryPluginInterface'
+      - '\Drupal\graphql\Attribute\PersistedQuery'
       - '\Drupal\graphql\Annotation\PersistedQuery'
       - '%graphql.config%'
 

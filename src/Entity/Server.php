@@ -7,7 +7,13 @@ namespace Drupal\graphql\Entity;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Controller\ServerListBuilder;
+use Drupal\graphql\Form\PersistedQueriesForm;
+use Drupal\graphql\Form\ServerForm;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
@@ -75,6 +81,46 @@ use GraphQL\Validator\Rules\QueryDepth;
  *   }
  * )
  */
+#[ConfigEntityType(
+  id: "graphql_server",
+  label: new TranslatableMarkup("Server"),
+  handlers: [
+    "list_builder" => ServerListBuilder::class,
+    "form" => [
+      "edit" => ServerForm::class,
+      "create" => ServerForm::class,
+      "delete" => EntityDeleteForm::class,
+      "persisted_queries" => PersistedQueriesForm::class,
+    ],
+  ],
+  config_prefix: "graphql_servers",
+  admin_permission: "administer graphql configuration",
+  entity_keys: [
+    "id" => "name",
+    "label" => "label",
+  ],
+  config_export: [
+    "name",
+    "label",
+    "schema",
+    "schema_configuration",
+    "persisted_queries_settings",
+    "endpoint",
+    "debug_flag",
+    "caching",
+    "batching",
+    "disable_introspection",
+    "query_depth",
+    "query_complexity",
+  ],
+  links: [
+    "collection" => "/admin/config/graphql/servers",
+    "create-form" => "/admin/config/graphql/servers/create",
+    "edit-form" => "/admin/config/graphql/servers/manage/{graphql_server}",
+    "delete-form" => "/admin/config/graphql/servers/manage/{graphql_server}/delete",
+    "persisted_queries-form" => "/admin/config/graphql/servers/manage/{graphql_server}/persisted_queries",
+  ]
+)]
 class Server extends ConfigEntityBase implements ServerInterface {
   use DependencySerializationTrait;
 

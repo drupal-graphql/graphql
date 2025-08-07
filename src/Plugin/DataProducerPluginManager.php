@@ -43,6 +43,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
     CacheContextsManager $contextsManager,
     CacheBackendInterface $resultCacheBackend,
     ?string $pluginInterface,
+    string $pluginAttributeName,
     string $pluginAnnotationName,
     array $config,
   ) {
@@ -51,6 +52,7 @@ class DataProducerPluginManager extends DefaultPluginManager {
       $namespaces,
       $moduleHandler,
       $pluginInterface,
+      $pluginAttributeName,
       $pluginAnnotationName
     );
 

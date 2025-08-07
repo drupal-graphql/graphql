@@ -38,6 +38,8 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
    *   The cache backend.
    * @param string|null $pluginInterface
    *   The interface each plugin should implement.
+   * @param string $pluginAttributeName
+   *   The name of the attribute that contains the plugin definition.
    * @param string $pluginAnnotationName
    *   The name of the annotation that contains the plugin definition.
    * @param array $config
@@ -49,6 +51,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $cacheBackend,
     ?string $pluginInterface,
+    string $pluginAttributeName,
     string $pluginAnnotationName,
     array $config,
   ) {
@@ -57,6 +60,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
       $namespaces,
       $moduleHandler,
       $pluginInterface,
+      $pluginAttributeName,
       $pluginAnnotationName
     );
 
