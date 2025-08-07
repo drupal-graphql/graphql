@@ -7,6 +7,7 @@ namespace Drupal\graphql\Plugin\GraphQL\PersistedQuery;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\graphql\Attribute\PersistedQuery;
 use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
 use GraphQL\Error\Error;
 use GraphQL\Server\OperationParams;
@@ -14,14 +15,13 @@ use GraphQL\Server\RequestError;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Load persisted queries from the cache.
- *
- * @PersistedQuery(
- *   id = "automatic_persisted_query",
- *   label = "Automatic Persisted Query",
- *   description = "Load persisted queries from the cache."
- * )
+ * Generates IDs for queries and loads persisted queries from the cache.
  */
+#[PersistedQuery(
+  id: "automatic_persisted_query",
+  label: "Automatic Persisted Query",
+  description: "Load persisted queries from the cache."
+)]
 class AutomaticPersistedQuery extends PersistedQueryPluginBase implements ContainerFactoryPluginInterface {
 
   /**

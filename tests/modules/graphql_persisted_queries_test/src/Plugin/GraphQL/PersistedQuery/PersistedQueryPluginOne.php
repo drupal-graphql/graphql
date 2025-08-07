@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\graphql_persisted_queries_test\Plugin\GraphQL\PersistedQuery;
 
+use Drupal\graphql\Attribute\PersistedQuery;
 use Drupal\graphql\PersistedQuery\PersistedQueryPluginBase;
 use GraphQL\Server\OperationParams;
 
 /**
  * Test persisted plugin.
- *
- * @PersistedQuery(
- *   id = "persisted_query_plugin_one",
- *   label = "Persisted Query One",
- *   description = "This is the first persisted query plugin"
- * )
  */
+#[PersistedQuery(
+  id: "persisted_query_plugin_one",
+  label: "Persisted Query One",
+  description: "This is the first persisted query plugin"
+)]
 class PersistedQueryPluginOne extends PersistedQueryPluginBase {
 
   /**
