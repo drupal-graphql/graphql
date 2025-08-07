@@ -17,7 +17,7 @@ use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
  *   id = "composable_extension",
  *   name = "Composable Example extension",
  *   description = "A simple extension that adds node related fields.",
- *   schema = "composable"
+ *   schema = "composable_example"
  * )
  */
 class ComposableSchemaExampleExtension extends SdlSchemaExtensionPluginBase {
