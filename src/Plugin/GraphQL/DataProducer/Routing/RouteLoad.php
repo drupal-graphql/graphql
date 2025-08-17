@@ -9,7 +9,10 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\redirect\RedirectRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,26 +21,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Returns the URL of the given path.
  *
  * @todo Fix the type of the output context.
- *
- * @DataProducer(
- *   id = "route_load",
- *   name = @Translation("Load route"),
- *   description = @Translation("Loads a route."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Route")
- *   ),
- *   consumes = {
- *     "path" = @ContextDefinition("string",
- *       label = @Translation("Path")
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Language"),
- *       required = FALSE,
- *       default_value = "und"
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "route_load",
+  name: new TranslatableMarkup("Load route"),
+  description: new TranslatableMarkup("Loads a route."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("Route")
+  ),
+  consumes: [
+    "path" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Path")
+    ),
+    "language" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Language"),
+      required: FALSE,
+      default_value: "und"
+    ),
+  ],
+)]
 class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

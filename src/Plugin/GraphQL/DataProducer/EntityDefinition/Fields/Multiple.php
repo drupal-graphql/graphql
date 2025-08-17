@@ -6,25 +6,29 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the "multiple" property from a given field definition.
- *
- * @DataProducer(
- *   id = "entity_definition_field_multiple",
- *   name = @Translation("Entity definition field multiple"),
- *   description = @Translation("Return entity definition field multiple."),
- *   consumes = {
- *     "entity_definition_field" = @ContextDefinition("any",
- *       label = @Translation("Entity definition field")
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition field multiple")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_field_multiple',
+  name: new TranslatableMarkup('Entity definition field multiple'),
+  description: new TranslatableMarkup('Return entity definition field multiple.'),
+  produces: new ContextDefinition(
+    data_type: 'boolean',
+    label: new TranslatableMarkup('Entity definition field multiple'),
+  ),
+  consumes: [
+    'entity_definition_field' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition field'),
+    ),
+  ],
+)]
 class Multiple extends DataProducerPluginBase {
 
   /**

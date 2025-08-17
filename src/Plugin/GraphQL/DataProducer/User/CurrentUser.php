@@ -5,23 +5,26 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Gets the current user.
- *
- * @DataProducer(
- *   id = "current_user",
- *   name = @Translation("Current user"),
- *   description = @Translation("Current logged in user."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Current user")
- *   )
- * )
  */
+#[DataProducer(
+  id: "current_user",
+  name: new TranslatableMarkup("Current user"),
+  description: new TranslatableMarkup("Current logged in user."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("Current user")
+  )
+)]
 class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

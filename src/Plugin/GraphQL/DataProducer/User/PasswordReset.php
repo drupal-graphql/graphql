@@ -6,7 +6,10 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Response\Response;
 use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -16,18 +19,18 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Resets the user's password (mutation).
- *
- * @DataProducer(
- *   id = "password_reset",
- *   name = @Translation("Password reset"),
- *   description = @Translation("Allows to reset the password."),
- *   consumes = {
- *     "email" = @ContextDefinition("email",
- *       label = @Translation("Email")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "password_reset",
+  name: new TranslatableMarkup("Password reset"),
+  description: new TranslatableMarkup("Allows to reset the password."),
+  consumes: [
+    "email" => new ContextDefinition(
+      data_type: "email",
+      label: new TranslatableMarkup("Email"),
+    ),
+  ],
+)]
 class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;

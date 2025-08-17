@@ -10,7 +10,10 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\FieldConfigInterface;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\taxonomy\TermStorageInterface;
@@ -18,41 +21,45 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Gets term items matching the given string in given field's vocabularies.
- *
- * @DataProducer(
- *   id = "term_field_autocomplete",
- *   name = @Translation("Term field autocomplete"),
- *   description = @Translation("Returns autocomplete items matched against given string for vocabularies in given field"),
- *   produces = @ContextDefinition("list",
- *     label = @Translation("List of term ids matching the string.")
- *   ),
- *   consumes = {
- *     "entity_type" = @ContextDefinition("string",
- *       label = @Translation("Entity type the searchable term field is attached to")
- *     ),
- *     "bundle" = @ContextDefinition("string",
- *       label = @Translation("Entity type the searchable term field is attached to")
- *     ),
- *     "field" = @ContextDefinition("string",
- *       label = @Translation("Field name to search the terms on")
- *     ),
- *     "match_string" = @ContextDefinition("string",
- *       label = @Translation("String to be matched"),
- *       required = FALSE
- *     ),
- *     "prioritize_start_with" = @ContextDefinition("boolean",
- *       label = @Translation("Whether terms which start with matching string should come first"),
- *       required = FALSE,
- *       default_value = TRUE
- *     ),
- *     "limit" = @ContextDefinition("integer",
- *       label = @Translation("Number of items to be returned"),
- *       required = FALSE,
- *       default_value = 10
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "term_field_autocomplete",
+  name: new TranslatableMarkup("Term field autocomplete"),
+  description: new TranslatableMarkup("Returns autocomplete items matched against given string for vocabularies in given field"),
+  produces: new ContextDefinition(
+    data_type: "list",
+    label: new TranslatableMarkup("List of term ids matching the string.")
+  ),
+  consumes: [
+    "entity_type" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity type the searchable term field is attached to")
+    ),
+    "bundle" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity type the searchable term field is attached to")
+    ),
+    "field" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Field name to search the terms on")
+    ),
+    "match_string" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("String to be matched"),
+      required: FALSE
+    ),
+    "match_operator" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Match operator"),
+      required: FALSE
+    ),
+    "limit" => new ContextDefinition(
+      data_type: "integer",
+      label: new TranslatableMarkup("Number of items to be returned"),
+      required: FALSE
+    ),
+  ]
+)]
 class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

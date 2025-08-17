@@ -5,25 +5,29 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the "label" from a given entity definition.
- *
- * @DataProducer(
- *   id = "entity_definition_label",
- *   name = @Translation("Entity definition label"),
- *   description = @Translation("Return entity definition label."),
- *   consumes = {
- *     "entity_definition" = @ContextDefinition("any",
- *       label = @Translation("Entity definition")
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition label")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_label',
+  name: new TranslatableMarkup('Entity definition label'),
+  description: new TranslatableMarkup('Return entity definition label.'),
+  produces: new ContextDefinition(
+    data_type: 'string',
+    label: new TranslatableMarkup('Entity definition label'),
+  ),
+  consumes: [
+    'entity_definition' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition'),
+    ),
+  ],
+)]
 class Label extends DataProducerPluginBase {
 
   /**

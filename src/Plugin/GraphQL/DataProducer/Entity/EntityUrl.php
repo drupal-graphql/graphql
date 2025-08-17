@@ -5,36 +5,44 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Returns the URL of an entity.
- *
- * @DataProducer(
- *   id = "entity_url",
- *   name = @Translation("Entity url"),
- *   description = @Translation("Returns the entity's url."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Url")
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     ),
- *     "rel" = @ContextDefinition("string",
- *       label = @Translation("Relationship type"),
- *       description = @Translation("The relationship type, e.g. canonical"),
- *       required = FALSE
- *     ),
- *     "options" = @ContextDefinition("any",
- *       label = @Translation("URL Options"),
- *       description = @Translation("Options to pass to the toUrl call"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_url",
+  name: new TranslatableMarkup("Entity url"),
+  description: new TranslatableMarkup("Returns the entity's url."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("Url"),
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity"),
+    ),
+    "rel" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Relationship type"),
+      // @phpstan-ignore-next-line Wrong doc comment in core.
+      description: new TranslatableMarkup("The relationship type, e.g. canonical"),
+      required: FALSE,
+    ),
+    "options" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("URL Options"),
+      // @phpstan-ignore-next-line Wrong doc comment in core.
+      description: new TranslatableMarkup("Options to pass to the toUrl call"),
+      required: FALSE,
+    ),
+  ],
+)]
 class EntityUrl extends DataProducerPluginBase {
 
   /**

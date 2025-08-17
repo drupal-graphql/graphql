@@ -7,26 +7,30 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the "status" property from a given field definition.
- *
- * @DataProducer(
- *   id = "entity_definition_field_status",
- *   name = @Translation("Entity definition field status"),
- *   description = @Translation("Return entity definition field status."),
- *   consumes = {
- *     "entity_definition_field" = @ContextDefinition("any",
- *       label = @Translation("Entity definition field")
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition field status")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_field_status',
+  name: new TranslatableMarkup('Entity definition field status'),
+  description: new TranslatableMarkup('Return entity definition field status.'),
+  produces: new ContextDefinition(
+    data_type: 'boolean',
+    label: new TranslatableMarkup('Entity definition field status'),
+  ),
+  consumes: [
+    'entity_definition_field' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition field'),
+    ),
+  ],
+)]
 class Status extends DataProducerPluginBase {
 
   /**

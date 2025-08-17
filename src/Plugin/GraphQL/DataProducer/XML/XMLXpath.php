@@ -4,29 +4,34 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * XPath query data producer.
- *
- * @DataProducer(
- *   id = "xml_xpath",
- *   name = @Translation("XML Path"),
- *   description = @Translation("A DOM element located at a specific path."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("DOM element"),
- *     multiple = TRUE
- *   ),
- *   consumes = {
- *     "dom" = @ContextDefinition("any",
- *       label = @Translation("The source DOM element")
- *     ),
- *    "query" = @ContextDefinition("string",
- *       label = @Translation("The xpath query")
- *     ),
- *   }
- * )
  */
+#[DataProducer(
+  id: "xml_xpath",
+  name: new TranslatableMarkup("XML Path"),
+  description: new TranslatableMarkup("A DOM element located at a specific path."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("DOM element"),
+    multiple: TRUE
+  ),
+  consumes: [
+    "dom" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("The source DOM element")
+    ),
+    "query" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("The xpath query")
+    ),
+  ]
+)]
 class XMLXpath extends DataProducerPluginBase {
 
   /**

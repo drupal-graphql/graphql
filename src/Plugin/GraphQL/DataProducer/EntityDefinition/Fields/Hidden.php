@@ -6,29 +6,34 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the "hidden" property from a given field definition.
- *
- * @DataProducer(
- *   id = "entity_definition_field_hidden",
- *   name = @Translation("Entity definition field hidden"),
- *   description = @Translation("Return entity definition field hidden."),
- *   consumes = {
- *     "entity_definition_field" = @ContextDefinition("any",
- *       label = @Translation("Entity definition field")
- *     ),
- *     "entity_form_display_context" = @ContextDefinition("any",
- *       label = @Translation("Entity form display context"),
- *       required = FALSE,
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition field hidden")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_field_hidden',
+  name: new TranslatableMarkup('Entity definition field hidden'),
+  description: new TranslatableMarkup('Return entity definition field hidden.'),
+  produces: new ContextDefinition(
+    data_type: 'string',
+    label: new TranslatableMarkup('Entity definition field hidden'),
+  ),
+  consumes: [
+    'entity_definition_field' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition field'),
+    ),
+    'entity_form_display_context' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity form display context'),
+      required: FALSE,
+    ),
+  ],
+)]
 class Hidden extends DataProducerPluginBase {
 
   /**

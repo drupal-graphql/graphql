@@ -10,7 +10,11 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -19,49 +23,56 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Loads entities from an entity reference field.
- *
- * @DataProducer(
- *   id = "entity_reference",
- *   name = @Translation("Entity reference"),
- *   description = @Translation("Loads entities from an entity reference field."),
- *   produces = @ContextDefinition("entity",
- *     label = @Translation("Entity"),
- *     multiple = TRUE
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Parent entity")
- *     ),
- *     "field" = @ContextDefinition("string",
- *       label = @Translation("Field name")
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity language"),
- *       required = FALSE
- *     ),
- *     "bundle" = @ContextDefinition("string",
- *       label = @Translation("Entity bundle(s)"),
- *       multiple = TRUE,
- *       required = FALSE
- *     ),
- *     "access" = @ContextDefinition("boolean",
- *       label = @Translation("Check access"),
- *       required = FALSE,
- *       default_value = TRUE
- *     ),
- *     "access_user" = @ContextDefinition("entity:user",
- *       label = @Translation("User"),
- *       required = FALSE,
- *       default_value = NULL
- *     ),
- *     "access_operation" = @ContextDefinition("string",
- *       label = @Translation("Operation"),
- *       required = FALSE,
- *       default_value = "view"
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_reference",
+  name: new TranslatableMarkup("Entity reference"),
+  description: new TranslatableMarkup("Loads entities from an entity reference field."),
+  produces: new ContextDefinition(
+    data_type: "entity",
+    label: new TranslatableMarkup("Entity"),
+    multiple: TRUE
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Parent entity")
+    ),
+    "field" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Field name")
+    ),
+    "language" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity language"),
+      required: FALSE
+    ),
+    "bundle" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity bundle(s)"),
+      required: FALSE,
+      multiple: TRUE
+    ),
+    "access" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Check access"),
+      required: FALSE,
+      default_value: TRUE
+    ),
+    "access_user" => new EntityContextDefinition(
+      data_type: "entity:user",
+      label: new TranslatableMarkup("User"),
+      required: FALSE,
+      default_value: NULL
+    ),
+    "access_operation" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Operation"),
+      required: FALSE,
+      default_value: "view"
+    ),
+  ]
+)]
 class EntityReference extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   use EntityReferenceTrait;

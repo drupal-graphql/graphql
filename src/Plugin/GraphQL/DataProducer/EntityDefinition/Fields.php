@@ -11,36 +11,42 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Retrieve the list of fields from a given entity definition.
- *
- * @DataProducer(
- *   id = "entity_definition_fields",
- *   name = @Translation("Entity definition fields"),
- *   description = @Translation("Return entity definition fields."),
- *   consumes = {
- *     "entity_definition" = @ContextDefinition("any",
- *       label = @Translation("Entity definition")
- *     ),
- *     "bundle_context" = @ContextDefinition("any",
- *       label = @Translation("Bundle context"),
- *       required = FALSE,
- *     ),
- *     "field_types_context" = @ContextDefinition("string",
- *       label = @Translation("Field types context"),
- *       required = FALSE,
- *     )
- *   },
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Entity definition field")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_fields',
+  name: new TranslatableMarkup('Entity definition fields'),
+  description: new TranslatableMarkup('Return entity definition fields.'),
+  produces: new ContextDefinition(
+    data_type: 'any',
+    label: new TranslatableMarkup('Entity definition field'),
+  ),
+  consumes: [
+    'entity_definition' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition'),
+    ),
+    'bundle_context' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Bundle context'),
+      required: FALSE,
+    ),
+    'field_types_context' => new ContextDefinition(
+      data_type: 'string',
+      label: new TranslatableMarkup('Field types context'),
+      required: FALSE,
+    ),
+  ],
+)]
 class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

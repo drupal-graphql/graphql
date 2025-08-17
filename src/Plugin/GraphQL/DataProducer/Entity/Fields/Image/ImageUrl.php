@@ -8,29 +8,33 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Returns the file URL of a file entity.
- *
- * @DataProducer(
- *   id = "image_url",
- *   name = @Translation("Image URL"),
- *   description = @Translation("Returns the url of an image entity."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("URL")
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "image_url",
+  name: new TranslatableMarkup("Image URL"),
+  description: new TranslatableMarkup("Returns the url of an image entity."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("URL"),
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity"),
+    ),
+  ],
+)]
 class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

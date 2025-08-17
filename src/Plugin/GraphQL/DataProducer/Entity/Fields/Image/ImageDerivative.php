@@ -8,34 +8,39 @@ use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Returns an image style derivative of an image.
- *
- * @DataProducer(
- *   id = "image_derivative",
- *   name = @Translation("Image Derivative"),
- *   description = @Translation("Returns an image derivative."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Image derivative properties")
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity"),
- *       required = FALSE
- *     ),
- *     "style" = @ContextDefinition("string",
- *       label = @Translation("Image style")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "image_derivative",
+  name: new TranslatableMarkup("Image Derivative"),
+  description: new TranslatableMarkup("Returns an image derivative."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("Image derivative properties")
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity"),
+      required: FALSE
+    ),
+    "style" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Image style")
+    ),
+  ]
+)]
 class ImageDerivative extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

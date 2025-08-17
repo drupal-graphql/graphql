@@ -15,9 +15,9 @@ class DataProducer extends Plugin {
 
   public function __construct(
     public readonly string $id,
-    public readonly string $name,
-    public readonly ContextDefinition $produces,
-    public readonly string $description = '',
+    public readonly string|\Stringable $name,
+    public readonly string|\Stringable $description = '',
+    public readonly ?ContextDefinition $produces = NULL,
     public readonly array $consumes = [],
   ) {
   }

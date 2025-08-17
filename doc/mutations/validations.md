@@ -107,7 +107,10 @@ Now we will make the mutation return a type that the module exposes which is the
 namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 use Drupal\node\Entity\Node;
@@ -115,29 +118,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Creates a new article entity.
- *
- * @DataProducer(
- *   id = "create_article",
- *   name = @Translation("Create Article"),
- *   description = @Translation("Creates a new article."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Article")
- *   ),
- *   consumes = {
- *     "data" = @ContextDefinition("any",
- *       label = @Translation("Article data")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: 'create_article',
+  name: new TranslatableMarkup('Create Article'),
+  description: new TranslatableMarkup('Creates a new article.'),
+  produces: new ContextDefinition(
+    data_type: 'any',
+    label: new TranslatableMarkup('Article'),
+  ),
+  consumes: [
+    'data' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Article data'),
+    ),
+  ],
+)]
 class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
 
   /**
    * {@inheritdoc}
@@ -200,7 +202,6 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
   }
 
 }
-
 ```
 
 We have added a new type that is returned `$response` where we call the `setArticle` method and if there are some validation errors we call the `addValidation` method to register in the errors property. Next we will resolve both these fields.

@@ -6,30 +6,35 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Returns the changed time of an entity if it supports it.
- *
- * @DataProducer(
- *   id = "entity_changed",
- *   name = @Translation("Entity changed date"),
- *   description = @Translation("Returns the entity changed date."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Changed date"),
- *     required = FALSE
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     ),
- *     "format" = @ContextDefinition("string",
- *       label = @Translation("Date format"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_changed",
+  name: new TranslatableMarkup("Entity changed date"),
+  description: new TranslatableMarkup("Returns the entity changed date."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Changed date"),
+    required: FALSE,
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity"),
+    ),
+    "format" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Date format"),
+      required: FALSE,
+    ),
+  ],
+)]
 class EntityChanged extends DataProducerPluginBase {
 
   /**

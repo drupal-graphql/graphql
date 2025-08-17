@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
 /**
@@ -48,55 +51,62 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *     )
  *   );
  * @endcode
- *
- * @DataProducer(
- *   id = "entity_query_count",
- *   name = @Translation("Load entities"),
- *   description = @Translation("Loads entities."),
- *   produces = @ContextDefinition("integer",
- *     label = @Translation("Total count of items queried by entity query."),
- *   ),
- *   consumes = {
- *     "type" = @ContextDefinition("string",
- *       label = @Translation("Entity type")
- *     ),
- *     "owned_only" = @ContextDefinition("boolean",
- *       label = @Translation("Query only owned entities"),
- *       required = FALSE,
- *       default_value = FALSE
- *     ),
- *     "conditions" = @ContextDefinition("any",
- *       label = @Translation("Conditions"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "allowed_filters" = @ContextDefinition("string",
- *       label = @Translation("Allowed filters"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "languages" = @ContextDefinition("string",
- *       label = @Translation("Entity languages"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "bundles" = @ContextDefinition("any",
- *       label = @Translation("Entity bundles"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "access" = @ContextDefinition("boolean",
- *       label = @Translation("Check access"),
- *       required = FALSE,
- *       default_value = TRUE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_query_count",
+  name: new TranslatableMarkup("Load entities"),
+  description: new TranslatableMarkup("Loads entities."),
+  produces: new ContextDefinition(
+    data_type: "integer",
+    label: new TranslatableMarkup("Total count of items queried by entity query."),
+  ),
+  consumes: [
+    "type" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity type"),
+    ),
+    "owned_only" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Query only owned entities"),
+      required: FALSE,
+      default_value: FALSE,
+    ),
+    "conditions" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("Conditions"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "allowed_filters" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Allowed filters"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "languages" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity languages"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "bundles" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("Entity bundles"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "access" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Check access"),
+      required: FALSE,
+      default_value: TRUE,
+    ),
+  ],
+)]
 class EntityQueryCount extends EntityQueryBase {
 
   /**

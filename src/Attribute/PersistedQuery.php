@@ -14,8 +14,8 @@ class PersistedQuery extends Plugin {
 
   public function __construct(
     public readonly string $id,
-    public readonly string $label,
-    public readonly string $description = '',
+    public readonly string|\Stringable $label,
+    public readonly string|\Stringable $description = '',
   ) {
   }
 

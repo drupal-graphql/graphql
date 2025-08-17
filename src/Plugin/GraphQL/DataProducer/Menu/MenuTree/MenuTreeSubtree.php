@@ -5,28 +5,32 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuTree;
 
 use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Returns a list of menu links under the menu tree element.
  *
  * @todo Fix input and output context type.
- *
- * @DataProducer(
- *   id = "menu_tree_subtree",
- *   name = @Translation("Menu tree subtree"),
- *   description = @Translation("Returns the subtree of a menu tree element."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Menu link tree element"),
- *     multiple = TRUE
- *   ),
- *   consumes = {
- *     "element" = @ContextDefinition("any",
- *       label = @Translation("Menu link tree element")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: 'menu_tree_subtree',
+  name: new TranslatableMarkup('Menu tree subtree'),
+  description: new TranslatableMarkup('Returns the subtree of a menu tree element.'),
+  produces: new ContextDefinition(
+    data_type: 'any',
+    label: new TranslatableMarkup('Menu link tree element'),
+    multiple: TRUE,
+  ),
+  consumes: [
+    'element' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Menu link tree element'),
+    ),
+  ],
+)]
 class MenuTreeSubtree extends DataProducerPluginBase {
 
   /**

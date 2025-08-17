@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * XML child nodes content data producer.
- *
- * @DataProducer(
- *   id = "xml_content",
- *   name = @Translation("XML Content"),
- *   description = @Translation("The content of a DOM element."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Content"),
- *   ),
- *   consumes = {
- *     "dom" = @ContextDefinition("any",
- *       label = @Translation("The DOM element")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "xml_content",
+  name: new TranslatableMarkup("XML Content"),
+  description: new TranslatableMarkup("The content of a DOM element."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Content")
+  ),
+  consumes: [
+    "dom" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("The DOM element")
+    ),
+  ]
+)]
 class XMLContent extends DataProducerPluginBase {
 
   /**

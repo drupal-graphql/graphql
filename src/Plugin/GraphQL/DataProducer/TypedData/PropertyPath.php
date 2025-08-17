@@ -5,38 +5,44 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\TypedData;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataTrait;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\typed_data\DataFetcherTrait;
 use Drupal\typed_data\Exception\InvalidArgumentException;
 
 /**
  * Resolves a typed data value at a given property path.
- *
- * @DataProducer(
- *   id = "property_path",
- *   name = @Translation("Property path"),
- *   description = @Translation("Resolves a typed data value at a given property path."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Property value")
- *   ),
- *   consumes = {
- *     "path" = @ContextDefinition("string",
- *       label = @Translation("Property path")
- *     ),
- *     "value" = @ContextDefinition("any",
- *       label = @Translation("Root value")
- *     ),
- *     "type" = @ContextDefinition("string",
- *       label = @Translation("Root type"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "property_path",
+  name: new TranslatableMarkup("Property path"),
+  description: new TranslatableMarkup("Resolves a typed data value at a given property path."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("Property value")
+  ),
+  consumes: [
+    "path" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Property path")
+    ),
+    "value" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("Root value")
+    ),
+    "type" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Root type"),
+      required: FALSE
+    ),
+  ]
+)]
 class PropertyPath extends DataProducerPluginBase {
   use TypedDataTrait;
   use DataFetcherTrait;

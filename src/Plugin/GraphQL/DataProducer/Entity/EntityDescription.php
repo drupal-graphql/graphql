@@ -6,25 +6,29 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Returns the description text of an entity.
- *
- * @DataProducer(
- *   id = "entity_description",
- *   name = @Translation("Entity description"),
- *   description = @Translation("Returns the entity description."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Description")
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_description",
+  name: new TranslatableMarkup("Entity description"),
+  description: new TranslatableMarkup("Returns the entity description."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Description")
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity")
+    ),
+  ]
+)]
 class EntityDescription extends DataProducerPluginBase {
 
   /**

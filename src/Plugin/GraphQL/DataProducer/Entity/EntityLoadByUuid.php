@@ -8,7 +8,11 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\EntityUuidBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -17,48 +21,55 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Loads an entity by UUID.
- *
- * @DataProducer(
- *   id = "entity_load_by_uuid",
- *   name = @Translation("Load entity by uuid"),
- *   description = @Translation("Loads a single entity by uuid."),
- *   produces = @ContextDefinition("entity",
- *     label = @Translation("Entity")
- *   ),
- *   consumes = {
- *     "type" = @ContextDefinition("string",
- *       label = @Translation("Entity type")
- *     ),
- *     "uuid" = @ContextDefinition("string",
- *       label = @Translation("Unique identifier")
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Entity language"),
- *       required = FALSE
- *     ),
- *     "bundles" = @ContextDefinition("string",
- *       label = @Translation("Entity bundle(s)"),
- *       multiple = TRUE,
- *       required = FALSE
- *     ),
- *     "access" = @ContextDefinition("boolean",
- *       label = @Translation("Check access"),
- *       required = FALSE,
- *       default_value = TRUE
- *     ),
- *     "access_user" = @ContextDefinition("entity:user",
- *       label = @Translation("User"),
- *       required = FALSE,
- *       default_value = NULL
- *     ),
- *     "access_operation" = @ContextDefinition("string",
- *       label = @Translation("Operation"),
- *       required = FALSE,
- *       default_value = "view"
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_load_by_uuid",
+  name: new TranslatableMarkup("Load entity by uuid"),
+  description: new TranslatableMarkup("Loads a single entity by uuid."),
+  produces: new ContextDefinition(
+    data_type: "entity",
+    label: new TranslatableMarkup("Entity")
+  ),
+  consumes: [
+    "type" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity type")
+    ),
+    "uuid" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Unique identifier")
+    ),
+    "language" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity language"),
+      required: FALSE
+    ),
+    "bundles" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity bundle(s)"),
+      multiple: TRUE,
+      required: FALSE
+    ),
+    "access" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Check access"),
+      required: FALSE,
+      default_value: TRUE
+    ),
+    "access_user" => new EntityContextDefinition(
+      data_type: "entity:user",
+      label: new TranslatableMarkup("User"),
+      required: FALSE,
+      default_value: NULL
+    ),
+    "access_operation" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Operation"),
+      required: FALSE,
+      default_value: "view"
+    ),
+  ],
+)]
 class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

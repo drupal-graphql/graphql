@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
 use Drupal\node\Entity\Node;
@@ -14,21 +17,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Creates a new article entity.
- *
- * @DataProducer(
- *   id = "create_article",
- *   name = @Translation("Create Article"),
- *   description = @Translation("Creates a new article."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Article")
- *   ),
- *   consumes = {
- *     "data" = @ContextDefinition("any",
- *       label = @Translation("Article data")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: 'create_article',
+  name: new TranslatableMarkup('Create Article'),
+  description: new TranslatableMarkup('Creates a new article.'),
+  produces: new ContextDefinition(
+    data_type: 'any',
+    label: new TranslatableMarkup('Article'),
+  ),
+  consumes: [
+    'data' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Article data'),
+    ),
+  ],
+)]
 class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;

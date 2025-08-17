@@ -29,30 +29,31 @@ Now that we have this we need to make a resolver that actually loads this user, 
 namespace Drupal\example\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Gets the ID of current user.
- *
- * @DataProducer(
- *   id = "current_user",
- *   name = @Translation("Current user"),
- *   description = @Translation("Current logged in user."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Current user")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'current_user',
+  name: new TranslatableMarkup('Current user'),
+  description: new TranslatableMarkup('Current logged in user.'),
+  produces: new ContextDefinition(
+    data_type: 'integer',
+    label: new TranslatableMarkup('Current user ID'),
+  ),
+)]
 class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
 
   /**
    * {@inheritdoc}
@@ -94,7 +95,6 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
   }
 
 }
-
 ```
 
 We are defining a custom data producer `current_user` that we can now use to resolve our query that we previously added to the schema.  Notice that our data producer returns only the user id and not the actual user object. However we can combine it with an entity_load which is already made very efficient with in the module (taking advantage of caching strategies using buffering) so we don't have to actually load the user here.

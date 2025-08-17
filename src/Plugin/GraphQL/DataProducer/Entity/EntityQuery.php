@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 
 /**
@@ -46,72 +49,82 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
  *     )
  *   );
  * @endcode
- *
- * @DataProducer(
- *   id = "entity_query",
- *   name = @Translation("Load entities"),
- *   description = @Translation("Returns entity IDs for a given query"),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity IDs"),
- *     multiple = TRUE
- *   ),
- *   consumes = {
- *     "type" = @ContextDefinition("string",
- *       label = @Translation("Entity type")
- *     ),
- *     "limit" = @ContextDefinition("integer",
- *       label = @Translation("Limit"),
- *       required = FALSE,
- *       default_value = 10
- *     ),
- *     "offset" = @ContextDefinition("integer",
- *       label = @Translation("Offset"),
- *       required = FALSE,
- *       default_value = 0
- *     ),
- *     "owned_only" = @ContextDefinition("boolean",
- *       label = @Translation("Query only owned entities"),
- *       required = FALSE,
- *       default_value = FALSE
- *     ),
- *     "conditions" = @ContextDefinition("any",
- *       label = @Translation("Conditions"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "allowed_filters" = @ContextDefinition("string",
- *       label = @Translation("Allowed filters"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "languages" = @ContextDefinition("string",
- *       label = @Translation("Entity languages"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "bundles" = @ContextDefinition("any",
- *       label = @Translation("Entity bundles"),
- *       multiple = TRUE,
- *       required = FALSE,
- *       default_value = {}
- *     ),
- *     "access" = @ContextDefinition("boolean",
- *       label = @Translation("Check access"),
- *       required = FALSE,
- *       default_value = TRUE
- *     ),
- *     "sorts" = @ContextDefinition("any",
- *       label = @Translation("Sorts"),
- *       multiple = TRUE,
- *       default_value = {},
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_query",
+  name: new TranslatableMarkup("Load entities"),
+  description: new TranslatableMarkup("Returns entity IDs for a given query"),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Entity IDs"),
+    multiple: TRUE,
+  ),
+  consumes: [
+    "type" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity type"),
+    ),
+    "limit" => new ContextDefinition(
+      data_type: "integer",
+      label: new TranslatableMarkup("Limit"),
+      required: FALSE,
+      default_value: 10,
+    ),
+    "offset" => new ContextDefinition(
+      data_type: "integer",
+      label: new TranslatableMarkup("Offset"),
+      required: FALSE,
+      default_value: 0,
+    ),
+    "owned_only" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Query only owned entities"),
+      required: FALSE,
+      default_value: FALSE,
+    ),
+    "conditions" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("Conditions"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "allowed_filters" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Allowed filters"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "languages" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Entity languages"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "bundles" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("Entity bundles"),
+      multiple: TRUE,
+      required: FALSE,
+      default_value: [],
+    ),
+    "access" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Check access"),
+      required: FALSE,
+      default_value: TRUE,
+    ),
+    "sorts" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("Sorts"),
+      multiple: TRUE,
+      default_value: [],
+      required: FALSE,
+    ),
+  ],
+)]
 class EntityQuery extends EntityQueryBase {
 
   /**

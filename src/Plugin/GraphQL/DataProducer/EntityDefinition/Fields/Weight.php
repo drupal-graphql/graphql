@@ -6,29 +6,34 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the weight value of a field.
- *
- * @DataProducer(
- *   id = "entity_definition_field_weight",
- *   name = @Translation("Entity definition field weight"),
- *   description = @Translation("Return entity definition field weight."),
- *   consumes = {
- *     "entity_definition_field" = @ContextDefinition("any",
- *       label = @Translation("Entity definition field")
- *     ),
- *     "entity_form_display_context" = @ContextDefinition("any",
- *       label = @Translation("Entity form display context"),
- *       required = FALSE,
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition field weight")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_field_weight',
+  name: new TranslatableMarkup('Entity definition field weight'),
+  description: new TranslatableMarkup('Return entity definition field weight.'),
+  produces: new ContextDefinition(
+    data_type: 'integer',
+    label: new TranslatableMarkup('Entity definition field weight'),
+  ),
+  consumes: [
+    'entity_definition_field' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition field'),
+    ),
+    'entity_form_display_context' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity form display context'),
+      required: FALSE,
+    ),
+  ],
+)]
 class Weight extends DataProducerPluginBase {
 
   /**

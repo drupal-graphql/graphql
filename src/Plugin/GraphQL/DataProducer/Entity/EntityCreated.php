@@ -5,30 +5,35 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Returns the created time of an entity if it supports it.
- *
- * @DataProducer(
- *   id = "entity_created",
- *   name = @Translation("Entity created date"),
- *   description = @Translation("Returns the entity created date."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Creation date"),
- *     required = FALSE
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     ),
- *     "format" = @ContextDefinition("string",
- *       label = @Translation("Date format"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_created",
+  name: new TranslatableMarkup("Entity created date"),
+  description: new TranslatableMarkup("Returns the entity created date."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Creation date"),
+    required: FALSE
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity")
+    ),
+    "format" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Date format"),
+      required: FALSE
+    ),
+  ]
+)]
 class EntityCreated extends DataProducerPluginBase {
 
   /**

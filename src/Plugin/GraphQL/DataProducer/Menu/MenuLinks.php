@@ -9,6 +9,10 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\system\MenuInterface;
@@ -18,22 +22,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Return the menu links of a menu.
  *
  * @todo Fix output context type.
- *
- * @DataProducer(
- *   id = "menu_links",
- *   name = @Translation("Menu links"),
- *   description = @Translation("Returns the menu links of a menu."),
- *   produces = @ContextDefinition("any",
- *     label = @Translation("Menu link"),
- *     multiple = TRUE
- *   ),
- *   consumes = {
- *     "menu" = @ContextDefinition("entity:menu",
- *       label = @Translation("Menu")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "menu_links",
+  name: new TranslatableMarkup("Menu links"),
+  description: new TranslatableMarkup("Returns the menu links of a menu."),
+  produces: new ContextDefinition(
+    data_type: "any",
+    label: new TranslatableMarkup("Menu link"),
+    multiple: TRUE,
+  ),
+  consumes: [
+    "menu" => new EntityContextDefinition(
+      data_type: "entity:menu",
+      label: new TranslatableMarkup("Menu"),
+    ),
+  ],
+)]
 class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 

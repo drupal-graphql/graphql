@@ -7,7 +7,11 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -16,50 +20,55 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Loads the taxonomy tree.
- *
- * @DataProducer(
- *   id = "taxonomy_load_tree",
- *   name = @Translation("Load multiple taxonomy terms"),
- *   description = @Translation("Loads Taxonomy terms as a tree"),
- *   produces = @ContextDefinition("taxonomy tree",
- *     label = @Translation("Taxonomy tree")
- *   ),
- *   consumes = {
- *     "vid" = @ContextDefinition("string",
- *       label = @Translation("Vocabulary id")
- *     ),
- *     "parent" = @ContextDefinition("integer",
- *       label = @Translation("The term ID under which to generate the tree"),
- *       required = FALSE
- *     ),
- *     "max_depth" = @ContextDefinition("integer",
- *       label = @Translation("Maximum tree depth"),
- *       required = FALSE
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Language"),
- *       required = FALSE
- *     ),
- *     "access" = @ContextDefinition("boolean",
- *       label = @Translation("Check access"),
- *       required = FALSE,
- *       default_value = TRUE
- *     ),
- *     "access_user" = @ContextDefinition("entity:user",
- *       label = @Translation("User"),
- *       required = FALSE,
- *       default_value = NULL
- *     ),
- *     "access_operation" = @ContextDefinition("string",
- *       label = @Translation("Operation"),
- *       required = FALSE,
- *       default_value = "view"
- *     )
- *   }
- * )
- *   }
- * )
  */
+#[DataProducer(
+  id: "taxonomy_load_tree",
+  name: new TranslatableMarkup("Load multiple taxonomy terms"),
+  description: new TranslatableMarkup("Loads Taxonomy terms as a tree"),
+  produces: new ContextDefinition(
+    data_type: "taxonomy tree",
+    label: new TranslatableMarkup("Taxonomy tree")
+  ),
+  consumes: [
+    "vid" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Vocabulary id")
+    ),
+    "parent" => new ContextDefinition(
+      data_type: "integer",
+      label: new TranslatableMarkup("The term ID under which to generate the tree"),
+      required: FALSE
+    ),
+    "max_depth" => new ContextDefinition(
+      data_type: "integer",
+      label: new TranslatableMarkup("Maximum tree depth"),
+      required: FALSE
+    ),
+    "language" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Language"),
+      required: FALSE
+    ),
+    "access" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Check access"),
+      required: FALSE,
+      default_value: TRUE
+    ),
+    "access_user" => new EntityContextDefinition(
+      data_type: "entity:user",
+      label: new TranslatableMarkup("User"),
+      required: FALSE,
+      default_value: NULL
+    ),
+    "access_operation" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Operation"),
+      required: FALSE,
+      default_value: "view"
+    ),
+  ]
+)]
 class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**

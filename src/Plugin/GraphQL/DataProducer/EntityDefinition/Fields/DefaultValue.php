@@ -5,25 +5,29 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the "default_value" property from a given field definition.
- *
- * @DataProducer(
- *   id = "entity_definition_field_default_value",
- *   name = @Translation("Entity definition field default_value"),
- *   description = @Translation("Return entity definition field default_value."),
- *   consumes = {
- *     "entity_definition_field" = @ContextDefinition("any",
- *       label = @Translation("Entity definition field")
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition field default_value")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_field_default_value',
+  name: new TranslatableMarkup('Entity definition field default_value'),
+  description: new TranslatableMarkup('Return entity definition field default_value.'),
+  produces: new ContextDefinition(
+    data_type: 'string',
+    label: new TranslatableMarkup('Entity definition field default_value'),
+  ),
+  consumes: [
+    'entity_definition_field' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition field'),
+    ),
+  ],
+)]
 class DefaultValue extends DataProducerPluginBase {
 
   /**

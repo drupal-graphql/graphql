@@ -4,28 +4,33 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\XML;
 
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * XML attribute data producer.
- *
- * @DataProducer(
- *   id = "xml_attribute",
- *   name = @Translation("XML Attribute"),
- *   description = @Translation("The attribute of a DOM element."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Content"),
- *   ),
- *   consumes = {
- *     "dom" = @ContextDefinition("any",
- *       label = @Translation("The DOM element")
- *     ),
- *     "name" = @ContextDefinition("string",
- *       label = @Translation("The name of the attribute")
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "xml_attribute",
+  name: new TranslatableMarkup("XML Attribute"),
+  description: new TranslatableMarkup("The attribute of a DOM element."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Content")
+  ),
+  consumes: [
+    "dom" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("The DOM element")
+    ),
+    "name" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("The name of the attribute")
+    ),
+  ]
+)]
 class XMLAttribute extends DataProducerPluginBase {
 
   /**

@@ -10,32 +10,37 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Returns the rendered entity in a given view mode.
- *
- * @DataProducer(
- *   id = "entity_rendered",
- *   name = @Translation("Entity rendered"),
- *   description = @Translation("Returns the rendered entity."),
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Rendered output")
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     ),
- *     "mode" = @ContextDefinition("string",
- *       label = @Translation("View mode"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_rendered",
+  name: new TranslatableMarkup("Entity rendered"),
+  description: new TranslatableMarkup("Returns the rendered entity."),
+  produces: new ContextDefinition(
+    data_type: "string",
+    label: new TranslatableMarkup("Rendered output")
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity")
+    ),
+    "mode" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("View mode"),
+      required: FALSE
+    ),
+  ],
+)]
 class EntityRendered extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 

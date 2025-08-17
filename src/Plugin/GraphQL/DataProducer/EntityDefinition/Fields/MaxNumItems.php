@@ -6,25 +6,29 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition\Fields;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 
 /**
  * Retrieves the "max_num_items" property from a given field definition.
- *
- * @DataProducer(
- *   id = "entity_definition_field_max_num_items",
- *   name = @Translation("Entity definition field max_num_items"),
- *   description = @Translation("Return entity definition field max_num_items."),
- *   consumes = {
- *     "entity_definition_field" = @ContextDefinition("any",
- *       label = @Translation("Entity definition field")
- *     )
- *   },
- *   produces = @ContextDefinition("string",
- *     label = @Translation("Entity definition field max_num_items")
- *   )
- * )
  */
+#[DataProducer(
+  id: 'entity_definition_field_max_num_items',
+  name: new TranslatableMarkup('Entity definition field max_num_items'),
+  description: new TranslatableMarkup('Return entity definition field max_num_items.'),
+  produces: new ContextDefinition(
+    data_type: 'integer',
+    label: new TranslatableMarkup('Entity definition field max_num_items'),
+  ),
+  consumes: [
+    'entity_definition_field' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Entity definition field'),
+    ),
+  ],
+)]
 class MaxNumItems extends DataProducerPluginBase {
 
   /**

@@ -10,46 +10,55 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Returns the entity in a given language.
- *
- * @DataProducer(
- *   id = "entity_translation",
- *   name = @Translation("Entity translation"),
- *   description = @Translation("Returns the translated entity."),
- *   produces = @ContextDefinition("entity",
- *     label = @Translation("Translated entity")
- *   ),
- *   consumes = {
- *     "entity" = @ContextDefinition("entity",
- *       label = @Translation("Entity")
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Language")
- *     ),
- *     "access" = @ContextDefinition("boolean",
- *       label = @Translation("Check access"),
- *       required = FALSE,
- *       default_value = TRUE
- *     ),
- *     "access_user" = @ContextDefinition("entity:user",
- *       label = @Translation("User"),
- *       required = FALSE,
- *       default_value = NULL
- *     ),
- *     "access_operation" = @ContextDefinition("string",
- *       label = @Translation("Operation"),
- *       required = FALSE,
- *       default_value = "view"
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "entity_translation",
+  name: new TranslatableMarkup("Entity translation"),
+  description: new TranslatableMarkup("Returns the translated entity."),
+  produces: new ContextDefinition(
+    data_type: "entity",
+    label: new TranslatableMarkup("Translated entity")
+  ),
+  consumes: [
+    "entity" => new ContextDefinition(
+      data_type: "entity",
+      label: new TranslatableMarkup("Entity")
+    ),
+    "language" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Language")
+    ),
+    "access" => new ContextDefinition(
+      data_type: "boolean",
+      label: new TranslatableMarkup("Check access"),
+      required: FALSE,
+      default_value: TRUE
+    ),
+    "access_user" => new EntityContextDefinition(
+      data_type: "entity:user",
+      label: new TranslatableMarkup("User"),
+      required: FALSE,
+      default_value: NULL
+    ),
+    "access_operation" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Operation"),
+      required: FALSE,
+      default_value: "view"
+    ),
+  ],
+)]
 class EntityTranslation extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 

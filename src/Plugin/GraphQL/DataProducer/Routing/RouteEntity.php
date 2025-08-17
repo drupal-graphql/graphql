@@ -9,7 +9,10 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Buffers\EntityBuffer;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
@@ -18,25 +21,27 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Loads the entity associated with the current URL.
- *
- * @DataProducer(
- *   id = "route_entity",
- *   name = @Translation("Load entity by uuid"),
- *   description = @Translation("The entity belonging to the current url."),
- *   produces = @ContextDefinition("entity",
- *     label = @Translation("Entity")
- *   ),
- *   consumes = {
- *     "url" = @ContextDefinition("any",
- *       label = @Translation("The URL")
- *     ),
- *     "language" = @ContextDefinition("string",
- *       label = @Translation("Language"),
- *       required = FALSE
- *     )
- *   }
- * )
  */
+#[DataProducer(
+  id: "route_entity",
+  name: new TranslatableMarkup("Load entity by uuid"),
+  description: new TranslatableMarkup("The entity belonging to the current url."),
+  produces: new ContextDefinition(
+    data_type: "entity",
+    label: new TranslatableMarkup("Entity"),
+  ),
+  consumes: [
+    "url" => new ContextDefinition(
+      data_type: "any",
+      label: new TranslatableMarkup("The URL"),
+    ),
+    "language" => new ContextDefinition(
+      data_type: "string",
+      label: new TranslatableMarkup("Language"),
+      required: FALSE,
+    ),
+  ],
+)]
 class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
   use DependencySerializationTrait;
 
