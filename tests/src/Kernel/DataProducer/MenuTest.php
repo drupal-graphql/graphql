@@ -68,6 +68,7 @@ class MenuTest extends GraphQLTestBase {
 
     $child_1 = $base_options + [
       'link' => ['uri' => 'internal:/menu-test/hierarchy/parent/child'],
+      'description' => 'Child 1 description',
       'parent' => $links['parent'],
     ];
     $link = MenuLinkContent::create($child_1);
@@ -92,6 +93,7 @@ class MenuTest extends GraphQLTestBase {
 
     $child_2 = $base_options + [
       'link' => ['uri' => 'internal:/menu-test/hierarchy/parent/child'],
+      'description' => NULL,
       'parent' => $links['parent'],
     ];
     $link = MenuLinkContent::create($child_2);
@@ -176,6 +178,13 @@ class MenuTest extends GraphQLTestBase {
       ]);
 
       $this->assertEquals($link_tree->link->getDescription(), $result);
+
+      foreach ($link_tree->subtree as $link) {
+        $result = $this->executeDataProducer('menu_link_description', [
+          'link' => $link->link,
+        ]);
+        $this->assertEquals($link->link->getDescription(), $result);
+      }
     }
   }
 

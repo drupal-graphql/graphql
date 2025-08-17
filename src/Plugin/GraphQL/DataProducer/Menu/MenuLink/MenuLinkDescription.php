@@ -36,7 +36,7 @@ class MenuLinkDescription extends DataProducerPluginBase {
    * Resolver.
    */
   public function resolve(MenuLinkInterface $link): string {
-    return $link->getDescription();
+    return (string) $link->getDescription();
   }
 
 }
