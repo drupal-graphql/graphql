@@ -48,7 +48,7 @@ class EntityCreated extends DataProducerPluginBase {
     // is a generic `EntityInterface`. Checking for method existence for now.
     if (method_exists($entity, 'getCreatedTime')) {
       $datetime = new \DateTime();
-      $datetime->setTimestamp($entity->getCreatedTime());
+      $datetime->setTimestamp((int) $entity->getCreatedTime());
       return $datetime->format($format ?? \DateTime::ISO8601);
     }
 

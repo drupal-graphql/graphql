@@ -142,9 +142,14 @@ class EntityTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityCreated::resolve
    */
   public function testResolveCreated(): void {
-    $this->entity->expects($this->once())
+    $this->entity->expects($this->exactly(2))
       ->method('getCreatedTime')
-      ->willReturn(17000000000);
+      ->willReturn(17000000000, '17000000000');
+
+    $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_created', [
+      'format' => 'Y-m-d',
+      'entity' => $this->entity,
+    ]));
 
     $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_created', [
       'format' => 'Y-m-d',
