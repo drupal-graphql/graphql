@@ -12,26 +12,6 @@ use Drupal\graphql\Plugin\LanguageNegotiation\OperationLanguageNegotiation;
 use GraphQL\Error\DebugFlag;
 
 /**
- * Implements hook_requirements().
- */
-function graphql_requirements(string $phase): array {
-  // This is the first reference into the library performed by the module.
-  $libraryAvailable = class_exists('\GraphQL\GraphQL');
-
-  $libraryArg = [
-    '@library' => 'webonyx/graphql-php',
-  ];
-
-  return [
-    'graphql' => [
-      'title' => 'GraphQL',
-      'description' => !empty($libraryAvailable) ? t('@library component available', $libraryArg) : t('@library component not found', $libraryArg),
-      'severity' => !empty($libraryAvailable) ? REQUIREMENT_OK : REQUIREMENT_ERROR,
-    ],
-  ];
-}
-
-/**
  * Implements hook_uninstall().
  */
 function graphql_uninstall(): void {
