@@ -66,3 +66,26 @@ function graphql_update_10400(): void {
 function graphql_update_50000(): void {
   \Drupal::configFactory()->getEditable('graphql.settings')->delete();
 }
+
+/**
+ * Set the query_depth and query_complexity to integer types.
+ */
+function graphql_update_50001(): void {
+  // Load config objects instead of full config entities to avoid fatal errors.
+  $server_ids = \Drupal::configFactory()->listAll('graphql.graphql_servers.');
+  foreach ($server_ids as $id) {
+    $server = \Drupal::configFactory()->getEditable($id);
+    $should_update = FALSE;
+    if (!is_int($server->get('query_depth'))) {
+      $server->set('query_depth', (int) $server->get('query_depth'));
+      $should_update = TRUE;
+    }
+    if (!is_int($server->get('query_complexity'))) {
+      $server->set('query_complexity', (int) $server->get('query_complexity'));
+      $should_update = TRUE;
+    }
+    if ($should_update) {
+      $server->save();
+    }
+  }
+}
