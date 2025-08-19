@@ -16,6 +16,7 @@ class Schema extends Plugin {
     public readonly string $id,
     public readonly string|\Stringable $name,
     public readonly string|\Stringable $description = '',
+    public readonly ?string $deriver = NULL,
   ) {
   }
 

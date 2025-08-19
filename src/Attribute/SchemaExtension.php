@@ -18,6 +18,7 @@ class SchemaExtension extends Plugin {
     public readonly string $schema,
     public readonly string|\Stringable $description = '',
     public readonly int $priority = 0,
+    public readonly ?string $deriver = NULL,
   ) {
   }
 

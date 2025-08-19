@@ -16,6 +16,7 @@ class PersistedQuery extends Plugin {
     public readonly string $id,
     public readonly string|\Stringable $label,
     public readonly string|\Stringable $description = '',
+    public readonly ?string $deriver = NULL,
   ) {
   }
 
