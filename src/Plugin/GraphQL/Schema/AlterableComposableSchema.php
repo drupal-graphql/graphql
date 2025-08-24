@@ -113,7 +113,7 @@ class AlterableComposableSchema extends ComposableSchema {
    */
   protected function getSchemaDocument(array $extensions = []) {
     // Only use caching of the parsed document if we aren't in development mode.
-    $cid = "schema:{$this->getPluginId()}";
+    $cid = $this->getCacheId('schema');
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
       return $cache->data;
     }

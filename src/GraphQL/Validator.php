@@ -194,10 +194,12 @@ class Validator implements ValidatorInterface {
    */
   private function getSchemaPlugin(ServerInterface $server) : SchemaPluginInterface {
     $schema_name = $server->get('schema');
+    $plugin_config = ['server_id' => $server->id()];
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $plugin */
     $plugin = $this->pluginManager->createInstance($schema_name);
     if ($plugin instanceof ConfigurableInterface && $config = $server->get('schema_configuration')) {
-      $plugin->setConfiguration($config[$schema_name] ?? []);
+      $schema_config = $config[$schema_name] ?? [];
+      $plugin->setConfiguration($schema_config + $plugin_config);
     }
 
     return $plugin;
