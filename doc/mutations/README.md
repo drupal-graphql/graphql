@@ -1,6 +1,6 @@
 # Mutations
 
-In version 4 of Drupal GraphQL `Mutations` work a lot more similar to queries than they do in 3.x. Mutations are called using also Data producers which we already looked at.
+Mutations are data-writing operations that are called also using Data producers which we already looked at.
 
 Let's make a mutation that creates a new article. In this case it takes a data parameter that can have a `title` and a `description` in order to set these fields when creating the new article if they have been provided.
 

@@ -1,6 +1,6 @@
 # Data Producers
 
-The 4.x version of the Drupal GraphQL module is built on top of a concept called "Data Producers". These help making data available to a schema by using in part some built-in producers that come with the module but you can also make your own custom producers to make more complex data structures available.
+The Drupal GraphQL module is built on top of a concept called "Data Producers". These help making data available to a schema by using in part some built-in producers that come with the module but you can also make your own custom producers to make more complex data structures available.
 
 A data producer is more or less a function that takes arguments (either from an end user query or static) and resolves these into some other data, for example taking an entity (such as a node) and giving back a particular field.
 
@@ -82,5 +82,5 @@ This particular resolver uses the `property_path` data producer that comes with 
 
 You can find a list of all Data Producers provided by the module inside `src/Plugin/GraphQL/DataProducer` folder.
 
-The 4.x module leverages the advantages of custom schemas and data producers, where you can create your own API structure. In the 3.x module if you had a field named `field_article_creator` the API would expose this field as `fieldArticleCreator`. This means that the API consumer needs to have knowledge about how Drupal structures its data internally.
-In the 4.x module you can (and also need to) define your own custom schemas (and data producers) and therefore create your own structure so that someone that uses the API does not need to know how Drupal structures the data.
+The module leverages the advantages of custom schemas and data producers, where you can create your own API structure. In the old 3.x version of the GraphQL module if you had a field named `field_article_creator` the API would expose this field as `fieldArticleCreator`. This means that the API consumer needs to have knowledge about how Drupal structures its data internally.
+Now you can (and also need to) define your own custom schemas (and data producers) and therefore create your own structure so that someone that uses the API does not need to know how Drupal structures the data.

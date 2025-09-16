@@ -1,8 +1,8 @@
 # Installation
 
-The module requires installation via `composer`in order to pull in the dependencies for the module to work, most notably the [webonyx/graphql-php library](https://github.com/webonyx/graphql-php).
+The module requires installation via `composer` in order to pull in the dependencies for the module to work, most notably the [webonyx/graphql-php library](https://github.com/webonyx/graphql-php).
 
-1. Install the module by running `composer require drupal/graphql:^4`.
+1. Install the module by running `composer require drupal/graphql:^5`.
 2. Enable the GraphQL module in extensions.
 3. Login and navigate to `/admin/config/graphql` to create a new server.
 4. At this point you can either start with the "Example schema" provided by the graphql_examples module (see the Introduction section) or start right away making your own custom schema as we will describe in the following sections.
@@ -17,4 +17,4 @@ At this point you can check the permissions added by the module in the permissio
 
 ## Creating a schema
 
-Like mentioned in the [Introduction](./../README.md) the 4.x version of the module uses a schema first approach which requires you to first start by making a schema and then start implementing how to resolve each of the fields of your schema. In the next chapter we will look at how to create your own schema to start resolving fields and returning actual Data from Drupal using the module.
+Like mentioned in the [Introduction](./../README.md) the 5.x version of the module uses a schema first approach which requires you to first start by making a schema and then start implementing how to resolve each of the fields of your schema. In the next chapter we will look at how to create your own schema to start resolving fields and returning actual Data from Drupal using the module.

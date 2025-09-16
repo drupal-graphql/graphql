@@ -6,11 +6,11 @@ As the module is developed more data producers can be added to the core module. 
 
 ## List of data producers
 
-This list includes all available data producers inside GraphQL to this day and briefly describes what they are about and how to be used.
+This list includes most available data producers inside GraphQL and briefly describes what they are about and how to be used. Browse the data producer plugin folder yourself to find more that are not documented here.
 
 ### Context data producers
 
-* **Context** (`context`) : Request arbitrary Drupal context objects with GraphQL. 
+* **Context** (`context`) : Request arbitrary Drupal context objects with GraphQL.
 
 ### Entity data producers
 
@@ -40,7 +40,7 @@ This list includes all available data producers inside GraphQL to this day and b
 * **Image Style URL** (`image_style_url`) : Returns the URL of an image derivative given a an image derivative.
 * **Image url** (`image_url`) : Returns the url of an image entity given an image/file entity
 
-### Entity reference data producers 
+### Entity reference data producers
 
 * **Entity Reference** (`entity_reference`) : Loads entities from an entity reference field given an entity and a field name.
 
@@ -67,6 +67,6 @@ This list includes all available data producers inside GraphQL to this day and b
 
 ## How to use the producers
 
-This is no doubt a very long list of supported properties by itself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations. 
+This is no doubt a very long list of supported properties by itself, but just as it is it provides no real value. The real value is in how these data producers can be combined to perform complex queries and mutations.
 
 We will look how to use the data producers together in the section "Queries" where we will do many common query scenarios like querying nodes or taxonomies, menus, custom fields, entity reference fields etc..

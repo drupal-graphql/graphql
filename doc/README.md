@@ -10,16 +10,16 @@ Anyone who wants to get JSON data out of Drupal.
 
 A few examples of where the GraphQL module could be used:
 
-* Decoupled Drupal applications with a javascript front-end \(React, Angular, Ember, etc\),
+* Decoupled Drupal applications with a javascript front-end \(React, Angular, Vue, etc\),
 * Twig Templates \(Drupal theming\)
 * Mobile applications that need a persistent data store
 * IOT data storage
 
-### Drupal GraphQL 4x
+### Drupal GraphQL 5.x
 
-This documentation refers to the 8.x-4.x version of the module which uses a schema first approach, where you will need to specify the schema in a DSL format. The documentation will guide you through the process of doing that. The benefits over the 3.x version is that the end resulting schema is a lot cleaner and includes only what you explicitly include in the schema, and not the whole of Drupal (as it is in the 3.x version of the module).
+This documentation refers to the 5.x version of the module which uses a schema first approach, where you will need to specify the schema in a DSL format. The documentation will guide you through the process of doing that. The benefit is that the end resulting schema is a lot cleaner and includes only what you explicitly include in the schema, and not the whole of Drupal's data structures.
 
-This trade-off does come with costs mostly around ease of use, where in the 3.x version it is a lot quicker to get up and running, in 4.x you will need to specify more in the schema and in code in order to get more out of the module.
+This trade-off does come with costs mostly around ease of use - if you prefer automatic generation of the schema then take a look at the [GraphQL Compose](https://www.drupal.org/project/graphql_compose) or [GraphQL Core Schema](https://www.drupal.org/project/graphql_core_schema) projects which have implemented automatic schema generation on top of the GraphQL module.
 
 ## Hello World \(Quick Start\)
 

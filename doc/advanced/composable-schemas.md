@@ -2,7 +2,7 @@
 
 It is possible to split up the schema into separate parts so that you can enable certain functionality that is for example tied to a particular module only when that module is enabled.
 
-You can find a complete example [here](https://github.com/drupal-graphql/graphql/tree/8.x-4.x/examples) on how this can be done.
+You can find a complete example [here](https://git.drupalcode.org/project/graphql/-/tree/5.x/examples) on how this can be done.
 
 If you have a complex system where certain modules are sometimes enabled / disabled and you want to make sure the API matches the functionality provided by those modules and also disable the API's that correspond to those modules when the modules are disabled splitting schemas into chunks is a good idea. This will keep the system organized and easy to read and look at.
 
@@ -33,7 +33,7 @@ class ExampleSchemaExtension extends SdlSchemaExtensionPluginBase {
 
 ## Add new types and fields
 
-To add new types and fields to the schema create a file inside `/graphql/example_extension.base.graphqls` (as seen [here](https://github.com/drupal-graphql/graphql/blob/8.x-4.x/examples/graphql/example_extension.base.graphqls)) with the new types :
+To add new types and fields to the schema create a file inside `/graphql/example.graphqls` (as seen [here](https://git.drupalcode.org/project/graphql/-/blob/5.x/examples/graphql_example/graphql/example.graphqls)) with the new types :
 
 ```
 type Page {
@@ -46,7 +46,7 @@ In this case we are creating a new type `Page`.
 
 ## Change existing types or fields
 
-Normally a new module when enabled should also change or add more fields to an existing type. In that case create new file `/graphql/example_extension.extension.graphqls` as seen [here](https://github.com/drupal-graphql/graphql/blob/8.x-4.x/examples/graphql/example_extension.extension.graphqls)
+Normally a new module when enabled should also change or add more fields to an existing type. In that case create new file `/graphql/example_extension.extension.graphqls` as seen [here](git.drupalcode.org/project/graphql/-/blob/5.x/examples/graphql_example/graphql/example.graphqls)
 
 ```
 extend type Query {

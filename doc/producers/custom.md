@@ -4,7 +4,7 @@ Sometimes you have a niche scenario that requires some custom code to resolve. E
 
 Custom data producers allow you essentially hook into any data of Drupal, because its a class and you can use services, request any kind of data.
 
-Lets look at a custom Data producer that loads the current user (similar to the 3.x version of currentUser query).
+Lets look at a custom Data producer that loads the current user.
 
 The first step as seen before  is to add our query to the schema :
 
