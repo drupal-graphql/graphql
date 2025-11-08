@@ -71,9 +71,16 @@ class CurrentUser extends DataProducerPluginBase implements ContainerFactoryPlug
    *   The current user.
    */
   public function resolve(FieldContext $field_context): AccountInterface {
-    // Response must be cached based on current user as a cache context,
-    // otherwise a new user would became a previous user.
-    $field_context->addCacheableDependency($this->currentUser);
+    // Response must be cached per user so that information from previously
+    // logged in users will not leak to newly logged in users. Note that we need
+    // to add the cache metadata manually because the AccountProxy object does
+    // not implement CacheableDependencyInterface.
+    $field_context->addCacheContexts(['user']);
+
+    // Also add a cache tag for the user entity so that changes to the user
+    // will invalidate the cache.
+    $field_context->addCacheTags(['user:' . $this->currentUser->id()]);
+
     return $this->currentUser;
   }
 
