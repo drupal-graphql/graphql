@@ -97,8 +97,8 @@ class ExplorerController implements ContainerInjectionInterface {
         'drupalSettings' => [
           'graphqlRequestUrl' => $url,
           'graphqlIntrospectionData' => $introspectionData,
-          'graphqlQuery' => $request->get('query'),
-          'graphqlVariables' => $request->get('variables'),
+          'graphqlQuery' => $request->query->get('query'),
+          'graphqlVariables' => $request->query->get('variables'),
         ],
       ],
     ];
