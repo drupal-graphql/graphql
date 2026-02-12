@@ -40,9 +40,9 @@ class EntityCrudOutputWrapper {
    *   additional error messages e.g. for access restrictions.
    */
   public function __construct(
-    EntityInterface $entity = NULL,
-    ConstraintViolationListInterface $violations = NULL,
-    array $errors = NULL
+    ?EntityInterface $entity = NULL,
+    ?ConstraintViolationListInterface $violations = NULL,
+    ?array $errors = NULL
   ) {
     $this->entity = $entity;
     $this->violations = $violations;

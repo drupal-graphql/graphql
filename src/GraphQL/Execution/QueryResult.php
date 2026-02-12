@@ -22,7 +22,7 @@ class QueryResult extends ExecutionResult implements RefinableCacheableDependenc
    * @param \Drupal\Core\Cache\CacheableDependencyInterface $metadata
    *   The cache metadata collected during query execution.
    */
-  public function __construct(array $data = null, array $errors = [], array $extensions = [], CacheableDependencyInterface $metadata = NULL) {
+  public function __construct(?array $data = null, array $errors = [], array $extensions = [], ?CacheableDependencyInterface $metadata = NULL) {
     $this->data = $data;
     $this->errors = $errors;
     $this->extensions = $extensions;
