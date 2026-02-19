@@ -205,6 +205,9 @@ services:
   graphql.buffer.entity:
     class: Drupal\graphql\GraphQL\Buffers\EntityBuffer
     arguments: ['@entity_type.manager']
+  graphql.buffer.entity_preview:
+    class: Drupal\graphql\GraphQL\Buffers\EntityPreviewBuffer
+    arguments: ["@node_preview"]
   graphql.buffer.entity_revision:
     class: Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
     arguments: ['@entity_type.manager']

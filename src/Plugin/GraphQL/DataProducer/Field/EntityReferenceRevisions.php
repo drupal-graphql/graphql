@@ -169,13 +169,39 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
     $type = $definition->getSetting('target_type');
     $values = $entity->get($field);
     if ($values instanceof EntityReferenceFieldItemListInterface) {
-      $vids = array_map(function ($value) {
-        return $value['target_revision_id'];
-      }, $values->getValue());
+      $resolvedEntities = [];
+      $vids = [];
 
-      $resolver = $this->entityRevisionBuffer->add($type, $vids);
-      return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
-        return $this->getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
+      foreach ($values as $delta => $item) {
+        // If the entity is already present (common in preview),
+        // use it directly and preserve ordering.
+        if (isset($item->entity)) {
+          $resolvedEntities[$delta] = $item->entity;
+        }
+        elseif (!empty($item->target_revision_id)) {
+          $vids[$delta] = $item->target_revision_id;
+        }
+      }
+
+      // If everything is already resolved, return immediately.
+      if (empty($vids)) {
+        return array_values($resolvedEntities);
+      }
+
+      $resolver = $this->entityRevisionBuffer->add($type, array_values($vids));
+
+      return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context, $resolvedEntities, $vids) {
+        $loadedEntities = $this->getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
+
+        // Merge resolved + loaded entities, preserving original order.
+        foreach ($vids as $delta => $_vid) {
+          if (isset($loadedEntities[$delta])) {
+            $resolvedEntities[$delta] = $loadedEntities[$delta];
+          }
+        }
+
+        ksort($resolvedEntities);
+        return array_values($resolvedEntities);
       });
     }
 

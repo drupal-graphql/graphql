@@ -11,6 +11,7 @@
   },
   "require-dev": {
     "drupal/coder": "8.3.30",
+    "drupal/entity_reference_revisions": "^1.14",
     "drupal/redirect": "^1.0",
     "phpstan/phpstan-deprecation-rules": "^2 || ^1",
     "jangregor/phpstan-prophecy": "^2 || ^1"

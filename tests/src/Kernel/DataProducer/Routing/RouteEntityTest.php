@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer\Routing;
 
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Url;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\Node;
@@ -269,6 +270,61 @@ class RouteEntityTest extends GraphQLTestBase {
     $this->assertNull($result);
     $this->assertContains('node_list', $this->fieldContext->getCacheTags());
     $this->assertContains('4xx-response', $this->fieldContext->getCacheTags());
+  }
+
+  /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteEntity::resolve
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteEntity::resolvePreview
+   */
+  public function testRouteEntityPreview(): void {
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = \Drupal::service('entity_type.manager');
+    /** @var \Drupal\node\Form\NodeForm $form_object */
+    $form_object = $entity_type_manager->getFormObject('node', 'default');
+    $form_object->setEntity($this->publishedNode);
+
+    $form_state = new FormState();
+    $form_state->setFormObject($form_object);
+
+    // Change the title in the form's entity without saving.
+    $newTitle = 'Test Event (Preview Title)';
+    /** @var \Drupal\node\Entity\Node $node */
+    $node = $form_object->getEntity();
+    $node->setTitle($newTitle);
+    $form_object->preview([], $form_state);
+
+    // 1) Preview returns the entity, reflects the changed title, and disables
+    // caching.
+    $url = Url::fromRoute('entity.node.preview', [
+      'node_preview' => $this->publishedNode->uuid(),
+      'view_mode_id' => 'full',
+    ]);
+    $result = $this->executeDataProducer('route_entity', [
+      'url' => $url,
+    ]);
+    $this->assertInstanceOf(Node::class, $result);
+    $this->assertEquals($this->publishedNode->uuid(), $result->uuid());
+    // Ensure the unsaved change from the form is reflected in preview.
+    $this->assertSame($newTitle, $result->label());
+    $this->assertSame(0, $this->fieldContext->getCacheMaxAge());
+
+    // 2) Preview with language parameter returns the correct translation when
+    // available.
+    $result = $this->executeDataProducer('route_entity', [
+      'url' => $url,
+      'language' => 'fr',
+    ]);
+    $this->assertInstanceOf(Node::class, $result);
+    $this->assertSame($this->translationFrPublished->getTitle(), $result->label());
+    $this->assertEquals($this->translationFrPublished->uuid(), $result->uuid());
+
+    $result = $this->executeDataProducer('route_entity', [
+      'url' => $url,
+      'language' => 'en',
+    ]);
+    $this->assertInstanceOf(Node::class, $result);
+    $this->assertSame($newTitle, $result->label());
+    $this->assertEquals($this->publishedNode->uuid(), $result->uuid());
   }
 
 }
