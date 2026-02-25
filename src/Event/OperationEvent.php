@@ -24,6 +24,11 @@ class OperationEvent extends Event {
   const GRAPHQL_OPERATION_AFTER = 'graphql.operation.after';
 
   /**
+   * Event fired after an operation result was retrieved from cache.
+   */
+  const GRAPHQL_OPERATION_CACHE_HIT = 'graphql.operation.cache_hit';
+
+  /**
    * Result of the query execution.
    */
   protected ?ExecutionResult $result;
