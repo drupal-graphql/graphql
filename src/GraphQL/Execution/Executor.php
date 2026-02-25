@@ -239,6 +239,8 @@ class Executor implements ExecutorImplementation {
    */
   protected function doExecuteCached($prefix) {
     if ($result = $this->cacheRead($prefix)) {
+      $event = new OperationEvent($this->context, $result);
+      $this->dispatcher->dispatch($event, OperationEvent::GRAPHQL_OPERATION_CACHE_HIT);
       return $this->adapter->createFulfilled($result);
     }
 
