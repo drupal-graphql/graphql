@@ -11,10 +11,15 @@ trait DescribablePluginTrait {
    */
   protected function buildDescription($definition) {
     if (!empty($definition['description']) && !is_null($definition['description'])) {
-      return (string) ($definition['description']);
+      try {
+        return (string) ($definition['description']);
+      }
+      catch (\TypeError $e) {
+        return '';
+      }
     }
 
-    return NULL;
+    return '';
   }
 
 }
