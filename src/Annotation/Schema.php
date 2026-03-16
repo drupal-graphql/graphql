@@ -2,7 +2,7 @@
 
 namespace Drupal\graphql\Annotation;
 
-use Doctrine\Common\Annotations\AnnotationException;
+use Drupal\Component\Annotation\Doctrine\AnnotationException;
 use Drupal\Component\Annotation\Plugin;
 
 /**
@@ -40,7 +40,7 @@ class Schema extends Plugin {
    * @param mixed $values
    *   The plugin annotation values.
    *
-   * @throws \Doctrine\Common\Annotations\AnnotationException
+   * @throws \Drupal\Component\Annotation\Doctrine\AnnotationException
    *   In case of missing required values.
    */
   public function __construct($values) {
