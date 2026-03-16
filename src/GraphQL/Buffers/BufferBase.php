@@ -54,7 +54,7 @@ abstract class BufferBase {
     }
 
     // Add the created item to the buffer.
-    $this->buffers[$bufferId]->attach($item, $item);
+    $this->buffers[$bufferId]->offsetSet($item, $item);
 
     // Return a callback that can be used to resolve the buffer item.
     return $this->createResolver($item, $this->buffers[$bufferId], $this->results[$bufferId]);
@@ -94,7 +94,7 @@ abstract class BufferBase {
    *   The result of resolving the given buffer item.
    */
   protected function resolveItem($item, \SplObjectStorage $buffer, \SplObjectStorage $result) {
-    if ($buffer->contains($item)) {
+    if ($buffer->offsetExists($item)) {
       $results = $this->resolveBuffer($buffer);
 
       // Remove the resolved items from the buffer and add them to the results.
@@ -102,7 +102,7 @@ abstract class BufferBase {
       $result->addAll($results);
     }
 
-    if ($result->contains($item)) {
+    if ($result->offsetExists($item)) {
       return $result[$item];
     }
 
@@ -127,7 +127,7 @@ abstract class BufferBase {
     // Assign the loaded items to their corresponding batch items.
     $output = new \SplObjectStorage();
     foreach ($this->resolveBufferArray($buffer) as $key => $item) {
-      $output->attach($buffer[$key], $item);
+      $output->offsetSet($buffer[$key], $item);
     }
 
     return $output;
