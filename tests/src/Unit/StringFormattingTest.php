@@ -44,7 +44,7 @@ class StringFormattingTest extends UnitTestCase {
   /**
    *
    */
-  public function providerTestStringFormatting() {
+  public static function providerTestStringFormatting() {
     return [
       [['simple-name'], 'SimpleName'],
       [['123-name-with*^&!@some-SPECIAL-chars'], '_123NameWithSomeSPECIALChars'],

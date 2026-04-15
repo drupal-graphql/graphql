@@ -124,14 +124,14 @@ trait MockGraphQLPluginTrait {
 
       $mockFactory = $this
         ->getMockBuilder(FactoryInterface::class)
-        ->setMethods([
+        ->onlyMethods([
           'createInstance',
         ])
         ->getMock();
 
       $mockDiscovery = $this
         ->getMockBuilder(DiscoveryInterface::class)
-        ->setMethods([
+        ->onlyMethods([
           'hasDefinition',
           'getDefinitions',
           'getDefinition',
@@ -343,7 +343,7 @@ trait MockGraphQLPluginTrait {
   protected function mockFieldFactory($definition, $result = NULL, $builder = NULL) {
     $field = $this->getMockBuilder(FieldPluginBase::class)
       ->setConstructorArgs([[], $definition['id'], $definition])
-      ->setMethods([
+      ->onlyMethods([
         'resolveValues',
       ])->getMock();
 
@@ -396,7 +396,7 @@ trait MockGraphQLPluginTrait {
   protected function mockTypeFactory($definition, $applies = TRUE, $builder = NULL) {
     $type = $this->getMockBuilder(TypePluginBase::class)
       ->setConstructorArgs([[], $definition['id'], $definition])
-      ->setMethods([
+      ->onlyMethods([
         'applies',
       ])->getMock();
 
@@ -486,7 +486,7 @@ trait MockGraphQLPluginTrait {
   protected function mockMutationFactory($definition, $result = NULL, $builder = NULL) {
     $mutation = $this->getMockBuilder(MutationPluginBase::class)
       ->setConstructorArgs([[], $definition['id'], $definition])
-      ->setMethods([
+      ->addMethods([
         'resolve',
       ])->getMock();
 
@@ -618,7 +618,7 @@ trait MockGraphQLPluginTrait {
   protected function mockEnumFactory($definition, $values = [], $builder = NULL) {
     $enum = $this->getMockBuilder(EnumPluginBase::class)
       ->setConstructorArgs([[], $definition['id'], $definition])
-      ->setMethods([
+      ->onlyMethods([
         'buildEnumValues',
       ])->getMock();
 

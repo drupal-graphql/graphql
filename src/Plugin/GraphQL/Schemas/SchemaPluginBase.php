@@ -277,7 +277,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
     });
 
     $config->setValidationRules(function (OperationParams $params, DocumentNode $document, $operation) {
-      if (isset($params->queryId) && empty($params->getOriginalInput('query'))) {
+      if (isset($params->queryId) && empty($params->originalInput['query'])) {
         // Assume that pre-parsed documents are already validated. This allows
         // us to store pre-validated query documents e.g. for persisted queries
         // effectively improving performance by skipping run-time validation.
@@ -287,7 +287,7 @@ abstract class SchemaPluginBase extends PluginBase implements SchemaPluginInterf
       return array_values(DocumentValidator::defaultRules());
     });
 
-    $config->setPersistentQueryLoader([$this->queryProvider, 'getQuery']);
+    $config->setPersistedQueryLoader([$this->queryProvider, 'getQuery']);
     $config->setQueryBatching(TRUE);
     $config->setDebugFlag($this->parameters['development'] ? DebugFlag::INCLUDE_DEBUG_MESSAGE : DebugFlag::NONE);
     $config->setSchema($this->getSchema());

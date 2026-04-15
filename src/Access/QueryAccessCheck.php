@@ -52,7 +52,7 @@ class QueryAccessCheck implements AccessInterface {
       // If a query was provided by the user, this is an arbitrary query (it's
       // not a persisted query). Hence, we only grant access if the user has the
       // permission to execute any query.
-      if ($operation->getOriginalInput('query')) {
+      if (isset($operation->originalInput['query'])) {
         return AccessResult::allowedIfHasPermission($account, 'execute graphql requests');
       }
     }
