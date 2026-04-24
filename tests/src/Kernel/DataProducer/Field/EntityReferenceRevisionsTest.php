@@ -133,4 +133,54 @@ class EntityReferenceRevisionsTest extends GraphQLTestBase {
     );
   }
 
+  /**
+   * Tests that inaccessible entities are filtered when access=TRUE.
+   *
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Field\EntityReferenceRevisions::resolve
+   */
+  public function testAccessFilteringRemovesInaccessible(): void {
+    // Hide the first referenced node from view to make it inaccessible.
+    $this->referencedNodes[0]->set('status', FALSE)->save();
+
+    // Create a host node with pre-resolved entities (including the hidden one).
+    $hostNode = Node::create(['title' => 'Host with hidden ref', 'type' => 'test1']);
+    $hostNode->set('field_ref1', [
+      [
+        'target_id' => $this->referencedNodes[0]->id(),
+        'target_revision_id' => $this->referencedNodes[0]->getRevisionId(),
+      ],
+      [
+        'target_id' => $this->referencedNodes[1]->id(),
+        'target_revision_id' => $this->referencedNodes[1]->getRevisionId(),
+      ],
+    ]);
+
+    // Execute with access=TRUE (should filter out hidden node).
+    $resultWithAccess = $this->executeDataProducer('entity_reference_revisions', [
+      'entity' => $hostNode,
+      'field' => 'field_ref1',
+      'access' => TRUE,
+      'access_operation' => 'view',
+    ]);
+
+    // Execute with access=FALSE (should return all nodes including hidden).
+    $resultWithoutAccess = $this->executeDataProducer('entity_reference_revisions', [
+      'entity' => $hostNode,
+      'field' => 'field_ref1',
+      'access' => FALSE,
+      'access_operation' => 'view',
+    ]);
+
+    // With access=TRUE, only the published node should be returned.
+    $this->assertCount(1, $resultWithAccess, 'Result with access=TRUE filters out inaccessible entity.');
+    $this->assertSame(
+      $this->referencedNodes[1]->id(),
+      $resultWithAccess[0]->id(),
+      'Only the accessible entity is returned with access=TRUE.'
+    );
+
+    // With access=FALSE, both nodes should be returned.
+    $this->assertCount(2, $resultWithoutAccess, 'Result with access=FALSE returns all entities.');
+  }
+
 }

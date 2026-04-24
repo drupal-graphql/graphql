@@ -185,6 +185,9 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
 
       // If everything is already resolved, return immediately.
       if (empty($vids)) {
+        if ($access) {
+          $resolvedEntities = $this->filterAccessible($resolvedEntities, $accessUser, $accessOperation, $context);
+        }
         return array_values($resolvedEntities);
       }
 
