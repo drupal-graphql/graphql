@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\redirect\Entity\Redirect;
 
 /**
  * Data producers Routing test class.
@@ -66,8 +67,8 @@ class RoutingTest extends GraphQLTestBase {
     $node->save();
     $nodeUrl = $node->toUrl()->toString();
 
-    /** @var \Drupal\redirect\Entity\Redirect $redirect */
-    $redirect = $this->container->get('entity_type.manager')->getStorage('redirect')->create();
+    $redirect = $this->redirectStorage->create();
+    assert($redirect instanceof Redirect);
     $redirect->setSource('internal-url');
     $redirect->setRedirect($nodeUrl);
     $redirect->save();
@@ -79,6 +80,8 @@ class RoutingTest extends GraphQLTestBase {
     $this->assertNotNull($result);
     $this->assertEquals($nodeUrl, $result->toString());
 
+    $redirect = $this->redirectStorage->create();
+    assert($redirect instanceof Redirect);
     $redirect->setSource('external-url');
     $redirect->setRedirect('https://example.com');
     $redirect->save();
@@ -94,8 +97,8 @@ class RoutingTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Routing\RouteLoad::resolve
    */
   public function testRedirectRouteLoad(): void {
-    /** @var \Drupal\redirect\Entity\Redirect $redirect */
     $redirect = $this->redirectStorage->create();
+    assert($redirect instanceof Redirect);
     $redirect->setSource('redirect-url');
     $redirect->setRedirect('user/logout');
     $redirect->save();
@@ -107,11 +110,15 @@ class RoutingTest extends GraphQLTestBase {
     $this->assertNotNull($result);
     $this->assertEquals('user.logout', $result->getRouteName());
 
+    $redirect = $this->redirectStorage->create();
+    assert($redirect instanceof Redirect);
+    $redirect->setSource('redirect-url2');
+    $redirect->setRedirect('user/logout');
     $redirect->setLanguage('de');
     $redirect->save();
 
     $result = $this->executeDataProducer('route_load', [
-      'path' => '/redirect-url',
+      'path' => '/redirect-url2',
       'language' => 'de',
     ]);
 

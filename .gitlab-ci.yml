@@ -14,18 +14,8 @@ include:
 variables:
   SKIP_ESLINT: 1
   SKIP_STYLELINT: 1
-  # We only wan to run PHPStan once on the max PHP version, skip default runs.
-  SKIP_PHPSTAN: 1
   OPT_IN_TEST_PREVIOUS_MAJOR: 1
   OPT_IN_TEST_PREVIOUS_MINOR: 1
   OPT_IN_TEST_NEXT_MINOR: 1
   OPT_IN_TEST_MAX_PHP: 1
   _PHPUNIT_CONCURRENT: 1
-
-phpstan (custom):
-  extends: phpstan
-  allow_failure: false
-  rules:
-    - when: on_success
-  needs:
-    - "composer (next minor)"
