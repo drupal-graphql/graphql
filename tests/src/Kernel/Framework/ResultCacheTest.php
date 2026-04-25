@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Render\RenderContext;
@@ -23,10 +25,36 @@ use Symfony\Component\HttpFoundation\Request;
 class ResultCacheTest extends GraphQLTestBase {
 
   /**
+   * The mocked time service.
+   */
+  protected TimeInterface $time;
+
+  /**
+   * The mocked request time to return.
+   */
+  protected int $requestTime;
+
+  /**
+   * The mocked current time to return.
+   */
+  protected int $currentTime;
+
+  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
+
+    $this->currentTime = $this->requestTime = time();
+    $this->time = $this->getMockBuilder(TimeInterface::class)
+      ->getMock();
+
+    $this->time->method('getRequestTime')
+      ->willReturnCallback(fn () => $this->requestTime);
+    $this->time->method('getCurrentTime')
+      ->willReturnCallback(fn () => $this->currentTime);
+
+    $this->container->set('datetime.time', $this->time);
 
     $schema = <<<GQL
       type Query {
@@ -416,6 +444,60 @@ GQL;
     $this->query('query one { root } query two { leakA }', NULL, [], [], FALSE, Request::METHOD_GET, 'one');
     // Second call is uncached.
     $this->query('query one { root } query two { leakA }', NULL, [], [], FALSE, Request::METHOD_GET, 'two');
+  }
+
+  /**
+   * Test cacheMaxAge is correctly set when reading from cache.
+   *
+   * Validates that Executor::cacheRead() calculates and merges cacheMaxAge
+   * as (expire - time()) when serving cached results.
+   *
+   * @coversClass \Drupal\graphql\GraphQL\Execution\Executor::cacheRead
+   */
+  public function testCacheMaxAgeOnRead(): void {
+    $lifetime = 45;
+    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
+      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
+      ->getMock();
+
+    $cacheable->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['a', 'b']);
+
+    $cacheable->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn($lifetime);
+
+    $cacheable->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+
+    $dummy = $this->getMockBuilder(Server::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['id'])
+      ->getMock();
+
+    $dummy->expects($this->exactly(1))
+      ->method('id')
+      ->willReturn('test');
+
+    $this->mockResolver('Query', 'root',
+      $this->builder->compose(
+        $this->builder->fromValue($cacheable),
+        $this->builder->callback(function () use ($dummy) {
+          return $dummy->id();
+        })
+      )
+    );
+
+    $this->query('{ root }');
+
+    $this->currentTime++;
+
+    $result2 = $this->query('{ root }');
+
+    $this->assertInstanceOf(CacheableJsonResponse::class, $result2);
+    $this->assertSame($lifetime - 1, $result2->getCacheableMetadata()->getCacheMaxAge());
   }
 
 }

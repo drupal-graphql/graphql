@@ -283,6 +283,12 @@ class Executor implements ExecutorImplementation {
       if (($cache = $this->cacheBackend->get("result:$prefix:$suffix"))) {
         $result = new CacheableExecutionResult($cache->data['data'], [], $cache->data['extensions']);
         $result->addCacheableDependency($cache->data['metadata']);
+        // The metadata cacheMaxAge is valid at the time the cache entry is
+        // created. However, it may have been in the cache for a while, which
+        // means it's outdated. The expire timestamp matches the maxAge at
+        // the time of insertion, which can be used to calculate the fresh
+        // max-age of the response.
+        $result->mergeCacheMaxAge((int) $cache->expire === Cache::PERMANENT ? Cache::PERMANENT : $cache->expire - $this->time->getCurrentTime());
         return $result;
       }
     }
