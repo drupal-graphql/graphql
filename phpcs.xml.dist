@@ -42,6 +42,9 @@
     <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/TypedData/PropertyPath.php</exclude-pattern>
     <exclude-pattern>src/Plugin/DataProducerPluginInterface.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/CustomScalarInterface.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/ResolverRegistryInterface.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/ResolverRegistry.php</exclude-pattern>
   </rule>
 
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">

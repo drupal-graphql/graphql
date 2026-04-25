@@ -75,4 +75,27 @@ interface ResolverRegistryInterface {
    */
   public function getTypeResolver(string $type): ?callable;
 
+  /**
+   * Register a custom scalar definition.
+   *
+   * @param string $typeName
+   *   The name of the scalar type as defined in the schema.
+   * @param \Drupal\graphql\GraphQL\CustomScalarInterface<mixed> $scalar
+   *   The custom scalar definition.
+   *
+   * @return $this
+   */
+  public function addCustomScalar(string $typeName, CustomScalarInterface $scalar): static;
+
+  /**
+   * Get a custom scalar definition by name.
+   *
+   * @param string $typeName
+   *   The name of the scalar type.
+   *
+   * @return \Drupal\graphql\GraphQL\CustomScalarInterface<mixed>|null
+   *   The custom scalar definition or NULL if not found.
+   */
+  public function getCustomScalar(string $typeName): ?CustomScalarInterface;
+
 }

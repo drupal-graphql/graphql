@@ -20,6 +20,7 @@ use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -152,9 +153,20 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected function getTypeConfigDecorator(ResolverRegistryInterface $registry): callable {
     $resolver = [$registry, 'resolveType'];
 
-    return static function ($config, TypeDefinitionNode $type) use ($resolver) {
+    return static function ($config, TypeDefinitionNode $type) use ($resolver, $registry) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $resolver;
+      }
+
+      if ($type instanceof ScalarTypeDefinitionNode) {
+        $definition = $registry->getCustomScalar($type->name->value);
+        if ($definition !== NULL) {
+          $config = array_merge($config, [
+            'serialize' => [$definition, 'serialize'],
+            'parseValue' => [$definition, 'parseValue'],
+            'parseLiteral' => [$definition, 'parseLiteral'],
+          ]);
+        }
       }
 
       return $config;

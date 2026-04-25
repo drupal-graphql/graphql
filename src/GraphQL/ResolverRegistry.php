@@ -54,6 +54,13 @@ class ResolverRegistry implements ResolverRegistryInterface {
   protected $defaultTypeResolver;
 
   /**
+   * Custom scalar definitions keyed by type name.
+   *
+   * @var array<string, \Drupal\graphql\GraphQL\CustomScalarInterface<mixed>>
+   */
+  protected array $customScalars = [];
+
+  /**
    * ResolverRegistry constructor.
    */
   public function __construct(?callable $defaultFieldResolver = NULL, ?callable $defaultTypeResolver = NULL) {
@@ -179,6 +186,41 @@ class ResolverRegistry implements ResolverRegistryInterface {
    */
   protected function resolveTypeDefault(mixed $value, ResolveContext $context, ResolveInfo $info): ?string {
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addCustomScalar(string $typeName, CustomScalarInterface $scalar): static {
+    // We serialize the custom scalar implementation since PHP or PHPStan does
+    // not provide a way for us to enforce this. This ensures that scalars that
+    // are not serializable fail loudly and do not block downstream
+    // serialization of the assembled schema where they would create
+    // hard-to-debug errors.
+    // This is a slight performance overhead which we accept with the
+    // expectation that custom scalars will initially be low volume and this
+    // overhead is eliminated once registry caching is implemented.
+    try {
+      serialize($scalar);
+    }
+    catch (\Exception $e) {
+      $class = get_class($scalar);
+      throw new \InvalidArgumentException(
+        "Custom scalar '$typeName' backed by '$class' must be serializable. " .
+        "Ensure it implements __serialize() or has no non-serializable properties. ",
+        0,
+        $e
+      );
+    }
+    $this->customScalars[$typeName] = $scalar;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCustomScalar(string $typeName): ?CustomScalarInterface {
+    return $this->customScalars[$typeName] ?? NULL;
   }
 
 }
