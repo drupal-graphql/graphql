@@ -28,6 +28,18 @@ function graphql_uninstall(): void {
 }
 
 /**
+ * Implements hook_update_dependencies().
+ */
+function graphql_update_dependencies(): array {
+  // Prevent type errors when the wrong order of update functions is executed.
+  // Our graphql update function must run first.
+  $dependencies['admin_toolbar_tools'][8203] = [
+    'graphql' => 50001,
+  ];
+  return $dependencies;
+}
+
+/**
  * Update GraphQL Server debug configuration value.
  */
 function graphql_update_8001(): void {
