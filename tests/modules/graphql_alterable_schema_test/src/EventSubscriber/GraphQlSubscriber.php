@@ -6,6 +6,13 @@ namespace Drupal\graphql_alterable_schema_test\EventSubscriber;
 
 use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Language\Parser;
+use GraphQL\Language\Visitor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -31,18 +38,42 @@ class GraphQlSubscriber implements EventSubscriberInterface {
    */
   public function alterSchemaExtensionData(AlterSchemaExtensionDataEvent $event): void {
     $schemaData = $event->getSchemaExtensionData();
-    // I do not recommend direct replace, better user parsing or regex.
-    // But this is an example of what you can do.
-    $schemaData['graphql_alterable_schema_test'] = str_replace('position: Int', 'position: Int!', $schemaData['graphql_alterable_schema_test'] ?? '');
 
     // Test empty extensions can still extend the schema.
     // https://github.com/drupal-graphql/graphql/issues/1395
     if (empty($schemaData['graphql_alterable_schema_test'])) {
-      $schemaData['graphql_alterable_schema_test'] = <<<GQL
+      $schemaData['graphql_alterable_schema_test'] = Parser::parse(<<<GQL
         extend type Result {
           empty: Boolean!
         }
-      GQL;
+      GQL);
+    }
+    // Test regular schema alteration using an AST visitor.
+    else {
+      Visitor::visit($schemaData['graphql_alterable_schema_test'], [
+        NodeKind::FIELD_DEFINITION => [
+          'enter' => function (Node $node) {
+            assert($node instanceof FieldDefinitionNode);
+            if ($node->name->value !== 'position') {
+              // Do nothing.
+              return NULL;
+            }
+            // Make the type non-nullable.
+            $node->type = new NonNullTypeNode(['type' => $node->type]);
+
+            return $node;
+          },
+          'leave' => function (Node $node) {
+            assert($node instanceof FieldDefinitionNode);
+            // Once we've visited the position field node we can stop.
+            if ($node->name->value === 'position') {
+              return Visitor::stop();
+            }
+            // Do nothing.
+            return NULL;
+          },
+        ],
+      ]);
     }
 
     $event->setSchemaExtensionData($schemaData);
@@ -53,9 +84,32 @@ class GraphQlSubscriber implements EventSubscriberInterface {
    */
   public function alterSchemaData(AlterSchemaDataEvent $event): void {
     $schemaData = $event->getSchemaData();
-    // It is not recommended direct replacement, better user parsing or regex.
-    // But this is an example of what you can do.
-    $schemaData[0] = str_replace('alterableQuery(id: Int): Result', 'alterableQuery(id: Int!): Result', $schemaData[0]);
+
+    Visitor::visit($schemaData['test'], [
+      NodeKind::INPUT_VALUE_DEFINITION => [
+        'enter' => function (Node $node) {
+          assert($node instanceof InputValueDefinitionNode);
+          if ($node->name->value !== 'id') {
+            // Do nothing.
+            return NULL;
+          }
+          // Make the type non-nullable.
+          $node->type = new NonNullTypeNode(['type' => $node->type]);
+
+          return $node;
+        },
+        'leave' => function (Node $node) {
+          assert($node instanceof InputValueDefinitionNode);
+          // Once we've visited the id argument node we can stop.
+          if ($node->name->value === 'id') {
+            return Visitor::stop();
+          }
+          // Do nothing.
+          return NULL;
+        },
+      ],
+    ]);
+
     $event->setSchemaData($schemaData);
   }
 

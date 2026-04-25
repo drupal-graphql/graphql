@@ -13,6 +13,8 @@ use Drupal\graphql\GraphQL\Resolver\Value;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\DataProducerPluginManager;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
+use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
+use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
@@ -90,9 +92,11 @@ trait MockingTrait {
    *   Schema id.
    * @param array $values
    *   Server entity values.
+   * @param array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface> $extensions
+   *   An array of schema extension plugins.
    */
-  protected function setUpSchema(string $schema, string $id = 'test', array $values = []): void {
-    $this->mockSchema($id, $schema);
+  protected function setUpSchema(string $schema, string $id = 'test', array $values = [], array $extensions = []): void {
+    $this->mockSchema($id, $schema, $extensions);
     $this->mockSchemaPluginManager($id);
     $this->createTestServer($id, '/graphql/' . $id, $values);
 
@@ -182,6 +186,40 @@ trait MockingTrait {
           'class' => '\Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase',
         ],
       ]);
+  }
+
+  /**
+   * Mock a schema extension plugin.
+   *
+   * @param string $id
+   *   The plugin ID.
+   * @param string|null $baseDefinition
+   *   The base schema definition for the plugin.
+   * @param string|null $extensionDefinition
+   *   The extension definition for the plugin.
+   *
+   * @return \Drupal\graphql\Plugin\SchemaExtensionPluginInterface
+   *   The mocked extension plugin.
+   */
+  protected function mockSchemaExtension(string $id, ?string $baseDefinition, ?string $extensionDefinition): SchemaExtensionPluginInterface {
+    $extension = $this->getMockBuilder(SdlSchemaExtensionPluginBase::class)
+      ->setConstructorArgs([
+        [],
+        $id,
+        [],
+        $this->container->get('module_handler'),
+      ])
+      ->onlyMethods(['getBaseDefinition', 'getExtensionDefinition', 'registerResolvers'])
+      ->getMock();
+
+    $extension->expects(static::any())
+      ->method('getBaseDefinition')
+      ->willReturn($baseDefinition);
+    $extension->expects(static::any())
+      ->method('getExtensionDefinition')
+      ->willReturn($extensionDefinition);
+
+    return $extension;
   }
 
   /**

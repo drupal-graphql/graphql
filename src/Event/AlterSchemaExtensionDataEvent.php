@@ -24,8 +24,8 @@ class AlterSchemaExtensionDataEvent extends Event {
   /**
    * AlterSchemaExtensionDataEvent constructor.
    *
-   * @param array $schemaExtensionData
-   *   The schema extension data.
+   * @param array<string, \GraphQL\Language\AST\DocumentNode> $schemaExtensionData
+   *   The schema extension data, indexed by plugin ID.
    */
   public function __construct(array $schemaExtensionData) {
     $this->schemaExtensionData = $schemaExtensionData;
@@ -34,8 +34,8 @@ class AlterSchemaExtensionDataEvent extends Event {
   /**
    * Returns the schema extension data.
    *
-   * @return array
-   *   The schema extension data.
+   * @return array<string, \GraphQL\Language\AST\DocumentNode>
+   *   The schema extension data, indexed by plugin ID.
    */
   public function getSchemaExtensionData(): array {
     return $this->schemaExtensionData;
@@ -44,8 +44,8 @@ class AlterSchemaExtensionDataEvent extends Event {
   /**
    * Returns the schema extension data.
    *
-   * @param array $schemaExtensionData
-   *   The schema extension data.
+   * @param array<string, \GraphQL\Language\AST\DocumentNode> $schemaExtensionData
+   *   The schema extension data, indexed by plugin ID.
    */
   public function setSchemaExtensionData(array $schemaExtensionData): void {
     $this->schemaExtensionData = $schemaExtensionData;
