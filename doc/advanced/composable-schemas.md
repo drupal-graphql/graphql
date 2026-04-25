@@ -8,7 +8,7 @@ If you have a complex system where certain modules are sometimes enabled / disab
 
 ## Register a new Schema Extension
 
-A new schema extension can be inserted inside a new module so that it can extend a given schema (in the example bellow the schema `example`) with new fields and types. The `schema` key will tell which schema to attach these types to and the `id` key will be used to tell which files to pick up from when generating the schema.
+A new schema extension can be inserted inside a new module so that it can extend a given schema (in the example below the schema `example`) with new fields and types. The `schema` key will tell which schema to attach these types to and the `id` key will be used to tell which files to pick up from when generating the schema.
 
 ```php
 <?php
