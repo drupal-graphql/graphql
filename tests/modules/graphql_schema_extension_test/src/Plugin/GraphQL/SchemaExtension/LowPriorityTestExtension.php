@@ -17,4 +17,13 @@ use Drupal\graphql\Attribute\SchemaExtension;
   schema: "composable",
   priority: -10
 )]
-class LowPriorityTestExtension extends TestExtension {}
+class LowPriorityTestExtension extends TestExtension {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBaseDefinition(): NULL {
+    return NULL;
+  }
+
+}

@@ -18,6 +18,7 @@ use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use GraphQL\Language\Source;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
@@ -159,7 +160,7 @@ trait MockingTrait {
 
     $this->schema->expects(static::any())
       ->method('getSchemaDefinition')
-      ->willReturn($schema);
+      ->willReturn(new Source($schema));
 
     $this->registry = new ResolverRegistry();
     $this->schema->expects($this->any())
@@ -214,10 +215,10 @@ trait MockingTrait {
 
     $extension->expects(static::any())
       ->method('getBaseDefinition')
-      ->willReturn($baseDefinition);
+      ->willReturn($baseDefinition ? new Source($baseDefinition) : NULL);
     $extension->expects(static::any())
       ->method('getExtensionDefinition')
-      ->willReturn($extensionDefinition);
+      ->willReturn($extensionDefinition ? new Source($extensionDefinition) : NULL);
 
     return $extension;
   }

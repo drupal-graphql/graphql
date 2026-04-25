@@ -9,6 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
+use GraphQL\Language\Source;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -63,8 +64,9 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    * {@inheritdoc}
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   In case the file does not exist.
    */
-  public function getBaseDefinition(): ?string {
+  public function getBaseDefinition(): ?Source {
     return $this->loadDefinitionFile('base');
   }
 
@@ -72,8 +74,9 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    * {@inheritdoc}
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   In case the file does not exist.
    */
-  public function getExtensionDefinition(): ?string {
+  public function getExtensionDefinition(): ?Source {
     return $this->loadDefinitionFile('extension');
   }
 
@@ -83,12 +86,13 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
    * @param string $type
    *   The type of the definition file to load.
    *
-   * @return string|null
-   *   The loaded definition file content or NULL if it was empty.
+   * @return \GraphQL\Language\Source
+   *   The loaded definition file content.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   In case the file does not exist.
    */
-  protected function loadDefinitionFile(string $type): ?string {
+  protected function loadDefinitionFile(string $type): Source {
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);
@@ -102,7 +106,18 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
           $module->getName(), $path, $definition['class']));
     }
 
-    return file_get_contents($file) ?: NULL;
+    $contents = file_get_contents($file);
+    if (!$contents) {
+      throw new InvalidPluginDefinitionException(
+        $id,
+        sprintf(
+          'Failed to read schema file "%s".',
+          $file
+        )
+      );
+    }
+
+    return new Source($contents, $file);
   }
 
 }

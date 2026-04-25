@@ -12,6 +12,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Attribute\Schema;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use GraphQL\Language\Source;
+use GraphQL\Language\SourceLocation;
 
 /**
  * A schema that is composed of extensions, each adding to the schema.
@@ -46,15 +48,18 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
   /**
    * {@inheritdoc}
    */
-  protected function getSchemaDefinition(): string {
-    return <<<GQL
-      type Schema {
-        query: Query
-      }
+  protected function getSchemaDefinition(): Source {
+    return new Source(
+      <<<GQL
+            type Schema {
+              query: Query
+            }
 
-      type Query
-GQL;
-
+            type Query
+      GQL,
+      __FILE__,
+      new SourceLocation(__LINE__ - 7, 1),
+    );
   }
 
   /**

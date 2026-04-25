@@ -23,6 +23,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Language\Source;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\BuildSchema;
@@ -234,7 +235,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
     $extensionBaseAsts = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
       $schema = $extension->getBaseDefinition();
-      if ($schema === NULL || $schema === '') {
+      if ($schema === NULL) {
         return NULL;
       }
       return Parser::parse($schema, ['noLocation' => !$this->inDevelopment]);
@@ -253,7 +254,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
     $extensionExtensionAsts = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
       $schema = $extension->getExtensionDefinition();
-      if ($schema === NULL || $schema === '') {
+      if ($schema === NULL) {
         return NULL;
       }
       return Parser::parse($schema, ['noLocation' => !$this->inDevelopment]);
@@ -281,12 +282,12 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   /**
    * Retrieves the raw schema definition string.
    *
-   * @return string
+   * @return \GraphQL\Language\Source
    *   The schema definition.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  protected function getSchemaDefinition(): string {
+  protected function getSchemaDefinition(): Source {
     $id = $this->getPluginId();
     $definition = $this->getPluginDefinition();
     $module = $this->moduleHandler->getModule($definition['provider']);
@@ -312,7 +313,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       );
     }
 
-    return $contents;
+    return new Source($contents, $file);
   }
 
   /**

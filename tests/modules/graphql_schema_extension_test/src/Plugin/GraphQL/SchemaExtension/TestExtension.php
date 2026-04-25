@@ -44,4 +44,11 @@ class TestExtension extends SdlSchemaExtensionPluginBase {
     ));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getExtensionDefinition(): NULL {
+    return NULL;
+  }
+
 }

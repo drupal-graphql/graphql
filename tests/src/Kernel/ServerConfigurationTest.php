@@ -10,6 +10,7 @@ use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
+use GraphQL\Language\Source;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -145,7 +146,7 @@ class ServerConfigurationTest extends GraphQLTestBase {
 
     $mock->expects(static::any())
       ->method('getSchemaDefinition')
-      ->willReturn($schema);
+      ->willReturn(new Source($schema));
 
     $registry = new ResolverRegistry();
     $mock->expects($this->any())

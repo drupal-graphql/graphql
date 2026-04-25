@@ -8,6 +8,7 @@ use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
+use GraphQL\Language\Source;
 
 /**
  * Tests the alterable schema.
@@ -146,19 +147,19 @@ class AlterableSchemaTest extends GraphQLTestBase {
 
     $extensions['graphql_alterable_schema_test']->expects(static::any())
       ->method('getBaseDefinition')
-      ->willReturn('');
+      ->willReturn(NULL);
 
     switch ($this->name()) {
       case 'testEmptySchemaExtensionAlteredQueryResultPropertyAdded':
-        $extensionDefinition = '';
+        $extensionDefinition = NULL;
         break;
 
       default:
-        $extensionDefinition = <<<GQL
+        $extensionDefinition = new Source(<<<GQL
           extend type Result {
             position: Int
           }
-        GQL;
+        GQL);
         break;
     }
 
@@ -193,7 +194,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
 
     $this->schema->expects(static::any())
       ->method('getSchemaDefinition')
-      ->willReturn($schema);
+      ->willReturn(new Source($schema));
 
     $this->registry = new ResolverRegistry();
     $this->schema->expects($this->any())

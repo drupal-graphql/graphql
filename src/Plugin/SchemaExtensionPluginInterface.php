@@ -7,6 +7,7 @@ namespace Drupal\graphql\Plugin;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use GraphQL\Language\Source;
 
 /**
  * Defines plugins that can extend the GraphQL schema definition.
@@ -24,17 +25,17 @@ interface SchemaExtensionPluginInterface extends PluginInspectionInterface, Deri
   /**
    * Retrieves the base schema definition.
    *
-   * @return string|null
+   * @return \GraphQL\Language\Source|null
    *   The base schema definition.
    */
-  public function getBaseDefinition(): ?string;
+  public function getBaseDefinition(): ?Source;
 
   /**
    * Retrieves the extension schema definition.
    *
-   * @return string|null
+   * @return \GraphQL\Language\Source|null
    *   The extension schema definition.
    */
-  public function getExtensionDefinition(): ?string;
+  public function getExtensionDefinition(): ?Source;
 
 }
