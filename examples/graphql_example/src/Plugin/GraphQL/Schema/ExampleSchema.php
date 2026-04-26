@@ -9,7 +9,6 @@ use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
-use Drupal\graphql_examples\Wrappers\QueryConnection;
 
 /**
  * Example schema plugin that maps article data.
@@ -87,15 +86,13 @@ class ExampleSchema extends SdlSchemaPluginBase {
    */
   protected function addConnectionFields(string $type, ResolverRegistry $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver($type, 'total',
-      $builder->callback(function (QueryConnection $connection) {
-        return $connection->total();
-      })
+      $builder->produce('connection_total')
+        ->map('connection', $builder->fromParent())
     );
 
     $registry->addFieldResolver($type, 'items',
-      $builder->callback(function (QueryConnection $connection) {
-        return $connection->items();
-      })
+      $builder->produce('connection_items')
+        ->map('connection', $builder->fromParent())
     );
   }
 

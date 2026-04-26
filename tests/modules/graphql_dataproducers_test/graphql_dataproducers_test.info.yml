@@ -1,0 +1,7 @@
+type: module
+name: GraphQL Data Producers Test
+description: Test module for GraphQL data producer plugins used in kernel tests.
+package: Testing
+hidden: TRUE
+dependencies:
+  - graphql:graphql

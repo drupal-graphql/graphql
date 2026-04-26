@@ -17,7 +17,7 @@ type Query {
 
 type User {
     id: Int
-    name: String
+    displayName: String
 }
 ```
 
@@ -118,7 +118,7 @@ In the end when we do a query like this :
 {
   currentUser {
     id
-    name
+    displayName
   }
 }
 ```
@@ -130,21 +130,21 @@ we get a result like this :
   "data": {
     "currentUser": {
       "id": 1,
-      "name": "admin"
+      "displayName": "Admin"
     }
   }
 }
 ```
 
-For this to actually work we would need to add resolvers to the User object to resolve the `id` and `name` properties like so:
+For this to actually work we would need to add resolvers to the User object to resolve the `id` and `displayName` properties like so:
 ```php
-$registry->addFieldResolver('User', 'id', $builder->callback(function ($account) {
-  /** @var \Drupal\Core\Session\AccountProxyInterface $account */
-  return $account->id();
-}));
+$registry->addFieldResolver('User', 'id',
+  $builder->product('entity_id')
+    ->map('entity', $builder->fromParent())
+);
 
-$registry->addFieldResolver('User', 'name', $builder->callback(function ($account) {
-  /** @var \Drupal\Core\Session\AccountProxyInterface $account */
-  return $account->getAccountName();
-}));
+$registry->addFieldResolver('User', 'displayName',
+  $builder->product('entity_label')
+    ->map('entity', $builder->fromParent())
+);
 ```

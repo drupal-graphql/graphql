@@ -57,6 +57,12 @@ class ResolverBuilder {
 
   /**
    * Register a callback as resolver.
+   *
+   * @deprecated in graphql:5.0.0 and is removed from graphql:6.0.0. Create a
+   *   class implementing Drupal\graphql\Plugin\DataProducerPluginInterface and
+   *   use ResolverBuilder::produce() instead.
+   *
+   * @see https://www.drupal.org/node/3576383
    */
   public function callback(callable $callback): Callback {
     return new Callback($callback);

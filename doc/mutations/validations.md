@@ -208,8 +208,100 @@ We have added a new type that is returned `$response` where we call the `setArti
 
 ## Resolve errors and article
 
-To resolve our fields similar to before we go to our schema implementation again and add the resolvers for the
-`ArticleResponse` we created (what the mutation now returns back):
+To resolve our fields similar to before we wire the `ArticleResponse` type (what the mutation now returns) using small **data producers**—one per field—and register them with `produce()` and `fromParent()` so the parent value is passed in as context.
+
+Add `ArticleResponseArticle.php` in `src/Plugin/GraphQL/DataProducer/` :
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
+
+/**
+ * Returns the article held on an ArticleResponse.
+ */
+#[DataProducer(
+  id: 'article_response_article',
+  name: new TranslatableMarkup('Article Response Article'),
+  description: new TranslatableMarkup('Get the article from an ArticleResponse.'),
+  produces: new ContextDefinition(
+    data_type: 'any',
+    label: new TranslatableMarkup('Article'),
+  ),
+  consumes: [
+    'response' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('ArticleResponse'),
+    ),
+  ],
+)]
+class ArticleResponseArticle extends DataProducerPluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resolve(ArticleResponse $response): ?ContentEntityInterface {
+    return $response->article();
+  }
+
+}
+```
+
+Add `ResponseViolations.php` in the same folder. It works for any response that extends the module's `Response` class (including `ArticleResponse`), because violations live on that base:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
+
+use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\graphql\Attribute\DataProducer;
+use Drupal\graphql\GraphQL\Response\Response;
+use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+
+/**
+ * Returns violation messages from a Response.
+ */
+#[DataProducer(
+  id: 'response_violations',
+  name: new TranslatableMarkup('Response Violations'),
+  description: new TranslatableMarkup('Get the violations from a Response.'),
+  produces: new ContextDefinition(
+    data_type: 'any',
+    label: new TranslatableMarkup('Violations'),
+  ),
+  consumes: [
+    'response' => new ContextDefinition(
+      data_type: 'any',
+      label: new TranslatableMarkup('Response'),
+    ),
+  ],
+)]
+class ResponseViolations extends DataProducerPluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resolve(Response $response): array {
+    return $response->getViolations();
+  }
+
+}
+```
+
+Then in our schema implementation we register the field resolvers for `ArticleResponse` :
 
 ```php
 /**
@@ -218,15 +310,13 @@ To resolve our fields similar to before we go to our schema implementation again
 public function registerResolvers(ResolverRegistryInterface $registry) {
   ...
   $registry->addFieldResolver('ArticleResponse', 'article',
-    $builder->callback(function (ArticleResponse $response) {
-      return $response->article();
-    })
+    $builder->produce('article_response_article')
+      ->map('response', $builder->fromParent())
   );
 
   $registry->addFieldResolver('ArticleResponse', 'errors',
-    $builder->callback(function (ArticleResponse $response) {
-      return $response->getViolations();
-    })
+    $builder->produce('response_violations')
+      ->map('response', $builder->fromParent())
   );
   ...
   return $registry;

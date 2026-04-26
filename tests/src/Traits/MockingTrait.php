@@ -235,6 +235,10 @@ trait MockingTrait {
    */
   protected function mockResolver(string $type, string $field, mixed $resolver = NULL): void {
     if (is_callable($resolver)) {
+      // To make sure we don't suddenly break people's tests we trigger a
+      // deprecation here but still forward to our deprecated class.
+      @trigger_error("Calling MockingTrait::mockResolver() with a callable is deprecated in graphql:5.0.0 and is removed from graphql:6.0.0. Create a test data producer class instead. See https://www.drupal.org/node/3576383", E_USER_DEPRECATED);
+      // @phpstan-ignore-next-line
       $resolver = new Callback($resolver);
     }
 

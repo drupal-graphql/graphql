@@ -19,7 +19,10 @@ class ResolverBuilderTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['graphql_resolver_builder_test'];
+  protected static $modules = [
+    'graphql_dataproducers_test',
+    'graphql_resolver_builder_test',
+  ];
 
   /**
    * {@inheritdoc}
@@ -455,29 +458,13 @@ GQL;
   public function testDeferredDefaultValue(): void {
     $this->mockResolver('Query', 'tree', ['name' => 'some tree', 'id' => 5]);
     $this->mockResolver('Tree', 'name', $this->builder->defaultValue(
-      $this->builder->callback(function () {
-        return new Deferred(function () {
-          return NULL;
-        });
-      }),
-      $this->builder->callback(function () {
-        return new Deferred(function () {
-          return 'bar';
-        });
-      })
+      $this->builder->produce('test_deferred')->map('value', $this->builder->fromValue(NULL)),
+      $this->builder->produce('test_deferred')->map('value', $this->builder->fromValue('bar'))
     ));
 
     $this->mockResolver('Tree', 'uri', $this->builder->defaultValue(
-      $this->builder->callback(function () {
-        return new Deferred(function () {
-          return 'baz';
-        });
-      }),
-      $this->builder->callback(function () {
-        return new Deferred(function () {
-          return 'bar';
-        });
-      })
+      $this->builder->produce('test_deferred')->map('value', $this->builder->fromValue('baz')),
+      $this->builder->produce('test_deferred')->map('value', $this->builder->fromValue('bar'))
     ));
 
     $query = <<<GQL

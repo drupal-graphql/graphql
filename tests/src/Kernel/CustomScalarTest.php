@@ -18,6 +18,13 @@ class CustomScalarTest extends GraphQLTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = [
+    'graphql_dataproducers_test',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -41,14 +48,8 @@ class CustomScalarTest extends GraphQLTestBase {
     $this->mockResolver('Query', 'read', ['foo', 'bar']);
     $builder = new ResolverBuilder();
     $this->mockResolver('Query', 'compare',
-      $builder->compose(
-        $builder->fromArgument('input'),
-        $builder->callback(
-          function (array $input) {
-            return $input[0] === $input[1];
-          }
-        ),
-      ),
+      $builder->produce('test_compare_tuple')
+        ->map('input', $builder->fromArgument('input'))
     );
   }
 

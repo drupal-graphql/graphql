@@ -15,57 +15,32 @@ $registry->addFieldResolver('Query', 'currentUser', $builder->compose(
 
 We are chaining the two data producers together here, one after the other and calling `fromParent` will give us the result that was returned in the previous step.
 
-## Custom steps
+## Debugging composed chains
 
-What if we need to do some massaging but not necessarily using any data producer? The `$builder` object includes a callback property as well that we can use for this :
+A `compose()` chain is executed by [`Composite`](../../src/GraphQL/Resolver/Composite.php). Each step receives the value returned by the previous step; the loop walks that list until the final result is produced.
 
-```php
-$registry->addFieldResolver('Query', 'currentUser', $builder->compose(
-  $builder->produce('current_user'),
-  $builder->produce('entity_load')
-    ->map('type', $builder->fromValue('user'))
-    ->map('id', $builder->fromParent()),
-  $builder->callback(function ($entity) {
-    // Here we can do anything we want to the data. We get as a parameter anything that was returned
-    // in the previous step.
-  })
-));
+### Where to break in `Composite`
+
+Set an Xdebug breakpoint in `Composite::resolve()` on the line **inside the `while` loop** where the next resolver runs—[`$value = $resolver->resolve(...)`](../../src/GraphQL/Resolver/Composite.php) (around line 46 in the graphql module sources).
+
+- **Before a step runs:** when execution stops on that line, `$value` is the output of the previous composed resolver (or the initial parent value for the first step), and `$resolver` is the resolver about to run (often a `DataProducerProxy` for the next producer).
+- **After a step runs:** step once (or break on the next line) and inspect the new `$value`, which is that step’s return value before the loop continues.
+
+If a step returns a `SyncPromise`, execution may continue asynchronously via `DeferredUtility::returnFinally`; in that case you may need to break again when the deferred continuation re-enters `Composite::resolve()` for the remainder of the chain.
+
+### Narrowing to one field and parent type
+
+The same `Composite` instance can be shared only indirectly, but every invocation receives GraphQL resolution metadata. Use a **conditional breakpoint** so you only stop for the field you care about:
+
+- **Field name** (API name of the field being resolved): `$field->getFieldName() === 'heroImage'`
+  `FieldContext::getFieldName()` delegates to [`ResolveInfo::$fieldName`](https://webonyx.github.io/graphql-php/class-reference/#graphqltypedefinitionresolveinfo).
+- **Parent GraphQL type** (the type of the object that owns the field): `$info->parentType->name === 'Article'`
+  For the root `Query` / `Mutation` fields, the parent type is typically that operation type’s name (`Query`, `Mutation`, etc.).
+
+Combine them when both matter, for example:
+
+```text
+$field->getFieldName() === 'heroImage' && $info->parentType->name === 'Article'
 ```
 
-## Debugging producers
-
-Note that you can always easily tap into the chain and e.g. use xdebug to debug the values:
-
-```php
-  $builder->compose(
-      $builder->tap($builder->callback(function ($parent, $args) {
-          // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
-          $compose_step = 0;
-      })),
-      // Load the file object from the field.
-      $builder->produce('property_path')
-        ->map('type', $builder->fromValue('entity:YOUR_ENTITY_TYPE'))
-        ->map('value', $builder->fromParent())
-        ->map('path', $builder->fromValue('YOUR_FIELD_NAME.YOUR_FIELD_PROPERTY')),
-      $builder->tap($builder->callback(function ($parent, $args) {
-          // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
-          $compose_step = 1;
-      })),
-      // Load the image style derivative of the file.
-      $builder->produce('image_derivative')
-        ->map('entity', $builder->fromParent())
-        ->map('style', $builder->fromValue('YOUR_IMAGE_STYLE')),
-      $builder->tap($builder->callback(function ($parent, $args) {
-          // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
-          $compose_step = 2;
-      })),
-      // Retrieve the url of the generated image.
-      $builder->produce('image_style_url')
-        ->map('derivative', $builder->fromParent()),
-      $builder->tap($builder->callback(function ($parent, $args) {
-          // YOU CAN SET A XDEBUG BREAKPOINT IN THESE CALLBACKS TO CHECK THE VALUES.
-          $compose_step = 3;
-      }))
-    )
-  );
-```
+You can add further conditions on `$value` (entity id, bundle, etc.) once you know what the parent passes into the chain—useful when the same composed chain is registered for several fields but you only want to stop for one case.

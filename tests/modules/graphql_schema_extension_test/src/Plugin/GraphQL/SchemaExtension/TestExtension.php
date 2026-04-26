@@ -39,9 +39,9 @@ class TestExtension extends SdlSchemaExtensionPluginBase {
   public function registerResolvers(ResolverRegistryInterface $registry): void {
     $builder = new ResolverBuilder();
 
-    $registry->addFieldResolver('TestType', 'pluginId', $builder->callback(
-      fn (): string => $this->getPluginDefinition()['id']
-    ));
+    $registry->addFieldResolver('TestType', 'pluginId',
+      $builder->fromValue($this->getPluginDefinition()['id'])
+    );
   }
 
   /**

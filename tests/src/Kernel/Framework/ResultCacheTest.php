@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\ContextCacheKeys;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\Tests\graphql\TestInvocationCounter;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use GraphQL\Deferred;
@@ -38,6 +39,11 @@ class ResultCacheTest extends GraphQLTestBase {
    * The mocked current time to return.
    */
   protected int $currentTime;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['graphql_dataproducers_test'];
 
   /**
    * {@inheritdoc}
@@ -112,21 +118,14 @@ GQL;
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $dummy = $this->getMockBuilder(Server::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['id'])
-      ->getMock();
-
-    $dummy->expects($this->exactly(2))
-      ->method('id')
-      ->willReturn('test');
+    $counter = new TestInvocationCounter();
 
     $this->mockResolver('Query', 'root',
       $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->builder->callback(function () use ($dummy) {
-          return $dummy->id();
-        })
+        $this->builder->produce('test_counting')
+          ->map('return_value', $this->builder->fromValue('test'))
+          ->map('counter', $this->builder->fromValue($counter))
       )
     );
 
@@ -135,6 +134,8 @@ GQL;
 
     // This should invoke the processor a second time.
     $this->query('{ root }');
+
+    $this->assertSame(2, $counter->getCount());
   }
 
   /**
@@ -157,21 +158,14 @@ GQL;
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $dummy = $this->getMockBuilder(Server::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['id'])
-      ->getMock();
-
-    $dummy->expects($this->exactly(2))
-      ->method('id')
-      ->willReturn('test');
+    $counter = new TestInvocationCounter();
 
     $this->mockResolver('Query', 'root',
       $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->builder->callback(function () use ($dummy) {
-          return $dummy->id();
-        })
+        $this->builder->produce('test_counting')
+          ->map('return_value', $this->builder->fromValue('test'))
+          ->map('counter', $this->builder->fromValue($counter))
       )
     );
 
@@ -180,6 +174,8 @@ GQL;
 
     // This should invoke the processor a second time.
     $this->query('{ root }');
+
+    $this->assertSame(2, $counter->getCount());
   }
 
   /**
@@ -231,14 +227,7 @@ GQL;
       ->method('getCacheContexts')
       ->willReturn(['context']);
 
-    $dummy = $this->getMockBuilder(Server::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['id'])
-      ->getMock();
-
-    $dummy->expects($this->exactly(2))
-      ->method('id')
-      ->willReturn('test');
+    $counter = new TestInvocationCounter();
 
     // Prepare a prophesied context manager.
     $contextManager = $this->prophesize(CacheContextsManager::class);
@@ -265,9 +254,9 @@ GQL;
     $this->mockResolver('Query', 'root',
       $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->builder->callback(function () use ($dummy) {
-          return $dummy->id();
-        })
+        $this->builder->produce('test_counting')
+          ->map('return_value', $this->builder->fromValue('test'))
+          ->map('counter', $this->builder->fromValue($counter))
       )
     );
 
@@ -285,6 +274,8 @@ GQL;
     $contextKeys->willReturn(new ContextCacheKeys(['a']));
     // This will be retrieved from cache for context 'a'.
     $this->query('{ root }');
+
+    $this->assertSame(2, $counter->getCount());
   }
 
   /**
@@ -307,21 +298,14 @@ GQL;
       ->method('getCacheContexts')
       ->willReturn([]);
 
-    $dummy = $this->getMockBuilder(Server::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['id'])
-      ->getMock();
-
-    $dummy->expects($this->exactly(2))
-      ->method('id')
-      ->willReturn('test');
+    $counter = new TestInvocationCounter();
 
     $this->mockResolver('Query', 'root',
       $this->builder->compose(
         $this->builder->fromValue($cacheable),
-        $this->builder->callback(function () use ($dummy) {
-          return $dummy->id();
-        })
+        $this->builder->produce('test_counting')
+          ->map('return_value', $this->builder->fromValue('test'))
+          ->map('counter', $this->builder->fromValue($counter))
       )
     );
 
@@ -333,6 +317,8 @@ GQL;
 
     // Another call will invoke the processor a second time.
     $this->query('{ root }');
+
+    $this->assertSame(2, $counter->getCount());
 
     // Invalidate a tag that is NOT part of the result metadata.
     $this->container->get('cache_tags.invalidator')->invalidateTags(['c']);
@@ -450,44 +436,37 @@ GQL;
    * Test cacheMaxAge is correctly set when reading from cache.
    *
    * Validates that Executor::cacheRead() calculates and merges cacheMaxAge
-   * as (expire - time()) when serving cached results.
+   * as (expire - TimeInterface::getCurrentTime()) when serving cached results.
    *
    * @coversClass \Drupal\graphql\GraphQL\Execution\Executor::cacheRead
    */
   public function testCacheMaxAgeOnRead(): void {
     $lifetime = 45;
-    $cacheable = $this->getMockBuilder(CacheableDependencyInterface::class)
-      ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
-      ->getMock();
-
-    $cacheable->expects($this->any())
-      ->method('getCacheTags')
-      ->willReturn(['a', 'b']);
-
-    $cacheable->expects($this->any())
-      ->method('getCacheMaxAge')
-      ->willReturn($lifetime);
-
-    $cacheable->expects($this->any())
-      ->method('getCacheContexts')
-      ->willReturn([]);
 
     $dummy = $this->getMockBuilder(Server::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['id'])
+      ->onlyMethods(['id', 'getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
     $dummy->expects($this->exactly(1))
       ->method('id')
       ->willReturn('test');
 
+    $dummy->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['a', 'b']);
+
+    $dummy->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn($lifetime);
+
+    $dummy->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+
     $this->mockResolver('Query', 'root',
-      $this->builder->compose(
-        $this->builder->fromValue($cacheable),
-        $this->builder->callback(function () use ($dummy) {
-          return $dummy->id();
-        })
-      )
+      $this->builder->produce('entity_id')
+        ->map('entity', $this->builder->fromValue($dummy))
     );
 
     $this->query('{ root }');
