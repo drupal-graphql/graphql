@@ -17,18 +17,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class QueryAccessCheck implements AccessInterface {
 
   /**
-   * The request stack.
-   */
-  protected RequestStack $requestStack;
-
-  /**
    * QueryAccessCheck constructor.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    */
-  public function __construct(RequestStack $requestStack) {
-    $this->requestStack = $requestStack;
+  public function __construct(
+    protected RequestStack $requestStack,
+  ) {
   }
 
   /**

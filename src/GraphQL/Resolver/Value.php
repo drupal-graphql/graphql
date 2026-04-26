@@ -15,15 +15,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Value implements ResolverInterface {
 
   /**
-   * Value to be resolved.
-   */
-  protected mixed $value;
-
-  /**
    * Value constructor.
+   *
+   * @param mixed $value
+   *   Value to be resolved.
    */
-  public function __construct(mixed $value) {
-    $this->value = $value;
+  public function __construct(
+    protected mixed $value,
+  ) {
   }
 
   /**

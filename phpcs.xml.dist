@@ -49,6 +49,8 @@
     <exclude-pattern>tests/src/Traits/DataProducerExecutionTrait.php</exclude-pattern>
     <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
     <exclude-pattern>tests/src/Traits/QueryResultAssertionTrait.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/Resolver/Context.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/Resolver/Value.php</exclude-pattern>
   </rule>
 
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">

@@ -14,21 +14,17 @@ use GraphQL\Type\Definition\ResolveInfo;
 class SourceContext implements ResolverInterface {
 
   /**
-   * Name of the context.
-   */
-  protected string $name;
-
-  /**
-   * Source resolver.
-   */
-  protected mixed $source;
-
-  /**
    * SourceContext constructor.
+   *
+   * @param string $name
+   *   Name of the context.
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface|null $source
+   *   Source resolver.
    */
-  public function __construct(string $name, ?ResolverInterface $source = NULL) {
-    $this->name = $name;
-    $this->source = $source;
+  public function __construct(
+    protected string $name,
+    protected ?ResolverInterface $source = NULL,
+  ) {
   }
 
   /**

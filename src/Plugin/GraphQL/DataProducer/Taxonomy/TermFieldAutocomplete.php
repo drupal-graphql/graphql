@@ -68,16 +68,6 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
   const MAX_ITEMS = 100;
 
   /**
-   * The database connection.
-   */
-  protected Connection $database;
-
-  /**
-   * The entity type manager.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
    * The term storage.
    */
   protected ?TermStorageInterface $termStorage = NULL;
@@ -88,25 +78,17 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
   protected ?ContentEntityTypeInterface $termType = NULL;
 
   /**
-   * The module handler.
-   */
-  protected ModuleHandlerInterface $moduleHandler;
-
-  /**
    * {@inheritdoc}
    */
   public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    Connection $database,
-    EntityTypeManagerInterface $entity_type_manager,
-    ModuleHandlerInterface $module_handler,
+    protected Connection $database,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->database = $database;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->moduleHandler = $module_handler;
   }
 
   /**

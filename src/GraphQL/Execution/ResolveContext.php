@@ -18,34 +18,9 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
-   * The GraphQL server configuration.
-   */
-  protected ServerInterface $server;
-
-  /**
-   * Configuration.
-   */
-  protected array $config;
-
-  /**
    * List of available contexts keyed by path and context name.
    */
   protected array $contexts;
-
-  /**
-   * The operation parameters to perform.
-   */
-  protected OperationParams $operation;
-
-  /**
-   * The parsed schema document.
-   */
-  protected DocumentNode $document;
-
-  /**
-   * Type.
-   */
-  protected string $type;
 
   /**
    * The context language.
@@ -54,21 +29,26 @@ class ResolveContext implements RefinableCacheableDependencyInterface {
 
   /**
    * ResolveContext constructor.
+   *
+   * @param \Drupal\graphql\Entity\ServerInterface $server
+   *   The GraphQL server configuration.
+   * @param \GraphQL\Server\OperationParams $operation
+   *   The operation parameters to perform.
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *   The parsed schema document.
+   * @param string $type
+   *   The type.
+   * @param array $config
+   *   Configuration.
    */
   public function __construct(
-    ServerInterface $server,
-    OperationParams $operation,
-    DocumentNode $document,
-    string $type,
-    array $config,
+    protected ServerInterface $server,
+    protected OperationParams $operation,
+    protected DocumentNode $document,
+    protected string $type,
+    protected array $config,
   ) {
     $this->addCacheContexts(['user.permissions']);
-
-    $this->server = $server;
-    $this->config = $config;
-    $this->operation = $operation;
-    $this->document = $document;
-    $this->type = $type;
   }
 
   /**

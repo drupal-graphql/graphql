@@ -61,11 +61,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityTranslation extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity repository.
-   */
-  protected EntityRepositoryInterface $entityRepository;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -81,10 +76,23 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
 
   /**
    * EntityTranslation constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository service.
    */
-  public function __construct(array $configuration, string $pluginId, PluginDefinitionInterface|array $pluginDefinition, EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    array $configuration,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityRepository = $entityRepository;
   }
 
   /**

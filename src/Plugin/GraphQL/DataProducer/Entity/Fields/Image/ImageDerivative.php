@@ -60,6 +60,17 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * ImageDerivative constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Image\ImageFactory $imageFactory
+   *   The image factory service.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
   public function __construct(
     array $configuration,

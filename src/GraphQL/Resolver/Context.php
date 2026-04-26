@@ -15,21 +15,17 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Context implements ResolverInterface {
 
   /**
-   * Name of the context.
-   */
-  protected mixed $name;
-
-  /**
-   * An arbitrary default value in case the context is not set.
-   */
-  protected mixed $default;
-
-  /**
    * Context constructor.
+   *
+   * @param string $name
+   *   Name of the context.
+   * @param mixed $default
+   *   An arbitrary default value in case the context is not set.
    */
-  public function __construct(string $name, mixed $default = NULL) {
-    $this->name = $name;
-    $this->default = $default;
+  public function __construct(
+    protected string $name,
+    protected mixed $default = NULL,
+  ) {
   }
 
   /**

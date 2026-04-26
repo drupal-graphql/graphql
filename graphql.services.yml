@@ -108,7 +108,7 @@ services:
   # Validator service.
   graphql.validator:
     class: Drupal\graphql\GraphQL\Validator
-    arguments: ['@plugin.manager.graphql.schema', '@logger.channel.graphql']
+    arguments: ['@plugin.manager.graphql.schema']
 
   # Reset the current language during sub-requests.
   graphql.subrequest_subscriber:

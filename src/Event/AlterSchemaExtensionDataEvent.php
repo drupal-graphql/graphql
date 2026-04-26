@@ -17,18 +17,14 @@ class AlterSchemaExtensionDataEvent extends Event {
   const EVENT_NAME = 'graphql.sdl.alter_schema_extension';
 
   /**
-   * The schema array data.
-   */
-  protected array $schemaExtensionData;
-
-  /**
    * AlterSchemaExtensionDataEvent constructor.
    *
    * @param array<string, \GraphQL\Language\AST\DocumentNode> $schemaExtensionData
    *   The schema extension data, indexed by plugin ID.
    */
-  public function __construct(array $schemaExtensionData) {
-    $this->schemaExtensionData = $schemaExtensionData;
+  public function __construct(
+    protected array $schemaExtensionData,
+  ) {
   }
 
   /**

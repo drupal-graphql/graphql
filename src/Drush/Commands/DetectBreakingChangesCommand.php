@@ -51,6 +51,13 @@ final class DetectBreakingChangesCommand extends Command {
 
   /**
    * Constructs a DumpSchemaCommand object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger service.
+   * @param \Consolidation\OutputFormatters\FormatterManager $formatterManager
+   *   The formatter manager service.
    */
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,

@@ -73,21 +73,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The entity repository service.
-   */
-  protected EntityRepositoryInterface $entityRepository;
-
-  /**
-   * The entity buffer service.
-   */
-  protected EntityUuidBuffer $entityBuffer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -110,14 +95,11 @@ class EntityLoadByUuid extends DataProducerPluginBase implements ContainerFactor
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityRepositoryInterface $entityRepository,
-    EntityUuidBuffer $entityBuffer,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected EntityUuidBuffer $entityBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityRepository = $entityRepository;
-    $this->entityBuffer = $entityBuffer;
   }
 
   /**

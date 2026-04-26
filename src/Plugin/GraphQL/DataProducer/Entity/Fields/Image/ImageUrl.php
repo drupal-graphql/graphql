@@ -38,16 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The rendering service.
-   */
-  protected RendererInterface $renderer;
-
-  /**
-   * The file URL generator service.
-   */
-  protected FileUrlGeneratorInterface $fileUrlGenerator;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -64,17 +54,26 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
 
   /**
    * ImageUrl constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   *   The file URL generator service.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     PluginDefinitionInterface|array $pluginDefinition,
-    RendererInterface $renderer,
-    FileUrlGeneratorInterface $fileUrlGenerator,
+    protected RendererInterface $renderer,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->renderer = $renderer;
-    $this->fileUrlGenerator = $fileUrlGenerator;
   }
 
   /**

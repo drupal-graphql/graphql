@@ -29,16 +29,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ServerForm extends EntityForm {
 
   /**
-   * The request context.
-   */
-  protected RequestContext $requestContext;
-
-  /**
-   * The schema plugin manager.
-   */
-  protected SchemaPluginManager $schemaManager;
-
-  /**
    * ServerForm constructor.
    *
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $schemaManager
@@ -48,9 +38,10 @@ class ServerForm extends EntityForm {
    *
    * @codeCoverageIgnore
    */
-  public function __construct(SchemaPluginManager $schemaManager, RequestContext $requestContext) {
-    $this->requestContext = $requestContext;
-    $this->schemaManager = $schemaManager;
+  public function __construct(
+    protected SchemaPluginManager $schemaManager,
+    protected RequestContext $requestContext,
+  ) {
   }
 
   /**

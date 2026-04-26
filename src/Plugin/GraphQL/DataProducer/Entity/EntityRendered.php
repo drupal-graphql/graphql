@@ -43,16 +43,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityRendered extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The renderer service.
-   */
-  protected RendererInterface $renderer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -74,12 +64,10 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
     array $configuration,
     string $pluginId,
     PluginDefinitionInterface|array $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    RendererInterface $renderer,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected RendererInterface $renderer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->renderer = $renderer;
   }
 
   /**

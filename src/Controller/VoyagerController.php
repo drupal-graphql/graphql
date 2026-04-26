@@ -15,10 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @codeCoverageIgnore
  */
 class VoyagerController implements ContainerInjectionInterface {
-  /**
-   * The introspection service.
-   */
-  protected Introspection $introspection;
 
   /**
    * {@inheritdoc}
@@ -37,8 +33,9 @@ class VoyagerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public function __construct(Introspection $introspection) {
-    $this->introspection = $introspection;
+  public function __construct(
+    protected Introspection $introspection,
+  ) {
   }
 
   /**

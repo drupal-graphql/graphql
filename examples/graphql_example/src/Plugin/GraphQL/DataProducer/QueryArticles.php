@@ -46,16 +46,6 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
   const MAX_LIMIT = 100;
 
   /**
-   * The entity type manager.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The entity buffer service.
-   */
-  protected EntityBuffer $entityBuffer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -72,17 +62,26 @@ class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPl
 
   /**
    * Constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   *   The entity buffer service.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     PluginDefinitionInterface|array $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityBuffer $entityBuffer,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityBuffer $entityBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityBuffer = $entityBuffer;
   }
 
   /**

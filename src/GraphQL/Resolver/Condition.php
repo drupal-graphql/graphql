@@ -19,15 +19,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Condition implements ResolverInterface {
 
   /**
-   * List of condition and their corresponding resolvers.
-   */
-  protected array $branches;
-
-  /**
    * Condition constructor.
+   *
+   * @param array $branches
+   *   List of condition and their corresponding resolvers.
    */
-  public function __construct(array $branches) {
-    $this->branches = $branches;
+  public function __construct(
+    protected array $branches,
+  ) {
   }
 
   /**

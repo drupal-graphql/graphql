@@ -22,12 +22,22 @@ class SubrequestSubscriber implements EventSubscriberInterface {
 
   /**
    * Constructs a SubrequestSubscriber object.
+   *
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager service.
+   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
+   *   The string translation service.
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   *   The current user.
+   * @param \Drupal\language\LanguageNegotiatorInterface|null $languageNegotiator
+   *   (optional) The language negotiator service.
    */
-  public function __construct(LanguageManagerInterface $languageManager, TranslatorInterface $translator, AccountInterface $currentUser, ?LanguageNegotiatorInterface $languageNegotiator = NULL) {
-    $this->languageManager = $languageManager;
-    $this->translator = $translator;
-    $this->currentUser = $currentUser;
-    $this->languageNegotiator = $languageNegotiator;
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+    protected TranslatorInterface $translator,
+    protected AccountInterface $currentUser,
+    protected ?LanguageNegotiatorInterface $languageNegotiator = NULL,
+  ) {
   }
 
   /**

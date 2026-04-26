@@ -15,22 +15,18 @@ class FieldContext implements RefinableCacheableDependencyInterface {
   use RefinableCacheableDependencyTrait;
 
   /**
-   * The context that has been passed down.
-   */
-  protected ResolveContext $context;
-
-  /**
-   * Schema type information of the current field.
-   */
-  protected ResolveInfo $info;
-
-  /**
    * FieldContext constructor.
+   *
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The context that has been passed down.
+   * @param \GraphQL\Type\Definition\ResolveInfo $info
+   *   Schema type information of the current field.
    */
-  public function __construct(ResolveContext $context, ResolveInfo $info) {
+  public function __construct(
+    protected ResolveContext $context,
+    protected ResolveInfo $info,
+  ) {
     $this->addCacheContexts(['user.permissions']);
-    $this->context = $context;
-    $this->info = $info;
   }
 
   /**

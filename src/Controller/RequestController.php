@@ -16,11 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RequestController implements ContainerInjectionInterface {
 
   /**
-   * The service configuration parameters.
-   */
-  protected array $parameters;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -37,8 +32,9 @@ class RequestController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public function __construct(array $parameters) {
-    $this->parameters = $parameters;
+  public function __construct(
+    protected array $parameters,
+  ) {
   }
 
   /**

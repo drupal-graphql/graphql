@@ -16,15 +16,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Composite implements ResolverInterface {
 
   /**
-   * DataProducerProxy objects.
-   */
-  protected array $resolvers = [];
-
-  /**
    * Composite constructor.
+   *
+   * @param array<\Drupal\graphql\GraphQL\Resolver\ResolverInterface> $resolvers
+   *   DataProducerProxy objects.
    */
-  public function __construct(array $resolvers) {
-    $this->resolvers = $resolvers;
+  public function __construct(
+    protected array $resolvers,
+  ) {
   }
 
   /**

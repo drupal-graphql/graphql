@@ -41,11 +41,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The menu link tree.
-   */
-  protected MenuLinkTreeInterface $menuLinkTree;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -61,10 +56,23 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * MenuItems constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
+   *   The menu link tree service.
    */
-  public function __construct(array $configuration, string $pluginId, array $pluginDefinition, MenuLinkTreeInterface $menuLinkTree) {
+  public function __construct(
+    array $configuration,
+    string $pluginId,
+    array $pluginDefinition,
+    protected MenuLinkTreeInterface $menuLinkTree,
+  ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->menuLinkTree = $menuLinkTree;
   }
 
   /**

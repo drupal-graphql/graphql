@@ -18,11 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class SdlSchemaExtensionPluginBase extends PluginBase implements SchemaExtensionPluginInterface, ContainerFactoryPluginInterface {
 
   /**
-   * The module handler service.
-   */
-  protected ModuleHandlerInterface $moduleHandler;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -54,10 +49,9 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    ModuleHandlerInterface $moduleHandler,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->moduleHandler = $moduleHandler;
   }
 
   /**

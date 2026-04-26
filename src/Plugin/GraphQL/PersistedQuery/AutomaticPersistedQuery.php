@@ -25,23 +25,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AutomaticPersistedQuery extends PersistedQueryPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The cache to store persisted queries.
-   */
-  protected CacheBackendInterface $cache;
-
-  /**
-   * Page cache kill switch.
-   */
-  protected KillSwitch $pageCacheKillSwitch;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CacheBackendInterface $cache, KillSwitch $pageCacheKillSwitch) {
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    array $plugin_definition,
+    protected CacheBackendInterface $cache,
+    protected KillSwitch $pageCacheKillSwitch,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->cache = $cache;
-    $this->pageCacheKillSwitch = $pageCacheKillSwitch;
   }
 
   /**

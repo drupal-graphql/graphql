@@ -18,16 +18,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 class DefaultValue implements ResolverInterface {
 
   /**
-   * The initial value.
-   */
-  protected ResolverInterface $value;
-
-  /**
-   * The fallback value in case the initial value resolves to NULL.
-   */
-  protected ResolverInterface $default;
-
-  /**
    * DefaultValue constructor.
    *
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $value
@@ -35,9 +25,10 @@ class DefaultValue implements ResolverInterface {
    * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $default
    *   The fallback value returned if the initial one resolves to NULL.
    */
-  public function __construct(ResolverInterface $value, ResolverInterface $default) {
-    $this->value = $value;
-    $this->default = $default;
+  public function __construct(
+    protected ResolverInterface $value,
+    protected ResolverInterface $default,
+  ) {
   }
 
   /**

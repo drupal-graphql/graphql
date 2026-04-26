@@ -14,18 +14,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ApqSubscriber implements EventSubscriberInterface {
 
   /**
-   * The cache to store persisted queries.
-   */
-  protected CacheBackendInterface $cache;
-
-  /**
    * Constructs a ApqSubscriber object.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache to store persisted queries.
    */
-  public function __construct(CacheBackendInterface $cache) {
-    $this->cache = $cache;
+  public function __construct(
+    protected CacheBackendInterface $cache,
+  ) {
   }
 
   /**

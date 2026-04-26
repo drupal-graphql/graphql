@@ -18,11 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PersistedQueriesForm extends EntityForm {
 
   /**
-   * Plugin manager for persisted query plugins.
-   */
-  protected PersistedQueryPluginManager $persistedQueryPluginManager;
-
-  /**
    * The entity being used by this form.
    *
    * We cannot type-hint this property because it is defined in the parent
@@ -34,9 +29,13 @@ class PersistedQueriesForm extends EntityForm {
 
   /**
    * PersistedQueriesForm constructor.
+   *
+   * @param \Drupal\graphql\Plugin\PersistedQueryPluginManager $persistedQueryPluginManager
+   *   Plugin manager for persisted query plugins.
    */
-  public function __construct(PersistedQueryPluginManager $persistedQueryPluginManager) {
-    $this->persistedQueryPluginManager = $persistedQueryPluginManager;
+  public function __construct(
+    protected PersistedQueryPluginManager $persistedQueryPluginManager,
+  ) {
   }
 
   /**

@@ -47,91 +47,54 @@ class FileUpload {
   protected FileStorageInterface $fileStorage;
 
   /**
-   * The current user.
-   */
-  protected AccountProxyInterface $currentUser;
-
-  /**
-   * The mime type guesser service.
-   */
-  protected MimeTypeGuesserInterface $mimeTypeGuesser;
-
-  /**
-   * The file system service.
-   */
-  protected FileSystemInterface $fileSystem;
-
-  /**
-   * GraphQL logger channel.
-   */
-  protected LoggerChannelInterface $logger;
-
-  /**
-   * The token replacement instance for tokens in file directory paths.
-   */
-  protected Token $token;
-
-  /**
-   * The lock service to prevent duplicate file uploads to the same destination.
-   */
-  protected LockBackendInterface $lock;
-
-  /**
    * The file system configuration to determine if we allow insecure uploads.
    */
   protected ImmutableConfig $systemFileConfig;
 
   /**
-   * The renderer service.
-   */
-  protected RendererInterface $renderer;
-
-  /**
-   * The event dispatcher service.
-   */
-  protected EventDispatcherInterface $eventDispatcher;
-
-  /**
-   * The image factory service.
-   */
-  protected ImageFactory $imageFactory;
-
-  /**
-   * The file validator service.
-   */
-  protected FileValidatorInterface $fileValidator;
-
-  /**
    * Constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+   *   The current user service.
+   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface $mimeTypeGuesser
+   *   The MIME type guesser service.
+   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   *   The file system service.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger service.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
+   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   *   The lock service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory service.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The event dispatcher service.
+   * @param \Drupal\Core\Image\ImageFactory $imageFactory
+   *   The image factory service.
+   * @param \Drupal\file\Validation\FileValidatorInterface $fileValidator
+   *   The file validator service.
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    AccountProxyInterface $currentUser,
-    MimeTypeGuesserInterface $mimeTypeGuesser,
-    FileSystemInterface $fileSystem,
-    LoggerChannelInterface $logger,
-    Token $token,
-    LockBackendInterface $lock,
+    protected AccountProxyInterface $currentUser,
+    protected MimeTypeGuesserInterface $mimeTypeGuesser,
+    protected FileSystemInterface $fileSystem,
+    protected LoggerChannelInterface $logger,
+    protected Token $token,
+    protected LockBackendInterface $lock,
     ConfigFactoryInterface $config_factory,
-    RendererInterface $renderer,
-    EventDispatcherInterface $eventDispatcher,
-    ImageFactory $image_factory,
-    FileValidatorInterface $file_validator,
+    protected RendererInterface $renderer,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected ImageFactory $imageFactory,
+    protected FileValidatorInterface $fileValidator,
   ) {
-    /** @var \Drupal\file\FileStorageInterface $file_storage */
-    $file_storage = $entityTypeManager->getStorage('file');
-    $this->fileStorage = $file_storage;
-    $this->currentUser = $currentUser;
-    $this->mimeTypeGuesser = $mimeTypeGuesser;
-    $this->fileSystem = $fileSystem;
-    $this->logger = $logger;
-    $this->token = $token;
-    $this->lock = $lock;
+    $this->fileStorage = $entityTypeManager->getStorage('file');
     $this->systemFileConfig = $config_factory->get('system.file');
-    $this->renderer = $renderer;
-    $this->eventDispatcher = $eventDispatcher;
-    $this->imageFactory = $image_factory;
-    $this->fileValidator = $file_validator;
   }
 
   /**

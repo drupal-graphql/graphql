@@ -14,15 +14,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Map implements ResolverInterface {
 
   /**
-   * Resolver to tap.
-   */
-  protected mixed $resolver;
-
-  /**
    * Map constructor.
+   *
+   * @param \Drupal\graphql\GraphQL\Resolver\ResolverInterface $resolver
+   *   Resolver to tap.
    */
-  public function __construct(ResolverInterface $resolver) {
-    $this->resolver = $resolver;
+  public function __construct(
+    protected ResolverInterface $resolver,
+  ) {
   }
 
   /**

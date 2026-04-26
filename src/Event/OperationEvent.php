@@ -29,21 +29,17 @@ class OperationEvent extends Event {
   const GRAPHQL_OPERATION_CACHE_HIT = 'graphql.operation.cache_hit';
 
   /**
-   * Result of the query execution.
-   */
-  protected ?ExecutionResult $result;
-
-  /**
-   * Resolver context used for the query.
-   */
-  protected ResolveContext $context;
-
-  /**
    * OperationEvent constructor.
+   *
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   Resolver context used for the query.
+   * @param \GraphQL\Executor\ExecutionResult|null $result
+   *   Result of the query execution.
    */
-  public function __construct(ResolveContext $context, ?ExecutionResult $result = NULL) {
-    $this->context = $context;
-    $this->result = $result;
+  public function __construct(
+    protected ResolveContext $context,
+    protected ?ExecutionResult $result = NULL,
+  ) {
   }
 
   /**

@@ -77,16 +77,6 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
   const MAX_DEPTH = 10;
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The entity buffer service.
-   */
-  protected EntityBuffer $entityBuffer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -121,12 +111,10 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityBuffer $entityBuffer,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityBuffer $entityBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityBuffer = $entityBuffer;
   }
 
   /**

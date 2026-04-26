@@ -38,11 +38,6 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
   use StringTranslationTrait;
 
   /**
-   * The current user.
-   */
-  protected AccountInterface $currentUser;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -63,12 +58,16 @@ class CreateArticle extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
    */
-  public function __construct(array $configuration, string $plugin_id, array $plugin_definition, AccountInterface $current_user) {
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    array $plugin_definition,
+    protected AccountInterface $currentUser,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->currentUser = $current_user;
   }
 
   /**

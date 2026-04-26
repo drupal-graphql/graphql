@@ -22,21 +22,6 @@ class ExplorerController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
-   * The URL generator service.
-   */
-  protected UrlGeneratorInterface $urlGenerator;
-
-  /**
-   * The introspection service.
-   */
-  protected Introspection $introspection;
-
-  /**
-   * The schema plugin manager.
-   */
-  protected SchemaPluginManager $pluginManager;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -61,10 +46,11 @@ class ExplorerController implements ContainerInjectionInterface {
    *
    * @codeCoverageIgnore
    */
-  public function __construct(UrlGeneratorInterface $urlGenerator, Introspection $introspection, SchemaPluginManager $pluginManager) {
-    $this->urlGenerator = $urlGenerator;
-    $this->introspection = $introspection;
-    $this->pluginManager = $pluginManager;
+  public function __construct(
+    protected UrlGeneratorInterface $urlGenerator,
+    protected Introspection $introspection,
+    protected SchemaPluginManager $pluginManager,
+  ) {
   }
 
   /**

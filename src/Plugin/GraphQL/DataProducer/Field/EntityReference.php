@@ -78,21 +78,6 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
   use EntityReferenceTrait;
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The entity repository service.
-   */
-  protected EntityRepositoryInterface $entityRepository;
-
-  /**
-   * The entity buffer service.
-   */
-  protected EntityBuffer $entityBuffer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -110,19 +95,29 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
 
   /**
    * Constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository service.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   *   The entity buffer service.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityRepositoryInterface $entityRepository,
-    EntityBuffer $entityBuffer,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected EntityBuffer $entityBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityRepository = $entityRepository;
-    $this->entityBuffer = $entityBuffer;
   }
 
   /**

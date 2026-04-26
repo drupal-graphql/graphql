@@ -46,16 +46,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The path validator service.
-   */
-  protected PathValidatorInterface $pathValidator;
-
-  /**
-   * Optional redirect module repository.
-   */
-  protected ?RedirectRepository $redirectRepository = NULL;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -72,17 +62,26 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
 
   /**
    * Route constructor.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The plugin_id for the plugin instance.
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|array $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
+   *   The path validator service.
+   * @param \Drupal\redirect\RedirectRepository|null $redirectRepository
+   *   (optional) The redirect repository service.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     PluginDefinitionInterface|array $pluginDefinition,
-    PathValidatorInterface $pathValidator,
-    ?RedirectRepository $redirectRepository = NULL,
+    protected PathValidatorInterface $pathValidator,
+    protected ?RedirectRepository $redirectRepository = NULL,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->pathValidator = $pathValidator;
-    $this->redirectRepository = $redirectRepository;
   }
 
   /**

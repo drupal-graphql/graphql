@@ -35,6 +35,9 @@ final class DumpSchemaCommand extends Command {
 
   /**
    * Constructs a DumpSchemaCommand object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager service.
    */
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,

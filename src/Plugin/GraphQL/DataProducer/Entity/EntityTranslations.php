@@ -60,11 +60,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityTranslations extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity repository.
-   */
-  protected EntityRepositoryInterface $entityRepository;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -81,9 +76,13 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
   /**
    * EntityTranslations constructor.
    */
-  public function __construct(array $configuration, string $pluginId, PluginDefinitionInterface|array $pluginDefinition, EntityRepositoryInterface $entityRepository) {
+  public function __construct(
+    array $configuration,
+    string $pluginId,
+    PluginDefinitionInterface|array $pluginDefinition,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityRepository = $entityRepository;
   }
 
   /**

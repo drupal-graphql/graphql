@@ -17,21 +17,17 @@ use Drupal\language\LanguageNegotiationMethodManager;
 class LanguageConfigOverride implements ConfigFactoryOverrideInterface {
 
   /**
-   * The config storage service.
-   */
-  protected StorageInterface $baseStorage;
-
-  /**
-   * The negotiator manager service.
-   */
-  protected ?LanguageNegotiationMethodManager $negotiatorManager = NULL;
-
-  /**
    * Constructor.
+   *
+   * @param \Drupal\Core\Config\StorageInterface $baseStorage
+   *   The config storage service.
+   * @param \Drupal\language\LanguageNegotiationMethodManager|null $negotiatorManager
+   *   The negotiator manager service.
    */
-  public function __construct(StorageInterface $storage, ?LanguageNegotiationMethodManager $negotiatorManager = NULL) {
-    $this->baseStorage = $storage;
-    $this->negotiatorManager = $negotiatorManager;
+  public function __construct(
+    protected StorageInterface $baseStorage,
+    protected ?LanguageNegotiationMethodManager $negotiatorManager = NULL,
+  ) {
   }
 
   /**

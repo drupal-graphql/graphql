@@ -25,64 +25,37 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DataProducerProxy implements ResolverInterface {
 
   /**
-   * The plugin config.
-   */
-  protected array $config;
-
-  /**
-   * The plugin id.
-   */
-  protected string $id;
-
-  /**
-   * The plugin manager.
-   */
-  protected DataProducerPluginManager $pluginManager;
-
-  /**
-   * The request stack for looking up request time.
-   */
-  protected RequestStack $requestStack;
-
-  /**
-   * The cache context manager for cache keys.
-   */
-  protected CacheContextsManager $contextsManager;
-
-  /**
-   * The cache backend for results.
-   */
-  protected CacheBackendInterface $cacheBackend;
-
-  /**
-   * The mapping of names to resolvers.
-   */
-  protected array $mapping = [];
-
-  /**
    * If results should be cached.
    */
   protected bool $cached = FALSE;
 
   /**
    * Construct DataProducerProxy object.
+   *
+   * @param string $id
+   *   The plugin id.
+   * @param array $mapping
+   *   The mapping of names to resolvers.
+   * @param array $config
+   *   The plugin config.
+   * @param \Drupal\graphql\Plugin\DataProducerPluginManager $pluginManager
+   *   The plugin manager.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack for looking up request time.
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache context manager for cache keys.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   The cache backend for results.
    */
   public function __construct(
-    string $id,
-    array $mapping,
-    array $config,
-    DataProducerPluginManager $pluginManager,
-    RequestStack $requestStack,
-    CacheContextsManager $contextsManager,
-    CacheBackendInterface $cacheBackend,
+    protected string $id,
+    protected array $mapping,
+    protected array $config,
+    protected DataProducerPluginManager $pluginManager,
+    protected RequestStack $requestStack,
+    protected CacheContextsManager $contextsManager,
+    protected CacheBackendInterface $cacheBackend,
   ) {
-    $this->id = $id;
-    $this->mapping = $mapping;
-    $this->config = $config;
-    $this->pluginManager = $pluginManager;
-    $this->requestStack = $requestStack;
-    $this->contextsManager = $contextsManager;
-    $this->cacheBackend = $cacheBackend;
   }
 
   /**

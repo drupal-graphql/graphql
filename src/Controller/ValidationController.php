@@ -17,11 +17,6 @@ class ValidationController implements ContainerInjectionInterface {
   use StringTranslationTrait;
 
   /**
-   * The schema plugin manager.
-   */
-  protected ValidatorInterface $validator;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): self {
@@ -36,8 +31,9 @@ class ValidationController implements ContainerInjectionInterface {
    * @param \Drupal\graphql\GraphQL\ValidatorInterface $validator
    *   The GraphQL validator.
    */
-  public function __construct(ValidatorInterface $validator) {
-    $this->validator = $validator;
+  public function __construct(
+    protected ValidatorInterface $validator,
+  ) {
   }
 
   /**

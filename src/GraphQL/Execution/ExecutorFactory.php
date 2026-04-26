@@ -15,15 +15,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ExecutorFactory {
 
   /**
-   * The service container.
-   */
-  protected ContainerInterface $container;
-
-  /**
    * ExecutorFactory constructor.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
    */
-  public function __construct(ContainerInterface $container) {
-    $this->container = $container;
+  public function __construct(
+    protected ContainerInterface $container,
+  ) {
   }
 
   /**

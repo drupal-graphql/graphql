@@ -62,8 +62,16 @@ class ResolverRegistry implements ResolverRegistryInterface {
 
   /**
    * ResolverRegistry constructor.
+   *
+   * @param callable|null $defaultFieldResolver
+   *   (optional) The default field resolver.
+   * @param callable|null $defaultTypeResolver
+   *   (optional) The default type resolver.
    */
-  public function __construct(?callable $defaultFieldResolver = NULL, ?callable $defaultTypeResolver = NULL) {
+  public function __construct(
+    ?callable $defaultFieldResolver = NULL,
+    ?callable $defaultTypeResolver = NULL,
+  ) {
     $this->defaultFieldResolver = $defaultFieldResolver ?: [
       $this,
       'resolveFieldDefault',

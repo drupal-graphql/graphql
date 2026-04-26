@@ -9,7 +9,6 @@ use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class for identifying language based on a graphql query.
@@ -26,11 +25,6 @@ class OperationLanguageNegotiation extends LanguageNegotiationMethodBase {
    * The language negotiation method id.
    */
   public const METHOD_ID = 'language-graphql-operation';
-
-  /**
-   * The request stack.
-   */
-  protected RequestStack $requestStack;
 
   /**
    * The current execution context.

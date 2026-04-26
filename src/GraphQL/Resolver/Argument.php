@@ -14,15 +14,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Argument implements ResolverInterface {
 
   /**
-   * Name of the argument.
-   */
-  protected string $name;
-
-  /**
    * Argument constructor.
+   *
+   * @param string $name
+   *   The argument name.
    */
-  public function __construct(string $name) {
-    $this->name = $name;
+  public function __construct(
+    protected string $name,
+  ) {
   }
 
   /**

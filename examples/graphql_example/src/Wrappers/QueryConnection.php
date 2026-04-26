@@ -14,21 +14,17 @@ use GraphQL\Deferred;
 class QueryConnection {
 
   /**
-   * The entity query object.
-   */
-  protected QueryInterface $query;
-
-  /**
-   * The entity buffer service.
-   */
-  protected EntityBuffer $entityBuffer;
-
-  /**
    * QueryConnection constructor.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The entity query.
+   * @param \Drupal\graphql\GraphQL\Buffers\EntityBuffer $entityBuffer
+   *   The entity buffer service.
    */
-  public function __construct(QueryInterface $query, EntityBuffer $entityBuffer) {
-    $this->query = $query;
-    $this->entityBuffer = $entityBuffer;
+  public function __construct(
+    protected QueryInterface $query,
+    protected EntityBuffer $entityBuffer,
+  ) {
   }
 
   /**

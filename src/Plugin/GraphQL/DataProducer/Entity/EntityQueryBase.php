@@ -40,16 +40,6 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
   ];
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManager $entityTypeManager;
-
-  /**
-   * The current user proxy.
-   */
-  protected AccountProxyInterface $currentUser;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -73,19 +63,17 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
    *   The plugin definition array.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy.
    */
   public function __construct(
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManager $entityTypeManager,
-    AccountProxyInterface $current_user,
+    protected EntityTypeManager $entityTypeManager,
+    protected AccountProxyInterface $currentUser,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->currentUser = $current_user;
   }
 
   /**

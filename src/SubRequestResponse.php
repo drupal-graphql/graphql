@@ -15,11 +15,6 @@ class SubRequestResponse extends Response implements RefinableCacheableDependenc
   use RefinableCacheableDependencyTrait;
 
   /**
-   * The request result.
-   */
-  protected mixed $result;
-
-  /**
    * SubrequestResponse constructor.
    *
    * @param mixed $result
@@ -29,9 +24,12 @@ class SubRequestResponse extends Response implements RefinableCacheableDependenc
    * @param array $headers
    *   An array of response headers.
    */
-  public function __construct(mixed $result, int $status = 200, array $headers = []) {
+  public function __construct(
+    protected mixed $result,
+    int $status = 200,
+    array $headers = [],
+  ) {
     parent::__construct('', $status, $headers);
-    $this->result = $result;
   }
 
   /**

@@ -14,16 +14,6 @@ use Symfony\Component\Routing\Route;
 class RouteProvider {
 
   /**
-   * The authentication collector service.
-   */
-  protected AuthenticationCollectorInterface $authenticationCollector;
-
-  /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
    * RouteProvider constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -31,9 +21,10 @@ class RouteProvider {
    * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authenticationCollector
    *   The authentication collector service.
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, AuthenticationCollectorInterface $authenticationCollector) {
-    $this->authenticationCollector = $authenticationCollector;
-    $this->entityTypeManager = $entityTypeManager;
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected AuthenticationCollectorInterface $authenticationCollector,
+  ) {
   }
 
   /**

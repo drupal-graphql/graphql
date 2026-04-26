@@ -15,6 +15,24 @@ class PersistedQueryPluginManager extends DefaultPluginManager {
 
   /**
    * PersistedQueryPluginManager constructor.
+   *
+   * @param bool|string $pluginSubdirectory
+   *   The namespace-relative path to the plugin sub-directory.
+   * @param \Traversable $namespaces
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
+   *   The cache backend to use to load plugin information.
+   * @param string|null $pluginInterface
+   *   (optional) The interface each plugin should implement.
+   * @param string $pluginAttributeName
+   *   The name of the provider attribute to search for in plugin definitions.
+   * @param string $pluginAnnotationName
+   *   The name of the annotation to search for in plugin definitions.
+   * @param array $config
+   *   The configuration service parameters.
    */
   public function __construct(
     bool|string $pluginSubdirectory,

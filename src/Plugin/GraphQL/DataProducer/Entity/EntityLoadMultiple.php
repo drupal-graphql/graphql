@@ -75,21 +75,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The entity repository service.
-   */
-  protected EntityRepositoryInterface $entityRepository;
-
-  /**
-   * The entity buffer service.
-   */
-  protected EntityBuffer $entityBuffer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -112,14 +97,11 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManagerInterface $entityTypeManager,
-    EntityRepositoryInterface $entityRepository,
-    EntityBuffer $entityBuffer,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected EntityBuffer $entityBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityRepository = $entityRepository;
-    $this->entityBuffer = $entityBuffer;
   }
 
   /**

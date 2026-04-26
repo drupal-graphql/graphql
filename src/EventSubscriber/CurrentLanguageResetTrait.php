@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Drupal\graphql\EventSubscriber;
 
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
-use Drupal\language\LanguageNegotiatorInterface;
 
 /**
  * Sets the current language for the current request.
@@ -19,21 +16,6 @@ trait CurrentLanguageResetTrait {
    * The language manager.
    */
   protected LanguageManagerInterface $languageManager;
-
-  /**
-   * The language negotiator.
-   */
-  protected ?LanguageNegotiatorInterface $languageNegotiator = NULL;
-
-  /**
-   * The translator.
-   */
-  protected TranslatorInterface $translator;
-
-  /**
-   * The current user service.
-   */
-  protected AccountInterface $currentUser;
 
   /**
    * Resets the global language context across different services.

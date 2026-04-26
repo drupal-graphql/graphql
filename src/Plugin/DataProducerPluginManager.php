@@ -17,31 +17,40 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DataProducerPluginManager extends DefaultPluginManager {
 
   /**
-   * The request stack later used to get the request time.
-   */
-  protected RequestStack $requestStack;
-
-  /**
-   * The cache context manager for calculating cache keys.
-   */
-  protected CacheContextsManager $contextsManager;
-
-  /**
-   * The cache backend to cache results in.
-   */
-  protected CacheBackendInterface $resultCacheBackend;
-
-  /**
    * DataProducerPluginManager constructor.
+   *
+   * @param bool|string $pluginSubdirectory
+   *   The namespace-relative path to the plugin sub-directory.
+   * @param \Traversable $namespaces
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $definitionCacheBackend
+   *   The cache backend to use to load plugin information.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack service.
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache contexts manager.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $resultCacheBackend
+   *   The cache backend for data producer result caching.
+   * @param string|null $pluginInterface
+   *   (optional) The interface each plugin should implement.
+   * @param string $pluginAttributeName
+   *   The name of the provider attribute to search for in plugin definitions.
+   * @param string $pluginAnnotationName
+   *   The name of the annotation to search for in plugin definitions.
+   * @param array $config
+   *   The configuration service parameters.
    */
   public function __construct(
     bool|string $pluginSubdirectory,
     \Traversable $namespaces,
     ModuleHandlerInterface $moduleHandler,
     CacheBackendInterface $definitionCacheBackend,
-    RequestStack $requestStack,
-    CacheContextsManager $contextsManager,
-    CacheBackendInterface $resultCacheBackend,
+    protected RequestStack $requestStack,
+    protected CacheContextsManager $contextsManager,
+    protected CacheBackendInterface $resultCacheBackend,
     ?string $pluginInterface,
     string $pluginAttributeName,
     string $pluginAnnotationName,
@@ -59,10 +68,6 @@ class DataProducerPluginManager extends DefaultPluginManager {
     $this->alterInfo('graphql_data_producer');
     $this->useCaches(empty($config['development']));
     $this->setCacheBackend($definitionCacheBackend, 'graphql_data_producer', ['graphql_data_producer']);
-
-    $this->requestStack = $requestStack;
-    $this->contextsManager = $contextsManager;
-    $this->resultCacheBackend = $resultCacheBackend;
   }
 
   /**

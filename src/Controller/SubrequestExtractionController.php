@@ -6,7 +6,6 @@ namespace Drupal\graphql\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\SubRequestResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,16 +17,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SubrequestExtractionController extends ControllerBase {
 
   /**
-   * The symfony request stack.
-   */
-  protected RequestStack $requestStack;
-
-  /**
-   * The renderer service.
-   */
-  protected RendererInterface $renderer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -35,7 +24,6 @@ class SubrequestExtractionController extends ControllerBase {
   public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('request_stack'),
-      $container->get('language_manager'),
       $container->get('renderer')
     );
   }
@@ -45,17 +33,15 @@ class SubrequestExtractionController extends ControllerBase {
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    *
    * @codeCoverageIgnore
    */
-  public function __construct(RequestStack $requestStack, LanguageManagerInterface $languageManager, RendererInterface $renderer) {
-    $this->requestStack = $requestStack;
-    $this->languageManager = $languageManager;
-    $this->renderer = $renderer;
+  public function __construct(
+    protected RequestStack $requestStack,
+    protected RendererInterface $renderer,
+  ) {
   }
 
   /**

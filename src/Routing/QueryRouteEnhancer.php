@@ -20,15 +20,14 @@ use Symfony\Component\Routing\Route;
 class QueryRouteEnhancer implements EnhancerInterface {
 
   /**
-   * The CORS options for Origin header checking.
-   */
-  protected array $corsOptions;
-
-  /**
    * Constructor.
+   *
+   * @param array $corsOptions
+   *   CORS configuration options.
    */
-  public function __construct(array $corsOptions) {
-    $this->corsOptions = $corsOptions;
+  public function __construct(
+    protected array $corsOptions,
+  ) {
   }
 
   /**

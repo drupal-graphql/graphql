@@ -77,16 +77,6 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
   use EntityReferenceTrait;
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManager $entityTypeManager;
-
-  /**
-   * The entity revision buffer service.
-   */
-  protected EntityRevisionBuffer $entityRevisionBuffer;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -121,12 +111,10 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    EntityTypeManager $entityTypeManager,
-    EntityRevisionBuffer $entityRevisionBuffer,
+    protected EntityTypeManager $entityTypeManager,
+    protected EntityRevisionBuffer $entityRevisionBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->entityRevisionBuffer = $entityRevisionBuffer;
   }
 
   /**

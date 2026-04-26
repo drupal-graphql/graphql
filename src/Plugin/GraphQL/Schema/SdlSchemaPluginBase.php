@@ -41,29 +41,9 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   use RefinableCacheableDependencyTrait;
 
   /**
-   * The cache bin for caching the parsed SDL.
-   */
-  protected CacheBackendInterface $astCache;
-
-  /**
    * Whether the system is currently in development mode.
    */
   protected bool $inDevelopment;
-
-  /**
-   * The schema extension plugin manager.
-   */
-  protected SchemaExtensionPluginManager $extensionManager;
-
-  /**
-   * The module handler service.
-   */
-  protected ModuleHandlerInterface $moduleHandler;
-
-  /**
-   * The event dispatcher service.
-   */
-  protected EventDispatcherInterface $dispatcher;
 
   /**
    * The statically cached resolver registry.
@@ -114,18 +94,14 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    CacheBackendInterface $astCache,
-    ModuleHandlerInterface $moduleHandler,
-    SchemaExtensionPluginManager $extensionManager,
+    protected CacheBackendInterface $astCache,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected SchemaExtensionPluginManager $extensionManager,
     array $config,
-    EventDispatcherInterface $dispatcher,
+    protected EventDispatcherInterface $dispatcher,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
     $this->inDevelopment = !empty($config['development']);
-    $this->astCache = $astCache;
-    $this->extensionManager = $extensionManager;
-    $this->moduleHandler = $moduleHandler;
-    $this->dispatcher = $dispatcher;
   }
 
   /**

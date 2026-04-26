@@ -20,17 +20,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 class Callback implements ResolverInterface {
 
   /**
-   * The callback.
-   *
-   * @var callable
-   */
-  protected $callback;
-
-  /**
    * Callback constructor.
+   *
+   * @param callable $callback
+   *   The callback.
    */
-  public function __construct(callable $callback) {
-    $this->callback = $callback;
+  public function __construct(
+    protected $callback,
+  ) {
   }
 
   /**

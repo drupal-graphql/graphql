@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\GraphQL;
 
-use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Error\Error;
@@ -19,23 +18,14 @@ use GraphQL\Type\Definition\ObjectType;
 class Validator implements ValidatorInterface {
 
   /**
-   * The schema plugin manager.
-   */
-  protected SchemaPluginManager $pluginManager;
-
-  /**
-   * GraphQL logger channel.
-   */
-  protected LoggerChannelInterface $logger;
-
-  /**
    * ValidateResolverController constructor.
    *
    * @param \Drupal\graphql\Plugin\SchemaPluginManager $pluginManager
    *   The schema plugin manager.
    */
-  public function __construct(SchemaPluginManager $pluginManager) {
-    $this->pluginManager = $pluginManager;
+  public function __construct(
+    protected SchemaPluginManager $pluginManager,
+  ) {
   }
 
   /**

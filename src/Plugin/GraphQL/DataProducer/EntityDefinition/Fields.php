@@ -50,16 +50,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity type manager service.
-   */
-  protected EntityTypeManager $entityTypeManager;
-
-  /**
-   * The entity field manager service.
-   */
-  protected EntityFieldManager $entityFieldManager;
-
-  /**
    * {@inheritdoc}
    *
    * @codeCoverageIgnore
@@ -83,9 +73,9 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
    *   The plugin id.
    * @param array $plugin_definition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManager $entityFieldManager
    *   The entity field manager service.
    *
    * @codeCoverageIgnore
@@ -94,12 +84,10 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    EntityTypeManager $entity_type_manager,
-    EntityFieldManager $entity_field_manager,
+    protected EntityTypeManager $entityTypeManager,
+    protected EntityFieldManager $entityFieldManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
