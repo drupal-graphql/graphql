@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\graphql_schema_extension_test\Plugin\GraphQL\SchemaExtension;
 
 use Drupal\graphql\Attribute\SchemaExtension;
+use GraphQL\Language\Source;
 
 /**
  * A test extension with low priority.
@@ -22,7 +23,7 @@ class LowPriorityTestExtension extends TestExtension {
   /**
    * {@inheritdoc}
    */
-  public function getBaseDefinition(): NULL {
+  public function getBaseDefinition(): ?Source {
     return NULL;
   }
 

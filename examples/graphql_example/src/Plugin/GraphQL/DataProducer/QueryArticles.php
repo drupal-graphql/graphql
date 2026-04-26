@@ -43,7 +43,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class QueryArticles extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
 
-  const int MAX_LIMIT = 100;
+  const MAX_LIMIT = 100;
 
   /**
    * The entity type manager.

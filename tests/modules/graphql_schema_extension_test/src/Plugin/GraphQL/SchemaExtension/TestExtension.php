@@ -8,6 +8,7 @@ use Drupal\graphql\Attribute\SchemaExtension;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
+use GraphQL\Language\Source;
 
 /**
  * A test extension.
@@ -47,7 +48,7 @@ class TestExtension extends SdlSchemaExtensionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getExtensionDefinition(): NULL {
+  public function getExtensionDefinition(): ?Source {
     return NULL;
   }
 
