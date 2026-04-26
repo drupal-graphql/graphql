@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
-use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -73,9 +73,9 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
    *   The plugin id.
    * @param array $plugin_definition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManager $entityFieldManager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager service.
    *
    * @codeCoverageIgnore
@@ -84,8 +84,8 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    protected EntityTypeManager $entityTypeManager,
-    protected EntityFieldManager $entityFieldManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

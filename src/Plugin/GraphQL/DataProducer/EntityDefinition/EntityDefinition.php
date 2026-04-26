@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\EntityDefinition;
 
-use Drupal\Core\Entity\EntityTypeBundleInfo;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\graphql\Attribute\DataProducer;
@@ -69,9 +69,9 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
    *   The plugin id.
    * @param array $plugin_definition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfo $entityTypeBundleInfo
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   Information about entity type bundles.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    *
    * @codeCoverageIgnore
@@ -80,8 +80,8 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    protected EntityTypeBundleInfo $entityTypeBundleInfo,
-    protected EntityTypeManager $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityTypeManagerInterface $entityTypeManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

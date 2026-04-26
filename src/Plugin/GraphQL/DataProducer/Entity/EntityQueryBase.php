@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -61,7 +61,7 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy.
@@ -70,7 +70,7 @@ abstract class EntityQueryBase extends DataProducerPluginBase implements Contain
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    protected EntityTypeManager $entityTypeManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
     protected AccountProxyInterface $currentUser,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);

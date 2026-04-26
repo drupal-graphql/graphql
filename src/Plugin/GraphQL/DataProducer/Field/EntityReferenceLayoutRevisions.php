@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Field;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -100,7 +100,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
    *   The plugin id.
    * @param array $pluginDefinition
    *   The plugin definition array.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param \Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer $entityRevisionBuffer
    *   The entity revision buffer service.
@@ -111,7 +111,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
     array $configuration,
     string $pluginId,
     array $pluginDefinition,
-    protected EntityTypeManager $entityTypeManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
     protected EntityRevisionBuffer $entityRevisionBuffer,
   ) {
     parent::__construct($configuration, $pluginId, $pluginDefinition);
