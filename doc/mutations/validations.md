@@ -120,7 +120,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Creates a new article entity.
  */
 #[DataProducer(
-  id: 'create_article',
+  id: 'graphql_docs_create_article',
   name: new TranslatableMarkup('Create Article'),
   description: new TranslatableMarkup('Creates a new article.'),
   produces: new ContextDefinition(
@@ -230,7 +230,7 @@ use Drupal\graphql_composable\GraphQL\Response\ArticleResponse;
  * Returns the article held on an ArticleResponse.
  */
 #[DataProducer(
-  id: 'article_response_article',
+  id: 'graphql_docs_article_response_article',
   name: new TranslatableMarkup('Article Response Article'),
   description: new TranslatableMarkup('Get the article from an ArticleResponse.'),
   produces: new ContextDefinition(
@@ -275,7 +275,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
  * Returns violation messages from a Response.
  */
 #[DataProducer(
-  id: 'response_violations',
+  id: 'graphql_docs_response_violations',
   name: new TranslatableMarkup('Response Violations'),
   description: new TranslatableMarkup('Get the violations from a Response.'),
   produces: new ContextDefinition(
@@ -310,12 +310,12 @@ Then in our schema implementation we register the field resolvers for `ArticleRe
 public function registerResolvers(ResolverRegistryInterface $registry) {
   ...
   $registry->addFieldResolver('ArticleResponse', 'article',
-    $builder->produce('article_response_article')
+    $builder->produce('graphql_docs_article_response_article')
       ->map('response', $builder->fromParent())
   );
 
   $registry->addFieldResolver('ArticleResponse', 'errors',
-    $builder->produce('response_violations')
+    $builder->produce('graphql_docs_response_violations')
       ->map('response', $builder->fromParent())
   );
   ...

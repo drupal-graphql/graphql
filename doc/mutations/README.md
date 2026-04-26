@@ -61,7 +61,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Creates a new article entity.
  */
 #[DataProducer(
-  id: 'create_article',
+  id: 'graphql_docs_create_article',
   name: new TranslatableMarkup('Create Article'),
   description: new TranslatableMarkup('Creates a new article.'),
   produces: new ContextDefinition(
@@ -147,7 +147,7 @@ things we need to check the user actually has access to do the operation.
 
 ## Calling the mutation
 
-To add the resolvers for the `createArticle` mutation we go to our schema implementation and call the created data producer `create_article` inside the `registerResolvers` method.
+To add the resolvers for the `createArticle` mutation we go to our schema implementation and call the created data producer `graphql_docs_create_article` inside the `registerResolvers` method.
 
 ```php
 /**
@@ -158,7 +158,7 @@ public function registerResolvers(ResolverRegistryInterface $registry) {
   ...
   // Create article mutation.
   $registry->addFieldResolver('Mutation', 'createArticle',
-    $builder->produce('create_article')
+    $builder->produce('graphql_docs_create_article')
       ->map('data', $builder->fromArgument('data'))
   );
 
