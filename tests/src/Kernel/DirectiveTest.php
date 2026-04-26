@@ -64,7 +64,7 @@ class DirectiveTest extends GraphQLTestBase {
    * Tests that a directive on a base type is preserved on the built schema.
    */
   public function testDirectiveExistsOnSchemaObject(): void {
-    $schema = $this->schema->getSchema($this->registry);
+    $schema = $this->schema->getSchema();
 
     $directive = $schema->getDirective('exampleDirective');
     $this->assertNotNull($directive);
@@ -77,7 +77,7 @@ class DirectiveTest extends GraphQLTestBase {
    * Tests that a directive on a base field is preserved on the built schema.
    */
   public function testDirectiveExistsOnSchemaField(): void {
-    $schema = $this->schema->getSchema($this->registry);
+    $schema = $this->schema->getSchema();
 
     $directive = $schema->getDirective('exampleDirective');
     $this->assertNotNull($directive);
@@ -89,7 +89,7 @@ class DirectiveTest extends GraphQLTestBase {
    * Tests that a directive on an extended type is preserved.
    */
   public function testDirectiveExistsOnExtendedSchemaObject(): void {
-    $schema = $this->schema->getSchema($this->registry);
+    $schema = $this->schema->getSchema();
 
     $directive = $schema->getDirective('exampleDirective');
     $this->assertNotNull($directive);
@@ -102,7 +102,7 @@ class DirectiveTest extends GraphQLTestBase {
    * Tests that a directive on an extended field is preserved.
    */
   public function testDirectiveExistsOnExtendedSchemaField(): void {
-    $schema = $this->schema->getSchema($this->registry);
+    $schema = $this->schema->getSchema();
 
     $directive = $schema->getDirective('exampleDirective');
     $this->assertNotNull($directive);

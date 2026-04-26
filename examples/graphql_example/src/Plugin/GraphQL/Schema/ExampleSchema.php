@@ -6,7 +6,6 @@ namespace Drupal\graphql_examples\Plugin\GraphQL\Schema;
 
 use Drupal\graphql\Attribute\Schema;
 use Drupal\graphql\GraphQL\ResolverBuilder;
-use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase;
 
@@ -22,23 +21,20 @@ class ExampleSchema extends SdlSchemaPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getResolverRegistry(): ResolverRegistryInterface {
+  protected function registerResolvers(ResolverRegistryInterface $registry): void {
     $builder = new ResolverBuilder();
-    $registry = new ResolverRegistry();
 
     $this->addQueryFields($registry, $builder);
     $this->addArticleFields($registry, $builder);
 
     // Re-usable connection type fields.
     $this->addConnectionFields('ArticleConnection', $registry, $builder);
-
-    return $registry;
   }
 
   /**
    * Mapping of article fields.
    */
-  protected function addArticleFields(ResolverRegistry $registry, ResolverBuilder $builder): void {
+  protected function addArticleFields(ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Article', 'id',
       $builder->produce('entity_id')
         ->map('entity', $builder->fromParent())
@@ -66,7 +62,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
   /**
    * Mapping of query fields.
    */
-  protected function addQueryFields(ResolverRegistry $registry, ResolverBuilder $builder): void {
+  protected function addQueryFields(ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver('Query', 'article',
       $builder->produce('entity_load')
         ->map('type', $builder->fromValue('node'))
@@ -84,7 +80,7 @@ class ExampleSchema extends SdlSchemaPluginBase {
   /**
    * Mapping of query connection fields.
    */
-  protected function addConnectionFields(string $type, ResolverRegistry $registry, ResolverBuilder $builder): void {
+  protected function addConnectionFields(string $type, ResolverRegistryInterface $registry, ResolverBuilder $builder): void {
     $registry->addFieldResolver($type, 'total',
       $builder->produce('connection_total')
         ->map('connection', $builder->fromParent())

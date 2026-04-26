@@ -259,7 +259,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
     $server->setPersistedQueryLoader($this->getPersistedQueryLoader());
     $server->setContext($this->getContext($plugin, $params));
     $server->setFieldResolver($this->getFieldResolver($registry));
-    $server->setSchema($plugin->getSchema($registry));
+    $server->setSchema($plugin->getSchema());
     $server->setPromiseAdapter(new SyncPromiseAdapter());
 
     return $server;

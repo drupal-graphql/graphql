@@ -20,18 +20,13 @@ interface SchemaPluginInterface extends PluginInspectionInterface, DerivativeIns
   /**
    * Retrieves the schema.
    *
-   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
-   *   The resolver registry.
-   *
    * @return \GraphQL\Type\Schema
    *   The schema.
    */
-  public function getSchema(ResolverRegistryInterface $registry): Schema;
+  public function getSchema(): Schema;
 
   /**
    * Retrieves the resolver registry.
-   *
-   * @todo Instead, this should be configuration.
    *
    * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
    *   The resolver registry.

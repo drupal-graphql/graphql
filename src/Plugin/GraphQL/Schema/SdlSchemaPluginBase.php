@@ -14,6 +14,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
+use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
@@ -63,6 +64,11 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * The event dispatcher service.
    */
   protected EventDispatcherInterface $dispatcher;
+
+  /**
+   * The statically cached resolver registry.
+   */
+  private ?ResolverRegistryInterface $resolverRegistry = NULL;
 
   /**
    * {@inheritdoc}
@@ -129,14 +135,58 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    * @throws \GraphQL\Error\Error
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getSchema(ResolverRegistryInterface $registry): Schema {
+  public function getSchema(): Schema {
     $document = $this->getSchemaDocument();
+    $registry = $this->getResolverRegistry();
 
+    return $this->buildSchema($document, $registry);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResolverRegistry(): ResolverRegistryInterface {
+    // This function may be called multiple times (e.g. in Server) and thus
+    // should statically cache its result.
+    if ($this->resolverRegistry === NULL) {
+      $registry = $this->createResolverRegistry();
+      $this->registerResolvers($registry);
+      $this->registerExtensionResolvers($registry);
+      $this->resolverRegistry = $registry;
+    }
+
+    return $this->resolverRegistry;
+  }
+
+  /**
+   * Registers base schema type and field resolvers in the shared registry.
+   *
+   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
+   *   The resolver registry.
+   */
+  abstract protected function registerResolvers(ResolverRegistryInterface $registry): void;
+
+  /**
+   * Register the resolvers for the extensions registered to this schema.
+   *
+   * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
+   *   The resolver registry.
+   */
+  protected function registerExtensionResolvers(ResolverRegistryInterface $registry): void {
     $extensions = $this->getExtensions();
     foreach ($extensions as $extension) {
       $extension->registerResolvers($registry);
     }
-    return $this->buildSchema($document, $registry);
+  }
+
+  /**
+   * Instantiate the resolver registry.
+   *
+   * @return \Drupal\graphql\GraphQL\ResolverRegistryInterface
+   *   The instantiated resolver registry without anything registered.
+   */
+  protected function createResolverRegistry(): ResolverRegistryInterface {
+    return new ResolverRegistry();
   }
 
   /**

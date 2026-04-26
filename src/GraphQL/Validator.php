@@ -44,7 +44,7 @@ class Validator implements ValidatorInterface {
   public function validateSchema(ServerInterface $server): array {
     $plugin = $this->pluginManager->getInstanceFromServer($server);
     try {
-      return $plugin->getSchema($plugin->getResolverRegistry())->validate();
+      return $plugin->getSchema()->validate();
     }
     // Catch errors that may be thrown during schema retrieval.
     catch (Error $e) {
@@ -60,7 +60,7 @@ class Validator implements ValidatorInterface {
     $resolver_registry = $plugin->getResolverRegistry();
 
     try {
-      $schema = $plugin->getSchema($resolver_registry);
+      $schema = $plugin->getSchema();
     }
     // In case the schema can't even be loaded we can't report anything.
     catch (Error $e) {
@@ -107,7 +107,7 @@ class Validator implements ValidatorInterface {
     $resolver_registry = $plugin->getResolverRegistry();
 
     try {
-      $schema = $plugin->getSchema($resolver_registry);
+      $schema = $plugin->getSchema();
     }
     // In case the schema can't even be loaded we can't report anything.
     catch (Error $e) {

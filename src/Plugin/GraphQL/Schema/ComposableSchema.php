@@ -10,7 +10,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Attribute\Schema;
-use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
 use GraphQL\Language\Source;
 use GraphQL\Language\SourceLocation;
@@ -28,8 +27,9 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
   /**
    * {@inheritdoc}
    */
-  public function getResolverRegistry(): ResolverRegistryInterface {
-    return new ResolverRegistry();
+  protected function registerResolvers(ResolverRegistryInterface $registry): void {
+    // The composable schema provides no resolvers on its own, all of them come
+    // from extensions that are configured for the schema.
   }
 
   /**

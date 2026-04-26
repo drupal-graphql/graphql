@@ -155,16 +155,18 @@ trait MockingTrait {
         ['development' => FALSE],
         $this->container->get('event_dispatcher'),
       ])
-      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry'])
+      ->onlyMethods(['getSchemaDefinition', 'registerResolvers', 'createResolverRegistry'])
       ->getMock();
 
     $this->schema->expects(static::any())
       ->method('getSchemaDefinition')
       ->willReturn(new Source($schema));
 
+    // Create a shared reference to the registry so we can register resolvers
+    // after SdlSchemaPluginBase registers them all.
     $this->registry = new ResolverRegistry();
     $this->schema->expects($this->any())
-      ->method('getResolverRegistry')
+      ->method('createResolverRegistry')
       ->willReturn($this->registry);
   }
 

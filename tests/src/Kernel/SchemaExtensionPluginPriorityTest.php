@@ -59,9 +59,9 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
    * @dataProvider composableSchemaExtensionOverridingProvider
    */
   public function testComposableSchemaExtensionOverriding(array $extensions, string $expected_result): void {
-    $schemaPlugin = $this->getMockedSchemaPlugin($extensions);
     $registry = new ResolverRegistry();
-    $schemaPlugin->getSchema($registry);
+    $schemaPlugin = $this->getMockedSchemaPlugin($registry, $extensions);
+    $schemaPlugin->getSchema();
     $resolver = $registry->getFieldResolver('TestType', 'pluginId');
     $result = $this->resolve($resolver);
     static::assertEquals($expected_result, $result);
@@ -104,7 +104,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
   /**
    * Returns a mocked schema plugin.
    */
-  protected function getMockedSchemaPlugin(array $extensions): ComposableSchema {
+  protected function getMockedSchemaPlugin(ResolverRegistry $registry, array $extensions): ComposableSchema {
     $schemaPlugin = $this->getMockBuilder(ComposableSchema::class)
       ->setConstructorArgs([
         [],
@@ -116,7 +116,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
         ['development' => FALSE],
         $this->container->get('event_dispatcher'),
       ])
-      ->onlyMethods(['getConfiguration', 'getResolverRegistry'])
+      ->onlyMethods(['getConfiguration', 'createResolverRegistry'])
       ->getMock();
 
     $schemaPlugin->expects(static::any())
@@ -126,9 +126,8 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
         'server_id' => 'test',
       ]);
 
-    $registry = new ResolverRegistry();
     $schemaPlugin->expects($this->any())
-      ->method('getResolverRegistry')
+      ->method('createResolverRegistry')
       ->willReturn($registry);
 
     return $schemaPlugin;
