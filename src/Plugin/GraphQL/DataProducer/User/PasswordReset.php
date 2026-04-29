@@ -16,6 +16,7 @@ use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
 use Drupal\user\Controller\UserAuthenticationController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Resets the user's password (mutation).
@@ -48,7 +49,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
       $plugin_id,
       $plugin_definition,
       $container,
-      $request_stack->getCurrentRequest(),
+      $request_stack,
       $logger
     );
   }
@@ -64,8 +65,8 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin implementation definition.
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The container, necessary for creating a UserAuthenticationController.
-   * @param \Symfony\Component\HttpFoundation\Request $currentRequest
-   *   The current request.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The logger service.
    */
@@ -74,7 +75,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     string $plugin_id,
     array $plugin_definition,
     protected ContainerInterface $container,
-    protected Request $currentRequest,
+    protected RequestStack $requestStack,
     protected LoggerChannelInterface $logger,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -102,13 +103,14 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     // data are reused including the client's IP which is needed for flood
     // control. The request body is the only thing (besides client's IP) which
     // is pulled from the request within controller.
+    $current_request = $this->requestStack->getCurrentRequest();
     $auth_request = new Request(
-      $this->currentRequest->query->all(),
-      $this->currentRequest->request->all(),
-      $this->currentRequest->attributes->all(),
-      $this->currentRequest->cookies->all(),
-      $this->currentRequest->files->all(),
-      $this->currentRequest->server->all(),
+      $current_request->query->all(),
+      $current_request->request->all(),
+      $current_request->attributes->all(),
+      $current_request->cookies->all(),
+      $current_request->files->all(),
+      $current_request->server->all(),
       json_encode($content)
     );
     $auth_request->setRequestFormat('json');

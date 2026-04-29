@@ -9,7 +9,6 @@ use Drupal\Component\Utility\Bytes;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
@@ -25,7 +24,6 @@ use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\file\FileInterface;
-use Drupal\file\FileStorageInterface;
 use Drupal\file\Validation\FileValidatorInterface;
 use Drupal\graphql\GraphQL\Response\FileUploadResponse;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -40,16 +38,6 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 class FileUpload {
 
   use StringTranslationTrait;
-
-  /**
-   * The file storage where we will create new file entities from.
-   */
-  protected FileStorageInterface $fileStorage;
-
-  /**
-   * The file system configuration to determine if we allow insecure uploads.
-   */
-  protected ImmutableConfig $systemFileConfig;
 
   /**
    * Constructor.
@@ -68,7 +56,7 @@ class FileUpload {
    *   The token service.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
@@ -80,21 +68,19 @@ class FileUpload {
    *   The file validator service.
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
     protected AccountProxyInterface $currentUser,
     protected MimeTypeGuesserInterface $mimeTypeGuesser,
     protected FileSystemInterface $fileSystem,
     protected LoggerChannelInterface $logger,
     protected Token $token,
     protected LockBackendInterface $lock,
-    ConfigFactoryInterface $config_factory,
+    protected ConfigFactoryInterface $configFactory,
     protected RendererInterface $renderer,
     protected EventDispatcherInterface $eventDispatcher,
     protected ImageFactory $imageFactory,
     protected FileValidatorInterface $fileValidator,
   ) {
-    $this->fileStorage = $entityTypeManager->getStorage('file');
-    $this->systemFileConfig = $config_factory->get('system.file');
   }
 
   /**
@@ -212,7 +198,7 @@ class FileUpload {
     try {
       // Begin building file entity.
       /** @var \Drupal\file\FileInterface $file */
-      $file = $this->fileStorage->create([]);
+      $file = $this->entityTypeManager->getStorage('file')->create([]);
       $file->setOwnerId($this->currentUser->id());
       $file->setFilename($prepared_filename);
       $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
@@ -437,7 +423,7 @@ class FileUpload {
    */
   protected function prepareFilename(string $filename, array &$validators): string {
     // Don't rename if 'allow_insecure_uploads' evaluates to TRUE.
-    if (!$this->systemFileConfig->get('allow_insecure_uploads')) {
+    if (!$this->configFactory->get('system.file')->get('allow_insecure_uploads')) {
       if (!empty($validators['FileExtension']['extensions'])) {
         // If there is a fileValidator service to validate FileExtension and
         // a list of valid extensions, munge the filename to protect against
@@ -458,7 +444,7 @@ class FileUpload {
         $passes_validation = FALSE;
         if (!empty($validators['FileExtension']['extensions'])) {
           /** @var \Drupal\file\FileInterface $file */
-          $file = $this->fileStorage->create([]);
+          $file = $this->entityTypeManager->getStorage('file')->create([]);
           $file->setFilename($filename);
           $passes_validation = count($this->fileValidator->validate($file, $validators['FileExtension']['extensions']));
         }
