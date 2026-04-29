@@ -107,11 +107,21 @@ abstract class SdlSchemaExtensionPluginBase extends PluginBase implements Schema
     }
 
     $contents = file_get_contents($file);
-    if (!$contents) {
+    if ($contents === FALSE) {
       throw new InvalidPluginDefinitionException(
         $id,
         sprintf(
           'Failed to read schema file "%s".',
+          $file
+        )
+      );
+    }
+
+    if (trim($contents) === '') {
+      throw new InvalidPluginDefinitionException(
+        $id,
+        sprintf(
+          'Schema file "%s" may not be empty.',
           $file
         )
       );
