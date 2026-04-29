@@ -207,7 +207,8 @@ services:
     arguments: ['@entity_type.manager']
   graphql.buffer.entity_preview:
     class: Drupal\graphql\GraphQL\Buffers\EntityPreviewBuffer
-    arguments: ["@node_preview"]
+    tags:
+      - { name: service_collector, tag: paramconverter, call: addConverter }
   graphql.buffer.entity_revision:
     class: Drupal\graphql\GraphQL\Buffers\EntityRevisionBuffer
     arguments: ['@entity_type.manager']

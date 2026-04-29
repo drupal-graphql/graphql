@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\graphql\GraphQL\Buffers;
 
 use Drupal\Core\ParamConverter\ParamConverterInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * Entity preview buffer for GraphQL.
@@ -12,14 +13,36 @@ use Drupal\Core\ParamConverter\ParamConverterInterface;
 class EntityPreviewBuffer extends BufferBase {
 
   /**
-   * Constructs a EntityPreviewBuffer object.
+   * A list of parameter converters keyed by type.
    *
-   * @param \Drupal\Core\ParamConverter\ParamConverterInterface $convertor
-   *   The entity preview converter. Currently thats just NodePreviewConverter.
+   * @var array<string, \Drupal\Core\ParamConverter\ParamConverterInterface>
+   */
+  protected array $typeConverters = [];
+
+  /**
+   * Constructs an EntityPreviewBuffer object.
+   *
+   * @param array<string, \Drupal\Core\ParamConverter\ParamConverterInterface> $converters
+   *   Array of loaded converter services keyed by their ids.
    */
   public function __construct(
-    protected ParamConverterInterface $convertor,
+    protected array $converters = [],
   ) {}
+
+  /**
+   * Registers a parameter converter with the buffer.
+   *
+   * @param \Drupal\Core\ParamConverter\ParamConverterInterface $param_converter
+   *   The added param converter instance.
+   * @param string $id
+   *   The parameter converter service id to register.
+   *
+   * @return $this
+   */
+  public function addConverter(ParamConverterInterface $param_converter, string $id) {
+    $this->converters[$id] = $param_converter;
+    return $this;
+  }
 
   /**
    * Add an item to the buffer.
@@ -63,7 +86,9 @@ class EntityPreviewBuffer extends BufferBase {
     $entities = [];
     foreach ($uuids as $uuid) {
       // Load the preview entity.
-      $entities[$uuid] = $this->convertor->convert($uuid, NULL, $type . '_preview', []);
+      // For supported entity types only the value is used in the conversion,
+      // and the name is used for debugging errors.
+      $entities[$uuid] = $this->getConverter($type . '_preview')->convert($uuid, NULL, "graphql_entity_preview_buffer", []);
     }
 
     return array_map(function ($item) use ($entities) {
@@ -80,6 +105,34 @@ class EntityPreviewBuffer extends BufferBase {
 
       return $entities[$item['uuid']] ?? NULL;
     }, $buffer);
+  }
+
+  /**
+   * Lazy loads the converter service.
+   *
+   * @param string $type
+   *   The type of the converter service to load.
+   *
+   * @return \Drupal\Core\ParamConverter\ParamConverterInterface
+   *   The converter service.
+   *
+   * @throws \InvalidArgumentException
+   *   In case the converter isn't registered.
+   */
+  protected function getConverter(string $type): ParamConverterInterface {
+    if (isset($this->typeConverters[$type])) {
+      return $this->typeConverters[$type];
+    }
+
+    $route = new Route("/");
+    foreach ($this->converters as $converter) {
+      if ($converter->applies(['type' => $type], "graphql_entity_preview_buffer", $route)) {
+        $this->typeConverters[$type] = $converter;
+        return $converter;
+      }
+    }
+
+    throw new \InvalidArgumentException("Could not find converter for type '$type'.");
   }
 
 }
