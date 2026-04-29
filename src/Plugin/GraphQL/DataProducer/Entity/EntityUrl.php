@@ -58,10 +58,14 @@ class EntityUrl extends DataProducerPluginBase {
    * @throws \Drupal\Core\Entity\EntityMalformedException
    *   When the entity cannot provide a URL.
    *
-   * @return \Drupal\Core\Url
-   *   The URL object for the entity with the given relation.
+   * @return \Drupal\Core\Url|null
+   *   The URL object for the entity with the given relation or NULL if it does
+   *   not yet have a URL.
    */
-  public function resolve(EntityInterface $entity, ?string $rel, ?array $options): Url {
+  public function resolve(EntityInterface $entity, ?string $rel, ?array $options): ?Url {
+    if ($entity->isNew()) {
+      return NULL;
+    }
     return $entity->toUrl($rel ?? 'canonical', $options ?? []);
   }
 
