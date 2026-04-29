@@ -121,20 +121,52 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
    */
   public function getSchema(ResolverRegistryInterface $registry) {
     $extensions = $this->getExtensions();
-    $document = $this->getSchemaDocument($extensions);
-    $schema = $this->buildSchema($document, $registry);
 
-    if (empty($extensions)) {
-      return $schema;
+    // Only use caching of the parsed document if we aren't in development mode.
+    // Get the full schema document from cache if it exists.
+    if (empty($this->inDevelopment) && !empty($extensions)) {
+      $cid = $this->getCacheId('full');
+
+      if ($cache = $this->astCache->get($cid)) {
+        $extendedDocument = $cache->data;
+      }
     }
 
-    foreach ($extensions as $extension) {
-      $extension->registerResolvers($registry);
-    }
-
-    $extendedDocument = $this->getFullSchemaDocument($schema, $extensions);
     if (empty($extendedDocument)) {
-      return $schema;
+      $document = $this->getSchemaDocument($extensions);
+      $schema = $this->buildSchema($document, $registry);
+
+      if (empty($extensions)) {
+        return $schema;
+      }
+
+      foreach ($extensions as $extension) {
+        $extension->registerResolvers($registry);
+      }
+
+      // Gets the full AST combination of parsed schema with extensions.
+      if ($extendAst = $this->getExtensionDocument($extensions)) {
+        $fullSchema = SchemaExtender::extend($schema, $extendAst);
+        // Performance: export the full schema as string and parse it again.
+        // That way we can cache the full AST.
+        $fullSchemaString = SchemaPrinter::doPrint($fullSchema);
+        $extendedDocument = Parser::parse($fullSchemaString, ['noLocation' => TRUE]);
+
+        if (empty($this->inDevelopment)) {
+          $cid = $this->getCacheId('full');
+          $this->astCache->set($cid, $extendedDocument, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
+        }
+      }
+
+      if (empty($extendedDocument)) {
+        return $schema;
+      }
+    }
+    else {
+      // Ensure the resolvers are registered for the extensions.
+      foreach ($extensions as $extension) {
+        $extension->registerResolvers($registry);
+      }
     }
 
     return $this->buildSchema($extendedDocument, $registry);
@@ -200,33 +232,6 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
       $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
     }
 
-    return $ast;
-  }
-
-  /**
-   * Returns the full AST combination of parsed schema with extensions, cached.
-   *
-   * This method is private for now as the build/cache approach might change.
-   */
-  private function getFullSchemaDocument(Schema $schema, array $extensions): ?DocumentNode {
-    // Only use caching of the parsed document if we aren't in development mode.
-    $cid = $this->getCacheId('full');
-    if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
-      return $cache->data;
-    }
-
-    $ast = NULL;
-    if ($extendAst = $this->getExtensionDocument($extensions)) {
-      $fullSchema = SchemaExtender::extend($schema, $extendAst);
-      // Performance: export the full schema as string and parse it again. That
-      // way we can cache the full AST.
-      $fullSchemaString = SchemaPrinter::doPrint($fullSchema);
-      $ast = Parser::parse($fullSchemaString, ['noLocation' => TRUE]);
-    }
-
-    if (empty($this->inDevelopment)) {
-      $this->astCache->set($cid, $ast, CacheBackendInterface::CACHE_PERMANENT, ['graphql']);
-    }
     return $ast;
   }
 
