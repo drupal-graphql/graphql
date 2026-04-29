@@ -50,7 +50,7 @@ class EntityChanged extends DataProducerPluginBase {
   public function resolve(EntityInterface $entity, ?string $format = NULL): ?string {
     if ($entity instanceof EntityChangedInterface) {
       $datetime = new \DateTime();
-      $datetime->setTimestamp($entity->getChangedTime());
+      $datetime->setTimestamp((int) $entity->getChangedTime());
       return $datetime->format($format ?? \DateTime::ISO8601);
     }
 
