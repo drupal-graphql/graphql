@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\TranslatableInterface;
@@ -60,7 +59,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   ],
 )]
 class EntityTranslation extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
 
   /**
    * The entity repository.

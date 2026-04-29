@@ -6,7 +6,6 @@ namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -42,7 +41,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   ],
 )]
 class EntityRendered extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
 
   /**
    * The entity type manager service.

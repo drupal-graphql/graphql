@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Menu;
 
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
@@ -40,7 +39,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   ],
 )]
 class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
 
   /**
    * The menu link tree.

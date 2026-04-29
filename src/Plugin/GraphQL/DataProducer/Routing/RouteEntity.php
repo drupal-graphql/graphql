@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Routing;
 
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
@@ -45,7 +44,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   ],
 )]
 class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPluginInterface {
-  use DependencySerializationTrait;
 
   /**
    * {@inheritdoc}
