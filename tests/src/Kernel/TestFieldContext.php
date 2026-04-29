@@ -12,9 +12,14 @@ use Drupal\graphql\GraphQL\Execution\FieldContext;
 class TestFieldContext extends FieldContext {
 
   /**
-   * Empty constructor override, we don't need it.
+   * Dummy constructor, we don't need the full setup.
+   *
+   * @param string|null $testLanguage
+   *   Helper property during tests. The language that should be returned by the
+   *   getContextLanguage() method.
    */
-  public function __construct() {}
+  public function __construct(protected ?string $testLanguage = NULL) {
+  }
 
   /**
    * {@inheritdoc}
@@ -35,6 +40,13 @@ class TestFieldContext extends FieldContext {
    */
   public function hasContextValue($name): bool {
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContextLanguage(): ?string {
+    return $this->testLanguage;
   }
 
 }

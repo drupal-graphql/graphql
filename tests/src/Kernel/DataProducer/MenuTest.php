@@ -228,6 +228,23 @@ class MenuTest extends GraphQLTestBase {
   }
 
   /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Menu\MenuLink\MenuLinkUrl::resolve
+   */
+  public function testMenuLinkUrlTranslated(): void {
+    foreach ($this->linkTree as $link_tree) {
+      $result = $this->executeDataProducer('menu_link_url', [
+        'link' => $link_tree->link,
+      ], 'en');
+
+      $expected_url = $link_tree
+        ->link
+        ->getUrlObject()
+        ->setOption('language', $this->container->get('language_manager')->getLanguage('en'));
+      $this->assertEquals($expected_url, $result);
+    }
+  }
+
+  /**
    * Test that there are no links returned that are not accessible.
    */
   public function testAccessDeniedLinksRemoved(): void {

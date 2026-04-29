@@ -4,7 +4,7 @@
   <file>.</file>
   <exclude-pattern>node_modules</exclude-pattern>
 
-  <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml"/>
+  <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml" />
 
   <rule ref="Drupal"></rule>
   <rule ref="DrupalPractice"></rule>
@@ -12,18 +12,21 @@
   <!-- We want to enforce use statements to be alphabetically sorted.  -->
   <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
     <properties>
-      <property name="caseSensitive" value="true"/>
+      <property name="caseSensitive" value="true" />
     </properties>
   </rule>
   <rule ref="SlevomatCodingStandard.TypeHints">
     <!-- Class constant type hints don't work with arrays in PHP 8.1. -->
-    <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint"/>
+    <exclude name="SlevomatCodingStandard.TypeHints.ClassConstantTypeHint" />
     <!-- We don't want to specify the traversable array type on hooks for example, ignore for now. -->
-    <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
-    <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification"/>
-    <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
+    <exclude
+      name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification" />
+    <exclude
+      name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification" />
+    <exclude
+      name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
     <!-- Disable deprecated sniff. -->
-    <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>
+    <exclude name="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat" />
   </rule>
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
     <severity>5</severity>
@@ -38,13 +41,14 @@
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/DataProducerProxy.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/Utility/Seek.php</exclude-pattern>
     <exclude-pattern>src/SubRequestResponse.php</exclude-pattern>
-    <exclude-pattern>tests/src/Traits/QueryResultAssertionTrait.php</exclude-pattern>
-    <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
     <exclude-pattern>src/Plugin/GraphQL/DataProducer/TypedData/PropertyPath.php</exclude-pattern>
     <exclude-pattern>src/Plugin/DataProducerPluginInterface.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/CustomScalarInterface.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/ResolverRegistryInterface.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/ResolverRegistry.php</exclude-pattern>
+    <exclude-pattern>tests/src/Traits/DataProducerExecutionTrait.php</exclude-pattern>
+    <exclude-pattern>tests/src/Traits/MockingTrait.php</exclude-pattern>
+    <exclude-pattern>tests/src/Traits/QueryResultAssertionTrait.php</exclude-pattern>
   </rule>
 
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
