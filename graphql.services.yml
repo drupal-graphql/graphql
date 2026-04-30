@@ -74,7 +74,12 @@ services:
   # Executor factory.
   graphql.executor:
     class: Drupal\graphql\GraphQL\Execution\ExecutorFactory
-    arguments: ['@service_container']
+    arguments:
+      - '@cache_contexts_manager'
+      - '@cache.graphql.results'
+      - '@datetime.time'
+      - '@event_dispatcher'
+      - '@logger.factory'
 
   # Deny caching of POST requests in the dynamic and standard page cache.
   graphql.request_policy.deny_query:

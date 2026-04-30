@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Response\Response;
 use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
-use Drupal\user\Controller\UserAuthenticationController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Resets the user's password (mutation).
@@ -48,7 +50,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container,
+      $container->get('http_kernel'),
       $request_stack,
       $logger
     );
@@ -63,8 +65,8 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The container, necessary for creating a UserAuthenticationController.
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   *   The http kernel, necessary for password reset subrequest.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
@@ -74,7 +76,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    protected ContainerInterface $container,
+    protected HttpKernelInterface $httpKernel,
     protected RequestStack $requestStack,
     protected LoggerChannelInterface $logger,
   ) {
@@ -86,38 +88,42 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    *
    * @param string $email
    *   The email address to reset the password for.
+   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $metadata
+   *   The field's caching metadata.
    *
    * @return \Drupal\graphql\GraphQL\Response\ResponseInterface
    *   Response for password reset mutation with violations in case of failure.
    */
-  public function resolve(string $email): ResponseInterface {
+  public function resolve(string $email, RefinableCacheableDependencyInterface $metadata): ResponseInterface {
     $content = [
       'mail' => $email,
     ];
 
-    // Drupal does not have a user authentication service so we need to use the
-    // authentication controller instead.
-    $controller = UserAuthenticationController::create($this->container);
     // Build up an authentication request for controller out of current request
     // but replace the request body with proper content. This way most of the
     // data are reused including the client's IP which is needed for flood
     // control. The request body is the only thing (besides client's IP) which
     // is pulled from the request within controller.
     $current_request = $this->requestStack->getCurrentRequest();
-    $auth_request = new Request(
-      $current_request->query->all(),
-      $current_request->request->all(),
-      $current_request->attributes->all(),
+    $url = Url::fromRoute('user.pass.http')->toString(TRUE);
+    $metadata->addCacheableDependency($url);
+    $auth_request = Request::create(
+      $url->getGeneratedUrl(),
+      'POST',
+      [],
       $current_request->cookies->all(),
-      $current_request->files->all(),
+      [],
       $current_request->server->all(),
-      json_encode($content)
+      json_encode($content),
     );
     $auth_request->setRequestFormat('json');
 
     $response = new Response();
     try {
-      $controller_response = $controller->resetPassword($auth_request);
+      $controller_response = $this->httpKernel->handle(
+        $auth_request,
+        HttpKernelInterface::SUB_REQUEST
+      );
     }
     catch (\Exception $e) {
       // Show general error message so potential attacker cannot abuse endpoint

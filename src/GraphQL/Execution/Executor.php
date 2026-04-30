@@ -23,7 +23,6 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\OperationParams;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -32,95 +31,50 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Executor implements ExecutorImplementation {
 
   /**
-   * Constructor.
+   * Create a new GraphQL request Executor.
+   *
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache contexts manager service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   The cache backend for caching query results.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The date/time service.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
+   *   The logger factory.
+   * @param \GraphQL\Executor\Promise\PromiseAdapter $adapter
+   *   The adapter for promises.
+   * @param \GraphQL\Type\Schema $schema
+   *   The parsed GraphQL schema.
+   * @param \GraphQL\Language\AST\DocumentNode $document
+   *   Represents the GraphQL schema document.
+   * @param \Drupal\graphql\GraphQL\Execution\ResolveContext $context
+   *   The context to pass down during field resolving.
+   * @param mixed $root
+   *   The root of the GraphQL execution tree.
+   * @param array $variables
+   *   Variables.
+   * @param string|null $operation
+   *   The operation to be performed.
+   * @param callable $resolver
+   *   The resolver to get results for the query.
    */
   public function __construct(
-    /**
-     * The cache contexts manager service.
-     */
     protected CacheContextsManager $contextsManager,
-    /**
-     * The cache backend for caching query results.
-     */
     protected CacheBackendInterface $cacheBackend,
-    /**
-     * The date/time service.
-     */
     protected TimeInterface $time,
-    /**
-     * The event dispatcher.
-     */
     protected EventDispatcherInterface $dispatcher,
-    /**
-     * The logger factory.
-     */
     protected LoggerChannelFactoryInterface $loggerFactory,
-    /**
-     * The adapter for promises.
-     */
     protected PromiseAdapter $adapter,
-    /**
-     * The parsed GraphQL schema.
-     */
     protected Schema $schema,
-    /**
-     * Represents the GraphQL schema document.
-     */
     protected DocumentNode $document,
-    /**
-     * The context to pass down during field resolving.
-     */
     protected ResolveContext $context,
-    /**
-     * The root of the GraphQL execution tree.
-     */
     protected mixed $root,
-    /**
-     * Variables.
-     */
     protected array $variables,
-    /**
-     * The operation to be performed.
-     */
     protected ?string $operation,
-    /**
-     * The resolver to get results for the query.
-     *
-     * @var callable
-     */
     protected $resolver,
   ) {}
-
-  /**
-   * Constructs an object from a services container.
-   */
-  public static function create(
-    ContainerInterface $container,
-    PromiseAdapter $adapter,
-    Schema $schema,
-    DocumentNode $document,
-    ResolveContext $context,
-    mixed $root,
-    array $variables,
-    ?string $operation,
-    callable $resolver,
-  ): static {
-    return new static(
-      $container->get('cache_contexts_manager'),
-      $container->get('cache.graphql.results'),
-      $container->get('datetime.time'),
-      $container->get('event_dispatcher'),
-      $container->get('logger.factory'),
-      $adapter,
-      $schema,
-      $document,
-      $context,
-      $root,
-      $variables,
-      $operation,
-      $resolver
-    );
-  }
 
   /**
    * {@inheritdoc}

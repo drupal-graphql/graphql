@@ -35,6 +35,7 @@
     <!-- We need the mixed type hint in some cases. -->
     <exclude-pattern>src/Entity/Server.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Buffers/BufferBase.php</exclude-pattern>
+    <exclude-pattern>src/GraphQL/Execution/Executor.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Execution/FieldContext.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Execution/ResolveContext.php</exclude-pattern>
     <exclude-pattern>src/GraphQL/Utility/FileUpload.php</exclude-pattern>

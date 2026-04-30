@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\GraphQL\Execution;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use GraphQL\Executor\Promise\PromiseAdapter;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Schema;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Service to make our GraphQL executor, can be swapped out.
@@ -17,11 +21,23 @@ class ExecutorFactory {
   /**
    * ExecutorFactory constructor.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The service container.
+   * @param \Drupal\Core\Cache\Context\CacheContextsManager $contextsManager
+   *   The cache contexts manager service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   The cache backend for caching query results.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The date/time service.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
+   *   The logger factory.
    */
   public function __construct(
-    protected ContainerInterface $container,
+    protected CacheContextsManager $contextsManager,
+    protected CacheBackendInterface $cacheBackend,
+    protected TimeInterface $time,
+    protected EventDispatcherInterface $dispatcher,
+    protected LoggerChannelFactoryInterface $loggerFactory,
   ) {
   }
 
@@ -38,7 +54,12 @@ class ExecutorFactory {
     ?string $operation,
     callable $resolver,
   ): Executor {
-    return Executor::create($this->container,
+    return new Executor(
+      $this->contextsManager,
+      $this->cacheBackend,
+      $this->time,
+      $this->dispatcher,
+      $this->loggerFactory,
       $adapter,
       $schema,
       $document,
