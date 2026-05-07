@@ -73,6 +73,9 @@ class PasswordResetTest extends GraphQLTestBase {
 
     $this->setUpSchema(self::SCHEMA);
 
+    // Install user.flood defaults required by the flood control check.
+    $this->installConfig('user');
+
     $this->config('user.settings')
       ->set('notify.password_reset', TRUE)
       ->save();
@@ -151,6 +154,48 @@ class PasswordResetTest extends GraphQLTestBase {
         'resetPassword' => [
           'violations' => [
             ['message' => 'Unable to reset password, please try again later.'],
+          ],
+        ],
+      ],
+      $this->defaultMutationCacheMetaData(),
+    );
+  }
+
+  /**
+   * Test that flood control blocks repeated password reset attempts.
+   */
+  public function testFloodControlBlocksRepeatedAttempts(): void {
+    // Lower the per-user threshold so the second attempt is blocked.
+    $this->config('user.flood')
+      ->set('user_limit', 1)
+      ->save();
+
+    $this->mailManager
+      ->method('mail')
+      ->willReturn(['result' => TRUE]);
+
+    $email = $this->users[1]->getEmail();
+
+    // First attempt is allowed.
+    $this->assertResults(
+      self::QUERY,
+      ['mail' => $email],
+      [
+        'resetPassword' => [
+          'violations' => [],
+        ],
+      ],
+      $this->defaultMutationCacheMetaData(),
+    );
+
+    // Second attempt is blocked by flood control.
+    $this->assertResults(
+      self::QUERY,
+      ['mail' => $email],
+      [
+        'resetPassword' => [
+          'violations' => [
+            ['message' => 'Too many password reset attempts for this account. Please try again later.'],
           ],
         ],
       ],

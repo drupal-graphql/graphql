@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\User;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
@@ -15,6 +16,7 @@ use Drupal\graphql\Attribute\DataProducer;
 use Drupal\graphql\GraphQL\Response\Response;
 use Drupal\graphql\GraphQL\Response\ResponseInterface;
 use Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerPluginBase;
+use Drupal\user\UserFloodControlInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -46,18 +48,24 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     $request_stack = $container->get('request_stack');
     /** @var \Drupal\Core\Logger\LoggerChannelInterface $logger */
     $logger = $container->get('logger.channel.graphql');
+    /** @var \Drupal\user\UserFloodControlInterface $user_flood_control */
+    $user_flood_control = $container->get('user.flood_control');
+    /** @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory */
+    $config_factory = $container->get('config.factory');
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('http_kernel'),
       $request_stack,
-      $logger
+      $logger,
+      $user_flood_control,
+      $config_factory,
     );
   }
 
   /**
-   * UserRegister constructor.
+   * PasswordReset constructor.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -71,6 +79,10 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    *   The request stack.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The logger service.
+   * @param \Drupal\user\UserFloodControlInterface $userFloodControl
+   *   The user flood control service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The configuration factory service.
    */
   public function __construct(
     array $configuration,
@@ -79,6 +91,8 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     protected HttpKernelInterface $httpKernel,
     protected RequestStack $requestStack,
     protected LoggerChannelInterface $logger,
+    protected UserFloodControlInterface $userFloodControl,
+    protected ConfigFactoryInterface $configFactory,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -95,6 +109,24 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
    *   Response for password reset mutation with violations in case of failure.
    */
   public function resolve(string $email, RefinableCacheableDependencyInterface $metadata): ResponseInterface {
+    $response = new Response();
+
+    // Flood control: UserAuthenticationController::resetPassword() does not
+    // enforce flood control (unlike login()), so we must check it here. We
+    // rate limit per email address rather than per IP, otherwise legitimate
+    // users sharing an IP (eg. behind a conference NAT) would be penalized.
+    // The core "user.flood" user_limit/user_window settings are reused; a
+    // graphql-specific config could be introduced later if needed.
+    // @todo Revisit once #3587709 lands and refactors password reset.
+    $flood_config = $this->configFactory->get('user.flood');
+    $flood_event = 'graphql.password_reset_user';
+    $flood_identifier = mb_strtolower($email);
+    if (!$this->userFloodControl->isAllowed($flood_event, $flood_config->get('user_limit'), $flood_config->get('user_window'), $flood_identifier)) {
+      $response->addViolation($this->t('Too many password reset attempts for this account. Please try again later.'));
+      return $response;
+    }
+    $this->userFloodControl->register($flood_event, $flood_config->get('user_window'), $flood_identifier);
+
     $content = [
       'mail' => $email,
     ];
@@ -118,7 +150,6 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     );
     $auth_request->setRequestFormat('json');
 
-    $response = new Response();
     try {
       $controller_response = $this->httpKernel->handle(
         $auth_request,
