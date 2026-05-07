@@ -37,10 +37,10 @@ class ConnectionItems extends DataProducerPluginBase {
    * @param \Drupal\graphql_examples\Wrappers\QueryConnection $connection
    *   The response.
    *
-   * @return \GraphQL\Deferred
+   * @return array|\GraphQL\Deferred
    *   The items.
    */
-  public function resolve(QueryConnection $connection): Deferred {
+  public function resolve(QueryConnection $connection): array|Deferred {
     return $connection->items();
   }
 
