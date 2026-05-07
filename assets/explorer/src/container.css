@@ -1,6 +1,7 @@
 #graphql-explorer {
   position: relative;
-  height: 650px;
+  height: 75vh;
+  min-height: 450px;
 }
 
 .graphiql-dialog-overlay,
