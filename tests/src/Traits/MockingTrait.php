@@ -111,9 +111,12 @@ trait MockingTrait {
   /**
    * Create test server.
    *
+   * @return \Drupal\graphql\Entity\ServerInterface
+   *   The created server entity.
+   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createTestServer(string $schema, string $endpoint, array $values = []): void {
+  protected function createTestServer(string $schema, string $endpoint, array $values = []): ServerInterface {
     $this->server = Server::create([
       'schema' => $schema,
       'name' => $this->randomMachineName(),
@@ -121,6 +124,8 @@ trait MockingTrait {
     ] + $values);
 
     $this->server->save();
+
+    return $this->server;
   }
 
   /**

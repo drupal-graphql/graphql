@@ -49,7 +49,7 @@ trait HttpRequestTrait {
     string $operationName = '',
   ): Response {
     $server = $server ?: $this->server;
-    $endpoint = $this->server->get('endpoint');
+    $endpoint = $server->get('endpoint');
     $extensions = !empty($extensions) ? ['extensions' => $extensions] : [];
     $data = [
       'variables' => $variables,
@@ -88,7 +88,7 @@ trait HttpRequestTrait {
     $server = $server ?: $this->server;
 
     $queries = json_encode($queries);
-    $endpoint = $this->server->get('endpoint');
+    $endpoint = $server->get('endpoint');
     $request = Request::create($endpoint, 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $queries);
     return $this->container->get('http_kernel')->handle($request);
   }

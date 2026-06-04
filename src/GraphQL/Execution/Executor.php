@@ -215,6 +215,7 @@ class Executor implements ExecutorImplementation {
       'variables' => $variables,
       'extensions' => $extensions,
       'operation' => $this->operation,
+      'server_id' => $this->context->getServer()->id(),
     ]));
 
     return $hash;
