@@ -14,6 +14,6 @@
     "drupal/redirect": "^1.0",
     "phpstan/phpstan-deprecation-rules": "^2 || ^1",
     "jangregor/phpstan-prophecy": "^2 || ^1",
-    "drush/drush": "^13 || ^14"
+    "drush/drush": "^12 || ^13 || ^14"
   }
 }
