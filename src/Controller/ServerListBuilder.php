@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
@@ -22,32 +22,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ServerListBuilder extends ConfigEntityListBuilder {
 
   /**
-   * Create a new Server List Builder instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage.
-   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
-   *   The current user.
+   * The current user.
    */
-  public function __construct(
-    EntityTypeInterface $entity_type,
-    EntityStorageInterface $storage,
-    protected AccountProxyInterface $currentUser,
-  ) {
-    parent::__construct($entity_type, $storage);
-  }
+  protected AccountProxyInterface $currentUser;
 
   /**
    * {@inheritDoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
-    return new static(
-      $entity_type,
-      $container->get('entity_type.manager')->getStorage($entity_type->id()),
-      $container->get('current_user'),
-    );
+    $instance = parent::createInstance($container, $entity_type);
+    $instance->currentUser = $container->get('current_user');
+    return $instance;
   }
 
   /**
@@ -71,8 +56,8 @@ class ServerListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
+  public function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
     $id = $entity->id();
 
     if ($this->currentUser->hasPermission('use graphql explorer')) {

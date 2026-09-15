@@ -69,6 +69,10 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
 
   /**
    * The term storage.
+   *
+   * @deprecated in graphql:5.1.0 and is removed from graphql:6.0.0. Use
+   *   $this->entityTypeManager->getStorage('taxonomy_term') instead.
+   * @see https://www.drupal.org/node/3623287
    */
   protected ?TermStorageInterface $termStorage = NULL;
 
@@ -110,11 +114,16 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
    *
    * @return \Drupal\taxonomy\TermStorageInterface
    *   The term storage.
+   *
+   * @deprecated in graphql:5.1.0 and is removed from graphql:6.0.0. Use
+   *   $this->entityTypeManager->getStorage('taxonomy_term') instead.
+   * @see https://www.drupal.org/node/3623287
    */
   protected function getTermStorage(): TermStorageInterface {
     if (!isset($this->termStorage)) {
       /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
       $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+      // @phpstan-ignore-next-line This method is deprecated anyway.
       $this->termStorage = $term_storage;
     }
     return $this->termStorage;
