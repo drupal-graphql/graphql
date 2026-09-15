@@ -41,6 +41,7 @@ class RoutingTest extends GraphQLTestBase {
     $this->installEntitySchema('redirect');
     $this->installConfig(['redirect']);
 
+    // @phpstan-ignore-next-line Using the storage in tests is perfectly fine.
     $this->redirectStorage = $this->container->get('entity_type.manager')->getStorage('redirect');
   }
 

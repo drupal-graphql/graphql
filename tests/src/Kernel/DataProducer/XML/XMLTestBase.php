@@ -11,7 +11,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
  *
  * @group graphql
  */
-class XMLTestBase extends GraphQLTestBase {
+abstract class XMLTestBase extends GraphQLTestBase {
 
   /**
    * Loads a test document.
