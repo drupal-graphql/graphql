@@ -457,7 +457,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * public function getValidationRules() {
    *   return function (OperationParams $params, DocumentNode $document, $operation) {
-   *     if (isset($params->queryId)) {
+   *     if (isset($params->queryId) && !isset($params->query)) {
    *       // Assume that pre-parsed documents are already validated. This allows
    *       // us to store pre-validated query documents e.g. for persisted queries
    *       // effectively improving performance by skipping run-time validation.
@@ -475,7 +475,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    */
   protected function getValidationRules(): array|callable {
     return function (OperationParams $params, DocumentNode $document, $operation) {
-      if (isset($params->queryId)) {
+      if (isset($params->queryId) && !isset($params->query)) {
         // Assume that pre-parsed documents are already validated. This allows
         // us to store pre-validated query documents e.g. for persisted queries
         // effectively improving performance by skipping run-time validation.

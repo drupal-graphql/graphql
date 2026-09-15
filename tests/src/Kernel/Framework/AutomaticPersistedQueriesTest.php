@@ -101,4 +101,49 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     $this->assertSame(['data' => ['field_one' => 'this is the field one']], json_decode($result->getContent(), TRUE));
   }
 
+  /**
+   * Tests APQ requests still enforce disabled introspection validation.
+   */
+  public function testAutomaticPersistedQueryDoesNotBypassDisabledIntrospection(): void {
+    // Before adding the persisted query plugins to the server, we want to make
+    // sure that there are no existing plugins already there.
+    $this->server->removeAllPersistedQueryInstances();
+    $this->server->addPersistedQueryInstance($this->pluginApq);
+    $this->server->set('disable_introspection', TRUE);
+    $this->server->save();
+
+    $query = '{ __schema { queryType { name } } }';
+    $payload = [
+      'query' => $query,
+      'queryId' => 'anything',
+      'extensions' => [
+        'persistedQuery' => [
+          'sha256Hash' => hash('sha256', $query),
+        ],
+      ],
+    ];
+
+    $request = Request::create(
+      $this->server->get('endpoint'),
+      Request::METHOD_POST,
+      [],
+      [],
+      [],
+      ['CONTENT_TYPE' => 'application/json'],
+      json_encode($payload)
+    );
+
+    $result = $this->container->get('http_kernel')->handle($request);
+
+    $this->assertSame(200, $result->getStatusCode());
+    $data = json_decode($result->getContent(), TRUE);
+    $this->assertIsArray($data);
+    $this->assertArrayHasKey('errors', $data);
+    $this->assertNotEmpty($data['errors']);
+    $this->assertSame(
+      'GraphQL introspection is not allowed, but the query contained __schema or __type',
+      $data['errors'][0]['message']
+    );
+  }
+
 }
