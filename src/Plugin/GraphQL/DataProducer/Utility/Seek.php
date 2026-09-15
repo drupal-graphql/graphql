@@ -37,7 +37,7 @@ class Seek extends DataProducerPluginBase {
   /**
    * Resolver.
    *
-   * @param array $input
+   * @param array|null $input
    *   The input array.
    * @param int $position
    *   The position to seek.
@@ -45,13 +45,16 @@ class Seek extends DataProducerPluginBase {
    * @return mixed
    *   The element at the specified position.
    */
-  public function resolve(array $input, int $position): mixed {
+  public function resolve(?array $input, int $position): mixed {
+    if ($input === NULL) {
+      return NULL;
+    }
     $array_object = new \ArrayObject($input);
     $iterator = $array_object->getIterator();
     try {
       $iterator->seek($position);
     }
-    catch (\OutOfBoundsException $e) {
+    catch (\OutOfBoundsException) {
       return NULL;
     }
     return $iterator->current();

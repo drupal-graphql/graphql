@@ -18,14 +18,14 @@ class SeekTest extends GraphQLTestBase {
    *
    * @dataProvider seekProvider
    *
-   * @param array $input
+   * @param array|null $input
    *   The test list to seek in.
    * @param int $position
    *   The position in the list to retrieve.
    * @param int|array|null $expected
    *   The expected result returned by the data producer.
    */
-  public function testSeek(array $input, int $position, int|array|null $expected): void {
+  public function testSeek(?array $input, int $position, int|array|null $expected): void {
     $result = $this->executeDataProducer('seek', [
       'input' => $input,
       'position' => $position,
@@ -63,6 +63,12 @@ class SeekTest extends GraphQLTestBase {
       [
         [1, 2, 3],
         -1,
+        NULL,
+      ],
+      // NULL input should resolve to NULL, not throw.
+      [
+        NULL,
+        0,
         NULL,
       ],
     ];
