@@ -6,12 +6,16 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity buffer with loading by UUID data producers.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityUuidBufferTest extends GraphQLTestBase {
 
   /**

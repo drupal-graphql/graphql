@@ -6,12 +6,16 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity buffer system that it returns the correct cache metadata.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityBufferTest extends GraphQLTestBase {
 
   /**

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Validator;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the GraphQL validator behaves correctly.
@@ -13,6 +15,8 @@ use Drupal\graphql\GraphQL\Validator;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ValidatorTest extends GraphQLTestBase {
 
   /**

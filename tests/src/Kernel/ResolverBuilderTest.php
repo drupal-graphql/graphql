@@ -6,6 +6,9 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use GraphQL\Deferred;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the resolver builder behaves correctly.
@@ -14,6 +17,8 @@ use GraphQL\Deferred;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ResolverBuilderTest extends GraphQLTestBase {
 
   /**
@@ -56,6 +61,7 @@ GQL;
    *
    * @dataProvider builderProducingProvider
    */
+  #[DataProvider('builderProducingProvider')]
   public function testBuilderProducing(string $input, string $expected): void {
     $plugin = $this->builder->produce($input, []);
     $this->assertInstanceOf($expected, $plugin);

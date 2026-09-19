@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests that the resolver registry behaves correctly.
  *
@@ -11,6 +14,8 @@ namespace Drupal\Tests\graphql\Kernel;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ResolverRegistryTest extends GraphQLTestBase {
 
   /**

@@ -6,6 +6,8 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -13,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class AutomaticPersistedQueriesTest extends GraphQLTestBase {
 
   /**

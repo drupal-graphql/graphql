@@ -8,8 +8,6 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 
 /**
  * Base class for XML data producer tests.
- *
- * @group graphql
  */
 abstract class XMLTestBase extends GraphQLTestBase {
 

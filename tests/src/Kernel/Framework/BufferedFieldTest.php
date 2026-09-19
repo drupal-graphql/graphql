@@ -7,12 +7,16 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\GraphQL\Buffers\BufferBase;
 use GraphQL\Deferred;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test batched field resolving.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class BufferedFieldTest extends GraphQLTestBase {
 
   /**

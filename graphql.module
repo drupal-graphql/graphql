@@ -7,26 +7,13 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\graphql\Hook\GraphqlHooks;
+
 /**
  * Implements hook_help().
  */
+#[LegacyHook]
 function graphql_help(string $routeName): ?string {
-  if ($routeName !== 'help.page.graphql') {
-    return NULL;
-  }
-
-  $title = t('About');
-  $description = t('
-<p>This module generates and exposes a
-  <a href="http://graphql.org/" target="_blank">GraphQL</a> schema for
-  <a href="https://www.drupal.org/8" target="_blank">Drupal 8</a> entities,
-  and allows you to expose your own custom schema in a consistent way and with
-  minimal effort.</p>');
-
-  $help = <<<EOT
-<h3>$title</h3>
-$description
-EOT;
-
-  return $help;
+  return \Drupal::service(GraphqlHooks::class)->help($routeName);
 }

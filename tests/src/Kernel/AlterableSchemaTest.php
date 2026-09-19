@@ -9,12 +9,16 @@ use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use GraphQL\Language\Source;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the alterable schema.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class AlterableSchemaTest extends GraphQLTestBase {
 
   /**

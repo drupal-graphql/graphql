@@ -7,6 +7,8 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -15,6 +17,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  * @coversDefaultClass \Drupal\graphql\Plugin\GraphQL\DataProducer\User\PasswordReset
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class PasswordResetTest extends GraphQLTestBase {
 
   use UserCreationTrait;

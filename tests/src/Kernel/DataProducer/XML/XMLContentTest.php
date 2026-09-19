@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer\XML;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Data producers XMLContent test class.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class XMLContentTest extends XMLTestBase {
 
   /**

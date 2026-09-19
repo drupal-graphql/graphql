@@ -6,6 +6,9 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\Routing\QueryRouteEnhancer;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -13,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class CsrfTest extends GraphQLTestBase {
 
   /**
@@ -49,6 +54,7 @@ GQL;
    *
    * @dataProvider provideSimpleContentTypes
    */
+  #[DataProvider('provideSimpleContentTypes')]
   public function testEvilOrigin(string $content_type): void {
     $request = Request::create('https://example.com/graphql/test', 'POST', [], [], [], [
       'CONTENT_TYPE' => $content_type,
@@ -102,6 +108,7 @@ GQL;
    *
    * @dataProvider provideAllowedJsonHeaders
    */
+  #[DataProvider('provideAllowedJsonHeaders')]
   public function testAllowedJsonRequests(array $headers): void {
     $request = Request::create('https://example.com/graphql/test', 'POST', [], [], [],
       $headers, '{ "query": "mutation { write }" }');
@@ -127,6 +134,7 @@ GQL;
    *
    * @dataProvider provideAllowedFormRequests
    */
+  #[DataProvider('provideAllowedFormRequests')]
   public function testAllowedFormRequests(array $headers, array $allowedDomains = []): void {
     $request = Request::create('https://example.com/graphql/test', 'POST',
       [

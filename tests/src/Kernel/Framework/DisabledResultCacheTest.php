@@ -7,12 +7,16 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\Entity\Server;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test disabled result cache.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class DisabledResultCacheTest extends GraphQLTestBase {
 
   /**

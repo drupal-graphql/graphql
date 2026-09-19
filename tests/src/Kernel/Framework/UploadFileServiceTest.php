@@ -7,6 +7,8 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\GraphQL\Utility\FileUpload;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -15,6 +17,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class UploadFileServiceTest extends GraphQLTestBase {
 
   /**

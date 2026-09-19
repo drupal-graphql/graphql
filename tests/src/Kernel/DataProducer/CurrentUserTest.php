@@ -8,6 +8,8 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Tests\graphql\TestInvocationCounter;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the current_user data producer.
@@ -15,6 +17,8 @@ use Drupal\user\Entity\User;
  * @coversDefaultClass \Drupal\graphql\Plugin\GraphQL\DataProducer\User\CurrentUser
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class CurrentUserTest extends GraphQLTestBase {
 
   use UserCreationTrait;

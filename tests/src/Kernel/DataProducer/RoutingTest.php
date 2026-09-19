@@ -9,12 +9,16 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\redirect\Entity\Redirect;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Data producers Routing test class.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class RoutingTest extends GraphQLTestBase {
 
   /**

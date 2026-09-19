@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Data producers Seek test class.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class SeekTest extends GraphQLTestBase {
 
   /**
@@ -25,6 +30,7 @@ class SeekTest extends GraphQLTestBase {
    * @param int|array|null $expected
    *   The expected result returned by the data producer.
    */
+  #[DataProvider('seekProvider')]
   public function testSeek(?array $input, int $position, int|array|null $expected): void {
     $result = $this->executeDataProducer('seek', [
       'input' => $input,

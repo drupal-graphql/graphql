@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Context default value test.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class DefaultValueTest extends GraphQLTestBase {
 
   /**

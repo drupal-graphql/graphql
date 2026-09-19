@@ -12,6 +12,8 @@ use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Language\Source;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -19,6 +21,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ServerCacheSeparationTest extends GraphQLTestBase {
 
   /**

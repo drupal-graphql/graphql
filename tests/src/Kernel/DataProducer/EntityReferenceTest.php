@@ -9,12 +9,17 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity_reference data producers.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceTest extends GraphQLTestBase {
   use EntityReferenceFieldCreationTrait;
 
@@ -94,6 +99,7 @@ class EntityReferenceTest extends GraphQLTestBase {
    *
    * @dataProvider emptyResultsProvider
    */
+  #[DataProvider('emptyResultsProvider')]
   public function testEmptyResults(string $data_producer, array $contexts): void {
     $node = Node::create([
       'title' => 'Dolor',

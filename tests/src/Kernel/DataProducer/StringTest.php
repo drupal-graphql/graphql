@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Data producers String test class.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class StringTest extends GraphQLTestBase {
 
   /**
@@ -18,6 +23,7 @@ class StringTest extends GraphQLTestBase {
    *
    * @dataProvider uppercaseProvider
    */
+  #[DataProvider('uppercaseProvider')]
   public function testUppercase(string $input, string $expected): void {
     $result = $this->executeDataProducer('uppercase', [
       'string' => $input,

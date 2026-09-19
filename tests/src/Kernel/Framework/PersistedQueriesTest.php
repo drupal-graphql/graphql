@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entire query result pipeline when using persisted queries.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class PersistedQueriesTest extends GraphQLTestBase {
 
   /**
@@ -54,6 +59,7 @@ GQL;
    *
    * @dataProvider persistedQueriesDataProvider
    */
+  #[DataProvider('persistedQueriesDataProvider')]
   public function testPersistedQueries(array $instanceIds, string $queryId, array $expected): void {
     // Before adding the persisted query plugins to the server, we want to make
     // sure that there are no existing plugins already there.

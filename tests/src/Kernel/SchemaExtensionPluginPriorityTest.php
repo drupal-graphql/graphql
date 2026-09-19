@@ -10,12 +10,17 @@ use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ordering schema extension plugins by priority.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
 
   /**
@@ -58,6 +63,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
    *
    * @dataProvider composableSchemaExtensionOverridingProvider
    */
+  #[DataProvider('composableSchemaExtensionOverridingProvider')]
   public function testComposableSchemaExtensionOverriding(array $extensions, string $expected_result): void {
     $registry = new ResolverRegistry();
     $schemaPlugin = $this->getMockedSchemaPlugin($registry, $extensions);

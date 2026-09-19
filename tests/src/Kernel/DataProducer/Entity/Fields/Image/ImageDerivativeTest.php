@@ -9,6 +9,8 @@ use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -16,6 +18,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ImageDerivativeTest extends GraphQLTestBase {
 
   /**

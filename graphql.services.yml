@@ -227,3 +227,7 @@ services:
     arguments: ['@config.storage', '@?plugin.manager.language_negotiation_method']
     tags:
       - { name: config.factory.override, priority: -253 }
+
+  Drupal\graphql\Hook\GraphqlHooks:
+    class: Drupal\graphql\Hook\GraphqlHooks
+    autowire: true

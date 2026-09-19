@@ -16,6 +16,12 @@ variables:
   SKIP_STYLELINT: 1
   OPT_IN_TEST_PREVIOUS_MAJOR: 1
   OPT_IN_TEST_PREVIOUS_MINOR: 1
+  OPT_IN_TEST_NEXT_MAJOR: 1
   OPT_IN_TEST_NEXT_MINOR: 1
   OPT_IN_TEST_MAX_PHP: 1
+  _COMPOSER_YARN_INSTALL: 0
   _PHPUNIT_CONCURRENT: 1
+
+composer (next major):
+  variables:
+    _LENIENT_ALLOW_LIST: typed_data,entity_reference_revisions

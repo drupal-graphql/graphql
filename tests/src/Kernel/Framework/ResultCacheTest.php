@@ -15,6 +15,8 @@ use Drupal\Tests\graphql\TestInvocationCounter;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use GraphQL\Deferred;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,6 +25,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ResultCacheTest extends GraphQLTestBase {
 
   /**

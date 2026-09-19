@@ -7,12 +7,16 @@ namespace Drupal\Tests\graphql\Kernel;
 use Drupal\Core\Form\FormState;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity preview buffer service.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityPreviewBufferTest extends GraphQLTestBase {
 
   /**

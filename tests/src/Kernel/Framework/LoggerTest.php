@@ -6,6 +6,8 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -13,6 +15,8 @@ use Psr\Log\LoggerInterface;
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class LoggerTest extends GraphQLTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;

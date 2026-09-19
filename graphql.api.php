@@ -7,6 +7,9 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Database\Query\ConditionInterface;
+use Drupal\Core\Database\Query\SelectInterface;
+
 /**
  * Alter the query built by the term autocomplete data producer.
  *
@@ -19,7 +22,7 @@ declare(strict_types=1);
  *   as OR condition group which allows to cover a match in term name OR in some
  *   other fields.
  */
-function hook_graphql_term_autocomplete_query_alter(array $args, \Drupal\Core\Database\Query\SelectInterface $query, \Drupal\Core\Database\Query\ConditionInterface $name_condition_group): void {
+function hook_graphql_term_autocomplete_query_alter(array $args, SelectInterface $query, ConditionInterface $name_condition_group): void {
   // Custom field on profile entity type of bundle resume has a reference to
   // synonyms field. Extend a query so it matches the string in term names OR in
   // synonyms.

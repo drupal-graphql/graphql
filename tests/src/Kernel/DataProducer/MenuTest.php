@@ -9,12 +9,16 @@ use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\Entity\Menu;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Data producers Menu test class.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class MenuTest extends GraphQLTestBase {
 
   /**

@@ -7,12 +7,16 @@ namespace Drupal\Tests\graphql\Kernel;
 use Drupal\graphql\GraphQL\CustomScalarInterface;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use GraphQL\Language\AST\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the custom scalar functionality.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class CustomScalarTest extends GraphQLTestBase {
 
   /**

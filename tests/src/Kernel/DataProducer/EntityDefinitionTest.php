@@ -11,12 +11,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the entity_definition data producer and friends.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityDefinitionTest extends GraphQLTestBase {
 
   /**
@@ -506,6 +510,8 @@ GQL;
     $base_field_definitions = $this->container->get('entity_field.manager')->getBaseFieldDefinitions('node');
     $this->fullDefinitionResult['entityDefinition']['fields'][13]['defaultValue'] =
       (string) $base_field_definitions['promote']->getDefaultValueLiteral()[0]['value'];
+    $this->fullDefinitionResult['entityDefinition']['fields'][13]['label'] =
+      (string) $base_field_definitions['promote']->getLabel();
   }
 
   /**

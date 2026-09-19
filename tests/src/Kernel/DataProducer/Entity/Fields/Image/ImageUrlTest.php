@@ -8,12 +8,16 @@ use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\file\FileInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test class for the ImageUrl data producer.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ImageUrlTest extends GraphQLTestBase {
 
   /**

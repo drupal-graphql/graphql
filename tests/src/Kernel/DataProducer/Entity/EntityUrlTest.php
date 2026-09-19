@@ -6,12 +6,16 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test class for the entity_url data producer.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityUrlTest extends GraphQLTestBase {
 
   /**

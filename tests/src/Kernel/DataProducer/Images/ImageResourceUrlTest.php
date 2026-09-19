@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\DataProducer\Images;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test class for the ImageResourceUrl data producer.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class ImageResourceUrlTest extends GraphQLTestBase {
 
   /**
@@ -18,6 +23,7 @@ class ImageResourceUrlTest extends GraphQLTestBase {
    *
    * @dataProvider imageResourceUrlProvider
    */
+  #[DataProvider('imageResourceUrlProvider')]
   public function testImageResourceUrl(array $input, string $expected): void {
     $result = $this->executeDataProducer('image_style_url', [
       'derivative' => $input,

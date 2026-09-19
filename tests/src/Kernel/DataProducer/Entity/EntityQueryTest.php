@@ -6,12 +6,16 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer\Entity;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use GraphQL\Error\UserError;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test class for the entity_query data producer.
  *
  * @group graphql
  */
+#[Group('graphql')]
+#[RunTestsInSeparateProcesses]
 class EntityQueryTest extends GraphQLTestBase {
 
   /**
