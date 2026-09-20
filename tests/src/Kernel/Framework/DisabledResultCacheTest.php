@@ -7,6 +7,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\Entity\Server;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class DisabledResultCacheTest extends GraphQLTestBase {
 
   /**

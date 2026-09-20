@@ -8,6 +8,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\Tests\graphql\TestInvocationCounter;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class CurrentUserTest extends GraphQLTestBase {
 
   use UserCreationTrait;

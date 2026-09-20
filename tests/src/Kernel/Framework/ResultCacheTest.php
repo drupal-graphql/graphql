@@ -15,6 +15,7 @@ use Drupal\Tests\graphql\TestInvocationCounter;
 use Drupal\graphql\Entity\Server;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use GraphQL\Deferred;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class ResultCacheTest extends GraphQLTestBase {
 
   /**
@@ -110,15 +112,15 @@ GQL;
       ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheTags')
       ->willReturn([]);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheMaxAge')
       ->willReturn(0);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheContexts')
       ->willReturn([]);
 
@@ -150,15 +152,15 @@ GQL;
       ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheTags')
       ->willReturn([]);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheMaxAge')
       ->willReturn(0);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheContexts')
       ->willReturn([]);
 
@@ -219,15 +221,15 @@ GQL;
       ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheTags')
       ->willReturn([]);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheMaxAge')
       ->willReturn(45);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheContexts')
       ->willReturn(['context']);
 
@@ -290,15 +292,15 @@ GQL;
       ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheTags')
       ->willReturn(['a', 'b']);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheMaxAge')
       ->willReturn(45);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheContexts')
       ->willReturn([]);
 
@@ -456,15 +458,15 @@ GQL;
       ->method('id')
       ->willReturn('test');
 
-    $dummy->expects($this->any())
+    $dummy
       ->method('getCacheTags')
       ->willReturn(['a', 'b']);
 
-    $dummy->expects($this->any())
+    $dummy
       ->method('getCacheMaxAge')
       ->willReturn($lifetime);
 
-    $dummy->expects($this->any())
+    $dummy
       ->method('getCacheContexts')
       ->willReturn([]);
 

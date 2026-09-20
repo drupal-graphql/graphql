@@ -6,6 +6,7 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use GraphQL\Deferred;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class ResolverBuilderTest extends GraphQLTestBase {
 
   /**

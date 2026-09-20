@@ -6,6 +6,7 @@ namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class EntityUuidBufferTest extends GraphQLTestBase {
 
   /**

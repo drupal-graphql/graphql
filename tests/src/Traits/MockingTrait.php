@@ -139,13 +139,16 @@ trait MockingTrait {
    *   An array of schema extension plugins.
    */
   protected function mockSchema(string $id, string $schema, array $extensions = []): void {
+    // @todo Convert the mocks to stubs when we drop Drupal 10 support. Then
+    // also remove all the AllowMockObjectsWithoutExpectations annotations from
+    // our kernel tests.
     /** @var \PHPUnit\Framework\MockObject\MockObject $extensionManager */
     $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getExtensions'])
       ->getMock();
 
-    $extensionManager->expects(static::any())
+    $extensionManager
       ->method('getExtensions')
       ->willReturn($extensions);
 
@@ -163,14 +166,14 @@ trait MockingTrait {
       ->onlyMethods(['getSchemaDefinition', 'registerResolvers', 'createResolverRegistry'])
       ->getMock();
 
-    $this->schema->expects(static::any())
+    $this->schema
       ->method('getSchemaDefinition')
       ->willReturn(new Source($schema));
 
     // Create a shared reference to the registry so we can register resolvers
     // after SdlSchemaPluginBase registers them all.
     $this->registry = new ResolverRegistry();
-    $this->schema->expects($this->any())
+    $this->schema
       ->method('createResolverRegistry')
       ->willReturn($this->registry);
   }
@@ -184,14 +187,14 @@ trait MockingTrait {
       ->onlyMethods(['getDefinitions', 'createInstance'])
       ->getMock();
 
-    $this->schemaPluginManager->expects($this->any())
+    $this->schemaPluginManager
       ->method('getDefinitions')
       ->willReturn([
         $id => [
           'id' => $id,
           'name' => 'Test schema',
           'provider' => 'graphql',
-          'class' => '\Drupal\graphql\Plugin\GraphQL\Schema\SdlSchemaPluginBase',
+          'class' => SdlSchemaPluginBase::class,
         ],
       ]);
   }
@@ -220,10 +223,10 @@ trait MockingTrait {
       ->onlyMethods(['getBaseDefinition', 'getExtensionDefinition', 'registerResolvers'])
       ->getMock();
 
-    $extension->expects(static::any())
+    $extension
       ->method('getBaseDefinition')
       ->willReturn($baseDefinition ? new Source($baseDefinition) : NULL);
-    $extension->expects(static::any())
+    $extension
       ->method('getExtensionDefinition')
       ->willReturn($extensionDefinition ? new Source($extensionDefinition) : NULL);
 

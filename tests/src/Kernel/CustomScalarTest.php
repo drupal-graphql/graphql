@@ -7,6 +7,7 @@ namespace Drupal\Tests\graphql\Kernel;
 use Drupal\graphql\GraphQL\CustomScalarInterface;
 use Drupal\graphql\GraphQL\ResolverBuilder;
 use GraphQL\Language\AST\Node;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class CustomScalarTest extends GraphQLTestBase {
 
   /**

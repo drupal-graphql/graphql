@@ -7,6 +7,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class TestFrameworkTest extends GraphQLTestBase {
 
   /**
@@ -35,15 +37,15 @@ GQL;
       ->onlyMethods(['getCacheTags', 'getCacheMaxAge', 'getCacheContexts'])
       ->getMock();
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheTags')
       ->willReturn(['my_tag']);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheMaxAge')
       ->willReturn(42);
 
-    $cacheable->expects($this->any())
+    $cacheable
       ->method('getCacheContexts')
       ->willReturn([]);
 

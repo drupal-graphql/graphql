@@ -11,9 +11,20 @@
   },
   "require-dev": {
     "drupal/entity_reference_revisions": "^1.14",
-    "drupal/redirect": "^1.0",
+    "drupal/redirect": "1.x-dev",
     "phpstan/phpstan-deprecation-rules": "^2 || ^1",
     "jangregor/phpstan-prophecy": "^2 || ^1",
-    "drush/drush": "^12 || ^13 || ^14"
+    "drush/drush": "^12 || ^13 || ^14",
+    "mglaman/composer-drupal-lenient": "^1 || ^2"
+  },
+  "config": {
+    "allow-plugins": {
+      "mglaman/composer-drupal-lenient": true
+    }
+  },
+  "extra": {
+    "drupal-lenient": {
+      "allow-all": true
+    }
   }
 }

@@ -11,6 +11,7 @@ use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Language\Source;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,6 +23,7 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class ServerConfigurationTest extends GraphQLTestBase {
 
   const TEST_SCHEMAS = [
@@ -129,7 +131,7 @@ class ServerConfigurationTest extends GraphQLTestBase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $extensionManager->expects($this->any())
+    $extensionManager
       ->method('createInstance')
       ->with($id)
       ->willReturn($schemaExtensionPlugin);
@@ -148,16 +150,16 @@ class ServerConfigurationTest extends GraphQLTestBase {
       ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry', 'getConfiguration'])
       ->getMock();
 
-    $mock->expects(static::any())
+    $mock
       ->method('getSchemaDefinition')
       ->willReturn(new Source($schema));
 
     $registry = new ResolverRegistry();
-    $mock->expects($this->any())
+    $mock
       ->method('getResolverRegistry')
       ->willReturn($registry);
 
-    $mock->expects($this->any())
+    $mock
       ->method('getConfiguration')
       ->willReturn([
         'extensions' => [$id => $id],
@@ -186,7 +188,7 @@ class ServerConfigurationTest extends GraphQLTestBase {
       'class' => ComposableSchema::class,
     ], $ids);
 
-    $schemaPluginManager->expects($this->any())
+    $schemaPluginManager
       ->method('getDefinitions')
       ->willReturn($definitions);
 

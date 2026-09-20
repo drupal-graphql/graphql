@@ -12,6 +12,7 @@ use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Language\Source;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class ServerCacheSeparationTest extends GraphQLTestBase {
 
   /**
@@ -115,7 +117,7 @@ class ServerCacheSeparationTest extends GraphQLTestBase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $extension_manager->expects($this->any())
+    $extension_manager
       ->method('createInstance')
       ->with($id)
       ->willReturn($schema_extension_plugin);
@@ -134,16 +136,16 @@ class ServerCacheSeparationTest extends GraphQLTestBase {
       ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry', 'getConfiguration'])
       ->getMock();
 
-    $mock->expects(static::any())
+    $mock
       ->method('getSchemaDefinition')
       ->willReturn(new Source($schema));
 
     $registry = new ResolverRegistry();
-    $mock->expects($this->any())
+    $mock
       ->method('getResolverRegistry')
       ->willReturn($registry);
 
-    $mock->expects($this->any())
+    $mock
       ->method('getConfiguration')
       ->willReturn([
         'extensions' => [$id => $id],
@@ -165,7 +167,7 @@ class ServerCacheSeparationTest extends GraphQLTestBase {
       ->onlyMethods(['getDefinitions', 'createInstance'])
       ->getMock();
 
-    $schema_plugin_manager->expects($this->any())
+    $schema_plugin_manager
       ->method('getDefinitions')
       ->willReturn([
         'composable' => [

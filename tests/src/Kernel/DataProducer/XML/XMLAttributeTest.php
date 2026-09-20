@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer\XML;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class XMLAttributeTest extends XMLTestBase {
 
   /**

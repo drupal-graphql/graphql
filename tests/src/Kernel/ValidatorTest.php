@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel;
 
 use Drupal\graphql\GraphQL\Validator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class ValidatorTest extends GraphQLTestBase {
 
   /**

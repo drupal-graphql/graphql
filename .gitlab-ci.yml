@@ -25,3 +25,9 @@ variables:
 composer (next major):
   variables:
     _LENIENT_ALLOW_LIST: typed_data,entity_reference_revisions
+
+phpunit (next major):
+  variables:
+    # Do not fail on deprecations on Drupal 12 because we need to support
+    # Drupal 11.
+    _RUNTESTS_EXTRA: '--suppress-deprecations'

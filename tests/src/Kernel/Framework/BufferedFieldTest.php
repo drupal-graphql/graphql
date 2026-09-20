@@ -7,6 +7,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\GraphQL\Buffers\BufferBase;
 use GraphQL\Deferred;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class BufferedFieldTest extends GraphQLTestBase {
 
   /**

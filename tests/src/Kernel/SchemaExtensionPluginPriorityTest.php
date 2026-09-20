@@ -10,6 +10,7 @@ use Drupal\graphql\GraphQL\Resolver\ResolverInterface;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
 
   /**
@@ -125,14 +127,14 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
       ->onlyMethods(['getConfiguration', 'createResolverRegistry'])
       ->getMock();
 
-    $schemaPlugin->expects(static::any())
+    $schemaPlugin
       ->method('getConfiguration')
       ->willReturn([
         'extensions' => $extensions,
         'server_id' => 'test',
       ]);
 
-    $schemaPlugin->expects($this->any())
+    $schemaPlugin
       ->method('createResolverRegistry')
       ->willReturn($registry);
 

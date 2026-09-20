@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class InvalidPayloadTest extends GraphQLTestBase {
 
   /**

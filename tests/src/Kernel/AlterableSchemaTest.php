@@ -9,6 +9,7 @@ use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
 use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use GraphQL\Language\Source;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class AlterableSchemaTest extends GraphQLTestBase {
 
   /**
@@ -149,7 +151,7 @@ class AlterableSchemaTest extends GraphQLTestBase {
     $extensions['graphql_alterable_schema_test'] = $this->getMockBuilder(SchemaExtensionPluginInterface::class)
       ->getMock();
 
-    $extensions['graphql_alterable_schema_test']->expects(static::any())
+    $extensions['graphql_alterable_schema_test']
       ->method('getBaseDefinition')
       ->willReturn(NULL);
 
@@ -167,14 +169,14 @@ class AlterableSchemaTest extends GraphQLTestBase {
         break;
     }
 
-    $extensions['graphql_alterable_schema_test']->expects(static::any())
+    $extensions['graphql_alterable_schema_test']
       ->method('getExtensionDefinition')
       ->willReturn($extensionDefinition);
 
-    $extensionManager->expects(static::any())
+    $extensionManager
       ->method('getExtensions')
       ->willReturn($extensions);
-    $extensionManager->expects(static::any())
+    $extensionManager
       ->method('createInstance')
       ->willReturn($extensions['graphql_alterable_schema_test']);
 
@@ -196,12 +198,12 @@ class AlterableSchemaTest extends GraphQLTestBase {
       ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry'])
       ->getMock();
 
-    $this->schema->expects(static::any())
+    $this->schema
       ->method('getSchemaDefinition')
       ->willReturn(new Source($schema));
 
     $this->registry = new ResolverRegistry();
-    $this->schema->expects($this->any())
+    $this->schema
       ->method('getResolverRegistry')
       ->willReturn($this->registry);
   }

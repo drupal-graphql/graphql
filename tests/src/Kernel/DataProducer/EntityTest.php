@@ -15,6 +15,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class EntityTest extends GraphQLTestBase {
 
   /**
@@ -300,7 +302,7 @@ class EntityTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityAccess::resolve
    */
   public function testResolveAccess(): void {
-    $this->entity->expects($this->any())
+    $this->entity
       ->method('access')
       ->willReturn(new AccessResultForbidden());
 

@@ -8,6 +8,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
+#[AllowMockObjectsWithoutExpectations]
 class AutomaticPersistedQueriesDynamicPageCacheTest extends GraphQLTestBase {
 
   /**

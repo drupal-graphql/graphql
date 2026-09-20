@@ -3,9 +3,14 @@ parameters:
   customRulesetUsed: true
   paths:
     - .
+  # We support multiple Drupal versions and ignore rules might not match in
+  # each.
+  reportUnmatchedIgnoredErrors: false
   ignoreErrors:
     # We inherit a lot of Drupal core docs that don't specify iterable types on
     # arrays, not sure we can fix this in a good way.
     - identifier: missingType.iterableValue
     # new static() is a best practice in Drupal, so we cannot fix that.
     - "#^Unsafe usage of new static\\(\\)\\.$#"
+    # We cannot use PHPUnit stubs yet in Drupal 10 and 11.
+    - message: '#Attribute class PHPUnit\\Framework\\Attributes\\AllowMockObjectsWithoutExpectations does not exist.#'
