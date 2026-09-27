@@ -187,13 +187,13 @@ class DataProducerProxy implements ResolverInterface {
     try {
       $prefix = $plugin->edgeCachePrefix();
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       throw new \LogicException(sprintf('Failed to serialize edge cache vectors for plugin %s.', $plugin->getPluginId()));
     }
 
     $contexts = $plugin->getCacheContexts();
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
-    return md5(serialize([$plugin->getPluginId(), $prefix, $keys]));
+    return hash('xxh64', serialize([$plugin->getPluginId(), $prefix, $keys]));
   }
 
   /**

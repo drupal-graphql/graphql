@@ -465,6 +465,10 @@ class EntityTest extends GraphQLTestBase {
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
    */
   public function testResolveEntityRendered(): void {
+    // Drupal core's Twig escape filter currently fails during entity rendering.
+    // @see https://www.drupal.org/project/drupal/issues/3625969
+    $this->markTestSkipped('Blocked by Drupal core issue #3625969.');
+    // @phpstan-ignore deadCode.unreachable
     $result = $this->executeDataProducer('entity_rendered', [
       'entity' => $this->node,
       'mode' => 'default',

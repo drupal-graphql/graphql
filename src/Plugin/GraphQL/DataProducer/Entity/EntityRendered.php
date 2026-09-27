@@ -74,7 +74,7 @@ class EntityRendered extends DataProducerPluginBase implements ContainerFactoryP
    * Resolver.
    */
   public function resolve(EntityInterface $entity, ?string $mode, RefinableCacheableDependencyInterface $metadata): string {
-    $mode = $mode ?? 'full';
+    $mode ??= 'full';
     $builder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
     $view = $builder->view($entity, $mode, $entity->language()->getId());
 

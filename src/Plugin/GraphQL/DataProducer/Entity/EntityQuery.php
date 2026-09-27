@@ -202,9 +202,7 @@ class EntityQuery extends EntityQueryBase {
       }
     }
 
-    $ids = $query->execute();
-
-    return $ids;
+    return $query->execute();
   }
 
 }

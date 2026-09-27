@@ -11,15 +11,24 @@
   "dictionaries": [],
   "dictionaryDefinitions": [],
   "words": [
+    "amateescu",
     "dataproducer",
     "dataproducers",
     "GraphiQL",
     "graphqls",
+    "halstead",
+    "mago",
     "webonyx"
   ],
   "flagWords": [
+    "blacklist",
+    "blacklists",
+    "blacklisted",
     "e-mail",
     "grey",
-    "queuing"
+    "queuing",
+    "whitelist",
+    "whitelists",
+    "whitelisted"
   ]
 }

@@ -21,9 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class SeekTest extends GraphQLTestBase {
 
   /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Utility\Seek::resolve
-   *
-   * @dataProvider seekProvider
+   * Tests seeking a value from a list.
    *
    * @param array|null $input
    *   The test list to seek in.
@@ -31,6 +29,10 @@ class SeekTest extends GraphQLTestBase {
    *   The position in the list to retrieve.
    * @param int|array|null $expected
    *   The expected result returned by the data producer.
+   *
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Utility\Seek::resolve
+   *
+   * @dataProvider seekProvider
    */
   #[DataProvider('seekProvider')]
   public function testSeek(?array $input, int $position, int|array|null $expected): void {

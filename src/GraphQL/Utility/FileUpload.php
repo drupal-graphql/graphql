@@ -128,40 +128,8 @@ class FileUpload {
   public function saveFileUpload(UploadedFile $uploaded_file, array $settings): FileUploadResponse {
     $response = new FileUploadResponse();
 
-    // Check for file upload errors and return FALSE for this file if a lower
-    // level system error occurred.
-    // @see http://php.net/manual/features.file-upload.errors.php.
-    switch ($uploaded_file->getError()) {
-      case UPLOAD_ERR_INI_SIZE:
-      case UPLOAD_ERR_FORM_SIZE:
-        $maxUploadSize = ByteSizeMarkup::create($this->getMaxUploadSize($settings));
-        $response->addViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', [
-          '@file' => $uploaded_file->getClientOriginalName(),
-          '@maxsize' => $maxUploadSize,
-        ]));
-        return $response;
-
-      case UPLOAD_ERR_PARTIAL:
-      case UPLOAD_ERR_NO_FILE:
-        $response->addViolation($this->t('The file "@file" could not be saved because the upload did not complete.', [
-          '@file' => $uploaded_file->getClientOriginalName(),
-        ]));
-        return $response;
-
-      case UPLOAD_ERR_OK:
-        // Final check that this is a valid upload, if it isn't, use the
-        // default error handler.
-        if ($uploaded_file->isValid()) {
-          break;
-        }
-
-      default:
-        $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $uploaded_file->getClientOriginalName()]));
-        $this->logger->error('Error while uploading the file "@file" with an error code "@code".', [
-          '@file' => $uploaded_file->getFilename(),
-          '@code' => $uploaded_file->getError(),
-        ]);
-        return $response;
+    if (!$this->validateUploadError($uploaded_file, $settings, $response)) {
+      return $response;
     }
 
     if (empty($settings['uri_scheme']) || empty($settings['file_directory'])) {
@@ -196,71 +164,121 @@ class FileUpload {
     }
 
     try {
-      // Begin building file entity.
-      /** @var \Drupal\file\FileInterface $file */
-      $file = $this->entityTypeManager->getStorage('file')->create([]);
-      $file->setOwnerId($this->currentUser->id());
-      $file->setFilename($prepared_filename);
-      $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
-      $file->setFileUri($temp_file_path);
-      // Set the size. This is done in File::preSave() but we validate the file
-      // before it is saved.
-      $file->setSize(@filesize($temp_file_path));
-
-      // Validate against fileValidator first with the temporary path.
-      /** @var \Symfony\Component\Validator\ConstraintViolationListInterface $file_validate_errors */
-      $file_validate_errors = $this->fileValidator->validate($file, $validators);
-      $errors = [];
-      if (count($file_validate_errors) > 0) {
-        foreach ($file_validate_errors as $violation) {
-          $errors[] = $violation->getMessage();
-        }
-      }
-
-      // Validate Image resolution.
-      $maxResolution = $settings['max_resolution'] ?? 0;
-      $minResolution = $settings['min_resolution'] ?? 0;
-      if (!empty($maxResolution) || !empty($minResolution)) {
-        $errors += $this->validateFileImageResolution($file, $maxResolution, $minResolution);
-      }
-
-      if (!empty($errors)) {
-        $response->addViolations($errors);
-        return $response;
-      }
-      $file->setFileUri($file_uri);
-      // Move the file to the correct location after validation. Use
-      // FileSystemInterface::EXISTS_ERROR as the file location has already been
-      // determined above in FileSystem::getDestinationFilename().
-      try {
-        $this->fileSystem->move($temp_file_path, $file_uri, FileExists::Rename);
-      }
-      catch (FileException $e) {
-        $response->addViolation($this->t('Unknown error while uploading the file "@file".', [
-          '@file' => $uploaded_file->getClientOriginalName(),
-        ]));
-        $this->logger->error('Unable to move file from "@file" to "@destination".', [
-          '@file' => $uploaded_file->getRealPath(),
-          '@destination' => $file->getFileUri(),
-        ]);
-        return $response;
-      }
-
-      // Validate the file entity against entity-level validation now after the
-      // file has moved.
-      if (!$this->validate($file, $validators, $response)) {
-        return $response;
-      }
-
-      $file->save();
-      $response->setFileEntity($file);
-      return $response;
+      return $this->saveLockedFileUpload($uploaded_file, $settings, $response, $validators, $prepared_filename, $temp_file_path, $file_uri);
     }
     finally {
       // This will always be executed before any return statement or exception
       // in the try {} block.
       $this->lock->release($lock_id);
     }
+  }
+
+  /**
+   * Creates and validates a file while its destination URI is locked.
+   */
+  protected function saveLockedFileUpload(UploadedFile $uploaded_file, array $settings, FileUploadResponse $response, array $validators, string $prepared_filename, string $temp_file_path, string $file_uri): FileUploadResponse {
+    // Begin building file entity.
+    /** @var \Drupal\file\FileInterface $file */
+    $file = $this->entityTypeManager->getStorage('file')->create([]);
+    $file->setOwnerId($this->currentUser->id());
+    $file->setFilename($prepared_filename);
+    $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
+    $file->setFileUri($temp_file_path);
+    // Set the size. This is done in File::preSave() but we validate the file
+    // before it is saved.
+    $file->setSize(@filesize($temp_file_path));
+
+    // Validate against fileValidator first with the temporary path.
+    /** @var \Symfony\Component\Validator\ConstraintViolationListInterface $file_validate_errors */
+    $file_validate_errors = $this->fileValidator->validate($file, $validators);
+    $errors = [];
+    if (count($file_validate_errors) > 0) {
+      foreach ($file_validate_errors as $violation) {
+        $errors[] = $violation->getMessage();
+      }
+    }
+
+    // Validate Image resolution.
+    $maxResolution = $settings['max_resolution'] ?? 0;
+    $minResolution = $settings['min_resolution'] ?? 0;
+    if (!empty($maxResolution) || !empty($minResolution)) {
+      $errors += $this->validateFileImageResolution($file, $maxResolution, $minResolution);
+    }
+
+    if (!empty($errors)) {
+      $response->addViolations($errors);
+      return $response;
+    }
+    $file->setFileUri($file_uri);
+    // Move the file to the correct location after validation. Use
+    // FileSystemInterface::EXISTS_ERROR as the file location has already been
+    // determined above in FileSystem::getDestinationFilename().
+    try {
+      $this->fileSystem->move($temp_file_path, $file_uri, FileExists::Rename);
+    }
+    catch (FileException) {
+      $response->addViolation($this->t('Unknown error while uploading the file "@file".', [
+        '@file' => $uploaded_file->getClientOriginalName(),
+      ]));
+      $this->logger->error('Unable to move file from "@file" to "@destination".', [
+        '@file' => $uploaded_file->getRealPath(),
+        '@destination' => $file->getFileUri(),
+      ]);
+      return $response;
+    }
+
+    // Validate the file entity against entity-level validation now after the
+    // file has moved.
+    if (!$this->validate($file, $validators, $response)) {
+      return $response;
+    }
+
+    $file->save();
+    $response->setFileEntity($file);
+    return $response;
+  }
+
+  /**
+   * Checks for errors reported by PHP during the upload.
+   */
+  protected function validateUploadError(UploadedFile $uploaded_file, array $settings, FileUploadResponse $response): bool {
+    // Check for file upload errors and return FALSE for this file if a lower
+    // level system error occurred.
+    // @see http://php.net/manual/features.file-upload.errors.php.
+    switch ($uploaded_file->getError()) {
+      case UPLOAD_ERR_INI_SIZE:
+      case UPLOAD_ERR_FORM_SIZE:
+        $maxUploadSize = ByteSizeMarkup::create($this->getMaxUploadSize($settings));
+        $response->addViolation($this->t('The file @file could not be saved because it exceeds @maxsize, the maximum allowed size for uploads.', [
+          '@file' => $uploaded_file->getClientOriginalName(),
+          '@maxsize' => $maxUploadSize,
+        ]));
+        return FALSE;
+
+      case UPLOAD_ERR_PARTIAL:
+      case UPLOAD_ERR_NO_FILE:
+        $response->addViolation($this->t('The file "@file" could not be saved because the upload did not complete.', [
+          '@file' => $uploaded_file->getClientOriginalName(),
+        ]));
+        return FALSE;
+
+      case UPLOAD_ERR_OK:
+        // Final check that this is a valid upload, if it isn't, use the
+        // default error handler.
+        if ($uploaded_file->isValid()) {
+          break;
+        }
+
+      default:
+        $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $uploaded_file->getClientOriginalName()]));
+        $this->logger->error('Error while uploading the file "@file" with an error code "@code".', [
+          '@file' => $uploaded_file->getFilename(),
+          '@code' => $uploaded_file->getError(),
+        ]);
+        return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
@@ -325,8 +343,8 @@ class FileUpload {
     if ($violations->count()) {
       foreach ($violations as $violation) {
         $response->addViolation($violation->getMessage());
-        return FALSE;
       }
+      return FALSE;
     }
 
     return TRUE;
@@ -449,7 +467,7 @@ class FileUpload {
           $passes_validation = count($this->fileValidator->validate($file, $validators['FileExtension']['extensions']));
         }
         if (empty($validators['FileExtension']['extensions']) || ($passes_validation > 0)) {
-          if ((substr($filename, -4) != '.txt')) {
+          if (substr($filename, -4) != '.txt') {
             // The destination filename will also later be used to create the
             // URI.
             $filename .= '.txt';

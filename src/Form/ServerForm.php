@@ -15,6 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Routing\RequestContext;
+use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\Plugin\SchemaPluginManager;
 use GraphQL\Error\DebugFlag;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -79,16 +80,28 @@ class ServerForm extends EntityForm {
     $form = parent::form($form, $formState);
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
-    $schemas = array_map(function ($definition) {
-      return $definition['name'] ?? $definition['id'];
-    }, $this->schemaManager->getDefinitions());
-    $schema_keys = array_keys($schemas);
+    $this->buildIdentityFields($form, $server);
+    $this->buildSchemaFields($form, $formState, $server);
+    $this->buildRequestFields($form, $server);
+    $this->buildValidationFields($form, $server);
+    $this->buildDebugField($form, $server);
 
-    $input = $formState->getUserInput();
-    // Use the schema selected by the user, the one configured, or fall back to
-    // the first schema that is defined.
-    $schema = ($input['schema'] ?? $server->get('schema')) ?: reset($schema_keys);
+    $form['actions'] = [
+      '#type' => 'actions',
+    ];
 
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Submit'),
+    ];
+
+    return $form;
+  }
+
+  /**
+   * Builds the server label and machine name fields.
+   */
+  protected function buildIdentityFields(array &$form, ServerInterface $server): void {
     if ($this->operation == 'create') {
       $form['#title'] = $this->t('Add server');
     }
@@ -115,6 +128,21 @@ class ServerForm extends EntityForm {
       ],
       '#description' => $this->t('A unique machine-readable name for this server. It must only contain lowercase letters, numbers, and underscores.'),
     ];
+  }
+
+  /**
+   * Builds the schema selector and its plugin configuration fields.
+   */
+  protected function buildSchemaFields(array &$form, FormStateInterface $formState, ServerInterface $server): void {
+    $schemas = array_map(function ($definition) {
+      return $definition['name'] ?? $definition['id'];
+    }, $this->schemaManager->getDefinitions());
+    $schema_keys = array_keys($schemas);
+
+    $input = $formState->getUserInput();
+    // Use the schema selected by the user, the one configured, or fall back to
+    // the first schema that is defined.
+    $schema = ($input['schema'] ?? $server->get('schema')) ?: reset($schema_keys);
 
     $form['schema'] = [
       '#title' => $this->t('Schema'),
@@ -151,7 +179,12 @@ class ServerForm extends EntityForm {
 
       $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $formState);
     }
+  }
 
+  /**
+   * Builds endpoint, batching, and caching fields.
+   */
+  protected function buildRequestFields(array &$form, ServerInterface $server): void {
     $form['endpoint'] = [
       '#title' => $this->t('Endpoint'),
       '#type' => 'textfield',
@@ -175,7 +208,12 @@ class ServerForm extends EntityForm {
       '#default_value' => !!$server->get('caching'),
       '#description' => $this->t('Whether caching of queries and partial results is enabled.'),
     ];
+  }
 
+  /**
+   * Builds query validation fields.
+   */
+  protected function buildValidationFields(array &$form, ServerInterface $server): void {
     $form['validation'] = [
       '#title' => $this->t('Validation rules'),
       '#type' => 'fieldset',
@@ -201,7 +239,12 @@ class ServerForm extends EntityForm {
       '#type' => 'number',
       '#description' => $this->t('Security rule: The maximum allowed complexity of a query. Set to 0 to set unlimited.'),
     ];
+  }
 
+  /**
+   * Builds the debug flag checkboxes.
+   */
+  protected function buildDebugField(array &$form, ServerInterface $server): void {
     $debug_flags = $server->get('debug_flag') ?? 0;
     $form['debug_flag'] = [
       '#title' => $this->t('Debug settings'),
@@ -220,17 +263,6 @@ class ServerForm extends EntityForm {
       ])),
       '#description' => $this->t("It is recommended to disable all debugging in production. During development you can enable the information that you need above."),
     ];
-
-    $form['actions'] = [
-      '#type' => 'actions',
-    ];
-
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Submit'),
-    ];
-
-    return $form;
   }
 
   /**

@@ -153,23 +153,10 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
       return [];
     }
 
-    $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
     $values = $entity->get($field);
     if ($values instanceof EntityReferenceFieldItemListInterface) {
-      $resolvedEntities = [];
-      $vids = [];
-
-      foreach ($values as $delta => $item) {
-        // If the entity is already present (common in preview),
-        // use it directly and preserve ordering.
-        if (isset($item->entity)) {
-          $resolvedEntities[$delta] = $item->entity;
-        }
-        elseif (!empty($item->target_revision_id)) {
-          $vids[$delta] = $item->target_revision_id;
-        }
-      }
+      [$resolvedEntities, $vids] = $this->collectReferences($values);
 
       // If everything is already resolved, return immediately.
       if (empty($vids)) {
@@ -197,6 +184,32 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
     }
 
     return [];
+  }
+
+  /**
+   * Collects already attached entities and revision IDs to load later.
+   *
+   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface<\Drupal\Core\Entity\EntityInterface> $values
+   *   The entity reference revisions field items.
+   *
+   * @return array{0: array<int, \Drupal\Core\Entity\EntityInterface>, 1: array<int, int|string>}
+   *   The attached entities and revision IDs, each keyed by field delta.
+   */
+  protected function collectReferences(EntityReferenceFieldItemListInterface $values): array {
+    $resolvedEntities = [];
+    $vids = [];
+
+    foreach ($values as $delta => $item) {
+      // Attached entities are common in previews and take precedence over IDs.
+      if (isset($item->entity)) {
+        $resolvedEntities[$delta] = $item->entity;
+      }
+      elseif (!empty($item->target_revision_id)) {
+        $vids[$delta] = $item->target_revision_id;
+      }
+    }
+
+    return [$resolvedEntities, $vids];
   }
 
 }

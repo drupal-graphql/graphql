@@ -23,7 +23,7 @@ trait DataProducerPluginCachingTrait {
       return $context;
     }, $this->getContextValues());
 
-    return hash('sha256', serialize($contexts));
+    return hash('xxh64', serialize($contexts));
   }
 
   /**

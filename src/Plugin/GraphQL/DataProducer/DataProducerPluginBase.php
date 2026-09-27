@@ -68,7 +68,7 @@ abstract class DataProducerPluginBase extends PluginBase implements DataProducer
    */
   public function getContextValuesWithDefaults(): array {
     $values = [];
-    foreach ($this->getContextDefinitions() as $name => $definition) {
+    foreach (array_keys($this->getContextDefinitions()) as $name) {
       $values[$name] = $this->getContext($name)->getContextValue();
     }
 

@@ -1,0 +1,72 @@
+version = "1"
+# The lowest PHP version that the supported core releases accept.
+php-version = "8.1"
+
+[source]
+paths = ["."]
+# In GitLab CI the checkout also holds the Drupal site and its vendor
+# directory. Neither is part of the module.
+excludes = ["vendor", "web", ".ddev"]
+extensions = ["php", "module", "install", "inc", "theme", "profile", "engine"]
+
+[extension-hosts.drupal]
+# The Drupal rules from amateescu/mago-drupal, installed in the site that
+# holds the module. The path assumes a core checkout with the module in
+# modules/trash. The GitLab CI job puts a vendor symlink at the same depth.
+command = ["php", "vendor/amateescu/mago-drupal/resources/worker.php"]
+
+[formatter]
+preset = "drupal"
+
+[linter]
+# Stops `lowercase-keyword` from reporting TRUE, FALSE and NULL.
+integrations = ["drupal"]
+# Fail on warnings too, the same way phpcs does.
+minimum-fail-level = "warning"
+
+[linter.rules]
+# Report an interface name without the "Interface" suffix.
+interface-name = { psr = true }
+# Report a file whose name differs from the class that it declares.
+file-name = { enabled = true }
+# Accept snake_case functions and camelCase methods. Hook documentation has
+# uppercase placeholders such as hook_ENTITY_TYPE_insert().
+function-name = { either = true, exclude = ["*.api.php"] }
+# Report a variable that is assigned and never read.
+no-redundant-variable = { enabled = true }
+
+# These rules contradict Drupal's standard, or repeat a rule of the extension.
+no-error-control-operator = { enabled = false }
+tagged-todo = { enabled = false }
+
+# Advice that Drupal's standard does not ask for.
+assert-description = { enabled = false }
+braced-string-interpolation = { enabled = false }
+cyclomatic-complexity = { enabled = false }
+excessive-nesting = { enabled = false }
+excessive-parameter-list = { enabled = false }
+halstead = { difficulty-threshold = 13 }
+identity-comparison = { enabled = false }
+kan-defect = { enabled = false }
+literal-named-argument = { enabled = false }
+no-assign-in-condition = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+no-else-clause = { enabled = false }
+no-empty = { enabled = false }
+no-empty-catch-clause = { enabled = false }
+no-isset = { enabled = false }
+no-multi-assignments = { enabled = false }
+no-shorthand-ternary = { enabled = false }
+prefer-arrow-function = { enabled = false }
+prefer-early-continue = { enabled = false }
+prefer-first-class-callable = { enabled = false }
+prefer-static-closure = { enabled = false }
+readable-literal = { enabled = false }
+too-many-methods = { enabled = false }
+strict-behavior = { enabled = false }
+strict-types = { enabled = false }
+
+
+[analyzer]
+# Report a PHP function that is called with the wrong case.
+check-name-casing = true

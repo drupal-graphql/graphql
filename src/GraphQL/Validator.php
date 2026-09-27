@@ -53,7 +53,7 @@ class Validator implements ValidatorInterface {
       $schema = $plugin->getSchema();
     }
     // In case the schema can't even be loaded we can't report anything.
-    catch (Error $e) {
+    catch (Error) {
       return [];
     }
 
@@ -68,7 +68,7 @@ class Validator implements ValidatorInterface {
 
       // Skip hidden/internal/introspection types since they're handled by
       // GraphQL itself.
-      if (strpos($type->name, "__") === 0) {
+      if (str_starts_with($type->name, "__")) {
         continue;
       }
 
@@ -100,7 +100,7 @@ class Validator implements ValidatorInterface {
       $schema = $plugin->getSchema();
     }
     // In case the schema can't even be loaded we can't report anything.
-    catch (Error $e) {
+    catch (Error) {
       return [];
     }
 

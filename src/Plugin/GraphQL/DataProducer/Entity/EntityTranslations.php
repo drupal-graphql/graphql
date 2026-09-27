@@ -89,6 +89,7 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
    * Resolver.
    *
    * @return array|null
+   *   The available translations, or NULL if none are available.
    */
   public function resolve(EntityInterface $entity, ?bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): ?array {
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {

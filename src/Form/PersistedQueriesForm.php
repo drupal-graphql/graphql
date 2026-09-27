@@ -48,14 +48,14 @@ class PersistedQueriesForm extends EntityForm {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'graphql_persisted_queries_form';
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
@@ -65,6 +65,33 @@ class PersistedQueriesForm extends EntityForm {
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'graphql/persisted_queries';
+    $this->buildEnabledPlugins($form, $plugins, $all_plugins);
+    $plugins_weight = $this->buildPluginWeights($form, $plugins, $all_plugins);
+    $this->buildPluginSettings($form, $form_state, $plugins, $all_plugins, $plugins_weight);
+
+    $form['actions'] = [
+      '#type' => 'actions',
+    ];
+
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Submit'),
+    ];
+
+    return $form;
+  }
+
+  /**
+   * Adds checkboxes for the available persisted query plugins.
+   *
+   * @param array $form
+   *   The form array.
+   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
+   *   Enabled plugin instances.
+   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
+   *   All available plugin instances.
+   */
+  protected function buildEnabledPlugins(array &$form, array $plugins, array $all_plugins): void {
     $form['enabled'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Enabled persisted query plugins'),
@@ -89,8 +116,22 @@ class PersistedQueriesForm extends EntityForm {
         ],
       ];
     }
+  }
 
-    // Set the weights of the persisted query plugins.
+  /**
+   * Adds the plugin ordering table and returns the sorted weights.
+   *
+   * @param array $form
+   *   The form array.
+   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
+   *   Enabled plugin instances.
+   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
+   *   All available plugin instances.
+   *
+   * @return array<string, int>
+   *   Plugin weights sorted in ascending order.
+   */
+  protected function buildPluginWeights(array &$form, array $plugins, array $all_plugins): array {
     $form['weights'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Order'),
@@ -127,14 +168,30 @@ class PersistedQueriesForm extends EntityForm {
         ],
       ];
     }
+    return $plugins_weight;
+  }
 
-    // Add vertical tabs containing the settings for the plugins.
+  /**
+   * Adds settings forms for plugins that provide them.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
+   *   Enabled plugin instances.
+   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
+   *   All available plugin instances.
+   * @param array<string, int> $plugins_weight
+   *   Plugin weights sorted in ascending order.
+   */
+  protected function buildPluginSettings(array &$form, FormStateInterface $form_state, array $plugins, array $all_plugins, array $plugins_weight): void {
     $form['plugin_settings'] = [
       '#title' => $this->t('Persisted queries settings'),
       '#type' => 'vertical_tabs',
     ];
 
-    foreach ($plugins_weight as $plugin_id => $weight) {
+    foreach (array_keys($plugins_weight) as $plugin_id) {
       $plugin = !empty($plugins[$plugin_id]) ? $plugins[$plugin_id] : $all_plugins[$plugin_id];
       if ($plugin instanceof PluginFormInterface) {
         $form['settings'][$plugin_id] = [
@@ -154,21 +211,10 @@ class PersistedQueriesForm extends EntityForm {
         unset($form['settings'][$plugin_id]);
       }
     }
-
-    $form['actions'] = [
-      '#type' => 'actions',
-    ];
-
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Submit'),
-    ];
-
-    return $form;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     parent::submitForm($form, $form_state);
@@ -200,7 +246,7 @@ class PersistedQueriesForm extends EntityForm {
    */
   protected function getAllPersistedQueryPlugins(): array {
     $plugins = [];
-    foreach ($this->persistedQueryPluginManager->getDefinitions() as $id => $definition) {
+    foreach (array_keys($this->persistedQueryPluginManager->getDefinitions()) as $id) {
       $plugins[$id] = $this->persistedQueryPluginManager->createInstance($id);
     }
     return $plugins;

@@ -18,6 +18,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Test class for the RouteEntity data producer.
  *
  * @group graphql
+ *
+ * @mago-expect lint:too-many-properties
  */
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]

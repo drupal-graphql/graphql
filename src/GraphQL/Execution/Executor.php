@@ -210,15 +210,13 @@ class Executor implements ExecutorImplementation {
     $extensions = $this->context->getOperation()->extensions ?: [];
     ksort($extensions);
 
-    $hash = hash('sha256', serialize([
+    return hash('xxh64', serialize([
       'query' => DocumentSerializer::serializeDocument($this->document),
       'variables' => $variables,
       'extensions' => $extensions,
       'operation' => $this->operation,
       'server_id' => $this->context->getServer()->id(),
     ]));
-
-    return $hash;
   }
 
   /**
@@ -226,16 +224,16 @@ class Executor implements ExecutorImplementation {
    */
   protected function cacheSuffix(array $contexts = []): string {
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();
-    return hash('sha256', serialize($keys));
+    return hash('xxh64', serialize($keys));
   }
 
   /**
    * Lookup cached results by contexts for this query.
    */
   protected function cacheRead(string $prefix): ?ExecutionResult {
-    if (($cache = $this->cacheBackend->get("contexts:$prefix"))) {
+    if ($cache = $this->cacheBackend->get("contexts:$prefix")) {
       $suffix = $this->cacheSuffix($cache->data ?? []);
-      if (($cache = $this->cacheBackend->get("result:$prefix:$suffix"))) {
+      if ($cache = $this->cacheBackend->get("result:$prefix:$suffix")) {
         $result = new CacheableExecutionResult($cache->data['data'], [], $cache->data['extensions']);
         $result->addCacheableDependency($cache->data['metadata']);
         // The metadata cacheMaxAge is valid at the time the cache entry is

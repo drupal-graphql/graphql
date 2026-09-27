@@ -34,8 +34,7 @@ class Callback implements ResolverInterface {
    * {@inheritdoc}
    */
   public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
-    $result = ($this->callback)($value, $args, $context, $info, $field);
-    return $result;
+    return ($this->callback)($value, $args, $context, $info, $field);
   }
 
 }

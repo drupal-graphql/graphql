@@ -21,6 +21,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ImageResourceUrlTest extends GraphQLTestBase {
 
   /**
+   * Tests the ImageResourceUrl data producer.
+   *
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Images\ImageResourceUrl::resolve
    *
    * @dataProvider imageResourceUrlProvider

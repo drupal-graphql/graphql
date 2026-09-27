@@ -22,7 +22,7 @@ trait SchemaPrinterTrait {
    *   The printed version of the schema.
    */
   protected function getPrintedSchema(?ServerInterface $server = NULL): string {
-    $server = $server ?? $this->server;
+    $server ??= $this->server;
     /** @var \GraphQL\Server\ServerConfig $config */
     $config = $server->configuration();
     $schema = $config->getSchema();

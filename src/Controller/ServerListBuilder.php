@@ -27,7 +27,7 @@ class ServerListBuilder extends ConfigEntityListBuilder {
   protected AccountProxyInterface $currentUser;
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     $instance = parent::createInstance($container, $entity_type);

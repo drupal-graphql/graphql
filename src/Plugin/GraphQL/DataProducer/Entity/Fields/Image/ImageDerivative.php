@@ -86,6 +86,9 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
    * Resolver.
    *
    * @return array|null
+   *   Returns an array containing the URL, width, and height of the image
+   *   derivative, or NULL if the image is not accessible or the image style
+   *   does not exist.
    */
   public function resolve(?FileInterface $entity, string $style, RefinableCacheableDependencyInterface $metadata): ?array {
     // Return if we don't have an entity or if it is an SVG image where image

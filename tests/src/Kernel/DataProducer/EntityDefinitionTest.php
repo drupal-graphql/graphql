@@ -415,6 +415,21 @@ GQL;
 
     $this->setUpSchema($schema);
 
+    $this->setUpResolvers();
+
+    // @todo Different field settings starting with Drupal 11.3, get them fresh
+    // from the service.
+    $base_field_definitions = $this->container->get('entity_field.manager')->getBaseFieldDefinitions('node');
+    $this->fullDefinitionResult['entityDefinition']['fields'][13]['defaultValue'] =
+      (string) $base_field_definitions['promote']->getDefaultValueLiteral()[0]['value'];
+    $this->fullDefinitionResult['entityDefinition']['fields'][13]['label'] =
+      (string) $base_field_definitions['promote']->getLabel();
+  }
+
+  /**
+   * Registers the entity definition field resolvers.
+   */
+  protected function setUpResolvers(): void {
     $registry = $this->registry;
     $builder = new ResolverBuilder();
 
@@ -506,14 +521,6 @@ GQL;
         'entity_form_display_context' => $builder->fromContext('entity_form_display'),
       ])
     );
-
-    // @todo Different field settings starting with Drupal 11.3, get them fresh
-    // from the service.
-    $base_field_definitions = $this->container->get('entity_field.manager')->getBaseFieldDefinitions('node');
-    $this->fullDefinitionResult['entityDefinition']['fields'][13]['defaultValue'] =
-      (string) $base_field_definitions['promote']->getDefaultValueLiteral()[0]['value'];
-    $this->fullDefinitionResult['entityDefinition']['fields'][13]['label'] =
-      (string) $base_field_definitions['promote']->getLabel();
   }
 
   /**
@@ -625,8 +632,7 @@ GQL;
    */
   protected function defaultCacheTags(): array {
     $tags = parent::defaultCacheTags();
-    $tags = array_merge($tags, $this->defaultCacheTags);
-    return $tags;
+    return array_merge($tags, $this->defaultCacheTags);
   }
 
 }

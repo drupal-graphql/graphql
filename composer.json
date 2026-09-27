@@ -15,7 +15,9 @@
     "phpstan/phpstan-deprecation-rules": "^2 || ^1",
     "jangregor/phpstan-prophecy": "^2 || ^1",
     "drush/drush": "^12 || ^13 || ^14",
-    "mglaman/composer-drupal-lenient": "^1 || ^2"
+    "mglaman/composer-drupal-lenient": "^1 || ^2",
+    "amateescu/mago-drupal": "^0.5",
+    "carthage-software/mago": "^1.50"
   },
   "config": {
     "allow-plugins": {

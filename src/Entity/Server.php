@@ -80,6 +80,9 @@ use GraphQL\Validator\Rules\QueryDepth;
  *     "persisted_queries-form" = "/admin/config/graphql/servers/manage/{graphql_server}/persisted_queries",
  *   }
  * )
+ *
+ * @mago-expect lint:drupal/property-name
+ * @mago-expect lint:too-many-properties
  */
 #[ConfigEntityType(
   id: "graphql_server",
@@ -369,7 +372,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function addPersistedQueryInstance(PersistedQueryPluginInterface $queryPlugin): void {
     // Make sure the persistedQueryInstances are loaded before trying to add a
@@ -393,7 +396,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function removeAllPersistedQueryInstances(): void {
     $this->persisted_query_instances = NULL;
@@ -410,9 +413,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
     /** @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
     $plugin_manager = \Drupal::service('plugin.manager.graphql.persisted_query');
-    $definitions = $plugin_manager->getDefinitions();
+    $definition_ids = array_keys($plugin_manager->getDefinitions());
     $persisted_queries_settings = $this->get('persisted_queries_settings');
-    foreach ($definitions as $id => $definition) {
+    foreach ($definition_ids as $id) {
       if (isset($persisted_queries_settings[$id])) {
         $configuration = !empty($persisted_queries_settings[$id]) ? $persisted_queries_settings[$id] : [];
         $this->persisted_query_instances[$id] = $plugin_manager->createInstance($id, $configuration);
@@ -567,7 +570,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage): void {
     // Write all the persisted queries configuration.

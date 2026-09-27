@@ -32,7 +32,7 @@ class DefaultValue implements ResolverInterface {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function resolve(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
     $result = $this->value->resolve($value, $args, $context, $info, $field);

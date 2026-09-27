@@ -21,6 +21,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class StringTest extends GraphQLTestBase {
 
   /**
+   * Tests converting a string to uppercase.
+   *
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\String\Uppercase::resolve
    *
    * @dataProvider uppercaseProvider

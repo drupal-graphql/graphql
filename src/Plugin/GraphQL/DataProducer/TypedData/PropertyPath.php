@@ -80,10 +80,10 @@ class PropertyPath extends DataProducerPluginBase {
     try {
       $output = $fetcher->fetchDataByPropertyPath($value, $path, $bubbleable)->getValue();
     }
-    catch (MissingDataException $exception) {
+    catch (MissingDataException) {
       // There is no data at the given path.
     }
-    catch (InvalidArgumentException $exception) {
+    catch (InvalidArgumentException) {
       // The path is invalid for the source object.
     }
     finally {

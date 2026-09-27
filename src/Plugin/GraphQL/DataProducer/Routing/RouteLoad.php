@@ -88,7 +88,7 @@ class RouteLoad extends DataProducerPluginBase implements ContainerFactoryPlugin
    * Resolver.
    */
   public function resolve(string $path, ?string $language, RefinableCacheableDependencyInterface $metadata): ?Url {
-    $language = $language ?? Language::LANGCODE_NOT_SPECIFIED;
+    $language ??= Language::LANGCODE_NOT_SPECIFIED;
     $redirect = $this->redirectRepository ? $this->redirectRepository->findMatchingRedirect($path, [], $language) : NULL;
     if ($redirect !== NULL) {
       $url = $redirect->getRedirectUrl();

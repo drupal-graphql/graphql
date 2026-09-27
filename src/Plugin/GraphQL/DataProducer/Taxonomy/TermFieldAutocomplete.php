@@ -162,9 +162,8 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $field_config_storage */
     $field_config_storage = $this->entityTypeManager->getStorage('field_config');
 
-    /** @var \Drupal\field\FieldConfigInterface|null $field_config */
     $field_config = $field_config_storage->load($entity_type . '.' . $bundle . '.' . $field);
-
+    assert($field_config instanceof FieldConfigInterface || $field_config === NULL);
     return $field_config;
   }
 

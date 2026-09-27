@@ -31,3 +31,30 @@ phpunit (next major):
     # Do not fail on deprecations on Drupal 12 because we need to support
     # Drupal 11.
     _RUNTESTS_EXTRA: '--suppress-deprecations'
+
+# Mago lint with the Drupal rules from amateescu/mago-drupal. The composer job
+# installs both from require-dev, and mago.toml in the module root holds the
+# configuration. The second run writes the GitLab code quality report.
+mago-lint:
+  stage: validate
+  needs: [composer]
+  rules:
+    - if: $SKIP_MAGO == "1"
+      when: never
+    - when: on_success
+  allow_failure: false
+  script:
+    - cd $CI_PROJECT_DIR && pwd
+    - $COMPOSER_BIN_DIR/mago version
+    - $COMPOSER_BIN_DIR/mago extension list
+    - $COMPOSER_BIN_DIR/mago lint || EXIT_CODE=$?
+    - $COMPOSER_BIN_DIR/mago lint --reporting-format gitlab > mago-codequality.json || true
+    - exit ${EXIT_CODE:-0}
+  artifacts:
+    expire_in: 1 mos
+    when: always
+    name: artifacts-$CI_PIPELINE_ID-$CI_JOB_NAME_SLUG
+    paths:
+      - mago-codequality.json
+    reports:
+      codequality: mago-codequality.json

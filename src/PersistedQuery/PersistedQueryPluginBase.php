@@ -13,21 +13,21 @@ use Drupal\graphql\Plugin\PersistedQueryPluginInterface;
 abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQueryPluginInterface {
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function getConfiguration() {
     return $this->configuration;
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function setConfiguration(array $configuration): void {
     $this->configuration = $configuration + $this->defaultConfiguration();
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function defaultConfiguration() {
     return [];

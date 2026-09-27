@@ -59,6 +59,8 @@ GQL;
   }
 
   /**
+   * Tests producing plugins from builder input.
+   *
    * @covers ::produce
    *
    * @dataProvider builderProducingProvider

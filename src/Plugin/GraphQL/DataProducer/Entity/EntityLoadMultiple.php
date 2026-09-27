@@ -127,7 +127,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
         return [];
       }
 
-      foreach ($entities as $id => $entity) {
+      foreach (array_keys($entities) as $id) {
         $context->addCacheableDependency($entities[$id]);
         if (isset($bundles) && !in_array($entities[$id]->bundle(), $bundles)) {
           // If the entity is not among the allowed bundles, don't return it.
