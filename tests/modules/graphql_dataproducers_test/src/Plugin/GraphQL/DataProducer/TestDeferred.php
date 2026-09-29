@@ -47,7 +47,7 @@ class TestDeferred extends DataProducerPluginBase {
    * @template T
    */
   public function resolve(mixed $value, FieldContext $field): Deferred {
-    return new Deferred(function () use ($value) {
+    return new Deferred(static function () use ($value) {
       return $value;
     });
   }

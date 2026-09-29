@@ -45,7 +45,7 @@ GQL;
     // Mock a mutation that accepts the upload input and just returns
     // the client filename.
     $this->mockResolver('Mutation', 'store',
-      function ($parent, $args) {
+      static function ($parent, $args) {
         return $args['file']->getClientOriginalName();
       }
     );

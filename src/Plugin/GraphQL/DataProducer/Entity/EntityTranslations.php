@@ -95,7 +95,7 @@ class EntityTranslations extends DataProducerPluginBase implements ContainerFact
     if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
       $languages = $entity->getTranslationLanguages();
 
-      return array_map(function (LanguageInterface $language) use ($entity, $access, $accessOperation, $accessUser, $context) {
+      return array_map(static function (LanguageInterface $language) use ($entity, $access, $accessOperation, $accessUser, $context) {
         $langcode = $language->getId();
         $entity = $entity->getTranslation($langcode);
         $entity->addCacheContexts(["static:language:{$langcode}"]);

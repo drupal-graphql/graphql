@@ -43,7 +43,7 @@ trait EntityReferenceTrait {
     $entities = $resolver() ?: [];
 
     if (isset($bundles)) {
-      $entities = array_filter($entities, function (EntityInterface $entity) use ($bundles) {
+      $entities = array_filter($entities, static function (EntityInterface $entity) use ($bundles) {
         return in_array($entity->bundle(), $bundles);
       });
     }
@@ -77,7 +77,7 @@ trait EntityReferenceTrait {
    *   Translated entities.
    */
   private function getTranslated(array $entities, string $language): array {
-    return array_map(function (EntityInterface $entity) use ($language) {
+    return array_map(static function (EntityInterface $entity) use ($language) {
       if ($language !== $entity->language()->getId() && $entity instanceof TranslatableInterface && $entity->hasTranslation($language)) {
         $entity = $entity->getTranslation($language);
       }
@@ -102,7 +102,7 @@ trait EntityReferenceTrait {
    *   Filtered entities.
    */
   private function filterAccessible(array $entities, ?AccountInterface $accessUser, string $accessOperation, FieldContext $context): array {
-    return array_filter($entities, function (EntityInterface $entity) use ($accessOperation, $accessUser, $context) {
+    return array_filter($entities, static function (EntityInterface $entity) use ($accessOperation, $accessUser, $context) {
       /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
       $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
       $context->addCacheableDependency($accessResult);

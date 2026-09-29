@@ -38,7 +38,7 @@ class DeferredUtility {
   public static function applyFinally(mixed $value, callable $callback): mixed {
     if ($value instanceof SyncPromise) {
       // Recursively apply this function to deferred results.
-      $value->then(function ($inner) use ($callback) {
+      $value->then(static function ($inner) use ($callback) {
         return static::applyFinally($inner, $callback);
       });
     }
@@ -54,7 +54,7 @@ class DeferredUtility {
    */
   public static function returnFinally(mixed $value, callable $callback): mixed {
     if ($value instanceof SyncPromise) {
-      return $value->then(function ($value) use ($callback) {
+      return $value->then(static function ($value) use ($callback) {
         return $callback($value);
       });
     }
@@ -78,9 +78,9 @@ class DeferredUtility {
    */
   public static function waitAll(array $values): Deferred|array {
     if (static::containsDeferred($values)) {
-      return new Deferred(function () use ($values) {
+      return new Deferred(static function () use ($values) {
         $adapter = static::promiseAdapter();
-        return $adapter->all(array_map(function ($value) use ($adapter) {
+        return $adapter->all(array_map(static function ($value) use ($adapter) {
           if ($value instanceof SyncPromise) {
             return $adapter->convertThenable($value);
           }

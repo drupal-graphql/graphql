@@ -83,7 +83,7 @@ class EntityMultipleTest extends GraphQLTestBase {
       'ids' => [$this->node1->id(), $this->node2->id(), $this->node3->id()],
     ]);
 
-    $nids = array_values(array_map(function (NodeInterface $item) {
+    $nids = array_values(array_map(static function (NodeInterface $item) {
       return $item->id();
     }, $result));
 

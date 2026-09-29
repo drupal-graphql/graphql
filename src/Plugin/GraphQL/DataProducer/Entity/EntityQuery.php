@@ -163,6 +163,8 @@ class EntityQuery extends EntityQueryBase {
    *
    * @throws \GraphQL\Error\UserError
    *   No bundles defined for given entity type.
+   *
+   * @mago-expect lint:excessive-parameter-list
    */
   public function resolve(string $type, int $limit, int $offset, bool $ownedOnly, array $conditions, array $allowedFilters, array $languages, array $bundles, bool $access, array $sorts, FieldContext $context): array {
     $query = $this->buildBaseEntityQuery(

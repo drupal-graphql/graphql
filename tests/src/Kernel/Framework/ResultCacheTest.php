@@ -92,9 +92,7 @@ GQL;
       ->willReturn('test');
 
     $this->mockResolver('Query', 'root',
-      function () use ($dummy) {
-        return $dummy->id();
-      }
+      $dummy->id(...)
     );
 
     // The first request that is supposed to be cached.
@@ -198,9 +196,7 @@ GQL;
       ->willReturn('test');
 
     $this->mockResolver('Query', 'root',
-      function () use ($dummy) {
-        return $dummy->id();
-      }
+      $dummy->id(...)
     );
 
     // This result will be stored in the cache.
@@ -245,7 +241,7 @@ GQL;
 
     // Argument patterns that check if the 'context' is in the list.
     $hasContext = Argument::containing('context');
-    $hasNotContext = Argument::that(function ($arg) {
+    $hasNotContext = Argument::that(static function ($arg) {
       return !in_array('context', $arg);
     });
 
@@ -344,7 +340,7 @@ GQL;
     $renderer = $this->container->get('renderer');
 
     $this->mockResolver('Query', 'leakA',
-      function ($a, $b, $c, $d, FieldContext $field) use ($renderer) {
+      static function ($a, $b, $c, $d, FieldContext $field) use ($renderer) {
         $el = [
           '#plain_text' => 'Leak A',
           '#cache' => [
@@ -353,7 +349,7 @@ GQL;
         ];
 
         $renderContext = new RenderContext();
-        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el) {
+        $value = $renderer->executeInRenderContext($renderContext, static function () use ($renderer, $el) {
           return $renderer->render($el)->__toString();
         });
 
@@ -366,7 +362,7 @@ GQL;
     );
 
     $this->mockResolver('Query', 'leakB',
-      function ($a, $b, $c, $d, FieldContext $field) use ($renderer) {
+      static function ($a, $b, $c, $d, FieldContext $field) use ($renderer) {
         $el = [
           '#plain_text' => 'Leak B',
           '#cache' => [
@@ -375,7 +371,7 @@ GQL;
         ];
 
         $renderContext = new RenderContext();
-        $value = $renderer->executeInRenderContext($renderContext, function () use ($renderer, $el) {
+        $value = $renderer->executeInRenderContext($renderContext, static function () use ($renderer, $el) {
           return $renderer->render($el)->__toString();
         });
 
@@ -383,7 +379,7 @@ GQL;
           $field->addCacheableDependency($renderContext->pop());
         }
 
-        return new Deferred(function () use ($value) {
+        return new Deferred(static function () use ($value) {
           return $value;
         });
       }
@@ -426,9 +422,7 @@ GQL;
     // Use the same resolver for both fields.
     foreach (['root', 'leakA'] as $field_name) {
       $this->mockResolver('Query', $field_name,
-        function () use ($dummy) {
-          return $dummy->id();
-        }
+        $dummy->id(...)
       );
     }
 

@@ -64,9 +64,7 @@ GQL;
       ->method('id')
       ->willReturn('test');
 
-    $this->mockResolver('Query', 'root', function () use ($object) {
-      return $object->id();
-    });
+    $this->mockResolver('Query', 'root', $object->id(...));
 
     // The first request that is not supposed to be cached.
     $this->query('{ root }');

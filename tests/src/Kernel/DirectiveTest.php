@@ -58,10 +58,10 @@ class DirectiveTest extends GraphQLTestBase {
     $this->setUpSchema($schema, 'test', [], [
       $this->mockSchemaExtension('test_extension', NULL, $extension),
     ]);
-    $this->mockResolver('Query', 'node', function () {
+    $this->mockResolver('Query', 'node', static function () {
       return ['id' => 1];
     });
-    $this->mockResolver('Query', 'nodeExtended', function () {
+    $this->mockResolver('Query', 'nodeExtended', static function () {
       return ['id' => 1];
     });
   }

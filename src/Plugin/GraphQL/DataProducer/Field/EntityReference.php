@@ -153,7 +153,7 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
     $type = $definition->getSetting('target_type');
     $values = $entity->get($field);
     if ($values instanceof EntityReferenceFieldItemListInterface) {
-      $ids = array_map(function ($value) {
+      $ids = array_map(static function ($value) {
         return $value['target_id'];
       }, $values->getValue());
 

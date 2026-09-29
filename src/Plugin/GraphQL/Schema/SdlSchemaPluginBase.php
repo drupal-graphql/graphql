@@ -278,7 +278,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
         return NULL;
       }
       return Parser::parse($schema, ['noLocation' => !$this->inDevelopment]);
-    }, $extensions), function ($definition) {
+    }, $extensions), static function ($definition) {
       return !empty($definition);
     });
 
@@ -297,7 +297,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
         return NULL;
       }
       return Parser::parse($schema, ['noLocation' => !$this->inDevelopment]);
-    }, $extensions), function ($definition) {
+    }, $extensions), static function ($definition) {
       return !empty($definition);
     });
 

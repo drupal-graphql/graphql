@@ -34,7 +34,7 @@ function graphql_update_dependencies(): array {
   // Prevent type errors when the wrong order of update functions is executed.
   // Our graphql update function must run first.
   $dependencies['admin_toolbar_tools'][8203] = [
-    'graphql' => 50001,
+    'graphql' => 50_001,
   ];
   return $dependencies;
 }

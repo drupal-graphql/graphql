@@ -54,7 +54,7 @@ class EntityBuffer extends BufferBase {
    */
   public function resolveBufferArray(array $buffer): array {
     $type = reset($buffer)['type'];
-    $ids = array_map(function (\ArrayObject $item) {
+    $ids = array_map(static function (\ArrayObject $item) {
       return (array) $item['id'];
     }, $buffer);
 
@@ -66,9 +66,9 @@ class EntityBuffer extends BufferBase {
       ->getStorage($type)
       ->loadMultiple($ids);
 
-    return array_map(function ($item) use ($entities) {
+    return array_map(static function ($item) use ($entities) {
       if (is_array($item['id'])) {
-        return array_reduce($item['id'], function ($carry, $current) use ($entities) {
+        return array_reduce($item['id'], static function ($carry, $current) use ($entities) {
           if (!empty($entities[$current])) {
             array_push($carry, $entities[$current]);
             return $carry;

@@ -83,6 +83,7 @@ use GraphQL\Validator\Rules\QueryDepth;
  *
  * @mago-expect lint:drupal/property-name
  * @mago-expect lint:too-many-properties
+ * @mago-expect lint:too-many-methods
  */
 #[ConfigEntityType(
   id: "graphql_server",
@@ -237,9 +238,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   public function executeBatch($operations): array {
     // We can't leverage parallel processing of batched queries because of the
     // contextual properties of Drupal (e.g. language manager, current user).
-    return array_map(function (OperationParams $operation) {
-      return $this->executeOperation($operation);
-    }, $operations);
+    return array_map($this->executeOperation(...), $operations);
   }
 
   /**
@@ -358,10 +357,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *   The default field resolver.
    */
   protected function getFieldResolver(ResolverRegistryInterface $registry): ?callable {
-    return function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($registry) {
+    return static function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($registry) {
       $field = new FieldContext($context, $info);
       $result = $registry->resolveField($value, $args, $context, $info, $field);
-      return DeferredUtility::applyFinally($result, function ($result) use ($field, $context): void {
+      return DeferredUtility::applyFinally($result, static function ($result) use ($field, $context): void {
         if ($result instanceof CacheableDependencyInterface) {
           $field->addCacheableDependency($result);
         }
@@ -421,7 +420,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
         $this->persisted_query_instances[$id] = $plugin_manager->createInstance($id, $configuration);
       }
     }
-    uasort($this->persisted_query_instances, function ($a, $b) {
+    uasort($this->persisted_query_instances, static function ($a, $b) {
       return $a->getWeight() <= $b->getWeight() ? -1 : 1;
     });
 

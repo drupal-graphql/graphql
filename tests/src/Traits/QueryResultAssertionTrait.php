@@ -194,7 +194,7 @@ trait QueryResultAssertionTrait {
     }
 
     // Create a list of patterns that never matched.
-    $missing = array_keys(array_filter($matchCount, function ($count) {
+    $missing = array_keys(array_filter($matchCount, static function ($count) {
       return $count == 0;
     }));
 

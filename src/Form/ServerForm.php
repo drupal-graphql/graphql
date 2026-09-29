@@ -134,7 +134,7 @@ class ServerForm extends EntityForm {
    * Builds the schema selector and its plugin configuration fields.
    */
   protected function buildSchemaFields(array &$form, FormStateInterface $formState, ServerInterface $server): void {
-    $schemas = array_map(function ($definition) {
+    $schemas = array_map(static function ($definition) {
       return $definition['name'] ?? $definition['id'];
     }, $this->schemaManager->getDefinitions());
     $schema_keys = array_keys($schemas);

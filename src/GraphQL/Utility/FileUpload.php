@@ -34,6 +34,9 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
  * Service to manage file uploads within GraphQL mutations.
  *
  * This service handles file validations like max upload size.
+ *
+ * @mago-expect lint:cyclomatic-complexity
+ * @mago-expect lint:kan-defect
  */
 class FileUpload {
 

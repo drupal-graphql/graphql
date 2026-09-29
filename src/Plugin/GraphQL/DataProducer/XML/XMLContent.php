@@ -39,7 +39,7 @@ class XMLContent extends DataProducerPluginBase {
    *   The XML content as string.
    */
   public function resolve(\DOMElement $dom): string {
-    return implode('', array_map(function ($child) {
+    return implode('', array_map(static function ($child) {
       if ($child instanceof \DOMText) {
         return $child->nodeValue;
       }

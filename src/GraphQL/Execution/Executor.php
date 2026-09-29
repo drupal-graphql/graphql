@@ -186,7 +186,7 @@ class Executor implements ExecutorImplementation {
             // JsonSerializable and strips some data out during the
             // serialization.
             '$result->data' => $result->data,
-            '$result->errors' => array_map(function ($error) {
+            '$result->errors' => array_map(static function ($error) {
               return (string) $error;
             }, $result->errors),
             '$result->extensions' => $result->extensions,

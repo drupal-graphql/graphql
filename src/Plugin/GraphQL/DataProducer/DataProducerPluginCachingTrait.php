@@ -15,7 +15,7 @@ trait DataProducerPluginCachingTrait {
    * {@inheritdoc}
    */
   public function edgeCachePrefix(): string {
-    $contexts = array_map(function ($context) {
+    $contexts = array_map(static function ($context) {
       if ($context instanceof EntityInterface) {
         return $context->uuid();
       }

@@ -76,7 +76,7 @@ class EntityPreviewBuffer extends BufferBase {
    */
   public function resolveBufferArray(array $buffer): array {
     $type = reset($buffer)['type'];
-    $uuids = array_map(function (\ArrayObject $item) {
+    $uuids = array_map(static function (\ArrayObject $item) {
       return (array) $item['uuid'];
     }, $buffer);
 
@@ -91,9 +91,9 @@ class EntityPreviewBuffer extends BufferBase {
       $entities[$uuid] = $this->getConverter($type . '_preview')->convert($uuid, NULL, "graphql_entity_preview_buffer", []);
     }
 
-    return array_map(function ($item) use ($entities) {
+    return array_map(static function ($item) use ($entities) {
       if (is_array($item['uuid'])) {
-        return array_reduce($item['uuid'], function ($carry, $current) use ($entities) {
+        return array_reduce($item['uuid'], static function ($carry, $current) use ($entities) {
           if (!empty($entities[$current])) {
             array_push($carry, $entities[$current]);
             return $carry;

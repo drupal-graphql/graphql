@@ -47,7 +47,7 @@ final class SchemaExtensionGenerator extends BaseGenerator {
     $vars['class'] = $ir->askPluginClass(suffix: 'Extension');
     $vars['services'] = $ir->askServices(FALSE);
 
-    $schemas = array_map(fn ($definition) => $definition['name'] ?? $definition['id'], $this->schemaPluginManager->getDefinitions());
+    $schemas = array_map(static fn ($definition) => $definition['name'] ?? $definition['id'], $this->schemaPluginManager->getDefinitions());
     $vars['schema'] = $ir->choice('Schema', $schemas);
 
     $assets->addFile('src/Plugin/GraphQL/SchemaExtension/{class}.php', 'schema-extension.twig');

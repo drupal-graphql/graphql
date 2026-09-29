@@ -57,7 +57,7 @@ class EntityChangedTest extends GraphQLTestBase {
   public function testWorksWithIntTimestamp(): void {
     $entity = $this->createMock(EditorialContentEntityBase::class);
     $entity->method("getChangedTime")
-      ->willReturn(1743465600);
+      ->willReturn(1_743_465_600);
 
     $this->assertEquals(
       "2025-04-01T00:00:00+0000",
@@ -73,7 +73,7 @@ class EntityChangedTest extends GraphQLTestBase {
   public function testAllowsSpecifyingFormat(): void {
     $entity = $this->createMock(EditorialContentEntityBase::class);
     $entity->method("getChangedTime")
-      ->willReturn(1743465600);
+      ->willReturn(1_743_465_600);
 
     $this->assertEquals(
       "1743465600",

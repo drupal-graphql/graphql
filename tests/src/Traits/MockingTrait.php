@@ -64,7 +64,7 @@ trait MockingTrait {
    */
   protected function toPromise(mixed $value): ReturnCallback {
     // @phpstan-ignore-next-line
-    return $this->returnCallback(is_callable($value) ? $value : function () use ($value) {
+    return $this->returnCallback(is_callable($value) ? $value : static function () use ($value) {
       yield $value;
     });
   }

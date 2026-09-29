@@ -144,7 +144,7 @@ class DataProducerProxy implements ResolverInterface {
     }
 
     $values = DeferredUtility::waitAll($values);
-    return DeferredUtility::returnFinally($values, function ($values) use ($plugin) {
+    return DeferredUtility::returnFinally($values, static function ($values) use ($plugin) {
       foreach ($values as $name => $value) {
         $plugin->setContextValue($name, $value);
       }
@@ -158,7 +158,7 @@ class DataProducerProxy implements ResolverInterface {
    */
   protected function resolveUncached(DataProducerPluginInterface $plugin, ResolveContext $context, FieldContext $field): mixed {
     $output = $plugin->resolveField($field);
-    return DeferredUtility::applyFinally($output, function () use ($plugin, $field): void {
+    return DeferredUtility::applyFinally($output, static function () use ($plugin, $field): void {
       $field->addCacheableDependency($plugin);
     });
   }

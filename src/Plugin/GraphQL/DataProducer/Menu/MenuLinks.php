@@ -96,7 +96,7 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
 
-    return array_filter($this->menuLinkTree->transform($tree, $manipulators), function (MenuLinkTreeElement $item) use ($context) {
+    return array_filter($this->menuLinkTree->transform($tree, $manipulators), static function (MenuLinkTreeElement $item) use ($context) {
       $context->addCacheableDependency($item->access);
       return $item->link->isEnabled() && $item->access->isAllowed();
     });

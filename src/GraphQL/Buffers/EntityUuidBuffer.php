@@ -63,7 +63,7 @@ class EntityUuidBuffer extends BufferBase {
       throw new EntityStorageException("Entity type $type does not support UUIDs.");
     }
 
-    $uuids = array_map(function (\ArrayObject $item) {
+    $uuids = array_map(static function (\ArrayObject $item) {
       return (array) $item['uuid'];
     }, $buffer);
 
@@ -73,13 +73,13 @@ class EntityUuidBuffer extends BufferBase {
     $entities = $this->entityTypeManager
       ->getStorage($type)->loadByProperties([$uuid_key => $uuids]);
 
-    $entities = array_reduce(array_map(function (EntityInterface $entity) {
+    $entities = array_reduce(array_map(static function (EntityInterface $entity) {
       return [$entity->uuid() => $entity];
     }, $entities), 'array_merge', []);
 
-    return array_map(function ($item) use ($entities) {
+    return array_map(static function ($item) use ($entities) {
       if (is_array($item['uuid'])) {
-        return array_reduce($item['uuid'], function ($carry, $current) use ($entities) {
+        return array_reduce($item['uuid'], static function ($carry, $current) use ($entities) {
           if (!empty($entities[$current])) {
             return $carry + [$current => $entities[$current]];
           }

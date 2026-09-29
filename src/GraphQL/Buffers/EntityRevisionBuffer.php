@@ -54,7 +54,7 @@ class EntityRevisionBuffer extends BufferBase {
    */
   public function resolveBufferArray(array $buffer): array {
     $type = reset($buffer)['type'];
-    $vids = array_map(function (\ArrayObject $item) {
+    $vids = array_map(static function (\ArrayObject $item) {
       return (array) $item['vid'];
     }, $buffer);
 
@@ -66,9 +66,9 @@ class EntityRevisionBuffer extends BufferBase {
     $storage = $this->entityTypeManager->getStorage($type);
     $entities = $storage->loadMultipleRevisions($vids);
 
-    return array_map(function ($item) use ($entities) {
+    return array_map(static function ($item) use ($entities) {
       if (is_array($item['vid'])) {
-        return array_reduce($item['vid'], function ($carry, $current) use ($entities) {
+        return array_reduce($item['vid'], static function ($carry, $current) use ($entities) {
           if (!empty($entities[$current])) {
             return $carry + [$current => $entities[$current]];
           }

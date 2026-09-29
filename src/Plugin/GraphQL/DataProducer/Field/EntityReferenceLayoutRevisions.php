@@ -157,7 +157,7 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
     $type = $definition->getSetting('target_type');
     $values = $entity->get($field);
     if ($values instanceof EntityReferenceFieldItemListInterface) {
-      $vids = array_map(function ($value) {
+      $vids = array_map(static function ($value) {
         return $value['target_revision_id'];
       }, $values->getValue());
 

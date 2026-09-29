@@ -36,7 +36,7 @@ class EntityUuidBufferTest extends GraphQLTestBase {
       'name' => 'Test',
     ])->save();
 
-    $this->nodeUuids = array_map(function ($i) {
+    $this->nodeUuids = array_map(static function ($i) {
       $node = Node::create([
         'title' => 'Node ' . $i,
         'type' => 'test',

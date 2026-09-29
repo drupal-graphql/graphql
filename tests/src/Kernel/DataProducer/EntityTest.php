@@ -6,19 +6,12 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultForbidden;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
-use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\entity_test\Entity\EntityTestBundle;
-use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
-use Drupal\node\NodeInterface;
-use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Data producers Entity test class.
@@ -28,87 +21,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 #[Group('graphql')]
 #[RunTestsInSeparateProcesses]
 #[AllowMockObjectsWithoutExpectations]
-class EntityTest extends GraphQLTestBase {
-
-  /**
-   * Test node.
-   */
-  protected NodeInterface $node;
-
-  /**
-   * Mocked test entity.
-   */
-  protected NodeInterface|MockObject $entity;
-
-  /**
-   * Mocked test entity interface.
-   */
-  protected EntityInterface $entityInterface;
-
-  /**
-   * Mocked test user.
-   */
-  protected UserInterface $user;
-
-  /**
-   * Translated test entity.
-   */
-  protected NodeInterface $translationFr;
-
-  /**
-   * Translated test entity.
-   */
-  protected NodeInterface $translationDe;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->entity = $this->getMockBuilder(NodeInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->entityInterface = $this->getMockBuilder(EntityInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->user = $this->getMockBuilder(UserInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $content_type = NodeType::create([
-      'type' => 'lorem',
-      'name' => 'ipsum',
-      'translatable' => TRUE,
-      'display_submitted' => FALSE,
-    ]);
-    $content_type->save();
-
-    // cspell:ignore otherbundle
-    $content_type = NodeType::create([
-      'type' => 'otherbundle',
-      'name' => 'otherbundle',
-      'translatable' => TRUE,
-      'display_submitted' => FALSE,
-    ]);
-    $content_type->save();
-
-    $this->node = Node::create([
-      'title' => 'Dolor',
-      'type' => 'lorem',
-    ]);
-    $this->node->save();
-
-    $this->translationFr = $this->node->addTranslation('fr', ['title' => 'sit amet fr']);
-    $this->translationFr->save();
-
-    $this->translationDe = $this->node->addTranslation('de', ['title' => 'sit amet de']);
-    $this->translationDe->save();
-
-    \Drupal::service('content_translation.manager')->setEnabled('node', 'lorem', TRUE);
-  }
+class EntityTest extends EntityTestBase {
 
   /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityBundle::resolve
@@ -131,7 +44,7 @@ class EntityTest extends GraphQLTestBase {
   public function testResolveChanged(): void {
     $this->entity->expects($this->once())
       ->method('getChangedTime')
-      ->willReturn(17000000000);
+      ->willReturn(17_000_000_000);
 
     $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_changed', [
       'format' => 'Y-m-d',
@@ -150,7 +63,7 @@ class EntityTest extends GraphQLTestBase {
   public function testResolveCreated(): void {
     $this->entity->expects($this->exactly(2))
       ->method('getCreatedTime')
-      ->willReturn(17000000000, '17000000000');
+      ->willReturn(17_000_000_000, '17000000000');
 
     $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_created', [
       'format' => 'Y-m-d',
@@ -314,27 +227,6 @@ class EntityTest extends GraphQLTestBase {
   }
 
   /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslation::resolve
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityTranslations::resolve
-   */
-  public function testResolveTranslation(): void {
-    $french = $this->executeDataProducer('entity_translation', [
-      'entity' => $this->node,
-      'language' => 'fr',
-    ]);
-
-    $this->assertEquals('sit amet fr', $french->label());
-
-    $translations = $this->executeDataProducer('entity_translations', [
-      'entity' => $this->node,
-    ]);
-
-    $this->assertEquals('Dolor', $translations['en']->label());
-    $this->assertEquals('sit amet fr', $translations['fr']->label());
-    $this->assertEquals('sit amet de', $translations['de']->label());
-  }
-
-  /**
    * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityUrl::resolve
    */
   public function testResolveUrl(): void {
@@ -382,100 +274,6 @@ class EntityTest extends GraphQLTestBase {
     $this->assertEquals('some uuid', $this->executeDataProducer('entity_uuid', [
       'entity' => $this->entity,
     ]));
-  }
-
-  /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
-   */
-  public function testResolveEntityLoad(): void {
-    $result = $this->executeDataProducer('entity_load', [
-      'type' => $this->node->getEntityTypeId(),
-      'id' => $this->node->id(),
-    ]);
-
-    $this->assertEquals($this->node->id(), $result->id());
-  }
-
-  /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoadByUuid::resolve
-   */
-  public function testResolveEntityLoadByUuid(): void {
-    $result = $this->executeDataProducer('entity_load_by_uuid', [
-      'type' => $this->node->getEntityTypeId(),
-      'uuid' => $this->node->uuid(),
-    ]);
-
-    $this->assertEquals($this->node->id(), $result->id());
-  }
-
-  /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
-   */
-  public function testResolveUnknownEntityLoad(): void {
-    $result = $this->executeDataProducer('entity_load', [
-      'type' => $this->node->getEntityTypeId(),
-      'id' => 0,
-    ]);
-
-    $this->assertNull($result);
-    $this->assertContains('node_list', $this->fieldContext->getCacheTags());
-  }
-
-  /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
-   */
-  public function testResolveMismatchEntityLoad(): void {
-    $result = $this->executeDataProducer('entity_load', [
-      'type' => $this->node->getEntityTypeId(),
-      'id' => $this->node->id(),
-      'bundles' => ['otherbundle'],
-    ]);
-
-    $this->assertNull($result);
-    $this->assertContains('node:1', $this->fieldContext->getCacheTags());
-  }
-
-  /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
-   */
-  public function testResolveTranslatedEntityLoad(): void {
-    $result = $this->executeDataProducer('entity_load', [
-      'type' => $this->node->getEntityTypeId(),
-      'id' => $this->node->id(),
-      'language' => 'fr',
-    ]);
-
-    $this->assertEquals('fr', $result->language()->getId());
-    $this->assertEquals('sit amet fr', $result->getTitle());
-  }
-
-  /**
-   * Make sure that passing a NULL id does not produce any warnings.
-   */
-  public function testResolveEntityLoadWithNullId(): void {
-    $result = $this->executeDataProducer('entity_load', [
-      'type' => $this->node->getEntityTypeId(),
-      'id' => NULL,
-    ]);
-
-    $this->assertNull($result);
-  }
-
-  /**
-   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLoad::resolve
-   */
-  public function testResolveEntityRendered(): void {
-    // Drupal core's Twig escape filter currently fails during entity rendering.
-    // @see https://www.drupal.org/project/drupal/issues/3625969
-    $this->markTestSkipped('Blocked by Drupal core issue #3625969.');
-    // @phpstan-ignore deadCode.unreachable
-    $result = $this->executeDataProducer('entity_rendered', [
-      'entity' => $this->node,
-      'mode' => 'default',
-    ]);
-
-    $this->assertMatchesRegularExpression('#<a href="/node/1" rel="bookmark">\s*<span>' . $this->node->getTitle() . '</span>#', $result);
-    $this->assertContains('node:1', $this->fieldContext->getCacheTags());
   }
 
 }

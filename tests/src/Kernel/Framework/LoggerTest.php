@@ -48,7 +48,7 @@ GQL;
     $this->setUpSchema($schema);
 
     $this->mockResolver('Query', 'resolvesToNull', NULL);
-    $this->mockResolver('Query', 'throwsException', function (): void {
+    $this->mockResolver('Query', 'throwsException', static function (): void {
       throw new \Exception('BOOM!');
     });
     $this->mockResolver('Query', 'takesIntArgument');

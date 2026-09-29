@@ -70,19 +70,19 @@ GQL;
 
     $buffer->expects(static::exactly(2))
       ->method('resolveBufferArray')
-      ->willReturnCallback(function ($items) use ($users) {
-        return array_map(function ($item) use ($users) {
+      ->willReturnCallback(static function ($items) use ($users) {
+        return array_map(static function ($item) use ($users) {
           return $users[$item['uid']];
         }, $items);
       });
 
     $this->mockResolver('Query', 'users',
-      function ($parent, $args) use ($buffer) {
-        $resolvers = array_map(function ($uid) use ($buffer) {
+      static function ($parent, $args) use ($buffer) {
+        $resolvers = array_map(static function ($uid) use ($buffer) {
           return $buffer->createBufferResolver(new \ArrayObject(['uid' => $uid]));
         }, $args['uids']);
 
-        return new Deferred(function () use ($resolvers) {
+        return new Deferred(static function () use ($resolvers) {
           $result = [];
           foreach ($resolvers as $resolver) {
             $result[] = $resolver();
@@ -94,19 +94,19 @@ GQL;
     );
 
     $this->mockResolver('User', 'name',
-      function ($parent) {
+      static function ($parent) {
         return $parent['name'];
       }
     );
 
     $this->mockResolver('User', 'friends',
-      function ($parent) use ($buffer) {
-        $resolvers = array_map(function ($uid) use ($buffer) {
+      static function ($parent) use ($buffer) {
+        $resolvers = array_map(static function ($uid) use ($buffer) {
           return $buffer->createBufferResolver(new \ArrayObject(['uid' => $uid]));
         }, $parent['friends']);
 
-        return new Deferred(function () use ($resolvers) {
-          return array_map(function ($resolver) {
+        return new Deferred(static function () use ($resolvers) {
+          return array_map(static function ($resolver) {
             return $resolver();
           }, $resolvers);
         });
@@ -114,10 +114,10 @@ GQL;
     );
 
     $this->mockResolver('User', 'foe',
-      function ($parent) use ($buffer) {
+      static function ($parent) use ($buffer) {
         $resolver = $buffer->createBufferResolver(new \ArrayObject(['uid' => $parent['foe']]));
 
-        return new Deferred(function () use ($resolver) {
+        return new Deferred(static function () use ($resolver) {
           return $resolver();
         });
       }

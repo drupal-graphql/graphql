@@ -52,7 +52,7 @@ class GraphQlSubscriber implements EventSubscriberInterface {
     else {
       Visitor::visit($schemaData['graphql_alterable_schema_test'], [
         NodeKind::FIELD_DEFINITION => [
-          'enter' => function (Node $node) {
+          'enter' => static function (Node $node) {
             assert($node instanceof FieldDefinitionNode);
             if ($node->name->value !== 'position') {
               // Do nothing.
@@ -63,7 +63,7 @@ class GraphQlSubscriber implements EventSubscriberInterface {
 
             return $node;
           },
-          'leave' => function (Node $node) {
+          'leave' => static function (Node $node) {
             assert($node instanceof FieldDefinitionNode);
             // Once we've visited the position field node we can stop.
             if ($node->name->value === 'position') {
@@ -87,7 +87,7 @@ class GraphQlSubscriber implements EventSubscriberInterface {
 
     Visitor::visit($schemaData['test'], [
       NodeKind::INPUT_VALUE_DEFINITION => [
-        'enter' => function (Node $node) {
+        'enter' => static function (Node $node) {
           assert($node instanceof InputValueDefinitionNode);
           if ($node->name->value !== 'id') {
             // Do nothing.
@@ -98,7 +98,7 @@ class GraphQlSubscriber implements EventSubscriberInterface {
 
           return $node;
         },
-        'leave' => function (Node $node) {
+        'leave' => static function (Node $node) {
           assert($node instanceof InputValueDefinitionNode);
           // Once we've visited the id argument node we can stop.
           if ($node->name->value === 'id') {

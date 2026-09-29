@@ -121,7 +121,7 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
       // context, we can capture the leaked metadata and make sure it gets
       // incorporated into the response.
       $context = new RenderContext();
-      $url = $this->renderer->executeInRenderContext($context, function () use ($image_style, $entity) {
+      $url = $this->renderer->executeInRenderContext($context, static function () use ($image_style, $entity) {
         return $image_style->buildUrl($entity->getFileUri());
       });
 

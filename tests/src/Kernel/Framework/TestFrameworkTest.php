@@ -127,7 +127,7 @@ GQL;
     $this->mockResolver('Query', 'root', TRUE);
 
     $this->mockResolver('Mutation', 'addUser',
-      function ($parent, $args) {
+      static function ($parent, $args) {
         return $args['user']['age'] > 50 && $args['user']['gender'] === 'Male';
       }
     );
@@ -172,7 +172,7 @@ GQL;
 
     $this->setUpSchema($schema);
 
-    $this->mockTypeResolver('Token', function ($value) {
+    $this->mockTypeResolver('Token', static function ($value) {
       return is_int($value['value']) ? 'Number' : 'Word';
     });
 
@@ -229,7 +229,7 @@ GQL;
 
     $this->setUpSchema($schema);
 
-    $this->mockTypeResolver('Token', function ($value) {
+    $this->mockTypeResolver('Token', static function ($value) {
       return is_int($value['value']) ? 'Number' : 'Word';
     });
 

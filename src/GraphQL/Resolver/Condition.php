@@ -44,7 +44,7 @@ class Condition implements ResolverInterface {
       }
 
       if ($condition instanceof SyncPromise) {
-        return DeferredUtility::returnFinally($condition, function ($cond) use ($branches, $resolver, $value, $args, $context, $info, $field) {
+        return DeferredUtility::returnFinally($condition, static function ($cond) use ($branches, $resolver, $value, $args, $context, $info, $field) {
           array_unshift($branches, [$cond, $resolver]);
           return (new Condition($branches))->resolve($value, $args, $context, $info, $field);
         });

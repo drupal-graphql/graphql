@@ -82,7 +82,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
     if (!isset($this->extensions[$id])) {
       $this->extensions[$id] = array_map(function ($definition) {
         return $this->createInstance($definition['id']);
-      }, array_filter($this->getDefinitions(), function ($definition) use ($id) {
+      }, array_filter($this->getDefinitions(), static function ($definition) use ($id) {
         return $definition['schema'] === $id;
       }));
     }
@@ -100,7 +100,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
    *   The sorted schema extension plugins.
    */
   public static function sortByPriority(array $extensions): array {
-    uasort($extensions, function (SchemaExtensionPluginInterface $a, SchemaExtensionPluginInterface $b) {
+    uasort($extensions, static function (SchemaExtensionPluginInterface $a, SchemaExtensionPluginInterface $b) {
       $priority_a = $a->getPluginDefinition()['priority'] ?? 0;
       $priority_b = $b->getPluginDefinition()['priority'] ?? 0;
       return $priority_b <=> $priority_a;

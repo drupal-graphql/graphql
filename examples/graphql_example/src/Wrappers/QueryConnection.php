@@ -47,7 +47,7 @@ class QueryConnection {
     }
 
     $callback = $this->entityBuffer->add($this->query->getEntityTypeId(), array_values($result));
-    return new Deferred(function () use ($callback) {
+    return new Deferred(static function () use ($callback) {
       return $callback();
     });
   }
