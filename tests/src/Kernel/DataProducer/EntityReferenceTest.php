@@ -83,7 +83,7 @@ class EntityReferenceTest extends GraphQLTestBase {
       'access_operation' => 'view',
     ]);
     $this->assertEquals($this->referencedNode->id(), reset($result)->id());
-    $this->assertEquals('Dolor2', reset($result)->label());
+    $this->assertSame('Dolor2', reset($result)->label());
 
     $result = $this->executeDataProducer('entity_reference', [
       'entity' => $this->node,
@@ -93,7 +93,7 @@ class EntityReferenceTest extends GraphQLTestBase {
       'language' => 'fr',
     ]);
     $this->assertEquals($this->referencedNode->id(), reset($result)->id());
-    $this->assertEquals('Dolor2 French', reset($result)->label());
+    $this->assertSame('Dolor2 French', reset($result)->label());
   }
 
   /**

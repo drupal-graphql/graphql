@@ -35,7 +35,7 @@ class EntityTest extends EntityTestBase {
       'entity' => $this->entity,
     ]);
 
-    $this->assertEquals('page', $result);
+    $this->assertSame('page', $result);
   }
 
   /**
@@ -46,7 +46,7 @@ class EntityTest extends EntityTestBase {
       ->method('getChangedTime')
       ->willReturn(17_000_000_000);
 
-    $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_changed', [
+    $this->assertSame('2508-09-16', $this->executeDataProducer('entity_changed', [
       'format' => 'Y-m-d',
       'entity' => $this->entity,
     ]));
@@ -65,12 +65,12 @@ class EntityTest extends EntityTestBase {
       ->method('getCreatedTime')
       ->willReturn(17_000_000_000, '17000000000');
 
-    $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_created', [
+    $this->assertSame('2508-09-16', $this->executeDataProducer('entity_created', [
       'format' => 'Y-m-d',
       'entity' => $this->entity,
     ]));
 
-    $this->assertEquals('2508-09-16', $this->executeDataProducer('entity_created', [
+    $this->assertSame('2508-09-16', $this->executeDataProducer('entity_created', [
       'format' => 'Y-m-d',
       'entity' => $this->entity,
     ]));
@@ -93,7 +93,7 @@ class EntityTest extends EntityTestBase {
       ->method('getDescription')
       ->willReturn('Dummy description');
 
-    $this->assertEquals('Dummy description', $this->executeDataProducer('entity_description', [
+    $this->assertSame('Dummy description', $this->executeDataProducer('entity_description', [
       'entity' => $entity,
     ]));
   }
@@ -106,7 +106,7 @@ class EntityTest extends EntityTestBase {
       ->method('id')
       ->willReturn(5);
 
-    $this->assertEquals(5, $this->executeDataProducer('entity_id', [
+    $this->assertSame(5, $this->executeDataProducer('entity_id', [
       'entity' => $this->entity,
     ]));
   }
@@ -138,7 +138,7 @@ class EntityTest extends EntityTestBase {
       })
       ->with('view label', NULL, TRUE);
 
-    $this->assertEquals('Dummy label', $this->executeDataProducer('entity_label', [
+    $this->assertSame('Dummy label', $this->executeDataProducer('entity_label', [
       'entity' => $this->entity,
     ]));
 
@@ -189,7 +189,7 @@ class EntityTest extends EntityTestBase {
       ->method('getEntityTypeId')
       ->willReturn('test_graphql');
 
-    $this->assertEquals('test_graphql', $this->executeDataProducer('entity_type_id', [
+    $this->assertSame('test_graphql', $this->executeDataProducer('entity_type_id', [
       'entity' => $this->entity,
     ]));
   }
@@ -202,7 +202,7 @@ class EntityTest extends EntityTestBase {
       ->method('isPublished')
       ->willReturn(TRUE);
 
-    $this->assertEquals(TRUE, $this->executeDataProducer('entity_published', [
+    $this->assertTrue($this->executeDataProducer('entity_published', [
       'entity' => $this->entity,
     ]));
 
@@ -271,7 +271,7 @@ class EntityTest extends EntityTestBase {
       ->method('uuid')
       ->willReturn('some uuid');
 
-    $this->assertEquals('some uuid', $this->executeDataProducer('entity_uuid', [
+    $this->assertSame('some uuid', $this->executeDataProducer('entity_uuid', [
       'entity' => $this->entity,
     ]));
   }

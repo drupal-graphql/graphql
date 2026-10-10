@@ -19,11 +19,12 @@ preset = "drupal"
 
 [linter]
 # Stops `lowercase-keyword` from reporting TRUE, FALSE and NULL.
-integrations = ["drupal"]
+integrations = ["drupal", "phpunit"]
 # Fail on warnings too, the same way phpcs does.
 minimum-fail-level = "warning"
 
 [linter.rules]
+assertion-style = { style = "this" }
 # Report an interface name without the "Interface" suffix.
 interface-name = { psr = true }
 # Report a file whose name differs from the class that it declares.

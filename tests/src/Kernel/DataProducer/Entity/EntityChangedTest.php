@@ -43,7 +43,7 @@ class EntityChangedTest extends GraphQLTestBase {
     $entity->method("getChangedTime")
       ->willReturn("1743465600");
 
-    $this->assertEquals(
+    $this->assertSame(
       "2025-04-01T00:00:00+0000",
       $this->executeDataProducer('entity_changed', [
         'entity' => $entity,
@@ -59,7 +59,7 @@ class EntityChangedTest extends GraphQLTestBase {
     $entity->method("getChangedTime")
       ->willReturn(1_743_465_600);
 
-    $this->assertEquals(
+    $this->assertSame(
       "2025-04-01T00:00:00+0000",
       $this->executeDataProducer('entity_changed', [
         'entity' => $entity,
@@ -75,7 +75,7 @@ class EntityChangedTest extends GraphQLTestBase {
     $entity->method("getChangedTime")
       ->willReturn(1_743_465_600);
 
-    $this->assertEquals(
+    $this->assertSame(
       "1743465600",
       $this->executeDataProducer('entity_changed', [
         'entity' => $entity,
@@ -90,11 +90,9 @@ class EntityChangedTest extends GraphQLTestBase {
   public function testNullForNonChangedEntities(): void {
     $entity = $this->createMock(EntityInterface::class);
 
-    $this->assertEquals(
-      NULL,
-      $this->executeDataProducer('entity_changed', [
-        'entity' => $entity,
-      ])
+    $this->assertNull($this->executeDataProducer('entity_changed', [
+      'entity' => $entity,
+    ])
     );
   }
 

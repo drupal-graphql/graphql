@@ -47,7 +47,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
       'low_priority_test' => 'low_priority_test',
     ];
     $actual_order = array_map(static fn ($extension) => $extension->getPluginId(), $extensions);
-    static::assertEquals($expected_order, $actual_order);
+    $this->assertEquals($expected_order, $actual_order);
   }
 
   /**
@@ -72,7 +72,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
     $schemaPlugin->getSchema();
     $resolver = $registry->getFieldResolver('TestType', 'pluginId');
     $result = $this->resolve($resolver);
-    static::assertEquals($expected_result, $result);
+    $this->assertEquals($expected_result, $result);
   }
 
   /**

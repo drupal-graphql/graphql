@@ -97,36 +97,36 @@ class CurrentUserTest extends GraphQLTestBase {
     // Initially no user is logged in. We expect the anonymous user (ID 0). The
     // result should be cached, so only the first call should trigger a query.
     $this->assertCurrentUser(0);
-    $this->assertEquals(1, $counter->getCount(), 'The user ID was queried for the anonymous user.');
+    $this->assertSame(1, $counter->getCount(), 'The user ID was queried for the anonymous user.');
     $this->assertCurrentUser(0);
-    $this->assertEquals(1, $counter->getCount(), 'When requesting the anonymous user a second time, the cached result was used.');
+    $this->assertSame(1, $counter->getCount(), 'When requesting the anonymous user a second time, the cached result was used.');
 
     // Log in as the first user.
     $this->container->get('current_user')->setAccount($this->users[0]);
     $this->assertCurrentUser((int) $this->users[0]->id());
-    $this->assertEquals(2, $counter->getCount(), 'The user ID was queried for the first user.');
+    $this->assertSame(2, $counter->getCount(), 'The user ID was queried for the first user.');
     $this->assertCurrentUser((int) $this->users[0]->id());
-    $this->assertEquals(2, $counter->getCount(), 'When requesting the first user a second time, the cached result was used.');
+    $this->assertSame(2, $counter->getCount(), 'When requesting the first user a second time, the cached result was used.');
 
     // Log in as the second user.
     $this->container->get('current_user')->setAccount($this->users[1]);
     $this->assertCurrentUser((int) $this->users[1]->id());
-    $this->assertEquals(3, $counter->getCount(), 'The user ID was queried for the second user.');
+    $this->assertSame(3, $counter->getCount(), 'The user ID was queried for the second user.');
     $this->assertCurrentUser((int) $this->users[1]->id());
-    $this->assertEquals(3, $counter->getCount(), 'When requesting the second user a second time, the cached result was used.');
+    $this->assertSame(3, $counter->getCount(), 'When requesting the second user a second time, the cached result was used.');
 
     // Make a change to the second user. This should invalidate the cache.
     $this->users[1]->setEmail('test@example.com')->save();
     $this->assertCurrentUser((int) $this->users[1]->id());
-    $this->assertEquals(4, $counter->getCount(), 'After modifying the second user, the user ID was queried again.');
+    $this->assertSame(4, $counter->getCount(), 'After modifying the second user, the user ID was queried again.');
     $this->assertCurrentUser((int) $this->users[1]->id());
-    $this->assertEquals(4, $counter->getCount(), 'When requesting the second user a second time after modification, the cached result was used.');
+    $this->assertSame(4, $counter->getCount(), 'When requesting the second user a second time after modification, the cached result was used.');
 
     // Log out. We already have the anonymous user cached so we should get
     // cached results.
     $this->container->get('current_user')->setAccount(User::getAnonymousUser());
     $this->assertCurrentUser(0);
-    $this->assertEquals(4, $counter->getCount(), 'When requesting the anonymous user again, the cached result was used.');
+    $this->assertSame(4, $counter->getCount(), 'When requesting the anonymous user again, the cached result was used.');
   }
 
   /**

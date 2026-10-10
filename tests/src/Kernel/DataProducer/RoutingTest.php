@@ -60,7 +60,7 @@ class RoutingTest extends GraphQLTestBase {
     ]);
 
     $this->assertNotNull($result);
-    $this->assertEquals('user.logout', $result->getRouteName());
+    $this->assertSame('user.logout', $result->getRouteName());
 
     // Test route_load with redirect to an internal URL.
     NodeType::create([
@@ -115,7 +115,7 @@ class RoutingTest extends GraphQLTestBase {
     ]);
 
     $this->assertNotNull($result);
-    $this->assertEquals('user.logout', $result->getRouteName());
+    $this->assertSame('user.logout', $result->getRouteName());
 
     $redirect = $this->redirectStorage->create();
     assert($redirect instanceof Redirect);
@@ -130,7 +130,7 @@ class RoutingTest extends GraphQLTestBase {
     ]);
 
     $this->assertNotNull($result);
-    $this->assertEquals('user.logout', $result->getRouteName());
+    $this->assertSame('user.logout', $result->getRouteName());
   }
 
   /**

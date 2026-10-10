@@ -35,7 +35,7 @@ GQL;
     $validator = new Validator($this->schemaPluginManager);
     $missing_resolvers = $validator->getMissingResolvers($this->server);
 
-    self::assertEquals(
+    $this->assertEquals(
       ['Query' => ['me']],
       $missing_resolvers
     );
@@ -69,7 +69,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $missing_resolvers = $validator->getMissingResolvers($this->server);
-    self::assertEquals([], $missing_resolvers);
+    $this->assertEquals([], $missing_resolvers);
   }
 
   /**
@@ -91,7 +91,7 @@ GQL;
     $validator = new Validator($this->schemaPluginManager);
     $missing_resolvers = $validator->getMissingResolvers($this->server, ['User']);
 
-    self::assertEquals([], $missing_resolvers);
+    $this->assertEquals([], $missing_resolvers);
   }
 
   /**
@@ -114,7 +114,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
-    self::assertEquals(['Actor' => ['name']], $orphaned_resolvers);
+    $this->assertEquals(['Actor' => ['name']], $orphaned_resolvers);
   }
 
   /**
@@ -133,7 +133,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
-    self::assertEquals(['User' => ['name']], $orphaned_resolvers);
+    $this->assertEquals(['User' => ['name']], $orphaned_resolvers);
   }
 
   /**
@@ -156,7 +156,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
-    self::assertEquals(['User' => ['birthday']], $orphaned_resolvers);
+    $this->assertEquals(['User' => ['birthday']], $orphaned_resolvers);
   }
 
   /**
@@ -183,7 +183,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
-    self::assertEquals(['Actor' => ['birthday']], $orphaned_resolvers);
+    $this->assertEquals(['Actor' => ['birthday']], $orphaned_resolvers);
   }
 
   /**
@@ -209,7 +209,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $orphaned_resolvers = $validator->getOrphanedResolvers($this->server);
-    self::assertEquals(['FakeInput' => ['removed_field']], $orphaned_resolvers);
+    $this->assertEquals(['FakeInput' => ['removed_field']], $orphaned_resolvers);
   }
 
   /**
@@ -232,7 +232,7 @@ GQL;
 
     $validator = new Validator($this->schemaPluginManager);
     $orphaned_resolvers = $validator->getOrphanedResolvers($this->server, ['Actor']);
-    self::assertEquals([], $orphaned_resolvers);
+    $this->assertEquals([], $orphaned_resolvers);
   }
 
 }

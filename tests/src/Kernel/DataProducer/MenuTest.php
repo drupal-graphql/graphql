@@ -35,7 +35,7 @@ class MenuTest extends MenuTestBase {
       $count += $link_tree->count();
     }
 
-    $this->assertEquals(5, $count);
+    $this->assertSame(5, $count);
   }
 
   /**

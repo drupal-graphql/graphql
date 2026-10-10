@@ -27,17 +27,17 @@ class XMLAttributeTest extends XMLTestBase {
     $div = iterator_to_array($xpath->query('//div/div', $document));
     $h1 = iterator_to_array($xpath->query('//div/h1', $document));
 
-    $this->assertEquals('some_header', $this->executeDataProducer('xml_attribute', [
+    $this->assertSame('some_header', $this->executeDataProducer('xml_attribute', [
       'dom' => $h1[0],
       'name' => 'data-tag-type',
     ]));
 
-    $this->assertEquals('', $this->executeDataProducer('xml_attribute', [
+    $this->assertSame('', $this->executeDataProducer('xml_attribute', [
       'dom' => $h1[0],
       'name' => 'no-attribute',
     ]));
 
-    $this->assertEquals('content', $this->executeDataProducer('xml_attribute', [
+    $this->assertSame('content', $this->executeDataProducer('xml_attribute', [
       'dom' => $div[0],
       'name' => 'class',
     ]));

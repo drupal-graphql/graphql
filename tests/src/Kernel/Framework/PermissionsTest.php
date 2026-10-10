@@ -47,7 +47,7 @@ GQL;
     $this->setUpCurrentUser();
 
     // Any query should fail.
-    $this->assertEquals(403, $this->query('query')->getStatusCode());
+    $this->assertSame(403, $this->query('query')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
@@ -55,7 +55,7 @@ GQL;
     ]);
 
     // If all batched queries fail, 403 is returned.
-    $this->assertEquals(403, $batched->getStatusCode());
+    $this->assertSame(403, $batched->getStatusCode());
   }
 
   /**
@@ -67,14 +67,14 @@ GQL;
     $this->setUpCurrentUser([], ["execute {$this->server->id()} arbitrary graphql requests"]);
 
     // All queries should work.
-    $this->assertEquals(200, $this->query('{ root }')->getStatusCode());
+    $this->assertSame(200, $this->query('{ root }')->getStatusCode());
 
     $batched = $this->batchedQueries([
       ['query' => '{ root }'],
       ['query' => '{ root }'],
     ]);
 
-    $this->assertEquals(200, $batched->getStatusCode());
+    $this->assertSame(200, $batched->getStatusCode());
 
     $data = [
       'data' => [

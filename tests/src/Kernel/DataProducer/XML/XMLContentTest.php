@@ -27,7 +27,7 @@ class XMLContentTest extends XMLTestBase {
     $h1 = iterator_to_array($xpath->query('//div/h1', $document));
     $span = iterator_to_array($xpath->query('//div/div/span', $document));
 
-    $this->assertEquals('Header', $this->executeDataProducer('xml_content', [
+    $this->assertSame('Header', $this->executeDataProducer('xml_content', [
       'dom' => $h1[0],
     ]));
 

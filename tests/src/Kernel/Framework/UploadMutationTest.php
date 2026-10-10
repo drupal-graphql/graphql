@@ -72,7 +72,7 @@ GQL;
     $uploadRequest->headers->add(['content-type' => 'multipart/form-data']);
     $response = $this->container->get('http_kernel')->handle($uploadRequest);
     $result = json_decode($response->getContent());
-    $this->assertEquals('test.txt', $result->data->store);
+    $this->assertSame('test.txt', $result->data->store);
   }
 
 }

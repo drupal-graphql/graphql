@@ -59,7 +59,7 @@ GQL;
     $cabrio_resolver = $this->builder->fromValue('Cabrio');
     $this->mockResolver('Cabrio', 'model', $cabrio_resolver);
 
-    self::assertEquals(
+    $this->assertEquals(
       [
         'Query' => ['transportation' => $transportation_resolver],
         'Car' => ['model' => $car_resolver],
@@ -82,7 +82,7 @@ GQL;
       'model'
     );
 
-    self::assertEquals(
+    $this->assertEquals(
       $expected_resolver,
       $returned_resolver
     );
@@ -100,7 +100,7 @@ GQL;
       'model'
     );
 
-    self::assertEquals(
+    $this->assertEquals(
       $expected_resolver,
       $returned_resolver
     );
@@ -119,7 +119,7 @@ GQL;
       'model'
     );
 
-    self::assertEquals(
+    $this->assertEquals(
       $expected_resolver,
       $returned_resolver
     );

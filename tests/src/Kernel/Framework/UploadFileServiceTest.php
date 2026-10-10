@@ -171,8 +171,8 @@ class UploadFileServiceTest extends GraphQLTestBase {
     ]);
     $file_entity = $file_upload_response->getFileEntity();
     $image = \Drupal::service('image.factory')->get($file_entity->getFileUri());
-    $this->assertEquals(5, $image->getWidth());
-    $this->assertEquals(5, $image->getHeight());
+    $this->assertSame(5, $image->getWidth());
+    $this->assertSame(5, $image->getHeight());
   }
 
   /**

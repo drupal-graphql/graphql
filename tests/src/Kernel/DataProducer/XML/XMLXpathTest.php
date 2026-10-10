@@ -30,7 +30,7 @@ class XMLXpathTest extends XMLTestBase {
     ]);
 
     $this->assertCount(1, $result);
-    $this->assertEquals('h1', $result[0]->tagName);
+    $this->assertSame('h1', $result[0]->tagName);
 
     $result = $this->executeDataProducer('xml_xpath', [
       'dom' => $document,
@@ -38,9 +38,9 @@ class XMLXpathTest extends XMLTestBase {
     ]);
 
     $this->assertCount(3, $result);
-    $this->assertEquals('div', $result[0]->tagName);
-    $this->assertEquals('div', $result[1]->tagName);
-    $this->assertEquals('div', $result[2]->tagName);
+    $this->assertSame('div', $result[0]->tagName);
+    $this->assertSame('div', $result[1]->tagName);
+    $this->assertSame('div', $result[2]->tagName);
 
     // Test that the resolve can accept a DOMElement object too, not only a
     // document root.
@@ -55,8 +55,8 @@ class XMLXpathTest extends XMLTestBase {
     ]);
 
     $this->assertCount(2, $result);
-    $this->assertEquals('p', $result[0]->tagName);
-    $this->assertEquals('p', $result[1]->tagName);
+    $this->assertSame('p', $result[0]->tagName);
+    $this->assertSame('p', $result[1]->tagName);
 
     // Test for non-existent element.
     $result = $this->executeDataProducer('xml_xpath', [

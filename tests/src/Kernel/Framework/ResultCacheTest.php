@@ -401,7 +401,7 @@ GQL;
     ], $metadata);
 
     $result = $this->query($query);
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
   }
 
   /**

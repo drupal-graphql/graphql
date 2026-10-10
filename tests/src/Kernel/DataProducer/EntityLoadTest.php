@@ -28,15 +28,15 @@ class EntityLoadTest extends EntityTestBase {
       'language' => 'fr',
     ]);
 
-    $this->assertEquals('sit amet fr', $french->label());
+    $this->assertSame('sit amet fr', $french->label());
 
     $translations = $this->executeDataProducer('entity_translations', [
       'entity' => $this->node,
     ]);
 
-    $this->assertEquals('Dolor', $translations['en']->label());
-    $this->assertEquals('sit amet fr', $translations['fr']->label());
-    $this->assertEquals('sit amet de', $translations['de']->label());
+    $this->assertSame('Dolor', $translations['en']->label());
+    $this->assertSame('sit amet fr', $translations['fr']->label());
+    $this->assertSame('sit amet de', $translations['de']->label());
   }
 
   /**
@@ -101,8 +101,8 @@ class EntityLoadTest extends EntityTestBase {
       'language' => 'fr',
     ]);
 
-    $this->assertEquals('fr', $result->language()->getId());
-    $this->assertEquals('sit amet fr', $result->getTitle());
+    $this->assertSame('fr', $result->language()->getId());
+    $this->assertSame('sit amet fr', $result->getTitle());
   }
 
   /**

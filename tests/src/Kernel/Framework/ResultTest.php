@@ -57,7 +57,7 @@ GQL;
       ],
     ], json_decode($result->getContent(), TRUE));
     $this->assertTrue($result->isCacheable());
-    $this->assertEquals('max-age=900, public', $result->headers->get('Cache-Control'));
+    $this->assertSame('max-age=900, public', $result->headers->get('Cache-Control'));
   }
 
   /**
