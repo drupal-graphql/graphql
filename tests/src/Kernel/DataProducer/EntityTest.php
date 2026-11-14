@@ -7,6 +7,7 @@ namespace Drupal\Tests\graphql\Kernel\DataProducer;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -272,6 +273,24 @@ class EntityTest extends EntityTestBase {
       ->willReturn('some uuid');
 
     $this->assertSame('some uuid', $this->executeDataProducer('entity_uuid', [
+      'entity' => $this->entity,
+    ]));
+  }
+
+  /**
+   * @covers \Drupal\graphql\Plugin\GraphQL\DataProducer\Entity\EntityLabel::resolve
+   */
+  public function testResolveLabelTranslatableMarkup(): void {
+    $this->entity->expects($this->once())
+      ->method('label')
+      ->willReturn(new TranslatableMarkup('Dummy translatable label'));
+
+    $this->entity->expects($this->once())
+      ->method('access')
+      ->willReturn(AccessResult::allowed())
+      ->with('view label', NULL, TRUE);
+
+    $this->assertSame('Dummy translatable label', $this->executeDataProducer('entity_label', [
       'entity' => $this->entity,
     ]));
   }

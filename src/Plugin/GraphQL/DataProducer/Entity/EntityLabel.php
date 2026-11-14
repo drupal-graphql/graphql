@@ -52,7 +52,8 @@ class EntityLabel extends DataProducerPluginBase implements DataProducerPluginCa
     $accessResult = $entity->access('view label', $accessUser, TRUE);
     $context->addCacheableDependency($accessResult);
     if ($accessResult->isAllowed()) {
-      return $entity->label();
+      $label = $entity->label();
+      return $label !== NULL ? (string) $label : NULL;
     }
     return NULL;
   }
