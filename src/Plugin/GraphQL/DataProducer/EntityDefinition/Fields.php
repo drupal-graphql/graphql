@@ -118,6 +118,7 @@ class Fields extends DataProducerPluginBase implements ContainerFactoryPluginInt
       $entity_type_id = $entity_definition->id();
       if ($bundle_context) {
         $key = $bundle_context['key'];
+        assert(is_string($key));
         $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $key);
 
         // Set entity form default display as context.

@@ -144,7 +144,9 @@ class EntityQueryCount extends EntityQueryBase {
       $context
     );
 
-    return $query->count()->execute();
+    $result = $query->count()->execute();
+    assert(is_int($result));
+    return $result;
   }
 
 }

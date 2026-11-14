@@ -48,11 +48,11 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('image.factory'),
       $container->get('renderer'),
     );
@@ -93,15 +93,20 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
   public function resolve(?FileInterface $entity, string $style, RefinableCacheableDependencyInterface $metadata): ?array {
     // Return if we don't have an entity or if it is an SVG image where image
     // styles don't apply.
-    if (!$entity || $entity->getMimeType() == 'image/svg+xml') {
+    if (!$entity || $entity->getMimeType() === 'image/svg+xml') {
       return NULL;
     }
 
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
+    // @mago-expect analysis:drupal/static-entity-load @todo fix in GraphQl 6.x.
     if ($access->isAllowed() && $image_style = ImageStyle::load($style)) {
+      $file_uri = $entity->getFileUri();
+      if (!$file_uri) {
+        return NULL;
+      }
       /** @var \Drupal\Core\Image\ImageInterface $image */
-      $image = $this->imageFactory->get($entity->getFileUri());
+      $image = $this->imageFactory->get($file_uri);
       if ($image->isValid()) {
         $width = $image->getWidth();
         $height = $image->getHeight();
@@ -113,7 +118,7 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
         'height' => $height ?? 0,
       ];
 
-      $image_style->transformDimensions($dimensions, $entity->getFileUri());
+      $image_style->transformDimensions($dimensions, $file_uri);
       $metadata->addCacheableDependency($image_style);
 
       // The underlying URL generator that will be invoked will leak cache
@@ -121,8 +126,8 @@ class ImageDerivative extends DataProducerPluginBase implements ContainerFactory
       // context, we can capture the leaked metadata and make sure it gets
       // incorporated into the response.
       $context = new RenderContext();
-      $url = $this->renderer->executeInRenderContext($context, static function () use ($image_style, $entity) {
-        return $image_style->buildUrl($entity->getFileUri());
+      $url = $this->renderer->executeInRenderContext($context, static function () use ($image_style, $file_uri) {
+        return $image_style->buildUrl($file_uri);
       });
 
       if (!$context->isEmpty()) {

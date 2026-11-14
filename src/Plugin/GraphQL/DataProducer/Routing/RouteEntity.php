@@ -50,11 +50,11 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('graphql.buffer.entity'),
       $container->get('graphql.buffer.entity_preview')
@@ -146,6 +146,8 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
         return $this->resolveNotFound($type, $context);
       }
 
+      assert($entity instanceof EntityInterface);
+
       // Get the correct translation.
       if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
         $entity = $entity->getTranslation($language);
@@ -185,13 +187,11 @@ class RouteEntity extends DataProducerPluginBase implements ContainerFactoryPlug
         return $this->resolveNotFound($type, $context);
       }
 
+      assert($entity instanceof EntityInterface);
+
       if (isset($language) && $language != $entity->language()->getId() && $entity instanceof TranslatableInterface) {
         $entity = $entity->getTranslation($language);
         $entity->addCacheContexts(["static:language:{$language}"]);
-      }
-
-      if (!$entity instanceof EntityInterface) {
-        return $this->resolveNotFound($type, $context);
       }
 
       $access = $entity->access('view', NULL, TRUE);

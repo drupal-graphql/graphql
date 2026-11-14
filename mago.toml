@@ -1,32 +1,26 @@
 version = "1"
 # The lowest PHP version that the supported core releases accept.
 php-version = "8.1"
+extends = "vendor/drupal/mago/drupal.mago.toml"
 
 [source]
 paths = ["examples", "graphql*", "src", "tests"]
 includes = ["vendor", "web"]
-excludes = [".ddev"]
-extensions = ["php", "module", "install", "inc", "theme", "profile", "engine"]
-
-[extension-hosts.drupal]
-# The Drupal rules from amateescu/mago-drupal, installed in the site that
-# holds the module. The path assumes a core checkout with the module in
-# modules/trash. The GitLab CI job puts a vendor symlink at the same depth.
-command = ["php", "vendor/amateescu/mago-drupal/resources/worker.php"]
-
-[formatter]
-preset = "drupal"
+excludes = [
+  ".ddev",
+  "vendor/*/Tests/*",
+  "vendor/*/tests/*",
+  "web/modules/custom/graphql",
+]
 
 [linter]
 # Stops `lowercase-keyword` from reporting TRUE, FALSE and NULL.
 integrations = ["drupal", "phpunit"]
-# Fail on warnings too, the same way phpcs does.
-minimum-fail-level = "warning"
+# Fail on anything, the same way phpcs does.
+minimum-fail-level = "note"
 
 [linter.rules]
 assertion-style = { style = "this" }
-# Report an interface name without the "Interface" suffix.
-interface-name = { psr = true }
 # Report a file whose name differs from the class that it declares.
 file-name = { enabled = true }
 # Accept snake_case functions and camelCase methods. Hook documentation has
@@ -35,11 +29,12 @@ function-name = { either = true, exclude = ["*.api.php"] }
 # Report a variable that is assigned and never read.
 no-redundant-variable = { enabled = true }
 # Code complexity checks are tuned to what we like in this code base.
-cyclomatic-complexity = { threshold = 30 }
-excessive-parameter-list = { constructor-threshold = 13, threshold = 8 }
-halstead = { difficulty-threshold = 13 }
-kan-defect = { threshold = 2.1 }
-too-many-methods = { threshold = 15 }
+cyclomatic-complexity = { enabled = true, threshold = 30 }
+excessive-parameter-list = { enabled = true, constructor-threshold = 13, threshold = 8 }
+halstead = { enabled = true, difficulty-threshold = 13 }
+kan-defect = { enabled = true, threshold = 2.1 }
+too-many-methods = { enabled = true, threshold = 15 }
+too-many-properties = { enabled = true }
 
 # These rules contradict Drupal's standard.
 no-error-control-operator = { enabled = false }
@@ -63,6 +58,36 @@ strict-behavior = { enabled = false }
 
 
 [analyzer]
-# Report a PHP function that is called with the wrong case.
-check-name-casing = true
-ignore = ["mixed-assignment", "possible-method-access-on-null"]
+plugins = ["phpstan-ignores"]
+ignore = [
+  # Test classes may keep entity storage in properties.
+  { code = "drupal/entity-storage-property", in = [
+    "tests/",
+  ] },
+  # We often get services from the container where the return type is mixed.
+  # @todo needs a Drupal or Symfony plugin?
+  "ambiguous-object-method-access",
+  # Same as ambiguous-object-method-access.
+  { code = "less-specific-argument", pattern = "::__construct`: expected `.+`, but provided type `null\\|object`" },
+  # Plugin definition arrays can be passed around as mixed.
+  { code = "mixed-argument", pattern = "::__construct" },
+  # We pass mixed arguments all the time in Drupal, is this even solvable?
+  "mixed-argument",
+  # We use mixed array types all over the place in Drupal, probably not fixable.
+  "mixed-array-access",
+  # We do mixed assignments all the time in Drupal, is this even solvable?
+  "mixed-assignment",
+  "mixed-operand",
+  # We do mixed property access all the time in Drupal, is this even solvable?
+  "mixed-property-access",
+  # We need to support attributes between different Drupal versions that might
+  # not exist.
+  "non-existent-attribute-class",
+  "redundant-docblock-type",
+  # Same container service problem as for "ambiguous-object-method-access".
+  #"possible-method-access-on-null",
+  # Same container service problem as for "ambiguous-object-method-access".
+  { code = "possibly-null-argument", pattern = "::__construct` is possibly `null`" },
+  # new static() is a best practice in Drupal.
+  { code = "unsafe-instantiation", pattern = "new static()" },
+]

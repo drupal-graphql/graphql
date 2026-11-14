@@ -32,8 +32,8 @@ phpunit (next major):
     # Drupal 11.
     _RUNTESTS_EXTRA: '--suppress-deprecations'
 
-# Mago lint with the Drupal rules from amateescu/mago-drupal. The composer job
-# installs both from require-dev, and mago.toml in the module root holds the
+# Mago lint with the Drupal rules from drupal/mago. The composer job installs
+# both from require-dev, and mago.toml in the module root holds the
 # configuration. The second run writes the GitLab code quality report.
 mago-lint:
   stage: validate
@@ -58,3 +58,17 @@ mago-lint:
       - mago-codequality.json
     reports:
       codequality: mago-codequality.json
+
+# Static analysis uses the same dependencies and configuration as mago-lint.
+# @todo: Enable when passing.
+# mago-analyse:
+#  stage: validate
+#  needs: [composer]
+#  rules:
+#    - if: $SKIP_MAGO == "1"
+#      when: never
+#    - when: on_success
+#  allow_failure: false
+#  script:
+#    - cd $CI_PROJECT_DIR && pwd
+#    - $COMPOSER_BIN_DIR/mago analyze

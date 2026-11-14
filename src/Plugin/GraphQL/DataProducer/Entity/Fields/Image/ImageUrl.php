@@ -42,11 +42,11 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('renderer'),
       $container->get('file_url_generator')
     );
@@ -83,18 +83,24 @@ class ImageUrl extends DataProducerPluginBase implements ContainerFactoryPluginI
     $access = $entity->access('view', NULL, TRUE);
     $metadata->addCacheableDependency($access);
     if ($access->isAllowed()) {
+      $file_uri = $entity->getFileUri();
+      if ($file_uri === NULL) {
+        return NULL;
+      }
+
       // The underlying URL generator that will be invoked will leak cache
       // metadata, resulting in an exception. By wrapping within a new render
       // context, we can capture the leaked metadata and make sure it gets
       // incorporated into the response.
       $context = new RenderContext();
-      $url = $this->renderer->executeInRenderContext($context, function () use ($entity) {
-        return $this->fileUrlGenerator->generateAbsoluteString($entity->getFileUri());
+      $url = $this->renderer->executeInRenderContext($context, function () use ($file_uri): string {
+        return $this->fileUrlGenerator->generateAbsoluteString($file_uri);
       });
 
       if (!$context->isEmpty()) {
         $metadata->addCacheableDependency($context->pop());
       }
+      assert(is_string($url));
       return $url;
     }
     return NULL;

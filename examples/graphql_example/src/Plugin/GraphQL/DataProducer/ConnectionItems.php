@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\graphql_composable\Plugin\GraphQL\DataProducer;
+namespace Drupal\graphql_examples\Plugin\GraphQL\DataProducer;
 
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;

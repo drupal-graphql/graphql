@@ -271,7 +271,7 @@ class FileUpload {
         if ($uploaded_file->isValid()) {
           break;
         }
-
+        // Otherwise, fall through to the default error handler.
       default:
         $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $uploaded_file->getClientOriginalName()]));
         $this->logger->error('Error while uploading the file "@file" with an error code "@code".', [

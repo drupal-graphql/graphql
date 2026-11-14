@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Taxonomy;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\ConditionInterface;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -73,6 +75,7 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
    * @deprecated in graphql:5.1.0 and is removed from graphql:6.0.0. Use
    *   $this->entityTypeManager->getStorage('taxonomy_term') instead.
    * @see https://www.drupal.org/node/3623287
+   * @mago-expect analysis:drupal/entity-storage-property
    */
   protected ?TermStorageInterface $termStorage = NULL;
 
@@ -137,8 +140,8 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
    */
   protected function getTermType(): ContentEntityTypeInterface {
     if (!isset($this->termType)) {
-      /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $term_type */
       $term_type = $this->entityTypeManager->getDefinition('taxonomy_term');
+      assert($term_type instanceof ContentEntityTypeInterface);
       $this->termType = $term_type;
     }
     return $this->termType;
@@ -229,6 +232,7 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
     }
 
     // Return list of vocabularies.
+    // @mago-expect analysis:mixed-return-statement
     return $handler_settings['target_bundles'];
   }
 
@@ -250,8 +254,8 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
    *   The caching context related to the current field.
    *
-   * @return array
-   *   List of matched terms.
+   * @return array<int|string>
+   *   List of matched term IDs.
    */
   public function resolve(
     string $entity_type,
@@ -284,7 +288,7 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
     // Make condition matching name as OR condition group. This makes it
     // extendable if a module needs to cover a match in term name OR in some
     // other fields.
-    $like_contains = '%' . $query->escapeLike($match_string) . '%';
+    $like_contains = '%' . $query->escapeLike($match_string ?? '') . '%';
     $name_condition_group = $query->orConditionGroup();
     $name_condition_group->condition('t.name', $like_contains, 'LIKE');
 
@@ -324,6 +328,8 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
     ];
     $this->moduleHandler->alter('graphql_term_autocomplete_query', $args, $query, $name_condition_group);
 
+    assert($query instanceof SelectInterface);
+    assert($name_condition_group instanceof ConditionInterface);
     // Add name OR condition group after query was altered. If added sooner then
     // condition group extensions done in alter hooks wouldn't be reflected.
     $query->condition($name_condition_group);
@@ -333,11 +339,13 @@ class TermFieldAutocomplete extends DataProducerPluginBase implements ContainerF
 
     // Process the terms returned by term autocomplete query.
     $terms = [];
-    foreach ($query->execute() as $match) {
-      $terms[] = $match->tid;
+    foreach ($query->execute() ?? [] as $match) {
+      $tid = $match->tid;
+      assert(is_int($tid) || is_string($tid));
+      $terms[] = $tid;
       // Invalidate on term update, because it may change the name which does
       // not match the string anymore.
-      $context->addCacheTags(['taxonomy_term:' . $match->tid]);
+      $context->addCacheTags(['taxonomy_term:' . $tid]);
     }
 
     $context->addCacheTags($this->getTermType()->getListCacheTags());

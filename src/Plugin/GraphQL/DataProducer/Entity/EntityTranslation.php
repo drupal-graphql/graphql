@@ -65,11 +65,11 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('entity.repository')
     );
   }
@@ -106,7 +106,7 @@ class EntityTranslation extends DataProducerPluginBase implements ContainerFacto
       // to the entity, if not return NULL.
       if ($access) {
         /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
-        $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+        $accessResult = $entity->access($accessOperation ?? 'view', $accessUser, TRUE);
         $context->addCacheableDependency($accessResult);
         if (!$accessResult->isAllowed()) {
           return NULL;

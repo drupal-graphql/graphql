@@ -22,7 +22,6 @@ class GraphqlHooks {
       return NULL;
     }
     $title = $this->t('About');
-    // @mago-expect lint:drupal/translatable-string
     $description = $this->t('
 <p>The GraphQL module lets you build a <a href="https://graphql.org/" target="_blank">GraphQL</a>
   API for Drupal using a custom schema. Client applications can query the API to

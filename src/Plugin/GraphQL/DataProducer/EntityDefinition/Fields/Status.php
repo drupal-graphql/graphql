@@ -44,15 +44,12 @@ class Status extends DataProducerPluginBase {
    */
   public function resolve(FieldDefinitionInterface $entity_definition_field): bool {
     if ($entity_definition_field instanceof BaseFieldDefinition) {
-      /** @var \Drupal\Core\Field\BaseFieldDefinition $entity_definition_field */
       return TRUE;
     }
     elseif ($entity_definition_field instanceof FieldConfig) {
-      /** @var \Drupal\field\Entity\FieldConfig $entity_definition_field */
       return $entity_definition_field->status();
     }
     elseif ($entity_definition_field instanceof BaseFieldOverride) {
-      /** @var \Drupal\Core\Field\Entity\BaseFieldOverride $entity_definition_field */
       return $entity_definition_field->status();
     }
 

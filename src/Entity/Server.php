@@ -81,7 +81,6 @@ use GraphQL\Validator\Rules\QueryDepth;
  *   }
  * )
  *
- * @mago-expect lint:drupal/property-name
  * @mago-expect lint:too-many-properties
  * @mago-expect lint:too-many-methods
  */

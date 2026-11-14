@@ -204,7 +204,9 @@ class EntityQuery extends EntityQueryBase {
       }
     }
 
-    return $query->execute();
+    $result = $query->execute();
+    assert(is_array($result));
+    return $result;
   }
 
 }

@@ -50,7 +50,7 @@ class QueryAccessCheck implements AccessInterface {
     }
 
     $request = $this->requestStack->getCurrentRequest();
-    $operations = $request->attributes->get('operations', []);
+    $operations = $request?->attributes->get('operations', []);
     if (!$operations) {
       return AccessResult::forbidden();
     }

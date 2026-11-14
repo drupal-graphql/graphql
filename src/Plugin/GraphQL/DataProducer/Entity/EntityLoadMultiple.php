@@ -142,7 +142,7 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
         if ($access) {
           /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
-          $accessResult = $entities[$id]->access($accessOperation, $accessUser, TRUE);
+          $accessResult = $entities[$id]->access($accessOperation ?? 'view', $accessUser, TRUE);
           $context->addCacheableDependency($accessResult);
           // We need to call isAllowed() because isForbidden() returns FALSE
           // for neutral access results, which is dangerous. Only an explicitly

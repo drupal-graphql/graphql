@@ -45,9 +45,11 @@ class DefaultValue extends DataProducerPluginBase {
       case 'list_integer':
       case 'list_string':
       case 'text_long':
+        // @mago-expect analysis:mixed-return-statement
         return $default_value[0]['value'] ?? NULL;
 
       case 'boolean':
+        // @mago-expect analysis:mixed-operand
         return (bool) ($default_value[0]['value'] ?? FALSE);
     }
     return NULL;

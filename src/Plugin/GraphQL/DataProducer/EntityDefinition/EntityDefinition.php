@@ -101,18 +101,18 @@ class EntityDefinition extends DataProducerPluginBase implements ContainerFactor
    * @param \Drupal\graphql\GraphQL\Execution\FieldContext $field_context
    *   Field context.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
-   *   The entity definition.
+   * @return \Drupal\Core\Entity\EntityTypeInterface|null
+   *   The entity definition or NULL if the entity type does not exist.
    */
   public function resolve(
     string $entity_type,
     ?string $bundle,
     ?string $field_types,
     FieldContext $field_context,
-  ): EntityTypeInterface {
+  ): ?EntityTypeInterface {
     if ($bundle) {
       $bundle_info = $this->entityTypeBundleInfo->getBundleInfo($entity_type);
-      if (isset($bundle_info[$bundle])) {
+      if (isset($bundle_info[$bundle]) && is_array($bundle_info[$bundle])) {
         $bundle_context = $bundle_info[$bundle];
         $bundle_context['key'] = $bundle;
         $field_context->setContextValue('bundle', $bundle_context);

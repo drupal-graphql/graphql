@@ -117,7 +117,7 @@ class Validator implements ValidatorInterface {
       try {
         $type = $schema->getType($type_name);
       }
-      catch (InvariantViolation $_) {
+      catch (InvariantViolation) {
         $type = NULL;
       }
 
@@ -133,7 +133,7 @@ class Validator implements ValidatorInterface {
         try {
           $type->getField($field_name);
         }
-        catch (InvariantViolation $_) {
+        catch (InvariantViolation) {
           if (!isset($orphaned_resolvers[$type_name])) {
             $orphaned_resolvers[$type_name] = [];
           }

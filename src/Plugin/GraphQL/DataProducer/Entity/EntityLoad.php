@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\graphql\Plugin\GraphQL\DataProducer\Entity;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
@@ -140,6 +141,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
         return NULL;
       }
 
+      assert($entity instanceof EntityInterface);
       $context->addCacheableDependency($entity);
       if (isset($bundles) && !in_array($entity->bundle(), $bundles)) {
         // If the entity is not among the allowed bundles, don't return it.
@@ -156,7 +158,7 @@ class EntityLoad extends DataProducerPluginBase implements ContainerFactoryPlugi
       // to the entity, if not return NULL.
       if ($access) {
         /** @var \Drupal\Core\Access\AccessResultInterface $accessResult */
-        $accessResult = $entity->access($accessOperation, $accessUser, TRUE);
+        $accessResult = $entity->access($accessOperation ?? 'view', $accessUser, TRUE);
         $context->addCacheableDependency($accessResult);
         if (!$accessResult->isAllowed()) {
           return NULL;

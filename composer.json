@@ -16,8 +16,8 @@
     "jangregor/phpstan-prophecy": "^2 || ^1",
     "drush/drush": "^12 || ^13 || ^14",
     "mglaman/composer-drupal-lenient": "^1 || ^2",
-    "amateescu/mago-drupal": "^0.5",
-    "carthage-software/mago": "^1.55"
+    "drupal/mago": "^1.0@alpha",
+    "carthage-software/mago": "^1.59.0"
   },
   "config": {
     "allow-plugins": {
