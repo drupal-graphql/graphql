@@ -10,6 +10,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Collects entity UUIDs per entity type and loads them all at once in the end.
+ *
+ * @extends BufferBase<array<array-key, string>|string>
  */
 class EntityUuidBuffer extends BufferBase {
 
@@ -29,7 +31,7 @@ class EntityUuidBuffer extends BufferBase {
    *
    * @param string $type
    *   The entity type of the given entity ids.
-   * @param array|string $uuid
+   * @param array<array-key, string>|string $uuid
    *   The entity uuid(s) to load.
    *
    * @return \Closure
@@ -48,6 +50,7 @@ class EntityUuidBuffer extends BufferBase {
    * {@inheritdoc}
    */
   protected function getBufferId(\ArrayObject $item): string {
+    /** @var string */
     return $item['type'];
   }
 
@@ -55,7 +58,13 @@ class EntityUuidBuffer extends BufferBase {
    * {@inheritdoc}
    */
   public function resolveBufferArray(array $buffer): array {
-    $type = reset($buffer)['type'];
+    /** @var array<array-key, \ArrayObject<string, array<array-key, string>|string>> $items */
+    $items = $buffer;
+    if ($items === []) {
+      return [];
+    }
+    /** @var string $type */
+    $type = reset($items)['type'];
 
     $entityType = $this->entityTypeManager->getDefinition($type);
 
@@ -64,22 +73,28 @@ class EntityUuidBuffer extends BufferBase {
     }
 
     $uuids = array_map(static function (\ArrayObject $item) {
-      return (array) $item['uuid'];
-    }, $buffer);
+      /** @var array<array-key, string>|string $ids */
+      $ids = $item['uuid'];
+      return (array) $ids;
+    }, $items);
 
-    $uuids = call_user_func_array('array_merge', $uuids);
+    $uuids = array_merge(...array_values($uuids));
     $uuids = array_values(array_unique($uuids));
 
     $entities = $this->entityTypeManager
       ->getStorage($type)->loadByProperties([$uuid_key => $uuids]);
 
     $entities = array_reduce(array_map(static function (EntityInterface $entity) {
-      return [$entity->uuid() => $entity];
+      $uuid = $entity->uuid();
+      if ($uuid === NULL) {
+        throw new EntityStorageException('A loaded entity has no UUID.');
+      }
+      return [$uuid => $entity];
     }, $entities), 'array_merge', []);
 
     return array_map(static function ($item) use ($entities) {
       if (is_array($item['uuid'])) {
-        return array_reduce($item['uuid'], static function ($carry, $current) use ($entities) {
+        return array_reduce($item['uuid'], static function ($carry, string $current) use ($entities) {
           if (!empty($entities[$current])) {
             return $carry + [$current => $entities[$current]];
           }
@@ -89,7 +104,7 @@ class EntityUuidBuffer extends BufferBase {
       }
 
       return $entities[$item['uuid']] ?? NULL;
-    }, $buffer);
+    }, $items);
   }
 
 }

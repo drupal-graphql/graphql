@@ -18,7 +18,9 @@ abstract class XMLTestBase extends GraphQLTestBase {
     $document = new \DOMDocument();
     libxml_use_internal_errors(TRUE);
     $document->loadHTMLFile(\Drupal::service('extension.list.module')->getPath('graphql') . '/tests/files/xml/test.xml');
-    return $document->documentElement;
+    $element = $document->documentElement;
+    $this->assertInstanceOf(\DOMElement::class, $element);
+    return $element;
   }
 
   /**

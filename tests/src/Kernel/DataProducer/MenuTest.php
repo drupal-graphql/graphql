@@ -29,6 +29,7 @@ class MenuTest extends MenuTestBase {
       'menu' => $this->menu,
     ]);
 
+    $this->assertIsArray($result);
     $count = 0;
     foreach ($result as $link_tree) {
       $this->assertInstanceOf(MenuLinkTreeElement::class, $link_tree);

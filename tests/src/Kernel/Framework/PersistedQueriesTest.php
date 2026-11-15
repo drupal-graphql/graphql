@@ -59,6 +59,13 @@ GQL;
   /**
    * Test a simple query result.
    *
+   * @param list<string> $instanceIds
+   *   The persisted query plugin IDs in priority order.
+   * @param string $queryId
+   *   The persisted query ID to execute.
+   * @param array $expected
+   *   The expected query response.
+   *
    * @dataProvider persistedQueriesDataProvider
    */
   #[DataProvider('persistedQueriesDataProvider')]
@@ -88,6 +95,16 @@ GQL;
    */
   public static function persistedQueriesDataProvider(): array {
     return [
+      // An unknown ID returns a client error after all plugins decline it.
+      [
+        ['plugin_one', 'plugin_two', 'plugin_three'],
+        'unknown_query',
+        [
+          'errors' => [
+            ['message' => 'PersistedQueryNotFound'],
+          ],
+        ],
+      ],
       // This is the most usual case, all the three plugins are enabled.
       [
         ['plugin_one', 'plugin_two', 'plugin_three'],

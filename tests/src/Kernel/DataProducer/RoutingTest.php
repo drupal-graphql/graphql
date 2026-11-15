@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Url;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -59,7 +60,7 @@ class RoutingTest extends GraphQLTestBase {
       'path' => '/user/logout',
     ]);
 
-    $this->assertNotNull($result);
+    $this->assertInstanceOf(Url::class, $result);
     $this->assertSame('user.logout', $result->getRouteName());
 
     // Test route_load with redirect to an internal URL.
@@ -84,7 +85,7 @@ class RoutingTest extends GraphQLTestBase {
       'path' => 'internal-url',
     ]);
 
-    $this->assertNotNull($result);
+    $this->assertInstanceOf(Url::class, $result);
     $this->assertEquals($nodeUrl, $result->toString());
 
     $redirect = $this->redirectStorage->create();
@@ -114,7 +115,7 @@ class RoutingTest extends GraphQLTestBase {
       'path' => '/redirect-url',
     ]);
 
-    $this->assertNotNull($result);
+    $this->assertInstanceOf(Url::class, $result);
     $this->assertSame('user.logout', $result->getRouteName());
 
     $redirect = $this->redirectStorage->create();
@@ -129,7 +130,7 @@ class RoutingTest extends GraphQLTestBase {
       'language' => 'de',
     ]);
 
-    $this->assertNotNull($result);
+    $this->assertInstanceOf(Url::class, $result);
     $this->assertSame('user.logout', $result->getRouteName());
   }
 

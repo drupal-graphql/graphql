@@ -54,8 +54,10 @@ class AutomaticPersistedQuery extends PersistedQueryPluginBase implements Contai
    * {@inheritdoc}
    */
   public function getQuery($id, OperationParams $operation): ?string {
-    if ($query = $this->cache->get($id)) {
-      return $query->data;
+    /** @var object{data: string}|false $cachedQuery */
+    $cachedQuery = $this->cache->get($id);
+    if ($cachedQuery !== FALSE) {
+      return $cachedQuery->data;
     }
     // Cache miss - store the query in cache.
     $query = $operation->query;

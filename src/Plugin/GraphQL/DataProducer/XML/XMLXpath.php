@@ -42,12 +42,22 @@ class XMLXpath extends DataProducerPluginBase {
    * @param string $query
    *   The xpath query.
    *
-   * @return array<\DOMElement>
-   *   Array of DOM elements matching the xpath query.
+   * @return list<\DOMNode>
+   *   The nodes matching the XPath query.
    */
   public function resolve(\DOMElement $dom, string $query): array {
-    $xpath = new \DOMXPath($dom->ownerDocument);
-    return iterator_to_array($xpath->query($query, $dom));
+    $document = $dom->ownerDocument;
+    if ($document === NULL) {
+      throw new \InvalidArgumentException('The XML element has no owner document.');
+    }
+    $xpath = new \DOMXPath($document);
+    /** @var \DOMNodeList<\DOMNode>|false $matches */
+    $matches = $xpath->query($query, $dom);
+    if ($matches === FALSE) {
+      throw new \InvalidArgumentException('The XPath query is invalid.');
+    }
+
+    return iterator_to_array($matches, FALSE);
   }
 
 }

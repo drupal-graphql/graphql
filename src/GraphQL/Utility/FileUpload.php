@@ -158,6 +158,11 @@ class FileUpload {
     $temp_file_path = $uploaded_file->getRealPath();
     $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileExists::Rename);
 
+    if ($temp_file_path === FALSE || $file_uri === FALSE) {
+      $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $uploaded_file->getClientOriginalName()]));
+      return $response;
+    }
+
     // Lock based on the prepared file URI.
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
 
@@ -180,16 +185,11 @@ class FileUpload {
    * Creates and validates a file while its destination URI is locked.
    */
   protected function saveLockedFileUpload(UploadedFile $uploaded_file, array $settings, FileUploadResponse $response, array $validators, string $prepared_filename, string $temp_file_path, string $file_uri): FileUploadResponse {
-    // Begin building file entity.
-    /** @var \Drupal\file\FileInterface $file */
-    $file = $this->entityTypeManager->getStorage('file')->create([]);
-    $file->setOwnerId($this->currentUser->id());
-    $file->setFilename($prepared_filename);
-    $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
-    $file->setFileUri($temp_file_path);
-    // Set the size. This is done in File::preSave() but we validate the file
-    // before it is saved.
-    $file->setSize(@filesize($temp_file_path));
+    $file = $this->createUploadFileEntity($prepared_filename, $temp_file_path);
+    if ($file === NULL) {
+      $response->addViolation($this->t('Unknown error while uploading the file "@file".', ['@file' => $uploaded_file->getClientOriginalName()]));
+      return $response;
+    }
 
     // Validate against fileValidator first with the temporary path.
     /** @var \Symfony\Component\Validator\ConstraintViolationListInterface $file_validate_errors */
@@ -197,7 +197,7 @@ class FileUpload {
     $errors = [];
     if (count($file_validate_errors) > 0) {
       foreach ($file_validate_errors as $violation) {
-        $errors[] = $violation->getMessage();
+        $errors[] = (string) $violation->getMessage();
       }
     }
 
@@ -239,6 +239,25 @@ class FileUpload {
     $file->save();
     $response->setFileEntity($file);
     return $response;
+  }
+
+  /**
+   * Creates a temporary file entity with metadata for upload validation.
+   */
+  protected function createUploadFileEntity(string $filename, string $path): ?FileInterface {
+    $size = @filesize($path);
+    if ($size === FALSE) {
+      return NULL;
+    }
+    /** @var \Drupal\file\FileInterface $file */
+    $file = $this->entityTypeManager->getStorage('file')->create([]);
+    $file->setOwnerId($this->currentUser->id());
+    $file->setFilename($filename);
+    $file->setMimeType($this->mimeTypeGuesser->guessMimeType($filename));
+    $file->setFileUri($path);
+    // Validation runs before File::preSave() populates the size.
+    $file->setSize($size);
+    return $file;
   }
 
   /**
@@ -345,7 +364,7 @@ class FileUpload {
     $violations = $file->validate();
     if ($violations->count()) {
       foreach ($violations as $violation) {
-        $response->addViolation($violation->getMessage());
+        $response->addViolation((string) $violation->getMessage());
       }
       return FALSE;
     }
@@ -374,7 +393,7 @@ class FileUpload {
    *   image meets a minimum size. A value of zero (the default) indicates that
    *   there is no restriction on size.
    *
-   * @return array
+   * @return list<\Drupal\Core\StringTranslation\TranslatableMarkup>
    *   An empty array if the file meets the specified dimensions, was resized
    *   successfully to meet those requirements or is not an image. If the image
    *   does not meet the requirements or an attempt to resize it fails, an array
@@ -391,8 +410,8 @@ class FileUpload {
       $scaling = FALSE;
       if ($maximum_dimensions) {
         // Check that it is smaller than the given dimensions.
-        [$width, $height] = explode('x', $maximum_dimensions);
-        if ($image->getWidth() > $width || $image->getHeight() > $height) {
+        [$width, $height] = explode('x', (string) $maximum_dimensions);
+        if (($image->getWidth() ?? 0) > $width || ($image->getHeight() ?? 0) > $height) {
           // Try to resize the image to fit the dimensions.
           if ($image->scale((int) $width, (int) $height)) {
             $scaling = TRUE;
@@ -406,22 +425,22 @@ class FileUpload {
 
       if ($minimum_dimensions) {
         // Check that it is larger than the given dimensions.
-        [$width, $height] = explode('x', $minimum_dimensions);
-        if ($image->getWidth() < $width || $image->getHeight() < $height) {
+        [$width, $height] = explode('x', (string) $minimum_dimensions);
+        if (($image->getWidth() ?? 0) < $width || ($image->getHeight() ?? 0) < $height) {
           if ($scaling) {
             $errors[] = $this->t('The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.',
               [
                 '%dimensions' => $minimum_dimensions,
-                '%width' => $image->getWidth(),
-                '%height' => $image->getHeight(),
+                '%width' => ($image->getWidth() ?? 0),
+                '%height' => ($image->getHeight() ?? 0),
               ]);
           }
           else {
             $errors[] = $this->t('The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
               [
                 '%dimensions' => $minimum_dimensions,
-                '%width' => $image->getWidth(),
-                '%height' => $image->getHeight(),
+                '%width' => ($image->getWidth() ?? 0),
+                '%height' => ($image->getHeight() ?? 0),
               ]);
           }
         }
@@ -462,7 +481,7 @@ class FileUpload {
         // If the file will be rejected anyway due to a disallowed extension, it
         // should not be renamed; rather, we'll let fileValidator service
         // to validate FileExtension reject it below.
-        $passes_validation = FALSE;
+        $passes_validation = 0;
         if (!empty($validators['FileExtension']['extensions'])) {
           /** @var \Drupal\file\FileInterface $file */
           $file = $this->entityTypeManager->getStorage('file')->create([]);

@@ -101,10 +101,12 @@ class ResolverRegistry implements ResolverRegistryInterface {
     // First, check if there is a resolver registered for this abstract type.
     if ($resolver = $this->getRuntimeTypeResolver($value, $context, $info)) {
       if (($type = $resolver($value, $context, $info)) !== NULL) {
+        /** @var string */
         return $type;
       }
     }
 
+    /** @var string|null */
     return call_user_func($this->defaultTypeResolver, $value, $context, $info);
   }
 
@@ -179,6 +181,7 @@ class ResolverRegistry implements ResolverRegistryInterface {
    * Resolves a default value for a field.
    */
   protected function resolveFieldDefault(mixed $value, array $args, ResolveContext $context, ResolveInfo $info, FieldContext $field): mixed {
+    /** @var array<string, scalar|array|object|null> $args */
     return Executor::defaultFieldResolver($value, $args, $context, $info);
   }
 

@@ -82,10 +82,17 @@ class EntityPreviewBufferTest extends GraphQLTestBase {
     /** @var \Drupal\graphql\GraphQL\Buffers\EntityPreviewBuffer $buffer */
     $buffer = \Drupal::service('graphql.buffer.entity_preview');
 
+    $uuidA = $this->nodes[0]->uuid();
+    $uuidB = $this->nodes[1]->uuid();
+    $uuidC = $this->nodes[2]->uuid();
+    $this->assertNotNull($uuidA);
+    $this->assertNotNull($uuidB);
+    $this->assertNotNull($uuidC);
+
     // Single resolvers for each preview UUID.
-    $resolverA = $buffer->add('node', $this->nodes[0]->uuid());
-    $resolverB = $buffer->add('node', $this->nodes[1]->uuid());
-    $resolverC = $buffer->add('node', $this->nodes[2]->uuid());
+    $resolverA = $buffer->add('node', $uuidA);
+    $resolverB = $buffer->add('node', $uuidB);
+    $resolverC = $buffer->add('node', $uuidC);
 
     $entityA = $resolverA();
     $entityB = $resolverB();
@@ -108,9 +115,9 @@ class EntityPreviewBufferTest extends GraphQLTestBase {
     // Also verify that passing an array of UUIDs returns an array of entities
     // in the same order, filtered to those that exist.
     $resolverArray = $buffer->add('node', [
-      $this->nodes[2]->uuid(),
+      $uuidC,
       'non-existent-uuid',
-      $this->nodes[0]->uuid(),
+      $uuidA,
     ]);
     $entities = $resolverArray();
 

@@ -19,8 +19,9 @@ class GraphqlFileValidationTestSubscriber implements EventSubscriberInterface {
    *   The event.
    */
   public function onFileValidation(FileValidationEvent $event): void {
-    if (!file_exists($event->file->getFileUri())) {
-      throw new \Exception('File does not exist during validation: ' . $event->file->getFileUri());
+    $uri = $event->file->getFileUri();
+    if ($uri === NULL || !file_exists($uri)) {
+      throw new \Exception('File does not exist during validation: ' . ($uri ?? '(no URI)'));
     }
   }
 

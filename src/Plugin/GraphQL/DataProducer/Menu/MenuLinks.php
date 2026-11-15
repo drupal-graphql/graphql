@@ -45,11 +45,11 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('menu.link_tree')
     );
   }
@@ -59,20 +59,20 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   * @param array $pluginDefinition
+   * @param array $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
    *   The menu link tree service.
    */
   public function __construct(
     array $configuration,
-    string $pluginId,
-    array $pluginDefinition,
+    string $plugin_id,
+    array $plugin_definition,
     protected MenuLinkTreeInterface $menuLinkTree,
   ) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
@@ -89,7 +89,11 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
   public function resolve(MenuInterface $menu, FieldContext $context): array {
     // Ensure the cache is invalidated when the menu changes.
     $context->addCacheableDependency($menu);
-    $tree = $this->menuLinkTree->load($menu->id(), new MenuTreeParameters());
+    $id = $menu->id();
+    if ($id === NULL) {
+      return [];
+    }
+    $tree = $this->menuLinkTree->load($id, new MenuTreeParameters());
 
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
@@ -98,7 +102,7 @@ class MenuLinks extends DataProducerPluginBase implements ContainerFactoryPlugin
 
     return array_filter($this->menuLinkTree->transform($tree, $manipulators), static function (MenuLinkTreeElement $item) use ($context) {
       $context->addCacheableDependency($item->access);
-      return $item->link->isEnabled() && $item->access->isAllowed();
+      return $item->link->isEnabled() && $item->access !== NULL && $item->access->isAllowed();
     });
   }
 

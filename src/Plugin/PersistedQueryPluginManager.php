@@ -10,6 +10,8 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Collects persisted queries that are defined as plugins.
+ *
+ * @method \Drupal\graphql\Plugin\PersistedQueryPluginInterface createInstance($plugin_id, array $configuration = [])
  */
 class PersistedQueryPluginManager extends DefaultPluginManager {
 

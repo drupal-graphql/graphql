@@ -19,14 +19,15 @@ class VoyagerMenuLinkDeriver extends DeriverBase {
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($basePluginDefinition) {
+  public function getDerivativeDefinitions($base_plugin_definition) {
+    assert(is_array($base_plugin_definition));
     $servers = array_keys(Server::loadMultiple());
 
     foreach ($servers as $id) {
       $this->derivatives[$id] = [
         'route_name' => "graphql.voyager.$id",
         'parent' => 'entity.graphql_server.collection',
-      ] + $basePluginDefinition;
+      ] + $base_plugin_definition;
     }
 
     return $this->derivatives;

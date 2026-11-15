@@ -41,6 +41,7 @@ class QueryConnection {
    * Returns a callback that resolves in a deferred fashion.
    */
   public function items(): array|Deferred {
+    /** @var array<array-key, int|string> $result */
     $result = $this->query->execute();
     if (empty($result)) {
       return [];

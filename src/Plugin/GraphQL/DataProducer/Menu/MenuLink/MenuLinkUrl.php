@@ -42,11 +42,11 @@ class MenuLinkUrl extends DataProducerPluginBase implements ContainerFactoryPlug
    *
    * @codeCoverageIgnore
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('language_manager')
     );
   }
@@ -56,11 +56,11 @@ class MenuLinkUrl extends DataProducerPluginBase implements ContainerFactoryPlug
    */
   public function __construct(
     array $configuration,
-    string $pluginId,
-    array $pluginDefinition,
+    string $plugin_id,
+    array $plugin_definition,
     protected LanguageManagerInterface $languageManager,
   ) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**

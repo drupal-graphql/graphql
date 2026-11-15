@@ -52,7 +52,13 @@ class SubrequestExtractionController extends ControllerBase {
    */
   public function extract(): SubRequestResponse {
     $request = $this->requestStack->getCurrentRequest();
+    if ($request === NULL) {
+      throw new \LogicException('Subrequest extraction requires a current request.');
+    }
     $callback = $request->attributes->get('_graphql_subrequest');
+    if (!is_callable($callback)) {
+      throw new \LogicException('The GraphQL subrequest callback is missing or invalid.');
+    }
 
     $metadata = new CacheableMetadata();
     $response = new SubRequestResponse($callback($metadata));

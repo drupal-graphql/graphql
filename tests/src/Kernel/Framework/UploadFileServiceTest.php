@@ -6,6 +6,7 @@ namespace Drupal\Tests\graphql\Kernel\Framework;
 
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
+use Drupal\file\FileInterface;
 use Drupal\graphql\GraphQL\Utility\FileUpload;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
@@ -73,8 +74,10 @@ class UploadFileServiceTest extends GraphQLTestBase {
       'file_directory' => 'test',
     ]);
     $file_entity = $file_upload_response->getFileEntity();
-    $this->assertSame('public://test/test.txt', $file_entity->getFileUri());
-    $this->assertFileExists($file_entity->getFileUri());
+    $this->assertInstanceOf(FileInterface::class, $file_entity);
+    $uri = $file_entity->getFileUri();
+    $this->assertSame('public://test/test.txt', $uri);
+    $this->assertFileExists($uri);
   }
 
   /**
@@ -170,6 +173,7 @@ class UploadFileServiceTest extends GraphQLTestBase {
       'max_resolution' => '5x5',
     ]);
     $file_entity = $file_upload_response->getFileEntity();
+    $this->assertInstanceOf(FileInterface::class, $file_entity);
     $image = \Drupal::service('image.factory')->get($file_entity->getFileUri());
     $this->assertSame(5, $image->getWidth());
     $this->assertSame(5, $image->getHeight());
@@ -213,9 +217,11 @@ class UploadFileServiceTest extends GraphQLTestBase {
       'file_directory' => 'test',
     ]);
     $file_entity = $file_upload_response->getFileEntity();
+    $this->assertInstanceOf(FileInterface::class, $file_entity);
 
-    $this->assertSame('public://test/test.php_.txt', $file_entity->getFileUri());
-    $this->assertFileExists($file_entity->getFileUri());
+    $uri = $file_entity->getFileUri();
+    $this->assertSame('public://test/test.php_.txt', $uri);
+    $this->assertFileExists($uri);
   }
 
   /**
@@ -301,9 +307,10 @@ class UploadFileServiceTest extends GraphQLTestBase {
     // There must be three file entities.
     $file_entities = $file_upload_response->getFileEntities();
     $this->assertCount(3, $file_entities);
-    foreach ($file_entities as $index => $file_entity) {
-      $this->assertSame('public://test/test' . ($index + 1) . '.txt', $file_entity->getFileUri());
-      $this->assertFileExists($file_entity->getFileUri());
+    foreach (array_values($file_entities) as $index => $file_entity) {
+      $uri = $file_entity->getFileUri();
+      $this->assertSame('public://test/test' . ($index + 1) . '.txt', $uri);
+      $this->assertFileExists($uri);
     }
   }
 

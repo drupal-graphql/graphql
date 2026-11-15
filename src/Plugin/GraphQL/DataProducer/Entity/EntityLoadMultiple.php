@@ -106,6 +106,23 @@ class EntityLoadMultiple extends DataProducerPluginBase implements ContainerFact
 
   /**
    * Resolver.
+   *
+   * @param string $type
+   *   The entity type ID.
+   * @param array<array-key, int|string|null> $ids
+   *   The entity IDs to load.
+   * @param string|null $language
+   *   The requested language.
+   * @param array<string>|null $bundles
+   *   The allowed bundles.
+   * @param bool $access
+   *   Whether to check entity access.
+   * @param \Drupal\Core\Session\AccountInterface|null $accessUser
+   *   The account to check access for.
+   * @param string|null $accessOperation
+   *   The access operation.
+   * @param \Drupal\graphql\GraphQL\Execution\FieldContext $context
+   *   The cache metadata context.
    */
   public function resolve(string $type, array $ids, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, ?string $accessOperation, FieldContext $context): Deferred {
     // Remove any NULL IDs.

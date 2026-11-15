@@ -44,6 +44,7 @@ class MenuLinkAttribute extends DataProducerPluginBase {
     $options = $link->getOptions();
     // Certain attributes like class can be arrays. Check for that and implode
     // them.
+    /** @var string|array<string>|null $attributeValue */
     $attributeValue = NestedArray::getValue(
       $options,
       ['attributes', $attribute]

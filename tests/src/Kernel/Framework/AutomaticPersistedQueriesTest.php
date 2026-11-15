@@ -51,10 +51,10 @@ class AutomaticPersistedQueriesTest extends GraphQLTestBase {
     $this->setUpSchema($schema);
     $this->mockResolver('Query', 'field_one', 'this is the field one');
 
-    /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.persisted_query');
 
-    $this->pluginApq = $manager->createInstance('automatic_persisted_query');
+    $plugin = $manager->createInstance('automatic_persisted_query');
+    $this->pluginApq = $plugin;
   }
 
   /**

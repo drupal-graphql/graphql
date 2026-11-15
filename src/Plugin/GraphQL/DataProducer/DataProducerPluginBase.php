@@ -27,6 +27,7 @@ abstract class DataProducerPluginBase extends PluginBase implements DataProducer
    * {@inheritdoc}
    */
   public function getContextDefinitions() {
+    /** @var array{consumes?: array<string, \Drupal\Core\Plugin\Context\ContextDefinitionInterface>} $definition */
     $definition = $this->getPluginDefinition();
     return !empty($definition['consumes']) ? $definition['consumes'] : [];
   }
@@ -54,10 +55,7 @@ abstract class DataProducerPluginBase extends PluginBase implements DataProducer
     }
     $populateDefaultValues = $this->configuration['dataproducer_populate_default_values'] ?? TRUE;
     $context = $populateDefaultValues ? $this->getContextValuesWithDefaults() : $this->getContextValues();
-    return call_user_func_array(
-      [$this, 'resolve'],
-      array_values(array_merge($context, [$field]))
-    );
+    return $this->resolve(...array_values(array_merge($context, [$field])));
   }
 
   /**

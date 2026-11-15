@@ -40,6 +40,7 @@ trait EntityReferenceTrait {
    *   The list of references entities.
    */
   protected function getReferencedEntities(string $type, ?string $language, ?array $bundles, bool $access, ?AccountInterface $accessUser, string $accessOperation, \Closure $resolver, FieldContext $context): array {
+    /** @var array<\Drupal\Core\Entity\EntityInterface> $entities */
     $entities = $resolver() ?: [];
 
     if (isset($bundles)) {

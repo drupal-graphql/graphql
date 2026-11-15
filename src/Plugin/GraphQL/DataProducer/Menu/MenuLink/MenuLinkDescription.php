@@ -36,6 +36,7 @@ class MenuLinkDescription extends DataProducerPluginBase {
    * Resolver.
    */
   public function resolve(MenuLinkInterface $link): string {
+    // @mago-expect analysis:redundant-cast
     return (string) $link->getDescription();
   }
 

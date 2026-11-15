@@ -37,10 +37,10 @@ class ArticleResponseArticle extends DataProducerPluginBase {
    * @param \Drupal\graphql_composable\GraphQL\Response\ArticleResponse $response
    *   The response.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   The article.
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The article, or NULL if the response has no article.
    */
-  public function resolve(ArticleResponse $response): EntityInterface {
+  public function resolve(ArticleResponse $response): ?EntityInterface {
     return $response->article();
   }
 

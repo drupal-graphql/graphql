@@ -27,6 +27,7 @@ use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Server\Helper;
 use GraphQL\Server\OperationParams;
+use GraphQL\Server\RequestError;
 use GraphQL\Server\ServerConfig;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Validator\DocumentValidator;
@@ -192,7 +193,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Persisted query plugin instances available on this server.
    *
-   * @var array|null
+   * @var array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface>|null
    */
   protected ?array $persisted_query_instances = NULL;
 
@@ -215,6 +216,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
     try {
       $config = $this->configuration();
+      /** @var \GraphQL\Executor\ExecutionResult $result */
       $result = (new Helper())->executeOperation($config, $operation);
 
       // In case execution fails before the execution stage, we have to wrap the
@@ -352,10 +354,10 @@ class Server extends ConfigEntityBase implements ServerInterface {
    * @param \Drupal\graphql\GraphQL\ResolverRegistryInterface $registry
    *   The resolver registry.
    *
-   * @return callable|null
+   * @return callable
    *   The default field resolver.
    */
-  protected function getFieldResolver(ResolverRegistryInterface $registry): ?callable {
+  protected function getFieldResolver(ResolverRegistryInterface $registry): callable {
     return static function ($value, array $args, ResolveContext $context, ResolveInfo $info) use ($registry) {
       $field = new FieldContext($context, $info);
       $result = $registry->resolveField($value, $args, $context, $info, $field);
@@ -411,7 +413,9 @@ class Server extends ConfigEntityBase implements ServerInterface {
 
     /** @var \Drupal\graphql\Plugin\PersistedQueryPluginManager $plugin_manager */
     $plugin_manager = \Drupal::service('plugin.manager.graphql.persisted_query');
-    $definition_ids = array_keys($plugin_manager->getDefinitions());
+    /** @var array<string, array> $definitions */
+    $definitions = $plugin_manager->getDefinitions();
+    $definition_ids = array_keys($definitions);
     $persisted_queries_settings = $this->get('persisted_queries_settings');
     foreach ($definition_ids as $id) {
       if (isset($persisted_queries_settings[$id])) {
@@ -429,11 +433,11 @@ class Server extends ConfigEntityBase implements ServerInterface {
   /**
    * Returns a callable for loading persisted queries.
    *
-   * @return callable
+   * @return callable(string, \GraphQL\Server\OperationParams): string
    *   The persisted query loader.
    */
   protected function getPersistedQueryLoader(): callable {
-    return function ($id, OperationParams $params) {
+    return function (string $id, OperationParams $params): string {
       $sortedPersistedQueryInstances = $this->getPersistedQueryInstances();
       if (!empty($sortedPersistedQueryInstances)) {
         foreach ($sortedPersistedQueryInstances as $persistedQueryInstance) {
@@ -443,6 +447,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
           }
         }
       }
+      throw new RequestError('PersistedQueryNotFound');
     };
   }
 
@@ -471,7 +476,7 @@ class Server extends ConfigEntityBase implements ServerInterface {
    *
    * @endcode
    *
-   * @return array|callable
+   * @return array<\GraphQL\Validator\Rules\ValidationRule>|(callable(\GraphQL\Server\OperationParams, \GraphQL\Language\AST\DocumentNode, string): array<\GraphQL\Validator\Rules\ValidationRule>)
    *   The validation rules or a callable factory.
    */
   protected function getValidationRules(): array|callable {

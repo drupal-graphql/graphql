@@ -76,12 +76,12 @@ class ServerForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $formState): array {
-    $form = parent::form($form, $formState);
+  public function form(array $form, FormStateInterface $form_state): array {
+    $form = parent::form($form, $form_state);
     /** @var \Drupal\graphql\Entity\ServerInterface $server */
     $server = $this->entity;
     $this->buildIdentityFields($form, $server);
-    $this->buildSchemaFields($form, $formState, $server);
+    $this->buildSchemaFields($form, $form_state, $server);
     $this->buildRequestFields($form, $server);
     $this->buildValidationFields($form, $server);
     $this->buildDebugField($form, $server);
@@ -106,7 +106,7 @@ class ServerForm extends EntityForm {
       $form['#title'] = $this->t('Add server');
     }
     else {
-      $form['#title'] = $this->t('Edit %label server', ['%label' => $server->label()]);
+      $form['#title'] = $this->t('Edit %label server', ['%label' => $server->label() ?? '']);
     }
 
     $form['label'] = [
@@ -133,15 +133,16 @@ class ServerForm extends EntityForm {
   /**
    * Builds the schema selector and its plugin configuration fields.
    */
-  protected function buildSchemaFields(array &$form, FormStateInterface $formState, ServerInterface $server): void {
+  protected function buildSchemaFields(array &$form, FormStateInterface $form_state, ServerInterface $server): void {
     $schemas = array_map(static function ($definition) {
       return $definition['name'] ?? $definition['id'];
     }, $this->schemaManager->getDefinitions());
     $schema_keys = array_keys($schemas);
 
-    $input = $formState->getUserInput();
+    $input = $form_state->getUserInput();
     // Use the schema selected by the user, the one configured, or fall back to
     // the first schema that is defined.
+    /** @var string|false $schema */
     $schema = ($input['schema'] ?? $server->get('schema')) ?: reset($schema_keys);
 
     $form['schema'] = [
@@ -168,7 +169,7 @@ class ServerForm extends EntityForm {
 
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $schema ? $this->schemaManager->createInstance($schema) : NULL;
-    if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
+    if ($schema !== FALSE && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
       $instance->setConfiguration($server->get('schema_configuration')[$schema] ?? []);
 
       $form['schema_configuration'][$schema] = [
@@ -177,7 +178,7 @@ class ServerForm extends EntityForm {
         '#tree' => TRUE,
       ];
 
-      $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $formState);
+      $form['schema_configuration'][$schema] += $instance->buildConfigurationForm([], $form_state);
     }
   }
 
@@ -271,6 +272,7 @@ class ServerForm extends EntityForm {
   protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state): void {
     // Translate the debug flag from individual checkboxes to the enum value
     // that the GraphQL library expects.
+    /** @var array<int, int|numeric-string>|int $debug_flag */
     $debug_flag = $form_state->getValue('debug_flag');
     if (is_array($debug_flag)) {
       $form_state->setValue('debug_flag', array_sum($debug_flag));
@@ -292,8 +294,8 @@ class ServerForm extends EntityForm {
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function validateForm(array &$form, FormStateInterface $formState): void {
-    $endpoint = &$formState->getValue('endpoint');
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $endpoint = &$form_state->getValue('endpoint');
 
     // Trim the submitted value of whitespace and slashes. Ensure to not trim
     // the slash on the left side.
@@ -302,17 +304,18 @@ class ServerForm extends EntityForm {
     // endpoint has been entered yet, to avoid showing this error message during
     // AJAX requests that do a partial form update.
     if (!empty($endpoint) && $endpoint[0] !== '/') {
-      $formState->setErrorByName('endpoint', 'The endpoint path has to start with a forward slash.');
+      $form_state->setErrorByName('endpoint', $this->t('The endpoint path has to start with a forward slash.'));
     }
     elseif (!UrlHelper::isValid($endpoint)) {
-      $formState->setErrorByName('endpoint', 'The endpoint path contains invalid characters.');
+      $form_state->setErrorByName('endpoint', $this->t('The endpoint path contains invalid characters.'));
     }
 
-    $schema = $formState->getValue('schema');
+    /** @var string $schema */
+    $schema = $form_state->getValue('schema');
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if (!empty($form['schema_configuration'][$schema]) && $instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
-      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $form_state);
       $instance->validateConfigurationForm($form['schema_configuration'][$schema], $state);
     }
   }
@@ -320,14 +323,15 @@ class ServerForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $formState): void {
-    parent::submitForm($form, $formState);
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    parent::submitForm($form, $form_state);
 
-    $schema = $formState->getValue('schema');
+    /** @var string $schema */
+    $schema = $form_state->getValue('schema');
     /** @var \Drupal\graphql\Plugin\SchemaPluginInterface $instance */
     $instance = $this->schemaManager->createInstance($schema);
     if ($instance instanceof PluginFormInterface && $instance instanceof ConfigurableInterface) {
-      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $formState);
+      $state = SubformState::createForSubform($form['schema_configuration'][$schema], $form, $form_state);
       $instance->submitConfigurationForm($form['schema_configuration'][$schema], $state);
     }
   }
@@ -337,14 +341,14 @@ class ServerForm extends EntityForm {
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function save(array $form, FormStateInterface $formState) {
-    $save_result = parent::save($form, $formState);
+  public function save(array $form, FormStateInterface $form_state) {
+    $save_result = parent::save($form, $form_state);
 
     $this->messenger()->addMessage($this->t('Saved the %label server.', [
-      '%label' => $this->entity->label(),
+      '%label' => $this->entity->label() ?? '',
     ]));
 
-    $formState->setRedirect('entity.graphql_server.collection');
+    $form_state->setRedirect('entity.graphql_server.collection');
     return $save_result;
   }
 

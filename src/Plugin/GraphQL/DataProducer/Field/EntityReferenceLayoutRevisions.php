@@ -149,17 +149,19 @@ class EntityReferenceLayoutRevisions extends DataProducerPluginBase implements C
     }
 
     $definition = $entity->getFieldDefinition($field);
+    if ($definition === NULL) {
+      return [];
+    }
     if ($definition->getType() !== 'entity_reference_layout_revisioned') {
       return [];
     }
 
-    $definition = $entity->getFieldDefinition($field);
     $type = $definition->getSetting('target_type');
     $values = $entity->get($field);
     if ($values instanceof EntityReferenceFieldItemListInterface) {
-      $vids = array_map(static function ($value) {
-        return $value['target_revision_id'];
-      }, $values->getValue());
+      /** @var array<array{target_revision_id: int|string}> $references */
+      $references = $values->getValue();
+      $vids = array_column($references, 'target_revision_id');
 
       $resolver = $this->entityRevisionBuffer->add($type, $vids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {

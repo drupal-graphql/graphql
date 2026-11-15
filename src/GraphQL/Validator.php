@@ -107,7 +107,7 @@ class Validator implements ValidatorInterface {
     $orphaned_resolvers = [];
     /**
      * @var string $type_name
-     * @var array $fields
+     * @var array<string, \Drupal\graphql\GraphQL\Resolver\ResolverInterface> $fields
      */
     foreach ($resolver_registry->getAllFieldResolvers() as $type_name => $fields) {
       if (in_array($type_name, $ignore_types, TRUE)) {

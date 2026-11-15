@@ -75,6 +75,7 @@ ignore = [
   "mixed-argument",
   # We use mixed array types all over the place in Drupal, probably not fixable.
   "mixed-array-access",
+  "mixed-array-assignment",
   # We do mixed assignments all the time in Drupal, is this even solvable?
   "mixed-assignment",
   "mixed-operand",
@@ -83,6 +84,10 @@ ignore = [
   # We need to support attributes between different Drupal versions that might
   # not exist.
   "non-existent-attribute-class",
+  # In test code we don't care about possibly false arguments.
+  { code = "possibly-false-argument", in = [
+    "tests/",
+  ] },
   "redundant-docblock-type",
   # Same container service problem as for "ambiguous-object-method-access".
   #"possible-method-access-on-null",

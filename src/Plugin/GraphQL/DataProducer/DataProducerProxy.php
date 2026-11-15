@@ -61,10 +61,10 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Create a new data producer proxy.
    *
-   * @return mixed
+   * @return \Drupal\graphql\Plugin\GraphQL\DataProducer\DataProducerProxy
    *   A new data producer proxy instance created via the plugin manager.
    */
-  public static function create(string $id, array $mapping = [], array $config = []): mixed {
+  public static function create(string $id, array $mapping = [], array $config = []): DataProducerProxy {
     $manager = \Drupal::service('plugin.manager.graphql.data_producer');
     return $manager->proxy($id, $mapping, $config);
   }
@@ -144,13 +144,19 @@ class DataProducerProxy implements ResolverInterface {
     }
 
     $values = DeferredUtility::waitAll($values);
-    return DeferredUtility::returnFinally($values, static function ($values) use ($plugin) {
-      foreach ($values as $name => $value) {
-        $plugin->setContextValue($name, $value);
-      }
+    return DeferredUtility::returnFinally(
+      $values,
+      /**
+       * @param array<string, scalar|array|object|null> $values
+       */
+      static function (array $values) use ($plugin) {
+        foreach ($values as $name => $value) {
+          $plugin->setContextValue($name, $value);
+        }
 
-      return $plugin;
-    });
+        return $plugin;
+      },
+    );
   }
 
   /**
@@ -199,7 +205,7 @@ class DataProducerProxy implements ResolverInterface {
   /**
    * Cache lookup.
    *
-   * @return array|null
+   * @return array{scalar|array|object|null, \Drupal\Core\Cache\CacheableMetadata}|null
    *   The cached data containing value and metadata, or NULL if no cache entry
    *   found.
    */
@@ -208,8 +214,10 @@ class DataProducerProxy implements ResolverInterface {
       $keys = !empty($cache->data) ? $this->contextsManager->convertTokensToKeys($cache->data)->getKeys() : [];
       $keys = serialize($keys);
 
-      if (($cache = $this->cacheBackend->get("$prefix:result:$keys")) && $data = $cache->data) {
-        return $data;
+      $cache = $this->cacheBackend->get("$prefix:result:$keys");
+      if ($cache && $cache->data) {
+        /** @var array{scalar|array|object|null, \Drupal\Core\Cache\CacheableMetadata} */
+        return $cache->data;
       }
     }
 

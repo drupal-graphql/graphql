@@ -72,10 +72,10 @@ GQL;
         ->map('entity', $this->builder->fromParent())
     );
 
-    /** @var \Drupal\graphql\Plugin\DataProducerPluginManager $manager */
     $manager = $this->container->get('plugin.manager.graphql.persisted_query');
 
-    $this->pluginApq = $manager->createInstance('automatic_persisted_query');
+    $plugin = $manager->createInstance('automatic_persisted_query');
+    $this->pluginApq = $plugin;
   }
 
   /**
@@ -114,7 +114,7 @@ GQL;
     $idQuery = 'query($id: String!) { node(id: $id) { id } }';
 
     // Post query to endpoint to register the query hashes.
-    $extensions['persistedQuery']['sha256Hash'] = hash('sha256', $titleQuery);
+    $extensions = ['persistedQuery' => ['sha256Hash' => hash('sha256', $titleQuery)]];
     $variables = ['id' => '2'];
     $result = $this->query($titleQuery, $this->server, $variables, $extensions, FALSE, Request::METHOD_POST);
     $this->assertSame(200, $result->getStatusCode());

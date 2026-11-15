@@ -87,7 +87,9 @@ class DirectiveTest extends GraphQLTestBase {
 
     $directive = $schema->getDirective('exampleDirective');
     $this->assertNotNull($directive);
-    $field = $schema->getQueryType()->getField('node');
+    $query = $schema->getQueryType();
+    $this->assertNotNull($query);
+    $field = $query->getField('node');
     $this->assertHasDirective($directive, $field);
   }
 
@@ -112,7 +114,9 @@ class DirectiveTest extends GraphQLTestBase {
 
     $directive = $schema->getDirective('exampleDirective');
     $this->assertNotNull($directive);
-    $field = $schema->getQueryType()->getField('nodeExtended');
+    $query = $schema->getQueryType();
+    $this->assertNotNull($query);
+    $field = $query->getField('nodeExtended');
     $this->assertHasDirective($directive, $field);
   }
 
@@ -127,7 +131,7 @@ class DirectiveTest extends GraphQLTestBase {
   public function assertHasDirective(Directive $directive, FieldDefinition|ObjectType $node): void {
     $this->assertNotNull($node->astNode);
     $hasAny = Values::getDirectiveValues($directive, $node->astNode) !== NULL;
-    foreach ($node->extensionASTNodes ?? [] as $extensionASTNode) {
+    foreach ($node instanceof ObjectType ? $node->extensionASTNodes : [] as $extensionASTNode) {
       if (Values::getDirectiveValues($directive, $extensionASTNode) !== NULL) {
         $hasAny = TRUE;
       }

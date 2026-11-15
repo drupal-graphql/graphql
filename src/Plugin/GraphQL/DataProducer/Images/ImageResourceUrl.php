@@ -31,6 +31,9 @@ class ImageResourceUrl extends DataProducerPluginBase {
 
   /**
    * Simply checks the url property in a given derivative result.
+   *
+   * @param array{url?: string} $derivative
+   *   The image derivative result.
    */
   public function resolve(array $derivative): string {
     return $derivative['url'] ?? '';

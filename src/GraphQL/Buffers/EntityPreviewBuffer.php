@@ -9,6 +9,8 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Entity preview buffer for GraphQL.
+ *
+ * @extends BufferBase<array<array-key, int|string>|int|string>
  */
 class EntityPreviewBuffer extends BufferBase {
 
@@ -49,7 +51,7 @@ class EntityPreviewBuffer extends BufferBase {
    *
    * @param string $type
    *   The entity type of the given entity ids.
-   * @param array|int|string $uuid
+   * @param array<array-key, int|string>|int|string $uuid
    *   The entity uuid(s) to load.
    *
    * @return \Closure
@@ -68,19 +70,29 @@ class EntityPreviewBuffer extends BufferBase {
    * {@inheritdoc}
    */
   protected function getBufferId($item): string {
-    return $item['type'] . '_preview';
+    /** @var string $type */
+    $type = $item['type'];
+    return $type . '_preview';
   }
 
   /**
    * {@inheritdoc}
    */
   public function resolveBufferArray(array $buffer): array {
-    $type = reset($buffer)['type'];
+    /** @var array<array-key, \ArrayObject<string, array<array-key, int|string>|int|string>> $items */
+    $items = $buffer;
+    if ($items === []) {
+      return [];
+    }
+    /** @var string $type */
+    $type = reset($items)['type'];
     $uuids = array_map(static function (\ArrayObject $item) {
-      return (array) $item['uuid'];
-    }, $buffer);
+      /** @var array<array-key, int|string>|int|string $ids */
+      $ids = $item['uuid'];
+      return (array) $ids;
+    }, $items);
 
-    $uuids = call_user_func_array('array_merge', $uuids);
+    $uuids = array_merge(...array_values($uuids));
     $uuids = array_values(array_unique($uuids));
 
     $entities = [];
@@ -104,7 +116,7 @@ class EntityPreviewBuffer extends BufferBase {
       }
 
       return $entities[$item['uuid']] ?? NULL;
-    }, $buffer);
+    }, $items);
   }
 
   /**

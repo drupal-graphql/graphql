@@ -11,6 +11,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\graphql\Attribute\Schema;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
+use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use GraphQL\Language\Source;
 use GraphQL\Language\SourceLocation;
 
@@ -36,7 +37,8 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
    * {@inheritdoc}
    */
   protected function getExtensions(): array {
-    $extensions = array_map(function ($id) {
+    $extensions = array_map(function ($id): SchemaExtensionPluginInterface {
+      /** @var \Drupal\graphql\Plugin\SchemaExtensionPluginInterface */
       return $this->extensionManager->createInstance($id);
     }, array_filter($this->getConfiguration()['extensions']));
 
@@ -111,14 +113,14 @@ class ComposableSchema extends SdlSchemaPluginBase implements ConfigurableInterf
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $formState): void {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
     // @todo Validate dependencies between extensions.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $formState): void {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     // Nothing to do here.
   }
 

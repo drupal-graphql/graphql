@@ -150,16 +150,19 @@ class EntityReference extends DataProducerPluginBase implements ContainerFactory
     }
 
     $definition = $entity->getFieldDefinition($field);
+    if ($definition === NULL) {
+      return [];
+    }
     $type = $definition->getSetting('target_type');
     $values = $entity->get($field);
     if ($values instanceof EntityReferenceFieldItemListInterface) {
-      $ids = array_map(static function ($value) {
-        return $value['target_id'];
-      }, $values->getValue());
+      /** @var array<array{target_id: int|string}> $references */
+      $references = $values->getValue();
+      $ids = array_column($references, 'target_id');
 
       $resolver = $this->entityBuffer->add($type, $ids);
       return new Deferred(function () use ($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context) {
-        return $this->getReferencedEntities($type, $language, $bundles, $access, $accessUser, $accessOperation, $resolver, $context);
+        return $this->getReferencedEntities($type, $language, $bundles, $access ?? TRUE, $accessUser, $accessOperation ?? 'view', $resolver, $context);
       });
     }
 

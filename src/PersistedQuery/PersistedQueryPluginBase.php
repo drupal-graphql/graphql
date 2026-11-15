@@ -37,26 +37,27 @@ abstract class PersistedQueryPluginBase extends PluginBase implements PersistedQ
    * {@inheritdoc}
    */
   public function label(): string {
+    /** @var array{label: string|\Stringable, description?: string|\Stringable} $plugin_definition */
     $plugin_definition = $this->getPluginDefinition();
-    return $plugin_definition['label'];
+    return (string) $plugin_definition['label'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription(): string {
+    /** @var array{label: string|\Stringable, description?: string|\Stringable} $plugin_definition */
     $plugin_definition = $this->getPluginDefinition();
-    return $plugin_definition['description'] ?? '';
+    return (string) ($plugin_definition['description'] ?? '');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWeight(): int {
-    if (isset($this->configuration['weight'])) {
-      return $this->configuration['weight'];
-    }
-    return 0;
+    /** @var array{weight?: int} $configuration */
+    $configuration = $this->configuration;
+    return $configuration['weight'] ?? 0;
   }
 
   /**

@@ -117,7 +117,7 @@ class CustomScalarTest extends GraphQLTestBase {
 
     $this->registry->addCustomScalar(
       "NotSerializable",
-      new class implements CustomScalarInterface {
+      new /** @implements CustomScalarInterface<string|array{string, string}> */ class implements CustomScalarInterface {
 
         /**
          * {@inheritdoc}
@@ -135,6 +135,9 @@ class CustomScalarTest extends GraphQLTestBase {
 
         /**
          * {@inheritdoc}
+         *
+         * @return array{string, string}
+         *   The parsed test tuple.
          */
         public function parseLiteral(Node $valueNode, ?array $variables = NULL): array {
           return ['bar', 'foo'];

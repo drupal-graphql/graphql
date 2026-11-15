@@ -13,7 +13,6 @@ use Drupal\Tests\graphql\Traits\HttpRequestTrait;
 use Drupal\Tests\graphql\Traits\MockingTrait;
 use Drupal\Tests\graphql\Traits\QueryFileTrait;
 use Drupal\Tests\graphql\Traits\QueryResultAssertionTrait;
-use Drupal\Tests\graphql\Traits\SchemaPrinterTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\graphql\Cache\RequestPolicy\GetOnly;
 use Drupal\graphql\Entity\ServerInterface;
@@ -29,7 +28,6 @@ abstract class GraphQLTestBase extends KernelTestBase {
   use HttpRequestTrait;
   use QueryFileTrait;
   use QueryResultAssertionTrait;
-  use SchemaPrinterTrait;
   use MockingTrait;
   use UserCreationTrait;
   use ProphecyTrait;

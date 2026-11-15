@@ -71,6 +71,7 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
     $schemaPlugin = $this->getMockedSchemaPlugin($registry, $extensions);
     $schemaPlugin->getSchema();
     $resolver = $registry->getFieldResolver('TestType', 'pluginId');
+    $this->assertInstanceOf(ResolverInterface::class, $resolver);
     $result = $this->resolve($resolver);
     $this->assertEquals($expected_result, $result);
   }
@@ -160,7 +161,9 @@ class SchemaExtensionPluginPriorityTest extends GraphQLTestBase {
     $fieldContext = $this->getMockBuilder(FieldContext::class)
       ->disableOriginalConstructor()
       ->getMock();
-    return $resolver->resolve(NULL, [], $resolveContext, $resolveInfo, $fieldContext);
+    $result = $resolver->resolve(NULL, [], $resolveContext, $resolveInfo, $fieldContext);
+    $this->assertIsString($result);
+    return $result;
   }
 
 }

@@ -81,6 +81,7 @@ class SchemaExtensionPluginManager extends DefaultPluginManager {
   public function getExtensions(string $id): array {
     if (!isset($this->extensions[$id])) {
       $this->extensions[$id] = array_map(function ($definition) {
+        /** @var \Drupal\graphql\Plugin\SchemaExtensionPluginInterface */
         return $this->createInstance($definition['id']);
       }, array_filter($this->getDefinitions(), static function ($definition) use ($id) {
         return $definition['schema'] === $id;

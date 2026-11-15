@@ -63,6 +63,7 @@ final class DetectBreakingChangesCommand extends Command {
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly LoggerInterface $logger,
     // This is needed by `FormatterTrait`.
+    // @mago-expect analysis:unused-property
     // @phpstan-ignore-next-line property.onlyWritten
     private readonly FormatterManager $formatterManager,
   ) {
@@ -96,7 +97,11 @@ final class DetectBreakingChangesCommand extends Command {
       throw new \InvalidArgumentException("GraphQL server does not have a schema.");
     }
 
-    $file = Path::makeAbsolute($input->getArgument('file'), getcwd());
+    $directory = getcwd();
+    if ($directory === FALSE) {
+      throw new \RuntimeException('The current working directory could not be determined.');
+    }
+    $file = Path::makeAbsolute($input->getArgument('file'), $directory);
     if (!file_exists($file)) {
       throw new \InvalidArgumentException("File '$file' does not exist.");
     }

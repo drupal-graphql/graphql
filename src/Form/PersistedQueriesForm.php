@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\graphql\Entity\ServerInterface;
 use Drupal\graphql\Plugin\PersistedQueryPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,16 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Admin form to set up persisted GraphQL queries.
  */
 class PersistedQueriesForm extends EntityForm {
-
-  /**
-   * The entity being used by this form.
-   *
-   * We cannot type-hint this property because it is defined in the parent
-   * class, hence the PHPCS ignore.
-   *
-   * @var \Drupal\graphql\Entity\ServerInterface
-   */
-  protected $entity; // phpcs:ignore
 
   /**
    * PersistedQueriesForm constructor.
@@ -60,8 +51,8 @@ class PersistedQueriesForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state): array {
     $form = parent::form($form, $form_state);
 
-    /** @var array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins */
-    $plugins = $this->entity->getPersistedQueryInstances();
+    /** @var array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins */
+    $plugins = $this->getServer()->getPersistedQueryInstances();
     $all_plugins = $this->getAllPersistedQueryPlugins();
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'graphql/persisted_queries';
@@ -86,9 +77,9 @@ class PersistedQueriesForm extends EntityForm {
    *
    * @param array $form
    *   The form array.
-   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
+   * @param array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
    *   Enabled plugin instances.
-   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
+   * @param array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
    *   All available plugin instances.
    */
   protected function buildEnabledPlugins(array &$form, array $plugins, array $all_plugins): void {
@@ -123,9 +114,9 @@ class PersistedQueriesForm extends EntityForm {
    *
    * @param array $form
    *   The form array.
-   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
+   * @param array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
    *   Enabled plugin instances.
-   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
+   * @param array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
    *   All available plugin instances.
    *
    * @return array<string, int>
@@ -151,11 +142,14 @@ class PersistedQueriesForm extends EntityForm {
     asort($plugins_weight);
     foreach ($plugins_weight as $id => $weight) {
       $plugin = $all_plugins[$id];
-      $form['weights']['order'][$id]['#attributes']['class'][] = 'draggable';
-      $form['weights']['order'][$id]['#attributes']['class'][] = 'persisted-queries-weight--' . Html::cleanCssIdentifier($id);
-      $form['weights']['order'][$id]['#weight'] = $weight;
-      $form['weights']['order'][$id]['label']['#plain_text'] = $plugin->label();
-      $form['weights']['order'][$id]['weight'] = [
+      $row = [
+        '#attributes' => [
+          'class' => ['draggable', 'persisted-queries-weight--' . Html::cleanCssIdentifier($id)],
+        ],
+        '#weight' => $weight,
+        'label' => ['#plain_text' => $plugin->label()],
+      ];
+      $row['weight'] = [
         '#type' => 'weight',
         '#title' => $this->t('Weight for persisted query plugin %title', ['%title' => $plugin->label()]),
         '#title_display' => 'invisible',
@@ -167,6 +161,7 @@ class PersistedQueriesForm extends EntityForm {
           ],
         ],
       ];
+      $form['weights']['order'][$id] = $row;
     }
     return $plugins_weight;
   }
@@ -178,9 +173,9 @@ class PersistedQueriesForm extends EntityForm {
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
-   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
+   * @param array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $plugins
    *   Enabled plugin instances.
-   * @param array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
+   * @param array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface> $all_plugins
    *   All available plugin instances.
    * @param array<string, int> $plugins_weight
    *   Plugin weights sorted in ascending order.
@@ -223,7 +218,7 @@ class PersistedQueriesForm extends EntityForm {
     $plugins = $this->getAllPersistedQueryPlugins();
     foreach ($plugins as $id => $plugin) {
       if (empty($values['enabled'][$id])) {
-        $this->entity->removePersistedQueryInstance($id);
+        $this->getServer()->removePersistedQueryInstance($id);
         continue;
       }
       if ($plugin instanceof PluginFormInterface) {
@@ -234,22 +229,35 @@ class PersistedQueriesForm extends EntityForm {
       if (isset($values['weights']['order'][$id]['weight'])) {
         $plugin->setWeight((int) $values['weights']['order'][$id]['weight']);
       }
-      $this->entity->addPersistedQueryInstance($plugin);
+      $this->getServer()->addPersistedQueryInstance($plugin);
     }
   }
 
   /**
    * Returns an array with all the available persisted query plugins.
    *
-   * @return array<\Drupal\graphql\Plugin\PersistedQueryPluginInterface>
+   * @return array<string, \Drupal\graphql\Plugin\PersistedQueryPluginInterface>
    *   All persisted query plugins available through plugins.
    */
   protected function getAllPersistedQueryPlugins(): array {
     $plugins = [];
-    foreach (array_keys($this->persistedQueryPluginManager->getDefinitions()) as $id) {
+    /** @var array<string, array> $definitions */
+    $definitions = $this->persistedQueryPluginManager->getDefinitions();
+    foreach (array_keys($definitions) as $id) {
       $plugins[$id] = $this->persistedQueryPluginManager->createInstance($id);
     }
     return $plugins;
+  }
+
+  /**
+   * Returns the server being configured.
+   */
+  protected function getServer(): ServerInterface {
+    $entity = $this->entity;
+    if (!$entity instanceof ServerInterface) {
+      throw new \LogicException('The persisted queries form requires a GraphQL server.');
+    }
+    return $entity;
   }
 
 }

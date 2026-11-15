@@ -19,8 +19,8 @@ class AlterSchemaDataEvent extends Event {
   /**
    * AlterSchemaDataEvent constructor.
    *
-   * @param array<string, \GraphQL\Language\AST\DocumentNode> $schemaData
-   *   The schema data, indexed by plugin ID.
+   * @param array<array-key, \GraphQL\Language\AST\DocumentNode> $schemaData
+   *   The schema data, keyed by plugin ID or extension index.
    */
   public function __construct(
     protected array $schemaData,
@@ -30,8 +30,8 @@ class AlterSchemaDataEvent extends Event {
   /**
    * Returns the schema data.
    *
-   * @return array<string, \GraphQL\Language\AST\DocumentNode>
-   *   The schema data, indexed by plugin ID.
+   * @return array<array-key, \GraphQL\Language\AST\DocumentNode>
+   *   The schema data, keyed by plugin ID or extension index.
    */
   public function getSchemaData(): array {
     return $this->schemaData;
@@ -40,8 +40,8 @@ class AlterSchemaDataEvent extends Event {
   /**
    * Sets the schema data.
    *
-   * @param array<string, \GraphQL\Language\AST\DocumentNode> $schemaData
-   *   The schema data, indexed by plugin ID.
+   * @param array<array-key, \GraphQL\Language\AST\DocumentNode> $schemaData
+   *   The schema data, keyed by plugin ID or extension index.
    */
   public function setSchemaData(array $schemaData): void {
     $this->schemaData = $schemaData;

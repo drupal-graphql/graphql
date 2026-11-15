@@ -44,7 +44,11 @@ class XMLContent extends DataProducerPluginBase {
         return $child->nodeValue;
       }
       elseif ($child instanceof \DOMElement) {
-        return $child->ownerDocument->saveXML($child);
+        $document = $child->ownerDocument;
+        if ($document === NULL) {
+          throw new \LogicException('The XML element has no owner document.');
+        }
+        return $document->saveXML($child);
       }
     }, iterator_to_array($dom->childNodes)));
   }

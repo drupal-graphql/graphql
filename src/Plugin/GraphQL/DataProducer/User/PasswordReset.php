@@ -121,11 +121,15 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     $flood_config = $this->configFactory->get('user.flood');
     $flood_event = 'graphql.password_reset_user';
     $flood_identifier = mb_strtolower($email);
-    if (!$this->userFloodControl->isAllowed($flood_event, $flood_config->get('user_limit'), $flood_config->get('user_window'), $flood_identifier)) {
+    /** @var int $limit */
+    $limit = $flood_config->get('user_limit');
+    /** @var int $window */
+    $window = $flood_config->get('user_window');
+    if (!$this->userFloodControl->isAllowed($flood_event, $limit, $window, $flood_identifier)) {
       $response->addViolation($this->t('Too many password reset attempts for this account. Please try again later.'));
       return $response;
     }
-    $this->userFloodControl->register($flood_event, $flood_config->get('user_window'), $flood_identifier);
+    $this->userFloodControl->register($flood_event, $window, $flood_identifier);
 
     $content = [
       'mail' => $email,
@@ -137,6 +141,9 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
     // control. The request body is the only thing (besides client's IP) which
     // is pulled from the request within controller.
     $current_request = $this->requestStack->getCurrentRequest();
+    if ($current_request === NULL) {
+      throw new \LogicException('Password reset requires a current request.');
+    }
     $url = Url::fromRoute('user.pass.http')->toString(TRUE);
     $metadata->addCacheableDependency($url);
     $auth_request = Request::create(
@@ -146,7 +153,7 @@ class PasswordReset extends DataProducerPluginBase implements ContainerFactoryPl
       $current_request->cookies->all(),
       [],
       $current_request->server->all(),
-      json_encode($content),
+      json_encode($content, JSON_THROW_ON_ERROR),
     );
     $auth_request->setRequestFormat('json');
 

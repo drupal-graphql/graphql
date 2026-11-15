@@ -149,6 +149,7 @@ class TaxonomyLoadTree extends DataProducerPluginBase implements ContainerFactor
       ->getStorage('taxonomy_term')
       ->loadTree($vid, $parent, $max_depth);
 
+    /** @var list<int|string> $term_ids */
     $term_ids = array_column($terms, 'tid');
     $resolver = $this->entityBuffer->add('taxonomy_term', $term_ids);
 

@@ -9,6 +9,7 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\graphql\GraphQL\Execution\ExecutionResult;
 use GraphQL\Server\OperationParams;
+use PHPUnit\Framework\Assert;
 
 /**
  * Trait for easier assertion on GraphQL query results.
@@ -111,7 +112,7 @@ trait QueryResultAssertionTrait {
    *   The query string.
    * @param array $variables
    *   The query variables.
-   * @param array $expected
+   * @param list<string> $expected
    *   The expected error messages.
    * @param \Drupal\Core\Cache\CacheableMetadata $metadata
    *   The expected cache metadata object.
@@ -147,7 +148,9 @@ trait QueryResultAssertionTrait {
    */
   private function assertResultData(ExecutionResult $result, mixed $expected): void {
     $data = $result->toArray();
-    $this->assertArrayHasKey('data', $data, 'No result data.');
+    if (!array_key_exists('data', $data)) {
+      Assert::fail('No result data.');
+    }
     $this->assertEquals($expected, $data['data'], 'Unexpected query result.');
   }
 
@@ -156,7 +159,7 @@ trait QueryResultAssertionTrait {
    *
    * @param \Drupal\graphql\GraphQL\Execution\ExecutionResult $result
    *   The query result object.
-   * @param array $expected
+   * @param list<string> $expected
    *   The list of expected error messages. Also allows regular expressions.
    *
    * @internal
@@ -186,8 +189,8 @@ trait QueryResultAssertionTrait {
         // Add error location information of the original error in the chain to
         // show developers where to look.
         $original_error = $error;
-        while ($original_error->getPrevious() !== NULL) {
-          $original_error = $original_error->getPrevious();
+        while (($previous = $original_error->getPrevious()) !== NULL) {
+          $original_error = $previous;
         }
         $unexpected[] = "Error message: {$error_message}\n  Originated in: {$original_error->getFile()}:{$original_error->getLine()}";
       }

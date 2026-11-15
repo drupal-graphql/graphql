@@ -4,20 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel;
 
-use Drupal\graphql\Entity\ServerInterface;
-use Drupal\graphql\GraphQL\ResolverRegistry;
-use Drupal\graphql\Plugin\GraphQL\Schema\ComposableSchema;
-use Drupal\graphql\Plugin\GraphQL\SchemaExtension\SdlSchemaExtensionPluginBase;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
-use Drupal\graphql\Plugin\SchemaPluginManager;
-use GraphQL\Language\Source;
+use GraphQL\Utils\SchemaPrinter;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Tests that the server configuration can be retrieved.
+ * Tests that composable schemas load each server's configured extensions.
  *
  * @group graphql
  */
@@ -46,18 +40,11 @@ class ServerConfigurationTest extends GraphQLTestBase {
   ];
 
   /**
-   * Test servers.
+   * Test servers keyed by their selected extension IDs.
    *
-   * @var array<\Drupal\graphql\Entity\ServerInterface>
+   * @var array<string, \Drupal\graphql\Entity\ServerInterface>
    */
-  protected array $servers;
-
-  /**
-   * Mocked schema extension plugins.
-   *
-   * @var array<\Drupal\graphql\Plugin\SchemaExtensionPluginInterface>
-   */
-  protected array $extensionPlugins;
+  protected array $servers = [];
 
   /**
    * {@inheritdoc}
@@ -65,134 +52,63 @@ class ServerConfigurationTest extends GraphQLTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $serverStorage = $this->container->get('entity_type.manager')->getStorage('graphql_server');
-
-    // Create two test servers which are using the same schema plugin
-    // (ComposableSchema) but configured with different extensions. This should
-    // result in a different schema for each server.
-    foreach (self::TEST_SCHEMAS as $id => $schema) {
-      $this->extensionPlugins[$id] = $this->mockSchemaExtensionPlugin($id, $schema);
-
-      $schemaConfiguration = ['composable' => ['extensions' => [$id => $id]]];
-      $this->createTestServer('composable', $id, ['schema_configuration' => $schemaConfiguration]);
-      $servers = $serverStorage->loadByProperties(['endpoint' => $id]);
-      $server = reset($servers);
-      if ($server instanceof ServerInterface) {
-        $this->servers[$id] = $server;
-      }
+    $extensions = [];
+    foreach (self::TEST_SCHEMAS as $id => $definition) {
+      $extensions[$id] = $this->mockSchemaExtension(
+        $id,
+        $definition,
+        "extend type Query { $id(uuid: String): " . ucfirst($id) . ' }',
+      );
     }
 
-    // Replace the schema plugin manager with a mocked version that returns the
-    // requested mocked schema extension plugins.
-    $schemaPluginManager = $this->mockPluginManager(array_keys(self::TEST_SCHEMAS));
-    $schemaPluginManager->method('createInstance')
-      ->willReturnCallback(fn ($pluginId, $pluginConfig) => match ([$pluginId, $pluginConfig['server_id']]) {
-        ['composable', $this->servers['node']->id()] => $this->extensionPlugins['node'],
-        ['composable', $this->servers['term']->id()] => $this->extensionPlugins['term'],
-        default => NULL,
-      });
-
-    $this->container->set('plugin.manager.graphql.schema', $schemaPluginManager);
-  }
-
-  /**
-   * Tests the retrieval of a server's configuration.
-   *
-   * When multiple servers are created, each server should return its own
-   * configuration. This checks that the configured schema is returned for each
-   * of the two test servers.
-   */
-  public function testRetrieveServerConfiguration(): void {
-    /** @var \Drupal\graphql\Entity\Server $server */
-    foreach ($this->servers as $server) {
-      $endpoint = $server->endpoint;
-      $expected_schema = self::TEST_SCHEMAS[$endpoint];
-      $actual_schema = $this->getPrintedSchema($server);
-      // The printed schema might be formatted differently. Strip whitespace.
-      $this->assertEquals(preg_replace('/\s+/', '', $expected_schema), preg_replace('/\s+/', '', $actual_schema));
-    }
-  }
-
-  /**
-   * Returns a mocked schema extension plugin.
-   *
-   * @param string $id
-   *   The ID to use for the schema extension plugin.
-   * @param string $schema
-   *   The schema to associate with the schema extension plugin.
-   */
-  protected function mockSchemaExtensionPlugin(string $id, string $schema): ComposableSchema {
+    // Mock only extension instantiation. Schema discovery, configuration,
+    // composition and caching use their real implementations.
     $extensionManager = $this->getMockBuilder(SchemaExtensionPluginManager::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['createInstance'])
       ->getMock();
+    $extensionManager->method('createInstance')
+      ->willReturnCallback(static fn (string $id) => $extensions[$id]);
+    $this->container->set('plugin.manager.graphql.schema_extension', $extensionManager);
 
-    $schemaExtensionPlugin = $this->getMockBuilder(SdlSchemaExtensionPluginBase::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $extensionManager
-      ->method('createInstance')
-      ->with($id)
-      ->willReturn($schemaExtensionPlugin);
-
-    $mock = $this->getMockBuilder(ComposableSchema::class)
-      ->setConstructorArgs([
-        [],
-        'composable',
-        [],
-        $this->container->get('cache.graphql.ast'),
-        $this->container->get('module_handler'),
-        $extensionManager,
-        ['development' => FALSE],
-        $this->container->get('event_dispatcher'),
-      ])
-      ->onlyMethods(['getSchemaDefinition', 'getResolverRegistry', 'getConfiguration'])
-      ->getMock();
-
-    $mock
-      ->method('getSchemaDefinition')
-      ->willReturn(new Source($schema));
-
-    $registry = new ResolverRegistry();
-    $mock
-      ->method('getResolverRegistry')
-      ->willReturn($registry);
-
-    $mock
-      ->method('getConfiguration')
-      ->willReturn([
-        'extensions' => [$id => $id],
-        'server_id' => $id,
+    foreach (array_keys(self::TEST_SCHEMAS) as $id) {
+      $server = $this->createTestServer('composable', $id, [
+        'schema_configuration' => [
+          'composable' => ['extensions' => [$id => $id]],
+        ],
       ]);
-
-    return $mock;
+      $this->servers[$id] = $server;
+    }
   }
 
   /**
-   * Returns a mocked schema plugin manager.
-   *
-   * @param array<string> $ids
-   *   The IDs of the schema plugins that the manager should return.
+   * Tests that each server's schema contains only its selected extension.
    */
-  protected function mockPluginManager(array $ids): SchemaPluginManager|MockObject {
-    $schemaPluginManager = $this->getMockBuilder(SchemaPluginManager::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getDefinitions', 'createInstance'])
-      ->getMock();
-
-    $definitions = array_map(static fn ($id) => [
-      'id' => $id,
-      'name' => 'Composable schema',
-      'provider' => 'graphql',
-      'class' => ComposableSchema::class,
-    ], $ids);
-
-    $schemaPluginManager
-      ->method('getDefinitions')
-      ->willReturn($definitions);
-
-    return $schemaPluginManager;
+  public function testRetrieveServerConfiguration(): void {
+    // Build both schemas twice to exercise the shared AST cache as well.
+    for ($pass = 0; $pass < 2; $pass++) {
+      foreach ($this->servers as $id => $server) {
+        $schema = $server->configuration()->getSchema();
+        $this->assertNotNull($schema);
+        $schema->assertValid();
+        $type = ucfirst($id);
+        $expected = <<<GQL
+          type Schema {
+            query: Query
+          }
+          type Query {
+            $id(uuid: String): $type
+          }
+        GQL;
+        $expected .= self::TEST_SCHEMAS[$id];
+        $actual = SchemaPrinter::doPrint($schema);
+        // Ignore formatting while comparing the complete composed schema.
+        $this->assertSame(
+          preg_replace('/\\s+/', '', $expected),
+          preg_replace('/\\s+/', '', $actual),
+        );
+      }
+    }
   }
 
 }

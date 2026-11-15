@@ -176,6 +176,7 @@ class RouteEntityTest extends GraphQLTestBase {
       'url' => $url,
     ]);
 
+    $this->assertInstanceOf(Node::class, $result);
     $this->assertEquals($this->publishedNode->id(), $result->id());
     $this->assertEquals($this->publishedNode->label(), $result->label());
 
@@ -184,6 +185,7 @@ class RouteEntityTest extends GraphQLTestBase {
       'language' => 'fr',
     ]);
 
+    $this->assertInstanceOf(Node::class, $result);
     $this->assertEquals($this->translationFrPublished->id(), $result->id());
     $this->assertEquals($this->translationFrPublished->label(), $result->label());
 
@@ -192,6 +194,7 @@ class RouteEntityTest extends GraphQLTestBase {
       'language' => 'de',
     ]);
 
+    $this->assertInstanceOf(Node::class, $result);
     $this->assertEquals($this->translationDePublished->id(), $result->id());
     $this->assertEquals($this->translationDePublished->label(), $result->label());
 
@@ -222,6 +225,7 @@ class RouteEntityTest extends GraphQLTestBase {
       'language' => 'fr',
     ]);
 
+    $this->assertInstanceOf(Node::class, $result);
     $this->assertEquals($this->translationFrUnpublishedToPublished->id(), $result->id());
     $this->assertEquals($this->translationFrUnpublishedToPublished->label(), $result->label());
 
@@ -230,6 +234,7 @@ class RouteEntityTest extends GraphQLTestBase {
       'language' => 'de',
     ]);
 
+    $this->assertInstanceOf(Node::class, $result);
     $this->assertEquals($this->translationDeUnpublishedToPublished->id(), $result->id());
     $this->assertEquals($this->translationDeUnpublishedToPublished->label(), $result->label());
 
@@ -241,6 +246,7 @@ class RouteEntityTest extends GraphQLTestBase {
       'url' => $url,
     ]);
 
+    $this->assertInstanceOf(Node::class, $result);
     $this->assertEquals($this->publishedToUnpublishedNode->id(), $result->id());
     $this->assertEquals($this->publishedToUnpublishedNode->label(), $result->label());
 

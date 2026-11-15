@@ -149,7 +149,7 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
     }
 
     $definition = $entity->getFieldDefinition($field);
-    if ($definition->getType() !== 'entity_reference_revisions') {
+    if ($definition === NULL || $definition->getType() !== 'entity_reference_revisions') {
       return [];
     }
 
@@ -186,8 +186,12 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
     return [];
   }
 
+  /* @mago-expect analysis:excess-template-parameter */
+
   /**
    * Collects already attached entities and revision IDs to load later.
+   *
+   * PHPStan adds the entity template through its Drupal stub.
    *
    * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface<\Drupal\Core\Entity\EntityInterface> $values
    *   The entity reference revisions field items.
@@ -201,11 +205,17 @@ class EntityReferenceRevisions extends DataProducerPluginBase implements Contain
 
     foreach ($values as $delta => $item) {
       // Attached entities are common in previews and take precedence over IDs.
-      if (isset($item->entity)) {
-        $resolvedEntities[$delta] = $item->entity;
+      /** @var \Drupal\Core\Entity\EntityInterface|null $entity */
+      $entity = $item->get('entity')->getValue();
+      if ($entity !== NULL) {
+        $resolvedEntities[$delta] = $entity;
       }
-      elseif (!empty($item->target_revision_id)) {
-        $vids[$delta] = $item->target_revision_id;
+      else {
+        /** @var int|string|null $vid */
+        $vid = $item->get('target_revision_id')->getValue();
+        if (!empty($vid)) {
+          $vids[$delta] = $vid;
+        }
       }
     }
 

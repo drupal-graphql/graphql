@@ -71,7 +71,9 @@ class SchemaPluginManager extends DefaultPluginManager {
     $schema_config = $server->get('schema_configuration') ?? [];
     $config = $schema_config[$schema_name] ?? [];
     $config['server_id'] = $server->id();
-    return $this->createInstance($schema_name, $config);
+    $instance = $this->createInstance($schema_name, $config);
+    assert($instance instanceof SchemaPluginInterface);
+    return $instance;
   }
 
 }

@@ -39,6 +39,7 @@ class MenuLinkLabel extends DataProducerPluginBase {
    *   The menu link title.
    */
   public function resolve(MenuLinkInterface $link): string {
+    // @mago-expect analysis:redundant-cast
     return (string) $link->getTitle();
   }
 

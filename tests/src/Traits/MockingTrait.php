@@ -81,7 +81,7 @@ trait MockingTrait {
    *   The return callback promise.
    */
   protected function toBoundPromise(mixed $value, mixed $scope): ReturnCallback {
-    return $this->toPromise(is_callable($value) ? \Closure::bind($value, $scope, $scope) : $value);
+    return $this->toPromise(is_callable($value) ? \Closure::bind(\Closure::fromCallable($value), $scope, $scope) : $value);
   }
 
   /**

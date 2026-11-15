@@ -8,6 +8,7 @@ use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -45,8 +46,10 @@ GQL;
     // Mock a mutation that accepts the upload input and just returns
     // the client filename.
     $this->mockResolver('Mutation', 'store',
-      static function ($parent, $args) {
-        return $args['file']->getClientOriginalName();
+      function ($parent, $args) {
+        $file = $args['file'];
+        $this->assertInstanceOf(UploadedFile::class, $file);
+        return $file->getClientOriginalName();
       }
     );
 

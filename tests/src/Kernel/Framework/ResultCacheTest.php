@@ -350,7 +350,7 @@ GQL;
 
         $renderContext = new RenderContext();
         $value = $renderer->executeInRenderContext($renderContext, static function () use ($renderer, $el) {
-          return $renderer->render($el)->__toString();
+          return (string) $renderer->render($el);
         });
 
         if (!$renderContext->isEmpty()) {
@@ -372,7 +372,7 @@ GQL;
 
         $renderContext = new RenderContext();
         $value = $renderer->executeInRenderContext($renderContext, static function () use ($renderer, $el) {
-          return $renderer->render($el)->__toString();
+          return (string) $renderer->render($el);
         });
 
         if (!$renderContext->isEmpty()) {
@@ -476,7 +476,9 @@ GQL;
     $result2 = $this->query('{ root }');
 
     $this->assertInstanceOf(CacheableJsonResponse::class, $result2);
-    $this->assertSame($lifetime - 1, $result2->getCacheableMetadata()->getCacheMaxAge());
+    /** @var \Drupal\Core\Cache\CacheableMetadata $metadata */
+    $metadata = $result2->getCacheableMetadata();
+    $this->assertSame($lifetime - 1, $metadata->getCacheMaxAge());
   }
 
 }

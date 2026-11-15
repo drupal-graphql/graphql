@@ -23,13 +23,13 @@ class GraphQlSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    *
-   * @return array
+   * @return array<string, string>
    *   The event names to listen for, and the methods that should be executed.
    */
   public static function getSubscribedEvents(): array {
     return [
-      AlterSchemaExtensionDataEvent::EVENT_NAME => ['alterSchemaExtensionData'],
-      AlterSchemaDataEvent::EVENT_NAME => ['alterSchemaData'],
+      AlterSchemaExtensionDataEvent::EVENT_NAME => 'alterSchemaExtensionData',
+      AlterSchemaDataEvent::EVENT_NAME => 'alterSchemaData',
     ];
   }
 

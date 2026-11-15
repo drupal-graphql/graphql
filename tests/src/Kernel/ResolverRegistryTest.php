@@ -77,8 +77,10 @@ GQL;
     $expected_resolver = $this->builder->fromValue('Car');
     $this->mockResolver('Car', 'model', $expected_resolver);
 
+    $type = $this->schema->getSchema()->getType('Cabrio');
+    $this->assertNotNull($type);
     $returned_resolver = $this->registry->getFieldResolverWithInheritance(
-      $this->schema->getSchema()->getType('Cabrio'),
+      $type,
       'model'
     );
 
@@ -95,8 +97,10 @@ GQL;
     $expected_resolver = $this->builder->fromValue('Vehicle');
     $this->mockResolver('Vehicle', 'model', $expected_resolver);
 
+    $type = $this->schema->getSchema()->getType('Cabrio');
+    $this->assertNotNull($type);
     $returned_resolver = $this->registry->getFieldResolverWithInheritance(
-      $this->schema->getSchema()->getType('Cabrio'),
+      $type,
       'model'
     );
 
@@ -114,8 +118,10 @@ GQL;
     $expected_resolver = $this->builder->fromValue('Cabrio');
     $this->mockResolver('Cabrio', 'model', $expected_resolver);
 
+    $type = $this->schema->getSchema()->getType('Cabrio');
+    $this->assertNotNull($type);
     $returned_resolver = $this->registry->getFieldResolverWithInheritance(
-      $this->schema->getSchema()->getType('Cabrio'),
+      $type,
       'model'
     );
 

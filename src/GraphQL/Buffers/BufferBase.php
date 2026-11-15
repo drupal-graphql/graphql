@@ -6,6 +6,8 @@ namespace Drupal\graphql\GraphQL\Buffers;
 
 /**
  * Base class for field buffering services.
+ *
+ * @template TValue
  */
 abstract class BufferBase {
 
@@ -26,7 +28,7 @@ abstract class BufferBase {
   /**
    * Returns the bucket name for grouping items together.
    *
-   * @param \ArrayObject<string, mixed> $item
+   * @param \ArrayObject<string, TValue> $item
    *   The item to get the buffer id for.
    *
    * @return string
@@ -39,7 +41,7 @@ abstract class BufferBase {
   /**
    * Helper function to create a resolver for a singular buffer.
    *
-   * @param \ArrayObject<string, mixed> $item
+   * @param \ArrayObject<string, TValue> $item
    *   The item to add to the buffer.
    *
    * @return \Closure
@@ -48,11 +50,15 @@ abstract class BufferBase {
   public function createBufferResolver(\ArrayObject $item): \Closure {
     $bufferId = $this->getBufferId($item);
     if (!isset($this->buffers[$bufferId])) {
-      $this->buffers[$bufferId] = new \SplObjectStorage();
+      /** @var \SplObjectStorage<object, object> $buffer */
+      $buffer = new \SplObjectStorage();
+      $this->buffers[$bufferId] = $buffer;
     }
 
     if (!isset($this->results[$bufferId])) {
-      $this->results[$bufferId] = new \SplObjectStorage();
+      /** @var \SplObjectStorage<object, object> $result */
+      $result = new \SplObjectStorage();
+      $this->results[$bufferId] = $result;
     }
 
     // Add the created item to the buffer.
@@ -65,7 +71,7 @@ abstract class BufferBase {
   /**
    * Creates a callback to invoke to load the result for this buffer item.
    *
-   * @param \ArrayObject<string, mixed> $item
+   * @param \ArrayObject<string, TValue> $item
    *   The item to add to create the resolver for.
    * @param \SplObjectStorage<object, object> $buffer
    *   The buffer.
@@ -85,7 +91,7 @@ abstract class BufferBase {
   /**
    * Returns the result of the given item after processing the buffer if needed.
    *
-   * @param \ArrayObject<string, mixed> $item
+   * @param \ArrayObject<string, TValue> $item
    *   The buffer item to retrieve the result for.
    * @param \SplObjectStorage<object, object> $buffer
    *   The buffer.
@@ -127,6 +133,7 @@ abstract class BufferBase {
     $buffer = iterator_to_array($buffer, FALSE);
 
     // Assign the loaded items to their corresponding batch items.
+    /** @var \SplObjectStorage<object, object> $output */
     $output = new \SplObjectStorage();
     foreach ($this->resolveBufferArray($buffer) as $key => $item) {
       $output->offsetSet($buffer[$key], $item);

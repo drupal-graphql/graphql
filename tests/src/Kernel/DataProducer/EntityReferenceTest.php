@@ -82,8 +82,11 @@ class EntityReferenceTest extends GraphQLTestBase {
       'access' => TRUE,
       'access_operation' => 'view',
     ]);
-    $this->assertEquals($this->referencedNode->id(), reset($result)->id());
-    $this->assertSame('Dolor2', reset($result)->label());
+    $this->assertIsArray($result);
+    $entity = reset($result);
+    $this->assertInstanceOf(Node::class, $entity);
+    $this->assertEquals($this->referencedNode->id(), $entity->id());
+    $this->assertSame('Dolor2', $entity->label());
 
     $result = $this->executeDataProducer('entity_reference', [
       'entity' => $this->node,
@@ -92,12 +95,20 @@ class EntityReferenceTest extends GraphQLTestBase {
       'access_operation' => 'view',
       'language' => 'fr',
     ]);
-    $this->assertEquals($this->referencedNode->id(), reset($result)->id());
-    $this->assertSame('Dolor2 French', reset($result)->label());
+    $this->assertIsArray($result);
+    $entity = reset($result);
+    $this->assertInstanceOf(Node::class, $entity);
+    $this->assertEquals($this->referencedNode->id(), $entity->id());
+    $this->assertSame('Dolor2 French', $entity->label());
   }
 
   /**
    * Tests that a given data producer returns an empty array.
+   *
+   * @param string $data_producer
+   *   The data producer plugin ID.
+   * @param array{field: string, access: bool, access_operation: string} $contexts
+   *   The field and access contexts for the producer.
    *
    * @dataProvider emptyResultsProvider
    */

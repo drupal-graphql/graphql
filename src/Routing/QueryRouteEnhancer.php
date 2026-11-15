@@ -173,7 +173,7 @@ class QueryRouteEnhancer implements EnhancerInterface {
       $values = array_merge($values, JsonHelper::decodeParams($content));
     }
 
-    if (stripos($request->headers->get('content-type', ''), 'multipart/form-data') !== FALSE) {
+    if (stripos($request->headers->get('content-type') ?? '', 'multipart/form-data') !== FALSE) {
       return $this->extractMultipart($request, $values);
     }
 
@@ -205,13 +205,16 @@ class QueryRouteEnhancer implements EnhancerInterface {
     // According to the graphql multipart request specification, uploaded files
     // are referenced to variable placeholders in a map. Here, we resolve this
     // map by assigning the uploaded files to the corresponding variables.
-    if (!empty($values['map']) && is_array($values['map']) && $files = $request->files->all()) {
+    $files = $request->files->all();
+    if (!empty($values['map']) && is_array($values['map']) && $files !== []) {
       foreach ($files as $key => $file) {
         if (!isset($values['map'][$key])) {
           continue;
         }
 
-        $paths = (array) $values['map'][$key];
+        /** @var string|array<string> $mappedPaths */
+        $mappedPaths = $values['map'][$key];
+        $paths = (array) $mappedPaths;
         foreach ($paths as $path) {
           $path = explode('.', $path);
 

@@ -113,6 +113,11 @@ class EntityReferenceRevisionsTest extends GraphQLTestBase {
       'access_operation' => 'view',
     ]);
 
+    $this->assertIsArray($result);
+    $this->assertCount(2, $result);
+    $this->assertInstanceOf(Node::class, $result[0]);
+    $this->assertInstanceOf(Node::class, $result[1]);
+
     // Ensure field delta order is preserved.
     $this->assertSame(
       $this->referencedNodes[1]->getRevisionId(),
@@ -177,6 +182,8 @@ class EntityReferenceRevisionsTest extends GraphQLTestBase {
 
     // With access=TRUE, only the published node should be returned.
     $this->assertCount(1, $resultWithAccess, 'Result with access=TRUE filters out inaccessible entity.');
+    $this->assertIsArray($resultWithAccess);
+    $this->assertInstanceOf(Node::class, $resultWithAccess[0]);
     $this->assertSame(
       $this->referencedNodes[1]->id(),
       $resultWithAccess[0]->id(),

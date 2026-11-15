@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\node\NodeInterface;
+
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -28,12 +30,17 @@ class EntityLoadTest extends EntityTestBase {
       'language' => 'fr',
     ]);
 
+    $this->assertInstanceOf(NodeInterface::class, $french);
     $this->assertSame('sit amet fr', $french->label());
 
     $translations = $this->executeDataProducer('entity_translations', [
       'entity' => $this->node,
     ]);
 
+    $this->assertIsArray($translations);
+    $this->assertInstanceOf(NodeInterface::class, $translations['en']);
+    $this->assertInstanceOf(NodeInterface::class, $translations['fr']);
+    $this->assertInstanceOf(NodeInterface::class, $translations['de']);
     $this->assertSame('Dolor', $translations['en']->label());
     $this->assertSame('sit amet fr', $translations['fr']->label());
     $this->assertSame('sit amet de', $translations['de']->label());
@@ -48,6 +55,7 @@ class EntityLoadTest extends EntityTestBase {
       'id' => $this->node->id(),
     ]);
 
+    $this->assertInstanceOf(NodeInterface::class, $result);
     $this->assertEquals($this->node->id(), $result->id());
   }
 
@@ -60,6 +68,7 @@ class EntityLoadTest extends EntityTestBase {
       'uuid' => $this->node->uuid(),
     ]);
 
+    $this->assertInstanceOf(NodeInterface::class, $result);
     $this->assertEquals($this->node->id(), $result->id());
   }
 
@@ -101,6 +110,7 @@ class EntityLoadTest extends EntityTestBase {
       'language' => 'fr',
     ]);
 
+    $this->assertInstanceOf(NodeInterface::class, $result);
     $this->assertSame('fr', $result->language()->getId());
     $this->assertSame('sit amet fr', $result->getTitle());
   }

@@ -14,7 +14,7 @@ interface ResponseInterface {
   /**
    * Adds the violation.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param string|\Drupal\Component\Render\MarkupInterface $message
    *   Violation message.
    * @param array $properties
    *   Other properties related to the violation.
@@ -34,7 +34,7 @@ interface ResponseInterface {
   /**
    * Gets the violations.
    *
-   * @return array<string>|array<\Drupal\Component\Render\MarkupInterface>
+   * @return list<array{message: string, ...}>
    *   Violations.
    */
   public function getViolations(): array;

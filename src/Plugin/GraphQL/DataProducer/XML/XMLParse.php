@@ -42,7 +42,11 @@ class XMLParse extends DataProducerPluginBase {
     $document = new \DOMDocument();
     libxml_use_internal_errors(TRUE);
     $document->loadHTML($input);
-    return $document->documentElement;
+    $element = $document->documentElement;
+    if ($element === NULL) {
+      throw new \UnexpectedValueException('The XML input has no document element.');
+    }
+    return $element;
   }
 
 }

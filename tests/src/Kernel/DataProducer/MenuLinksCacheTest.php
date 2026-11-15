@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\graphql\Kernel\DataProducer;
 
+use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Tests\graphql\Kernel\GraphQLTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\system\Entity\Menu;
@@ -79,7 +80,9 @@ class MenuLinksCacheTest extends GraphQLTestBase {
     $result = $this->executeDataProducer('menu_links', [
       'menu' => $this->menu,
     ]);
+    $this->assertIsArray($result);
     $menu_item = reset($result);
+    $this->assertInstanceOf(MenuLinkTreeElement::class, $menu_item);
     $this->assertSame('Menu link test', $menu_item->link->getTitle());
     $this->assertSame('user', $this->fieldContext->getCacheContexts()[0]);
   }

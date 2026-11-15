@@ -16,7 +16,6 @@ use Drupal\graphql\Event\AlterSchemaDataEvent;
 use Drupal\graphql\Event\AlterSchemaExtensionDataEvent;
 use Drupal\graphql\GraphQL\ResolverRegistry;
 use Drupal\graphql\GraphQL\ResolverRegistryInterface;
-use Drupal\graphql\Plugin\SchemaExtensionPluginInterface;
 use Drupal\graphql\Plugin\SchemaExtensionPluginManager;
 use Drupal\graphql\Plugin\SchemaPluginInterface;
 use GraphQL\Language\AST\DocumentNode;
@@ -179,7 +178,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
   protected function getTypeConfigDecorator(ResolverRegistryInterface $registry): callable {
     $resolver = [$registry, 'resolveType'];
 
-    return static function ($config, TypeDefinitionNode $type) use ($resolver, $registry) {
+    return static function (array $config, TypeDefinitionNode $type) use ($resolver, $registry) {
       if ($type instanceof InterfaceTypeDefinitionNode || $type instanceof UnionTypeDefinitionNode) {
         $config['resolveType'] = $resolver;
       }
@@ -195,6 +194,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
         }
       }
 
+      /** @var array<string, scalar|array|object|null> */
       return $config;
     };
   }
@@ -238,6 +238,7 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // Only use caching of the parsed document if we aren't in development mode.
     $cid = $this->getCacheId('schema');
     if (empty($this->inDevelopment) && $cache = $this->astCache->get($cid)) {
+      /** @var \GraphQL\Language\AST\DocumentNode */
       return $cache->data;
     }
 
@@ -272,15 +273,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
     // development, we don't cache and can provide location info for debugging.
     $ast = Parser::parse($baseSchemaDocument, ['noLocation' => !$this->inDevelopment]);
 
-    $extensionBaseAsts = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
-      $schema = $extension->getBaseDefinition();
-      if ($schema === NULL) {
-        return NULL;
+    $extensionBaseAsts = [];
+    foreach ($extensions as $id => $extension) {
+      $definition = $extension->getBaseDefinition();
+      if ($definition !== NULL) {
+        $extensionBaseAsts[$id] = Parser::parse($definition, ['noLocation' => !$this->inDevelopment]);
       }
-      return Parser::parse($schema, ['noLocation' => !$this->inDevelopment]);
-    }, $extensions), static function ($definition) {
-      return !empty($definition);
-    });
+    }
 
     $asts = [$this->getPluginId() => $ast, ...$extensionBaseAsts];
     $event = new AlterSchemaDataEvent($asts);
@@ -291,15 +290,13 @@ abstract class SdlSchemaPluginBase extends PluginBase implements SchemaPluginInt
 
     $asts = $event->getSchemaData();
 
-    $extensionExtensionAsts = array_filter(array_map(function (SchemaExtensionPluginInterface $extension) {
-      $schema = $extension->getExtensionDefinition();
-      if ($schema === NULL) {
-        return NULL;
+    $extensionExtensionAsts = [];
+    foreach ($extensions as $id => $extension) {
+      $definition = $extension->getExtensionDefinition();
+      if ($definition !== NULL) {
+        $extensionExtensionAsts[$id] = Parser::parse($definition, ['noLocation' => !$this->inDevelopment]);
       }
-      return Parser::parse($schema, ['noLocation' => !$this->inDevelopment]);
-    }, $extensions), static function ($definition) {
-      return !empty($definition);
-    });
+    }
 
     // Event in order to alter the schema extension data.
     $event = new AlterSchemaExtensionDataEvent($extensionExtensionAsts);

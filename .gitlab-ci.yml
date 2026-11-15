@@ -60,15 +60,14 @@ mago-lint:
       codequality: mago-codequality.json
 
 # Static analysis uses the same dependencies and configuration as mago-lint.
-# @todo: Enable when passing.
-# mago-analyse:
-#  stage: validate
-#  needs: [composer]
-#  rules:
-#    - if: $SKIP_MAGO == "1"
-#      when: never
-#    - when: on_success
-#  allow_failure: false
-#  script:
-#    - cd $CI_PROJECT_DIR && pwd
-#    - $COMPOSER_BIN_DIR/mago analyze
+mago-analyze:
+  stage: validate
+  needs: [composer]
+  rules:
+    - if: $SKIP_MAGO == "1"
+      when: never
+    - when: on_success
+  allow_failure: false
+  script:
+    - cd $CI_PROJECT_DIR && pwd
+    - $COMPOSER_BIN_DIR/mago analyze

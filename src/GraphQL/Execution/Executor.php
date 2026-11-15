@@ -126,13 +126,15 @@ class Executor implements ExecutorImplementation {
    * Get query results on a cache miss.
    */
   protected function doExecuteUncached(): Promise {
+    /** @var array<string, scalar|array|object|null> $variables */
+    $variables = $this->variables;
     $executor = ReferenceExecutor::create(
       $this->adapter,
       $this->schema,
       $this->document,
       $this->root,
       $this->context,
-      $this->variables,
+      $variables,
       $this->operation,
       $this->resolver
     );
@@ -169,9 +171,19 @@ class Executor implements ExecutorImplementation {
       // Log the error that cause the error we caught. This makes the error
       // logs more useful because GraphQL usually wraps the original error.
       if ($error->getPrevious() instanceof \Throwable) {
+        $decoded = ErrorUtil::decodeException($error->getPrevious());
+        $replacements = [
+          '@index' => (string) $index,
+          '%type' => (string) $decoded['%type'],
+          '@message' => (string) $decoded['@message'],
+          '%function' => (string) $decoded['%function'],
+          '%line' => (string) $decoded['%line'],
+          '%file' => (string) $decoded['%file'],
+          '@backtrace_string' => (string) $decoded['@backtrace_string'],
+        ];
         $previousErrors[] = strtr(
           "For error #@index: %type: @message in %function (line %line of %file)\n@backtrace_string.",
-          ErrorUtil::decodeException($error->getPrevious()) + ['@index' => $index]
+          $replacements
         );
       }
     }
@@ -221,6 +233,9 @@ class Executor implements ExecutorImplementation {
 
   /**
    * Calculate the cache suffix for the current contexts.
+   *
+   * @param array<string> $contexts
+   *   The cache context tokens.
    */
   protected function cacheSuffix(array $contexts = []): string {
     $keys = $this->contextsManager->convertTokensToKeys($contexts)->getKeys();

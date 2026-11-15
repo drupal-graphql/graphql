@@ -61,7 +61,7 @@ abstract class MenuTestBase extends GraphQLTestBase {
     ];
     $link = MenuLinkContent::create($parent);
     $link->save();
-    $links['parent'] = $link->getPluginId();
+    $links = ['parent' => $link->getPluginId()];
 
     $child_1 = $base_options + [
       'link' => ['uri' => 'internal:/menu-test/hierarchy/parent/child'],

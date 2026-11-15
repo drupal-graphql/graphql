@@ -34,7 +34,7 @@ class PermissionProvider {
     $permissions = [];
 
     foreach ($servers as $id => $server) {
-      $params = ['%name' => $server->label()];
+      $params = ['%name' => $server->label() ?? $id];
 
       $permissions["execute $id arbitrary graphql requests"] = [
         'title' => $this->t('%name: Execute arbitrary requests', $params),

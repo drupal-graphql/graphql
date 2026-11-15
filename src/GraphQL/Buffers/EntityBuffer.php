@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Collects entity IDs per entity type and loads them all at once in the end.
+ *
+ * @extends BufferBase<array<array-key, int|string>|int|string>
  */
 class EntityBuffer extends BufferBase {
 
@@ -27,7 +29,7 @@ class EntityBuffer extends BufferBase {
    *
    * @param string $type
    *   The entity type of the given entity ids.
-   * @param array|int|string $id
+   * @param array<array-key, int|string>|int|string $id
    *   The entity id(s) to load.
    *
    * @return \Closure
@@ -46,6 +48,7 @@ class EntityBuffer extends BufferBase {
    * {@inheritdoc}
    */
   protected function getBufferId(\ArrayObject $item): string {
+    /** @var string */
     return $item['type'];
   }
 
@@ -53,12 +56,20 @@ class EntityBuffer extends BufferBase {
    * {@inheritdoc}
    */
   public function resolveBufferArray(array $buffer): array {
-    $type = reset($buffer)['type'];
+    if ($buffer === []) {
+      return [];
+    }
+
+    /** @var \ArrayObject<string, array<array-key, int|string>|int|string> $first */
+    $first = reset($buffer);
+    $type = $this->getBufferId($first);
     $ids = array_map(static function (\ArrayObject $item) {
-      return (array) $item['id'];
+      /** @var array<array-key, int|string>|int|string $id */
+      $id = $item['id'];
+      return (array) $id;
     }, $buffer);
 
-    $ids = call_user_func_array('array_merge', $ids);
+    $ids = array_merge(...array_values($ids));
     $ids = array_values(array_unique($ids));
 
     // Load the buffered entities.

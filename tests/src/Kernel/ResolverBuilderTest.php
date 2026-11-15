@@ -26,6 +26,11 @@ class ResolverBuilderTest extends ResolverBuilderTestBase {
   /**
    * Tests producing plugins from builder input.
    *
+   * @param string $input
+   *   The data producer plugin ID.
+   * @param class-string $expected
+   *   The expected resolver class or interface.
+   *
    * @covers ::produce
    *
    * @dataProvider builderProducingProvider

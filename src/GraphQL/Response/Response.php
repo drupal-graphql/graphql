@@ -13,6 +13,11 @@ class Response implements ResponseInterface {
 
   /**
    * List of violations.
+   *
+   * The PHPCS variable type sniff does not support open array shapes.
+   *
+   * phpcs:ignore Drupal.Commenting.VariableComment.IncorrectVarType
+   * @var list<array{message: string, ...}>
    */
   protected array $violations = [];
 

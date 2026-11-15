@@ -29,7 +29,11 @@ trait QueryFileTrait {
    *   The graphql query string.
    */
   public function getQueryFromFile(string $queryFile): string {
-    return file_get_contents($this->getQueriesDirectory() . '/' . $queryFile);
+    $contents = file_get_contents($this->getQueriesDirectory() . '/' . $queryFile);
+    if ($contents === FALSE) {
+      throw new \RuntimeException(sprintf('Could not read GraphQL query file: %s', $queryFile));
+    }
+    return $contents;
   }
 
 }

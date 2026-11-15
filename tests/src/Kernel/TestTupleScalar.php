@@ -33,19 +33,37 @@ class TestTupleScalar implements CustomScalarInterface {
       throw new UserError('TestTuple should be a colon (:) separated string.');
     }
 
-    return explode(':', $value);
+    $tuple = explode(':', $value);
+    if (count($tuple) !== 2) {
+      throw new UserError('TestTuple should contain exactly two colon (:) separated strings.');
+    }
+    return [$tuple[0], $tuple[1]];
   }
 
   /**
    * {@inheritdoc}
    */
   public function parseLiteral(Node $valueNode, ?array $variables = NULL): mixed {
-    $value = AST::valueFromAST($valueNode, new NonNull(new StringType()), $variables);
+    $namedVariables = NULL;
+    if ($variables !== NULL) {
+      $namedVariables = [];
+      foreach ($variables as $name => $variable) {
+        if (!is_string($name)) {
+          throw new UserError('GraphQL variable names must be strings.');
+        }
+        $namedVariables[$name] = $variable;
+      }
+    }
+    $value = AST::valueFromAST($valueNode, new NonNull(new StringType()), $namedVariables);
     if (!is_string($value)) {
       throw new UserError('TestTuple should be a colon (:) separated string.');
     }
 
-    return explode(':', $value);
+    $tuple = explode(':', $value);
+    if (count($tuple) !== 2) {
+      throw new UserError('TestTuple should contain exactly two colon (:) separated strings.');
+    }
+    return [$tuple[0], $tuple[1]];
   }
 
 }

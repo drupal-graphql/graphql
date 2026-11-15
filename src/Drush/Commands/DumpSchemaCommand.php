@@ -78,7 +78,11 @@ final class DumpSchemaCommand extends Command {
     $printed = $json ? json_encode(Introspection::fromSchema($schema), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR) : SchemaPrinter::doPrint($schema);
 
     if ($file !== NULL) {
-      $file = Path::makeAbsolute($file, getcwd());
+      $directory = getcwd();
+      if ($directory === FALSE) {
+        throw new \RuntimeException('The current working directory could not be determined.');
+      }
+      $file = Path::makeAbsolute($file, $directory);
       file_put_contents($file, $printed);
       fwrite(STDERR, "Wrote to $file" . PHP_EOL);
     }
